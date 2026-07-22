@@ -1,3 +1,6 @@
+import i18n from "../i18n/index.js";
+import { normalizeLanguage } from "../i18n/locale.js";
+
 const BASE = "/api";
 
 async function request(path, options = {}) {
@@ -14,16 +17,18 @@ async function request(path, options = {}) {
     /* no body */
   }
   if (!res.ok) {
-    throw new Error(data?.error || `Erro ${res.status}`);
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
   }
   return data;
 }
 
 // ---------- Auth ----------
-export const getAuthStatus = () => request("/auth/status");
 export const getMe = () => request("/auth/me");
-export const setupMaster = (data) => request("/auth/setup", { method: "POST", body: data });
-export const registerSelf = (data) => request("/auth/register", { method: "POST", body: data });
+export const registerCompany = (data) =>
+  request("/auth/register-company", { method: "POST", body: { ...data, locale: normalizeLanguage(i18n.language) } });
 export const login = (data) => request("/auth/login", { method: "POST", body: data });
 export const logout = () => request("/auth/logout", { method: "POST" });
 export const changePassword = (data) => request("/auth/change-password", { method: "POST", body: data });
@@ -59,6 +64,13 @@ export const createCard = (listId, data) => request(`/lists/${listId}/cards`, { 
 // ---------- Cards ----------
 export const updateCard = (id, patch) => request(`/cards/${id}`, { method: "PATCH", body: patch });
 export const deleteCard = (id) => request(`/cards/${id}`, { method: "DELETE" });
+
+// ---------- Card attachments ----------
+export const addLinkAttachment = (cardId, data) => request(`/cards/${cardId}/attachments/link`, { method: "POST", body: data });
+export const addFileAttachment = (cardId, data) => request(`/cards/${cardId}/attachments/file`, { method: "POST", body: data });
+export const removeCardAttachment = (cardId, attachmentId) =>
+  request(`/cards/${cardId}/attachments/${attachmentId}`, { method: "DELETE" });
+export const attachmentDownloadUrl = (cardId, attachmentId) => `${BASE}/cards/${cardId}/attachments/${attachmentId}/download`;
 
 // ---------- Geocoding ----------
 export const geocodeAddress = (q) => request(`/geocode?q=${encodeURIComponent(q)}`);

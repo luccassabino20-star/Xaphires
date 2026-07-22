@@ -1,26 +1,20 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
 import { initials, colorForUser } from "../../utils/members.js";
+import { localeTag } from "../../i18n/locale.js";
 
-function formatDate(iso) {
+function formatDate(iso, lng) {
   if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
+  return new Date(iso + "T00:00:00").toLocaleDateString(localeTag(lng));
 }
 
-const COLUMNS = [
-  { id: "completed", label: "" },
-  { id: "title", label: "Título" },
-  { id: "listTitle", label: "Lista" },
-  { id: "labels", label: "Etiquetas" },
-  { id: "members", label: "Membros" },
-  { id: "startDate", label: "Início" },
-  { id: "due", label: "Entrega" },
-  { id: "checklist", label: "Checklist" },
-];
+const COLUMN_IDS = ["completed", "title", "listTitle", "labels", "members", "startDate", "due", "checklist"];
 
 export default function TableView({ board, users, searchQuery, memberFilter, onOpenCard }) {
+  const { t, i18n } = useTranslation();
+  const COLUMNS = COLUMN_IDS.map((id) => ({ id, label: t(`views.table.columns.${id}`) }));
   const [sortBy, setSortBy] = useState("title");
   const [sortDir, setSortDir] = useState("asc");
 
@@ -131,8 +125,8 @@ export default function TableView({ board, users, searchQuery, memberFilter, onO
                       ))}
                     </div>
                   </td>
-                  <td>{formatDate(card.startDate)}</td>
-                  <td>{formatDate(card.due)}</td>
+                  <td>{formatDate(card.startDate, i18n.language)}</td>
+                  <td>{formatDate(card.due, i18n.language)}</td>
                   <td>{card.checklist.length ? `${done}/${card.checklist.length}` : "—"}</td>
                 </tr>
               );
@@ -140,7 +134,7 @@ export default function TableView({ board, users, searchQuery, memberFilter, onO
             {sorted.length === 0 && (
               <tr>
                 <td colSpan={COLUMNS.length} className="table-empty">
-                  Nenhum cartão encontrado.
+                  {t("views.table.empty")}
                 </td>
               </tr>
             )}

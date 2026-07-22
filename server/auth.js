@@ -23,8 +23,8 @@ export function hashPassword(password) {
 export function verifyPassword(password, hash) {
   return bcrypt.compareSync(password, hash);
 }
-export function signToken(user) {
-  return jwt.sign({ sub: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
+export function signToken(user, companyId) {
+  return jwt.sign({ sub: user.id, role: user.role, companyId }, JWT_SECRET, { expiresIn: "7d" });
 }
 export function verifyToken(token) {
   try {

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { BACKGROUND_COLORS } from "../utils/backgrounds.js";
 
 export default function ListMenu({ board, list, onClose, anchorRef }) {
+  const { t } = useTranslation();
   const dispatch = useBoardDispatch();
   const showToast = useToast();
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
@@ -24,16 +26,16 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
     onClose();
   }
   function clearCards() {
-    if (confirm(`Remover todos os cartões de "${list.title}"?`)) {
+    if (confirm(t("board.listMenu.clearCardsConfirm", { title: list.title }))) {
       dispatch({ type: "CLEAR_LIST_CARDS", boardId: board.id, listId: list.id });
-      showToast("Cartões removidos");
+      showToast(t("board.listMenu.cardsRemovedToast"));
     }
     onClose();
   }
   function deleteList() {
-    if (confirm(`Excluir a lista "${list.title}" e todos os seus cartões?`)) {
+    if (confirm(t("board.listMenu.deleteListConfirm", { title: list.title }))) {
       dispatch({ type: "DELETE_LIST", boardId: board.id, listId: list.id });
-      showToast("Lista excluída");
+      showToast(t("board.listMenu.listDeletedToast"));
     }
     onClose();
   }
@@ -48,7 +50,7 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
           className="list-color-swatch-icon"
           style={{ background: list.color || "transparent", borderStyle: list.color ? "solid" : "dashed" }}
         />
-        Cor da lista
+        {t("board.listMenu.listColor")}
       </div>
       {colorPickerOpen && (
         <div className="list-color-picker">
@@ -61,7 +63,7 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
               title={c.id}
             />
           ))}
-          <button className="list-color-swatch list-color-swatch-none" onClick={() => applyColor(null)} title="Padrão">
+          <button className="list-color-swatch list-color-swatch-none" onClick={() => applyColor(null)} title={t("board.listMenu.defaultColor")}>
             &times;
           </button>
         </div>
@@ -69,14 +71,14 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
 
       <div className="dropdown-divider" />
       <div className="dropdown-item" onClick={sortCards}>
-        Ordenar por título (A-Z)
+        {t("board.listMenu.sortAZ")}
       </div>
       <div className="dropdown-item" onClick={clearCards}>
-        Limpar todos os cartões
+        {t("board.listMenu.clearCards")}
       </div>
       <div className="dropdown-divider" />
       <div className="dropdown-item danger" onClick={deleteList}>
-        Excluir lista
+        {t("board.listMenu.deleteList")}
       </div>
     </div>
   );

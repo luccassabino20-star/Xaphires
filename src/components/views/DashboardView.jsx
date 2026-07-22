@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
 import { initials, colorForUser } from "../../utils/members.js";
@@ -7,8 +8,6 @@ function isOverdue(iso) {
   if (!iso) return false;
   return new Date(iso + "T23:59:59").getTime() < Date.now();
 }
-
-const LABEL_NAMES = { gray: "Cinza", blue: "Azul", green: "Verde", amber: "Âmbar", red: "Vermelho", purple: "Roxo" };
 
 function BarRow({ label, count, max, color, avatar }) {
   const pct = max > 0 ? Math.max((count / max) * 100, count > 0 ? 4 : 0) : 0;
@@ -27,6 +26,8 @@ function BarRow({ label, count, max, color, avatar }) {
 }
 
 export default function DashboardView({ board, users, searchQuery, memberFilter }) {
+  const { t } = useTranslation();
+  const LABEL_NAMES = t("views.dashboard.labelNames", { returnObjects: true });
   const cards = useMemo(() => flattenCards(board), [board]);
   const filtered = cards.filter((c) => {
     const matchesSearch = !searchQuery || c.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -62,27 +63,27 @@ export default function DashboardView({ board, users, searchQuery, memberFilter 
     <div className="view-scroll">
       <div className="dash-stats-row">
         <div className="dash-stat-tile">
-          <div className="dash-stat-label">Total de cartões</div>
+          <div className="dash-stat-label">{t("views.dashboard.totalCards")}</div>
           <div className="dash-stat-value">{total}</div>
         </div>
         <div className="dash-stat-tile">
-          <div className="dash-stat-label">Concluídos</div>
+          <div className="dash-stat-label">{t("views.dashboard.completed")}</div>
           <div className="dash-stat-value dash-stat-good">{completionPct}%</div>
-          <div className="dash-stat-sub">{completedCount} de {total}</div>
+          <div className="dash-stat-sub">{completedCount} / {total}</div>
         </div>
         <div className="dash-stat-tile">
-          <div className="dash-stat-label">Atrasados</div>
+          <div className="dash-stat-label">{t("views.dashboard.overdue")}</div>
           <div className={"dash-stat-value" + (overdueCount > 0 ? " dash-stat-critical" : "")}>{overdueCount}</div>
         </div>
         <div className="dash-stat-tile">
-          <div className="dash-stat-label">Sem responsável</div>
+          <div className="dash-stat-label">{t("views.dashboard.unassigned")}</div>
           <div className="dash-stat-value">{unassignedCount}</div>
         </div>
       </div>
 
       <div className="dash-meter-card">
         <div className="dash-meter-header">
-          <span>Progresso geral</span>
+          <span>{t("views.dashboard.overallProgress")}</span>
           <span>{completionPct}%</span>
         </div>
         <div className="dash-meter-track">
@@ -92,16 +93,16 @@ export default function DashboardView({ board, users, searchQuery, memberFilter 
 
       <div className="dash-grid">
         <div className="dash-card">
-          <div className="dash-card-title">Cartões por lista</div>
-          {perList.length === 0 && <div className="dash-empty">Sem listas.</div>}
+          <div className="dash-card-title">{t("views.dashboard.cardsByList")}</div>
+          {perList.length === 0 && <div className="dash-empty">{t("views.dashboard.noLists")}</div>}
           {perList.map((l) => (
             <BarRow key={l.id} label={l.title} count={l.count} max={maxListCount} color="#4d7ea8" />
           ))}
         </div>
 
         <div className="dash-card">
-          <div className="dash-card-title">Cartões por membro</div>
-          {perMember.length === 0 && <div className="dash-empty">Nenhum cartão atribuído a alguém ainda.</div>}
+          <div className="dash-card-title">{t("views.dashboard.cardsByMember")}</div>
+          {perMember.length === 0 && <div className="dash-empty">{t("views.dashboard.noAssigned")}</div>}
           {perMember.map((m) => (
             <BarRow
               key={m.id}
@@ -119,8 +120,8 @@ export default function DashboardView({ board, users, searchQuery, memberFilter 
         </div>
 
         <div className="dash-card">
-          <div className="dash-card-title">Cartões por etiqueta</div>
-          {perLabel.length === 0 && <div className="dash-empty">Nenhuma etiqueta em uso.</div>}
+          <div className="dash-card-title">{t("views.dashboard.cardsByLabel")}</div>
+          {perLabel.length === 0 && <div className="dash-empty">{t("views.dashboard.noLabels")}</div>}
           {perLabel.map((l) => (
             <BarRow
               key={l.id}

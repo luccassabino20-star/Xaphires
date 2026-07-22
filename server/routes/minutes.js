@@ -22,7 +22,7 @@ router.post(
   "/",
   ah(async (req, res) => {
     const { title, date, attendeeIds, agenda, decisions, actionItems } = req.body || {};
-    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório" });
+    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório", code: "TITLE_REQUIRED" });
     const id = await repo.createMinute({
       title: title.trim(),
       date: date || new Date().toISOString().slice(0, 10),
@@ -39,9 +39,9 @@ router.post(
 router.patch(
   "/:id",
   ah(async (req, res) => {
-    if (!(await repo.getMinuteById(req.params.id))) return res.status(404).json({ error: "Ata não encontrada" });
+    if (!(await repo.getMinuteById(req.params.id))) return res.status(404).json({ error: "Ata não encontrada", code: "MINUTE_NOT_FOUND" });
     if (!(await canEdit(req, req.params.id)))
-      return res.status(403).json({ error: "Apenas o autor ou o usuário master pode editar esta ata" });
+      return res.status(403).json({ error: "Apenas o autor ou o usuário master pode editar esta ata", code: "FORBIDDEN_MINUTE_EDIT" });
     const { title, date, attendeeIds, agenda, decisions, actionItems } = req.body || {};
     await repo.updateMinute(req.params.id, {
       title: title !== undefined ? title.trim() || "Sem título" : undefined,
@@ -58,9 +58,9 @@ router.patch(
 router.delete(
   "/:id",
   ah(async (req, res) => {
-    if (!(await repo.getMinuteById(req.params.id))) return res.status(404).json({ error: "Ata não encontrada" });
+    if (!(await repo.getMinuteById(req.params.id))) return res.status(404).json({ error: "Ata não encontrada", code: "MINUTE_NOT_FOUND" });
     if (!(await canEdit(req, req.params.id)))
-      return res.status(403).json({ error: "Apenas o autor ou o usuário master pode excluir esta ata" });
+      return res.status(403).json({ error: "Apenas o autor ou o usuário master pode excluir esta ata", code: "FORBIDDEN_MINUTE_DELETE" });
     await repo.deleteMinute(req.params.id);
     res.json({ ok: true });
   })

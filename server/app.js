@@ -19,7 +19,7 @@ if (frontendUrl) {
   app.use(cors({ origin: frontendUrl, credentials: true }));
 }
 
-app.use(express.json());
+app.use(express.json({ limit: "12mb" }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
@@ -40,5 +40,5 @@ if (fs.existsSync(distPath)) {
 
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ error: "Erro interno do servidor" });
+  res.status(500).json({ error: "Erro interno do servidor", code: "INTERNAL_ERROR" });
 });

@@ -1,0 +1,401 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "add": "Adicionar",
+    "remove": "Remover",
+    "close": "Fechar",
+    "loading": "Carregando..."
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema",
+    "title": "Tema",
+    "ariaLabel": "Alternar tema"
+  },
+  "language": {
+    "title": "Idioma",
+    "ariaLabel": "Alterar idioma",
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
+  "landing": {
+    "nav": {
+      "brand": "Kanban IMG",
+      "home": "Início",
+      "features": "Recursos",
+      "solutions": "Soluções",
+      "pricing": "Preços",
+      "enter": "Entrar"
+    },
+    "home": {
+      "heroTitle": "Sua equipe organizada, sem esforço extra",
+      "heroText": "O Kanban IMG substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
+      "ctaStart": "Comece agora",
+      "ctaPlans": "Ver planos",
+      "heroNote": "Sem burocracia. Cancele quando quiser.",
+      "stats": [
+        { "value": "8", "label": "Ferramentas integradas num só lugar" },
+        { "value": "100%", "label": "Sincronização em tempo real entre a equipe" },
+        { "value": "0", "label": "Planilhas soltas ou grupos de WhatsApp" },
+        { "value": "24/7", "label": "Acesso ao quadro, de qualquer lugar" }
+      ],
+      "benefits": [
+        { "title": "Tudo num só lugar", "text": "Substitua planilhas soltas, grupos de WhatsApp e ferramentas espalhadas por um único sistema." },
+        { "title": "Sua equipe já entende", "text": "Interface simples, sem curso ou treinamento — quem já usou um quadro Kanban começa a usar em minutos." },
+        { "title": "Cresce com você", "text": "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis." }
+      ],
+      "exploreTitle": "Explore o Kanban IMG",
+      "exploreLinks": [
+        { "page": "features", "badge": "R", "title": "Recursos", "text": "Conheça as 8 ferramentas do Kanban IMG: quadro, tabela, calendário, mapa e mais." },
+        { "page": "solutions", "badge": "S", "title": "Soluções", "text": "Veja como times de projeto, campo, gestão e operações usam o Kanban IMG no dia a dia." },
+        { "page": "pricing", "badge": "P", "title": "Preços", "text": "Compare os planos Básico, Profissional e Empresarial e escolha o ideal pra sua equipe." }
+      ]
+    },
+    "features": {
+      "headerTitle": "Tudo o que a sua equipe precisa",
+      "headerText": "Oito ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
+      "items": [
+        { "badge": "Q", "title": "Quadro Kanban", "text": "Chega de tarefa perdida em print de conversa. Arraste e solte entre listas e veja o andamento real da equipe." },
+        { "badge": "T", "title": "Tabela", "text": "Todos os cartões em formato de planilha, com busca e filtro por membro — sem precisar de outra ferramenta." },
+        { "badge": "C", "title": "Calendário", "text": "Prazos e datas de início numa visão mensal, para nada passar despercebido." },
+        { "badge": "L", "title": "Linha do tempo", "text": "O cronograma inteiro do projeto num só olhar, período a período." },
+        { "badge": "P", "title": "Painel", "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma." },
+        { "badge": "M", "title": "Mapa", "text": "Tarefas com endereço plotadas num mapa interativo — ótimo para equipes em campo." },
+        { "badge": "E", "title": "Matriz Eisenhower", "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto." },
+        { "badge": "A", "title": "Atas de reunião", "text": "Pauta, decisões e itens de ação registrados — e cobrados depois." }
+      ],
+      "secondary": [
+        { "title": "Quadros privados e compartilhados", "text": "Separe o que é da equipe do que é só seu, com controle total de visibilidade." },
+        { "title": "Controle de usuários e papéis", "text": "Defina quem é administrador (master) e quem é membro da equipe." }
+      ]
+    },
+    "solutions": {
+      "headerTitle": "Soluções para cada tipo de equipe",
+      "headerText": "O mesmo Kanban IMG, organizado do jeito que cada time precisa trabalhar.",
+      "items": [
+        { "title": "Agências e times de projeto", "text": "Um quadro por cliente ou projeto, com linha do tempo para prazos e painel de métricas prontos para mostrar o progresso em reunião.", "tags": ["Quadro Kanban", "Linha do tempo", "Painel"] },
+        { "title": "Equipes em campo", "text": "Tarefas com endereço plotadas no mapa — ideal para manutenção, entregas, vistorias e qualquer equipe que trabalha fora do escritório.", "tags": ["Mapa", "Quadro Kanban"] },
+        { "title": "Gestão e liderança", "text": "Priorize com a Matriz Eisenhower, acompanhe indicadores no Painel e mantenha planejamentos sensíveis em quadros privados.", "tags": ["Matriz Eisenhower", "Painel", "Quadros privados"] },
+        { "title": "Operações e rotina", "text": "O par Quadro Kanban + Tabela cobre o trabalho do dia a dia, com Calendário para prazos recorrentes e nada passa despercebido.", "tags": ["Quadro Kanban", "Tabela", "Calendário"] },
+        { "title": "Reuniões e alinhamento", "text": "Atas de reunião com pauta, decisões e itens de ação — registrados na hora e cobrados depois, sem depender de memória.", "tags": ["Atas de reunião"] }
+      ]
+    },
+    "pricing": {
+      "headerTitle": "Escolha o plano da sua equipe",
+      "headerText": "Escolha o plano ideal para sua equipe e mude quando ela crescer.",
+      "mostPopular": "Mais popular",
+      "plans": [
+        { "name": "Básico", "price": "Grátis", "period": "", "tagline": "Para equipes pequenas começarem com o essencial", "cta": "Começar grátis", "features": ["Até 3 usuários", "Quadros ilimitados", "Quadro Kanban, Tabela e Calendário", "Suporte por e-mail"] },
+        { "name": "Profissional", "price": "R$ 799", "period": "/usuário/mês", "tagline": "Para equipes que querem controle total", "cta": "Assinar Profissional", "highlight": true, "features": ["Usuários ilimitados", "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)", "Atas de reunião", "Quadros privados e compartilhados", "Suporte prioritário"] },
+        { "name": "Empresarial", "price": "Sob consulta", "period": "", "tagline": "Para organizações com necessidades específicas", "cta": "Falar com vendas", "features": ["Tudo do Profissional", "Onboarding dedicado", "Suporte dedicado", "Acordo de nível de serviço (SLA)"] }
+      ]
+    },
+    "footer": {
+      "title": "Pronto para organizar sua equipe?",
+      "cta": "Comece agora"
+    }
+  },
+  "auth": {
+    "brandTitle": "Kanban IMG",
+    "brandText": "Organize seus projetos em quadros Kanban simples, rápidos e colaborativos.",
+    "back": "← Voltar",
+    "tabLogin": "Entrar",
+    "tabSignup": "Criar empresa",
+    "companyName": "Nome da empresa",
+    "yourName": "Seu nome",
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "passwordsMismatch": "As senhas não coincidem",
+    "submitWait": "Aguarde...",
+    "submitLogin": "Entrar",
+    "submitSignup": "Criar empresa"
+  },
+  "app": {
+    "loadingBoards": "Carregando quadros...",
+    "noBoards": "Nenhum quadro. Crie um na barra lateral.",
+    "sidebar": {
+      "minutesNav": "Atas de Reunião",
+      "sharedBoards": "Quadros compartilhados",
+      "myPrivateBoards": "Meus quadros privados",
+      "newBoard": "+ Novo quadro",
+      "boardNamePlaceholder": "Nome do quadro",
+      "privateToggle": "Privado (só você vê)",
+      "create": "Criar",
+      "deleteBoardTitle": "Excluir quadro",
+      "deleteBoardConfirm": "Excluir o quadro \"{{title}}\" e todo o seu conteúdo?",
+      "boardDeletedToast": "Quadro excluído"
+    },
+    "topbar": {
+      "toggleSidebar": "Mostrar/ocultar barra lateral",
+      "menu": "Menu",
+      "defaultBoardName": "Quadro sem nome",
+      "privateBoardTitle": "Quadro privado — visível só para você",
+      "filterBy": "Filtrar por {{name}}",
+      "usersBtn": "Usuários",
+      "searchPlaceholder": "Buscar cartões...",
+      "clearBoard": "Limpar quadro",
+      "clearBoardConfirm": "Isso vai apagar todas as listas e cartões deste quadro. Continuar?",
+      "clearBoardToast": "Quadro limpo"
+    },
+    "dataMenu": {
+      "moreOptions": "Mais opções",
+      "personalize": "Personalizar",
+      "dataSection": "Dados",
+      "exportCurrent": "Exportar quadro atual",
+      "exportAll": "Exportar tudo (backup)",
+      "importJson": "Importar JSON",
+      "importing": "Importando...",
+      "colors": "Cores",
+      "gradients": "Gradientes",
+      "monoGradientTitle": "Gradiente por tonalidade",
+      "monoGradientHint": "Escolha uma cor e o degradê passa por tons mais claros e mais escuros dela.",
+      "customColor": "Cor personalizada",
+      "apply": "Aplicar",
+      "noBackground": "Padrão (sem fundo)",
+      "exportBoardToast": "Quadro exportado",
+      "exportAllToast": "Backup completo exportado",
+      "importSuccessToast": "Importação concluída",
+      "importFailAlert": "Falha ao importar: {{message}}",
+      "importedBoardTitle": "Quadro importado"
+    },
+    "accountMenu": {
+      "changePassword": "Alterar senha",
+      "logout": "Sair",
+      "currentPassword": "Senha atual",
+      "newPassword": "Nova senha",
+      "save": "Salvar",
+      "passwordChangedToast": "Senha alterada",
+      "master": "Master"
+    },
+    "taskTicker": {
+      "pending": "Pendentes ({{count}})"
+    }
+  },
+  "board": {
+    "listMenu": {
+      "listColor": "Cor da lista",
+      "defaultColor": "Padrão",
+      "sortAZ": "Ordenar por título (A-Z)",
+      "clearCards": "Limpar todos os cartões",
+      "clearCardsConfirm": "Remover todos os cartões de \"{{title}}\"?",
+      "cardsRemovedToast": "Cartões removidos",
+      "deleteList": "Excluir lista",
+      "deleteListConfirm": "Excluir a lista \"{{title}}\" e todos os seus cartões?",
+      "listDeletedToast": "Lista excluída"
+    },
+    "listColumn": {
+      "cardTitlePlaceholder": "Insira um título para este cartão...",
+      "addCard": "+ Adicionar um cartão",
+      "addCardBtn": "Adicionar cartão",
+      "defaultListName": "Lista"
+    },
+    "boardView": {
+      "listTitlePlaceholder": "Insira o título da lista...",
+      "addList": "Adicionar lista",
+      "addAnotherList": "+ Adicionar outra lista"
+    },
+    "cardItem": {
+      "markComplete": "Marcar como concluído",
+      "markIncomplete": "Marcar como não concluído",
+      "urgent": "Urgente",
+      "important": "Importante"
+    },
+    "cardModal": {
+      "untitled": "Sem título",
+      "complete": "Concluído",
+      "markComplete": "Marcar como concluído",
+      "members": "Membros",
+      "noUsersYet": "Nenhum usuário cadastrado ainda.",
+      "labels": "Etiquetas",
+      "priority": "Prioridade (Matriz de Eisenhower)",
+      "urgent": "Urgente",
+      "important": "Importante",
+      "startDate": "Data de início",
+      "dueDate": "Data de entrega",
+      "location": "Local",
+      "addressPlaceholder": "Endereço, cidade...",
+      "locating": "Buscando...",
+      "locate": "Localizar",
+      "locationFound": "Localização encontrada — visível no Mapa",
+      "locationPending": "Endereço salvo, mas não localizado no mapa",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Adicione uma descrição mais detalhada...",
+      "checklist": "Checklist",
+      "addItemPlaceholder": "Adicionar um item",
+      "attachments": "Anexos",
+      "attachFile": "Anexar arquivo",
+      "attachLink": "Anexar link",
+      "linkUrlPlaceholder": "https://...",
+      "linkNamePlaceholder": "Nome do link (opcional)",
+      "attachmentAdded": "Anexo adicionado",
+      "attachmentRemoved": "Anexo removido",
+      "attachmentTooLarge": "O arquivo deve ter até 8MB",
+      "uploading": "Enviando...",
+      "deleteCard": "Excluir cartão",
+      "deleteCardConfirm": "Excluir este cartão permanentemente?",
+      "cardDeletedToast": "Cartão excluído"
+    }
+  },
+  "views": {
+    "switcher": {
+      "board": "Quadro",
+      "table": "Tabela",
+      "calendar": "Calendário",
+      "timeline": "Linha do tempo",
+      "dashboard": "Painel",
+      "map": "Mapa",
+      "matrix": "Matriz Eisenhower"
+    },
+    "table": {
+      "columns": {
+        "completed": "",
+        "title": "Título",
+        "listTitle": "Lista",
+        "labels": "Etiquetas",
+        "members": "Membros",
+        "startDate": "Início",
+        "due": "Entrega",
+        "checklist": "Checklist"
+      },
+      "empty": "Nenhum cartão encontrado."
+    },
+    "calendar": {
+      "today": "Hoje",
+      "prevMonth": "Mês anterior",
+      "nextMonth": "Próximo mês",
+      "more": "+{{count}} mais"
+    },
+    "timeline": {
+      "empty": "Nenhum cartão com data de início ou entrega para mostrar na linha do tempo.",
+      "undated_one": "{{count}} cartão sem data de início/entrega não exibido.",
+      "undated_other": "{{count}} cartões sem data de início/entrega não exibidos."
+    },
+    "dashboard": {
+      "totalCards": "Total de cartões",
+      "completed": "Concluídos",
+      "overdue": "Atrasados",
+      "unassigned": "Sem responsável",
+      "overallProgress": "Progresso geral",
+      "cardsByList": "Cartões por lista",
+      "cardsByMember": "Cartões por membro",
+      "cardsByLabel": "Cartões por etiqueta",
+      "noLists": "Sem listas.",
+      "noAssigned": "Nenhum cartão atribuído a alguém ainda.",
+      "noLabels": "Nenhuma etiqueta em uso.",
+      "labelNames": { "gray": "Cinza", "blue": "Azul", "green": "Verde", "amber": "Âmbar", "red": "Vermelho", "purple": "Roxo" }
+    },
+    "map": {
+      "emptyLine1": "Nenhum cartão com localização definida.",
+      "emptyLine2": "Abra um cartão e preencha o campo \"Local\" para vê-lo aqui.",
+      "unlocated_one": "{{count}} endereço salvo mas não localizado no mapa.",
+      "unlocated_other": "{{count}} endereços salvos mas não localizados no mapa."
+    },
+    "matrix": {
+      "doNow": { "title": "Fazer agora", "subtitle": "Urgente e importante" },
+      "schedule": { "title": "Planejar", "subtitle": "Importante, não urgente" },
+      "delegate": { "title": "Delegar", "subtitle": "Urgente, não importante" },
+      "eliminate": { "title": "Eliminar", "subtitle": "Nem urgente, nem importante" },
+      "dropHere": "Arraste cartões para cá"
+    }
+  },
+  "minutes": {
+    "screen": {
+      "title": "Atas de Reunião",
+      "newMinute": "+ Nova ata",
+      "loading": "Carregando atas...",
+      "empty": "Nenhuma ata registrada ainda."
+    },
+    "modal": {
+      "titlePlaceholder": "Título da reunião",
+      "date": "Data",
+      "author": "Autor",
+      "participants": "Participantes",
+      "noUsersYet": "Nenhum usuário cadastrado ainda.",
+      "agenda": "Pauta",
+      "agendaPlaceholder": "O que será discutido...",
+      "decisions": "Decisões",
+      "decisionsPlaceholder": "O que foi decidido...",
+      "actionItems": "Itens de ação",
+      "assignee": "Responsável",
+      "addActionPlaceholder": "Adicionar um item de ação",
+      "deleteMinute": "Excluir ata",
+      "deleteConfirm": "Excluir esta ata permanentemente?",
+      "minuteDeletedToast": "Ata excluída",
+      "minuteCreatedToast": "Ata criada",
+      "minuteUpdatedToast": "Ata atualizada",
+      "saving": "Salvando...",
+      "createMinute": "Criar ata",
+      "saveChanges": "Salvar alterações"
+    }
+  },
+  "users": {
+    "title": "Painel de usuários",
+    "you": " (você)",
+    "colName": "Nome",
+    "colEmail": "E-mail",
+    "colRole": "Papel",
+    "roleMaster": "Master",
+    "roleMember": "Membro",
+    "makeMaster": "Tornar master",
+    "resetPassword": "Redefinir senha",
+    "delete": "Excluir",
+    "newPasswordFor": "Nova senha para {{name}}",
+    "savePassword": "Salvar nova senha",
+    "newUser": "+ Novo usuário",
+    "name": "Nome",
+    "email": "E-mail",
+    "password": "Senha",
+    "creating": "Criando...",
+    "createUser": "Criar usuário",
+    "makeMasterConfirm": "Tornar \"{{name}}\" um usuário master? Ele passará a ter acesso administrativo completo.",
+    "becameMasterToast": "{{name}} agora é master",
+    "deleteUserConfirm": "Excluir o usuário \"{{name}}\"? Ele será removido de todos os cartões atribuídos.",
+    "userCreatedToast": "Usuário criado",
+    "userDeletedToast": "Usuário excluído",
+    "passwordResetToast": "Senha redefinida",
+    "passwordMinLength": "A nova senha deve ter ao menos 6 caracteres"
+  },
+  "errors": {
+    "NOT_AUTHENTICATED": "Não autenticado",
+    "FORBIDDEN_MASTER_ONLY": "Acesso restrito ao usuário master",
+    "BOARD_NOT_FOUND": "Quadro não encontrado",
+    "FORBIDDEN_BOARD_ACCESS": "Você não tem acesso a este quadro",
+    "NOT_FOUND": "Não encontrado",
+    "VALIDATION_MISSING_FIELDS": "Preencha nome, e-mail e uma senha com pelo menos 6 caracteres",
+    "COMPANY_NAME_REQUIRED": "Informe o nome da empresa",
+    "EMAIL_ALREADY_REGISTERED": "E-mail já cadastrado",
+    "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "E-mail já cadastrado (pode já pertencer a outra empresa)",
+    "INVALID_CREDENTIALS": "E-mail ou senha inválidos",
+    "PASSWORD_TOO_SHORT": "A nova senha deve ter ao menos 6 caracteres",
+    "CURRENT_PASSWORD_INCORRECT": "Senha atual incorreta",
+    "TITLE_REQUIRED": "Título obrigatório",
+    "FORBIDDEN_DELETE_SHARED_BOARD": "Apenas o usuário master pode excluir quadros compartilhados",
+    "ORDERED_LIST_IDS_REQUIRED": "orderedListIds obrigatório",
+    "CARD_IDS_REQUIRED": "cardIds obrigatório",
+    "USER_NOT_FOUND": "Usuário não encontrado",
+    "EMAIL_IN_USE": "E-mail já em uso",
+    "INVALID_ROLE": "Papel inválido",
+    "CANNOT_DELETE_MASTER": "Não é possível excluir o usuário master",
+    "MINUTE_NOT_FOUND": "Ata não encontrada",
+    "FORBIDDEN_MINUTE_EDIT": "Apenas o autor ou o usuário master pode editar esta ata",
+    "FORBIDDEN_MINUTE_DELETE": "Apenas o autor ou o usuário master pode excluir esta ata",
+    "ADDRESS_REQUIRED": "Informe um endereço para buscar",
+    "ADDRESS_NOT_FOUND": "Endereço não encontrado",
+    "GEOCODE_UNAVAILABLE": "Não foi possível buscar o endereço agora. Tente novamente.",
+    "INTERNAL_ERROR": "Erro interno do servidor",
+    "GENERIC": "Erro {{status}}",
+    "IMPORT_READ_FAIL": "Não foi possível ler o arquivo",
+    "IMPORT_UNRECOGNIZED_FORMAT": "Formato de arquivo não reconhecido",
+    "IMPORT_INVALID_JSON": "JSON inválido",
+    "URL_REQUIRED": "Informe uma URL",
+    "INVALID_URL": "URL inválida",
+    "FILE_REQUIRED": "Selecione um arquivo",
+    "FILE_TOO_LARGE": "O arquivo deve ter até 8MB",
+    "ATTACHMENT_NOT_FOUND": "Anexo não encontrado"
+  }
+}

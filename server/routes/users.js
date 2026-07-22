@@ -2,10 +2,10 @@ import { Router } from "express";
 import { requireAuth, requireMaster } from "../middleware.js";
 import { hashPassword } from "../auth.js";
 import { ah } from "../asyncHandler.js";
+import * as directory from "../directory.js";
 import {
   listUsers,
   publicUser,
-  getUserByEmail,
   getUserById,
   insertUser,
   updateUser,
@@ -32,15 +32,34 @@ router.post(
   ah(async (req, res) => {
     const { name, email, password } = req.body || {};
     if (!name?.trim() || !email?.trim() || !password || password.length < 6) {
-      return res.status(400).json({ error: "Preencha nome, e-mail e uma senha com pelo menos 6 caracteres" });
+      return res
+        .status(400)
+        .json({ error: "Preencha nome, e-mail e uma senha com pelo menos 6 caracteres", code: "VALIDATION_MISSING_FIELDS" });
     }
-    if (await getUserByEmail(email)) return res.status(409).json({ error: "E-mail já cadastrado" });
-    const user = await insertUser({
-      name: name.trim(),
-      email: email.trim(),
-      passwordHash: hashPassword(password),
-      role: "member",
-    });
+    if (directory.getCompanyIdForEmail(email)) {
+      return res
+        .status(409)
+        .json({ error: "E-mail já cadastrado (pode já pertencer a outra empresa)", code: "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY" });
+    }
+    try {
+      directory.addUserToDirectory(email, req.companyId);
+    } catch {
+      return res
+        .status(409)
+        .json({ error: "E-mail já cadastrado (pode já pertencer a outra empresa)", code: "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY" });
+    }
+    let user;
+    try {
+      user = await insertUser({
+        name: name.trim(),
+        email: email.trim(),
+        passwordHash: hashPassword(password),
+        role: "member",
+      });
+    } catch (err) {
+      directory.removeUserFromDirectory(email);
+      throw err;
+    }
     res.status(201).json(publicUser(user));
   })
 );
@@ -50,13 +69,14 @@ router.patch(
   requireMaster,
   ah(async (req, res) => {
     const target = await getUserById(req.params.id);
-    if (!target) return res.status(404).json({ error: "Usuário não encontrado" });
+    if (!target) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
     const { name, email } = req.body || {};
-    if (email) {
-      const existing = await getUserByEmail(email);
-      if (existing && existing.id !== target.id) return res.status(409).json({ error: "E-mail já em uso" });
+    const emailChanged = email && email.trim().toLowerCase() !== target.email.toLowerCase();
+    if (emailChanged && directory.getCompanyIdForEmail(email)) {
+      return res.status(409).json({ error: "E-mail já em uso", code: "EMAIL_IN_USE" });
     }
     const updated = await updateUser(target.id, { name, email });
+    if (emailChanged) directory.updateUserDirectoryEmail(target.email, updated.email);
     res.json(publicUser(updated));
   })
 );
@@ -66,10 +86,10 @@ router.post(
   requireMaster,
   ah(async (req, res) => {
     const target = await getUserById(req.params.id);
-    if (!target) return res.status(404).json({ error: "Usuário não encontrado" });
+    if (!target) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
     const { role } = req.body || {};
     if (role !== "master" && role !== "member") {
-      return res.status(400).json({ error: "Papel inválido" });
+      return res.status(400).json({ error: "Papel inválido", code: "INVALID_ROLE" });
     }
     const updated = await setUserRole(target.id, role);
     res.json(publicUser(updated));
@@ -81,10 +101,10 @@ router.post(
   requireMaster,
   ah(async (req, res) => {
     const target = await getUserById(req.params.id);
-    if (!target) return res.status(404).json({ error: "Usuário não encontrado" });
+    if (!target) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
     const { newPassword } = req.body || {};
     if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ error: "A nova senha deve ter ao menos 6 caracteres" });
+      return res.status(400).json({ error: "A nova senha deve ter ao menos 6 caracteres", code: "PASSWORD_TOO_SHORT" });
     }
     await setPassword(target.id, hashPassword(newPassword));
     res.json({ ok: true });
@@ -96,11 +116,13 @@ router.delete(
   requireMaster,
   ah(async (req, res) => {
     const target = await getUserById(req.params.id);
-    if (!target) return res.status(404).json({ error: "Usuário não encontrado" });
-    if (target.role === "master") return res.status(400).json({ error: "Não é possível excluir o usuário master" });
+    if (!target) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
+    if (target.role === "master")
+      return res.status(400).json({ error: "Não é possível excluir o usuário master", code: "CANNOT_DELETE_MASTER" });
     await deletePrivateBoardsByOwner(target.id);
     await deleteUser(target.id);
     await scrubUserFromCards(target.id);
+    directory.removeUserFromDirectory(target.email);
     res.json({ ok: true });
   })
 );

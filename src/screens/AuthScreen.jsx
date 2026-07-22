@@ -1,10 +1,15 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
+import { translateError } from "../utils/errors.js";
 import ThemeToggle from "../components/ThemeToggle.jsx";
+import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 
 export default function AuthScreen({ onBack }) {
-  const { login, registerSelf } = useAuth();
+  const { t } = useTranslation();
+  const { login, registerCompany } = useAuth();
   const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [companyName, setCompanyName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +21,7 @@ export default function AuthScreen({ onBack }) {
     e.preventDefault();
     setError("");
     if (mode === "signup" && password !== confirm) {
-      setError("As senhas não coincidem");
+      setError(t("auth.passwordsMismatch"));
       return;
     }
     setSubmitting(true);
@@ -24,10 +29,10 @@ export default function AuthScreen({ onBack }) {
       if (mode === "login") {
         await login({ email, password });
       } else {
-        await registerSelf({ name, email, password });
+        await registerCompany({ companyName, name, email, password });
       }
     } catch (err) {
-      setError(err.message);
+      setError(translateError(err, t));
     } finally {
       setSubmitting(false);
     }
@@ -40,37 +45,52 @@ export default function AuthScreen({ onBack }) {
 
   return (
     <div className="auth-shell">
-      <ThemeToggle className="auth-theme-toggle" />
+      <div className="auth-theme-toggle auth-toolbar">
+        <LanguageSwitcher />
+        <ThemeToggle />
+      </div>
       {onBack && (
         <button className="auth-back-btn" onClick={onBack}>
-          ← Voltar
+          {t("auth.back")}
         </button>
       )}
       <div className="auth-brand">
         <div className="auth-brand-icon">IMG</div>
-        <h1>Kanban IMG</h1>
-        <p>Organize seus projetos em quadros Kanban simples, rápidos e colaborativos.</p>
+        <h1>{t("auth.brandTitle")}</h1>
+        <p>{t("auth.brandText")}</p>
       </div>
       <div className="auth-panel">
         <div className="auth-card">
           <div className="auth-tabs">
             <button className={"auth-tab" + (mode === "login" ? " active" : "")} onClick={() => switchMode("login")}>
-              Entrar
+              {t("auth.tabLogin")}
             </button>
             <button className={"auth-tab" + (mode === "signup" ? " active" : "")} onClick={() => switchMode("signup")}>
-              Criar conta
+              {t("auth.tabSignup")}
             </button>
           </div>
 
           <form className="auth-form" onSubmit={handleSubmit}>
             {mode === "signup" && (
-              <label className="auth-field">
-                <span>Nome</span>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
-              </label>
+              <>
+                <label className="auth-field">
+                  <span>{t("auth.companyName")}</span>
+                  <input
+                    type="text"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                </label>
+                <label className="auth-field">
+                  <span>{t("auth.yourName")}</span>
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+                </label>
+              </>
             )}
             <label className="auth-field">
-              <span>E-mail</span>
+              <span>{t("auth.email")}</span>
               <input
                 type="email"
                 value={email}
@@ -80,12 +100,12 @@ export default function AuthScreen({ onBack }) {
               />
             </label>
             <label className="auth-field">
-              <span>Senha</span>
+              <span>{t("auth.password")}</span>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
             </label>
             {mode === "signup" && (
               <label className="auth-field">
-                <span>Confirmar senha</span>
+                <span>{t("auth.confirmPassword")}</span>
                 <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={6} />
               </label>
             )}
@@ -93,7 +113,7 @@ export default function AuthScreen({ onBack }) {
             {error && <div className="auth-error">{error}</div>}
 
             <button type="submit" className="btn-primary auth-submit" disabled={submitting}>
-              {submitting ? "Aguarde..." : mode === "login" ? "Entrar" : "Criar conta"}
+              {submitting ? t("auth.submitWait") : mode === "login" ? t("auth.submitLogin") : t("auth.submitSignup")}
             </button>
           </form>
         </div>

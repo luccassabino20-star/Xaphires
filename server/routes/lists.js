@@ -37,7 +37,7 @@ router.put(
   "/:id/card-order",
   ah(async (req, res) => {
     const { cardIds } = req.body || {};
-    if (!Array.isArray(cardIds)) return res.status(400).json({ error: "cardIds obrigatório" });
+    if (!Array.isArray(cardIds)) return res.status(400).json({ error: "cardIds obrigatório", code: "CARD_IDS_REQUIRED" });
     await repo.setCardOrder(req.params.id, cardIds);
     res.json({ ok: true });
   })
@@ -47,7 +47,7 @@ router.post(
   "/:id/cards",
   ah(async (req, res) => {
     const { id, title } = req.body || {};
-    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório" });
+    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório", code: "TITLE_REQUIRED" });
     const cardId = await repo.createCard(req.params.id, { id, title: title.trim() });
     res.status(201).json({ id: cardId });
   })

@@ -1,11 +1,12 @@
+import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { LABEL_COLORS } from "../utils/labels.js";
 import { initials, colorForUser } from "../utils/members.js";
+import { localeTag } from "../i18n/locale.js";
 
-function formatDate(iso) {
+function formatDate(iso, lng) {
   if (!iso) return "";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
+  return new Date(iso + "T00:00:00").toLocaleDateString(localeTag(lng));
 }
 
 function isOverdue(iso, checklist) {
@@ -36,6 +37,13 @@ function DescIcon() {
     </svg>
   );
 }
+function AttachmentIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="13" height="13">
+      <path fill="currentColor" d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6z" />
+    </svg>
+  );
+}
 function CheckmarkIcon() {
   return (
     <svg viewBox="0 0 24 24" width="12" height="12">
@@ -59,6 +67,7 @@ function ImportantIcon() {
 }
 
 export default function CardItem({ card, boardId, members, searchQuery, memberFilter, onOpen, onDragStart, onDragEnd }) {
+  const { t, i18n } = useTranslation();
   const dispatch = useBoardDispatch();
   const matchesSearch = !searchQuery || card.title.toLowerCase().includes(searchQuery.toLowerCase());
   const matchesMemberFilter = !memberFilter || (card.memberIds || []).includes(memberFilter);
@@ -67,6 +76,7 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
   const hasDue = !!card.due;
   const hasChecklist = card.checklist && card.checklist.length > 0;
   const hasDesc = !!(card.description && card.description.trim());
+  const hasAttachments = card.attachments && card.attachments.length > 0;
   const cardMembers = (card.memberIds || []).map((id) => members.find((m) => m.id === id)).filter(Boolean);
 
   function toggleCompleted(e) {
@@ -97,29 +107,29 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
           type="button"
           className={"card-complete-check" + (card.completed ? " checked" : "")}
           onClick={toggleCompleted}
-          title={card.completed ? "Marcar como não concluído" : "Marcar como concluído"}
+          title={card.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
         >
           {card.completed && <CheckmarkIcon />}
         </button>
         <div className="card-title-text">{card.title}</div>
       </div>
 
-      {(hasDue || hasChecklist || hasDesc || card.urgent || card.important || cardMembers.length > 0) && (
+      {(hasDue || hasChecklist || hasDesc || hasAttachments || card.urgent || card.important || cardMembers.length > 0) && (
         <div className="card-footer-row">
           <div className="card-meta">
             {card.urgent && (
-              <span className="card-meta-item priority-badge-urgent" title="Urgente">
+              <span className="card-meta-item priority-badge-urgent" title={t("board.cardItem.urgent")}>
                 <UrgentIcon />
               </span>
             )}
             {card.important && (
-              <span className="card-meta-item priority-badge-important" title="Importante">
+              <span className="card-meta-item priority-badge-important" title={t("board.cardItem.important")}>
                 <ImportantIcon />
               </span>
             )}
             {hasDue && (
               <span className={"card-meta-item" + (isOverdue(card.due, card.checklist) ? " due-overdue" : "")}>
-                <ClockIcon /> {formatDate(card.due)}
+                <ClockIcon /> {formatDate(card.due, i18n.language)}
               </span>
             )}
             {hasChecklist && (
@@ -130,6 +140,11 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
             {hasDesc && (
               <span className="card-meta-item">
                 <DescIcon />
+              </span>
+            )}
+            {hasAttachments && (
+              <span className="card-meta-item">
+                <AttachmentIcon /> {card.attachments.length}
               </span>
             )}
           </div>

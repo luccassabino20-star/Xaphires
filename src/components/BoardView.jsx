@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { uid } from "../utils/id.js";
 import ListColumn from "./ListColumn.jsx";
 
 export default function BoardView({ board, members, searchQuery, memberFilter, onOpenCard }) {
+  const { t } = useTranslation();
   const dispatch = useBoardDispatch();
   const [dragCard, setDragCard] = useState(null); // { cardId, fromListId }
   const [dragListId, setDragListId] = useState(null);
@@ -100,7 +102,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
             <div className="list-composer">
               <input
                 autoFocus
-                placeholder="Insira o título da lista..."
+                placeholder={t("board.boardView.listTitlePlaceholder")}
                 value={newListTitle}
                 onChange={(e) => setNewListTitle(e.target.value)}
                 onKeyDown={(e) => {
@@ -113,7 +115,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
               />
               <div className="composer-actions">
                 <button className="btn-primary btn-small" onClick={submitNewList}>
-                  Adicionar lista
+                  {t("board.boardView.addList")}
                 </button>
                 <button
                   className="btn-cancel"
@@ -128,7 +130,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
             </div>
           ) : (
             <button className="add-list-btn" onClick={() => setAddingList(true)}>
-              + Adicionar outra lista
+              {t("board.boardView.addAnotherList")}
             </button>
           )}
         </div>

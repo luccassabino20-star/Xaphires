@@ -98,6 +98,7 @@ export function reducer(state, action) {
           completed: false,
           urgent: false,
           important: false,
+          attachments: [],
         };
         return {
           ...b,
@@ -182,6 +183,12 @@ export function reducer(state, action) {
         if (!card) return b;
         const checklist = card.checklist.filter((_, i) => i !== action.index);
         return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, checklist } } };
+      });
+    case "SET_CARD_ATTACHMENTS":
+      return updateBoard(state, action.boardId, (b) => {
+        const card = b.cards[action.cardId];
+        if (!card) return b;
+        return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, attachments: action.attachments } } };
       });
 
     default:

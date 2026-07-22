@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { flattenCards } from "../../utils/boardCards.js";
@@ -8,6 +9,7 @@ const DEFAULT_CENTER = [-14.235, -51.9253]; // Brazil
 const DEFAULT_ZOOM = 4;
 
 export default function MapView({ board, searchQuery, memberFilter, onOpenCard }) {
+  const { t } = useTranslation();
   const mapElRef = useRef(null);
   const mapRef = useRef(null);
   const markersLayerRef = useRef(null);
@@ -77,13 +79,13 @@ export default function MapView({ board, searchQuery, memberFilter, onOpenCard }
       <div ref={mapElRef} className="map-view-canvas" />
       {located.length === 0 && (
         <div className="map-empty-overlay">
-          Nenhum cartão com localização definida.
+          {t("views.map.emptyLine1")}
           <br />
-          Abra um cartão e preencha o campo "Local" para vê-lo aqui.
+          {t("views.map.emptyLine2")}
         </div>
       )}
       {unlocatedCount > 0 && (
-        <div className="map-footnote-overlay">{unlocatedCount} endereço(s) salvo(s) mas não localizado(s) no mapa.</div>
+        <div className="map-footnote-overlay">{t("views.map.unlocated", { count: unlocatedCount })}</div>
       )}
     </div>
   );

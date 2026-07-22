@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 function isOverdue(card) {
   if (!card.due) return false;
   const allDone = card.checklist && card.checklist.length > 0 && card.checklist.every((i) => i.done);
@@ -6,6 +8,7 @@ function isOverdue(card) {
 }
 
 export default function TaskTicker({ board, onOpenCard }) {
+  const { t } = useTranslation();
   if (!board) return null;
 
   const listTitleById = new Map(board.lists.map((l) => [l.id, l.title]));
@@ -27,8 +30,8 @@ export default function TaskTicker({ board, onOpenCard }) {
         aria-hidden={ariaHidden || undefined}
         onClick={() => onOpenCard(card.id)}
       >
-        {card.urgent && <span className="task-ticker-flag urgent" title="Urgente" />}
-        {card.important && <span className="task-ticker-flag important" title="Importante" />}
+        {card.urgent && <span className="task-ticker-flag urgent" title={t("board.cardItem.urgent")} />}
+        {card.important && <span className="task-ticker-flag important" title={t("board.cardItem.important")} />}
         <span className={"task-ticker-title" + (isOverdue(card) ? " overdue" : "")}>{card.title}</span>
         {listTitle && <span className="task-ticker-list">{listTitle}</span>}
       </button>
@@ -37,7 +40,7 @@ export default function TaskTicker({ board, onOpenCard }) {
 
   return (
     <div className="task-ticker">
-      <span className="task-ticker-label">Pendentes ({pending.length})</span>
+      <span className="task-ticker-label">{t("app.taskTicker.pending", { count: pending.length })}</span>
       <div className="task-ticker-track">
         <div className="task-ticker-content" style={{ animationDuration: `${duration}s` }}>
           {renderItems("a", false)}

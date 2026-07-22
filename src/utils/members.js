@@ -1,6 +1,6 @@
 export const MEMBER_COLORS = [
-  "#2563eb", "#16a34a", "#d97706", "#dc2626",
-  "#7c3aed", "#0d9488", "#ea580c", "#4f46e5",
+  "#3b82f6", "#22c55e", "#f59e0b", "#ef4444",
+  "#a855f7", "#14b8a6", "#f97316", "#6366f1",
 ];
 
 export function colorForUser(id) {

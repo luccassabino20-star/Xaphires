@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMinutes } from "../state/MinutesContext.jsx";
 import { useUsers } from "../state/UsersContext.jsx";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
+import { translateError } from "../utils/errors.js";
 import { uid } from "../utils/id.js";
 import { initials, colorForUser } from "../utils/members.js";
 
@@ -11,6 +13,7 @@ function todayIso() {
 }
 
 export default function MinuteModal({ minuteId, onClose }) {
+  const { t } = useTranslation();
   const { minutes, createMinute, updateMinute, deleteMinute } = useMinutes();
   const { users } = useUsers();
   const { user } = useAuth();
@@ -73,27 +76,27 @@ export default function MinuteModal({ minuteId, onClose }) {
       const payload = { title: val, date, attendeeIds, agenda, decisions, actionItems };
       if (isNew) {
         await createMinute(payload);
-        showToast("Ata criada");
+        showToast(t("minutes.modal.minuteCreatedToast"));
       } else {
         await updateMinute(minuteId, payload);
-        showToast("Ata atualizada");
+        showToast(t("minutes.modal.minuteUpdatedToast"));
       }
       onClose();
     } catch (err) {
-      alert(err.message);
+      alert(translateError(err, t));
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete() {
-    if (!confirm("Excluir esta ata permanentemente?")) return;
+    if (!confirm(t("minutes.modal.deleteConfirm"))) return;
     try {
       await deleteMinute(minuteId);
-      showToast("Ata excluída");
+      showToast(t("minutes.modal.minuteDeletedToast"));
       onClose();
     } catch (err) {
-      alert(err.message);
+      alert(translateError(err, t));
     }
   }
 
@@ -109,7 +112,7 @@ export default function MinuteModal({ minuteId, onClose }) {
       }}
     >
       <div className="modal">
-        <button className="modal-close" onClick={onClose} aria-label="Fechar">
+        <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
           &times;
         </button>
         <div className="modal-header">
@@ -119,7 +122,7 @@ export default function MinuteModal({ minuteId, onClose }) {
           <input
             ref={titleRef}
             className="modal-title-input"
-            placeholder="Título da reunião"
+            placeholder={t("minutes.modal.titlePlaceholder")}
             value={title}
             spellCheck={false}
             onChange={(e) => setTitle(e.target.value)}
@@ -130,11 +133,11 @@ export default function MinuteModal({ minuteId, onClose }) {
         <div className="modal-body">
           <div className="modal-section modal-section-row">
             <div>
-              <label className="modal-label">Data</label>
+              <label className="modal-label">{t("minutes.modal.date")}</label>
               <input type="date" className="modal-date" value={date} onChange={(e) => setDate(e.target.value)} disabled={!canEdit} />
             </div>
             <div>
-              <label className="modal-label">Autor</label>
+              <label className="modal-label">{t("minutes.modal.author")}</label>
               <div className="minutes-author-tag">
                 <span className="avatar avatar-small" style={{ background: colorForUser(authorId) }}>
                   {initials(authorName)}
@@ -145,7 +148,7 @@ export default function MinuteModal({ minuteId, onClose }) {
           </div>
 
           <div className="modal-section">
-            <label className="modal-label">Participantes</label>
+            <label className="modal-label">{t("minutes.modal.participants")}</label>
             <div className="member-avatars-row">
               {attendees.map((m) => (
                 <span key={m.id} className="avatar" style={{ background: colorForUser(m.id) }} title={m.name}>
@@ -160,7 +163,7 @@ export default function MinuteModal({ minuteId, onClose }) {
             </div>
             {attendeePickerOpen && canEdit && (
               <div className="member-picker">
-                {users.length === 0 && <div className="member-picker-empty">Nenhum usuário cadastrado ainda.</div>}
+                {users.length === 0 && <div className="member-picker-empty">{t("minutes.modal.noUsersYet")}</div>}
                 {users.map((m) => (
                   <label key={m.id} className="member-picker-row">
                     <input type="checkbox" checked={attendeeIds.includes(m.id)} onChange={() => toggleAttendee(m.id)} />
@@ -175,10 +178,10 @@ export default function MinuteModal({ minuteId, onClose }) {
           </div>
 
           <div className="modal-section">
-            <label className="modal-label">Pauta</label>
+            <label className="modal-label">{t("minutes.modal.agenda")}</label>
             <textarea
               className="modal-textarea"
-              placeholder="O que será discutido..."
+              placeholder={t("minutes.modal.agendaPlaceholder")}
               value={agenda}
               onChange={(e) => setAgenda(e.target.value)}
               readOnly={!canEdit}
@@ -186,10 +189,10 @@ export default function MinuteModal({ minuteId, onClose }) {
           </div>
 
           <div className="modal-section">
-            <label className="modal-label">Decisões</label>
+            <label className="modal-label">{t("minutes.modal.decisions")}</label>
             <textarea
               className="modal-textarea"
-              placeholder="O que foi decidido..."
+              placeholder={t("minutes.modal.decisionsPlaceholder")}
               value={decisions}
               onChange={(e) => setDecisions(e.target.value)}
               readOnly={!canEdit}
@@ -197,7 +200,7 @@ export default function MinuteModal({ minuteId, onClose }) {
           </div>
 
           <div className="modal-section">
-            <label className="modal-label">Itens de ação</label>
+            <label className="modal-label">{t("minutes.modal.actionItems")}</label>
             {actionItems.length > 0 && (
               <ul className="checklist">
                 {actionItems.map((item) => (
@@ -210,7 +213,7 @@ export default function MinuteModal({ minuteId, onClose }) {
                       onChange={(e) => setActionAssignee(item.id, e.target.value)}
                       disabled={!canEdit}
                     >
-                      <option value="">Responsável</option>
+                      <option value="">{t("minutes.modal.assignee")}</option>
                       {users.map((u) => (
                         <option key={u.id} value={u.id}>
                           {u.name}
@@ -230,12 +233,12 @@ export default function MinuteModal({ minuteId, onClose }) {
               <form className="checklist-add" onSubmit={addActionItem}>
                 <input
                   type="text"
-                  placeholder="Adicionar um item de ação"
+                  placeholder={t("minutes.modal.addActionPlaceholder")}
                   value={actionText}
                   onChange={(e) => setActionText(e.target.value)}
                 />
                 <button type="submit" className="btn-primary btn-small">
-                  Adicionar
+                  {t("common.add")}
                 </button>
               </form>
             )}
@@ -246,13 +249,13 @@ export default function MinuteModal({ minuteId, onClose }) {
           <div className="modal-footer modal-footer-split">
             {!isNew ? (
               <button className="btn-danger" onClick={handleDelete}>
-                Excluir ata
+                {t("minutes.modal.deleteMinute")}
               </button>
             ) : (
               <span />
             )}
             <button className="btn-primary" onClick={handleSave} disabled={saving || !title.trim()}>
-              {saving ? "Salvando..." : isNew ? "Criar ata" : "Salvar alterações"}
+              {saving ? t("minutes.modal.saving") : isNew ? t("minutes.modal.createMinute") : t("minutes.modal.saveChanges")}
             </button>
           </div>
         )}

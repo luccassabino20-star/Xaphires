@@ -1,6 +1,8 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
+import { localeTag } from "../../i18n/locale.js";
 
 const DAY_WIDTH = 36;
 const MS_DAY = 86400000;
@@ -28,6 +30,7 @@ function buildDays(start, end) {
 }
 
 export default function TimelineView({ board, searchQuery, memberFilter, onOpenCard }) {
+  const { t, i18n } = useTranslation();
   const allCards = useMemo(() => flattenCards(board), [board]);
   const filtered = allCards.filter((c) => {
     const matchesSearch = !searchQuery || c.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -70,7 +73,7 @@ export default function TimelineView({ board, searchQuery, memberFilter, onOpenC
   if (dated.length === 0) {
     return (
       <div className="view-scroll">
-        <div className="view-placeholder">Nenhum cartão com data de início ou entrega para mostrar na linha do tempo.</div>
+        <div className="view-placeholder">{t("views.timeline.empty")}</div>
       </div>
     );
   }
@@ -84,7 +87,7 @@ export default function TimelineView({ board, searchQuery, memberFilter, onOpenC
             {days.map((d, i) => (
               <div key={i} className={"timeline-day" + (i === todayOffset ? " today" : "")} style={{ width: DAY_WIDTH }}>
                 <div className="timeline-day-date">{d.getDate()}</div>
-                <div className="timeline-day-month">{d.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}</div>
+                <div className="timeline-day-month">{d.toLocaleDateString(localeTag(i18n.language), { month: "short" }).replace(".", "")}</div>
               </div>
             ))}
           </div>
@@ -120,7 +123,7 @@ export default function TimelineView({ board, searchQuery, memberFilter, onOpenC
         ))}
       </div>
       {undatedCount > 0 && (
-        <div className="timeline-footnote">{undatedCount} cartão(ões) sem data de início/entrega não exibido(s).</div>
+        <div className="timeline-footnote">{t("views.timeline.undated", { count: undatedCount })}</div>
       )}
     </div>
   );

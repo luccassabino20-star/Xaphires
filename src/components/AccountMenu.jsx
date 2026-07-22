@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
+import { translateError } from "../utils/errors.js";
 import * as api from "../state/api.js";
 import { initials, colorForUser } from "../utils/members.js";
 
 export default function AccountMenu() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const showToast = useToast();
   const [open, setOpen] = useState(false);
@@ -30,13 +33,13 @@ export default function AccountMenu() {
     setError("");
     try {
       await api.changePassword({ currentPassword, newPassword });
-      showToast("Senha alterada");
+      showToast(t("app.accountMenu.passwordChangedToast"));
       setChangingPassword(false);
       setCurrentPassword("");
       setNewPassword("");
       setOpen(false);
     } catch (err) {
-      setError(err.message);
+      setError(translateError(err, t));
     }
   }
 
@@ -52,7 +55,7 @@ export default function AccountMenu() {
           <div className="account-dropdown-header">
             <div className="account-dropdown-name">
               {user.name}
-              {user.role === "master" && <span className="role-badge master">Master</span>}
+              {user.role === "master" && <span className="role-badge master">{t("app.accountMenu.master")}</span>}
             </div>
             <div className="account-dropdown-email">{user.email}</div>
           </div>
@@ -61,7 +64,7 @@ export default function AccountMenu() {
             <form className="account-password-form" onSubmit={submitChangePassword}>
               <input
                 type="password"
-                placeholder="Senha atual"
+                placeholder={t("app.accountMenu.currentPassword")}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
@@ -69,7 +72,7 @@ export default function AccountMenu() {
               />
               <input
                 type="password"
-                placeholder="Nova senha"
+                placeholder={t("app.accountMenu.newPassword")}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
@@ -78,7 +81,7 @@ export default function AccountMenu() {
               {error && <div className="auth-error">{error}</div>}
               <div className="composer-actions">
                 <button type="submit" className="btn-primary btn-small">
-                  Salvar
+                  {t("app.accountMenu.save")}
                 </button>
                 <button type="button" className="btn-cancel" onClick={() => setChangingPassword(false)}>
                   &times;
@@ -88,10 +91,10 @@ export default function AccountMenu() {
           ) : (
             <>
               <div className="dropdown-item" onClick={() => setChangingPassword(true)}>
-                Alterar senha
+                {t("app.accountMenu.changePassword")}
               </div>
               <div className="dropdown-item danger" onClick={logout}>
-                Sair
+                {t("app.accountMenu.logout")}
               </div>
             </>
           )}

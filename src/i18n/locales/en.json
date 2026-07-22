@@ -1,0 +1,401 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "add": "Add",
+    "remove": "Remove",
+    "close": "Close",
+    "loading": "Loading..."
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "title": "Theme",
+    "ariaLabel": "Toggle theme"
+  },
+  "language": {
+    "title": "Language",
+    "ariaLabel": "Change language",
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
+  "landing": {
+    "nav": {
+      "brand": "Kanban IMG",
+      "home": "Home",
+      "features": "Features",
+      "solutions": "Solutions",
+      "pricing": "Pricing",
+      "enter": "Sign in"
+    },
+    "home": {
+      "heroTitle": "Your team organized, with no extra effort",
+      "heroText": "Kanban IMG replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
+      "ctaStart": "Get started",
+      "ctaPlans": "See plans",
+      "heroNote": "No red tape. Cancel anytime.",
+      "stats": [
+        { "value": "8", "label": "Integrated tools in one place" },
+        { "value": "100%", "label": "Real-time sync across the team" },
+        { "value": "0", "label": "Loose spreadsheets or WhatsApp groups" },
+        { "value": "24/7", "label": "Board access, from anywhere" }
+      ],
+      "benefits": [
+        { "title": "Everything in one place", "text": "Replace loose spreadsheets, WhatsApp groups and scattered tools with a single system." },
+        { "title": "Your team already gets it", "text": "Simple interface, no training needed — anyone who's used a Kanban board starts using it in minutes." },
+        { "title": "Grows with you", "text": "From a small team to multiple departments, with private and shared boards, access control and roles." }
+      ],
+      "exploreTitle": "Explore Kanban IMG",
+      "exploreLinks": [
+        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Kanban IMG's 8 tools: board, table, calendar, map and more." },
+        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Kanban IMG day to day." },
+        { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Basic, Professional and Enterprise plans and pick the right one for your team." }
+      ]
+    },
+    "features": {
+      "headerTitle": "Everything your team needs",
+      "headerText": "Eight integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
+      "items": [
+        { "badge": "B", "title": "Kanban board", "text": "No more tasks lost in chat screenshots. Drag and drop between lists and see the team's real progress." },
+        { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member — no need for another tool." },
+        { "badge": "C", "title": "Calendar", "text": "Deadlines and start dates in a monthly view, so nothing slips by unnoticed." },
+        { "badge": "L", "title": "Timeline", "text": "The whole project schedule at a glance, period by period." },
+        { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet." },
+        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map — great for field teams." },
+        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest." },
+        { "badge": "N", "title": "Meeting minutes", "text": "Agenda, decisions and action items recorded — and followed up on later." }
+      ],
+      "secondary": [
+        { "title": "Private and shared boards", "text": "Separate what's the team's from what's just yours, with full visibility control." },
+        { "title": "User and role management", "text": "Define who's an admin (master) and who's a team member." }
+      ]
+    },
+    "solutions": {
+      "headerTitle": "Solutions for every kind of team",
+      "headerText": "The same Kanban IMG, organized the way each team needs to work.",
+      "items": [
+        { "title": "Agencies and project teams", "text": "One board per client or project, with a timeline for deadlines and a dashboard ready to show progress in meetings.", "tags": ["Kanban board", "Timeline", "Dashboard"] },
+        { "title": "Field teams", "text": "Tasks with addresses plotted on the map — ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
+        { "title": "Management and leadership", "text": "Prioritize with the Eisenhower Matrix, track indicators on the Dashboard, and keep sensitive planning in private boards.", "tags": ["Eisenhower Matrix", "Dashboard", "Private boards"] },
+        { "title": "Operations and routine", "text": "The Kanban board + Table pair covers day-to-day work, with a Calendar for recurring deadlines so nothing slips by.", "tags": ["Kanban board", "Table", "Calendar"] },
+        { "title": "Meetings and alignment", "text": "Meeting minutes with agenda, decisions and action items — recorded on the spot and followed up on later, without relying on memory.", "tags": ["Meeting minutes"] }
+      ]
+    },
+    "pricing": {
+      "headerTitle": "Choose your team's plan",
+      "headerText": "Pick the right plan for your team and change it as it grows.",
+      "mostPopular": "Most popular",
+      "plans": [
+        { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 3 users", "Unlimited boards", "Kanban board, Table and Calendar", "Email support"] },
+        { "name": "Professional", "price": "R$ 799", "period": "/user/month", "tagline": "For teams that want full control", "cta": "Subscribe to Professional", "highlight": true, "features": ["Unlimited users", "All views (Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Private and shared boards", "Priority support"] },
+        { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
+      ]
+    },
+    "footer": {
+      "title": "Ready to organize your team?",
+      "cta": "Get started"
+    }
+  },
+  "auth": {
+    "brandTitle": "Kanban IMG",
+    "brandText": "Organize your projects in simple, fast and collaborative Kanban boards.",
+    "back": "← Back",
+    "tabLogin": "Sign in",
+    "tabSignup": "Create company",
+    "companyName": "Company name",
+    "yourName": "Your name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "passwordsMismatch": "Passwords don't match",
+    "submitWait": "Please wait...",
+    "submitLogin": "Sign in",
+    "submitSignup": "Create company"
+  },
+  "app": {
+    "loadingBoards": "Loading boards...",
+    "noBoards": "No boards. Create one in the sidebar.",
+    "sidebar": {
+      "minutesNav": "Meeting Minutes",
+      "sharedBoards": "Shared boards",
+      "myPrivateBoards": "My private boards",
+      "newBoard": "+ New board",
+      "boardNamePlaceholder": "Board name",
+      "privateToggle": "Private (only you see it)",
+      "create": "Create",
+      "deleteBoardTitle": "Delete board",
+      "deleteBoardConfirm": "Delete board \"{{title}}\" and all its content?",
+      "boardDeletedToast": "Board deleted"
+    },
+    "topbar": {
+      "toggleSidebar": "Show/hide sidebar",
+      "menu": "Menu",
+      "defaultBoardName": "Untitled board",
+      "privateBoardTitle": "Private board — only visible to you",
+      "filterBy": "Filter by {{name}}",
+      "usersBtn": "Users",
+      "searchPlaceholder": "Search cards...",
+      "clearBoard": "Clear board",
+      "clearBoardConfirm": "This will delete all lists and cards on this board. Continue?",
+      "clearBoardToast": "Board cleared"
+    },
+    "dataMenu": {
+      "moreOptions": "More options",
+      "personalize": "Customize",
+      "dataSection": "Data",
+      "exportCurrent": "Export current board",
+      "exportAll": "Export everything (backup)",
+      "importJson": "Import JSON",
+      "importing": "Importing...",
+      "colors": "Colors",
+      "gradients": "Gradients",
+      "monoGradientTitle": "Tonal gradient",
+      "monoGradientHint": "Pick a color and the gradient flows through lighter and darker shades of it.",
+      "customColor": "Custom color",
+      "apply": "Apply",
+      "noBackground": "Default (no background)",
+      "exportBoardToast": "Board exported",
+      "exportAllToast": "Full backup exported",
+      "importSuccessToast": "Import complete",
+      "importFailAlert": "Import failed: {{message}}",
+      "importedBoardTitle": "Imported board"
+    },
+    "accountMenu": {
+      "changePassword": "Change password",
+      "logout": "Sign out",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "save": "Save",
+      "passwordChangedToast": "Password changed",
+      "master": "Master"
+    },
+    "taskTicker": {
+      "pending": "Pending ({{count}})"
+    }
+  },
+  "board": {
+    "listMenu": {
+      "listColor": "List color",
+      "defaultColor": "Default",
+      "sortAZ": "Sort by title (A-Z)",
+      "clearCards": "Clear all cards",
+      "clearCardsConfirm": "Remove all cards from \"{{title}}\"?",
+      "cardsRemovedToast": "Cards removed",
+      "deleteList": "Delete list",
+      "deleteListConfirm": "Delete list \"{{title}}\" and all its cards?",
+      "listDeletedToast": "List deleted"
+    },
+    "listColumn": {
+      "cardTitlePlaceholder": "Enter a title for this card...",
+      "addCard": "+ Add a card",
+      "addCardBtn": "Add card",
+      "defaultListName": "List"
+    },
+    "boardView": {
+      "listTitlePlaceholder": "Enter list title...",
+      "addList": "Add list",
+      "addAnotherList": "+ Add another list"
+    },
+    "cardItem": {
+      "markComplete": "Mark as complete",
+      "markIncomplete": "Mark as incomplete",
+      "urgent": "Urgent",
+      "important": "Important"
+    },
+    "cardModal": {
+      "untitled": "Untitled",
+      "complete": "Complete",
+      "markComplete": "Mark as complete",
+      "members": "Members",
+      "noUsersYet": "No users registered yet.",
+      "labels": "Labels",
+      "priority": "Priority (Eisenhower Matrix)",
+      "urgent": "Urgent",
+      "important": "Important",
+      "startDate": "Start date",
+      "dueDate": "Due date",
+      "location": "Location",
+      "addressPlaceholder": "Address, city...",
+      "locating": "Searching...",
+      "locate": "Locate",
+      "locationFound": "Location found — visible on the Map",
+      "locationPending": "Address saved, but not located on the map",
+      "description": "Description",
+      "descriptionPlaceholder": "Add a more detailed description...",
+      "checklist": "Checklist",
+      "addItemPlaceholder": "Add an item",
+      "attachments": "Attachments",
+      "attachFile": "Attach file",
+      "attachLink": "Attach link",
+      "linkUrlPlaceholder": "https://...",
+      "linkNamePlaceholder": "Link name (optional)",
+      "attachmentAdded": "Attachment added",
+      "attachmentRemoved": "Attachment removed",
+      "attachmentTooLarge": "File must be up to 8MB",
+      "uploading": "Uploading...",
+      "deleteCard": "Delete card",
+      "deleteCardConfirm": "Delete this card permanently?",
+      "cardDeletedToast": "Card deleted"
+    }
+  },
+  "views": {
+    "switcher": {
+      "board": "Board",
+      "table": "Table",
+      "calendar": "Calendar",
+      "timeline": "Timeline",
+      "dashboard": "Dashboard",
+      "map": "Map",
+      "matrix": "Eisenhower Matrix"
+    },
+    "table": {
+      "columns": {
+        "completed": "",
+        "title": "Title",
+        "listTitle": "List",
+        "labels": "Labels",
+        "members": "Members",
+        "startDate": "Start",
+        "due": "Due",
+        "checklist": "Checklist"
+      },
+      "empty": "No cards found."
+    },
+    "calendar": {
+      "today": "Today",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "more": "+{{count}} more"
+    },
+    "timeline": {
+      "empty": "No cards with a start or due date to show on the timeline.",
+      "undated_one": "{{count}} card with no start/due date not shown.",
+      "undated_other": "{{count}} cards with no start/due date not shown."
+    },
+    "dashboard": {
+      "totalCards": "Total cards",
+      "completed": "Completed",
+      "overdue": "Overdue",
+      "unassigned": "Unassigned",
+      "overallProgress": "Overall progress",
+      "cardsByList": "Cards by list",
+      "cardsByMember": "Cards by member",
+      "cardsByLabel": "Cards by label",
+      "noLists": "No lists.",
+      "noAssigned": "No card assigned to anyone yet.",
+      "noLabels": "No labels in use.",
+      "labelNames": { "gray": "Gray", "blue": "Blue", "green": "Green", "amber": "Amber", "red": "Red", "purple": "Purple" }
+    },
+    "map": {
+      "emptyLine1": "No cards with a location set.",
+      "emptyLine2": "Open a card and fill in the \"Location\" field to see it here.",
+      "unlocated_one": "{{count}} saved address not located on the map.",
+      "unlocated_other": "{{count}} saved addresses not located on the map."
+    },
+    "matrix": {
+      "doNow": { "title": "Do now", "subtitle": "Urgent and important" },
+      "schedule": { "title": "Schedule", "subtitle": "Important, not urgent" },
+      "delegate": { "title": "Delegate", "subtitle": "Urgent, not important" },
+      "eliminate": { "title": "Eliminate", "subtitle": "Neither urgent nor important" },
+      "dropHere": "Drag cards here"
+    }
+  },
+  "minutes": {
+    "screen": {
+      "title": "Meeting Minutes",
+      "newMinute": "+ New minute",
+      "loading": "Loading minutes...",
+      "empty": "No minutes recorded yet."
+    },
+    "modal": {
+      "titlePlaceholder": "Meeting title",
+      "date": "Date",
+      "author": "Author",
+      "participants": "Participants",
+      "noUsersYet": "No users registered yet.",
+      "agenda": "Agenda",
+      "agendaPlaceholder": "What will be discussed...",
+      "decisions": "Decisions",
+      "decisionsPlaceholder": "What was decided...",
+      "actionItems": "Action items",
+      "assignee": "Assignee",
+      "addActionPlaceholder": "Add an action item",
+      "deleteMinute": "Delete minute",
+      "deleteConfirm": "Delete this minute permanently?",
+      "minuteDeletedToast": "Minute deleted",
+      "minuteCreatedToast": "Minute created",
+      "minuteUpdatedToast": "Minute updated",
+      "saving": "Saving...",
+      "createMinute": "Create minute",
+      "saveChanges": "Save changes"
+    }
+  },
+  "users": {
+    "title": "Users panel",
+    "you": " (you)",
+    "colName": "Name",
+    "colEmail": "Email",
+    "colRole": "Role",
+    "roleMaster": "Master",
+    "roleMember": "Member",
+    "makeMaster": "Make master",
+    "resetPassword": "Reset password",
+    "delete": "Delete",
+    "newPasswordFor": "New password for {{name}}",
+    "savePassword": "Save new password",
+    "newUser": "+ New user",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "creating": "Creating...",
+    "createUser": "Create user",
+    "makeMasterConfirm": "Make \"{{name}}\" a master user? They will get full administrative access.",
+    "becameMasterToast": "{{name}} is now a master",
+    "deleteUserConfirm": "Delete user \"{{name}}\"? They will be removed from all assigned cards.",
+    "userCreatedToast": "User created",
+    "userDeletedToast": "User deleted",
+    "passwordResetToast": "Password reset",
+    "passwordMinLength": "The new password must be at least 6 characters"
+  },
+  "errors": {
+    "NOT_AUTHENTICATED": "Not authenticated",
+    "FORBIDDEN_MASTER_ONLY": "Restricted to the master user",
+    "BOARD_NOT_FOUND": "Board not found",
+    "FORBIDDEN_BOARD_ACCESS": "You don't have access to this board",
+    "NOT_FOUND": "Not found",
+    "VALIDATION_MISSING_FIELDS": "Fill in name, email and a password with at least 6 characters",
+    "COMPANY_NAME_REQUIRED": "Enter the company name",
+    "EMAIL_ALREADY_REGISTERED": "Email already registered",
+    "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Email already registered (it may already belong to another company)",
+    "INVALID_CREDENTIALS": "Invalid email or password",
+    "PASSWORD_TOO_SHORT": "The new password must be at least 6 characters",
+    "CURRENT_PASSWORD_INCORRECT": "Current password is incorrect",
+    "TITLE_REQUIRED": "Title is required",
+    "FORBIDDEN_DELETE_SHARED_BOARD": "Only the master user can delete shared boards",
+    "ORDERED_LIST_IDS_REQUIRED": "orderedListIds is required",
+    "CARD_IDS_REQUIRED": "cardIds is required",
+    "USER_NOT_FOUND": "User not found",
+    "EMAIL_IN_USE": "Email already in use",
+    "INVALID_ROLE": "Invalid role",
+    "CANNOT_DELETE_MASTER": "The master user cannot be deleted",
+    "MINUTE_NOT_FOUND": "Minute not found",
+    "FORBIDDEN_MINUTE_EDIT": "Only the author or the master user can edit this minute",
+    "FORBIDDEN_MINUTE_DELETE": "Only the author or the master user can delete this minute",
+    "ADDRESS_REQUIRED": "Enter an address to search",
+    "ADDRESS_NOT_FOUND": "Address not found",
+    "GEOCODE_UNAVAILABLE": "Couldn't look up the address right now. Try again.",
+    "INTERNAL_ERROR": "Internal server error",
+    "GENERIC": "Error {{status}}",
+    "IMPORT_READ_FAIL": "Couldn't read the file",
+    "IMPORT_UNRECOGNIZED_FORMAT": "Unrecognized file format",
+    "IMPORT_INVALID_JSON": "Invalid JSON",
+    "URL_REQUIRED": "Enter a URL",
+    "INVALID_URL": "Invalid URL",
+    "FILE_REQUIRED": "Select a file",
+    "FILE_TOO_LARGE": "File must be up to 8MB",
+    "ATTACHMENT_NOT_FOUND": "Attachment not found"
+  }
+}

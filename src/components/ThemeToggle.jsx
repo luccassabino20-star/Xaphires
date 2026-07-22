@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../state/ThemeContext.jsx";
-
-const OPTIONS = [
-  { id: "light", label: "Claro" },
-  { id: "dark", label: "Escuro" },
-  { id: "system", label: "Sistema" },
-];
 
 function SunIcon() {
   return (
@@ -34,11 +29,17 @@ function SystemIcon() {
 const ICONS = { light: SunIcon, dark: MoonIcon, system: SystemIcon };
 
 export default function ThemeToggle({ className }) {
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const btnRef = useRef(null);
   const Icon = ICONS[theme] || SystemIcon;
+  const OPTIONS = [
+    { id: "light", label: t("theme.light") },
+    { id: "dark", label: t("theme.dark") },
+    { id: "system", label: t("theme.system") },
+  ];
 
   useEffect(() => {
     function handleClick(e) {
@@ -52,7 +53,7 @@ export default function ThemeToggle({ className }) {
 
   return (
     <div className={"theme-toggle" + (className ? " " + className : "")}>
-      <button ref={btnRef} className="icon-btn" onClick={() => setOpen((o) => !o)} title="Tema" aria-label="Alternar tema">
+      <button ref={btnRef} className="icon-btn" onClick={() => setOpen((o) => !o)} title={t("theme.title")} aria-label={t("theme.ariaLabel")}>
         <Icon />
       </button>
       {open && (

@@ -1,11 +1,9 @@
-import { useRef, useState } from "react";
-import { useBoardDispatch, useBoardState, useBoardRefetch } from "../state/BoardContext.jsx";
-import { useUsers } from "../state/UsersContext.jsx";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useBoardDispatch, useBoardState } from "../state/BoardContext.jsx";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { uid } from "../utils/id.js";
-import { exportAll, exportBoard, parseImportFile } from "../utils/importExport.js";
-import * as api from "../state/api.js";
 
 function LockIcon() {
   return (
@@ -23,10 +21,9 @@ function NotesIcon() {
 }
 
 export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, screen, onOpenMinutes }) {
+  const { t } = useTranslation();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
-  const refetchBoards = useBoardRefetch();
-  const { users } = useUsers();
   const { user } = useAuth();
   const showToast = useToast();
   const [adding, setAdding] = useState(false);
@@ -34,8 +31,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
   const [newPrivate, setNewPrivate] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
-  const [importing, setImporting] = useState(false);
-  const fileInputRef = useRef(null);
 
   const sharedBoards = state.boards.filter((b) => b.visibility !== "private");
   const privateBoards = state.boards.filter((b) => b.visibility === "private");
@@ -64,62 +59,9 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
     setEditingId(null);
   }
   function deleteBoard(board) {
-    if (!confirm(`Excluir o quadro "${board.title}" e todo o seu conteúdo?`)) return;
+    if (!confirm(t("app.sidebar.deleteBoardConfirm", { title: board.title }))) return;
     dispatch({ type: "DELETE_BOARD", boardId: board.id });
-    showToast("Quadro excluído");
-  }
-
-  function handleExportCurrent() {
-    const board = state.boards.find((b) => b.id === activeBoardId);
-    if (!board) return;
-    exportBoard(board, users);
-    showToast("Quadro exportado");
-  }
-  function handleExportAll() {
-    exportAll(state, users);
-    showToast("Backup completo exportado");
-  }
-  function handleImportClick() {
-    fileInputRef.current?.click();
-  }
-
-  async function handleFileChange(e) {
-    const file = e.target.files[0];
-    e.target.value = "";
-    if (!file) return;
-    setImporting(true);
-    try {
-      const parsed = await parseImportFile(file);
-      let lastBoardId = null;
-      for (const b of parsed.boards) {
-        const created = await api.createBoard({ title: b.title || "Quadro importado" });
-        lastBoardId = created.id;
-        for (const l of b.lists || []) {
-          const listCreated = await api.createList(created.id, { title: l.title || "Lista" });
-          const cardsById = b.cards || {};
-          for (const cardId of l.cardIds || []) {
-            const c = cardsById[cardId];
-            if (!c) continue;
-            const cardCreated = await api.createCard(listCreated.id, { title: c.title || "Sem título" });
-            const memberIds = (c.memberIds || []).filter((oldId) => users.some((u) => u.id === oldId));
-            await api.updateCard(cardCreated.id, {
-              description: c.description || "",
-              labels: c.labels || [],
-              due: c.due || null,
-              checklist: c.checklist || [],
-              memberIds,
-            });
-          }
-        }
-      }
-      await refetchBoards();
-      if (lastBoardId) onSelectBoard(lastBoardId);
-      showToast("Importação concluída");
-    } catch (err) {
-      alert("Falha ao importar: " + err.message);
-    } finally {
-      setImporting(false);
-    }
+    showToast(t("app.sidebar.boardDeletedToast"));
   }
 
   function renderBoardItem(b) {
@@ -146,7 +88,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
           </button>
         )}
         {canDelete && (
-          <button className="board-list-delete" title="Excluir quadro" onClick={() => deleteBoard(b)}>
+          <button className="board-list-delete" title={t("app.sidebar.deleteBoardTitle")} onClick={() => deleteBoard(b)}>
             &times;
           </button>
         )}
@@ -158,17 +100,17 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
     <aside className={"sidebar" + (collapsed ? " collapsed" : "")}>
       <button className={"sidebar-minutes-nav" + (screen === "minutes" ? " active" : "")} onClick={onOpenMinutes}>
         <span className="sidebar-minutes-nav-icon"><NotesIcon /></span>
-        Atas de Reunião
+        {t("app.sidebar.minutesNav")}
       </button>
       <div className="sidebar-divider" />
 
-      <div className="sidebar-header">Quadros compartilhados</div>
+      <div className="sidebar-header">{t("app.sidebar.sharedBoards")}</div>
       <div className="board-list">{sharedBoards.map(renderBoardItem)}</div>
 
       {privateBoards.length > 0 && (
         <>
           <div className="sidebar-header sidebar-header-secondary">
-            <LockIcon /> Meus quadros privados
+            <LockIcon /> {t("app.sidebar.myPrivateBoards")}
           </div>
           <div className="board-list">{privateBoards.map(renderBoardItem)}</div>
         </>
@@ -178,7 +120,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
         <div className="board-add-form">
           <input
             autoFocus
-            placeholder="Nome do quadro"
+            placeholder={t("app.sidebar.boardNamePlaceholder")}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             onKeyDown={(e) => {
@@ -192,11 +134,11 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
           <label className="board-add-private-toggle">
             <input type="checkbox" checked={newPrivate} onChange={(e) => setNewPrivate(e.target.checked)} />
             <LockIcon />
-            <span>Privado (só você vê)</span>
+            <span>{t("app.sidebar.privateToggle")}</span>
           </label>
           <div className="composer-actions">
             <button className="btn-primary btn-small" onClick={addBoard}>
-              Criar
+              {t("app.sidebar.create")}
             </button>
             <button
               className="btn-cancel"
@@ -212,22 +154,9 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
         </div>
       ) : (
         <button className="sidebar-add-board" onClick={() => setAdding(true)}>
-          + Novo quadro
+          {t("app.sidebar.newBoard")}
         </button>
       )}
-
-      <div className="sidebar-divider" />
-      <div className="sidebar-section-label">Dados</div>
-      <button className="sidebar-action" onClick={handleExportCurrent}>
-        Exportar quadro atual
-      </button>
-      <button className="sidebar-action" onClick={handleExportAll}>
-        Exportar tudo (backup)
-      </button>
-      <button className="sidebar-action" onClick={handleImportClick} disabled={importing}>
-        {importing ? "Importando..." : "Importar JSON"}
-      </button>
-      <input type="file" accept="application/json" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
     </aside>
   );
 }

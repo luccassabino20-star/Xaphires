@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../../state/BoardContext.jsx";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
@@ -33,47 +34,21 @@ function TrashIcon() {
   );
 }
 
-const QUADRANTS = [
-  {
-    key: "do",
-    urgent: true,
-    important: true,
-    Icon: FlagIcon,
-    title: "Fazer agora",
-    subtitle: "Urgente e importante",
-    accent: "#b3444a",
-  },
-  {
-    key: "schedule",
-    urgent: false,
-    important: true,
-    Icon: CalendarIcon,
-    title: "Planejar",
-    subtitle: "Importante, não urgente",
-    accent: "#4d7ea8",
-  },
-  {
-    key: "delegate",
-    urgent: true,
-    important: false,
-    Icon: DelegateIcon,
-    title: "Delegar",
-    subtitle: "Urgente, não importante",
-    accent: "#c9922f",
-  },
-  {
-    key: "eliminate",
-    urgent: false,
-    important: false,
-    Icon: TrashIcon,
-    title: "Eliminar",
-    subtitle: "Nem urgente, nem importante",
-    accent: "#7a7a82",
-  },
+const QUADRANT_META = [
+  { key: "do", urgent: true, important: true, Icon: FlagIcon, i18nKey: "doNow", accent: "#b3444a" },
+  { key: "schedule", urgent: false, important: true, Icon: CalendarIcon, i18nKey: "schedule", accent: "#4d7ea8" },
+  { key: "delegate", urgent: true, important: false, Icon: DelegateIcon, i18nKey: "delegate", accent: "#c9922f" },
+  { key: "eliminate", urgent: false, important: false, Icon: TrashIcon, i18nKey: "eliminate", accent: "#7a7a82" },
 ];
 
 export default function MatrixView({ board, users, searchQuery, memberFilter, onOpenCard }) {
+  const { t } = useTranslation();
   const dispatch = useBoardDispatch();
+  const QUADRANTS = QUADRANT_META.map((q) => ({
+    ...q,
+    title: t(`views.matrix.${q.i18nKey}.title`),
+    subtitle: t(`views.matrix.${q.i18nKey}.subtitle`),
+  }));
   const [dragCardId, setDragCardId] = useState(null);
   const [dragOverKey, setDragOverKey] = useState(null);
 
@@ -164,7 +139,7 @@ export default function MatrixView({ board, users, searchQuery, memberFilter, on
                     </div>
                   );
                 })}
-                {qCards.length === 0 && <div className="matrix-quadrant-empty">Arraste cartões para cá</div>}
+                {qCards.length === 0 && <div className="matrix-quadrant-empty">{t("views.matrix.dropHere")}</div>}
               </div>
             </div>
           );

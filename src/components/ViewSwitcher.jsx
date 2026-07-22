@@ -1,19 +1,14 @@
-const VIEWS = [
-  { id: "board", label: "Quadro" },
-  { id: "table", label: "Tabela" },
-  { id: "calendar", label: "Calendário" },
-  { id: "timeline", label: "Linha do tempo" },
-  { id: "dashboard", label: "Painel" },
-  { id: "map", label: "Mapa" },
-  { id: "matrix", label: "Matriz Eisenhower" },
-];
+import { useTranslation } from "react-i18next";
+
+const VIEW_IDS = ["board", "table", "calendar", "timeline", "dashboard", "map", "matrix"];
 
 export default function ViewSwitcher({ view, onChange }) {
+  const { t } = useTranslation();
   return (
     <nav className="view-tabs">
-      {VIEWS.map((v) => (
-        <button key={v.id} className={"view-tab" + (view === v.id ? " active" : "")} onClick={() => onChange(v.id)}>
-          {v.label}
+      {VIEW_IDS.map((id) => (
+        <button key={id} className={"view-tab" + (view === id ? " active" : "")} onClick={() => onChange(id)}>
+          {t(`views.switcher.${id}`)}
         </button>
       ))}
     </nav>

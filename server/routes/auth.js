@@ -2,8 +2,11 @@ import { Router } from "express";
 import { hashPassword, verifyPassword, signToken, verifyToken, COOKIE_NAME } from "../auth.js";
 import { requireAuth } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
+import { runWithCompany } from "../context.js";
+import * as directory from "../directory.js";
+import { getSeedContent } from "../seedContent.js";
 import {
-  countUsers,
+  uid,
   getUserByEmail,
   getUserById,
   insertUser,
@@ -26,8 +29,8 @@ const COOKIE_OPTS = {
   path: "/",
 };
 
-function setAuthCookie(res, user) {
-  res.cookie(COOKIE_NAME, signToken(user), COOKIE_OPTS);
+function setAuthCookie(res, user, companyId) {
+  res.cookie(COOKIE_NAME, signToken(user, companyId), COOKIE_OPTS);
 }
 
 function validateCredentials(name, email, password) {
@@ -38,72 +41,64 @@ function validateCredentials(name, email, password) {
 }
 
 router.get(
-  "/status",
-  ah(async (req, res) => {
-    res.json({ needsSetup: (await countUsers()) === 0 });
-  })
-);
-
-router.get(
   "/me",
   ah(async (req, res) => {
     const token = req.cookies?.[COOKIE_NAME];
     const payload = token && verifyToken(token);
-    const user = payload && (await getUserById(payload.sub));
-    if (!user) return res.status(401).json({ error: "Não autenticado" });
+    if (!payload?.companyId) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+    const user = await runWithCompany(payload.companyId, () => getUserById(payload.sub));
+    if (!user) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
     res.json(publicUser(user));
   })
 );
 
 router.post(
-  "/setup",
+  "/register-company",
   ah(async (req, res) => {
-    if ((await countUsers()) > 0) return res.status(400).json({ error: "Configuração já concluída" });
-    const { name, email, password } = req.body || {};
+    const { companyName, name, email, password, locale } = req.body || {};
+    if (!companyName?.trim()) return res.status(400).json({ error: "Informe o nome da empresa", code: "COMPANY_NAME_REQUIRED" });
     const validationError = validateCredentials(name, email, password);
-    if (validationError) return res.status(400).json({ error: validationError });
-    if (await getUserByEmail(email)) return res.status(409).json({ error: "E-mail já cadastrado" });
+    if (validationError) return res.status(400).json({ error: validationError, code: "VALIDATION_MISSING_FIELDS" });
+    if (directory.getCompanyIdForEmail(email))
+      return res.status(409).json({ error: "E-mail já cadastrado", code: "EMAIL_ALREADY_REGISTERED" });
 
-    const user = await insertUser({
-      name: name.trim(),
-      email: email.trim(),
-      passwordHash: hashPassword(password),
-      role: "master",
+    const companyId = uid();
+    directory.createCompany({ id: companyId, name: companyName.trim() });
+    const seed = getSeedContent(locale);
+
+    const user = await runWithCompany(companyId, async () => {
+      const master = await insertUser({
+        name: name.trim(),
+        email: email.trim(),
+        passwordHash: hashPassword(password),
+        role: "master",
+      });
+
+      const boardId = await createBoard({ title: seed.boardTitle });
+      const listTodo = await createList(boardId, { title: seed.listTodo });
+      const listDoing = await createList(boardId, { title: seed.listDoing });
+      await createList(boardId, { title: seed.listDone });
+      const c1 = await createCard(listTodo, { title: seed.welcomeCardTitle });
+      await updateCard(c1, {
+        description: seed.welcomeCardDescription,
+        labels: ["blue"],
+      });
+      await createCard(listTodo, { title: seed.dragCardTitle });
+      await createCard(listDoing, { title: seed.inviteCardTitle });
+
+      return master;
     });
 
-    const boardId = await createBoard({ title: "Meu Quadro" });
-    const listTodo = await createList(boardId, { title: "A Fazer" });
-    const listDoing = await createList(boardId, { title: "Em Andamento" });
-    await createList(boardId, { title: "Concluído" });
-    const c1 = await createCard(listTodo, { title: "Bem-vindo ao seu quadro Kanban 👋" });
-    await updateCard(c1, {
-      description: "Clique em um cartão para editar detalhes, etiquetas, membros, datas e checklists.",
-      labels: ["blue"],
-    });
-    await createCard(listTodo, { title: "Arraste os cartões entre as listas" });
-    await createCard(listDoing, { title: "Convide sua equipe no painel de Usuários" });
+    // Corrida rara: alguém registrou o mesmo e-mail entre a checagem acima e agora.
+    // A empresa/usuário criados ficam órfãos (sem entrada no diretório, portanto inacessíveis)
+    // em vez de sobrescrever o registro do vencedor da corrida.
+    try {
+      directory.addUserToDirectory(email, companyId);
+    } catch {
+      return res.status(409).json({ error: "E-mail já cadastrado", code: "EMAIL_ALREADY_REGISTERED" });
+    }
 
-    setAuthCookie(res, user);
-    res.status(201).json(publicUser(user));
-  })
-);
-
-router.post(
-  "/register",
-  ah(async (req, res) => {
-    if ((await countUsers()) === 0) return res.status(400).json({ error: "Conclua a configuração inicial primeiro" });
-    const { name, email, password } = req.body || {};
-    const validationError = validateCredentials(name, email, password);
-    if (validationError) return res.status(400).json({ error: validationError });
-    if (await getUserByEmail(email)) return res.status(409).json({ error: "E-mail já cadastrado" });
-
-    const user = await insertUser({
-      name: name.trim(),
-      email: email.trim(),
-      passwordHash: hashPassword(password),
-      role: "member",
-    });
-    setAuthCookie(res, user);
+    setAuthCookie(res, user, companyId);
     res.status(201).json(publicUser(user));
   })
 );
@@ -112,11 +107,14 @@ router.post(
   "/login",
   ah(async (req, res) => {
     const { email, password } = req.body || {};
-    const user = email && (await getUserByEmail(email));
+    const companyId = email && directory.getCompanyIdForEmail(email);
+    if (!companyId) return res.status(401).json({ error: "E-mail ou senha inválidos", code: "INVALID_CREDENTIALS" });
+
+    const user = await runWithCompany(companyId, () => getUserByEmail(email));
     if (!user || !verifyPassword(password || "", user.password_hash)) {
-      return res.status(401).json({ error: "E-mail ou senha inválidos" });
+      return res.status(401).json({ error: "E-mail ou senha inválidos", code: "INVALID_CREDENTIALS" });
     }
-    setAuthCookie(res, user);
+    setAuthCookie(res, user, companyId);
     res.json(publicUser(user));
   })
 );
@@ -132,10 +130,10 @@ router.post(
   ah(async (req, res) => {
     const { currentPassword, newPassword } = req.body || {};
     if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ error: "A nova senha deve ter ao menos 6 caracteres" });
+      return res.status(400).json({ error: "A nova senha deve ter ao menos 6 caracteres", code: "PASSWORD_TOO_SHORT" });
     }
     if (!verifyPassword(currentPassword || "", req.user.password_hash)) {
-      return res.status(401).json({ error: "Senha atual incorreta" });
+      return res.status(401).json({ error: "Senha atual incorreta", code: "CURRENT_PASSWORD_INCORRECT" });
     }
     await setPassword(req.user.id, hashPassword(newPassword));
     res.json({ ok: true });

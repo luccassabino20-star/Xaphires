@@ -87,6 +87,9 @@ export function syncAction(action, state) {
       }
       break;
     }
+    case "SET_CARD_ATTACHMENTS":
+      // already persisted server-side by the dedicated attachment endpoints
+      break;
     default:
       break;
   }

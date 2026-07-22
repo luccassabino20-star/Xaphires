@@ -1,91 +1,70 @@
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ThemeToggle from "../components/ThemeToggle.jsx";
+import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 
-const FEATURES = [
-  { badge: "Q", title: "Quadro Kanban", text: "Chega de tarefa perdida em print de conversa. Arraste e solte entre listas e veja o andamento real da equipe." },
-  { badge: "T", title: "Tabela", text: "Todos os cartões em formato de planilha, com busca e filtro por membro — sem precisar de outra ferramenta." },
-  { badge: "C", title: "Calendário", text: "Prazos e datas de início numa visão mensal, para nada passar despercebido." },
-  { badge: "L", title: "Linha do tempo", text: "O cronograma inteiro do projeto num só olhar, período a período." },
-  { badge: "P", title: "Painel", text: "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma." },
-  { badge: "M", title: "Mapa", text: "Tarefas com endereço plotadas num mapa interativo — ótimo para equipes em campo." },
-  { badge: "E", title: "Matriz Eisenhower", text: "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto." },
-  { badge: "A", title: "Atas de reunião", text: "Pauta, decisões e itens de ação registrados — e cobrados depois." },
-];
+const NAV_PAGES = ["home", "features", "solutions", "pricing"];
 
-const BENEFITS = [
-  { title: "Tudo num só lugar", text: "Substitua planilhas soltas, grupos de WhatsApp e ferramentas espalhadas por um único sistema." },
-  { title: "Sua equipe já entende", text: "Interface simples, sem curso ou treinamento — quem já usou um quadro Kanban começa a usar em minutos." },
-  { title: "Cresce com você", text: "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis." },
-];
+function StatCard({ value, label }) {
+  const ref = useRef(null);
 
-const PLANS = [
-  {
-    name: "Básico",
-    price: "R$ 399",
-    period: "/mês",
-    tagline: "Para equipes pequenas começarem com o essencial",
-    cta: "Assinar Básico",
-    features: ["Até 3 usuários", "Quadros ilimitados", "Quadro Kanban, Tabela e Calendário", "Suporte por e-mail"],
-  },
-  {
-    name: "Profissional",
-    price: "R$ 799",
-    period: "/usuário/mês",
-    tagline: "Para equipes que querem controle total",
-    cta: "Assinar Profissional",
-    highlight: true,
-    features: [
-      "Usuários ilimitados",
-      "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
-      "Atas de reunião",
-      "Quadros privados e compartilhados",
-      "Suporte prioritário",
-    ],
-  },
-  {
-    name: "Empresarial",
-    price: "Sob consulta",
-    period: "",
-    tagline: "Para organizações com necessidades específicas",
-    cta: "Falar com vendas",
-    features: ["Tudo do Profissional", "Onboarding dedicado", "Suporte dedicado", "Acordo de nível de serviço (SLA)"],
-  },
-];
+  function handleMove(e) {
+    const el = ref.current;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.setProperty("--rx", `${(-y * 14).toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${(x * 14).toFixed(2)}deg`);
+    el.style.setProperty("--tx", `${(x * 18).toFixed(2)}px`);
+    el.style.setProperty("--ty", `${(y * 18).toFixed(2)}px`);
+  }
 
-export default function LandingScreen({ onEnter }) {
+  function handleLeave() {
+    const el = ref.current;
+    el.style.setProperty("--rx", "0deg");
+    el.style.setProperty("--ry", "0deg");
+    el.style.setProperty("--tx", "0px");
+    el.style.setProperty("--ty", "0px");
+  }
+
   return (
-    <div className="landing-shell">
-      <header className="landing-nav">
-        <div className="landing-nav-brand">
-          <span className="landing-nav-icon">IMG</span>
-          <span>Kanban IMG</span>
-        </div>
-        <div className="landing-nav-actions">
-          <ThemeToggle />
-          <button className="btn-primary btn-small" onClick={onEnter}>
-            Entrar
-          </button>
-        </div>
-      </header>
+    <div className="landing-stat-card" ref={ref} onMouseMove={handleMove} onMouseLeave={handleLeave}>
+      <span className="landing-stat-value">{value}</span>
+      <span className="landing-stat-label">{label}</span>
+    </div>
+  );
+}
 
+function HomePage({ onEnter, onNavigate }) {
+  const { t } = useTranslation();
+  const stats = t("landing.home.stats", { returnObjects: true });
+  const benefits = t("landing.home.benefits", { returnObjects: true });
+  const exploreLinks = t("landing.home.exploreLinks", { returnObjects: true });
+
+  return (
+    <>
       <section className="landing-hero">
-        <h1>Sua equipe organizada, sem esforço extra</h1>
-        <p>
-          O Kanban IMG substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades
-          e atas de reunião, sincronizados em tempo real para toda a equipe.
-        </p>
+        <h1>{t("landing.home.heroTitle")}</h1>
+        <p>{t("landing.home.heroText")}</p>
         <div className="landing-hero-actions">
           <button className="btn-primary" onClick={onEnter}>
-            Comece agora
+            {t("landing.home.ctaStart")}
           </button>
-          <a className="btn-secondary landing-hero-secondary" href="#planos">
-            Ver planos
-          </a>
+          <button className="btn-secondary landing-hero-secondary" onClick={() => onNavigate("pricing")}>
+            {t("landing.home.ctaPlans")}
+          </button>
         </div>
-        <p className="landing-hero-note">Sem burocracia. Cancele quando quiser.</p>
+        <p className="landing-hero-note">{t("landing.home.heroNote")}</p>
+      </section>
+
+      <section className="landing-stats">
+        {stats.map((s) => (
+          <StatCard key={s.label} value={s.value} label={s.label} />
+        ))}
       </section>
 
       <section className="landing-benefits">
-        {BENEFITS.map((b) => (
+        {benefits.map((b) => (
           <div className="landing-benefit-item" key={b.title}>
             <h3>{b.title}</h3>
             <p>{b.text}</p>
@@ -93,10 +72,38 @@ export default function LandingScreen({ onEnter }) {
         ))}
       </section>
 
+      <section className="landing-explore">
+        <h2>{t("landing.home.exploreTitle")}</h2>
+        <div className="landing-explore-grid">
+          {exploreLinks.map((e) => (
+            <button className="landing-explore-card" key={e.page} onClick={() => onNavigate(e.page)}>
+              <span className="landing-feature-badge">{e.badge}</span>
+              <h3>{e.title}</h3>
+              <p>{e.text}</p>
+              <span className="landing-explore-arrow" aria-hidden="true">→</span>
+            </button>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function FeaturesPage() {
+  const { t } = useTranslation();
+  const items = t("landing.features.items", { returnObjects: true });
+  const secondary = t("landing.features.secondary", { returnObjects: true });
+
+  return (
+    <>
+      <section className="landing-page-header">
+        <h1>{t("landing.features.headerTitle")}</h1>
+        <p>{t("landing.features.headerText")}</p>
+      </section>
+
       <section className="landing-features">
-        <h2>Tudo o que a sua equipe precisa</h2>
         <div className="landing-features-grid">
-          {FEATURES.map((f) => (
+          {items.map((f) => (
             <div className="landing-feature-card" key={f.title}>
               <span className="landing-feature-badge">{f.badge}</span>
               <h3>{f.title}</h3>
@@ -106,13 +113,64 @@ export default function LandingScreen({ onEnter }) {
         </div>
       </section>
 
-      <section className="landing-pricing" id="planos">
-        <h2>Escolha o plano da sua equipe</h2>
-        <p className="landing-pricing-sub">Escolha o plano ideal para sua equipe e mude quando ela crescer.</p>
+      <section className="landing-secondary">
+        {secondary.map((s) => (
+          <div className="landing-secondary-item" key={s.title}>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        ))}
+      </section>
+    </>
+  );
+}
+
+function SolutionsPage() {
+  const { t } = useTranslation();
+  const items = t("landing.solutions.items", { returnObjects: true });
+
+  return (
+    <>
+      <section className="landing-page-header">
+        <h1>{t("landing.solutions.headerTitle")}</h1>
+        <p>{t("landing.solutions.headerText")}</p>
+      </section>
+
+      <section className="landing-solutions">
+        {items.map((s) => (
+          <div className="landing-solution-card" key={s.title}>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+            <div className="landing-solution-tags">
+              {s.tags.map((tag) => (
+                <span className="landing-solution-tag" key={tag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+    </>
+  );
+}
+
+function PricingPage({ onEnter }) {
+  const { t } = useTranslation();
+  const plans = t("landing.pricing.plans", { returnObjects: true });
+
+  return (
+    <>
+      <section className="landing-page-header">
+        <h1>{t("landing.pricing.headerTitle")}</h1>
+        <p>{t("landing.pricing.headerText")}</p>
+      </section>
+
+      <section className="landing-pricing">
         <div className="landing-pricing-grid">
-          {PLANS.map((p) => (
+          {plans.map((p) => (
             <div className={"landing-plan-card" + (p.highlight ? " highlight" : "")} key={p.name}>
-              {p.highlight && <span className="landing-plan-badge">Mais popular</span>}
+              {p.highlight && <span className="landing-plan-badge">{t("landing.pricing.mostPopular")}</span>}
               <h3>{p.name}</h3>
               <p className="landing-plan-tagline">{p.tagline}</p>
               <div className="landing-plan-price">
@@ -131,22 +189,55 @@ export default function LandingScreen({ onEnter }) {
           ))}
         </div>
       </section>
+    </>
+  );
+}
 
-      <section className="landing-secondary">
-        <div className="landing-secondary-item">
-          <h3>Quadros privados e compartilhados</h3>
-          <p>Separe o que é da equipe do que é só seu, com controle total de visibilidade.</p>
+export default function LandingScreen({ onEnter }) {
+  const { t } = useTranslation();
+  const shellRef = useRef(null);
+  const [page, setPage] = useState("home");
+
+  useEffect(() => {
+    shellRef.current?.scrollTo({ top: 0 });
+  }, [page]);
+
+  return (
+    <div className="landing-shell" ref={shellRef}>
+      <header className="landing-nav">
+        <div className="landing-nav-brand">
+          <span className="landing-nav-icon">IMG</span>
+          <span>{t("landing.nav.brand")}</span>
         </div>
-        <div className="landing-secondary-item">
-          <h3>Controle de usuários e papéis</h3>
-          <p>Defina quem é administrador (master) e quem é membro da equipe.</p>
+        <nav className="landing-nav-links">
+          {NAV_PAGES.map((p) => (
+            <button
+              key={p}
+              className={"landing-nav-link" + (page === p ? " active" : "")}
+              onClick={() => setPage(p)}
+            >
+              {t(`landing.nav.${p}`)}
+            </button>
+          ))}
+        </nav>
+        <div className="landing-nav-actions">
+          <LanguageSwitcher />
+          <ThemeToggle />
+          <button className="btn-primary btn-small" onClick={onEnter}>
+            {t("landing.nav.enter")}
+          </button>
         </div>
-      </section>
+      </header>
+
+      {page === "home" && <HomePage onEnter={onEnter} onNavigate={setPage} />}
+      {page === "features" && <FeaturesPage />}
+      {page === "solutions" && <SolutionsPage />}
+      {page === "pricing" && <PricingPage onEnter={onEnter} />}
 
       <footer className="landing-footer">
-        <h2>Pronto para organizar sua equipe?</h2>
+        <h2>{t("landing.footer.title")}</h2>
         <button className="btn-primary" onClick={onEnter}>
-          Comece agora
+          {t("landing.footer.cta")}
         </button>
       </footer>
     </div>

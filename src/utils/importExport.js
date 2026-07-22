@@ -53,10 +53,16 @@ export function exportAll(state, users) {
   download(`kanban-backup-${dateStamp()}.json`, payload);
 }
 
-export function parseImportFile(file) {
+function codedError(code, message) {
+  const err = new Error(message);
+  err.code = code;
+  return err;
+}
+
+export function parseImportFile(file, defaultBoardTitle) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Não foi possível ler o arquivo"));
+    reader.onerror = () => reject(codedError("IMPORT_READ_FAIL", "Não foi possível ler o arquivo"));
     reader.onload = () => {
       try {
         const json = JSON.parse(reader.result);
@@ -67,12 +73,12 @@ export function parseImportFile(file) {
         } else if (Array.isArray(json.boards)) {
           resolve({ boards: json.boards });
         } else if (json.lists && json.cards) {
-          resolve({ boards: [{ title: json.boardTitle || json.title || "Quadro importado", lists: json.lists, cards: json.cards }] });
+          resolve({ boards: [{ title: json.boardTitle || json.title || defaultBoardTitle, lists: json.lists, cards: json.cards }] });
         } else {
-          reject(new Error("Formato de arquivo não reconhecido"));
+          reject(codedError("IMPORT_UNRECOGNIZED_FORMAT", "Formato de arquivo não reconhecido"));
         }
       } catch (e) {
-        reject(new Error("JSON inválido"));
+        reject(codedError("IMPORT_INVALID_JSON", "JSON inválido"));
       }
     };
     reader.readAsText(file);

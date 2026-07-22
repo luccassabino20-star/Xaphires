@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Sidebar from "./components/Sidebar.jsx";
 import TopBar from "./components/TopBar.jsx";
 import TaskTicker from "./components/TaskTicker.jsx";
@@ -16,6 +17,7 @@ import { useBoardState } from "./state/BoardContext.jsx";
 import { useUsers } from "./state/UsersContext.jsx";
 
 export default function AuthenticatedApp() {
+  const { t } = useTranslation();
   const state = useBoardState();
   const { users } = useUsers();
   const [activeBoardId, setActiveBoardId] = useState(null);
@@ -41,7 +43,7 @@ export default function AuthenticatedApp() {
   }
 
   if (!state.hydrated) {
-    return <div className="app-loading">Carregando quadros...</div>;
+    return <div className="app-loading">{t("app.loadingBoards")}</div>;
   }
 
   const viewProps = { board, users, searchQuery, memberFilter, onOpenCard: setActiveCardId };
@@ -67,6 +69,7 @@ export default function AuthenticatedApp() {
               onSearchChange={setSearchQuery}
               memberFilter={memberFilter}
               onFilterChange={setMemberFilter}
+              onSelectBoard={selectBoard}
             />
             {board && <TaskTicker board={board} onOpenCard={setActiveCardId} />}
             {board && <ViewSwitcher view={view} onChange={setView} />}
@@ -83,7 +86,7 @@ export default function AuthenticatedApp() {
                 {view === "matrix" && <MatrixView {...viewProps} />}
               </div>
             ) : (
-              <div className="empty-state">Nenhum quadro. Crie um na barra lateral.</div>
+              <div className="empty-state">{t("app.noBoards")}</div>
             )}
           </>
         )}

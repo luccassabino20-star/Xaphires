@@ -17,7 +17,7 @@ router.post(
   "/",
   ah(async (req, res) => {
     const { id, title, visibility } = req.body || {};
-    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório" });
+    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório", code: "TITLE_REQUIRED" });
     const boardId = await repo.createBoard({ id, title: title.trim(), ownerId: req.user.id, visibility });
     res.status(201).json({ id: boardId });
   })
@@ -40,7 +40,9 @@ router.delete(
   ah(async (req, res) => {
     const access = await repo.getBoardAccessInfo(req.params.id);
     if (access.visibility !== "private" && req.user.role !== "master") {
-      return res.status(403).json({ error: "Apenas o usuário master pode excluir quadros compartilhados" });
+      return res
+        .status(403)
+        .json({ error: "Apenas o usuário master pode excluir quadros compartilhados", code: "FORBIDDEN_DELETE_SHARED_BOARD" });
     }
     await repo.deleteBoard(req.params.id);
     res.json({ ok: true });
@@ -61,7 +63,7 @@ router.post(
   requireBoardAccess((req) => req.params.boardId),
   ah(async (req, res) => {
     const { id, title } = req.body || {};
-    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório" });
+    if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório", code: "TITLE_REQUIRED" });
     const listId = await repo.createList(req.params.boardId, { id, title: title.trim() });
     res.status(201).json({ id: listId });
   })
@@ -72,7 +74,8 @@ router.put(
   requireBoardAccess((req) => req.params.boardId),
   ah(async (req, res) => {
     const { orderedListIds } = req.body || {};
-    if (!Array.isArray(orderedListIds)) return res.status(400).json({ error: "orderedListIds obrigatório" });
+    if (!Array.isArray(orderedListIds))
+      return res.status(400).json({ error: "orderedListIds obrigatório", code: "ORDERED_LIST_IDS_REQUIRED" });
     await repo.setListOrder(orderedListIds);
     res.json({ ok: true });
   })

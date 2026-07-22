@@ -1,14 +1,28 @@
-import pg from "pg";
+import { DatabaseSync } from "node:sqlite";
+import fs from "node:fs";
+import path from "node:path";
+import { getCurrentCompanyId } from "./context.js";
 
-const { Pool } = pg;
+const dataDir = process.env.KANBAN_DATA_DIR || path.join(process.cwd(), "server", "data");
+fs.mkdirSync(dataDir, { recursive: true });
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+export function companiesDir() {
+  return path.join(dataDir, "companies");
+}
 
-export async function initDb() {
-  await pool.query(`
+export function legacyDbPath() {
+  return path.join(dataDir, "app.sqlite");
+}
+
+function addColumnIfMissing(companyDb, table, name, ddl) {
+  const columns = companyDb.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+  if (!columns.includes(name)) companyDb.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+}
+
+function applySchema(companyDb) {
+  companyDb.exec(`
+    PRAGMA foreign_keys = ON;
+
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -50,6 +64,7 @@ export async function initDb() {
       completed INTEGER NOT NULL DEFAULT 0,
       urgent INTEGER NOT NULL DEFAULT 0,
       important INTEGER NOT NULL DEFAULT 0,
+      attachments TEXT NOT NULL DEFAULT '[]',
       position INTEGER NOT NULL DEFAULT 0
     );
 
@@ -64,15 +79,37 @@ export async function initDb() {
       action_items TEXT NOT NULL DEFAULT '[]',
       created_at TEXT NOT NULL
     );
-
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS completed INTEGER NOT NULL DEFAULT 0;
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS start_date TEXT;
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS location TEXT;
-    ALTER TABLE boards ADD COLUMN IF NOT EXISTS background TEXT;
-    ALTER TABLE boards ADD COLUMN IF NOT EXISTS owner_id TEXT;
-    ALTER TABLE boards ADD COLUMN IF NOT EXISTS visibility TEXT NOT NULL DEFAULT 'shared';
-    ALTER TABLE lists ADD COLUMN IF NOT EXISTS color TEXT;
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS urgent INTEGER NOT NULL DEFAULT 0;
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS important INTEGER NOT NULL DEFAULT 0;
   `);
+
+  addColumnIfMissing(companyDb, "cards", "completed", "completed INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing(companyDb, "cards", "start_date", "start_date TEXT");
+  addColumnIfMissing(companyDb, "cards", "location", "location TEXT");
+  addColumnIfMissing(companyDb, "boards", "background", "background TEXT");
+  addColumnIfMissing(companyDb, "boards", "owner_id", "owner_id TEXT");
+  addColumnIfMissing(companyDb, "boards", "visibility", "visibility TEXT NOT NULL DEFAULT 'shared'");
+  addColumnIfMissing(companyDb, "lists", "color", "color TEXT");
+  addColumnIfMissing(companyDb, "cards", "urgent", "urgent INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing(companyDb, "cards", "important", "important INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing(companyDb, "cards", "attachments", "attachments TEXT NOT NULL DEFAULT '[]'");
+}
+
+const cache = new Map();
+
+export function getCompanyDb(companyId) {
+  if (cache.has(companyId)) return cache.get(companyId);
+  const dir = path.join(companiesDir(), companyId);
+  fs.mkdirSync(dir, { recursive: true });
+  const companyDb = new DatabaseSync(path.join(dir, "app.sqlite"));
+  applySchema(companyDb);
+  cache.set(companyId, companyDb);
+  return companyDb;
+}
+
+export function getDb() {
+  return getCompanyDb(getCurrentCompanyId());
+}
+
+export function closeAllDbs() {
+  for (const companyDb of cache.values()) companyDb.close();
+  cache.clear();
 }

@@ -1,19 +1,23 @@
 import { verifyToken, COOKIE_NAME } from "./auth.js";
 import { getUserById, getBoardAccessInfo } from "./repo.js";
 import { ah } from "./asyncHandler.js";
+import { runWithCompany } from "./context.js";
 
 export const requireAuth = ah(async (req, res, next) => {
   const token = req.cookies?.[COOKIE_NAME];
   const payload = token && verifyToken(token);
-  if (!payload) return res.status(401).json({ error: "Não autenticado" });
-  const user = await getUserById(payload.sub);
-  if (!user) return res.status(401).json({ error: "Não autenticado" });
-  req.user = user;
-  next();
+  if (!payload?.companyId) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+  return runWithCompany(payload.companyId, async () => {
+    const user = await getUserById(payload.sub);
+    if (!user) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+    req.companyId = payload.companyId;
+    req.user = user;
+    next();
+  });
 });
 
 export function requireMaster(req, res, next) {
-  if (req.user?.role !== "master") return res.status(403).json({ error: "Acesso restrito ao usuário master" });
+  if (req.user?.role !== "master") return res.status(403).json({ error: "Acesso restrito ao usuário master", code: "FORBIDDEN_MASTER_ONLY" });
   next();
 }
 
@@ -28,10 +32,11 @@ export function hasBoardAccess(user, access) {
 export function requireBoardAccess(getBoardId) {
   return ah(async (req, res, next) => {
     const boardId = getBoardId(req);
-    if (!boardId) return res.status(404).json({ error: "Quadro não encontrado" });
+    if (!boardId) return res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
     const access = await getBoardAccessInfo(boardId);
-    if (!access) return res.status(404).json({ error: "Quadro não encontrado" });
-    if (!hasBoardAccess(req.user, access)) return res.status(403).json({ error: "Você não tem acesso a este quadro" });
+    if (!access) return res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
+    if (!hasBoardAccess(req.user, access))
+      return res.status(403).json({ error: "Você não tem acesso a este quadro", code: "FORBIDDEN_BOARD_ACCESS" });
     next();
   });
 }
@@ -41,10 +46,11 @@ export function requireBoardAccess(getBoardId) {
 export function requireBoardAccessParam(resolveBoardId) {
   return ah(async (req, res, next, value) => {
     const boardId = await resolveBoardId(value);
-    if (!boardId) return res.status(404).json({ error: "Não encontrado" });
+    if (!boardId) return res.status(404).json({ error: "Não encontrado", code: "NOT_FOUND" });
     const access = await getBoardAccessInfo(boardId);
-    if (!access) return res.status(404).json({ error: "Quadro não encontrado" });
-    if (!hasBoardAccess(req.user, access)) return res.status(403).json({ error: "Você não tem acesso a este quadro" });
+    if (!access) return res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
+    if (!hasBoardAccess(req.user, access))
+      return res.status(403).json({ error: "Você não tem acesso a este quadro", code: "FORBIDDEN_BOARD_ACCESS" });
     next();
   });
 }

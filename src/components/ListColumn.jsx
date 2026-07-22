@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { uid } from "../utils/id.js";
 import CardItem from "./CardItem.jsx";
@@ -20,6 +21,7 @@ export default function ListColumn({
   onListDragEnd,
   onListHover,
 }) {
+  const { t } = useTranslation();
   const dispatch = useBoardDispatch();
   const [title, setTitle] = useState(list.title);
   const [addingCard, setAddingCard] = useState(false);
@@ -33,7 +35,7 @@ export default function ListColumn({
   }, [list.title]);
 
   function commitTitle() {
-    const val = title.trim() || "Lista";
+    const val = title.trim() || t("board.listColumn.defaultListName");
     dispatch({ type: "RENAME_LIST", boardId: board.id, listId: list.id, title: val });
     setTitle(val);
   }
@@ -64,7 +66,7 @@ export default function ListColumn({
   }
 
   const listStyle = list.color
-    ? { background: `color-mix(in srgb, ${list.color} 16%, var(--bg-list))`, borderTop: `3px solid ${list.color}` }
+    ? { background: `color-mix(in srgb, ${list.color} 16%, var(--bg-column))`, borderTop: `3px solid ${list.color}` }
     : undefined;
 
   return (
@@ -118,7 +120,7 @@ export default function ListColumn({
           <div className="card-composer">
             <textarea
               autoFocus
-              placeholder="Insira um título para este cartão..."
+              placeholder={t("board.listColumn.cardTitlePlaceholder")}
               value={newCardText}
               onChange={(e) => setNewCardText(e.target.value)}
               onKeyDown={(e) => {
@@ -134,7 +136,7 @@ export default function ListColumn({
             />
             <div className="composer-actions">
               <button className="btn-primary btn-small" onClick={submitNewCard}>
-                Adicionar cartão
+                {t("board.listColumn.addCardBtn")}
               </button>
               <button
                 className="btn-cancel"
@@ -149,7 +151,7 @@ export default function ListColumn({
           </div>
         ) : (
           <button className="add-card-btn" onClick={() => setAddingCard(true)}>
-            + Adicionar um cartão
+            {t("board.listColumn.addCard")}
           </button>
         )}
       </div>

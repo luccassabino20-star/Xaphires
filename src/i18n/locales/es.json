@@ -1,0 +1,401 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "add": "Agregar",
+    "remove": "Eliminar",
+    "close": "Cerrar",
+    "loading": "Cargando..."
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema",
+    "title": "Tema",
+    "ariaLabel": "Cambiar tema"
+  },
+  "language": {
+    "title": "Idioma",
+    "ariaLabel": "Cambiar idioma",
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
+  "landing": {
+    "nav": {
+      "brand": "Kanban IMG",
+      "home": "Inicio",
+      "features": "Funciones",
+      "solutions": "Soluciones",
+      "pricing": "Precios",
+      "enter": "Ingresar"
+    },
+    "home": {
+      "heroTitle": "Tu equipo organizado, sin esfuerzo extra",
+      "heroText": "Kanban IMG reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
+      "ctaStart": "Empieza ahora",
+      "ctaPlans": "Ver planes",
+      "heroNote": "Sin burocracia. Cancela cuando quieras.",
+      "stats": [
+        { "value": "8", "label": "Herramientas integradas en un solo lugar" },
+        { "value": "100%", "label": "Sincronización en tiempo real entre el equipo" },
+        { "value": "0", "label": "Hojas de cálculo sueltas o grupos de WhatsApp" },
+        { "value": "24/7", "label": "Acceso al tablero, desde cualquier lugar" }
+      ],
+      "benefits": [
+        { "title": "Todo en un solo lugar", "text": "Reemplaza hojas de cálculo sueltas, grupos de WhatsApp y herramientas dispersas por un único sistema." },
+        { "title": "Tu equipo ya lo entiende", "text": "Interfaz simple, sin necesidad de capacitación — quien ya usó un tablero Kanban empieza a usarlo en minutos." },
+        { "title": "Crece contigo", "text": "De un equipo pequeño a varias áreas, con tableros privados y compartidos, control de accesos y roles." }
+      ],
+      "exploreTitle": "Explora Kanban IMG",
+      "exploreLinks": [
+        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las 8 herramientas de Kanban IMG: tablero, tabla, calendario, mapa y más." },
+        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Kanban IMG en el día a día." },
+        { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Básico, Profesional y Empresarial y elige el ideal para tu equipo." }
+      ]
+    },
+    "features": {
+      "headerTitle": "Todo lo que tu equipo necesita",
+      "headerText": "Ocho herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
+      "items": [
+        { "badge": "T", "title": "Tablero Kanban", "text": "Se acabaron las tareas perdidas en capturas de chat. Arrastra y suelta entre listas y ve el avance real del equipo." },
+        { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro — sin necesitar otra herramienta." },
+        { "badge": "C", "title": "Calendario", "text": "Plazos y fechas de inicio en una vista mensual, para que nada pase desapercibido." },
+        { "badge": "L", "title": "Línea de tiempo", "text": "Todo el cronograma del proyecto de un vistazo, período a período." },
+        { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla." },
+        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo — ideal para equipos en terreno." },
+        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte." },
+        { "badge": "A", "title": "Actas de reunión", "text": "Agenda, decisiones y tareas registradas — y exigidas después." }
+      ],
+      "secondary": [
+        { "title": "Tableros privados y compartidos", "text": "Separa lo que es del equipo de lo que es solo tuyo, con control total de visibilidad." },
+        { "title": "Control de usuarios y roles", "text": "Define quién es administrador (master) y quién es miembro del equipo." }
+      ]
+    },
+    "solutions": {
+      "headerTitle": "Soluciones para cada tipo de equipo",
+      "headerText": "El mismo Kanban IMG, organizado como cada equipo necesita trabajar.",
+      "items": [
+        { "title": "Agencias y equipos de proyecto", "text": "Un tablero por cliente o proyecto, con línea de tiempo para plazos y panel de métricas listo para mostrar el progreso en reuniones.", "tags": ["Tablero Kanban", "Línea de tiempo", "Panel"] },
+        { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa — ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
+        { "title": "Gestión y liderazgo", "text": "Prioriza con la Matriz de Eisenhower, sigue los indicadores en el Panel y mantén la planificación sensible en tableros privados.", "tags": ["Matriz de Eisenhower", "Panel", "Tableros privados"] },
+        { "title": "Operaciones y rutina", "text": "El dúo Tablero Kanban + Tabla cubre el trabajo diario, con Calendario para plazos recurrentes y nada pasa desapercibido.", "tags": ["Tablero Kanban", "Tabla", "Calendario"] },
+        { "title": "Reuniones y alineación", "text": "Actas de reunión con agenda, decisiones y tareas — registradas al momento y exigidas después, sin depender de la memoria.", "tags": ["Actas de reunión"] }
+      ]
+    },
+    "pricing": {
+      "headerTitle": "Elige el plan de tu equipo",
+      "headerText": "Elige el plan ideal para tu equipo y cámbialo cuando crezca.",
+      "mostPopular": "Más popular",
+      "plans": [
+        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 3 usuarios", "Tableros ilimitados", "Tablero Kanban, Tabla y Calendario", "Soporte por correo"] },
+        { "name": "Profesional", "price": "R$ 799", "period": "/usuario/mes", "tagline": "Para equipos que quieren control total", "cta": "Suscribirse a Profesional", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Tableros privados y compartidos", "Soporte prioritario"] },
+        { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo de Profesional", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
+      ]
+    },
+    "footer": {
+      "title": "¿Listo para organizar tu equipo?",
+      "cta": "Empieza ahora"
+    }
+  },
+  "auth": {
+    "brandTitle": "Kanban IMG",
+    "brandText": "Organiza tus proyectos en tableros Kanban simples, rápidos y colaborativos.",
+    "back": "← Volver",
+    "tabLogin": "Ingresar",
+    "tabSignup": "Crear empresa",
+    "companyName": "Nombre de la empresa",
+    "yourName": "Tu nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordsMismatch": "Las contraseñas no coinciden",
+    "submitWait": "Espera...",
+    "submitLogin": "Ingresar",
+    "submitSignup": "Crear empresa"
+  },
+  "app": {
+    "loadingBoards": "Cargando tableros...",
+    "noBoards": "Sin tableros. Crea uno en la barra lateral.",
+    "sidebar": {
+      "minutesNav": "Actas de Reunión",
+      "sharedBoards": "Tableros compartidos",
+      "myPrivateBoards": "Mis tableros privados",
+      "newBoard": "+ Nuevo tablero",
+      "boardNamePlaceholder": "Nombre del tablero",
+      "privateToggle": "Privado (solo tú lo ves)",
+      "create": "Crear",
+      "deleteBoardTitle": "Eliminar tablero",
+      "deleteBoardConfirm": "¿Eliminar el tablero \"{{title}}\" y todo su contenido?",
+      "boardDeletedToast": "Tablero eliminado"
+    },
+    "topbar": {
+      "toggleSidebar": "Mostrar/ocultar barra lateral",
+      "menu": "Menú",
+      "defaultBoardName": "Tablero sin nombre",
+      "privateBoardTitle": "Tablero privado — visible solo para ti",
+      "filterBy": "Filtrar por {{name}}",
+      "usersBtn": "Usuarios",
+      "searchPlaceholder": "Buscar tarjetas...",
+      "clearBoard": "Vaciar tablero",
+      "clearBoardConfirm": "Esto borrará todas las listas y tarjetas de este tablero. ¿Continuar?",
+      "clearBoardToast": "Tablero vaciado"
+    },
+    "dataMenu": {
+      "moreOptions": "Más opciones",
+      "personalize": "Personalizar",
+      "dataSection": "Datos",
+      "exportCurrent": "Exportar tablero actual",
+      "exportAll": "Exportar todo (respaldo)",
+      "importJson": "Importar JSON",
+      "importing": "Importando...",
+      "colors": "Colores",
+      "gradients": "Degradados",
+      "monoGradientTitle": "Degradado por tonalidad",
+      "monoGradientHint": "Elige un color y el degradado pasa por tonos más claros y más oscuros de él.",
+      "customColor": "Color personalizado",
+      "apply": "Aplicar",
+      "noBackground": "Predeterminado (sin fondo)",
+      "exportBoardToast": "Tablero exportado",
+      "exportAllToast": "Respaldo completo exportado",
+      "importSuccessToast": "Importación completa",
+      "importFailAlert": "Error al importar: {{message}}",
+      "importedBoardTitle": "Tablero importado"
+    },
+    "accountMenu": {
+      "changePassword": "Cambiar contraseña",
+      "logout": "Cerrar sesión",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "save": "Guardar",
+      "passwordChangedToast": "Contraseña cambiada",
+      "master": "Master"
+    },
+    "taskTicker": {
+      "pending": "Pendientes ({{count}})"
+    }
+  },
+  "board": {
+    "listMenu": {
+      "listColor": "Color de la lista",
+      "defaultColor": "Predeterminado",
+      "sortAZ": "Ordenar por título (A-Z)",
+      "clearCards": "Vaciar todas las tarjetas",
+      "clearCardsConfirm": "¿Quitar todas las tarjetas de \"{{title}}\"?",
+      "cardsRemovedToast": "Tarjetas eliminadas",
+      "deleteList": "Eliminar lista",
+      "deleteListConfirm": "¿Eliminar la lista \"{{title}}\" y todas sus tarjetas?",
+      "listDeletedToast": "Lista eliminada"
+    },
+    "listColumn": {
+      "cardTitlePlaceholder": "Escribe un título para esta tarjeta...",
+      "addCard": "+ Agregar una tarjeta",
+      "addCardBtn": "Agregar tarjeta",
+      "defaultListName": "Lista"
+    },
+    "boardView": {
+      "listTitlePlaceholder": "Escribe el título de la lista...",
+      "addList": "Agregar lista",
+      "addAnotherList": "+ Agregar otra lista"
+    },
+    "cardItem": {
+      "markComplete": "Marcar como completada",
+      "markIncomplete": "Marcar como no completada",
+      "urgent": "Urgente",
+      "important": "Importante"
+    },
+    "cardModal": {
+      "untitled": "Sin título",
+      "complete": "Completada",
+      "markComplete": "Marcar como completada",
+      "members": "Miembros",
+      "noUsersYet": "Aún no hay usuarios registrados.",
+      "labels": "Etiquetas",
+      "priority": "Prioridad (Matriz de Eisenhower)",
+      "urgent": "Urgente",
+      "important": "Importante",
+      "startDate": "Fecha de inicio",
+      "dueDate": "Fecha de entrega",
+      "location": "Ubicación",
+      "addressPlaceholder": "Dirección, ciudad...",
+      "locating": "Buscando...",
+      "locate": "Ubicar",
+      "locationFound": "Ubicación encontrada — visible en el Mapa",
+      "locationPending": "Dirección guardada, pero no ubicada en el mapa",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Agrega una descripción más detallada...",
+      "checklist": "Lista de tareas",
+      "addItemPlaceholder": "Agregar un ítem",
+      "attachments": "Adjuntos",
+      "attachFile": "Adjuntar archivo",
+      "attachLink": "Adjuntar enlace",
+      "linkUrlPlaceholder": "https://...",
+      "linkNamePlaceholder": "Nombre del enlace (opcional)",
+      "attachmentAdded": "Adjunto agregado",
+      "attachmentRemoved": "Adjunto eliminado",
+      "attachmentTooLarge": "El archivo debe tener hasta 8MB",
+      "uploading": "Subiendo...",
+      "deleteCard": "Eliminar tarjeta",
+      "deleteCardConfirm": "¿Eliminar esta tarjeta de forma permanente?",
+      "cardDeletedToast": "Tarjeta eliminada"
+    }
+  },
+  "views": {
+    "switcher": {
+      "board": "Tablero",
+      "table": "Tabla",
+      "calendar": "Calendario",
+      "timeline": "Línea de tiempo",
+      "dashboard": "Panel",
+      "map": "Mapa",
+      "matrix": "Matriz de Eisenhower"
+    },
+    "table": {
+      "columns": {
+        "completed": "",
+        "title": "Título",
+        "listTitle": "Lista",
+        "labels": "Etiquetas",
+        "members": "Miembros",
+        "startDate": "Inicio",
+        "due": "Entrega",
+        "checklist": "Lista de tareas"
+      },
+      "empty": "No se encontraron tarjetas."
+    },
+    "calendar": {
+      "today": "Hoy",
+      "prevMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente",
+      "more": "+{{count}} más"
+    },
+    "timeline": {
+      "empty": "No hay tarjetas con fecha de inicio o entrega para mostrar en la línea de tiempo.",
+      "undated_one": "{{count}} tarjeta sin fecha de inicio/entrega no mostrada.",
+      "undated_other": "{{count}} tarjetas sin fecha de inicio/entrega no mostradas."
+    },
+    "dashboard": {
+      "totalCards": "Total de tarjetas",
+      "completed": "Completadas",
+      "overdue": "Atrasadas",
+      "unassigned": "Sin responsable",
+      "overallProgress": "Progreso general",
+      "cardsByList": "Tarjetas por lista",
+      "cardsByMember": "Tarjetas por miembro",
+      "cardsByLabel": "Tarjetas por etiqueta",
+      "noLists": "Sin listas.",
+      "noAssigned": "Ninguna tarjeta asignada a alguien todavía.",
+      "noLabels": "Ninguna etiqueta en uso.",
+      "labelNames": { "gray": "Gris", "blue": "Azul", "green": "Verde", "amber": "Ámbar", "red": "Rojo", "purple": "Morado" }
+    },
+    "map": {
+      "emptyLine1": "No hay tarjetas con ubicación definida.",
+      "emptyLine2": "Abre una tarjeta y completa el campo \"Ubicación\" para verla aquí.",
+      "unlocated_one": "{{count}} dirección guardada pero no ubicada en el mapa.",
+      "unlocated_other": "{{count}} direcciones guardadas pero no ubicadas en el mapa."
+    },
+    "matrix": {
+      "doNow": { "title": "Hacer ahora", "subtitle": "Urgente e importante" },
+      "schedule": { "title": "Planificar", "subtitle": "Importante, no urgente" },
+      "delegate": { "title": "Delegar", "subtitle": "Urgente, no importante" },
+      "eliminate": { "title": "Eliminar", "subtitle": "Ni urgente ni importante" },
+      "dropHere": "Arrastra tarjetas aquí"
+    }
+  },
+  "minutes": {
+    "screen": {
+      "title": "Actas de Reunión",
+      "newMinute": "+ Nueva acta",
+      "loading": "Cargando actas...",
+      "empty": "Aún no hay actas registradas."
+    },
+    "modal": {
+      "titlePlaceholder": "Título de la reunión",
+      "date": "Fecha",
+      "author": "Autor",
+      "participants": "Participantes",
+      "noUsersYet": "Aún no hay usuarios registrados.",
+      "agenda": "Agenda",
+      "agendaPlaceholder": "Qué se va a discutir...",
+      "decisions": "Decisiones",
+      "decisionsPlaceholder": "Qué se decidió...",
+      "actionItems": "Tareas",
+      "assignee": "Responsable",
+      "addActionPlaceholder": "Agregar una tarea",
+      "deleteMinute": "Eliminar acta",
+      "deleteConfirm": "¿Eliminar esta acta de forma permanente?",
+      "minuteDeletedToast": "Acta eliminada",
+      "minuteCreatedToast": "Acta creada",
+      "minuteUpdatedToast": "Acta actualizada",
+      "saving": "Guardando...",
+      "createMinute": "Crear acta",
+      "saveChanges": "Guardar cambios"
+    }
+  },
+  "users": {
+    "title": "Panel de usuarios",
+    "you": " (tú)",
+    "colName": "Nombre",
+    "colEmail": "Correo electrónico",
+    "colRole": "Rol",
+    "roleMaster": "Master",
+    "roleMember": "Miembro",
+    "makeMaster": "Convertir en master",
+    "resetPassword": "Restablecer contraseña",
+    "delete": "Eliminar",
+    "newPasswordFor": "Nueva contraseña para {{name}}",
+    "savePassword": "Guardar nueva contraseña",
+    "newUser": "+ Nuevo usuario",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "creating": "Creando...",
+    "createUser": "Crear usuario",
+    "makeMasterConfirm": "¿Convertir a \"{{name}}\" en usuario master? Tendrá acceso administrativo completo.",
+    "becameMasterToast": "{{name}} ahora es master",
+    "deleteUserConfirm": "¿Eliminar al usuario \"{{name}}\"? Será quitado de todas las tarjetas asignadas.",
+    "userCreatedToast": "Usuario creado",
+    "userDeletedToast": "Usuario eliminado",
+    "passwordResetToast": "Contraseña restablecida",
+    "passwordMinLength": "La nueva contraseña debe tener al menos 6 caracteres"
+  },
+  "errors": {
+    "NOT_AUTHENTICATED": "No autenticado",
+    "FORBIDDEN_MASTER_ONLY": "Acceso restringido al usuario master",
+    "BOARD_NOT_FOUND": "Tablero no encontrado",
+    "FORBIDDEN_BOARD_ACCESS": "No tienes acceso a este tablero",
+    "NOT_FOUND": "No encontrado",
+    "VALIDATION_MISSING_FIELDS": "Completa nombre, correo electrónico y una contraseña con al menos 6 caracteres",
+    "COMPANY_NAME_REQUIRED": "Indica el nombre de la empresa",
+    "EMAIL_ALREADY_REGISTERED": "Correo electrónico ya registrado",
+    "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Correo electrónico ya registrado (puede pertenecer a otra empresa)",
+    "INVALID_CREDENTIALS": "Correo electrónico o contraseña inválidos",
+    "PASSWORD_TOO_SHORT": "La nueva contraseña debe tener al menos 6 caracteres",
+    "CURRENT_PASSWORD_INCORRECT": "La contraseña actual es incorrecta",
+    "TITLE_REQUIRED": "El título es obligatorio",
+    "FORBIDDEN_DELETE_SHARED_BOARD": "Solo el usuario master puede eliminar tableros compartidos",
+    "ORDERED_LIST_IDS_REQUIRED": "orderedListIds es obligatorio",
+    "CARD_IDS_REQUIRED": "cardIds es obligatorio",
+    "USER_NOT_FOUND": "Usuario no encontrado",
+    "EMAIL_IN_USE": "Correo electrónico ya en uso",
+    "INVALID_ROLE": "Rol inválido",
+    "CANNOT_DELETE_MASTER": "No se puede eliminar al usuario master",
+    "MINUTE_NOT_FOUND": "Acta no encontrada",
+    "FORBIDDEN_MINUTE_EDIT": "Solo el autor o el usuario master puede editar esta acta",
+    "FORBIDDEN_MINUTE_DELETE": "Solo el autor o el usuario master puede eliminar esta acta",
+    "ADDRESS_REQUIRED": "Indica una dirección para buscar",
+    "ADDRESS_NOT_FOUND": "Dirección no encontrada",
+    "GEOCODE_UNAVAILABLE": "No se pudo buscar la dirección ahora. Intenta de nuevo.",
+    "INTERNAL_ERROR": "Error interno del servidor",
+    "GENERIC": "Error {{status}}",
+    "IMPORT_READ_FAIL": "No se pudo leer el archivo",
+    "IMPORT_UNRECOGNIZED_FORMAT": "Formato de archivo no reconocido",
+    "IMPORT_INVALID_JSON": "JSON inválido",
+    "URL_REQUIRED": "Ingresa una URL",
+    "INVALID_URL": "URL inválida",
+    "FILE_REQUIRED": "Selecciona un archivo",
+    "FILE_TOO_LARGE": "El archivo debe tener hasta 8MB",
+    "ATTACHMENT_NOT_FOUND": "Adjunto no encontrado"
+  }
+}

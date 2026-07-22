@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useUsers } from "../state/UsersContext.jsx";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
+import { translateError } from "../utils/errors.js";
 import { initials, colorForUser } from "../utils/members.js";
 
 export default function UsersPanel({ onClose }) {
+  const { t } = useTranslation();
   const { users, createUser, deleteUser, resetPassword, setRole } = useUsers();
   const { user: currentUser } = useAuth();
   const showToast = useToast();
@@ -28,47 +31,47 @@ export default function UsersPanel({ onClose }) {
       setEmail("");
       setPassword("");
       setShowCreate(false);
-      showToast("Usuário criado");
+      showToast(t("users.userCreatedToast"));
     } catch (err) {
-      setError(err.message);
+      setError(translateError(err, t));
     } finally {
       setSubmitting(false);
     }
   }
 
   async function handleMakeMaster(u) {
-    if (!confirm(`Tornar "${u.name}" um usuário master? Ele passará a ter acesso administrativo completo.`)) return;
+    if (!confirm(t("users.makeMasterConfirm", { name: u.name }))) return;
     try {
       await setRole(u.id, "master");
-      showToast(`${u.name} agora é master`);
+      showToast(t("users.becameMasterToast", { name: u.name }));
     } catch (err) {
-      alert(err.message);
+      alert(translateError(err, t));
     }
   }
 
   async function handleDelete(u) {
-    if (!confirm(`Excluir o usuário "${u.name}"? Ele será removido de todos os cartões atribuídos.`)) return;
+    if (!confirm(t("users.deleteUserConfirm", { name: u.name }))) return;
     try {
       await deleteUser(u.id);
-      showToast("Usuário excluído");
+      showToast(t("users.userDeletedToast"));
     } catch (err) {
-      alert(err.message);
+      alert(translateError(err, t));
     }
   }
 
   async function handleResetSubmit(e) {
     e.preventDefault();
     if (resetPasswordValue.length < 6) {
-      alert("A nova senha deve ter ao menos 6 caracteres");
+      alert(t("users.passwordMinLength"));
       return;
     }
     try {
       await resetPassword(resetTargetId, resetPasswordValue);
-      showToast("Senha redefinida");
+      showToast(t("users.passwordResetToast"));
       setResetTargetId(null);
       setResetPasswordValue("");
     } catch (err) {
-      alert(err.message);
+      alert(translateError(err, t));
     }
   }
 
@@ -80,11 +83,11 @@ export default function UsersPanel({ onClose }) {
       }}
     >
       <div className="modal modal-wide">
-        <button className="modal-close" onClick={onClose} aria-label="Fechar">
+        <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
           &times;
         </button>
         <div className="modal-header">
-          <h2 className="members-modal-title">Painel de usuários</h2>
+          <h2 className="members-modal-title">{t("users.title")}</h2>
         </div>
         <div className="modal-body">
           <div className="users-table-wrap">
@@ -92,9 +95,9 @@ export default function UsersPanel({ onClose }) {
               <thead>
                 <tr>
                   <th></th>
-                  <th>Nome</th>
-                  <th>E-mail</th>
-                  <th>Papel</th>
+                  <th>{t("users.colName")}</th>
+                  <th>{t("users.colEmail")}</th>
+                  <th>{t("users.colRole")}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -108,19 +111,19 @@ export default function UsersPanel({ onClose }) {
                     </td>
                     <td>
                       {u.name}
-                      {u.id === currentUser.id && <span className="users-table-you"> (você)</span>}
+                      {u.id === currentUser.id && <span className="users-table-you">{t("users.you")}</span>}
                     </td>
                     <td>{u.email}</td>
                     <td>
                       <span className={"role-badge" + (u.role === "master" ? " master" : "")}>
-                        {u.role === "master" ? "Master" : "Membro"}
+                        {u.role === "master" ? t("users.roleMaster") : t("users.roleMember")}
                       </span>
                     </td>
                     <td className="users-table-actions">
                       {u.role !== "master" && (
                         <>
                           <button className="btn-ghost btn-small" onClick={() => handleMakeMaster(u)}>
-                            Tornar master
+                            {t("users.makeMaster")}
                           </button>
                           <button
                             className="btn-ghost btn-small"
@@ -129,10 +132,10 @@ export default function UsersPanel({ onClose }) {
                               setResetPasswordValue("");
                             }}
                           >
-                            Redefinir senha
+                            {t("users.resetPassword")}
                           </button>
                           <button className="btn-danger btn-small" onClick={() => handleDelete(u)}>
-                            Excluir
+                            {t("users.delete")}
                           </button>
                         </>
                       )}
@@ -146,7 +149,7 @@ export default function UsersPanel({ onClose }) {
           {resetTargetId && (
             <form className="users-reset-form" onSubmit={handleResetSubmit}>
               <label className="auth-field">
-                <span>Nova senha para {users.find((u) => u.id === resetTargetId)?.name}</span>
+                <span>{t("users.newPasswordFor", { name: users.find((u) => u.id === resetTargetId)?.name })}</span>
                 <input
                   type="password"
                   value={resetPasswordValue}
@@ -158,7 +161,7 @@ export default function UsersPanel({ onClose }) {
               </label>
               <div className="composer-actions">
                 <button type="submit" className="btn-primary btn-small">
-                  Salvar nova senha
+                  {t("users.savePassword")}
                 </button>
                 <button type="button" className="btn-cancel" onClick={() => setResetTargetId(null)}>
                   &times;
@@ -172,21 +175,21 @@ export default function UsersPanel({ onClose }) {
           {showCreate ? (
             <form className="users-create-form" onSubmit={handleCreate}>
               <label className="auth-field">
-                <span>Nome</span>
+                <span>{t("users.name")}</span>
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
               </label>
               <label className="auth-field">
-                <span>E-mail</span>
+                <span>{t("users.email")}</span>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </label>
               <label className="auth-field">
-                <span>Senha</span>
+                <span>{t("users.password")}</span>
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
               </label>
               {error && <div className="auth-error">{error}</div>}
               <div className="composer-actions">
                 <button type="submit" className="btn-primary btn-small" disabled={submitting}>
-                  {submitting ? "Criando..." : "Criar usuário"}
+                  {submitting ? t("users.creating") : t("users.createUser")}
                 </button>
                 <button type="button" className="btn-cancel" onClick={() => setShowCreate(false)}>
                   &times;
@@ -195,7 +198,7 @@ export default function UsersPanel({ onClose }) {
             </form>
           ) : (
             <button className="btn-primary btn-small" onClick={() => setShowCreate(true)}>
-              + Novo usuário
+              {t("users.newUser")}
             </button>
           )}
         </div>

@@ -1,12 +1,21 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
+import { localeTag } from "../../i18n/locale.js";
 
-const WEEKDAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
-const MONTH_NAMES = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
-];
+// 2021-08-02 foi uma segunda-feira: usado como âncora para gerar os nomes dos dias da semana na ordem seg->dom.
+function weekdayNames(lng) {
+  const fmt = new Intl.DateTimeFormat(localeTag(lng), { weekday: "short" });
+  return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2021, 7, 2 + i)));
+}
+function monthNames(lng) {
+  const fmt = new Intl.DateTimeFormat(localeTag(lng), { month: "long" });
+  return Array.from({ length: 12 }, (_, i) => {
+    const name = fmt.format(new Date(2021, i, 1));
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  });
+}
 
 function toISODate(date) {
   const y = date.getFullYear();
@@ -31,6 +40,9 @@ function buildGrid(monthDate) {
 }
 
 export default function CalendarView({ board, users, searchQuery, memberFilter, onOpenCard }) {
+  const { t, i18n } = useTranslation();
+  const WEEKDAYS = useMemo(() => weekdayNames(i18n.language), [i18n.language]);
+  const MONTH_NAMES = useMemo(() => monthNames(i18n.language), [i18n.language]);
   const [monthDate, setMonthDate] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -74,12 +86,12 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
         </div>
         <div className="calendar-nav">
           <button className="btn-ghost btn-small" onClick={goToday}>
-            Hoje
+            {t("views.calendar.today")}
           </button>
-          <button className="icon-btn" onClick={goPrev} aria-label="Mês anterior">
+          <button className="icon-btn" onClick={goPrev} aria-label={t("views.calendar.prevMonth")}>
             <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" /></svg>
           </button>
-          <button className="icon-btn" onClick={goNext} aria-label="Próximo mês">
+          <button className="icon-btn" onClick={goNext} aria-label={t("views.calendar.nextMonth")}>
             <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" /></svg>
           </button>
         </div>
@@ -113,7 +125,7 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
                     </button>
                   );
                 })}
-                {dayCards.length > 4 && <div className="calendar-more">+{dayCards.length - 4} mais</div>}
+                {dayCards.length > 4 && <div className="calendar-more">{t("views.calendar.more", { count: dayCards.length - 4 })}</div>}
               </div>
             </div>
           );
