@@ -230,7 +230,7 @@
       "title": "What teams are saying",
       "items": [
         { "quote": "We replaced three spreadsheets and WhatsApp groups with a single board. The team stopped losing tasks.", "name": "Alex Rivera", "role": "Team Lead" },
-        { "quote": "The timeline became our Monday meeting. Everyone sees the same schedule and the version arguments are over. And I can check it all from my phone.", "name": "Ana Braga", "role": "Planning Manager" },
+        { "quote": "The timeline became our Monday meeting. Everyone sees the same schedule and the version arguments are over. And I can check it all from my phone.", "name": "Ana Braga", "role": "Planning" },
         { "quote": "Minutes with action items changed the most here. What gets decided now has an owner and a due date, nobody forgets anything, and I can check it all from my phone.", "name": "Carlos Santana", "role": "Team Lead" },
         { "quote": "I improved my time management with this kanban.", "name": "Lucas Sabino", "role": "Finance" }
       ]

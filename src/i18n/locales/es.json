@@ -230,7 +230,7 @@
       "title": "Lo que dicen los equipos",
       "items": [
         { "quote": "Reemplazamos tres planillas y grupos de WhatsApp por un solo tablero. El equipo dejó de perder tareas.", "name": "Alex Rivera", "role": "Líder de equipo" },
-        { "quote": "La línea de tiempo se volvió la reunión del lunes. Todos ven el mismo cronograma y se acabó la discusión de versiones. Y además puedo ver todo desde el celular.", "name": "Ana Braga", "role": "Gerente de Planificación" },
+        { "quote": "La línea de tiempo se volvió la reunión del lunes. Todos ven el mismo cronograma y se acabó la discusión de versiones. Y además puedo ver todo desde el celular.", "name": "Ana Braga", "role": "Planificación" },
         { "quote": "Las actas con ítems de acción fueron lo que más cambió acá. Lo que se decide ahora tiene responsable y fecha de entrega, nadie se olvida de nada y puedo ver todo desde el celular.", "name": "Carlos Santana", "role": "Líder de equipo" },
         { "quote": "Mejoré mi gestión del tiempo con este kanban.", "name": "Lucas Sabino", "role": "Finanzas" }
       ]
