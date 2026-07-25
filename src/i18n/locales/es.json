@@ -24,7 +24,7 @@
   },
   "landing": {
     "nav": {
-      "brand": "Kanban IMG",
+      "brand": "Cantiere",
       "home": "Inicio",
       "features": "Funciones",
       "solutions": "Soluciones",
@@ -33,7 +33,7 @@
     },
     "home": {
       "heroTitle": "Tu equipo organizado, sin esfuerzo extra",
-      "heroText": "Kanban IMG reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
+      "heroText": "Cantiere reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
       "ctaStart": "Empieza ahora",
       "ctaPlans": "Ver planes",
       "heroNote": "Sin burocracia. Cancela cuando quieras.",
@@ -45,13 +45,13 @@
       ],
       "benefits": [
         { "title": "Todo en un solo lugar", "text": "Reemplaza hojas de cálculo sueltas, grupos de WhatsApp y herramientas dispersas por un único sistema." },
-        { "title": "Tu equipo ya lo entiende", "text": "Interfaz simple, sin necesidad de capacitación — quien ya usó un tablero Kanban empieza a usarlo en minutos." },
+        { "title": "Tu equipo ya lo entiende", "text": "Interfaz simple, sin necesidad de capacitación. Quien ya usó un tablero Kanban empieza a usarlo en minutos." },
         { "title": "Crece contigo", "text": "De un equipo pequeño a varias áreas, con tableros privados y compartidos, control de accesos y roles." }
       ],
-      "exploreTitle": "Explora Kanban IMG",
+      "exploreTitle": "Explora Cantiere",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las 8 herramientas de Kanban IMG: tablero, tabla, calendario, mapa y más." },
-        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Kanban IMG en el día a día." },
+        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las 8 herramientas de Cantiere: tablero, tabla, calendario, mapa y más." },
+        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Cantiere en el día a día." },
         { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Básico, Profesional y Empresarial y elige el ideal para tu equipo." }
       ]
     },
@@ -60,13 +60,13 @@
       "headerText": "Ocho herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
       "items": [
         { "badge": "T", "title": "Tablero Kanban", "text": "Se acabaron las tareas perdidas en capturas de chat. Arrastra y suelta entre listas y ve el avance real del equipo." },
-        { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro — sin necesitar otra herramienta." },
+        { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro, sin necesitar otra herramienta." },
         { "badge": "C", "title": "Calendario", "text": "Plazos y fechas de inicio en una vista mensual, para que nada pase desapercibido." },
         { "badge": "L", "title": "Línea de tiempo", "text": "Todo el cronograma del proyecto de un vistazo, período a período." },
         { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla." },
-        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo — ideal para equipos en terreno." },
+        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno." },
         { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte." },
-        { "badge": "A", "title": "Actas de reunión", "text": "Agenda, decisiones y tareas registradas — y exigidas después." }
+        { "badge": "A", "title": "Actas de reunión", "text": "Agenda, decisiones y tareas registradas y exigidas después." }
       ],
       "secondary": [
         { "title": "Tableros privados y compartidos", "text": "Separa lo que es del equipo de lo que es solo tuyo, con control total de visibilidad." },
@@ -75,13 +75,38 @@
     },
     "solutions": {
       "headerTitle": "Soluciones para cada tipo de equipo",
-      "headerText": "El mismo Kanban IMG, organizado como cada equipo necesita trabajar.",
+      "headerText": "El mismo Cantiere, organizado como cada equipo necesita trabajar.",
       "items": [
         { "title": "Agencias y equipos de proyecto", "text": "Un tablero por cliente o proyecto, con línea de tiempo para plazos y panel de métricas listo para mostrar el progreso en reuniones.", "tags": ["Tablero Kanban", "Línea de tiempo", "Panel"] },
-        { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa — ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
+        { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa. Ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
         { "title": "Gestión y liderazgo", "text": "Prioriza con la Matriz de Eisenhower, sigue los indicadores en el Panel y mantén la planificación sensible en tableros privados.", "tags": ["Matriz de Eisenhower", "Panel", "Tableros privados"] },
         { "title": "Operaciones y rutina", "text": "El dúo Tablero Kanban + Tabla cubre el trabajo diario, con Calendario para plazos recurrentes y nada pasa desapercibido.", "tags": ["Tablero Kanban", "Tabla", "Calendario"] },
-        { "title": "Reuniones y alineación", "text": "Actas de reunión con agenda, decisiones y tareas — registradas al momento y exigidas después, sin depender de la memoria.", "tags": ["Actas de reunión"] }
+        { "title": "Reuniones y alineación", "text": "Actas de reunión con agenda, decisiones y tareas, registradas al momento y exigidas después, sin depender de la memoria.", "tags": ["Actas de reunión"] },
+        { "title": "Equipos de Producto", "text": "Del roadmap al lanzamiento: organiza iniciativas en la Línea de tiempo, prioriza pedidos de funciones y mantén todo en un solo lugar.", "tags": ["Línea de tiempo", "Matriz de Eisenhower", "Adjuntos"], "page": "productTeams" }
+      ],
+      "learnMore": "Saber más"
+    },
+    "productTeams": {
+      "backLink": "← Volver a Soluciones",
+      "badge": "Para equipos de producto",
+      "heroTitle": "Roadmap, sprints y lanzamientos, sin depender de una hoja de cálculo",
+      "heroText": "Organiza las iniciativas del producto, sigue el ciclo de cada sprint y prioriza pedidos de funciones con visibilidad en tiempo real para todo el equipo.",
+      "ctaStart": "Empezar ahora",
+      "ctaPlans": "Ver planes",
+      "templatesTitle": "Un tablero para cada etapa del producto",
+      "templates": [
+        { "badge": "R", "title": "Roadmap de Producto", "text": "Organiza iniciativas por trimestre y sigue todo en la Línea de tiempo, desde la planificación hasta el lanzamiento." },
+        { "badge": "S", "title": "Sprint Ágil", "text": "Listas de Backlog, En progreso y Completado, con lista de tareas y fecha límite en cada tarjeta." },
+        { "badge": "F", "title": "Pedidos de Funciones", "text": "Etiquetas por prioridad y adjuntos con capturas o enlaces de referencia en cada pedido." }
+      ],
+      "timelineBadge": "Línea de tiempo",
+      "timelineTitle": "Lanzamientos más previsibles",
+      "timelineText": "Ve todo el cronograma del roadmap de un vistazo, período a período, y detecta retrasos antes de que se conviertan en un problema de lanzamiento.",
+      "extraTitle": "Prioridad y visibilidad, sin esfuerzo extra",
+      "extra": [
+        { "title": "Matriz de Eisenhower", "text": "Separa lo urgente de lo importante y deja de reaccionar solo a lo que más grita en el backlog." },
+        { "title": "Panel", "text": "Métricas listas para mostrar el progreso del producto en cualquier reunión, sin armar una diapositiva." },
+        { "title": "Tableros privados", "text": "Mantén los roadmaps sensibles visibles solo para quien los necesita, antes del anuncio oficial." }
       ]
     },
     "pricing": {
@@ -94,13 +119,131 @@
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo de Profesional", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
     },
+    "privacy": {
+      "backLink": "← Volver",
+      "headerTitle": "Política de Privacidad",
+      "headerText": "Cómo Cantiere recopila, usa, almacena y protege los datos de tu equipo.",
+      "updatedLabel": "Última actualización",
+      "updatedDate": "25 de julio de 2026",
+      "sections": [
+        {
+          "title": "1. Información que recopilamos",
+          "paragraphs": ["Recopilamos solo lo necesario para operar la plataforma. Los datos provienen de lo que informas al crear la cuenta y del contenido que produces durante el uso."],
+          "bullets": [
+            "Datos de registro: nombre, correo electrónico, contraseña y el nombre de la empresa indicado en el registro.",
+            "Contenido que creas: tableros, listas, tarjetas, descripciones, plazos, listas de verificación, etiquetas, responsables, actas de reunión y archivos adjuntos.",
+            "Direcciones: solo cuando agregas una dirección a una tarjeta para mostrarla en el Mapa.",
+            "Datos de sesión: la información necesaria para mantenerte conectado de forma segura."
+          ]
+        },
+        {
+          "title": "2. Cómo usamos la información",
+          "paragraphs": ["Usamos los datos exclusivamente para brindar y mantener el servicio. No vendemos tus datos, no los usamos para publicidad y no los cedemos a terceros con fines de marketing."],
+          "bullets": [
+            "Autenticar tu acceso y mantener tu sesión activa.",
+            "Mostrar y sincronizar el contenido de los tableros entre los miembros de tu empresa.",
+            "Convertir direcciones en coordenadas para mostrarlas en el Mapa.",
+            "Comunicar avisos operativos importantes sobre el servicio.",
+            "Investigar y prevenir el uso indebido, el fraude y los incidentes de seguridad."
+          ]
+        },
+        {
+          "title": "3. Divulgación de información",
+          "paragraphs": ["No vendemos ni alquilamos datos personales. La divulgación ocurre solo en las situaciones siguientes."],
+          "bullets": [
+            "Con otros usuarios de tu empresa: el contenido de los tableros compartidos es visible para los demás miembros. Los tableros privados solo son visibles para quien los creó.",
+            "Con el servicio de geocodificación OpenStreetMap (Nominatim): cuando buscas una dirección, solo se envía el texto de la dirección para obtener las coordenadas. No se transmite ningún dato de tu cuenta.",
+            "Por obligación legal: cuando lo exija la ley, una orden judicial o una autoridad competente."
+          ]
+        },
+        {
+          "title": "4. Cómo almacenamos y protegemos",
+          "paragraphs": ["Los datos de cada empresa se guardan en una base de datos aislada, separada de las demás empresas de la plataforma."],
+          "bullets": [
+            "Las contraseñas nunca se almacenan en texto plano: guardamos solo un hash criptográfico.",
+            "Todas las rutas de la API exigen autenticación, y cada solicitud se valida contra la empresa y los permisos del usuario.",
+            "La sesión usa una cookie httpOnly, inaccesible para los scripts de la página.",
+            "En producción, todo el tráfico usa conexión cifrada (HTTPS).",
+            "Las solicitudes de escritura tienen el origen verificado, lo que impide acciones falsificadas por sitios de terceros."
+          ]
+        },
+        {
+          "title": "5. Cuánto tiempo conservamos los datos",
+          "paragraphs": [
+            "Conservamos los datos mientras la cuenta esté activa y durante el período necesario para cumplir obligaciones legales.",
+            "Cuando un administrador elimina a un usuario, se borra el registro, se eliminan sus tableros privados y se desvinculan las referencias a esa persona en las tarjetas."
+          ]
+        },
+        {
+          "title": "6. Cookies y almacenamiento local",
+          "paragraphs": ["No usamos cookies de publicidad ni de rastreo entre sitios."],
+          "bullets": [
+            "Cookie de sesión: guarda el token que te mantiene conectado, con validez de 7 días.",
+            "Almacenamiento local del navegador: guarda solo tus preferencias de tema e idioma."
+          ]
+        },
+        {
+          "title": "7. Tus derechos",
+          "paragraphs": ["Según la legislación de protección de datos aplicable, en cualquier momento puedes:"],
+          "bullets": [
+            "Confirmar la existencia del tratamiento y acceder a tus datos.",
+            "Corregir datos incompletos, inexactos o desactualizados, directamente en tu perfil.",
+            "Solicitar la eliminación de la cuenta y de los datos asociados.",
+            "Exportar el contenido de tus tableros en formato JSON, desde la propia plataforma.",
+            "Revocar el consentimiento y oponerte a tratamientos que consideres indebidos."
+          ]
+        },
+        {
+          "title": "8. Niños y adolescentes",
+          "paragraphs": ["Cantiere es una herramienta corporativa, destinada al uso profesional. No dirigimos el servicio a menores de 18 años y no recopilamos intencionalmente datos de niños. Los registros identificados en esas condiciones serán eliminados."]
+        },
+        {
+          "title": "9. Cambios en esta política",
+          "paragraphs": ["Podemos actualizar esta política para reflejar cambios en el servicio o en la legislación. La fecha de última actualización en la parte superior de esta página siempre indica la versión vigente. Los cambios relevantes se comunicarán por los canales de contacto registrados."]
+        },
+        {
+          "title": "10. Cómo contactarnos",
+          "paragraphs": ["Para dudas sobre esta política o sobre el tratamiento de tus datos, contacta al responsable de protección de datos:"],
+          "bullets": [
+            "Correo electrónico: [COMPLETAR: correo de contacto]",
+            "Razón social: [COMPLETAR: razón social]",
+            "Identificación fiscal: [COMPLETAR: identificación fiscal]",
+            "Dirección: [COMPLETAR: dirección completa]"
+          ]
+        }
+      ]
+    },
+    "switcher": {
+      "title": "Una herramienta que sigue el ritmo de la obra",
+      "text": "Todo lo que el equipo registra aparece al instante para todos, con el nivel de acceso adecuado para cada persona.",
+      "items": [
+        { "key": "realtime", "mark": "S", "title": "Sincronización en tiempo real", "text": "Cambias una tarjeta y todo el equipo lo ve en el mismo instante.", "statusLabel": "Sincronización", "statusValue": "Activa" },
+        { "key": "access", "mark": "A", "title": "Acceso por rol", "text": "Cada persona ve y edita solo lo que corresponde a su función.", "statusLabel": "Control de acceso", "statusValue": "Por rol" },
+        { "key": "insights", "mark": "P", "title": "Indicadores listos", "text": "El panel muestra el avance sin que nadie arme un informe.", "statusLabel": "Panel", "statusValue": "Actualizado" }
+      ]
+    },
+    "logos": {
+      "label": "Todo esto en un solo lugar",
+      "items": ["Tablero Kanban", "Tabla", "Calendario", "Línea de tiempo", "Panel", "Mapa", "Matriz Eisenhower", "Actas de reunión"]
+    },
+    "testimonials": {
+      "title": "Lo que dicen los equipos",
+      "items": [
+        { "quote": "Reemplazamos tres planillas y grupos de WhatsApp por un solo tablero. El equipo dejó de perder tareas.", "name": "Alex Rivera", "role": "Líder de equipo" },
+        { "quote": "La línea de tiempo se volvió la reunión del lunes. Todos ven el mismo cronograma y se acabó la discusión de versiones. Y además puedo ver todo desde el celular.", "name": "Ana Braga", "role": "Gerente de Planificación" },
+        { "quote": "Las actas con ítems de acción fueron lo que más cambió acá. Lo que se decide ahora tiene responsable y fecha de entrega, nadie se olvida de nada y puedo ver todo desde el celular.", "name": "Carlos Santana", "role": "Líder de equipo" },
+        { "quote": "Mejoré mi gestión del tiempo con este kanban.", "name": "Lucas Sabino", "role": "Finanzas" }
+      ]
+    },
     "footer": {
       "title": "¿Listo para organizar tu equipo?",
-      "cta": "Empieza ahora"
+      "cta": "Empieza ahora",
+      "privacy": "Política de Privacidad",
+      "copyright": "Derechos de autor © 2026 Cantiere"
     }
   },
   "auth": {
-    "brandTitle": "Kanban IMG",
+    "brandTitle": "Cantiere",
     "brandText": "Organiza tus proyectos en tableros Kanban simples, rápidos y colaborativos.",
     "back": "← Volver",
     "tabLogin": "Ingresar",
@@ -134,7 +277,7 @@
       "toggleSidebar": "Mostrar/ocultar barra lateral",
       "menu": "Menú",
       "defaultBoardName": "Tablero sin nombre",
-      "privateBoardTitle": "Tablero privado — visible solo para ti",
+      "privateBoardTitle": "Tablero privado, visible solo para ti",
       "filterBy": "Filtrar por {{name}}",
       "usersBtn": "Usuarios",
       "searchPlaceholder": "Buscar tarjetas...",
@@ -221,7 +364,7 @@
       "addressPlaceholder": "Dirección, ciudad...",
       "locating": "Buscando...",
       "locate": "Ubicar",
-      "locationFound": "Ubicación encontrada — visible en el Mapa",
+      "locationFound": "Ubicación encontrada, visible en el Mapa",
       "locationPending": "Dirección guardada, pero no ubicada en el mapa",
       "description": "Descripción",
       "descriptionPlaceholder": "Agrega una descripción más detallada...",
@@ -273,7 +416,9 @@
     "timeline": {
       "empty": "No hay tarjetas con fecha de inicio o entrega para mostrar en la línea de tiempo.",
       "undated_one": "{{count}} tarjeta sin fecha de inicio/entrega no mostrada.",
-      "undated_other": "{{count}} tarjetas sin fecha de inicio/entrega no mostradas."
+      "undated_other": "{{count}} tarjetas sin fecha de inicio/entrega no mostradas.",
+      "zoomHint": "Arrastra para desplazar, usa la rueda para hacer zoom",
+      "resetZoom": "Restablecer zoom"
     },
     "dashboard": {
       "totalCards": "Total de tarjetas",

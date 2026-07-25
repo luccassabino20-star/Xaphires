@@ -24,7 +24,7 @@
   },
   "landing": {
     "nav": {
-      "brand": "Kanban IMG",
+      "brand": "Cantiere",
       "home": "Home",
       "features": "Features",
       "solutions": "Solutions",
@@ -33,7 +33,7 @@
     },
     "home": {
       "heroTitle": "Your team organized, with no extra effort",
-      "heroText": "Kanban IMG replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
+      "heroText": "Cantiere replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
       "ctaStart": "Get started",
       "ctaPlans": "See plans",
       "heroNote": "No red tape. Cancel anytime.",
@@ -45,13 +45,13 @@
       ],
       "benefits": [
         { "title": "Everything in one place", "text": "Replace loose spreadsheets, WhatsApp groups and scattered tools with a single system." },
-        { "title": "Your team already gets it", "text": "Simple interface, no training needed — anyone who's used a Kanban board starts using it in minutes." },
+        { "title": "Your team already gets it", "text": "Simple interface, no training needed. Anyone who's used a Kanban board starts using it in minutes." },
         { "title": "Grows with you", "text": "From a small team to multiple departments, with private and shared boards, access control and roles." }
       ],
-      "exploreTitle": "Explore Kanban IMG",
+      "exploreTitle": "Explore Cantiere",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Kanban IMG's 8 tools: board, table, calendar, map and more." },
-        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Kanban IMG day to day." },
+        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Cantiere's 8 tools: board, table, calendar, map and more." },
+        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Cantiere day to day." },
         { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Basic, Professional and Enterprise plans and pick the right one for your team." }
       ]
     },
@@ -60,13 +60,13 @@
       "headerText": "Eight integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
       "items": [
         { "badge": "B", "title": "Kanban board", "text": "No more tasks lost in chat screenshots. Drag and drop between lists and see the team's real progress." },
-        { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member — no need for another tool." },
+        { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member. No need for another tool." },
         { "badge": "C", "title": "Calendar", "text": "Deadlines and start dates in a monthly view, so nothing slips by unnoticed." },
         { "badge": "L", "title": "Timeline", "text": "The whole project schedule at a glance, period by period." },
         { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet." },
-        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map — great for field teams." },
+        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams." },
         { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest." },
-        { "badge": "N", "title": "Meeting minutes", "text": "Agenda, decisions and action items recorded — and followed up on later." }
+        { "badge": "N", "title": "Meeting minutes", "text": "Agenda, decisions and action items recorded and followed up on later." }
       ],
       "secondary": [
         { "title": "Private and shared boards", "text": "Separate what's the team's from what's just yours, with full visibility control." },
@@ -75,13 +75,38 @@
     },
     "solutions": {
       "headerTitle": "Solutions for every kind of team",
-      "headerText": "The same Kanban IMG, organized the way each team needs to work.",
+      "headerText": "The same Cantiere, organized the way each team needs to work.",
       "items": [
         { "title": "Agencies and project teams", "text": "One board per client or project, with a timeline for deadlines and a dashboard ready to show progress in meetings.", "tags": ["Kanban board", "Timeline", "Dashboard"] },
-        { "title": "Field teams", "text": "Tasks with addresses plotted on the map — ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
+        { "title": "Field teams", "text": "Tasks with addresses plotted on the map. Ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
         { "title": "Management and leadership", "text": "Prioritize with the Eisenhower Matrix, track indicators on the Dashboard, and keep sensitive planning in private boards.", "tags": ["Eisenhower Matrix", "Dashboard", "Private boards"] },
         { "title": "Operations and routine", "text": "The Kanban board + Table pair covers day-to-day work, with a Calendar for recurring deadlines so nothing slips by.", "tags": ["Kanban board", "Table", "Calendar"] },
-        { "title": "Meetings and alignment", "text": "Meeting minutes with agenda, decisions and action items — recorded on the spot and followed up on later, without relying on memory.", "tags": ["Meeting minutes"] }
+        { "title": "Meetings and alignment", "text": "Meeting minutes with agenda, decisions and action items, recorded on the spot and followed up on later, without relying on memory.", "tags": ["Meeting minutes"] },
+        { "title": "Product Teams", "text": "From roadmap to launch: organize initiatives on the Timeline, prioritize feature requests, and keep everything in one place.", "tags": ["Timeline", "Eisenhower Matrix", "Attachments"], "page": "productTeams" }
+      ],
+      "learnMore": "Learn more"
+    },
+    "productTeams": {
+      "backLink": "← Back to Solutions",
+      "badge": "For product teams",
+      "heroTitle": "Roadmaps, sprints and launches, without relying on spreadsheets",
+      "heroText": "Organize product initiatives, track each sprint's progress, and prioritize feature requests with real-time visibility for the whole team.",
+      "ctaStart": "Get started",
+      "ctaPlans": "See plans",
+      "templatesTitle": "A board for every stage of the product",
+      "templates": [
+        { "badge": "R", "title": "Product Roadmap", "text": "Organize initiatives by quarter and track everything on the Timeline, from planning to launch." },
+        { "badge": "S", "title": "Agile Sprint", "text": "Backlog, In progress and Done lists, with a checklist and due date on every card." },
+        { "badge": "F", "title": "Feature Requests", "text": "Priority labels and attachments for screenshots or reference links on every request." }
+      ],
+      "timelineBadge": "Timeline",
+      "timelineTitle": "More predictable launches",
+      "timelineText": "See the whole roadmap timeline at a glance, period by period, and spot delays before they become a launch problem.",
+      "extraTitle": "Priority and visibility, with no extra effort",
+      "extra": [
+        { "title": "Eisenhower Matrix", "text": "Separate what's urgent from what's important and stop reacting only to the loudest item in the backlog." },
+        { "title": "Dashboard", "text": "Ready-made metrics to show product progress in any meeting, without building a slide." },
+        { "title": "Private boards", "text": "Keep sensitive roadmaps visible only to who needs them, before the official announcement." }
       ]
     },
     "pricing": {
@@ -94,13 +119,131 @@
         { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
       ]
     },
+    "privacy": {
+      "backLink": "← Back",
+      "headerTitle": "Privacy Policy",
+      "headerText": "How Cantiere collects, uses, stores and protects your team's data.",
+      "updatedLabel": "Last updated",
+      "updatedDate": "July 25, 2026",
+      "sections": [
+        {
+          "title": "1. Information we collect",
+          "paragraphs": ["We collect only what is needed to operate the platform. The data comes from what you provide when creating an account and from the content you produce while using it."],
+          "bullets": [
+            "Account data: name, email, password and the company name given at registration.",
+            "Content you create: boards, lists, cards, descriptions, due dates, checklists, labels, assignees, meeting minutes and attached files.",
+            "Addresses: only when you add an address to a card to show it on the Map.",
+            "Session data: the information needed to keep you securely signed in."
+          ]
+        },
+        {
+          "title": "2. How we use information",
+          "paragraphs": ["We use the data solely to provide and maintain the service. We do not sell your data, do not use it for advertising and do not pass it to third parties for marketing."],
+          "bullets": [
+            "Authenticate your access and keep your session active.",
+            "Display and sync board content among the members of your company.",
+            "Convert addresses into coordinates for display on the Map.",
+            "Send important operational notices about the service.",
+            "Investigate and prevent misuse, fraud and security incidents."
+          ]
+        },
+        {
+          "title": "3. How we disclose information",
+          "paragraphs": ["We do not sell or rent personal data. Disclosure happens only in the situations below."],
+          "bullets": [
+            "With other users in your company: content on shared boards is visible to the other members. Private boards are visible only to the person who created them.",
+            "With the OpenStreetMap (Nominatim) geocoding service: when you search for an address, only the address text is sent to obtain the coordinates. No account data is transmitted.",
+            "For legal reasons: when required by law, court order or a competent authority."
+          ]
+        },
+        {
+          "title": "4. How we store and secure information",
+          "paragraphs": ["Each company's data is kept in an isolated database, separate from the other companies on the platform."],
+          "bullets": [
+            "Passwords are never stored in plain text: we keep only a cryptographic hash.",
+            "Every API route requires authentication, and each request is validated against the company and the user's permissions.",
+            "The session uses an httpOnly cookie, inaccessible to page scripts.",
+            "In production, all traffic uses an encrypted connection (HTTPS).",
+            "Write requests have their origin verified, which blocks actions forged by third-party sites."
+          ]
+        },
+        {
+          "title": "5. How long we keep information",
+          "paragraphs": [
+            "We keep data while the account is active and for the period needed to meet legal obligations.",
+            "When an administrator deletes a user, the account is removed, their private boards are deleted and references to them on cards are unlinked."
+          ]
+        },
+        {
+          "title": "6. Cookies and local storage",
+          "paragraphs": ["We do not use advertising cookies or cross-site tracking."],
+          "bullets": [
+            "Session cookie: holds the token that keeps you signed in, valid for 7 days.",
+            "Browser local storage: holds only your theme and language preferences."
+          ]
+        },
+        {
+          "title": "7. Your rights",
+          "paragraphs": ["Under applicable data protection law, you may at any time:"],
+          "bullets": [
+            "Confirm that processing exists and access your data.",
+            "Correct incomplete, inaccurate or outdated data, directly in your profile.",
+            "Request deletion of the account and associated data.",
+            "Export your board content in JSON format, from within the platform.",
+            "Withdraw consent and object to processing you consider improper."
+          ]
+        },
+        {
+          "title": "8. Our policy towards children",
+          "paragraphs": ["Cantiere is a corporate tool intended for professional use. We do not direct the service to anyone under 18 and do not knowingly collect children's data. Accounts identified in those conditions will be removed."]
+        },
+        {
+          "title": "9. Changes to this policy",
+          "paragraphs": ["We may update this policy to reflect changes in the service or in the law. The last-updated date at the top of this page always indicates the current version. Material changes will be communicated through the registered contact channels."]
+        },
+        {
+          "title": "10. How to contact us",
+          "paragraphs": ["For questions about this policy or about how your data is handled, contact the data protection officer:"],
+          "bullets": [
+            "Email: [FILL IN: contact email]",
+            "Legal entity: [FILL IN: registered company name]",
+            "Tax ID: [FILL IN: tax identification number]",
+            "Address: [FILL IN: full address]"
+          ]
+        }
+      ]
+    },
+    "switcher": {
+      "title": "A tool that keeps up with the work",
+      "text": "Everything the team logs shows up instantly for everyone, with the right level of access for each person.",
+      "items": [
+        { "key": "realtime", "mark": "S", "title": "Real-time sync", "text": "Change a card and the whole team sees it in the same instant.", "statusLabel": "Sync", "statusValue": "Active" },
+        { "key": "access", "mark": "A", "title": "Role-based access", "text": "Each person sees and edits only what their role covers.", "statusLabel": "Access control", "statusValue": "By role" },
+        { "key": "insights", "mark": "D", "title": "Dashboards out of the box", "text": "Progress is visible without anyone building a report.", "statusLabel": "Dashboard", "statusValue": "Up to date" }
+      ]
+    },
+    "logos": {
+      "label": "All of it in one place",
+      "items": ["Kanban board", "Table", "Calendar", "Timeline", "Dashboard", "Map", "Eisenhower matrix", "Meeting minutes"]
+    },
+    "testimonials": {
+      "title": "What teams are saying",
+      "items": [
+        { "quote": "We replaced three spreadsheets and WhatsApp groups with a single board. The team stopped losing tasks.", "name": "Alex Rivera", "role": "Team Lead" },
+        { "quote": "The timeline became our Monday meeting. Everyone sees the same schedule and the version arguments are over. And I can check it all from my phone.", "name": "Ana Braga", "role": "Planning Manager" },
+        { "quote": "Minutes with action items changed the most here. What gets decided now has an owner and a due date, nobody forgets anything, and I can check it all from my phone.", "name": "Carlos Santana", "role": "Team Lead" },
+        { "quote": "I improved my time management with this kanban.", "name": "Lucas Sabino", "role": "Finance" }
+      ]
+    },
     "footer": {
       "title": "Ready to organize your team?",
-      "cta": "Get started"
+      "cta": "Get started",
+      "privacy": "Privacy Policy",
+      "copyright": "Copyright © 2026 Cantiere"
     }
   },
   "auth": {
-    "brandTitle": "Kanban IMG",
+    "brandTitle": "Cantiere",
     "brandText": "Organize your projects in simple, fast and collaborative Kanban boards.",
     "back": "← Back",
     "tabLogin": "Sign in",
@@ -134,7 +277,7 @@
       "toggleSidebar": "Show/hide sidebar",
       "menu": "Menu",
       "defaultBoardName": "Untitled board",
-      "privateBoardTitle": "Private board — only visible to you",
+      "privateBoardTitle": "Private board, only visible to you",
       "filterBy": "Filter by {{name}}",
       "usersBtn": "Users",
       "searchPlaceholder": "Search cards...",
@@ -221,7 +364,7 @@
       "addressPlaceholder": "Address, city...",
       "locating": "Searching...",
       "locate": "Locate",
-      "locationFound": "Location found — visible on the Map",
+      "locationFound": "Location found, visible on the Map",
       "locationPending": "Address saved, but not located on the map",
       "description": "Description",
       "descriptionPlaceholder": "Add a more detailed description...",
@@ -273,7 +416,9 @@
     "timeline": {
       "empty": "No cards with a start or due date to show on the timeline.",
       "undated_one": "{{count}} card with no start/due date not shown.",
-      "undated_other": "{{count}} cards with no start/due date not shown."
+      "undated_other": "{{count}} cards with no start/due date not shown.",
+      "zoomHint": "Drag to pan, scroll to zoom",
+      "resetZoom": "Reset zoom"
     },
     "dashboard": {
       "totalCards": "Total cards",

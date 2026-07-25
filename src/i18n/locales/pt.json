@@ -24,7 +24,7 @@
   },
   "landing": {
     "nav": {
-      "brand": "Kanban IMG",
+      "brand": "Cantiere",
       "home": "Início",
       "features": "Recursos",
       "solutions": "Soluções",
@@ -33,55 +33,221 @@
     },
     "home": {
       "heroTitle": "Sua equipe organizada, sem esforço extra",
-      "heroText": "O Kanban IMG substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
+      "heroText": "O Cantiere substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
       "ctaStart": "Comece agora",
       "ctaPlans": "Ver planos",
       "heroNote": "Sem burocracia. Cancele quando quiser.",
       "stats": [
-        { "value": "8", "label": "Ferramentas integradas num só lugar" },
-        { "value": "100%", "label": "Sincronização em tempo real entre a equipe" },
-        { "value": "0", "label": "Planilhas soltas ou grupos de WhatsApp" },
-        { "value": "24/7", "label": "Acesso ao quadro, de qualquer lugar" }
+        {
+          "value": "8",
+          "label": "Ferramentas integradas num só lugar"
+        },
+        {
+          "value": "100%",
+          "label": "Sincronização em tempo real entre a equipe"
+        },
+        {
+          "value": "0",
+          "label": "Planilhas soltas ou grupos de WhatsApp"
+        },
+        {
+          "value": "24/7",
+          "label": "Acesso ao quadro, de qualquer lugar"
+        }
       ],
       "benefits": [
-        { "title": "Tudo num só lugar", "text": "Substitua planilhas soltas, grupos de WhatsApp e ferramentas espalhadas por um único sistema." },
-        { "title": "Sua equipe já entende", "text": "Interface simples, sem curso ou treinamento — quem já usou um quadro Kanban começa a usar em minutos." },
-        { "title": "Cresce com você", "text": "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis." }
+        {
+          "title": "Tudo num só lugar",
+          "text": "Substitua planilhas soltas, grupos de WhatsApp e ferramentas espalhadas por um único sistema."
+        },
+        {
+          "title": "Sua equipe já entende",
+          "text": "Interface simples, sem curso ou treinamento. Quem já usou um quadro Kanban começa a usar em minutos."
+        },
+        {
+          "title": "Cresce com você",
+          "text": "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis."
+        }
       ],
-      "exploreTitle": "Explore o Kanban IMG",
+      "exploreTitle": "Explore o Cantiere",
       "exploreLinks": [
-        { "page": "features", "badge": "R", "title": "Recursos", "text": "Conheça as 8 ferramentas do Kanban IMG: quadro, tabela, calendário, mapa e mais." },
-        { "page": "solutions", "badge": "S", "title": "Soluções", "text": "Veja como times de projeto, campo, gestão e operações usam o Kanban IMG no dia a dia." },
-        { "page": "pricing", "badge": "P", "title": "Preços", "text": "Compare os planos Básico, Profissional e Empresarial e escolha o ideal pra sua equipe." }
+        {
+          "page": "features",
+          "badge": "R",
+          "title": "Recursos",
+          "text": "Conheça as 8 ferramentas do Cantiere: quadro, tabela, calendário, mapa e mais."
+        },
+        {
+          "page": "solutions",
+          "badge": "S",
+          "title": "Soluções",
+          "text": "Veja como times de projeto, campo, gestão e operações usam o Cantiere no dia a dia."
+        },
+        {
+          "page": "pricing",
+          "badge": "P",
+          "title": "Preços",
+          "text": "Compare os planos Básico, Profissional e Empresarial e escolha o ideal pra sua equipe."
+        }
       ]
     },
     "features": {
       "headerTitle": "Tudo o que a sua equipe precisa",
       "headerText": "Oito ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
       "items": [
-        { "badge": "Q", "title": "Quadro Kanban", "text": "Chega de tarefa perdida em print de conversa. Arraste e solte entre listas e veja o andamento real da equipe." },
-        { "badge": "T", "title": "Tabela", "text": "Todos os cartões em formato de planilha, com busca e filtro por membro — sem precisar de outra ferramenta." },
-        { "badge": "C", "title": "Calendário", "text": "Prazos e datas de início numa visão mensal, para nada passar despercebido." },
-        { "badge": "L", "title": "Linha do tempo", "text": "O cronograma inteiro do projeto num só olhar, período a período." },
-        { "badge": "P", "title": "Painel", "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma." },
-        { "badge": "M", "title": "Mapa", "text": "Tarefas com endereço plotadas num mapa interativo — ótimo para equipes em campo." },
-        { "badge": "E", "title": "Matriz Eisenhower", "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto." },
-        { "badge": "A", "title": "Atas de reunião", "text": "Pauta, decisões e itens de ação registrados — e cobrados depois." }
+        {
+          "badge": "Q",
+          "title": "Quadro Kanban",
+          "text": "Chega de tarefa perdida em print de conversa. Arraste e solte entre listas e veja o andamento real da equipe."
+        },
+        {
+          "badge": "T",
+          "title": "Tabela",
+          "text": "Todos os cartões em formato de planilha, com busca e filtro por membro, sem precisar de outra ferramenta."
+        },
+        {
+          "badge": "C",
+          "title": "Calendário",
+          "text": "Prazos e datas de início numa visão mensal, para nada passar despercebido."
+        },
+        {
+          "badge": "L",
+          "title": "Linha do tempo",
+          "text": "O cronograma inteiro do projeto num só olhar, período a período."
+        },
+        {
+          "badge": "P",
+          "title": "Painel",
+          "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma."
+        },
+        {
+          "badge": "M",
+          "title": "Mapa",
+          "text": "Tarefas com endereço plotadas num mapa interativo. Ótimo para equipes em campo."
+        },
+        {
+          "badge": "E",
+          "title": "Matriz Eisenhower",
+          "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto."
+        },
+        {
+          "badge": "A",
+          "title": "Atas de reunião",
+          "text": "Pauta, decisões e itens de ação registrados e cobrados depois."
+        }
       ],
       "secondary": [
-        { "title": "Quadros privados e compartilhados", "text": "Separe o que é da equipe do que é só seu, com controle total de visibilidade." },
-        { "title": "Controle de usuários e papéis", "text": "Defina quem é administrador (master) e quem é membro da equipe." }
+        {
+          "title": "Quadros privados e compartilhados",
+          "text": "Separe o que é da equipe do que é só seu, com controle total de visibilidade."
+        },
+        {
+          "title": "Controle de usuários e papéis",
+          "text": "Defina quem é administrador (master) e quem é membro da equipe."
+        }
       ]
     },
     "solutions": {
       "headerTitle": "Soluções para cada tipo de equipe",
-      "headerText": "O mesmo Kanban IMG, organizado do jeito que cada time precisa trabalhar.",
+      "headerText": "O mesmo Cantiere, organizado do jeito que cada time precisa trabalhar.",
       "items": [
-        { "title": "Agências e times de projeto", "text": "Um quadro por cliente ou projeto, com linha do tempo para prazos e painel de métricas prontos para mostrar o progresso em reunião.", "tags": ["Quadro Kanban", "Linha do tempo", "Painel"] },
-        { "title": "Equipes em campo", "text": "Tarefas com endereço plotadas no mapa — ideal para manutenção, entregas, vistorias e qualquer equipe que trabalha fora do escritório.", "tags": ["Mapa", "Quadro Kanban"] },
-        { "title": "Gestão e liderança", "text": "Priorize com a Matriz Eisenhower, acompanhe indicadores no Painel e mantenha planejamentos sensíveis em quadros privados.", "tags": ["Matriz Eisenhower", "Painel", "Quadros privados"] },
-        { "title": "Operações e rotina", "text": "O par Quadro Kanban + Tabela cobre o trabalho do dia a dia, com Calendário para prazos recorrentes e nada passa despercebido.", "tags": ["Quadro Kanban", "Tabela", "Calendário"] },
-        { "title": "Reuniões e alinhamento", "text": "Atas de reunião com pauta, decisões e itens de ação — registrados na hora e cobrados depois, sem depender de memória.", "tags": ["Atas de reunião"] }
+        {
+          "title": "Agências e times de projeto",
+          "text": "Um quadro por cliente ou projeto, com linha do tempo para prazos e painel de métricas prontos para mostrar o progresso em reunião.",
+          "tags": [
+            "Quadro Kanban",
+            "Linha do tempo",
+            "Painel"
+          ]
+        },
+        {
+          "title": "Equipes em campo",
+          "text": "Tarefas com endereço plotadas no mapa. Ideal para manutenção, entregas, vistorias e qualquer equipe que trabalha fora do escritório.",
+          "tags": [
+            "Mapa",
+            "Quadro Kanban"
+          ]
+        },
+        {
+          "title": "Gestão e liderança",
+          "text": "Priorize com a Matriz Eisenhower, acompanhe indicadores no Painel e mantenha planejamentos sensíveis em quadros privados.",
+          "tags": [
+            "Matriz Eisenhower",
+            "Painel",
+            "Quadros privados"
+          ]
+        },
+        {
+          "title": "Operações e rotina",
+          "text": "O par Quadro Kanban + Tabela cobre o trabalho do dia a dia, com Calendário para prazos recorrentes e nada passa despercebido.",
+          "tags": [
+            "Quadro Kanban",
+            "Tabela",
+            "Calendário"
+          ]
+        },
+        {
+          "title": "Reuniões e alinhamento",
+          "text": "Atas de reunião com pauta, decisões e itens de ação, registrados na hora e cobrados depois, sem depender de memória.",
+          "tags": [
+            "Atas de reunião"
+          ]
+        },
+        {
+          "title": "Times de Produto",
+          "text": "Do roadmap ao lançamento: organize iniciativas na Linha do tempo, priorize pedidos de feature e mantenha tudo num só lugar.",
+          "tags": [
+            "Linha do tempo",
+            "Matriz Eisenhower",
+            "Anexos"
+          ],
+          "page": "productTeams"
+        }
+      ],
+      "learnMore": "Saiba mais"
+    },
+    "productTeams": {
+      "backLink": "← Voltar para Soluções",
+      "badge": "Para times de produto",
+      "heroTitle": "Roadmap, sprints e lançamentos, sem depender de planilha",
+      "heroText": "Organize as iniciativas do produto, acompanhe o ciclo de cada sprint e priorize pedidos de feature com visibilidade em tempo real para toda a equipe.",
+      "ctaStart": "Comece agora",
+      "ctaPlans": "Ver planos",
+      "templatesTitle": "Um quadro para cada etapa do produto",
+      "templates": [
+        {
+          "badge": "R",
+          "title": "Roadmap de Produto",
+          "text": "Organize iniciativas por trimestre e acompanhe tudo na Linha do tempo, do planejamento ao lançamento."
+        },
+        {
+          "badge": "S",
+          "title": "Sprint Ágil",
+          "text": "Listas de Backlog, Em andamento e Concluído, com checklist e prazo em cada cartão."
+        },
+        {
+          "badge": "F",
+          "title": "Pedidos de Feature",
+          "text": "Etiquetas por prioridade e anexos com prints ou links de referência em cada pedido."
+        }
+      ],
+      "timelineBadge": "Linha do tempo",
+      "timelineTitle": "Lançamentos mais previsíveis",
+      "timelineText": "Veja o cronograma inteiro do roadmap num só olhar, período a período, e identifique atrasos antes que virem problema no lançamento.",
+      "extraTitle": "Prioridade e visibilidade, sem esforço extra",
+      "extra": [
+        {
+          "title": "Matriz Eisenhower",
+          "text": "Separe o que é urgente do que é importante e pare de reagir só ao que grita mais alto no backlog."
+        },
+        {
+          "title": "Painel",
+          "text": "Métricas prontas para mostrar o progresso do produto em qualquer reunião, sem montar slide."
+        },
+        {
+          "title": "Quadros privados",
+          "text": "Mantenha roadmaps sensíveis visíveis só para quem precisa, antes do anúncio oficial."
+        }
       ]
     },
     "pricing": {
@@ -89,18 +255,238 @@
       "headerText": "Escolha o plano ideal para sua equipe e mude quando ela crescer.",
       "mostPopular": "Mais popular",
       "plans": [
-        { "name": "Básico", "price": "Grátis", "period": "", "tagline": "Para equipes pequenas começarem com o essencial", "cta": "Começar grátis", "features": ["Até 3 usuários", "Quadros ilimitados", "Quadro Kanban, Tabela e Calendário", "Suporte por e-mail"] },
-        { "name": "Profissional", "price": "R$ 799", "period": "/usuário/mês", "tagline": "Para equipes que querem controle total", "cta": "Assinar Profissional", "highlight": true, "features": ["Usuários ilimitados", "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)", "Atas de reunião", "Quadros privados e compartilhados", "Suporte prioritário"] },
-        { "name": "Empresarial", "price": "Sob consulta", "period": "", "tagline": "Para organizações com necessidades específicas", "cta": "Falar com vendas", "features": ["Tudo do Profissional", "Onboarding dedicado", "Suporte dedicado", "Acordo de nível de serviço (SLA)"] }
+        {
+          "name": "Básico",
+          "price": "Grátis",
+          "period": "",
+          "tagline": "Para equipes pequenas começarem com o essencial",
+          "cta": "Começar grátis",
+          "features": [
+            "Até 3 usuários",
+            "Quadros ilimitados",
+            "Quadro Kanban, Tabela e Calendário",
+            "Suporte por e-mail"
+          ]
+        },
+        {
+          "name": "Profissional",
+          "price": "R$ 799",
+          "period": "/usuário/mês",
+          "tagline": "Para equipes que querem controle total",
+          "cta": "Assinar Profissional",
+          "highlight": true,
+          "features": [
+            "Usuários ilimitados",
+            "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
+            "Atas de reunião",
+            "Quadros privados e compartilhados",
+            "Suporte prioritário"
+          ]
+        },
+        {
+          "name": "Empresarial",
+          "price": "Sob consulta",
+          "period": "",
+          "tagline": "Para organizações com necessidades específicas",
+          "cta": "Falar com vendas",
+          "features": [
+            "Tudo do Profissional",
+            "Onboarding dedicado",
+            "Suporte dedicado",
+            "Acordo de nível de serviço (SLA)"
+          ]
+        }
+      ]
+    },
+    "switcher": {
+      "title": "Uma ferramenta que acompanha o ritmo da obra",
+      "text": "Tudo que a equipe registra aparece na hora para todo mundo, com o nível de acesso certo para cada pessoa.",
+      "items": [
+        {
+          "key": "realtime",
+          "mark": "S",
+          "title": "Sincronização em tempo real",
+          "text": "Mudou o cartão, mudou para a equipe inteira, no mesmo instante.",
+          "statusLabel": "Sincronização",
+          "statusValue": "Ativa"
+        },
+        {
+          "key": "access",
+          "mark": "A",
+          "title": "Acesso por papel",
+          "text": "Cada pessoa vê e edita apenas o que cabe à sua função.",
+          "statusLabel": "Controle de acesso",
+          "statusValue": "Por papel"
+        },
+        {
+          "key": "insights",
+          "mark": "P",
+          "title": "Indicadores prontos",
+          "text": "O painel mostra o andamento sem ninguém precisar montar relatório.",
+          "statusLabel": "Painel",
+          "statusValue": "Atualizado"
+        }
+      ]
+    },
+    "logos": {
+      "label": "Tudo isso num só lugar",
+      "items": [
+        "Quadro Kanban",
+        "Tabela",
+        "Calendário",
+        "Linha do tempo",
+        "Painel",
+        "Mapa",
+        "Matriz Eisenhower",
+        "Atas de reunião"
+      ]
+    },
+    "testimonials": {
+      "title": "O que dizem as equipes",
+      "items": [
+        {
+          "quote": "Substituímos três planilhas e grupos de WhatsApp por um quadro só. A equipe parou de perder tarefa.",
+          "name": "Alex Rivera",
+          "role": "Líder de equipe"
+        },
+        {
+          "quote": "A linha do tempo virou a reunião de segunda. Todo mundo vê o mesmo cronograma e acabou a discussão de versão. E ainda consigo ver tudo do meu celular.",
+          "name": "Ana Braga",
+          "role": "Gerente de Planejamento"
+        },
+        {
+          "quote": "As atas com itens de ação foram o que mais mudou aqui. O que foi decidido agora tem dono e prazo de entrega e ninguém esquece de nada e ainda consigo ver tudo do meu celular.",
+          "name": "Carlos Santana",
+          "role": "Líder de equipe"
+        },
+        {
+          "quote": "Melhorei a minha gestão de tempo com esse kanban.",
+          "name": "Lucas Sabino",
+          "role": "Financeiro"
+        }
       ]
     },
     "footer": {
       "title": "Pronto para organizar sua equipe?",
-      "cta": "Comece agora"
+      "cta": "Comece agora",
+      "privacy": "Política de Privacidade",
+      "copyright": "Direitos autorais © 2026 Cantiere"
+    },
+    "privacy": {
+      "backLink": "← Voltar",
+      "headerTitle": "Política de Privacidade",
+      "headerText": "Como o Cantiere coleta, usa, armazena e protege os dados da sua equipe.",
+      "updatedLabel": "Última atualização",
+      "updatedDate": "25 de julho de 2026",
+      "sections": [
+        {
+          "title": "1. Informações que coletamos",
+          "paragraphs": [
+            "Coletamos apenas o necessário para operar a plataforma. Os dados vêm do que você informa ao criar a conta e do conteúdo que produz durante o uso."
+          ],
+          "bullets": [
+            "Dados de cadastro: nome, e-mail, senha e o nome da empresa informado no registro.",
+            "Conteúdo que você cria: quadros, listas, cartões, descrições, prazos, checklists, etiquetas, responsáveis, atas de reunião e arquivos anexados.",
+            "Endereços: apenas quando você adiciona um endereço a um cartão para exibi-lo no Mapa.",
+            "Dados de sessão: as informações necessárias para manter você conectado com segurança."
+          ]
+        },
+        {
+          "title": "2. Como usamos as informações",
+          "paragraphs": [
+            "Usamos os dados exclusivamente para fornecer e manter o serviço. Não vendemos seus dados, não os usamos para publicidade e não os repassamos a terceiros para fins de marketing."
+          ],
+          "bullets": [
+            "Autenticar seu acesso e manter sua sessão ativa.",
+            "Exibir e sincronizar o conteúdo dos quadros entre os membros da sua empresa.",
+            "Converter endereços em coordenadas para exibição no Mapa.",
+            "Comunicar avisos operacionais importantes sobre o serviço.",
+            "Investigar e prevenir uso indevido, fraude e incidentes de segurança."
+          ]
+        },
+        {
+          "title": "3. Compartilhamento de informações",
+          "paragraphs": [
+            "Não vendemos nem alugamos dados pessoais. O compartilhamento acontece apenas nas situações abaixo."
+          ],
+          "bullets": [
+            "Com outros usuários da sua empresa: o conteúdo dos quadros compartilhados fica visível para os demais membros. Quadros privados são visíveis apenas para quem os criou.",
+            "Com o serviço de geocodificação OpenStreetMap (Nominatim): quando você busca um endereço, apenas o texto do endereço é enviado para obter as coordenadas. Nenhum dado da sua conta é transmitido.",
+            "Por obrigação legal: quando exigido por lei, ordem judicial ou autoridade competente."
+          ]
+        },
+        {
+          "title": "4. Como armazenamos e protegemos",
+          "paragraphs": [
+            "Os dados de cada empresa ficam em um banco de dados isolado, separado das demais empresas da plataforma."
+          ],
+          "bullets": [
+            "Senhas nunca são armazenadas em texto puro: guardamos apenas um hash criptográfico.",
+            "Todas as rotas da API exigem autenticação, e cada requisição é validada contra a empresa e as permissões do usuário.",
+            "A sessão usa cookie httpOnly, inacessível aos scripts da página.",
+            "Em produção, todo o tráfego usa conexão criptografada (HTTPS).",
+            "Requisições de escrita têm a origem verificada, o que impede ações forjadas por sites de terceiros."
+          ]
+        },
+        {
+          "title": "5. Por quanto tempo mantemos os dados",
+          "paragraphs": [
+            "Mantemos os dados enquanto a conta estiver ativa e pelo período necessário para cumprir obrigações legais.",
+            "Quando um usuário é excluído por um administrador, o cadastro é removido, os quadros privados dele são apagados e as referências a ele nos cartões são desvinculadas."
+          ]
+        },
+        {
+          "title": "6. Cookies e armazenamento local",
+          "paragraphs": [
+            "Não usamos cookies de publicidade nem de rastreamento entre sites."
+          ],
+          "bullets": [
+            "Cookie de sessão: guarda o token que mantém você conectado, com validade de 7 dias.",
+            "Armazenamento local do navegador: guarda apenas suas preferências de tema e idioma."
+          ]
+        },
+        {
+          "title": "7. Seus direitos",
+          "paragraphs": [
+            "Conforme a Lei Geral de Proteção de Dados (LGPD), você pode a qualquer momento:"
+          ],
+          "bullets": [
+            "Confirmar a existência de tratamento e acessar seus dados.",
+            "Corrigir dados incompletos, inexatos ou desatualizados, diretamente no seu perfil.",
+            "Solicitar a exclusão da conta e dos dados associados.",
+            "Exportar o conteúdo dos seus quadros em formato JSON, pela própria plataforma.",
+            "Revogar consentimento e se opor a tratamentos que considere indevidos."
+          ]
+        },
+        {
+          "title": "8. Crianças e adolescentes",
+          "paragraphs": [
+            "O Cantiere é uma ferramenta corporativa, destinada ao uso profissional. Não direcionamos o serviço a menores de 18 anos e não coletamos intencionalmente dados de crianças. Cadastros identificados nessas condições serão removidos."
+          ]
+        },
+        {
+          "title": "9. Alterações nesta política",
+          "paragraphs": [
+            "Podemos atualizar esta política para refletir mudanças no serviço ou na legislação. A data de última atualização no topo desta página sempre indica a versão vigente. Mudanças relevantes serão comunicadas pelos canais de contato cadastrados."
+          ]
+        },
+        {
+          "title": "10. Como entrar em contato",
+          "paragraphs": [
+            "Para dúvidas sobre esta política ou sobre o tratamento dos seus dados, fale com o encarregado de proteção de dados:"
+          ],
+          "bullets": [
+            "E-mail: [PREENCHER: e-mail de contato]",
+            "Razão social: [PREENCHER: razão social]",
+            "CNPJ: [PREENCHER: CNPJ]",
+            "Endereço: [PREENCHER: endereço completo]"
+          ]
+        }
+      ]
     }
   },
   "auth": {
-    "brandTitle": "Kanban IMG",
+    "brandTitle": "Cantiere",
     "brandText": "Organize seus projetos em quadros Kanban simples, rápidos e colaborativos.",
     "back": "← Voltar",
     "tabLogin": "Entrar",
@@ -134,7 +520,7 @@
       "toggleSidebar": "Mostrar/ocultar barra lateral",
       "menu": "Menu",
       "defaultBoardName": "Quadro sem nome",
-      "privateBoardTitle": "Quadro privado — visível só para você",
+      "privateBoardTitle": "Quadro privado, visível só para você",
       "filterBy": "Filtrar por {{name}}",
       "usersBtn": "Usuários",
       "searchPlaceholder": "Buscar cartões...",
@@ -221,7 +607,7 @@
       "addressPlaceholder": "Endereço, cidade...",
       "locating": "Buscando...",
       "locate": "Localizar",
-      "locationFound": "Localização encontrada — visível no Mapa",
+      "locationFound": "Localização encontrada, visível no Mapa",
       "locationPending": "Endereço salvo, mas não localizado no mapa",
       "description": "Descrição",
       "descriptionPlaceholder": "Adicione uma descrição mais detalhada...",
@@ -273,7 +659,9 @@
     "timeline": {
       "empty": "Nenhum cartão com data de início ou entrega para mostrar na linha do tempo.",
       "undated_one": "{{count}} cartão sem data de início/entrega não exibido.",
-      "undated_other": "{{count}} cartões sem data de início/entrega não exibidos."
+      "undated_other": "{{count}} cartões sem data de início/entrega não exibidos.",
+      "zoomHint": "Arraste para navegar, use a roda do mouse para dar zoom",
+      "resetZoom": "Redefinir zoom"
     },
     "dashboard": {
       "totalCards": "Total de cartões",
@@ -287,7 +675,14 @@
       "noLists": "Sem listas.",
       "noAssigned": "Nenhum cartão atribuído a alguém ainda.",
       "noLabels": "Nenhuma etiqueta em uso.",
-      "labelNames": { "gray": "Cinza", "blue": "Azul", "green": "Verde", "amber": "Âmbar", "red": "Vermelho", "purple": "Roxo" }
+      "labelNames": {
+        "gray": "Cinza",
+        "blue": "Azul",
+        "green": "Verde",
+        "amber": "Âmbar",
+        "red": "Vermelho",
+        "purple": "Roxo"
+      }
     },
     "map": {
       "emptyLine1": "Nenhum cartão com localização definida.",
@@ -296,10 +691,22 @@
       "unlocated_other": "{{count}} endereços salvos mas não localizados no mapa."
     },
     "matrix": {
-      "doNow": { "title": "Fazer agora", "subtitle": "Urgente e importante" },
-      "schedule": { "title": "Planejar", "subtitle": "Importante, não urgente" },
-      "delegate": { "title": "Delegar", "subtitle": "Urgente, não importante" },
-      "eliminate": { "title": "Eliminar", "subtitle": "Nem urgente, nem importante" },
+      "doNow": {
+        "title": "Fazer agora",
+        "subtitle": "Urgente e importante"
+      },
+      "schedule": {
+        "title": "Planejar",
+        "subtitle": "Importante, não urgente"
+      },
+      "delegate": {
+        "title": "Delegar",
+        "subtitle": "Urgente, não importante"
+      },
+      "eliminate": {
+        "title": "Eliminar",
+        "subtitle": "Nem urgente, nem importante"
+      },
       "dropHere": "Arraste cartões para cá"
     }
   },
