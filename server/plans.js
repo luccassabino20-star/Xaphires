@@ -8,10 +8,10 @@ export const TRIAL_DAYS = 7;
 // autoArchive é o direito à regra de arquivamento automático: o arquivamento
 // manual está em todos os planos, só a automação é paga.
 export const PLANS = {
-  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false },
-  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true, recurringCards: false, bottleneckMonitor: true },
-  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true, recurringCards: true, bottleneckMonitor: true }, // null = ilimitado
-  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true },
+  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024 },
+  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
+  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 }, // null = ilimitado
+  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
 };
 
 export const PLAN_IDS = Object.keys(PLANS);
@@ -94,4 +94,11 @@ export function canUseRecurringCards(planId) {
 // Direito ao monitor de gargalos. Mesmo degrau do arquivamento automático.
 export function canUseBottleneckMonitor(planId) {
   return getPlan(planId).bottleneckMonitor === true;
+}
+
+// Teto de anexo por plano, em bytes. O gratuito fica com 10 MB e os pagos com 50.
+// Subir para 200 MB é trocar este número: o upload é em streaming e o arquivo
+// nunca fica inteiro na memória, então o limite é política, não restrição técnica.
+export function attachmentLimitFor(planId) {
+  return getPlan(planId).maxAttachmentBytes;
 }

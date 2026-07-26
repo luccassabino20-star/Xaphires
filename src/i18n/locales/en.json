@@ -489,7 +489,7 @@
       "linkNamePlaceholder": "Link name (optional)",
       "attachmentAdded": "Attachment added",
       "attachmentRemoved": "Attachment removed",
-      "attachmentTooLarge": "File must be up to 8MB",
+      "attachmentTooLarge": "File must be up to {{mb}} MB",
       "uploading": "Uploading...",
       "deleteCard": "Delete card",
       "deleteCardConfirm": "Delete this card permanently?",
@@ -705,7 +705,7 @@
     "URL_REQUIRED": "Enter a URL",
     "INVALID_URL": "Invalid URL",
     "FILE_REQUIRED": "Select a file",
-    "FILE_TOO_LARGE": "File must be up to 8MB",
+    "FILE_TOO_LARGE": "The file is larger than your plan allows.",
     "ATTACHMENT_NOT_FOUND": "Attachment not found"
   }
 }

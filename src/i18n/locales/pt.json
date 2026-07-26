@@ -751,7 +751,7 @@
       "linkNamePlaceholder": "Nome do link (opcional)",
       "attachmentAdded": "Anexo adicionado",
       "attachmentRemoved": "Anexo removido",
-      "attachmentTooLarge": "O arquivo deve ter até 8MB",
+      "attachmentTooLarge": "O arquivo deve ter até {{mb}} MB",
       "uploading": "Enviando...",
       "deleteCard": "Excluir cartão",
       "deleteCardConfirm": "Excluir este cartão permanentemente?",
@@ -986,7 +986,7 @@
     "URL_REQUIRED": "Informe uma URL",
     "INVALID_URL": "URL inválida",
     "FILE_REQUIRED": "Selecione um arquivo",
-    "FILE_TOO_LARGE": "O arquivo deve ter até 8MB",
+    "FILE_TOO_LARGE": "O arquivo é maior que o limite do seu plano.",
     "ATTACHMENT_NOT_FOUND": "Anexo não encontrado"
   }
 }

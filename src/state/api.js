@@ -73,7 +73,30 @@ export const archiveCompletedCards = (listId) => request(`/lists/${listId}/archi
 
 // ---------- Card attachments ----------
 export const addLinkAttachment = (cardId, data) => request(`/cards/${cardId}/attachments/link`, { method: "POST", body: data });
-export const addFileAttachment = (cardId, data) => request(`/cards/${cardId}/attachments/file`, { method: "POST", body: data });
+// Upload de arquivo não passa pelo request(): o corpo é multipart, montado pelo
+// próprio navegador com o boundary correto, e o arquivo vai em streaming.
+export async function addFileAttachment(cardId, file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  const res = await fetch(`${BASE}/cards/${cardId}/attachments/file`, {
+    method: "POST",
+    body: form,
+    credentials: "same-origin",
+  });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 export const removeCardAttachment = (cardId, attachmentId) =>
   request(`/cards/${cardId}/attachments/${attachmentId}`, { method: "DELETE" });
 export const attachmentDownloadUrl = (cardId, attachmentId) => `${BASE}/cards/${cardId}/attachments/${attachmentId}/download`;

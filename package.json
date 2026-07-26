@@ -17,6 +17,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "bcryptjs": "^2.4.3",
+    "busboy": "^1.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "d3-axis": "^3.0.0",

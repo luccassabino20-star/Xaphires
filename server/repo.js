@@ -617,3 +617,37 @@ export function runRecurrences(now = new Date()) {
 
   return criados;
 }
+
+// Caminho de destino para um anexo que está sendo gravado em streaming. O id é
+// gerado antes porque o arquivo começa a ser escrito enquanto ainda chega.
+export function newAttachmentTarget() {
+  const id = uid();
+  return { id, path: path.join(attachmentsUploadsDir(), id) };
+}
+
+// Registra no cartão um arquivo que já está no disco. Separado do addFileAttachment
+// antigo, que recebia o conteúdo inteiro em memória.
+export function registerFileAttachment(cardId, { id, name, mimeType, size }) {
+  const row = getDb().prepare("SELECT attachments FROM cards WHERE id = ?").get(cardId);
+  if (!row) return null;
+  const attachments = parseAttachments(row);
+  attachments.push({
+    id,
+    type: "file",
+    name,
+    url: null,
+    mimeType: mimeType || "application/octet-stream",
+    size,
+    addedAt: nowIso(),
+  });
+  getDb().prepare("UPDATE cards SET attachments = ? WHERE id = ?").run(JSON.stringify(attachments), cardId);
+  return attachments;
+}
+
+export function discardAttachmentFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* arquivo pode nem ter sido criado */
+  }
+}

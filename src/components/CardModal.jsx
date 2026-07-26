@@ -6,9 +6,7 @@ import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import { LABEL_COLORS } from "../utils/labels.js";
 import { initials, colorForUser } from "../utils/members.js";
-import { geocodeAddress, addLinkAttachment, addFileAttachment, removeCardAttachment, attachmentDownloadUrl } from "../state/api.js";
-
-const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
+import { geocodeAddress, addLinkAttachment, addFileAttachment, removeCardAttachment, attachmentDownloadUrl, getPlan } from "../state/api.js";
 
 function AttachmentFileIcon() {
   return (
@@ -23,14 +21,6 @@ function AttachmentLinkIcon() {
       <path fill="currentColor" d="M3.9 12a4.1 4.1 0 0 1 4.1-4.1h4V6.1h-4a5.9 5.9 0 0 0 0 11.8h4v-1.8h-4A4.1 4.1 0 0 1 3.9 12zM8 13h8v-2H8zm8.1-6.9h-4v1.8h4a4.1 4.1 0 0 1 0 8.2h-4v1.8h4a5.9 5.9 0 0 0 0-11.8z" />
     </svg>
   );
-}
-function readFileAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
 }
 function formatBytes(bytes) {
   if (!bytes && bytes !== 0) return "";
@@ -81,8 +71,21 @@ export default function CardModal({ boardId, cardId, onClose }) {
   const [linkUrl, setLinkUrl] = useState("");
   const [linkName, setLinkName] = useState("");
   const [uploading, setUploading] = useState(false);
+  // Teto de anexo do plano da empresa. Fica null até a consulta voltar; nesse
+  // intervalo a checagem local é pulada e quem barra é o servidor.
+  const [limiteAnexo, setLimiteAnexo] = useState(null);
   const titleRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    let ativo = true;
+    getPlan()
+      .then((p) => ativo && setLimiteAnexo(p.maxAttachmentBytes ?? null))
+      .catch(() => {});
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   useEffect(() => {
     function onKey(e) {
@@ -198,14 +201,16 @@ export default function CardModal({ boardId, cardId, onClose }) {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    if (file.size > MAX_ATTACHMENT_BYTES) {
-      showToast(t("board.cardModal.attachmentTooLarge"));
+    // O limite vem do plano. Esta checagem é conveniência: evita subir 200 MB
+    // para o servidor recusar no fim. Quem manda é a verificação no servidor,
+    // que aborta durante a transferência.
+    if (limiteAnexo !== null && file.size > limiteAnexo) {
+      showToast(t("board.cardModal.attachmentTooLarge", { mb: Math.round(limiteAnexo / 1024 / 1024) }));
       return;
     }
     setUploading(true);
     try {
-      const dataBase64 = await readFileAsBase64(file);
-      const { attachments } = await addFileAttachment(cardId, { name: file.name, mimeType: file.type, dataBase64 });
+      const { attachments } = await addFileAttachment(cardId, file);
       dispatch({ type: "SET_CARD_ATTACHMENTS", boardId, cardId, attachments });
       showToast(t("board.cardModal.attachmentAdded"));
     } catch (err) {

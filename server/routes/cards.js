@@ -1,7 +1,12 @@
 import { Router } from "express";
 import { requireAuth, requireBoardAccessParam } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
+import fs from "node:fs";
+import Busboy from "busboy";
 import * as repo from "../repo.js";
+import { getCompany } from "../directory.js";
+import { attachmentLimitFor } from "../plans.js";
+import { runWithCompany } from "../context.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -39,8 +44,6 @@ router.post(
   })
 );
 
-const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
-
 router.post(
   "/:id/attachments/link",
   ah(async (req, res) => {
@@ -64,24 +67,112 @@ router.post(
   })
 );
 
-router.post(
-  "/:id/attachments/file",
-  ah(async (req, res) => {
-    const { name, mimeType, dataBase64 } = req.body || {};
-    if (!name?.trim() || !dataBase64) return res.status(400).json({ error: "Arquivo inválido", code: "FILE_REQUIRED" });
-    let buffer;
+// Upload em streaming: o arquivo é escrito no disco em pedaços, conforme chega,
+// e nunca existe inteiro na memória. É isso que permite tetos altos sem o servidor
+// consumir várias vezes o tamanho do arquivo por upload simultâneo.
+//
+// O limite é verificado DURANTE a transferência, não no fim: um arquivo grande
+// demais é abortado no meio, em vez de ser recebido por completo para só então
+// ser recusado.
+router.post("/:id/attachments/file", (req, res) => {
+  const limite = attachmentLimitFor(getCompany(req.companyId)?.plan);
+  const alvo = repo.newAttachmentTarget();
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: limite } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let nomeArquivo = "";
+  let tipo = "";
+  let bytes = 0;
+  let excedeu = false;
+  let respondido = false;
+  let saida = null;
+  let descartar = false;
+
+  // O arquivo parcial é apagado só depois que o stream fecha. No Windows, tentar
+  // remover enquanto há escrita em voo falha silenciosamente e deixa lixo.
+  function apagarQuandoPuder() {
+    descartar = true;
+    if (!saida || saida.destroyed) repo.discardAttachmentFile(alvo.path);
+  }
+
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    nomeArquivo = (info.filename || "").trim();
+    tipo = info.mimeType || "application/octet-stream";
+    saida = fs.createWriteStream(alvo.path);
+
+    // Destruir o stream no meio do pipe faz ele emitir 'error'. Sem listener isso
+    // é uncaught e derruba o processo — foi o que aconteceu na primeira versão.
+    saida.on("error", () => {
+      falhar(500, { error: "Erro ao gravar o arquivo", code: "UPLOAD_FAILED" });
+    });
+    saida.on("close", () => {
+      if (descartar) repo.discardAttachmentFile(alvo.path);
+    });
+
+    stream.on("data", (chunk) => {
+      bytes += chunk.length;
+    });
+    // Emitido pelo busboy ao passar de limits.fileSize.
+    stream.on("limit", () => {
+      excedeu = true;
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, {
+        error: `Arquivo deve ter até ${Math.round(limite / 1024 / 1024)} MB`,
+        code: "FILE_TOO_LARGE",
+        maxBytes: limite,
+      });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+
+  bb.on("close", () => {
+    if (respondido || excedeu) return;
+    if (!nomeArquivo || bytes === 0) {
+      return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    }
+    // Os eventos do busboy são emitidos a partir do socket, que existe desde
+    // antes do requireAuth entrar no contexto da empresa — o AsyncLocalStorage
+    // não alcança aqui. Sem reentrar, getDb() não sabe qual banco abrir.
+    //
+    // O try/catch é essencial: uma exceção solta num handler de evento é
+    // uncaught e derruba o processo inteiro, não só esta requisição.
     try {
-      buffer = Buffer.from(dataBase64, "base64");
-    } catch {
-      buffer = null;
+      const attachments = runWithCompany(req.companyId, () =>
+        repo.registerFileAttachment(req.params.id, {
+          id: alvo.id,
+          name: nomeArquivo,
+          mimeType: tipo,
+          size: bytes,
+        })
+      );
+      if (!attachments) return falhar(404, { error: "Cartão não encontrado", code: "CARD_NOT_FOUND" });
+      respondido = true;
+      res.status(201).json({ attachments });
+    } catch (err) {
+      console.error("Falha ao registrar anexo:", err);
+      falhar(500, { error: "Erro ao salvar o anexo", code: "ATTACHMENT_SAVE_FAILED" });
     }
-    if (!buffer || buffer.length === 0 || buffer.length > MAX_ATTACHMENT_BYTES) {
-      return res.status(400).json({ error: "Arquivo deve ter até 8MB", code: "FILE_TOO_LARGE" });
-    }
-    const attachments = await repo.addFileAttachment(req.params.id, { name: name.trim(), mimeType, buffer });
-    res.status(201).json({ attachments });
-  })
-);
+  });
+
+  req.pipe(bb);
+});
 
 router.delete(
   "/:id/attachments/:attachmentId",
