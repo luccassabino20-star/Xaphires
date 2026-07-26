@@ -287,6 +287,7 @@
       "clearBoardToast": "Tablero vaciado"
     },
     "dataMenu": {
+      "bottlenecks": "Monitor de cuellos de botella",
       "archivedCards": "Tarjetas archivadas",
       "moreOptions": "Más opciones",
       "personalize": "Personalizar",
@@ -322,6 +323,31 @@
     }
   },
   "board": {
+    "bottlenecks": {
+      "bareHours": "{{count}} hora",
+      "bareHours_other": "{{count}} horas",
+      "bareDays": "{{count}} día",
+      "bareDays_other": "{{count}} días",
+      "msgGreetingNoName": "¡Hola!",
+      "title": "Monitor de cuellos de botella",
+      "noneMonitored": "Ninguna columna está siendo monitoreada. Abre el menú de una columna y define cuánto tiempo puede quedarse una tarjeta antes de generar alerta.",
+      "allClear": "Sin atascos. {{count}} columna monitoreada y todo al día.",
+      "allClear_other": "Sin atascos. {{count}} columnas monitoreadas y todo al día.",
+      "summary": "{{count}} tarjeta detenida más allá del límite de su columna.",
+      "summary_other": "{{count}} tarjetas detenidas más allá del límite de su columna.",
+      "inList": "En {{list}} · límite de {{hours}}h",
+      "hours": "{{count}}h detenida",
+      "hours_other": "{{count}}h detenida",
+      "days": "{{count}} día detenida",
+      "days_other": "{{count}} días detenida",
+      "cardTooltip": "Detenida hace {{duration}} en esta columna",
+      "copyFollowUp": "Copiar seguimiento",
+      "copied": "Mensaje copiado",
+      "msgGreeting": "¡Hola, {{name}}!",
+      "msgBody": "Te escribo para saber cómo va \"{{title}}\". La tarjeta está en {{list}} desde hace {{duration}}.",
+      "msgDue": "La fecha acordada es {{date}}.",
+      "msgClosing": "¿Me puedes contar cómo está avanzando? ¡Gracias!"
+    },
     "archive": {
       "autoPlanRequired": "El archivado automático está disponible desde el plan Intermedio. El archivado manual sigue disponible.",
       "autoLabel": "Archivar completadas automáticamente",
@@ -342,6 +368,15 @@
       "deletedToast": "Tarjeta eliminada"
     },
     "listMenu": {
+      "stuckConfigure": "Monitorear atascos en esta columna",
+      "stuckConfigured": "Atasco: alerta a las {{hours}}h",
+      "stuckHint": "Avisa cuando una tarjeta pase este tiempo detenida en esta columna.",
+      "stuckHoursSuffix": "horas",
+      "stuckSave": "Guardar",
+      "stuckDisable": "Dejar de monitorear",
+      "stuckOn": "Columna monitoreada: alerta a las {{hours}}h",
+      "stuckOff": "Monitoreo desactivado en esta columna",
+      "stuckInvalid": "Indica un número de horas entre 1 y 8760",
       "archiveCompleted": "Archivar completadas",
       "cardsArchivedToast": "{{count}} tarjeta archivada",
       "cardsArchivedToast_other": "{{count}} tarjetas archivadas",
@@ -570,6 +605,7 @@
     "movedToBasic": "Plan cambiado a Básico"
   },
   "errors": {
+    "INVALID_STUCK_HOURS": "Indica un número de horas entre 1 y 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Intermedio.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Aquí solo se puede subir de plan. Para bajar o cancelar, contacta al soporte.",
     "PLAN_EXPIRED": "Tu plan expiró. Renueva para volver a editar.",

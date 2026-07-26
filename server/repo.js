@@ -260,8 +260,23 @@ export function updateCard(id, patch) {
   );
 }
 export function setCardOrder(listId, cardIds) {
+  // O relógio do gargalo só reinicia quando o cartão TROCA de coluna. Reordenar
+  // dentro da mesma lista chama esta função também, e zerar ali deixaria qualquer
+  // arrastão esconder um gargalo real.
+  const atual = getDb().prepare("SELECT id, list_id FROM cards WHERE id = ?");
   const stmt = getDb().prepare("UPDATE cards SET list_id = ?, position = ? WHERE id = ?");
-  cardIds.forEach((id, idx) => stmt.run(listId, idx, id));
+  const marcaEntrada = getDb().prepare("UPDATE cards SET list_entered_at = ? WHERE id = ?");
+  const agora = nowIso();
+  cardIds.forEach((id, idx) => {
+    const antes = atual.get(id);
+    stmt.run(listId, idx, id);
+    if (antes && antes.list_id !== listId) marcaEntrada.run(agora, id);
+  });
+}
+
+export function setListStuckHours(listId, hours) {
+  const valor = Number.isInteger(hours) && hours > 0 ? hours : null;
+  getDb().prepare("UPDATE lists SET stuck_hours = ? WHERE id = ?").run(valor, listId);
 }
 
 // ---------- Card attachments ----------
@@ -427,6 +442,7 @@ export function getWorkspace(userId) {
             archived: !!c.archived,
             archivedAt: c.archived_at || null,
             completedAt: c.completed_at || null,
+            listEnteredAt: c.list_entered_at || null,
             // Coluna de origem, para o modal de arquivados mostrar de onde veio
             // e para o restaurar saber para onde devolver.
             archivedFrom: c.archived ? l.id : null,
@@ -444,6 +460,7 @@ export function getWorkspace(userId) {
         id: l.id,
         title: l.title,
         color: l.color || null,
+        stuckHours: l.stuck_hours || null,
         // Arquivado sai daqui, e é só isso que o tira do quadro e de todas as views:
         // elas montam suas listas de cartões percorrendo cardIds (via flattenCards).
         cardIds: cards.filter((c) => c.list_id === l.id && !c.archived).map((c) => c.id),

@@ -59,6 +59,11 @@ export function reducer(state, action) {
         ...b,
         lists: b.lists.map((l) => (l.id === action.listId ? { ...l, color: action.color } : l)),
       }));
+    case "SET_LIST_STUCK_HOURS":
+      return updateBoard(state, action.boardId, (b) => ({
+        ...b,
+        lists: b.lists.map((l) => (l.id === action.listId ? { ...l, stuckHours: action.hours } : l)),
+      }));
     case "DELETE_LIST":
       return updateBoard(state, action.boardId, (b) => {
         const list = b.lists.find((l) => l.id === action.listId);
@@ -204,6 +209,17 @@ export function reducer(state, action) {
           let insertAt = action.toIndex;
           insertAt = Math.max(0, Math.min(insertAt, toList.cardIds.length));
           toList.cardIds.splice(insertAt, 0, action.cardId);
+          // Trocar de coluna reinicia o relógio do gargalo. Reordenar dentro da
+          // mesma lista cai no ramo acima e não mexe na data — senão bastaria
+          // arrastar o cartão no lugar para esconder um gargalo real.
+          const card = b.cards[action.cardId];
+          if (card) {
+            return {
+              ...b,
+              lists,
+              cards: { ...b.cards, [action.cardId]: { ...card, listEnteredAt: action.at } },
+            };
+          }
         }
         return { ...b, lists };
       });

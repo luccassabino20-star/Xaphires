@@ -33,6 +33,9 @@ export function syncAction(action, state) {
     case "SET_LIST_COLOR":
       api.setListColor(action.listId, action.color).catch(logError);
       break;
+    case "SET_LIST_STUCK_HOURS":
+      api.setListStuckHours(action.listId, action.hours).catch(logError);
+      break;
     case "DELETE_LIST":
       api.deleteList(action.listId).catch(logError);
       break;

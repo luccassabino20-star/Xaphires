@@ -106,6 +106,7 @@ export default function ListColumn({
             <CardItem
               key={card.id}
               card={card}
+              list={list}
               boardId={board.id}
               members={members}
               searchQuery={searchQuery}

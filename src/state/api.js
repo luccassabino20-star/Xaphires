@@ -58,6 +58,7 @@ export const setListOrder = (boardId, orderedListIds) =>
 // ---------- Lists ----------
 export const renameList = (id, title) => request(`/lists/${id}`, { method: "PATCH", body: { title } });
 export const setListColor = (id, color) => request(`/lists/${id}`, { method: "PATCH", body: { color } });
+export const setListStuckHours = (id, stuckHours) => request(`/lists/${id}`, { method: "PATCH", body: { stuckHours } });
 export const deleteList = (id) => request(`/lists/${id}`, { method: "DELETE" });
 export const clearListCards = (id) => request(`/lists/${id}/clear`, { method: "POST" });
 export const setCardOrder = (listId, cardIds) => request(`/lists/${listId}/card-order`, { method: "PUT", body: { cardIds } });

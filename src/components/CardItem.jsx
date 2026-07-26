@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { LABEL_COLORS } from "../utils/labels.js";
+import { isStuck, hoursStuck, formatDuration } from "../utils/bottlenecks.js";
 import { initials, colorForUser } from "../utils/members.js";
 import { localeTag } from "../i18n/locale.js";
 
@@ -66,7 +67,7 @@ function ImportantIcon() {
   );
 }
 
-export default function CardItem({ card, boardId, members, searchQuery, memberFilter, onOpen, onDragStart, onDragEnd }) {
+export default function CardItem({ card, list, boardId, members, searchQuery, memberFilter, onOpen, onDragStart, onDragEnd }) {
   const { t, i18n } = useTranslation();
   const dispatch = useBoardDispatch();
   const matchesSearch = !searchQuery || card.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -92,6 +93,16 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
       onDragEnd={onDragEnd}
       onClick={onOpen}
     >
+      {isStuck(card, list) && (
+        <div
+          className="card-stuck"
+          title={t("board.bottlenecks.cardTooltip", { duration: formatDuration(hoursStuck(card), t) })}
+        >
+          <span className="card-stuck-dot" />
+          {formatDuration(hoursStuck(card), t)}
+        </div>
+      )}
+
       {card.labels?.length > 0 && (
         <div className="card-labels">
           {card.labels.map((labelId) => {

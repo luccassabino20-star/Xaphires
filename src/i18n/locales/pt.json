@@ -546,6 +546,7 @@
       "clearBoardToast": "Quadro limpo"
     },
     "dataMenu": {
+      "bottlenecks": "Monitor de gargalos",
       "archivedCards": "Cartões arquivados",
       "moreOptions": "Mais opções",
       "personalize": "Personalizar",
@@ -581,6 +582,31 @@
     }
   },
   "board": {
+    "bottlenecks": {
+      "bareHours": "{{count}} hora",
+      "bareHours_other": "{{count}} horas",
+      "bareDays": "{{count}} dia",
+      "bareDays_other": "{{count}} dias",
+      "msgGreetingNoName": "Oi!",
+      "title": "Monitor de gargalos",
+      "noneMonitored": "Nenhuma coluna está sendo monitorada. Abra o menu de uma coluna e defina o tempo a partir do qual um cartão parado vira alerta.",
+      "allClear": "Nenhum gargalo. {{count}} coluna monitorada e tudo em dia.",
+      "allClear_other": "Nenhum gargalo. {{count}} colunas monitoradas e tudo em dia.",
+      "summary": "{{count}} cartão parado além do prazo da coluna.",
+      "summary_other": "{{count}} cartões parados além do prazo da coluna.",
+      "inList": "Em {{list}} · limite de {{hours}}h",
+      "hours": "{{count}}h parado",
+      "hours_other": "{{count}}h parado",
+      "days": "{{count}} dia parado",
+      "days_other": "{{count}} dias parado",
+      "cardTooltip": "Parado há {{duration}} nesta coluna",
+      "copyFollowUp": "Copiar cobrança",
+      "copied": "Mensagem copiada",
+      "msgGreeting": "Oi, {{name}}!",
+      "msgBody": "Estou passando para saber como está \"{{title}}\". O cartão está em {{list}} há {{duration}}.",
+      "msgDue": "O prazo combinado é {{date}}.",
+      "msgClosing": "Consegue me dar um retorno sobre o andamento? Obrigado!"
+    },
     "archive": {
       "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Intermediário. O arquivamento manual continua liberado.",
       "autoLabel": "Arquivar concluídos automaticamente",
@@ -601,6 +627,15 @@
       "deletedToast": "Cartão excluído"
     },
     "listMenu": {
+      "stuckConfigure": "Monitorar gargalo nesta coluna",
+      "stuckConfigured": "Gargalo: alerta em {{hours}}h",
+      "stuckHint": "Avisa quando um cartão passar deste tempo parado nesta coluna.",
+      "stuckHoursSuffix": "horas",
+      "stuckSave": "Salvar",
+      "stuckDisable": "Parar de monitorar",
+      "stuckOn": "Coluna monitorada: alerta em {{hours}}h",
+      "stuckOff": "Monitoramento desligado nesta coluna",
+      "stuckInvalid": "Informe um número de horas entre 1 e 8760",
       "archiveCompleted": "Arquivar concluídos",
       "cardsArchivedToast": "{{count}} cartão arquivado",
       "cardsArchivedToast_other": "{{count}} cartões arquivados",
@@ -848,6 +883,7 @@
     "movedToBasic": "Plano alterado para Básico"
   },
   "errors": {
+    "INVALID_STUCK_HOURS": "Informe um número de horas entre 1 e 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Intermediário.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",
     "PLAN_EXPIRED": "Seu plano expirou. Renove para voltar a editar.",

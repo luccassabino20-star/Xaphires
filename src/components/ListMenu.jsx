@@ -9,6 +9,8 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
   const dispatch = useBoardDispatch();
   const showToast = useToast();
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const [stuckOpen, setStuckOpen] = useState(false);
+  const [stuckHoras, setStuckHoras] = useState(String(list.stuckHours || 48));
   const ref = useRef(null);
 
   useEffect(() => {
@@ -23,6 +25,16 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
 
   function sortCards() {
     dispatch({ type: "SORT_LIST_CARDS", boardId: board.id, listId: list.id });
+    onClose();
+  }
+  function salvarMonitor(horas) {
+    const n = Number(horas);
+    if (horas !== null && (!Number.isInteger(n) || n < 1 || n > 8760)) {
+      showToast(t("board.listMenu.stuckInvalid"));
+      return;
+    }
+    dispatch({ type: "SET_LIST_STUCK_HOURS", boardId: board.id, listId: list.id, hours: horas === null ? null : n });
+    showToast(horas === null ? t("board.listMenu.stuckOff") : t("board.listMenu.stuckOn", { hours: n }));
     onClose();
   }
   function archiveCompleted() {
@@ -84,6 +96,34 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
       <div className="dropdown-item" onClick={sortCards}>
         {t("board.listMenu.sortAZ")}
       </div>
+      <div className="dropdown-item" onClick={() => setStuckOpen((o) => !o)}>
+        {list.stuckHours
+          ? t("board.listMenu.stuckConfigured", { hours: list.stuckHours })
+          : t("board.listMenu.stuckConfigure")}
+      </div>
+      {stuckOpen && (
+        <div className="list-stuck-config">
+          <p>{t("board.listMenu.stuckHint")}</p>
+          <div className="list-stuck-row">
+            <input
+              type="number"
+              min="1"
+              max="8760"
+              value={stuckHoras}
+              onChange={(e) => setStuckHoras(e.target.value)}
+            />
+            <span>{t("board.listMenu.stuckHoursSuffix")}</span>
+            <button className="btn-primary btn-small" onClick={() => salvarMonitor(stuckHoras)}>
+              {t("board.listMenu.stuckSave")}
+            </button>
+          </div>
+          {list.stuckHours && (
+            <button className="btn-cancel list-stuck-off" onClick={() => salvarMonitor(null)}>
+              {t("board.listMenu.stuckDisable")}
+            </button>
+          )}
+        </div>
+      )}
       <div className="dropdown-item" onClick={archiveCompleted}>
         {t("board.listMenu.archiveCompleted")}
       </div>

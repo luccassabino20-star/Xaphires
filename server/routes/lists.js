@@ -10,9 +10,16 @@ router.param("id", requireBoardAccessParam(repo.getBoardIdForList));
 router.patch(
   "/:id",
   ah(async (req, res) => {
-    const { title, color } = req.body || {};
+    const { title, color, stuckHours } = req.body || {};
     if (title !== undefined) await repo.renameList(req.params.id, title.trim() || "Lista");
     if (color !== undefined) await repo.setListColor(req.params.id, color);
+    if (stuckHours !== undefined) {
+      const h = stuckHours === null ? null : Number(stuckHours);
+      if (h !== null && (!Number.isInteger(h) || h < 1 || h > 8760)) {
+        return res.status(400).json({ error: "Horas deve ser entre 1 e 8760", code: "INVALID_STUCK_HOURS" });
+      }
+      await repo.setListStuckHours(req.params.id, h);
+    }
     res.json({ ok: true });
   })
 );

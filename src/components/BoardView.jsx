@@ -34,6 +34,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
       fromListId: dragCard.fromListId,
       toListId: targetListId,
       toIndex: targetIndex,
+      at: new Date().toISOString(),
     });
     if (targetListId !== dragCard.fromListId) {
       setDragCard({ cardId: dragCard.cardId, fromListId: targetListId });

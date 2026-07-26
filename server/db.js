@@ -99,6 +99,12 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "cards", "archived_at", "archived_at TEXT");
   // Marca quando o cartão foi concluído, base da regra de arquivamento automático.
   addColumnIfMissing(companyDb, "cards", "completed_at", "completed_at TEXT");
+  // Quando o cartão entrou na coluna atual. Base do monitor de gargalos.
+  addColumnIfMissing(companyDb, "cards", "list_entered_at", "list_entered_at TEXT");
+  // Horas até a coluna acusar gargalo. NULL = coluna não monitorada, que é o padrão:
+  // "parado" significa coisas diferentes por coluna, e um prazo global acusaria
+  // gargalo em espera legítima como Backlog.
+  addColumnIfMissing(companyDb, "lists", "stuck_hours", "stuck_hours INTEGER");
   // Dias até arquivar um concluído. NULL = regra desligada, que é o padrão.
   addColumnIfMissing(companyDb, "boards", "auto_archive_days", "auto_archive_days INTEGER");
 
@@ -107,6 +113,11 @@ function applySchema(companyDb) {
   // não vê um lote inteiro sumir de imediato, só N dias depois.
   companyDb
     .prepare("UPDATE cards SET completed_at = ? WHERE completed = 1 AND completed_at IS NULL")
+    .run(new Date().toISOString());
+  // Cartões anteriores à coluna não têm entrada registrada. Contam a partir de
+  // agora, senão apareceriam todos como parados desde sempre no primeiro uso.
+  companyDb
+    .prepare("UPDATE cards SET list_entered_at = ? WHERE list_entered_at IS NULL")
     .run(new Date().toISOString());
 }
 

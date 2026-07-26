@@ -287,6 +287,7 @@
       "clearBoardToast": "Board cleared"
     },
     "dataMenu": {
+      "bottlenecks": "Bottleneck monitor",
       "archivedCards": "Archived cards",
       "moreOptions": "More options",
       "personalize": "Customize",
@@ -322,6 +323,31 @@
     }
   },
   "board": {
+    "bottlenecks": {
+      "bareHours": "{{count}} hour",
+      "bareHours_other": "{{count}} hours",
+      "bareDays": "{{count}} day",
+      "bareDays_other": "{{count}} days",
+      "msgGreetingNoName": "Hi!",
+      "title": "Bottleneck monitor",
+      "noneMonitored": "No column is being monitored. Open a column's menu and set how long a card can sit there before it becomes an alert.",
+      "allClear": "No bottlenecks. {{count}} monitored column, all on track.",
+      "allClear_other": "No bottlenecks. {{count}} monitored columns, all on track.",
+      "summary": "{{count}} card past its column's limit.",
+      "summary_other": "{{count}} cards past their column's limit.",
+      "inList": "In {{list}} · {{hours}}h limit",
+      "hours": "{{count}}h stuck",
+      "hours_other": "{{count}}h stuck",
+      "days": "{{count}} day stuck",
+      "days_other": "{{count}} days stuck",
+      "cardTooltip": "Stuck for {{duration}} in this column",
+      "copyFollowUp": "Copy follow-up",
+      "copied": "Message copied",
+      "msgGreeting": "Hi, {{name}}!",
+      "msgBody": "Just checking in on \"{{title}}\". The card has been in {{list}} for {{duration}}.",
+      "msgDue": "The agreed due date is {{date}}.",
+      "msgClosing": "Could you let me know where it stands? Thanks!"
+    },
     "archive": {
       "autoPlanRequired": "Auto-archiving is available from the Intermediate plan up. Manual archiving stays available.",
       "autoLabel": "Auto-archive completed cards",
@@ -342,6 +368,15 @@
       "deletedToast": "Card deleted"
     },
     "listMenu": {
+      "stuckConfigure": "Monitor bottlenecks in this column",
+      "stuckConfigured": "Bottleneck: alert at {{hours}}h",
+      "stuckHint": "Warns when a card sits in this column longer than this.",
+      "stuckHoursSuffix": "hours",
+      "stuckSave": "Save",
+      "stuckDisable": "Stop monitoring",
+      "stuckOn": "Column monitored: alert at {{hours}}h",
+      "stuckOff": "Monitoring turned off for this column",
+      "stuckInvalid": "Enter a number of hours between 1 and 8760",
       "archiveCompleted": "Archive completed",
       "cardsArchivedToast": "{{count}} card archived",
       "cardsArchivedToast_other": "{{count}} cards archived",
@@ -570,6 +605,7 @@
     "movedToBasic": "Plan changed to Basic"
   },
   "errors": {
+    "INVALID_STUCK_HOURS": "Enter a number of hours between 1 and 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Intermediate plan up.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Only upgrades are available here. To move down or cancel, contact support.",
     "PLAN_EXPIRED": "Your plan expired. Renew to edit again.",
