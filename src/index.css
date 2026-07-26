@@ -1925,8 +1925,11 @@ input, textarea { font-family: inherit; }
 .landing-feature-card h3 { font-size: 15px; font-weight: 700; margin: 0 0 6px; }
 .landing-feature-card p { font-size: 13.5px; line-height: 1.55; color: var(--text-secondary); margin: 0; }
 
+/* 1200px para caber os 4 planos numa linha só. Com os 1080px anteriores, o
+   auto-fit de minmax(260px) só acomodava 3 colunas e o quarto card caía sozinho
+   numa segunda linha. */
 .landing-pricing {
-  max-width: 1080px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px 72px;
 }
@@ -2956,6 +2959,13 @@ input, textarea { font-family: inherit; }
   .archive-rule { grid-template-columns: 1fr; }
 }
 
+/* Nota de período de teste, sob o CTA do plano */
+.landing-plan-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 8px 0 0;
+}
 
 /* ---------- Aviso de plano ---------- */
 .plan-banner {

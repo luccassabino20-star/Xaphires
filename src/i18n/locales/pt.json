@@ -269,11 +269,25 @@
           ]
         },
         {
+          "name": "Intermediário",
+          "price": "R$ 249,99",
+          "period": "/mês",
+          "tagline": "Para equipes que cresceram além de três pessoas",
+          "cta": "Experimente grátis", "note": "7 dias grátis para testar",
+          "features": [
+            "Até 10 usuários",
+            "Quadros ilimitados",
+            "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
+            "Atas de reunião",
+            "Suporte por e-mail"
+          ]
+        },
+        {
           "name": "Profissional",
-          "price": "R$ 799",
-          "period": "/usuário/mês",
+          "price": "R$ 679,99",
+          "period": "/mês",
           "tagline": "Para equipes que querem controle total",
-          "cta": "Assinar Profissional",
+          "cta": "Experimente grátis", "note": "7 dias grátis para testar",
           "highlight": true,
           "features": [
             "Usuários ilimitados",
@@ -529,6 +543,7 @@
       "clearBoardToast": "Quadro limpo"
     },
     "dataMenu": {
+      "archivedCards": "Cartões arquivados",
       "moreOptions": "Mais opções",
       "personalize": "Personalizar",
       "dataSection": "Dados",
@@ -563,7 +578,29 @@
     }
   },
   "board": {
+    "archive": {
+      "autoLabel": "Arquivar concluídos automaticamente",
+      "autoDaysSuffix": "dias",
+      "autoOnHint": "Cartões concluídos há mais de {{days}} dias vão para o arquivo quando o quadro é carregado. Desmarcar um cartão reinicia a contagem.",
+      "autoOffHint": "Com a regra desligada, os concluídos ficam no quadro até você arquivar à mão.",
+      "autoInvalid": "Informe um número de dias entre 1 e 365",
+      "title": "Cartões arquivados",
+      "searchPlaceholder": "Buscar nos arquivados",
+      "empty": "Nenhum cartão arquivado ainda. Arquivar tira o cartão do quadro sem apagar nada.",
+      "noResults": "Nenhum arquivado corresponde à busca",
+      "fromList": "De {{list}}",
+      "fromDeletedList": "Coluna de origem removida",
+      "restore": "Restaurar",
+      "delete": "Excluir",
+      "restoredToast": "{{title}} restaurado",
+      "deleteConfirm": "Excluir \"{{title}}\" definitivamente? Esta ação não pode ser desfeita.",
+      "deletedToast": "Cartão excluído"
+    },
     "listMenu": {
+      "archiveCompleted": "Arquivar concluídos",
+      "cardsArchivedToast": "{{count}} cartão arquivado",
+      "cardsArchivedToast_other": "{{count}} cartões arquivados",
+      "noCompletedToArchive": "Nenhum cartão concluído nesta coluna",
       "listColor": "Cor da lista",
       "defaultColor": "Padrão",
       "sortAZ": "Ordenar por título (A-Z)",
@@ -592,6 +629,8 @@
       "important": "Importante"
     },
     "cardModal": {
+      "archiveCard": "Arquivar",
+      "cardArchivedToast": "Cartão arquivado",
       "untitled": "Sem título",
       "complete": "Concluído",
       "markComplete": "Marcar como concluído",
@@ -767,7 +806,18 @@
     "passwordResetToast": "Senha redefinida",
     "passwordMinLength": "A nova senha deve ter ao menos 6 caracteres"
   },
+  "plan": {
+    "trialEnding": "Seu teste termina em {{count}} dia",
+    "trialEnding_other": "Seu teste termina em {{count}} dias",
+    "expiredMessage": "Seu plano expirou. Você ainda vê tudo, mas não pode criar nem editar.",
+    "continueOnBasic": "Continuar no Básico grátis",
+    "movedToBasic": "Plano alterado para Básico"
+  },
   "errors": {
+    "PLAN_EXPIRED": "Seu plano expirou. Renove para voltar a editar.",
+    "PLAN_USER_LIMIT": "Seu plano atingiu o limite de usuários. Mude de plano para adicionar mais.",
+    "PLAN_USER_LIMIT_EXCEEDED": "A empresa tem mais usuários do que o plano escolhido permite.",
+    "INVALID_PLAN": "Plano inválido",
     "NOT_AUTHENTICATED": "Não autenticado",
     "FORBIDDEN_MASTER_ONLY": "Acesso restrito ao usuário master",
     "BOARD_NOT_FOUND": "Quadro não encontrado",

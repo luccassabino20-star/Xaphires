@@ -519,6 +519,8 @@ function PricingPage({ onEnter }) {
               <button className={p.highlight ? "btn-primary" : "btn-secondary"} onClick={onEnter}>
                 {p.cta}
               </button>
+              {/* Só os planos com período de teste trazem essa nota. */}
+              {p.note && <p className="landing-plan-note">{p.note}</p>}
               <ul className="landing-plan-features">
                 {p.features.map((f) => (
                   <li key={f}>{f}</li>

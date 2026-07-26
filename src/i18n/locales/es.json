@@ -115,7 +115,8 @@
       "mostPopular": "Más popular",
       "plans": [
         { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 3 usuarios", "Tableros ilimitados", "Tablero Kanban, Tabla y Calendario", "Soporte por correo"] },
-        { "name": "Profesional", "price": "R$ 799", "period": "/usuario/mes", "tagline": "Para equipos que quieren control total", "cta": "Suscribirse a Profesional", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Tableros privados y compartidos", "Soporte prioritario"] },
+        { "name": "Intermedio", "price": "R$ 249,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de tres personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 10 usuarios", "Tableros ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Soporte por correo"] },
+        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Tableros privados y compartidos", "Soporte prioritario"] },
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo de Profesional", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
     },
@@ -286,6 +287,7 @@
       "clearBoardToast": "Tablero vaciado"
     },
     "dataMenu": {
+      "archivedCards": "Tarjetas archivadas",
       "moreOptions": "Más opciones",
       "personalize": "Personalizar",
       "dataSection": "Datos",
@@ -320,7 +322,29 @@
     }
   },
   "board": {
+    "archive": {
+      "autoLabel": "Archivar completadas automáticamente",
+      "autoDaysSuffix": "días",
+      "autoOnHint": "Las tarjetas completadas hace más de {{days}} días pasan al archivo cuando se carga el tablero. Desmarcar una tarjeta reinicia el conteo.",
+      "autoOffHint": "Con la regla apagada, las completadas quedan en el tablero hasta que las archives a mano.",
+      "autoInvalid": "Indica un número de días entre 1 y 365",
+      "title": "Tarjetas archivadas",
+      "searchPlaceholder": "Buscar en archivadas",
+      "empty": "Todavía no hay tarjetas archivadas. Archivar saca la tarjeta del tablero sin borrar nada.",
+      "noResults": "Ninguna archivada coincide con la búsqueda",
+      "fromList": "De {{list}}",
+      "fromDeletedList": "Columna de origen eliminada",
+      "restore": "Restaurar",
+      "delete": "Eliminar",
+      "restoredToast": "{{title}} restaurada",
+      "deleteConfirm": "¿Eliminar \"{{title}}\" definitivamente? Esta acción no se puede deshacer.",
+      "deletedToast": "Tarjeta eliminada"
+    },
     "listMenu": {
+      "archiveCompleted": "Archivar completadas",
+      "cardsArchivedToast": "{{count}} tarjeta archivada",
+      "cardsArchivedToast_other": "{{count}} tarjetas archivadas",
+      "noCompletedToArchive": "No hay tarjetas completadas en esta columna",
       "listColor": "Color de la lista",
       "defaultColor": "Predeterminado",
       "sortAZ": "Ordenar por título (A-Z)",
@@ -349,6 +373,8 @@
       "important": "Importante"
     },
     "cardModal": {
+      "archiveCard": "Archivar",
+      "cardArchivedToast": "Tarjeta archivada",
       "untitled": "Sin título",
       "complete": "Completada",
       "markComplete": "Marcar como completada",
@@ -505,7 +531,18 @@
     "passwordResetToast": "Contraseña restablecida",
     "passwordMinLength": "La nueva contraseña debe tener al menos 6 caracteres"
   },
+  "plan": {
+    "trialEnding": "Tu prueba termina en {{count}} día",
+    "trialEnding_other": "Tu prueba termina en {{count}} días",
+    "expiredMessage": "Tu plan expiró. Todavía ves todo, pero no puedes crear ni editar.",
+    "continueOnBasic": "Continuar en el plan Básico gratis",
+    "movedToBasic": "Plan cambiado a Básico"
+  },
   "errors": {
+    "PLAN_EXPIRED": "Tu plan expiró. Renueva para volver a editar.",
+    "PLAN_USER_LIMIT": "Tu plan alcanzó el límite de usuarios. Cambia de plan para agregar más.",
+    "PLAN_USER_LIMIT_EXCEEDED": "La empresa tiene más usuarios de los que permite el plan elegido.",
+    "INVALID_PLAN": "Plan inválido",
     "NOT_AUTHENTICATED": "No autenticado",
     "FORBIDDEN_MASTER_ONLY": "Acceso restringido al usuario master",
     "BOARD_NOT_FOUND": "Tablero no encontrado",
