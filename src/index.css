@@ -14,6 +14,10 @@
   --accent-hover: #26262c;
   --danger: #b3444a;
   --danger-hover: #9c3a40;
+  /* Verde de "concluído/ok": checkbox do cartão, barra de checklist, painel.
+     Tem valor por tema porque um verde que brilha no fundo preto fica lavado no
+     branco — no claro o tom precisa ser mais fechado para manter contraste. */
+  --success: #16a34a;
   --shadow-card: 0 1px 1px rgba(20,22,30,0.03), 0 2px 5px rgba(20,22,30,0.06);
   --shadow-card-hover: 0 2px 4px rgba(20,22,30,0.05), 0 8px 18px rgba(20,22,30,0.10);
   --shadow-list: 0 1px 2px rgba(20,22,30,0.04);
@@ -23,21 +27,29 @@
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* O dark do app usa a mesma base quase-preta da landing e do login, para não haver
+   salto de tom ao entrar. Os degraus entre app > lista > cartão são mais curtos que
+   os da landing de propósito: lá --bg-list e --bg-card podem ser iguais porque são
+   superfícies isoladas, aqui um cartão fica DENTRO de uma lista e precisa se separar
+   dela. Qualquer alteração aqui precisa ser repetida no bloco :root[data-theme="dark"]
+   logo abaixo — os dois definem o mesmo tema, um para o sistema e outro para a
+   escolha explícita do usuário. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-app: #17181b;
-    --bg-topbar: #202124;
-    --bg-list: #222327;
-    --bg-column: #222327;
-    --bg-card: #2c2d33;
-    --bg-card-hover: #34353c;
-    --border-subtle: #34353a;
-    --border-strong: #45464e;
-    --text-primary: #edeef1;
-    --text-secondary: #b0b3bc;
-    --text-muted: #82858f;
-    --accent: #c9c9ce;
-    --accent-hover: #e4e4e8;
+    --bg-app: #050505;
+    --bg-topbar: #0d0d0d;
+    --bg-list: #131313;
+    --bg-column: #131313;
+    --bg-card: #1e1e1e;
+    --bg-card-hover: #2a2a2a;
+    --border-subtle: #262626;
+    --border-strong: #3d3d3d;
+    --text-primary: #f0f0f0;
+    --text-secondary: #a3a3a3;
+    --text-muted: #737373;
+    --accent: #e5e5e5;
+    --accent-hover: #ffffff;
+    --success: #22c55e;
     --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.25);
     --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
     --shadow-list: 0 1px 3px rgba(0,0,0,0.2);
@@ -47,19 +59,20 @@
 
 /* Explicit user choice always wins over the OS preference above */
 :root[data-theme="dark"] {
-  --bg-app: #17181b;
-  --bg-topbar: #202124;
-  --bg-list: #222327;
-  --bg-column: #222327;
-  --bg-card: #2c2d33;
-  --bg-card-hover: #34353c;
-  --border-subtle: #34353a;
-  --border-strong: #45464e;
-  --text-primary: #edeef1;
-  --text-secondary: #b0b3bc;
-  --text-muted: #82858f;
-  --accent: #c9c9ce;
-  --accent-hover: #e4e4e8;
+  --bg-app: #050505;
+  --bg-topbar: #0d0d0d;
+  --bg-list: #131313;
+  --bg-column: #131313;
+  --bg-card: #1e1e1e;
+  --bg-card-hover: #2a2a2a;
+  --border-subtle: #262626;
+  --border-strong: #3d3d3d;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+  --accent: #e5e5e5;
+  --accent-hover: #ffffff;
+  --success: #22c55e;
   --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.25);
   --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
   --shadow-list: 0 1px 3px rgba(0,0,0,0.2);
@@ -79,6 +92,7 @@
   --text-muted: #969ba5;
   --accent: #3d3d46;
   --accent-hover: #26262c;
+  --success: #16a34a;
   --shadow-card: 0 1px 1px rgba(20,22,30,0.03), 0 2px 5px rgba(20,22,30,0.06);
   --shadow-card-hover: 0 2px 4px rgba(20,22,30,0.05), 0 8px 18px rgba(20,22,30,0.10);
   --shadow-list: 0 1px 2px rgba(20,22,30,0.04);
@@ -694,7 +708,7 @@ input, textarea { font-family: inherit; }
 }
 .dash-stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
 .dash-stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; }
-.dash-stat-value.dash-stat-good { color: #5a9c6f; }
+.dash-stat-value.dash-stat-good { color: var(--success); }
 .dash-stat-value.dash-stat-critical { color: var(--danger); }
 .dash-stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 
@@ -707,7 +721,7 @@ input, textarea { font-family: inherit; }
 }
 .dash-meter-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
 .dash-meter-track { height: 10px; background: var(--bg-list); border-radius: 6px; overflow: hidden; }
-.dash-meter-fill { height: 100%; background: #5a9c6f; border-radius: 6px; transition: width 0.2s; }
+.dash-meter-fill { height: 100%; background: var(--success); border-radius: 6px; transition: width 0.2s; }
 
 .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
 .dash-card {
@@ -988,8 +1002,8 @@ input, textarea { font-family: inherit; }
 .card-complete-check.checked {
   opacity: 1;
 }
-.card-complete-check:hover { border-color: #5a9c6f; }
-.card-complete-check.checked { background: #5a9c6f; border-color: #5a9c6f; }
+.card-complete-check:hover { border-color: var(--success); }
+.card-complete-check.checked { background: var(--success); border-color: var(--success); }
 
 .card-footer-row {
   display: flex;
@@ -1263,7 +1277,7 @@ input, textarea { font-family: inherit; }
   color: var(--text-primary);
 }
 .card-complete-toggle-row:hover { border-color: var(--border-strong); }
-.card-complete-toggle-row.checked { color: #5a9c6f; }
+.card-complete-toggle-row.checked { color: var(--success); }
 .card-complete-toggle-row .card-complete-check { opacity: 1; }
 
 .modal-section { margin-bottom: 20px; }
@@ -1359,7 +1373,7 @@ input, textarea { font-family: inherit; }
 
 .location-form { display: flex; gap: 8px; }
 .location-input { flex: 1; width: auto; }
-.location-confirmed { margin-top: 8px; font-size: 12.5px; color: #5a9c6f; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+.location-confirmed { margin-top: 8px; font-size: 12.5px; color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 5px; }
 .location-pending { margin-top: 8px; font-size: 12.5px; color: var(--text-muted); }
 
 .modal-textarea {
@@ -1379,7 +1393,7 @@ input, textarea { font-family: inherit; }
 
 .checklist-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .checklist-progress-bar { flex: 1; height: 8px; background: var(--bg-list); border-radius: 4px; overflow: hidden; }
-.checklist-progress-fill { height: 100%; background: #5a9c6f; border-radius: 4px; transition: width 0.15s; }
+.checklist-progress-fill { height: 100%; background: var(--success); border-radius: 4px; transition: width 0.15s; }
 .checklist-progress span { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 
 .checklist { list-style: none; margin: 0 0 10px 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -2772,3 +2786,4 @@ input, textarea { font-family: inherit; }
   .landing-shell .btn-primary:active,
   .landing-shell .btn-secondary:active { transform: none; }
 }
+
