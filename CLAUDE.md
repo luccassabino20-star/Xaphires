@@ -103,13 +103,17 @@ Esta é a regra mais importante do checkout, e a mais fácil de destruir sem per
 
 O formulário com campo de número só aparece quando `GET /api/billing` devolve `simulated: true`, e ali o número é de mentira. A rota `dev/confirm` responde 404 fora do modo simulado.
 
-O SDK é carregado sob demanda, ao escolher cartão — nunca no `index.html`, que faria todo visitante da landing baixar script de terceiro. A chave pública vai no `GET /api/billing` e é feita para ficar exposta; a que cobra (`MERCADOPAGO_ACCESS_TOKEN`) nunca sai do servidor.
+O SDK é carregado por `await import()` dentro de `carregarSdk()`, e o import precisa continuar dinâmico: com import estático o Vite o coloca no bundle principal e todo visitante da landing baixa código de pagamento. O build confirma a separação — o SDK fica num pedaço próprio de ~1,6 kB, e só ele contém a URL `sdk.mercadopago.com`.
+
+A chave pública vai no `GET /api/billing` e é feita para ficar exposta; a que cobra (`MERCADOPAGO_ACCESS_TOKEN`) nunca sai do servidor.
 
 ### O adaptador do Mercado Pago não foi testado contra a API
 
-`providers/mercadopago.js` e `utils/mercadopago.js` foram escritos contra a documentação. Os pontos marcados com `conferir:` são os que quebram calado se a forma da resposta for outra — manifesto da assinatura do webhook, caminhos de leitura do QR code e da linha do boleto, e a API de `fields` do SDK. **Rode com credencial de teste antes de apontar para produção.**
+Usa os SDKs oficiais: `mercadopago` no servidor (`Payment`, `PreApproval`) e `@mercadopago/sdk-js` no navegador. Não monte requisição à mão — os tipos que vêm no pacote são o que permite conferir formato de corpo e caminho de leitura **localmente, sem credencial**, e foi assim que se descobriu que a linha do boleto mora em `transaction_details.digitable_line` e não na raiz.
 
-O que já está verificado offline: tradução de status, conversão centavos/reais, validação de assinatura HMAC e as recusas por dado faltando.
+O que já está verificado offline: tradução de status, conversão centavos/reais, validação de assinatura HMAC, recusas por dado faltando, e o corpo enviado em cada meio de pagamento (suíte que intercepta o `fetch` antes da rede).
+
+**Nenhuma chamada de rede foi exercitada.** Falta o teste com credencial de teste, e o `conferir:` que resta é o formato do manifesto da assinatura do webhook — esse não está nos tipos. Se a validação recusar avisos legítimos, os pagamentos param de ser confirmados pelo webhook e só a consulta do cliente salva.
 
 Três decisões dele que não são óbvias:
 
