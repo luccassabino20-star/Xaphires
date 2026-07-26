@@ -9,6 +9,9 @@ router.use(requireAuth);
 router.get(
   "/",
   ah(async (req, res) => {
+    // A regra de arquivamento automático roda aqui, antes da leitura: assim o que
+    // volta já está varrido e o cliente nunca mostra um cartão que deveria ter saído.
+    await repo.runAutoArchive();
     res.json({ boards: await repo.getWorkspace(req.user.id) });
   })
 );
@@ -27,9 +30,16 @@ router.patch(
   "/:id",
   requireBoardAccess((req) => req.params.id),
   ah(async (req, res) => {
-    const { title, background } = req.body || {};
+    const { title, background, autoArchiveDays } = req.body || {};
     if (title !== undefined) await repo.renameBoard(req.params.id, title.trim() || "Quadro");
     if (background !== undefined) await repo.setBoardBackground(req.params.id, background);
+    if (autoArchiveDays !== undefined) {
+      const dias = autoArchiveDays === null ? null : Number(autoArchiveDays);
+      if (dias !== null && (!Number.isInteger(dias) || dias < 1 || dias > 365)) {
+        return res.status(400).json({ error: "Dias deve ser entre 1 e 365", code: "INVALID_AUTO_ARCHIVE_DAYS" });
+      }
+      await repo.setBoardAutoArchiveDays(req.params.id, dias);
+    }
     res.json({ ok: true });
   })
 );

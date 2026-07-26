@@ -47,6 +47,8 @@ export const getWorkspace = () => request("/boards");
 export const createBoard = (data) => request("/boards", { method: "POST", body: data });
 export const renameBoard = (id, title) => request(`/boards/${id}`, { method: "PATCH", body: { title } });
 export const setBoardBackground = (id, background) => request(`/boards/${id}`, { method: "PATCH", body: { background } });
+export const setAutoArchiveDays = (id, autoArchiveDays) =>
+  request(`/boards/${id}`, { method: "PATCH", body: { autoArchiveDays } });
 export const deleteBoard = (id) => request(`/boards/${id}`, { method: "DELETE" });
 export const clearBoard = (id) => request(`/boards/${id}/clear`, { method: "POST" });
 export const createList = (boardId, data) => request(`/boards/${boardId}/lists`, { method: "POST", body: data });
@@ -64,6 +66,9 @@ export const createCard = (listId, data) => request(`/lists/${listId}/cards`, { 
 // ---------- Cards ----------
 export const updateCard = (id, patch) => request(`/cards/${id}`, { method: "PATCH", body: patch });
 export const deleteCard = (id) => request(`/cards/${id}`, { method: "DELETE" });
+export const archiveCard = (id) => request(`/cards/${id}/archive`, { method: "POST" });
+export const unarchiveCard = (id) => request(`/cards/${id}/unarchive`, { method: "POST" });
+export const archiveCompletedCards = (listId) => request(`/lists/${listId}/archive-completed`, { method: "POST" });
 
 // ---------- Card attachments ----------
 export const addLinkAttachment = (cardId, data) => request(`/cards/${cardId}/attachments/link`, { method: "POST", body: data });

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
-import { BACKGROUND_COLORS } from "../utils/backgrounds.js";
+import { LIST_COLORS, brightListColor } from "../utils/backgrounds.js";
 
 export default function ListMenu({ board, list, onClose, anchorRef }) {
   const { t } = useTranslation();
@@ -23,6 +23,17 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
 
   function sortCards() {
     dispatch({ type: "SORT_LIST_CARDS", boardId: board.id, listId: list.id });
+    onClose();
+  }
+  function archiveCompleted() {
+    const total = list.cardIds.filter((cid) => board.cards[cid]?.completed).length;
+    if (total === 0) {
+      showToast(t("board.listMenu.noCompletedToArchive"));
+      onClose();
+      return;
+    }
+    dispatch({ type: "ARCHIVE_COMPLETED_CARDS", boardId: board.id, listId: list.id, at: new Date().toISOString() });
+    showToast(t("board.listMenu.cardsArchivedToast", { count: total }));
     onClose();
   }
   function clearCards() {
@@ -48,16 +59,16 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
       <div className="dropdown-item" onClick={() => setColorPickerOpen((o) => !o)}>
         <span
           className="list-color-swatch-icon"
-          style={{ background: list.color || "transparent", borderStyle: list.color ? "solid" : "dashed" }}
+          style={{ background: brightListColor(list.color) || "transparent", borderStyle: list.color ? "solid" : "dashed" }}
         />
         {t("board.listMenu.listColor")}
       </div>
       {colorPickerOpen && (
         <div className="list-color-picker">
-          {BACKGROUND_COLORS.map((c) => (
+          {LIST_COLORS.map((c) => (
             <button
               key={c.id}
-              className={"list-color-swatch" + (list.color === c.css ? " active" : "")}
+              className={"list-color-swatch" + (brightListColor(list.color) === c.css ? " active" : "")}
               style={{ background: c.css }}
               onClick={() => applyColor(c.css)}
               title={c.id}
@@ -72,6 +83,9 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
       <div className="dropdown-divider" />
       <div className="dropdown-item" onClick={sortCards}>
         {t("board.listMenu.sortAZ")}
+      </div>
+      <div className="dropdown-item" onClick={archiveCompleted}>
+        {t("board.listMenu.archiveCompleted")}
       </div>
       <div className="dropdown-item" onClick={clearCards}>
         {t("board.listMenu.clearCards")}

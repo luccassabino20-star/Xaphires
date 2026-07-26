@@ -33,6 +33,14 @@ router.post(
   })
 );
 
+router.post(
+  "/:id/archive-completed",
+  ah(async (req, res) => {
+    const cardIds = await repo.archiveCompletedCards(req.params.id);
+    res.json({ cardIds });
+  })
+);
+
 router.put(
   "/:id/card-order",
   ah(async (req, res) => {

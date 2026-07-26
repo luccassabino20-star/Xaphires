@@ -7,6 +7,7 @@ import { translateError } from "../utils/errors.js";
 import { exportAll, exportBoard, parseImportFile } from "../utils/importExport.js";
 import { BACKGROUND_COLORS, BACKGROUND_GRADIENTS, monochromaticGradient } from "../utils/backgrounds.js";
 import * as api from "../state/api.js";
+import ArchiveModal from "./ArchiveModal.jsx";
 
 function DotsIcon() {
   return (
@@ -39,6 +40,7 @@ export default function DataMenu({ board, onSelectBoard }) {
   const showToast = useToast();
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("main"); // "main" | "background"
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const [importing, setImporting] = useState(false);
   const [customColor, setCustomColor] = useState("#4d7ea8");
   const [monoColor, setMonoColor] = useState("#4d7ea8");
@@ -142,6 +144,16 @@ export default function DataMenu({ board, onSelectBoard }) {
                 {t("app.dataMenu.personalize")}
                 <ChevronRightIcon />
               </div>
+              <div
+                className={"dropdown-item" + (!board ? " disabled" : "")}
+                onClick={() => {
+                  if (!board) return;
+                  setArchiveOpen(true);
+                  setOpen(false);
+                }}
+              >
+                {t("app.dataMenu.archivedCards")}
+              </div>
               <div className="dropdown-divider" />
               <div className="board-bg-section-label">{t("app.dataMenu.dataSection")}</div>
               <div className={"dropdown-item" + (!board ? " disabled" : "")} onClick={handleExportCurrent}>
@@ -219,6 +231,7 @@ export default function DataMenu({ board, onSelectBoard }) {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
+      {archiveOpen && board && <ArchiveModal board={board} onClose={() => setArchiveOpen(false)} />}
     </div>
   );
 }

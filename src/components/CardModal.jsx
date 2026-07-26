@@ -170,6 +170,13 @@ export default function CardModal({ boardId, cardId, onClose }) {
     showToast(t("board.cardModal.cardDeletedToast"));
     onClose();
   }
+  // Arquivar não pede confirmação: é reversível pelo modal de arquivados,
+  // diferente de excluir.
+  function archiveCard() {
+    dispatch({ type: "ARCHIVE_CARD", boardId, cardId, at: new Date().toISOString() });
+    showToast(t("board.cardModal.cardArchivedToast"));
+    onClose();
+  }
 
   async function submitLinkAttachment(e) {
     e.preventDefault();
@@ -483,6 +490,9 @@ export default function CardModal({ boardId, cardId, onClose }) {
         </div>
 
         <div className="modal-footer">
+          <button className="btn-secondary" onClick={archiveCard}>
+            {t("board.cardModal.archiveCard")}
+          </button>
           <button className="btn-danger" onClick={deleteCard}>
             {t("board.cardModal.deleteCard")}
           </button>

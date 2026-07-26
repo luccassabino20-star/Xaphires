@@ -65,6 +65,8 @@ function applySchema(companyDb) {
       urgent INTEGER NOT NULL DEFAULT 0,
       important INTEGER NOT NULL DEFAULT 0,
       attachments TEXT NOT NULL DEFAULT '[]',
+      archived INTEGER NOT NULL DEFAULT 0,
+      archived_at TEXT,
       position INTEGER NOT NULL DEFAULT 0
     );
 
@@ -91,6 +93,21 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "cards", "urgent", "urgent INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing(companyDb, "cards", "important", "important INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing(companyDb, "cards", "attachments", "attachments TEXT NOT NULL DEFAULT '[]'");
+  // O cartão arquivado mantém list_id e position, para restaurar de volta à coluna
+  // de origem; o que muda é ele deixar de entrar em list.cardIds na leitura.
+  addColumnIfMissing(companyDb, "cards", "archived", "archived INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing(companyDb, "cards", "archived_at", "archived_at TEXT");
+  // Marca quando o cartão foi concluído, base da regra de arquivamento automático.
+  addColumnIfMissing(companyDb, "cards", "completed_at", "completed_at TEXT");
+  // Dias até arquivar um concluído. NULL = regra desligada, que é o padrão.
+  addColumnIfMissing(companyDb, "boards", "auto_archive_days", "auto_archive_days INTEGER");
+
+  // Cartões já concluídos antes desta coluna existir não têm data. Preenche com o
+  // instante da migração, para o relógio deles começar agora: quem ligar a regra
+  // não vê um lote inteiro sumir de imediato, só N dias depois.
+  companyDb
+    .prepare("UPDATE cards SET completed_at = ? WHERE completed = 1 AND completed_at IS NULL")
+    .run(new Date().toISOString());
 }
 
 const cache = new Map();

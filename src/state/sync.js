@@ -15,6 +15,9 @@ export function syncAction(action, state) {
     case "SET_BOARD_BACKGROUND":
       api.setBoardBackground(action.boardId, action.background).catch(logError);
       break;
+    case "SET_AUTO_ARCHIVE_DAYS":
+      api.setAutoArchiveDays(action.boardId, action.days).catch(logError);
+      break;
     case "DELETE_BOARD":
       api.deleteBoard(action.boardId).catch(logError);
       break;
@@ -50,6 +53,22 @@ export function syncAction(action, state) {
       break;
     case "DELETE_CARD":
       api.deleteCard(action.cardId).catch(logError);
+      break;
+    case "ARCHIVE_CARD":
+      api.archiveCard(action.cardId).catch(logError);
+      break;
+    case "UNARCHIVE_CARD": {
+      api.unarchiveCard(action.cardId).catch(logError);
+      // O servidor guarda a position original, mas o reducer devolve o cartão ao
+      // fim da coluna. Sem reenviar a ordem, ele saltaria de lugar no próximo
+      // carregamento — então a ordem que está na tela vira a verdade.
+      const board = state.boards.find((b) => b.id === action.boardId);
+      const list = board?.lists.find((l) => l.cardIds.includes(action.cardId));
+      if (list) api.setCardOrder(list.id, list.cardIds).catch(logError);
+      break;
+    }
+    case "ARCHIVE_COMPLETED_CARDS":
+      api.archiveCompletedCards(action.listId).catch(logError);
       break;
     case "MOVE_CARD": {
       const board = state.boards.find((b) => b.id === action.boardId);

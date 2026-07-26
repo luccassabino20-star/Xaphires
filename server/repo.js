@@ -143,7 +143,10 @@ export function setListOrder(orderedListIds) {
   orderedListIds.forEach((id, idx) => stmt.run(idx, id));
 }
 export function clearListCards(listId) {
-  getDb().prepare("DELETE FROM cards WHERE list_id = ?").run(listId);
+  // Preserva os arquivados: o reducer do cliente só apaga o que está em cardIds,
+  // e arquivado não está lá. Sem o filtro, limpar a coluna apagaria no servidor
+  // um histórico que continuaria aparecendo na tela até o próximo carregamento.
+  getDb().prepare("DELETE FROM cards WHERE list_id = ? AND archived = 0").run(listId);
 }
 export function listExists(id) {
   return !!getDb().prepare("SELECT 1 FROM lists WHERE id = ?").get(id);
@@ -159,6 +162,60 @@ export function createCard(listId, { id, title }) {
 }
 export function deleteCard(id) {
   getDb().prepare("DELETE FROM cards WHERE id = ?").run(id);
+}
+
+// ---------- Arquivamento de cartões ----------
+// Arquivar não move nem apaga: list_id e position ficam intactos, então restaurar
+// devolve o cartão à coluna e à posição de origem. O que muda é a leitura do quadro,
+// que deixa de incluir o id em list.cardIds.
+export function setCardArchived(id, archived) {
+  getDb()
+    .prepare("UPDATE cards SET archived = ?, archived_at = ? WHERE id = ?")
+    .run(archived ? 1 : 0, archived ? nowIso() : null, id);
+}
+
+export function setBoardAutoArchiveDays(boardId, days) {
+  const valor = Number.isInteger(days) && days > 0 ? days : null;
+  getDb().prepare("UPDATE boards SET auto_archive_days = ? WHERE id = ?").run(valor, boardId);
+}
+
+// Varre os quadros com a regra ligada e arquiva os concluídos que passaram do prazo.
+// Roda na leitura do workspace: sem agendador, e o resultado é sempre coerente com
+// o que o usuário está prestes a ver. Retorna quantos foram arquivados.
+export function runAutoArchive() {
+  const boards = getDb()
+    .prepare("SELECT id, auto_archive_days FROM boards WHERE auto_archive_days IS NOT NULL AND auto_archive_days > 0")
+    .all();
+  if (boards.length === 0) return 0;
+
+  const at = nowIso();
+  let total = 0;
+  const stmt = getDb().prepare(`
+    UPDATE cards SET archived = 1, archived_at = ?
+    WHERE archived = 0
+      AND completed = 1
+      AND completed_at IS NOT NULL
+      AND completed_at <= ?
+      AND list_id IN (SELECT id FROM lists WHERE board_id = ?)
+  `);
+  for (const b of boards) {
+    const limite = new Date(Date.now() - b.auto_archive_days * 86400000).toISOString();
+    const r = stmt.run(at, limite, b.id);
+    total += Number(r.changes || 0);
+  }
+  return total;
+}
+
+// Arquiva os cartões concluídos e ainda não arquivados de uma coluna.
+// Retorna os ids afetados para o cliente saber o que sumiu sem precisar recarregar.
+export function archiveCompletedCards(listId) {
+  const rows = getDb()
+    .prepare("SELECT id FROM cards WHERE list_id = ? AND completed = 1 AND archived = 0")
+    .all(listId);
+  const stmt = getDb().prepare("UPDATE cards SET archived = 1, archived_at = ? WHERE id = ?");
+  const at = nowIso();
+  rows.forEach((r) => stmt.run(at, r.id));
+  return rows.map((r) => r.id);
 }
 export function updateCard(id, patch) {
   const row = getDb().prepare("SELECT * FROM cards WHERE id = ?").get(id);
@@ -176,8 +233,16 @@ export function updateCard(id, patch) {
     urgent: patch.urgent !== undefined ? (patch.urgent ? 1 : 0) : row.urgent,
     important: patch.important !== undefined ? (patch.important ? 1 : 0) : row.important,
   };
+  // A data de conclusão acompanha a transição: marcar grava agora, desmarcar limpa
+  // (assim reconcluir reinicia a contagem). Se completed não veio no patch, preserva.
+  let completedAt = row.completed_at;
+  if (patch.completed !== undefined) {
+    const virouConcluido = !!patch.completed;
+    if (virouConcluido && !row.completed) completedAt = nowIso();
+    else if (!virouConcluido) completedAt = null;
+  }
   getDb().prepare(
-    "UPDATE cards SET title=?, description=?, labels=?, due=?, start_date=?, location=?, checklist=?, member_ids=?, completed=?, urgent=?, important=? WHERE id=?"
+    "UPDATE cards SET title=?, description=?, labels=?, due=?, start_date=?, location=?, checklist=?, member_ids=?, completed=?, urgent=?, important=?, completed_at=? WHERE id=?"
   ).run(
     next.title,
     next.description,
@@ -190,6 +255,7 @@ export function updateCard(id, patch) {
     next.completed,
     next.urgent,
     next.important,
+    completedAt,
     id
   );
 }
@@ -358,6 +424,12 @@ export function getWorkspace(userId) {
             urgent: !!c.urgent,
             important: !!c.important,
             attachments: JSON.parse(c.attachments || "[]"),
+            archived: !!c.archived,
+            archivedAt: c.archived_at || null,
+            completedAt: c.completed_at || null,
+            // Coluna de origem, para o modal de arquivados mostrar de onde veio
+            // e para o restaurar saber para onde devolver.
+            archivedFrom: c.archived ? l.id : null,
           };
         });
     });
@@ -367,11 +439,14 @@ export function getWorkspace(userId) {
       background: b.background || null,
       ownerId: b.owner_id || null,
       visibility: b.visibility || "shared",
+      autoArchiveDays: b.auto_archive_days || null,
       lists: boardLists.map((l) => ({
         id: l.id,
         title: l.title,
         color: l.color || null,
-        cardIds: cards.filter((c) => c.list_id === l.id).map((c) => c.id),
+        // Arquivado sai daqui, e é só isso que o tira do quadro e de todas as views:
+        // elas montam suas listas de cartões percorrendo cardIds (via flattenCards).
+        cardIds: cards.filter((c) => c.list_id === l.id && !c.archived).map((c) => c.id),
       })),
       cards: cardsObj,
     };

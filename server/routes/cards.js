@@ -23,6 +23,22 @@ router.delete(
   })
 );
 
+router.post(
+  "/:id/archive",
+  ah(async (req, res) => {
+    await repo.setCardArchived(req.params.id, true);
+    res.json({ ok: true });
+  })
+);
+
+router.post(
+  "/:id/unarchive",
+  ah(async (req, res) => {
+    await repo.setCardArchived(req.params.id, false);
+    res.json({ ok: true });
+  })
+);
+
 const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
 
 router.post(

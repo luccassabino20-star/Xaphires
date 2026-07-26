@@ -26,6 +26,13 @@ export function reducer(state, action) {
       };
     case "RENAME_BOARD":
       return { ...state, boards: state.boards.map((b) => (b.id === action.boardId ? { ...b, title: action.title } : b)) };
+    case "SET_AUTO_ARCHIVE_DAYS":
+      return {
+        ...state,
+        boards: state.boards.map((b) =>
+          b.id === action.boardId ? { ...b, autoArchiveDays: action.days } : b
+        ),
+      };
     case "SET_BOARD_BACKGROUND":
       return {
         ...state,
@@ -116,6 +123,65 @@ export function reducer(state, action) {
         const cards = { ...b.cards };
         delete cards[action.cardId];
         return { ...b, cards, lists: b.lists.map((l) => ({ ...l, cardIds: l.cardIds.filter((cid) => cid !== action.cardId) })) };
+      });
+    // Arquivar tira o id de cardIds e marca o cartão, que continua em b.cards.
+    // Como todas as views montam suas listas percorrendo cardIds (flattenCards),
+    // basta isso para o cartão sumir do quadro, da tabela, do mapa e das demais.
+    case "ARCHIVE_CARD":
+      return updateBoard(state, action.boardId, (b) => {
+        const card = b.cards[action.cardId];
+        if (!card || card.archived) return b;
+        const fromList = b.lists.find((l) => l.cardIds.includes(action.cardId));
+        return {
+          ...b,
+          cards: {
+            ...b.cards,
+            [action.cardId]: {
+              ...card,
+              archived: true,
+              archivedAt: action.at,
+              archivedFrom: fromList?.id ?? null,
+            },
+          },
+          lists: b.lists.map((l) => ({ ...l, cardIds: l.cardIds.filter((cid) => cid !== action.cardId) })),
+        };
+      });
+    case "UNARCHIVE_CARD":
+      return updateBoard(state, action.boardId, (b) => {
+        const card = b.cards[action.cardId];
+        if (!card || !card.archived) return b;
+        // A coluna de origem pode ter sido apagada enquanto o cartão estava arquivado;
+        // nesse caso ele volta para a primeira lista, em vez de sumir sem aviso.
+        const target = b.lists.find((l) => l.id === card.archivedFrom) || b.lists[0];
+        if (!target) return b;
+        return {
+          ...b,
+          cards: {
+            ...b.cards,
+            [action.cardId]: { ...card, archived: false, archivedAt: null, archivedFrom: null },
+          },
+          lists: b.lists.map((l) =>
+            l.id === target.id ? { ...l, cardIds: [...l.cardIds, action.cardId] } : l
+          ),
+        };
+      });
+    case "ARCHIVE_COMPLETED_CARDS":
+      return updateBoard(state, action.boardId, (b) => {
+        const list = b.lists.find((l) => l.id === action.listId);
+        if (!list) return b;
+        const alvo = list.cardIds.filter((cid) => b.cards[cid]?.completed);
+        if (alvo.length === 0) return b;
+        const cards = { ...b.cards };
+        alvo.forEach((cid) => {
+          cards[cid] = { ...cards[cid], archived: true, archivedAt: action.at, archivedFrom: list.id };
+        });
+        return {
+          ...b,
+          cards,
+          lists: b.lists.map((l) =>
+            l.id === list.id ? { ...l, cardIds: l.cardIds.filter((cid) => !alvo.includes(cid)) } : l
+          ),
+        };
       });
     case "MOVE_CARD":
       return updateBoard(state, action.boardId, (b) => {
