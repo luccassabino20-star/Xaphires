@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
 import { translateError } from "../utils/errors.js";
-import ThemeToggle from "../components/ThemeToggle.jsx";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 
 export default function AuthScreen({ onBack }) {
@@ -45,9 +44,10 @@ export default function AuthScreen({ onBack }) {
 
   return (
     <div className="auth-shell">
+      {/* Sem ThemeToggle: o login é sempre dark, para não ter salto de tom vindo
+          da landing. A troca de tema continua disponível dentro do app. */}
       <div className="auth-theme-toggle auth-toolbar">
         <LanguageSwitcher />
-        <ThemeToggle />
       </div>
       {onBack && (
         <button className="auth-back-btn" onClick={onBack}>
@@ -55,7 +55,7 @@ export default function AuthScreen({ onBack }) {
         </button>
       )}
       <div className="auth-brand">
-        <div className="auth-brand-icon">IMG</div>
+        <div className="auth-brand-icon">C</div>
         <h1>{t("auth.brandTitle")}</h1>
         <p>{t("auth.brandText")}</p>
       </div>

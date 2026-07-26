@@ -2398,11 +2398,14 @@ input, textarea { font-family: inherit; }
   justify-content: center;
 }
 
-/* ---------- Landing: tema dark fixo ---------- */
-/* A landing sempre usa a paleta escura do template, independente do tema do app.
-   Como as variáveis são redefinidas no escopo do .landing-shell, todo componente
-   filho (inclusive .btn-primary/.btn-secondary) se adapta sem regra extra. */
-.landing-shell {
+/* ---------- Landing e login: tema dark fixo ---------- */
+/* Landing e tela de login usam sempre a paleta escura do template, independente
+   do tema do app. Como as variáveis são redefinidas no escopo desses dois shells,
+   todo componente filho (inclusive .btn-primary/.btn-secondary) se adapta sem
+   regra extra. As duas telas dividem a mesma paleta de propósito: sair da landing
+   e cair no login não pode ter salto de tom. */
+.landing-shell,
+.auth-shell {
   --bg-app: #050505;
   --bg-topbar: #0a0a0a;
   --bg-list: #171717;
@@ -2786,4 +2789,72 @@ input, textarea { font-family: inherit; }
   .landing-shell .btn-primary:active,
   .landing-shell .btn-secondary:active { transform: none; }
 }
+
+/* ---------- Login: superfícies e fundo blueprint ---------- */
+/* A paleta da landing serve para uma página de leitura, onde --bg-list e --bg-card
+   são ambos #171717. O login tem componentes empilhados (card > trilho de abas >
+   aba ativa > input) e precisa de uma escala com degraus distintos, senão a aba
+   ativa some contra o trilho. Estes valores redefinem só esses degraus; o resto
+   da paleta continua vindo da regra compartilhada com a landing. */
+.auth-shell {
+  --bg-topbar: #0f0f0f;   /* card do formulário, um passo acima da página */
+  --bg-list: #050505;     /* trilho das abas, recuado dentro do card */
+  --bg-card: #262626;     /* aba ativa e inputs, elevados sobre o trilho */
+  --bg-card-hover: #333333;
+}
+
+/* O blueprint sai do shorthand de background e vira camada própria, para a
+   opacidade ser ajustável — sobre o quase-preto ele fica mais contrastado do que
+   ficava sobre o cinza do tema do app. */
+.auth-shell { background: var(--bg-app); }
+.auth-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/blueprint-bg.svg") center / cover no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Só os dois painéis do flex. Um seletor abrangente aqui sobrescreveria o
+   position: absolute do .auth-back-btn e do .auth-theme-toggle, que voltariam
+   para o fluxo e empurrariam o layout; os dois já têm z-index: 10 próprio. */
+.auth-shell > .auth-brand,
+.auth-shell > .auth-panel { position: relative; z-index: 1; }
+
+/* O hover do botão voltar usava --bg-list, que agora é a cor da própria página. */
+.auth-shell .auth-back-btn:hover { background: #1a1a1a; }
+
+/* ---------- Logotipo Cantiere ---------- */
+/* Playfair Display só no nome da marca — na nav da landing e no painel do login.
+   O resto da interface continua na Inter, e o contraste entre as duas é proposital:
+   a serifa marca o logotipo, a sem-serifa carrega o texto. */
+.landing-nav-brand,
+.auth-brand h1,
+.auth-brand-icon {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+.landing-nav-brand {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+/* O quadrado acompanha o corpo do nome: dimensionado para a Inter em 16px, ficava
+   subdimensionado ao lado da marca em 24px. */
+.landing-nav-icon {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 22px;
+}
+
+.auth-brand h1 {
+  font-weight: 700;
+  font-size: 44px;
+  letter-spacing: 0.01em;
+}
+.auth-brand-icon { font-weight: 700; }
 
