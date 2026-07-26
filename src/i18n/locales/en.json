@@ -38,7 +38,7 @@
       "ctaPlans": "See plans",
       "heroNote": "No red tape. Cancel anytime.",
       "stats": [
-        { "value": "8", "label": "Integrated tools in one place" },
+        { "value": "13", "label": "Integrated tools in one place" },
         { "value": "100%", "label": "Real-time sync across the team" },
         { "value": "0", "label": "Loose spreadsheets or WhatsApp groups" },
         { "value": "24/7", "label": "Board access, from anywhere" }
@@ -50,14 +50,14 @@
       ],
       "exploreTitle": "Explore Cantiere",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Cantiere's 8 tools: board, table, calendar, map and more." },
+        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Cantiere's tools: board, table, calendar, map and more." },
         { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Cantiere day to day." },
         { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Basic, Professional and Enterprise plans and pick the right one for your team." }
       ]
     },
     "features": {
       "headerTitle": "Everything your team needs",
-      "headerText": "Eight integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
+      "headerText": "Integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
       "items": [
         { "badge": "B", "title": "Kanban board", "text": "No more tasks lost in chat screenshots. Drag and drop between lists and see the team's real progress." },
         { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member. No need for another tool." },

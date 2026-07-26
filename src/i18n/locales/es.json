@@ -38,7 +38,7 @@
       "ctaPlans": "Ver planes",
       "heroNote": "Sin burocracia. Cancela cuando quieras.",
       "stats": [
-        { "value": "8", "label": "Herramientas integradas en un solo lugar" },
+        { "value": "13", "label": "Herramientas integradas en un solo lugar" },
         { "value": "100%", "label": "Sincronización en tiempo real entre el equipo" },
         { "value": "0", "label": "Hojas de cálculo sueltas o grupos de WhatsApp" },
         { "value": "24/7", "label": "Acceso al tablero, desde cualquier lugar" }
@@ -50,14 +50,14 @@
       ],
       "exploreTitle": "Explora Cantiere",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las 8 herramientas de Cantiere: tablero, tabla, calendario, mapa y más." },
+        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las herramientas de Cantiere: tablero, tabla, calendario, mapa y más." },
         { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Cantiere en el día a día." },
         { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Básico, Profesional y Empresarial y elige el ideal para tu equipo." }
       ]
     },
     "features": {
       "headerTitle": "Todo lo que tu equipo necesita",
-      "headerText": "Ocho herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
+      "headerText": "Herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
       "items": [
         { "badge": "T", "title": "Tablero Kanban", "text": "Se acabaron las tareas perdidas en capturas de chat. Arrastra y suelta entre listas y ve el avance real del equipo." },
         { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro, sin necesitar otra herramienta." },

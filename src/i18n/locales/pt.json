@@ -39,7 +39,7 @@
       "heroNote": "Sem burocracia. Cancele quando quiser.",
       "stats": [
         {
-          "value": "8",
+          "value": "13",
           "label": "Ferramentas integradas num só lugar"
         },
         {
@@ -75,7 +75,7 @@
           "page": "features",
           "badge": "R",
           "title": "Recursos",
-          "text": "Conheça as 8 ferramentas do Cantiere: quadro, tabela, calendário, mapa e mais."
+          "text": "Conheça as ferramentas do Cantiere: quadro, tabela, calendário, mapa e mais."
         },
         {
           "page": "solutions",
@@ -93,7 +93,7 @@
     },
     "features": {
       "headerTitle": "Tudo o que a sua equipe precisa",
-      "headerText": "Oito ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
+      "headerText": "Ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
       "items": [
         {
           "badge": "Q",
