@@ -1712,7 +1712,21 @@ input, textarea { font-family: inherit; }
 }
 .landing-hero-actions { display: flex; justify-content: center; gap: 12px; }
 .landing-hero-secondary { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-.landing-hero-note { font-size: 12.5px; color: var(--text-muted); margin: 42px 0 0; }
+/* O seletor precisa do `p`: `.landing-hero p` define margin e, por ter classe +
+   tipo, vence de `.landing-hero-note` sozinho — a margem do topo daqui era
+   descartada e a frase ficava colada nos botões.
+   E as margens vão em propriedades longas, não no atalho `margin`: o atalho zera
+   o margin-left/right auto que `.landing-hero-main p` usa para centralizar a
+   caixa de 560px, e a frase encosta à esquerda. */
+.landing-hero p.landing-hero-note {
+  /* Sem font-size próprio: assim herda o clamp(16px, 1.5vw, 19px) de
+     `.landing-hero-main p` e tem o mesmo corpo do parágrafo acima, acompanhando
+     a largura da tela junto com ele. A cor segue mais apagada, que é o que
+     mantém a frase como observação e não como parte do texto. */
+  color: var(--text-muted);
+  margin-top: 24px;
+  margin-bottom: 0;
+}
 
 .landing-hero-main {
   max-width: 880px;
@@ -1753,7 +1767,9 @@ input, textarea { font-family: inherit; }
 .landing-stats {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 0 24px 64px;
+  /* O topo precisa de respiro: a faixa do letreiro acima (.landing-logos) fecha
+     com uma borda inferior, e com padding-top 0 os cartões encostavam nela. */
+  padding: 64px 24px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
