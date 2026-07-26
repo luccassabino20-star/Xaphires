@@ -266,6 +266,7 @@
             "Quadros ilimitados",
             "Quadro Kanban, Tabela e Calendário",
             "Arquivamento de cartões",
+            "Anexos e links nos cartões (até 10 MB)",
             "Suporte por e-mail"
           ]
         },
@@ -282,6 +283,7 @@
             "Atas de reunião",
             "Arquivamento automático de concluídos",
             "Monitor de gargalos",
+            "Anexos e links nos cartões (até 50 MB)",
             "Suporte por e-mail"
           ]
         },
@@ -300,6 +302,7 @@
             "Arquivamento automático de concluídos",
             "Monitor de gargalos",
             "Rotinas que criam cartões sozinhas",
+            "Anexos e links nos cartões (até 50 MB)",
             "Suporte prioritário"
           ]
         },
@@ -310,7 +313,7 @@
           "tagline": "Para organizações com necessidades específicas",
           "cta": "Falar com vendas",
           "features": [
-            "Tudo do Profissional",
+            "Tudo incluído no profissional, mais:",
             "Onboarding dedicado",
             "Suporte dedicado",
             "Acordo de nível de serviço (SLA)"
