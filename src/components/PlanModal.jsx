@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import * as api from "../state/api.js";
+import CheckoutModal from "./CheckoutModal.jsx";
 
 function formatarData(iso, locale) {
   if (!iso) return null;
@@ -24,36 +25,58 @@ export default function PlanModal({ onClose }) {
   const { user } = useAuth();
   const showToast = useToast();
   const [plano, setPlano] = useState(null);
+  const [cobranca, setCobranca] = useState(null);
   const [erro, setErro] = useState(null);
   const [trocando, setTrocando] = useState(null);
+  const [checkout, setCheckout] = useState(null); // { id, priceCents }
+
+  const carregar = useCallback(async () => {
+    try {
+      const [resumo, billing] = await Promise.all([api.getPlan(), api.getBilling()]);
+      setPlano(resumo);
+      setCobranca(billing);
+    } catch (e) {
+      setErro(translateError(e, t));
+    }
+  }, [t]);
 
   useEffect(() => {
-    api
-      .getPlan()
-      .then(setPlano)
-      .catch((e) => setErro(translateError(e, t)));
-  }, [t]);
+    carregar();
+  }, [carregar]);
 
   const ehMaster = user?.role === "master";
 
-  // Contratar gera cobrança, então pede confirmação com o valor à vista — bem
-  // diferente do clique-e-muda que existia antes. Passar para o gratuito não cobra
-  // nada, então a pergunta é outra: não faz sentido confirmar "por R$ 0,00/mês".
+  // Plano pago abre o checkout: o acesso só muda quando o pagamento é confirmado, e
+  // por isso não há mais um "confirmar e pronto" aqui. Plano gratuito continua sendo
+  // troca direta, porque não cobra nada.
   async function trocarPara(alvo) {
+    if (alvo.paid) {
+      setCheckout({ id: alvo.id, priceCents: Math.round((alvo.price || 0) * 100) });
+      return;
+    }
     const nome = t(`plan.names.${alvo.id}`);
-    const pergunta = alvo.paid
-      ? t("plan.upgradeConfirm", { plan: nome, price: formatarValor(alvo.price, i18n.language) })
-      : t("plan.selectFreeConfirm", { plan: nome });
-    if (!confirm(pergunta)) return;
+    if (!confirm(t("plan.selectFreeConfirm", { plan: nome }))) return;
 
     setTrocando(alvo.id);
     try {
       setPlano(await api.setPlan(alvo.id));
+      await carregar();
       showToast(t("plan.changed", { plan: nome }));
     } catch (e) {
       showToast(translateError(e, t));
     } finally {
       setTrocando(null);
+    }
+  }
+
+  async function cancelarAssinatura() {
+    if (!confirm(t("billing.cancelConfirm"))) return;
+    try {
+      await api.cancelSubscription();
+      await carregar();
+      showToast(t("billing.canceled"));
+    } catch (e) {
+      showToast(translateError(e, t));
     }
   }
 
@@ -67,8 +90,13 @@ export default function PlanModal({ onClose }) {
   // Sem plano pago em vigor a lista deixa de ser só "subir": entram o Básico e o
   // próprio plano atual, para renovar. O título e a dica mudam junto, senão a tela
   // continuaria dizendo "só é possível subir" embaixo de um botão de Básico.
+  //
+  // A condição espelha o canSelfSelectPlan do servidor: em vigor é só plano pago com
+  // status active. Teste, carência e vencido dão escolha livre — antes esta linha
+  // olhava só "expired" e a tela em teste mostrava os três planos sob o título
+  // "Subir de plano", contradizendo os próprios botões.
   const planoAtual = plano?.catalog?.find((p) => p.current);
-  const escolhaLivre = !!plano && (!planoAtual?.paid || plano.status === "expired");
+  const escolhaLivre = !!plano && !(planoAtual?.paid && plano.status === "active");
 
   return (
     <div
@@ -135,6 +163,79 @@ export default function PlanModal({ onClose }) {
                 {!plano.canAddUser && <p className="plan-warning">{t("plan.userLimitReached")}</p>}
               </div>
 
+              {/* Cobrança em aberto vem antes de tudo: é a única coisa nesta tela que
+                  exige ação e tem prazo. */}
+              {cobranca?.pendingPayment && (
+                <div className="plan-pending-charge">
+                  <div className="plan-pending-head">
+                    <span className="checkout-status-badge pending">{t("billing.awaitingPayment")}</span>
+                    <strong>{formatarValor(cobranca.pendingPayment.amountCents / 100, i18n.language)}</strong>
+                  </div>
+                  <p>{t(`billing.methods.${cobranca.pendingPayment.method}`)}</p>
+                  {ehMaster && (
+                    <button
+                      className="btn-primary btn-small"
+                      onClick={() =>
+                        setCheckout({ id: cobranca.pendingPayment.plan, priceCents: cobranca.pendingPayment.amountCents })
+                      }
+                    >
+                      {t("billing.finishPayment")}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {cobranca?.subscription && (
+                <div className="plan-subscription">
+                  <h3>{t("billing.subscriptionTitle")}</h3>
+                  <dl className="plan-facts">
+                    <div>
+                      <dt>{t("billing.methodLabel")}</dt>
+                      <dd>{t(`billing.methods.${cobranca.subscription.method}`)}</dd>
+                    </div>
+                    {cobranca.subscription.nextChargeAt && (
+                      <div>
+                        <dt>{t("billing.nextChargeLabel")}</dt>
+                        <dd>{formatarData(cobranca.subscription.nextChargeAt, i18n.language)}</dd>
+                      </div>
+                    )}
+                    <div>
+                      <dt>{t("billing.subStatusLabel")}</dt>
+                      <dd>{t(`billing.subStatus.${cobranca.subscription.status}`)}</dd>
+                    </div>
+                  </dl>
+                  {ehMaster && cobranca.subscription.status !== "canceled" && (
+                    <button className="btn-ghost btn-small" onClick={cancelarAssinatura}>
+                      {t("billing.cancelSubscription")}
+                    </button>
+                  )}
+                  {cobranca.subscription.status === "canceled" && (
+                    <p className="plan-switch-hint">{t("billing.canceledHint")}</p>
+                  )}
+                </div>
+              )}
+
+              {cobranca?.payments?.length > 0 && (
+                <div className="plan-history">
+                  <h3>{t("billing.historyTitle")}</h3>
+                  <ul className="plan-history-list">
+                    {cobranca.payments.map((p) => (
+                      <li key={p.id} className={"plan-history-item status-" + p.status}>
+                        <span className="plan-history-date">
+                          {formatarData(p.paidAt || p.createdAt, i18n.language)}
+                        </span>
+                        <span className="plan-history-plan">{t(`plan.names.${p.plan}`)}</span>
+                        <span className="plan-history-method">{t(`billing.methods.${p.method}`)}</span>
+                        <span className="plan-history-amount">
+                          {formatarValor(p.amountCents / 100, i18n.language)}
+                        </span>
+                        <span className={"plan-history-status " + p.status}>{t(`billing.payStatus.${p.status}`)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {ehMaster ? (
                 <div className="plan-switch">
                   {podeEscolher.length > 0 && (
@@ -169,6 +270,19 @@ export default function PlanModal({ onClose }) {
           )}
         </div>
       </div>
+
+      {checkout && (
+        <CheckoutModal
+          plan={checkout.id}
+          priceCents={checkout.priceCents}
+          simulated={!!cobranca?.simulated}
+          onClose={() => {
+            setCheckout(null);
+            carregar();
+          }}
+          onPaid={carregar}
+        />
+      )}
     </div>
   );
 }

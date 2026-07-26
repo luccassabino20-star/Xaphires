@@ -981,8 +981,75 @@
     "continueOnBasic": "Continuar no Básico grátis",
     "movedToBasic": "Plano alterado para Básico",
     "selectTitle": "Escolher plano",
-    "freeChoiceHint": "Seu plano não está em vigor, então você pode escolher qualquer plano abaixo - inclusive o Básico gratuito, que não expira.",
+    "freeChoiceHint": "Você ainda não tem um plano pago em vigor, então pode escolher qualquer plano abaixo - inclusive o Básico gratuito, que não expira.",
     "selectFreeConfirm": "Passar para o plano {{plan}}? Ele é gratuito e não tem prazo de validade."
+  },
+  "billing": {
+    "checkoutTitle": "Contratar {{plan}}",
+    "chooseMethod": "Como você quer pagar",
+    "methods": {
+      "pix": "Pix",
+      "card": "Cartão de crédito",
+      "boleto": "Boleto"
+    },
+    "methodNotes": {
+      "pix": "Libera em segundos",
+      "card": "Renova sozinho todo mês",
+      "boleto": "Compensa em até 3 dias úteis"
+    },
+    "payNow": "Pagar agora",
+    "processing": "Processando...",
+    "fineprint": "O plano é liberado quando o pagamento é confirmado. Você pode cancelar a renovação quando quiser.",
+    "cardNumber": "Número do cartão",
+    "cardName": "Nome impresso no cartão",
+    "cardExpiry": "Validade",
+    "cardCvv": "CVV",
+    "cardUnavailable": "O pagamento por cartão ainda não está disponível nesta instalação.",
+    "testMode": "Modo de teste: nenhuma cobrança real acontece.",
+    "testCards": "Cartões de teste: terminação 1111 aprova, 0002 recusa, 0003 sem saldo, 0004 expirado.",
+    "awaitingPayment": "Aguardando pagamento",
+    "pixCopyPaste": "Pix copia e cola",
+    "boletoLine": "Linha digitável",
+    "copyCode": "Copiar código",
+    "copied": "Copiado",
+    "copyFailed": "Não foi possível copiar. Selecione o código e copie à mão.",
+    "payUntil": "Pague até {{date}}",
+    "willUpdateAlone": "Esta tela se atualiza sozinha quando o pagamento for confirmado.",
+    "simulateConfirm": "Simular confirmação do pagamento",
+    "paid": "Pago",
+    "paidToast": "Pagamento confirmado",
+    "releasedUntil": "Acesso liberado até {{date}}",
+    "failed": "Não aprovado",
+    "failureGeneric": "O pagamento não foi aprovado. Tente outra forma de pagamento.",
+    "failureReasons": {
+      "CARD_DECLINED": "O cartão foi recusado pelo banco emissor.",
+      "INSUFFICIENT_FUNDS": "Não havia saldo ou limite suficiente.",
+      "EXPIRED_CARD": "O cartão está expirado.",
+      "EXPIRED": "A cobrança venceu antes de ser paga."
+    },
+    "tryAgain": "Tentar de novo",
+    "finishPayment": "Terminar o pagamento",
+    "subscriptionTitle": "Assinatura",
+    "methodLabel": "Forma de pagamento",
+    "nextChargeLabel": "Próxima cobrança",
+    "subStatusLabel": "Situação",
+    "subStatus": {
+      "active": "Ativa",
+      "past_due": "Pagamento atrasado",
+      "canceled": "Cancelada"
+    },
+    "cancelSubscription": "Cancelar renovação",
+    "cancelConfirm": "Cancelar a renovação automática? Você continua com acesso até o fim do período já pago.",
+    "canceled": "Renovação cancelada",
+    "canceledHint": "A renovação está cancelada. O acesso vale até o fim do período já pago.",
+    "historyTitle": "Histórico de pagamentos",
+    "payStatus": {
+      "paid": "Pago",
+      "pending": "Pendente",
+      "failed": "Não aprovado",
+      "canceled": "Cancelado",
+      "refunded": "Devolvido"
+    }
   },
   "errors": {
     "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Intermediário.",

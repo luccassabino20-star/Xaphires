@@ -3235,3 +3235,146 @@ input, textarea { font-family: inherit; }
   line-height: 1.6;
   color: var(--text-secondary);
 }
+
+/* ---------- Cobrança: checkout, assinatura e extrato ---------- */
+.checkout-modal { max-width: 520px; }
+.checkout-title { margin: 0; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.checkout-amount {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+.checkout-amount span { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-left: 2px; }
+
+/* Os meios ficam em grade que colapsa para uma coluna no celular, onde três cartões
+   lado a lado deixariam o texto de apoio ilegível. */
+.checkout-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+.checkout-method {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.checkout-method:hover { border-color: var(--border-strong); }
+/* O selecionado precisa de mais que cor de borda: no tema claro o --accent é escuro
+   e no escuro é claro, então só a borda muda pouco. O fundo é o que deixa óbvio. */
+.checkout-method.active {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+}
+.checkout-method-name { font-size: 13.5px; font-weight: 600; }
+.checkout-method-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.35; }
+
+.checkout-card-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+.checkout-card-row { display: flex; gap: 10px; }
+.checkout-card-row .auth-field { flex: 1; }
+.checkout-testmode {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  background: color-mix(in srgb, #c9922f 16%, transparent);
+  color: #c9922f;
+}
+.checkout-testhint { margin: 0; font-size: 11.5px; line-height: 1.5; color: var(--text-muted); }
+.checkout-warning { margin: 0 0 12px; font-size: 12.5px; color: var(--text-muted); }
+.checkout-submit { width: 100%; margin-top: 12px; }
+.checkout-fineprint { margin: 10px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--text-muted); }
+
+.checkout-status-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.checkout-status-badge.pending { background: color-mix(in srgb, #c9922f 20%, transparent); color: #c9922f; }
+.checkout-status-badge.paid { background: color-mix(in srgb, var(--success) 20%, transparent); color: var(--success); }
+.checkout-status-badge.failed { background: color-mix(in srgb, #b3444a 20%, transparent); color: #b3444a; }
+
+.checkout-pending, .checkout-done, .checkout-failed { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.checkout-pending .modal-label { margin-top: 6px; }
+/* O código do Pix é longo e não tem espaços: precisa quebrar em qualquer caractere,
+   senão estoura a largura do modal. */
+.checkout-code {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-list);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.checkout-due, .checkout-polling { margin: 0; font-size: 12px; color: var(--text-muted); }
+.checkout-simulate { margin-top: 4px; }
+.checkout-done p, .checkout-failed p { margin: 0; font-size: 13.5px; color: var(--text-secondary); line-height: 1.55; }
+
+.plan-pending-charge {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, #c9922f 40%, var(--border-subtle));
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.plan-pending-head { display: flex; align-items: center; gap: 10px; }
+.plan-pending-head strong { font-size: 15px; color: var(--text-primary); }
+.plan-pending-charge p { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+
+.plan-subscription, .plan-history { margin-top: 20px; }
+.plan-subscription h3, .plan-history h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.plan-history-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+/* Grade em vez de tabela: as colunas ficam alinhadas e a linha inteira reflui no
+   celular sem precisar de rolagem horizontal. */
+.plan-history-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+.plan-history-item:last-child { border-bottom: none; }
+.plan-history-date { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.plan-history-plan { font-weight: 600; color: var(--text-primary); }
+.plan-history-method { color: var(--text-muted); }
+.plan-history-amount { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.plan-history-status { grid-column: 1 / -1; font-size: 11.5px; }
+.plan-history-status.paid { color: var(--success); }
+.plan-history-status.pending { color: #c9922f; }
+.plan-history-status.failed, .plan-history-status.canceled { color: #b3444a; }
+.plan-history-status.refunded { color: var(--text-muted); }

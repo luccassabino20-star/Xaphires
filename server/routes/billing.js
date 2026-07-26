@@ -4,7 +4,7 @@ import { ah } from "../asyncHandler.js";
 import { getCompany } from "../directory.js";
 import { countUsers } from "../repo.js";
 import { canSelfSelectPlan, getPlan, priceCentsOf } from "../plans.js";
-import { metodoValido, METODOS } from "../billing/gateway.js";
+import { metodoValido, METODOS, gateway } from "../billing/gateway.js";
 import * as store from "../billing/store.js";
 import * as ciclo from "../billing/lifecycle.js";
 
@@ -31,6 +31,12 @@ router.get(
     const pendente = store.pendingPayment(req.companyId);
     res.json({
       methods: METODOS,
+      // O cliente precisa saber que está no provedor simulado para só então mostrar
+      // campo de número de cartão. Com provedor real, os dados do cartão são
+      // trocados por um token no navegador, pelo SDK dele, e o número NUNCA chega
+      // aqui — é o que mantém o projeto fora do escopo PCI.
+      simulated: gateway.nome === "fake",
+      provider: gateway.nome,
       subscription: visaoAssinatura(store.getActiveSubscription(req.companyId)),
       pendingPayment: store.publicPayment(pendente),
       payments: store.listPayments(req.companyId).map(store.publicPayment),
@@ -152,6 +158,26 @@ router.put(
       }
       throw err;
     }
+  })
+);
+
+// Confirma uma cobrança à mão. SÓ existe no provedor simulado, e é o que permite
+// exercitar o fluxo de Pix e boleto no navegador em desenvolvimento — sem ela não há
+// como um Pix simulado sair de pendente, porque quem confirma no mundo real é o
+// banco. Com provedor real esta rota responde 404, então não há como usá-la para
+// liberar plano sem pagar.
+router.post(
+  "/dev/confirm/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    if (gateway.nome !== "fake") {
+      return res.status(404).json({ error: "Indisponível", code: "NOT_FOUND" });
+    }
+    const pagamento = store.getPayment(req.params.id);
+    if (!pagamento || pagamento.company_id !== req.companyId) {
+      return res.status(404).json({ error: "Cobrança não encontrada", code: "PAYMENT_NOT_FOUND" });
+    }
+    res.json({ payment: store.publicPayment(ciclo.confirmarPagamento(req.params.id)) });
   })
 );
 

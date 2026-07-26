@@ -210,6 +210,20 @@ export function setPaymentStatus(id, status, { paidAt, failureReason, providerCh
   return getPayment(id);
 }
 
+// Corrige o período que o pagamento comprou, na confirmação. Na emissão o período é
+// um palpite contado de hoje; quem paga adiantado ganha o ciclo a partir do fim do
+// atual, e sem reescrever aqui o extrato mostraria um intervalo que não foi o
+// concedido.
+export function setPaymentPeriod(id, periodStart, periodEnd) {
+  db.prepare("UPDATE payments SET period_start = ?, period_end = ?, updated_at = ? WHERE id = ?").run(
+    periodStart,
+    periodEnd,
+    new Date().toISOString(),
+    id
+  );
+  return getPayment(id);
+}
+
 export function listPayments(companyId, limite = 24) {
   return db
     .prepare("SELECT * FROM payments WHERE company_id = ? ORDER BY created_at DESC LIMIT ?")

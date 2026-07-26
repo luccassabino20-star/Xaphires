@@ -138,6 +138,33 @@ export function setPlan(plan) {
   });
 }
 
+// ---------- Cobrança ----------
+// Toda rota que mexe na assinatura invalida o cache do plano: o resumo carrega
+// status e vencimento, e depois de pagar eles mudaram.
+function invalidandoPlano(promessa) {
+  return promessa.then((r) => {
+    planoCache = null;
+    return r;
+  });
+}
+
+export const getBilling = () => request("/billing");
+
+// `card` só leva número quando o provedor é o simulado. Com provedor real, os dados
+// do cartão são tokenizados no navegador pelo SDK dele e aqui vai só o token — o
+// número do cartão nunca deve trafegar pela nossa API.
+export const subscribe = (data) => invalidandoPlano(request("/billing/subscribe", { method: "POST", body: data }));
+
+export const setPaymentMethod = (data) => invalidandoPlano(request("/billing/method", { method: "PUT", body: data }));
+
+export const cancelSubscription = () => invalidandoPlano(request("/billing/cancel", { method: "POST" }));
+
+// Pergunta ao gateway se uma cobrança pendente já foi paga, sem depender do webhook.
+export const checkPayment = (id) => invalidandoPlano(request(`/billing/payments/${id}/check`, { method: "POST" }));
+
+// Só funciona no provedor simulado; com provedor real o servidor devolve 404.
+export const devConfirmPayment = (id) => invalidandoPlano(request(`/billing/dev/confirm/${id}`, { method: "POST" }));
+
 // ---------- Cartões recorrentes ----------
 export const listRecurrences = (boardId) => request(`/recurrences/board/${boardId}`);
 export const createRecurrence = (boardId, data) =>

@@ -665,8 +665,75 @@
     "continueOnBasic": "Continue on the free Basic plan",
     "movedToBasic": "Plan changed to Basic",
     "selectTitle": "Choose a plan",
-    "freeChoiceHint": "Your plan is no longer active, so you can pick any plan below - including the free Basic, which never expires.",
+    "freeChoiceHint": "You do not have a paid plan in effect, so you can pick any plan below - including the free Basic, which never expires.",
     "selectFreeConfirm": "Switch to the {{plan}} plan? It is free and never expires."
+  },
+  "billing": {
+    "checkoutTitle": "Subscribe to {{plan}}",
+    "chooseMethod": "How would you like to pay",
+    "methods": {
+      "pix": "Pix",
+      "card": "Credit card",
+      "boleto": "Bank slip"
+    },
+    "methodNotes": {
+      "pix": "Clears in seconds",
+      "card": "Renews automatically",
+      "boleto": "Clears in up to 3 business days"
+    },
+    "payNow": "Pay now",
+    "processing": "Processing...",
+    "fineprint": "The plan is released once payment clears. You can cancel renewal at any time.",
+    "cardNumber": "Card number",
+    "cardName": "Name on card",
+    "cardExpiry": "Expiry",
+    "cardCvv": "CVV",
+    "cardUnavailable": "Card payment is not available on this installation yet.",
+    "testMode": "Test mode: no real charge is made.",
+    "testCards": "Test cards: ending 1111 approves, 0002 declines, 0003 insufficient funds, 0004 expired.",
+    "awaitingPayment": "Awaiting payment",
+    "pixCopyPaste": "Pix copy and paste",
+    "boletoLine": "Barcode line",
+    "copyCode": "Copy code",
+    "copied": "Copied",
+    "copyFailed": "Could not copy. Select the code and copy it manually.",
+    "payUntil": "Pay by {{date}}",
+    "willUpdateAlone": "This screen updates itself once the payment clears.",
+    "simulateConfirm": "Simulate payment confirmation",
+    "paid": "Paid",
+    "paidToast": "Payment confirmed",
+    "releasedUntil": "Access released until {{date}}",
+    "failed": "Not approved",
+    "failureGeneric": "The payment was not approved. Try another payment method.",
+    "failureReasons": {
+      "CARD_DECLINED": "The card was declined by the issuing bank.",
+      "INSUFFICIENT_FUNDS": "There was not enough balance or limit.",
+      "EXPIRED_CARD": "The card has expired.",
+      "EXPIRED": "The charge expired before it was paid."
+    },
+    "tryAgain": "Try again",
+    "finishPayment": "Finish payment",
+    "subscriptionTitle": "Subscription",
+    "methodLabel": "Payment method",
+    "nextChargeLabel": "Next charge",
+    "subStatusLabel": "Status",
+    "subStatus": {
+      "active": "Active",
+      "past_due": "Payment overdue",
+      "canceled": "Canceled"
+    },
+    "cancelSubscription": "Cancel renewal",
+    "cancelConfirm": "Cancel automatic renewal? You keep access until the end of the period already paid.",
+    "canceled": "Renewal canceled",
+    "canceledHint": "Renewal is canceled. Access lasts until the end of the period already paid.",
+    "historyTitle": "Payment history",
+    "payStatus": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "failed": "Not approved",
+      "canceled": "Canceled",
+      "refunded": "Refunded"
+    }
   },
   "errors": {
     "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Intermediate plan up.",

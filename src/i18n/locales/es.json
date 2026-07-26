@@ -665,8 +665,75 @@
     "continueOnBasic": "Continuar en el plan Básico gratis",
     "movedToBasic": "Plan cambiado a Básico",
     "selectTitle": "Elegir plan",
-    "freeChoiceHint": "Tu plan no está vigente, así que puedes elegir cualquier plan de abajo, incluido el Básico gratuito, que no caduca.",
+    "freeChoiceHint": "Aún no tienes un plan de pago vigente, así que puedes elegir cualquier plan de abajo, incluido el Básico gratuito, que no caduca.",
     "selectFreeConfirm": "¿Pasar al plan {{plan}}? Es gratuito y no tiene fecha de vencimiento."
+  },
+  "billing": {
+    "checkoutTitle": "Contratar {{plan}}",
+    "chooseMethod": "Cómo quieres pagar",
+    "methods": {
+      "pix": "Pix",
+      "card": "Tarjeta de crédito",
+      "boleto": "Boleto"
+    },
+    "methodNotes": {
+      "pix": "Se acredita en segundos",
+      "card": "Se renueva solo cada mes",
+      "boleto": "Se acredita hasta en 3 días hábiles"
+    },
+    "payNow": "Pagar ahora",
+    "processing": "Procesando...",
+    "fineprint": "El plan se libera cuando se confirma el pago. Puedes cancelar la renovación cuando quieras.",
+    "cardNumber": "Número de la tarjeta",
+    "cardName": "Nombre en la tarjeta",
+    "cardExpiry": "Vencimiento",
+    "cardCvv": "CVV",
+    "cardUnavailable": "El pago con tarjeta aún no está disponible en esta instalación.",
+    "testMode": "Modo de prueba: no se hace ningún cobro real.",
+    "testCards": "Tarjetas de prueba: terminación 1111 aprueba, 0002 rechaza, 0003 sin saldo, 0004 vencida.",
+    "awaitingPayment": "Esperando el pago",
+    "pixCopyPaste": "Pix copiar y pegar",
+    "boletoLine": "Línea digitable",
+    "copyCode": "Copiar código",
+    "copied": "Copiado",
+    "copyFailed": "No se pudo copiar. Selecciona el código y cópialo a mano.",
+    "payUntil": "Paga hasta {{date}}",
+    "willUpdateAlone": "Esta pantalla se actualiza sola cuando se confirme el pago.",
+    "simulateConfirm": "Simular confirmación del pago",
+    "paid": "Pagado",
+    "paidToast": "Pago confirmado",
+    "releasedUntil": "Acceso liberado hasta {{date}}",
+    "failed": "No aprobado",
+    "failureGeneric": "El pago no fue aprobado. Prueba otra forma de pago.",
+    "failureReasons": {
+      "CARD_DECLINED": "La tarjeta fue rechazada por el banco emisor.",
+      "INSUFFICIENT_FUNDS": "No había saldo o límite suficiente.",
+      "EXPIRED_CARD": "La tarjeta está vencida.",
+      "EXPIRED": "El cobro venció antes de ser pagado."
+    },
+    "tryAgain": "Intentar de nuevo",
+    "finishPayment": "Terminar el pago",
+    "subscriptionTitle": "Suscripción",
+    "methodLabel": "Forma de pago",
+    "nextChargeLabel": "Próximo cobro",
+    "subStatusLabel": "Situación",
+    "subStatus": {
+      "active": "Activa",
+      "past_due": "Pago atrasado",
+      "canceled": "Cancelada"
+    },
+    "cancelSubscription": "Cancelar renovación",
+    "cancelConfirm": "¿Cancelar la renovación automática? Mantienes el acceso hasta el fin del período ya pagado.",
+    "canceled": "Renovación cancelada",
+    "canceledHint": "La renovación está cancelada. El acceso vale hasta el fin del período ya pagado.",
+    "historyTitle": "Historial de pagos",
+    "payStatus": {
+      "paid": "Pagado",
+      "pending": "Pendiente",
+      "failed": "No aprobado",
+      "canceled": "Cancelado",
+      "refunded": "Devuelto"
+    }
   },
   "errors": {
     "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Intermedio.",

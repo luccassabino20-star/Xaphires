@@ -57,6 +57,11 @@ export function confirmarPagamento(paymentId, { paidAt } = {}) {
     empresa?.expires_at && new Date(empresa.expires_at) > new Date() ? empresa.expires_at : nowIso();
   const novoVencimento = addOneMonth(base);
 
+  // O período do pagamento passa a ser o que ele realmente comprou. Sem isto, quem
+  // paga adiantado via no comprovante um intervalo contado de hoje, enquanto o acesso
+  // ia até um mês depois do vencimento antigo — dois números diferentes na mesma tela.
+  store.setPaymentPeriod(paymentId, base, novoVencimento);
+
   setCompanyPlan(pagamento.company_id, {
     plan: pagamento.plan,
     status: "active",
