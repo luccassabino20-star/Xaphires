@@ -276,6 +276,7 @@ export default function PlanModal({ onClose }) {
           plan={checkout.id}
           priceCents={checkout.priceCents}
           simulated={!!cobranca?.simulated}
+          docInicial={cobranca?.subscription?.payerDoc}
           onClose={() => {
             setCheckout(null);
             carregar();

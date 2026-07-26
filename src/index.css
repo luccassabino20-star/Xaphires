@@ -3281,6 +3281,11 @@ input, textarea { font-family: inherit; }
 .checkout-method-name { font-size: 13.5px; font-weight: 600; }
 .checkout-method-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.35; }
 
+.checkout-doc { margin-bottom: 12px; }
+.checkout-doc input[aria-invalid="true"] { border-color: var(--danger); }
+.checkout-doc-hint { font-size: 11.5px; color: var(--text-muted); }
+.checkout-doc-error { font-size: 11.5px; color: var(--danger); }
+
 .checkout-card-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
 .checkout-card-row { display: flex; gap: 10px; }
 .checkout-card-row .auth-field { flex: 1; }

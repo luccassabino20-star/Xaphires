@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
+import { docValido, formatarDoc, normalizarDoc } from "../utils/doc.js";
 import * as api from "../state/api.js";
 
 // Intervalo da consulta de status enquanto a cobrança está pendente. Webhook perdido
@@ -38,11 +39,15 @@ function IconeBoleto() {
 
 const ICONES = { pix: IconePix, card: IconeCartao, boleto: IconeBoleto };
 
-export default function CheckoutModal({ plan, priceCents, simulated, onClose, onPaid }) {
+export default function CheckoutModal({ plan, priceCents, simulated, docInicial, onClose, onPaid }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
 
   const [metodo, setMetodo] = useState("pix");
+  // Vem preenchido quando a empresa já assinou antes: ninguém quer redigitar o CNPJ
+  // a cada renovação.
+  const [doc, setDoc] = useState(() => formatarDoc(docInicial || ""));
+  const [docTocado, setDocTocado] = useState(false);
   const [numero, setNumero] = useState("");
   const [nome, setNome] = useState("");
   const [validade, setValidade] = useState("");
@@ -82,13 +87,23 @@ export default function CheckoutModal({ plan, priceCents, simulated, onClose, on
   async function pagar(e) {
     e.preventDefault();
     setErro("");
+    // Confere antes de gastar a chamada: documento inválido volta do gateway como
+    // erro genérico, difícil de explicar na tela.
+    //
+    // Só marca o campo, sem mensagem geral: o aviso inline já diz o que está errado
+    // e aponta para onde corrigir. Repetir o mesmo texto na caixa de erro embaixo
+    // dava a impressão de dois problemas diferentes.
+    if (docObrigatorio && !docValido(doc)) {
+      setDocTocado(true);
+      return;
+    }
     setEnviando(true);
     try {
       // Com provedor real este objeto leva um token gerado pelo SDK no navegador, e
       // nunca o número digitado. Ver o comentário em api.js.
       const card =
         metodo === "card" && simulated ? { number: numero.replace(/\s+/g, ""), name: nome, validade, cvv } : undefined;
-      const r = await api.subscribe({ plan, method: metodo, card });
+      const r = await api.subscribe({ plan, method: metodo, card, payerDoc: normalizarDoc(doc) || undefined });
       setCobranca(r.payment);
       if (r.payment?.status === "paid") {
         showToast(t("billing.paidToast"));
@@ -130,6 +145,10 @@ export default function CheckoutModal({ plan, priceCents, simulated, onClose, on
   const pago = cobranca?.status === "paid";
   const pendente = cobranca?.status === "pending";
   const falhou = cobranca?.status === "failed";
+  // Pix e boleto exigem documento do pagador no Brasil. No cartão quem identifica é
+  // o próprio cartão, então não se pede.
+  const docObrigatorio = metodo === "pix" || metodo === "boleto";
+  const docComErro = docTocado && docObrigatorio && doc.length > 0 && !docValido(doc);
 
   return (
     <div
@@ -172,6 +191,27 @@ export default function CheckoutModal({ plan, priceCents, simulated, onClose, on
                   );
                 })}
               </div>
+
+              {docObrigatorio && (
+                <label className="auth-field checkout-doc">
+                  <span>{t("billing.docLabel")}</span>
+                  <input
+                    value={doc}
+                    onChange={(e) => setDoc(formatarDoc(e.target.value))}
+                    onBlur={() => setDocTocado(true)}
+                    placeholder="000.000.000-00"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    aria-invalid={docComErro || undefined}
+                    required
+                  />
+                  {docComErro ? (
+                    <span className="checkout-doc-error">{t("billing.docInvalid")}</span>
+                  ) : (
+                    <span className="checkout-doc-hint">{t("billing.docHint")}</span>
+                  )}
+                </label>
+              )}
 
               {metodo === "card" && !simulated && (
                 <p className="checkout-warning">{t("billing.cardUnavailable")}</p>

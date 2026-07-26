@@ -3,6 +3,7 @@ import { requireAuth, requireMaster } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
 import { getCompany } from "../directory.js";
 import { countUsers } from "../repo.js";
+import { docValido, normalizarDoc } from "../doc.js";
 import { canSelfSelectPlan, getPlan, priceCentsOf } from "../plans.js";
 import { metodoValido, METODOS, gateway } from "../billing/gateway.js";
 import * as store from "../billing/store.js";
@@ -11,7 +12,10 @@ import * as ciclo from "../billing/lifecycle.js";
 const router = Router();
 router.use(requireAuth);
 
-function visaoAssinatura(row) {
+// `ehMaster` controla o documento do pagador: serve para preencher o campo numa
+// renovação, mas é dado pessoal de quem contratou e não tem por que aparecer para
+// os demais membros da empresa.
+function visaoAssinatura(row, ehMaster = false) {
   if (!row) return null;
   return {
     id: row.id,
@@ -21,6 +25,7 @@ function visaoAssinatura(row) {
     nextChargeAt: row.next_charge_at,
     canceledAt: row.canceled_at,
     createdAt: row.created_at,
+    payerDoc: ehMaster ? row.payer_doc || null : null,
   };
 }
 
@@ -37,7 +42,7 @@ router.get(
       // aqui — é o que mantém o projeto fora do escopo PCI.
       simulated: gateway.nome === "fake",
       provider: gateway.nome,
-      subscription: visaoAssinatura(store.getActiveSubscription(req.companyId)),
+      subscription: visaoAssinatura(store.getActiveSubscription(req.companyId), req.user.role === "master"),
       pendingPayment: store.publicPayment(pendente),
       payments: store.listPayments(req.companyId).map(store.publicPayment),
       graceUntil: getCompany(req.companyId)?.grace_until || null,
@@ -92,6 +97,19 @@ router.post(
       return res.status(400).json({ error: "Escolha uma forma de pagamento", code: "INVALID_PAYMENT_METHOD" });
     }
 
+    // Pix e boleto exigem CPF ou CNPJ do pagador no Brasil. Conferido aqui com
+    // dígito verificador de verdade: documento com erro de digitação volta do
+    // gateway como 400 genérico que ninguém consegue interpretar na tela.
+    const docPagador = normalizarDoc(req.body?.payerDoc);
+    if (method === "pix" || method === "boleto") {
+      if (!docPagador) {
+        return res.status(400).json({ error: "Informe o CPF ou CNPJ do pagador", code: "PAYER_DOCUMENT_REQUIRED" });
+      }
+      if (!docValido(docPagador)) {
+        return res.status(400).json({ error: "CPF ou CNPJ inválido", code: "PAYER_DOCUMENT_INVALID" });
+      }
+    }
+
     // Mesma regra da troca de plano: não deixa contratar um plano pago apertado
     // demais para a equipe atual, senão a empresa pagaria por algo que já nasce
     // bloqueado. countUsers() lê o banco da empresa, e o contexto vem do requireAuth.
@@ -110,7 +128,7 @@ router.post(
       // O pagador sai da sessão, não do corpo: e-mail de cobrança não é campo que o
       // cliente escolhe. O documento vem do formulário porque não temos CPF no
       // cadastro — ver o aviso em providers/mercadopago.js.
-      const payer = { email: req.user.email, name: req.user.name, doc: (req.body?.payerDoc || "").trim() || null };
+      const payer = { email: req.user.email, name: req.user.name, doc: docPagador || null };
       const r = await ciclo.assinar({ companyId: req.companyId, plan, method, card, payer });
       res.status(201).json({
         subscription: visaoAssinatura(r.subscription),
