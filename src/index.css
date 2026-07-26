@@ -1712,7 +1712,7 @@ input, textarea { font-family: inherit; }
 }
 .landing-hero-actions { display: flex; justify-content: center; gap: 12px; }
 .landing-hero-secondary { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-.landing-hero-note { font-size: 12.5px; color: var(--text-muted); margin: 16px 0 0; }
+.landing-hero-note { font-size: 12.5px; color: var(--text-muted); margin: 42px 0 0; }
 
 .landing-hero-main {
   max-width: 880px;
@@ -3206,4 +3206,16 @@ input, textarea { font-family: inherit; }
 @media (max-width: 560px) {
   .recurrence-item { flex-direction: column; align-items: stretch; }
   .recurrence-item-actions { justify-content: flex-end; }
+}
+
+/* Subtítulo do bloco de automações na página de Recursos. O título acima já tinha
+   margem inferior própria, então aqui ela é zerada para não abrir vão duplo. */
+.landing-features-title + .landing-features-subtitle { margin-top: -20px; }
+.landing-features-subtitle {
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 28px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
 }

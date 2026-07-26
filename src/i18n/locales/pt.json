@@ -92,6 +92,40 @@
       ]
     },
     "features": {
+      "automationsTitle": "O que o Cantiere faz sozinho",
+      "automationsText": "Automações que trabalham em segundo plano, para você não precisar lembrar nem cobrar na mão.",
+      "automations": [
+        {
+          "badge": "R",
+          "title": "Arquivamento de cartões",
+          "text": "Tire o concluído do quadro sem apagar nada. Arquivado sai de todas as visões e volta para a coluna de origem quando você quiser."
+        },
+        {
+          "badge": "A",
+          "title": "Arquivamento automático",
+          "text": "Defina os dias e os cartões concluídos vão para o arquivo sozinhos. Disponível do plano Intermediário para cima."
+        },
+        {
+          "badge": "G",
+          "title": "Monitor de gargalos",
+          "text": "Marque o tempo aceitável de cada coluna e veja quais cartões passaram do prazo, com mensagem de cobrança pronta. Do Intermediário para cima."
+        },
+        {
+          "badge": "T",
+          "title": "Rotinas automáticas",
+          "text": "Tarefas fixas viram cartão sozinhas na data certa, com o checklist já preenchido. Do plano Profissional para cima."
+        },
+        {
+          "badge": "L",
+          "title": "Letreiro de tarefas",
+          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu."
+        },
+        {
+          "badge": "X",
+          "title": "Anexos e links",
+          "text": "Contratos, plantas e fotos direto no cartão, além de links para o que mora fora do sistema."
+        }
+      ],
       "headerTitle": "Tudo o que a sua equipe precisa",
       "headerText": "Ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
       "items": [

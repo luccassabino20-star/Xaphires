@@ -56,6 +56,16 @@
       ]
     },
     "features": {
+      "automationsTitle": "What Cantiere does on its own",
+      "automationsText": "Automations running in the background, so you don't have to remember or chase things by hand.",
+      "automations": [
+        { "badge": "A", "title": "Card archiving", "text": "Take finished work off the board without deleting it. Archived cards leave every view and return to their original column whenever you want." },
+        { "badge": "R", "title": "Auto-archiving", "text": "Set the number of days and completed cards move to the archive on their own. Available from the Intermediate plan up." },
+        { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Intermediate up." },
+        { "badge": "T", "title": "Automatic routines", "text": "Fixed tasks become cards on their own at the right date, with the checklist already filled in. From the Professional plan up." },
+        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue." },
+        { "badge": "X", "title": "Attachments and links", "text": "Contracts, plans and photos straight on the card, plus links to whatever lives outside the system." }
+      ],
       "headerTitle": "Everything your team needs",
       "headerText": "Integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
       "items": [

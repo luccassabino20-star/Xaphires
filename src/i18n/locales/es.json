@@ -56,6 +56,16 @@
       ]
     },
     "features": {
+      "automationsTitle": "Lo que Cantiere hace solo",
+      "automationsText": "Automatizaciones que trabajan en segundo plano, para que no tengas que recordar ni reclamar a mano.",
+      "automations": [
+        { "badge": "A", "title": "Archivado de tarjetas", "text": "Saca lo terminado del tablero sin borrar nada. Lo archivado sale de todas las vistas y vuelve a su columna cuando quieras." },
+        { "badge": "R", "title": "Archivado automático", "text": "Define los días y las tarjetas completadas pasan al archivo solas. Disponible desde el plan Intermedio." },
+        { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Intermedio." },
+        { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Profesional." },
+        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció." },
+        { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." }
+      ],
       "headerTitle": "Todo lo que tu equipo necesita",
       "headerText": "Herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
       "items": [

@@ -363,8 +363,11 @@ function HomePage({ onEnter, onNavigate }) {
 function FeaturesPage() {
   const { t } = useTranslation();
   const items = t("landing.features.items", { returnObjects: true });
+  const automations = t("landing.features.automations", { returnObjects: true });
   const secondary = t("landing.features.secondary", { returnObjects: true });
   const gridRef = useFlashlight();
+  // Grade própria: o flashlight percorre os cards do container onde está montado.
+  const autoRef = useFlashlight();
 
   return (
     <>
@@ -376,6 +379,23 @@ function FeaturesPage() {
       <section className="landing-features">
         <div className="landing-features-grid" ref={gridRef}>
           {items.map((f) => (
+            <div className="landing-feature-card landing-flash" key={f.title}>
+              <div className="landing-flash-border" />
+              <span className="landing-feature-badge">{f.badge}</span>
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* As visões acima respondem "como eu olho o trabalho"; estas respondem
+          "o que o sistema faz sozinho". Separar deixa a diferença explícita. */}
+      <section className="landing-features">
+        <h2 className="landing-features-title">{t("landing.features.automationsTitle")}</h2>
+        <p className="landing-features-subtitle">{t("landing.features.automationsText")}</p>
+        <div className="landing-features-grid" ref={autoRef}>
+          {automations.map((f) => (
             <div className="landing-feature-card landing-flash" key={f.title}>
               <div className="landing-flash-border" />
               <span className="landing-feature-badge">{f.badge}</span>
