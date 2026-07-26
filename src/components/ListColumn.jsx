@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { uid } from "../utils/id.js";
+import { brightListColor } from "../utils/backgrounds.js";
 import CardItem from "./CardItem.jsx";
 import ListMenu from "./ListMenu.jsx";
 
@@ -65,8 +66,10 @@ export default function ListColumn({
     onCardHover(list.id, index);
   }
 
-  const listStyle = list.color
-    ? { background: `color-mix(in srgb, ${list.color} 16%, var(--bg-column))`, borderTop: `3px solid ${list.color}` }
+  // Converte o tom antigo gravado no dado para a versão viva, sem migrar o banco.
+  const listColor = brightListColor(list.color);
+  const listStyle = listColor
+    ? { background: `color-mix(in srgb, ${listColor} 16%, var(--bg-column))`, borderTop: `3px solid ${listColor}` }
     : undefined;
 
   return (
