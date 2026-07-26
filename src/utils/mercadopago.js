@@ -1,7 +1,11 @@
 // Carregamento e uso do SDK do Mercado Pago para tokenizar cartão.
 //
-// AVISO DE VERIFICAÇÃO: escrito contra a documentação, não contra o SDK. Nenhuma
-// chamada aqui foi executada de verdade, porque exige chave pública de uma conta.
+// O carregamento vem de `@mercadopago/sdk-js`, e não de uma tag <script> montada na
+// mão: o pacote resolve a URL do SDK e o carregamento único, e uma mudança de
+// endereço do script deixa de ser problema nosso. O que ele traz para a página
+// continua sendo o mesmo bundle do Mercado Pago, servido por eles.
+//
+// AINDA NÃO FOI EXERCITADO: montar os campos exige chave pública de uma conta real.
 // Os pontos marcados com "conferir:" são os que quebram calado se a API do SDK for
 // diferente do descrito.
 //
@@ -21,29 +25,28 @@
 // existir, um estado React com o número do cartão. Se aparecer um `useState` para
 // isso em algum lugar, o desenho foi perdido.
 
-const URL_SDK = "https://sdk.mercadopago.com/js/v2";
-
 let promessaSdk = null;
 
-// Carrega o SDK uma vez só, e só quando alguém escolhe pagar com cartão. Deixar no
-// index.html faria todo visitante da landing baixar o script de um terceiro sem
-// necessidade nenhuma.
+// Carrega o SDK uma vez só, e só quando alguém escolhe pagar com cartão.
+//
+// O import é dinâmico de propósito: com import estático o Vite colocaria o pacote no
+// bundle principal, e todo visitante da landing baixaria código de pagamento que
+// nunca vai usar. Assim ele vira um pedaço separado, buscado no primeiro uso.
 export function carregarSdk() {
   if (promessaSdk) return promessaSdk;
-  promessaSdk = new Promise((resolve, reject) => {
-    if (window.MercadoPago) return resolve(window.MercadoPago);
-    const script = document.createElement("script");
-    script.src = URL_SDK;
-    script.async = true;
-    script.onload = () => (window.MercadoPago ? resolve(window.MercadoPago) : reject(new Error("SDK carregou sem expor MercadoPago")));
-    script.onerror = () => {
-      // Zera para uma nova tentativa poder recarregar: rede cai, e travar o SDK
-      // como "falhou para sempre" obrigaria a recarregar a página inteira.
+  promessaSdk = (async () => {
+    try {
+      const { loadMercadoPago } = await import("@mercadopago/sdk-js");
+      await loadMercadoPago();
+      if (!window.MercadoPago) throw new Error("SDK carregou sem expor MercadoPago");
+      return window.MercadoPago;
+    } catch (err) {
+      // Zera para uma nova tentativa poder recarregar: rede cai, e travar o SDK como
+      // "falhou para sempre" obrigaria a recarregar a página inteira.
       promessaSdk = null;
-      reject(new Error("Não foi possível carregar o SDK do Mercado Pago"));
-    };
-    document.head.appendChild(script);
-  });
+      throw new Error("Não foi possível carregar o SDK do Mercado Pago");
+    }
+  })();
   return promessaSdk;
 }
 

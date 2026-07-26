@@ -3,11 +3,14 @@
 // Implementa o contrato de billing/gateway.js contra a API real. Ligar é definir
 // BILLING_PROVIDER=mercadopago e MERCADOPAGO_ACCESS_TOKEN.
 //
-// AVISO DE VERIFICAÇÃO: este arquivo foi escrito contra a documentação da API, não
-// contra a API. Nenhuma chamada de rede aqui foi executada de verdade. Antes de
-// apontar para produção, rode com credencial de TESTE e confira o formato das
-// respostas — em especial os caminhos de leitura marcados com "conferir" abaixo,
-// que são os que quebram calado se a API mudar de forma.
+// Usa o SDK oficial (`mercadopago`), e não requisições montadas à mão. O SDK carrega
+// os tipos da API, então o formato do corpo e os caminhos de leitura da resposta
+// deixam de ser suposição — foi assim que se descobriu que a linha do boleto vive em
+// transaction_details, e não na raiz como esta implementação supunha antes.
+//
+// AINDA NÃO FOI EXERCITADO CONTRA A API. Os formatos conferem com os tipos
+// instalados, mas nenhuma chamada de rede daqui rodou de verdade. Antes de apontar
+// para produção, rode com credencial de TESTE.
 //
 // Decisões que valem conhecer antes de mexer:
 //
@@ -17,28 +20,46 @@
 // resposta. Dividir por 100 aqui é seguro porque não há aritmética depois.
 //
 // IDEMPOTÊNCIA É OBRIGATÓRIA. A varredura roda na leitura do quadro e uma chamada
-// pode ser repetida por retry de rede. Sem X-Idempotency-Key, duas requisições
-// iguais viram duas cobranças no cartão do cliente.
+// pode ser repetida por retry de rede. Sem idempotencyKey, duas requisições iguais
+// viram duas cobranças no cartão do cliente.
 //
 // O WEBHOOK NÃO DIZ O QUE ACONTECEU. O Mercado Pago manda só { type, data: { id } }.
-// O estado vem de uma consulta a GET /v1/payments/{id}. Confiar no corpo do aviso
-// deixaria qualquer POST forjado liberar plano pago.
+// O estado vem de uma consulta. Confiar no corpo do aviso deixaria qualquer POST
+// forjado liberar plano pago.
 
 import crypto from "node:crypto";
+import { MercadoPagoConfig, Payment, PreApproval } from "mercadopago";
 
-const BASE = "https://api.mercadopago.com";
 const TIMEOUT_MS = 15000;
 
-function token() {
-  const t = process.env.MERCADOPAGO_ACCESS_TOKEN;
-  if (!t) {
+// Criado sob demanda, e não no import: com BILLING_PROVIDER=fake este arquivo é
+// carregado do mesmo jeito (o gateway importa os dois provedores), e exigir
+// credencial no topo quebraria o desenvolvimento.
+let clientes = null;
+
+function api() {
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token) {
     const err = new Error(
       "MERCADOPAGO_ACCESS_TOKEN não definido. Defina a credencial ou rode com BILLING_PROVIDER=fake."
     );
     err.code = "BILLING_PROVIDER_NOT_CONFIGURED";
     throw err;
   }
-  return t;
+  if (!clientes || clientes.token !== token) {
+    const config = new MercadoPagoConfig({ accessToken: token, options: { timeout: TIMEOUT_MS } });
+    clientes = { token, payment: new Payment(config), preApproval: new PreApproval(config) };
+  }
+  return clientes;
+}
+
+// Erro do SDK vira erro nosso, com o código que as rotas sabem tratar.
+function comoErroNosso(err) {
+  const e = new Error(err?.message || "Falha ao falar com o Mercado Pago");
+  e.code = "GATEWAY_ERROR";
+  e.status = err?.status || err?.statusCode || null;
+  e.detalhe = err?.cause || err?.error || null;
+  return e;
 }
 
 // Centavos inteiros -> reais decimais, só na borda da API.
@@ -50,40 +71,6 @@ function reais(cents) {
 // 349.99 pode voltar do JSON como 349.98999999999995 e truncar perderia um centavo.
 export function paraCentavos(valor) {
   return Math.round(Number(valor) * 100);
-}
-
-async function chamar(caminho, { metodo = "GET", corpo, idempotencia } = {}) {
-  const controle = new AbortController();
-  const timer = setTimeout(() => controle.abort(), TIMEOUT_MS);
-  try {
-    const res = await fetch(BASE + caminho, {
-      method: metodo,
-      headers: {
-        Authorization: `Bearer ${token()}`,
-        "Content-Type": "application/json",
-        ...(idempotencia ? { "X-Idempotency-Key": idempotencia } : {}),
-      },
-      body: corpo ? JSON.stringify(corpo) : undefined,
-      signal: controle.signal,
-    });
-    const texto = await res.text();
-    let dados = null;
-    try {
-      dados = texto ? JSON.parse(texto) : null;
-    } catch {
-      /* resposta sem JSON */
-    }
-    if (!res.ok) {
-      const err = new Error(dados?.message || `Mercado Pago respondeu ${res.status}`);
-      err.code = "GATEWAY_ERROR";
-      err.status = res.status;
-      err.detalhe = dados;
-      throw err;
-    }
-    return dados;
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 // Vocabulário deles -> o nosso. Ficar aqui, e não espalhado, é o que permite o resto
@@ -171,30 +158,43 @@ export const mercadoPago = {
     // A chave de idempotência precisa ser estável para a MESMA tentativa e diferente
     // entre tentativas distintas. Quem manda é o chamador, que sabe de qual ciclo e
     // de qual tentativa se trata.
-    const resposta = await chamar("/v1/payments", {
-      metodo: "POST",
-      corpo,
-      idempotencia: idempotencyKey || crypto.randomUUID(),
-    });
+    let resposta;
+    try {
+      resposta = await api().payment.create({
+        body: corpo,
+        requestOptions: { idempotencyKey: idempotencyKey || crypto.randomUUID() },
+      });
+    } catch (err) {
+      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED") throw err;
+      throw comoErroNosso(err);
+    }
 
     const status = traduzirStatus(resposta?.status);
-    // conferir: caminhos de leitura da resposta.
     const pix = resposta?.point_of_interaction?.transaction_data;
+    const detalhes = resposta?.transaction_details;
     return {
       providerChargeId: String(resposta?.id ?? ""),
       status: status || "pending",
       failureReason: resposta?.status_detail || null,
       pixCode: pix?.qr_code || null,
-      boletoLine: resposta?.barcode?.content || null,
-      checkoutUrl: resposta?.transaction_details?.external_resource_url || pix?.ticket_url || null,
+      // A linha digitável mora em transaction_details, não na raiz — e o campo certo
+      // é digitable_line, que é o que a pessoa digita no banco. barcode.content é o
+      // conteúdo cru do código de barras, e serve de reserva.
+      boletoLine: detalhes?.digitable_line || detalhes?.barcode?.content || null,
+      checkoutUrl: detalhes?.external_resource_url || pix?.ticket_url || null,
       dueAt: resposta?.date_of_expiration || null,
     };
   },
 
   async consultarCobranca(providerChargeId) {
     if (!providerChargeId) return { status: null };
-    const r = await chamar(`/v1/payments/${encodeURIComponent(providerChargeId)}`);
-    return { status: traduzirStatus(r?.status), failureReason: r?.status_detail || null };
+    try {
+      const r = await api().payment.get({ id: String(providerChargeId) });
+      return { status: traduzirStatus(r?.status), failureReason: r?.status_detail || null };
+    } catch (err) {
+      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED") throw err;
+      throw comoErroNosso(err);
+    }
   },
 
   // Débito recorrente de verdade. É o /preapproval, e não uma cobrança repetida:
@@ -213,9 +213,8 @@ export const mercadoPago = {
     exigePagador(payer, method);
 
     try {
-      const r = await chamar("/preapproval", {
-        metodo: "POST",
-        corpo: {
+      const r = await api().preApproval.create({
+        body: {
           reason: `Cantiere - plano ${plan}`,
           auto_recurring: {
             frequency: 1,
@@ -231,22 +230,26 @@ export const mercadoPago = {
       });
       return { providerSubscriptionId: String(r?.id ?? ""), status: "active" };
     } catch (err) {
+      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED") throw err;
       // Cartão recusado é resposta de negócio, não falha de integração: vira um
       // resultado que o ciclo de vida sabe tratar, com a mensagem do emissor.
-      if (err.status === 400) {
-        return { providerSubscriptionId: null, status: "failed", failureReason: err.detalhe?.message || "CARD_DECLINED" };
+      const status = err?.status || err?.statusCode;
+      if (status === 400) {
+        return { providerSubscriptionId: null, status: "failed", failureReason: err?.message || "CARD_DECLINED" };
       }
-      throw err;
+      throw comoErroNosso(err);
     }
   },
 
   async cancelarAssinatura(providerSubscriptionId) {
     if (!providerSubscriptionId) return { status: "canceled" };
-    await chamar(`/preapproval/${encodeURIComponent(providerSubscriptionId)}`, {
-      metodo: "PUT",
-      corpo: { status: "cancelled" },
-    });
-    return { status: "canceled" };
+    try {
+      await api().preApproval.update({ id: String(providerSubscriptionId), body: { status: "cancelled" } });
+      return { status: "canceled" };
+    } catch (err) {
+      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED") throw err;
+      throw comoErroNosso(err);
+    }
   },
 
   // Traduz o aviso. NÃO decide nada sobre o pagamento: devolve o id e um pedido de
