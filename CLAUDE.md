@@ -16,7 +16,7 @@ npm start         # produção: um processo só, Express serve dist/ e a API
 
 Node >= 22.5 é obrigatório (`node:sqlite`). O `.node-version` fixa 24, onde o módulo já não precisa de flag.
 
-Variáveis de ambiente em `.env.example`. Além das de lá, a cobrança usa `BILLING_PROVIDER` (padrão `fake`) e `BILLING_WEBHOOK_SECRET`.
+Variáveis de ambiente em `.env.example`, incluindo as da cobrança: `BILLING_PROVIDER` (padrão `fake`), `BILLING_WEBHOOK_SECRET`, e o trio do Mercado Pago `MERCADOPAGO_ACCESS_TOKEN` / `MERCADOPAGO_PUBLIC_KEY` / `MERCADOPAGO_WEBHOOK_SECRET`. Provedor real sem configuração completa grita no log no arranque, e não na primeira cobrança.
 
 **O Vite recarrega o cliente sozinho, o Express não.** Mudou algo em `server/`, reinicie o `npm run dev` — senão você testa contra o código antigo e conclui que a correção não funcionou.
 
@@ -44,6 +44,10 @@ Dois níveis de banco em `server/data/`:
 - `companies/<id>/app.sqlite` — um banco por empresa, com usuários, quadros, listas, cartões, recorrências e atas. Anexos em `companies/<id>/uploads/`.
 
 O `companyId` viaja por `AsyncLocalStorage` (`server/context.js`), não por parâmetro. `getDb()` resolve o banco a partir desse contexto, então **qualquer código que chegue a `repo.js` precisa estar dentro de `runWithCompany`**. O `requireAuth` faz isso para as rotas normais; handlers assíncronos que nascem do socket escapam do ALS e têm de reentrar na mão — é o caso do upload em `routes/cards.js`.
+
+**`getCompanyDb()` cria o banco quando não existe, sem perguntar se a empresa existe.** É o que faz o cadastro funcionar, e é uma armadilha: o token vale 7 dias e sobrevive à exclusão da empresa, então uma aba aberta com sessão órfã ressuscitava a pasta apagada a cada requisição. O `requireAuth` confere `getCompany()` antes de entrar no contexto justamente por isso. Qualquer caminho novo que chame `runWithCompany` com um id vindo de token precisa da mesma conferência.
+
+Excluir uma empresa é: apagar `payments`, `subscriptions`, `user_directory` e `companies` numa transação, e remover a pasta. No Windows a pasta só sai com o servidor parado, porque o SQLite mantém o arquivo aberto pelo cache do `getCompanyDb`.
 
 `migrateLegacy.js` roda no boot e converte a instalação antiga de banco único para o formato multiempresa. Só age se o diretório estiver vazio.
 
@@ -83,13 +87,35 @@ Três regras que governam tudo ali:
 
 > **O provedor fica atrás de `billing/gateway.js`.** Nenhum outro arquivo importa SDK de gateway. O padrão é `fake`, para variável de ambiente esquecida não virar cobrança silenciosa no cartão de alguém.
 
-`providers/fake.js` não é mock descartável: é o provedor de desenvolvimento, e imita o que importa do mundo real — Pix e boleto nascem pendentes, e cartão com terminação `0002`/`0003`/`0004` é recusado. `providers/mercadopago.js` ainda falha de propósito em cada método, com a lista do que falta para ligar; provedor que finge aprovação liberaria plano sem cobrar.
+`providers/fake.js` não é mock descartável: é o provedor de desenvolvimento, e imita o que importa do mundo real — Pix e boleto nascem pendentes, e cartão com terminação `0002`/`0003`/`0004` é recusado.
 
 `POST /api/plan` **só troca para plano gratuito**. Plano pago passa por `POST /api/billing/subscribe`, e o acesso muda só na confirmação. Trocar a forma de pagamento é `PUT /api/billing/method`, que não cobra nada — é cadastro, não renovação antecipada.
 
 Carência e tentativas são constantes no topo de `lifecycle.js` (`GRACE_DAYS`, `MAX_TENTATIVAS_CARTAO`, `ESPACAMENTO_DIAS`).
 
-**Número de cartão não pode chegar ao servidor.** O formulário com o campo só aparece quando `GET /api/billing` devolve `simulated: true`. Com provedor real, os dados são trocados por token no navegador pelo SDK dele. A rota `dev/confirm` responde 404 fora do modo simulado.
+Pix e boleto exigem CPF ou CNPJ do pagador. Validado com dígito verificador nos dois lados (`server/doc.js` é a autoridade, `src/utils/doc.js` dá a resposta imediata), e gravado em `subscriptions.payer_doc` — a renovação roda fora do contexto da empresa e não teria como buscar o dado depois. O documento só volta no `GET /api/billing` para o master.
+
+### O número do cartão nunca é nosso
+
+Esta é a regra mais importante do checkout, e a mais fácil de destruir sem perceber.
+
+> **Não existe, e não pode passar a existir, um estado com o número do cartão.** Com provedor real os campos de número, validade e CVV são iframes do Mercado Pago (Secure Fields, em `utils/mercadopago.js`): o número sai deles direto para o gateway e o que volta é um token de uso único. Se aparecer um `useState` guardando PAN em algum lugar, o desenho foi perdido — o escopo de conformidade sobe de SAQ A para SAQ A-EP.
+
+O formulário com campo de número só aparece quando `GET /api/billing` devolve `simulated: true`, e ali o número é de mentira. A rota `dev/confirm` responde 404 fora do modo simulado.
+
+O SDK é carregado sob demanda, ao escolher cartão — nunca no `index.html`, que faria todo visitante da landing baixar script de terceiro. A chave pública vai no `GET /api/billing` e é feita para ficar exposta; a que cobra (`MERCADOPAGO_ACCESS_TOKEN`) nunca sai do servidor.
+
+### O adaptador do Mercado Pago não foi testado contra a API
+
+`providers/mercadopago.js` e `utils/mercadopago.js` foram escritos contra a documentação. Os pontos marcados com `conferir:` são os que quebram calado se a forma da resposta for outra — manifesto da assinatura do webhook, caminhos de leitura do QR code e da linha do boleto, e a API de `fields` do SDK. **Rode com credencial de teste antes de apontar para produção.**
+
+O que já está verificado offline: tradução de status, conversão centavos/reais, validação de assinatura HMAC e as recusas por dado faltando.
+
+Três decisões dele que não são óbvias:
+
+- **Valor vai em reais decimais**, não centavos. A conversão acontece só na borda e volta a inteiro com `Math.round`, porque o JSON devolve `349.98999999999995`.
+- **O webhook não traz o estado.** `lerWebhook` devolve `consultar: true` e a rota pergunta ao gateway antes de aplicar — um POST forjado não pode liberar plano.
+- **Status desconhecido traduz para `null`**, não para um palpite. Estado novo na API deles não vira "pago" por omissão.
 
 ### Autenticação
 
