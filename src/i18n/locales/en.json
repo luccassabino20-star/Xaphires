@@ -115,7 +115,7 @@
       "mostPopular": "Most popular",
       "plans": [
         { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 3 users", "Unlimited boards", "Kanban board, Table and Calendar", "Email support"] },
-        { "name": "Intermediate", "price": "R$ 249.99", "period": "/month", "tagline": "For teams that outgrew three people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 10 users", "Unlimited boards", "All views (Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Email support"] },
+        { "name": "Intermediate", "price": "R$ 349.99", "period": "/month", "tagline": "For teams that outgrew three people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 10 users", "Unlimited boards", "All views (Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Email support"] },
         { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "All views (Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Private and shared boards", "Priority support"] },
         { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
       ]

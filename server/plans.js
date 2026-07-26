@@ -7,7 +7,7 @@ export const TRIAL_DAYS = 7;
 // "sob consulta" — sem valor de tabela, então não pode ser contratado sozinho.
 export const PLANS = {
   basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0 },
-  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 249.99 },
+  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99 },
   professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99 }, // null = ilimitado
   enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null },
 };
