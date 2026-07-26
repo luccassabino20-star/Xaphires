@@ -3052,3 +3052,8 @@ input, textarea { font-family: inherit; }
 .plan-switch-btn.active { border-color: var(--accent); cursor: default; }
 .plan-switch-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 .plan-switch-hint { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+
+/* Botão de subir de plano: nome em cima, valor embaixo. */
+.plan-switch-btn { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+.plan-switch-name { font-size: 13px; font-weight: 600; }
+.plan-switch-price { font-size: 12px; font-weight: 500; color: var(--text-secondary); }

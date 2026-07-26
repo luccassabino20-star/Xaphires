@@ -532,6 +532,13 @@
     "passwordMinLength": "La nueva contraseña debe tener al menos 6 caracteres"
   },
   "plan": {
+    "monthlyLabel": "Mensualidad",
+    "onRequest": "Bajo consulta",
+    "contractedAtLabel": "Contratado el",
+    "perMonth": "/mes",
+    "upgradeTitle": "Subir de plan",
+    "upgradeConfirm": "¿Contratar el plan {{plan}} por {{price}}/mes? El ciclo empieza a contar hoy.",
+    "downgradeHint": "Para bajar de plan o cancelar, contacta al soporte. Aquí solo se puede subir.",
     "menuItem": "Mi plan",
     "title": "Plan de la empresa",
     "unlimited": "ilimitado",
@@ -542,8 +549,6 @@
     "daysLeftValue": "{{count}} día",
     "daysLeftValue_other": "{{count}} días",
     "userLimitReached": "Alcanzaste el límite de usuarios de este plan. Cambia de plan para agregar más personas.",
-    "changeTitle": "Cambiar de plan",
-    "changeHint": "El cambio se aplica al instante. Todavía no hay cobro automático, así que el pago se acuerda aparte.",
     "masterOnly": "Solo el usuario master puede cambiar el plan de la empresa.",
     "changed": "Plan cambiado a {{plan}}",
     "names": {
@@ -564,6 +569,7 @@
     "movedToBasic": "Plan cambiado a Básico"
   },
   "errors": {
+    "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Aquí solo se puede subir de plan. Para bajar o cancelar, contacta al soporte.",
     "PLAN_EXPIRED": "Tu plan expiró. Renueva para volver a editar.",
     "PLAN_USER_LIMIT": "Tu plan alcanzó el límite de usuarios. Cambia de plan para agregar más.",
     "PLAN_USER_LIMIT_EXCEEDED": "La empresa tiene más usuarios de los que permite el plan elegido.",

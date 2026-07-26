@@ -532,6 +532,13 @@
     "passwordMinLength": "The new password must be at least 6 characters"
   },
   "plan": {
+    "monthlyLabel": "Monthly price",
+    "onRequest": "On request",
+    "contractedAtLabel": "Contracted on",
+    "perMonth": "/month",
+    "upgradeTitle": "Move up a plan",
+    "upgradeConfirm": "Subscribe to the {{plan}} plan for {{price}}/month? The cycle restarts today.",
+    "downgradeHint": "To move down a plan or cancel, contact support. Only upgrades are available here.",
     "menuItem": "My plan",
     "title": "Company plan",
     "unlimited": "unlimited",
@@ -542,8 +549,6 @@
     "daysLeftValue": "{{count}} day",
     "daysLeftValue_other": "{{count}} days",
     "userLimitReached": "You reached this plan's user limit. Change plans to add more people.",
-    "changeTitle": "Change plan",
-    "changeHint": "The change applies immediately. There is no automatic billing yet, so payment is arranged separately.",
     "masterOnly": "Only the master user can change the company plan.",
     "changed": "Plan changed to {{plan}}",
     "names": {
@@ -564,6 +569,7 @@
     "movedToBasic": "Plan changed to Basic"
   },
   "errors": {
+    "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Only upgrades are available here. To move down or cancel, contact support.",
     "PLAN_EXPIRED": "Your plan expired. Renew to edit again.",
     "PLAN_USER_LIMIT": "Your plan reached its user limit. Change plans to add more.",
     "PLAN_USER_LIMIT_EXCEEDED": "The company has more users than the chosen plan allows.",

@@ -31,6 +31,11 @@ function addColumnIfMissing(table, name, ddl) {
 addColumnIfMissing("companies", "plan", "plan TEXT NOT NULL DEFAULT 'professional'");
 addColumnIfMissing("companies", "status", "status TEXT NOT NULL DEFAULT 'active'");
 addColumnIfMissing("companies", "expires_at", "expires_at TEXT");
+// Quando o plano atual passou a valer. Base do cálculo do vencimento mensal.
+addColumnIfMissing("companies", "contracted_at", "contracted_at TEXT");
+// Empresas anteriores a esta coluna herdam a data de criação: é a melhor
+// aproximação disponível e evita o campo ficar vazio para sempre na tela.
+directoryDb.exec("UPDATE companies SET contracted_at = created_at WHERE contracted_at IS NULL");
 
 function nowIso() {
   return new Date().toISOString();
@@ -43,10 +48,12 @@ export function countCompanies() {
   return directoryDb.prepare("SELECT COUNT(*) as c FROM companies").get().c;
 }
 
-export function createCompany({ id, name, plan, status, expiresAt }) {
+export function createCompany({ id, name, plan, status, expiresAt, contractedAt }) {
   directoryDb
-    .prepare("INSERT INTO companies (id, name, created_at, plan, status, expires_at) VALUES (?, ?, ?, ?, ?, ?)")
-    .run(id, name, nowIso(), plan || "professional", status || "active", expiresAt || null);
+    .prepare(
+      "INSERT INTO companies (id, name, created_at, plan, status, expires_at, contracted_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    )
+    .run(id, name, nowIso(), plan || "professional", status || "active", expiresAt || null, contractedAt || nowIso());
   return id;
 }
 
@@ -54,15 +61,16 @@ export function getCompany(id) {
   return directoryDb.prepare("SELECT * FROM companies WHERE id = ?").get(id) || null;
 }
 
-export function setCompanyPlan(id, { plan, status, expiresAt }) {
+export function setCompanyPlan(id, { plan, status, expiresAt, contractedAt }) {
   const atual = getCompany(id);
   if (!atual) return null;
   directoryDb
-    .prepare("UPDATE companies SET plan = ?, status = ?, expires_at = ? WHERE id = ?")
+    .prepare("UPDATE companies SET plan = ?, status = ?, expires_at = ?, contracted_at = ? WHERE id = ?")
     .run(
       plan ?? atual.plan,
       status ?? atual.status,
       expiresAt === undefined ? atual.expires_at : expiresAt,
+      contractedAt === undefined ? atual.contracted_at : contractedAt,
       id
     );
   return getCompany(id);

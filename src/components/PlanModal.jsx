@@ -5,13 +5,18 @@ import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import * as api from "../state/api.js";
 
-const ORDEM = ["basic", "intermediate", "professional", "enterprise"];
-
 function formatarData(iso, locale) {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
   return d.toLocaleDateString(locale, { day: "2-digit", month: "long", year: "numeric" });
+}
+
+// A moeda é sempre BRL, mesmo em outro idioma: o preço é em reais e traduzir a
+// moeda daria a impressão de que o valor muda com o idioma.
+function formatarValor(valor, locale) {
+  if (valor === null || valor === undefined) return null;
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "BRL" }).format(valor);
 }
 
 export default function PlanModal({ onClose }) {
@@ -31,11 +36,17 @@ export default function PlanModal({ onClose }) {
 
   const ehMaster = user?.role === "master";
 
-  async function trocarPara(id) {
-    setTrocando(id);
+  // Contratar gera cobrança, então pede confirmação com o valor à vista — bem
+  // diferente do clique-e-muda que existia antes.
+  async function subirPara(alvo) {
+    const nome = t(`plan.names.${alvo.id}`);
+    const valorFmt = formatarValor(alvo.price, i18n.language);
+    if (!confirm(t("plan.upgradeConfirm", { plan: nome, price: valorFmt }))) return;
+
+    setTrocando(alvo.id);
     try {
-      setPlano(await api.setPlan(id));
-      showToast(t("plan.changed", { plan: t(`plan.names.${id}`) }));
+      setPlano(await api.setPlan(alvo.id));
+      showToast(t("plan.changed", { plan: nome }));
     } catch (e) {
       showToast(translateError(e, t));
     } finally {
@@ -44,8 +55,12 @@ export default function PlanModal({ onClose }) {
   }
 
   const dataFim = plano && formatarData(plano.expiresAt, i18n.language);
+  const dataInicio = plano && formatarData(plano.contractedAt, i18n.language);
+  const valor = plano && formatarValor(plano.price, i18n.language);
   // Ilimitado vira traço em vez de "null" na tela.
   const limite = plano && (plano.maxUsers === null ? t("plan.unlimited") : plano.maxUsers);
+  // O servidor já decidiu o que é autoatendimento; aqui só se exibe.
+  const podeSubir = plano?.catalog?.filter((p) => p.selfUpgradable) || [];
 
   return (
     <div
@@ -78,11 +93,15 @@ export default function PlanModal({ onClose }) {
 
                 <dl className="plan-facts">
                   <div>
-                    <dt>{t("plan.usersLabel")}</dt>
-                    <dd>
-                      {plano.userCount} / {limite}
-                    </dd>
+                    <dt>{t("plan.monthlyLabel")}</dt>
+                    <dd>{valor ?? t("plan.onRequest")}</dd>
                   </div>
+                  {dataInicio && (
+                    <div>
+                      <dt>{t("plan.contractedAtLabel")}</dt>
+                      <dd>{dataInicio}</dd>
+                    </div>
+                  )}
                   {dataFim && (
                     <div>
                       <dt>
@@ -97,6 +116,12 @@ export default function PlanModal({ onClose }) {
                       <dd>{t("plan.daysLeftValue", { count: plano.daysLeft })}</dd>
                     </div>
                   )}
+                  <div>
+                    <dt>{t("plan.usersLabel")}</dt>
+                    <dd>
+                      {plano.userCount} / {limite}
+                    </dd>
+                  </div>
                 </dl>
 
                 {!plano.canAddUser && <p className="plan-warning">{t("plan.userLimitReached")}</p>}
@@ -104,20 +129,28 @@ export default function PlanModal({ onClose }) {
 
               {ehMaster ? (
                 <div className="plan-switch">
-                  <h3>{t("plan.changeTitle")}</h3>
-                  <div className="plan-switch-list">
-                    {ORDEM.map((id) => (
-                      <button
-                        key={id}
-                        className={"plan-switch-btn" + (id === plano.plan ? " active" : "")}
-                        onClick={() => trocarPara(id)}
-                        disabled={id === plano.plan || trocando !== null}
-                      >
-                        {t(`plan.names.${id}`)}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="plan-switch-hint">{t("plan.changeHint")}</p>
+                  {podeSubir.length > 0 && (
+                    <>
+                      <h3>{t("plan.upgradeTitle")}</h3>
+                      <div className="plan-switch-list">
+                        {podeSubir.map((p) => (
+                          <button
+                            key={p.id}
+                            className="plan-switch-btn"
+                            onClick={() => subirPara(p)}
+                            disabled={trocando !== null}
+                          >
+                            <span className="plan-switch-name">{t(`plan.names.${p.id}`)}</span>
+                            <span className="plan-switch-price">
+                              {formatarValor(p.price, i18n.language)}
+                              {t("plan.perMonth")}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  <p className="plan-switch-hint">{t("plan.downgradeHint")}</p>
                 </div>
               ) : (
                 <p className="plan-switch-hint">{t("plan.masterOnly")}</p>

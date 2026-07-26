@@ -3,11 +3,13 @@
 
 export const TRIAL_DAYS = 7;
 
+// rank ordena os planos; price é a mensalidade em BRL. price null significa
+// "sob consulta" — sem valor de tabela, então não pode ser contratado sozinho.
 export const PLANS = {
-  basic: { id: "basic", maxUsers: 3, paid: false },
-  intermediate: { id: "intermediate", maxUsers: 10, paid: true },
-  professional: { id: "professional", maxUsers: null, paid: true }, // null = ilimitado
-  enterprise: { id: "enterprise", maxUsers: null, paid: true },
+  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0 },
+  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 249.99 },
+  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99 }, // null = ilimitado
+  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null },
 };
 
 export const PLAN_IDS = Object.keys(PLANS);
@@ -47,4 +49,30 @@ export function daysLeft(company, now = new Date()) {
 export function canAddUser(company, currentUserCount) {
   const max = getPlan(company?.plan).maxUsers;
   return max === null || currentUserCount < max;
+}
+
+// Um mês adiante, preservando o dia da contratação. Contratou dia 31, vence dia 31
+// nos meses que têm — nos que não têm, cai no último dia, em vez de vazar para o
+// mês seguinte como faria um setMonth ingênuo.
+export function addOneMonth(iso) {
+  const d = new Date(iso);
+  const dia = d.getUTCDate();
+  const alvo = new Date(
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1, d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds())
+  );
+  const ultimoDiaDoMes = new Date(Date.UTC(alvo.getUTCFullYear(), alvo.getUTCMonth() + 1, 0)).getUTCDate();
+  alvo.setUTCDate(Math.min(dia, ultimoDiaDoMes));
+  return alvo.toISOString();
+}
+
+// Só subir de plano é autoatendimento. Descer significa pagar menos, e cancelar
+// significa parar de pagar — isso passa por contato, não por um clique.
+// O Empresarial fica de fora porque é "sob consulta": sem preço de tabela não há
+// o que contratar sozinho.
+export function canSelfUpgradeTo(currentPlanId, targetPlanId) {
+  const atual = getPlan(currentPlanId);
+  const alvo = PLANS[targetPlanId];
+  if (!alvo) return false;
+  if (alvo.price === null) return false;
+  return alvo.rank > atual.rank;
 }
