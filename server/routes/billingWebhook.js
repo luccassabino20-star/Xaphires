@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
   // Não reconhecido ou assinatura inválida: 200 e silêncio. Devolver 401 ensinaria
   // um atacante a distinguir aviso rejeitado de aviso aceito, e faria o gateway
   // legítimo reenviar sem parar quando o formato mudar.
-  if (!aviso?.providerChargeId || !aviso?.status) {
+  if (!aviso?.providerChargeId) {
     return res.status(200).json({ received: true, applied: false });
   }
 
@@ -44,6 +44,17 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    // Provedor que não manda o estado no aviso (o Mercado Pago é assim) pede
+    // consulta. É o desenho certo: um POST forjado não pode liberar plano pago,
+    // porque o que decide é a resposta autenticada do gateway, não o corpo recebido.
+    if (aviso.consultar) {
+      await ciclo.conferirPagamento(pagamento.id);
+      return res.status(200).json({ received: true, applied: true });
+    }
+
+    if (!aviso.status) {
+      return res.status(200).json({ received: true, applied: false });
+    }
     if (aviso.status === "paid") {
       ciclo.confirmarPagamento(pagamento.id);
     } else if (aviso.status === "failed") {

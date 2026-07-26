@@ -70,6 +70,22 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_subs_company ON subscriptions(company_id);
 `);
 
+// Mesmo padrão do db.js: coluna nova entra aqui, idempotente, sem pasta de migrations.
+function addColumnIfMissing(tabela, nome, ddl) {
+  const colunas = db.prepare(`PRAGMA table_info(${tabela})`).all().map((c) => c.name);
+  if (!colunas.includes(nome)) db.exec(`ALTER TABLE ${tabela} ADD COLUMN ${ddl}`);
+}
+
+// Dados do pagador, guardados na assinatura porque a RENOVAÇÃO precisa deles e roda
+// fora do contexto da empresa — a varredura percorre assinaturas de todas as
+// empresas de uma vez e não teria como abrir o banco de cada uma para achar o
+// e-mail do master.
+//
+// Só e-mail e documento: nome, endereço e o resto ficam com o gateway. E nunca
+// dado de cartão, que não pode passar por aqui de forma alguma.
+addColumnIfMissing("subscriptions", "payer_email", "payer_email TEXT");
+addColumnIfMissing("subscriptions", "payer_doc", "payer_doc TEXT");
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -88,13 +104,36 @@ export function getSubscription(id) {
   return db.prepare("SELECT * FROM subscriptions WHERE id = ?").get(id) || null;
 }
 
-export function createSubscription({ id, companyId, plan, method, provider, providerSubscriptionId, nextChargeAt }) {
+export function createSubscription({
+  id,
+  companyId,
+  plan,
+  method,
+  provider,
+  providerSubscriptionId,
+  nextChargeAt,
+  payerEmail,
+  payerDoc,
+}) {
   const agora = nowIso();
   db.prepare(
     `INSERT INTO subscriptions
-     (id, company_id, plan, method, status, provider, provider_subscription_id, next_charge_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, 'active', ?, ?, ?, ?, ?)`
-  ).run(id, companyId, plan, method, provider, providerSubscriptionId || null, nextChargeAt || null, agora, agora);
+     (id, company_id, plan, method, status, provider, provider_subscription_id, next_charge_at,
+      payer_email, payer_doc, created_at, updated_at)
+     VALUES (?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`
+  ).run(
+    id,
+    companyId,
+    plan,
+    method,
+    provider,
+    providerSubscriptionId || null,
+    nextChargeAt || null,
+    payerEmail || null,
+    payerDoc || null,
+    agora,
+    agora
+  );
   return getSubscription(id);
 }
 

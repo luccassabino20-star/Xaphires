@@ -107,7 +107,11 @@ router.post(
     }
 
     try {
-      const r = await ciclo.assinar({ companyId: req.companyId, plan, method, card });
+      // O pagador sai da sessão, não do corpo: e-mail de cobrança não é campo que o
+      // cliente escolhe. O documento vem do formulário porque não temos CPF no
+      // cadastro — ver o aviso em providers/mercadopago.js.
+      const payer = { email: req.user.email, name: req.user.name, doc: (req.body?.payerDoc || "").trim() || null };
+      const r = await ciclo.assinar({ companyId: req.companyId, plan, method, card, payer });
       res.status(201).json({
         subscription: visaoAssinatura(r.subscription),
         payment: store.publicPayment(r.payment),
@@ -123,8 +127,13 @@ router.post(
       if (err.code === "CARD_DECLINED") {
         return res.status(402).json({ error: err.message, code: err.code, failureReason: err.failureReason });
       }
-      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED") {
-        return res.status(503).json({ error: err.message, code: err.code });
+      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED" || err.code === "GATEWAY_ERROR") {
+        return res.status(503).json({ error: err.message, code: "BILLING_PROVIDER_NOT_CONFIGURED" });
+      }
+      // Dados do pagador que o gateway exige e não temos. Código próprio para a tela
+      // poder pedir exatamente o que falta, em vez de mostrar erro genérico.
+      if (err.code === "PAYER_DOCUMENT_REQUIRED" || err.code === "PAYER_EMAIL_REQUIRED" || err.code === "CARD_TOKEN_REQUIRED") {
+        return res.status(400).json({ error: err.message, code: err.code });
       }
       throw err;
     }

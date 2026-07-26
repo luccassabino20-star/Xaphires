@@ -113,7 +113,7 @@ export function registrarFalha(paymentId, motivo) {
 
 // Emite a cobrança de um ciclo. Devolve o pagamento criado, já com o estado que o
 // gateway respondeu — pago (cartão aprovado), pendente (Pix/boleto) ou falho.
-export async function emitirCobranca({ companyId, plan, method, subscriptionId, card, periodStart, attempt }) {
+export async function emitirCobranca({ companyId, plan, method, subscriptionId, card, payer, periodStart, attempt }) {
   const centavos = priceCentsOf(plan);
   if (centavos === null) {
     const err = new Error("Plano sob consulta não passa por cobrança automática");
@@ -122,12 +122,18 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
   }
 
   const inicio = periodStart || nowIso();
+  const tentativa = attempt || 1;
   const resposta = await gateway.criarCobranca({
     amountCents: centavos,
     method,
     plan,
     companyId,
     card,
+    payer,
+    // Estável para a mesma tentativa do mesmo ciclo, diferente entre tentativas.
+    // É o que impede a varredura, ao rodar duas vezes por retry de rede, de virar
+    // duas cobranças no cartão do cliente.
+    idempotencyKey: `${subscriptionId || companyId}:${inicio}:${tentativa}`,
   });
 
   const pagamento = store.createPayment({
@@ -144,7 +150,7 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
     boletoLine: resposta.boletoLine,
     periodStart: inicio,
     periodEnd: addOneMonth(inicio),
-    attempt: attempt || 1,
+    attempt: tentativa,
     dueAt: resposta.dueAt,
     // Nasce sempre pendente e só então transiciona, para o histórico registrar a
     // emissão mesmo que a confirmação falhe no meio.
@@ -164,7 +170,7 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
 // pagamento. Com cartão aprovado isso acontece na mesma chamada; com Pix e boleto o
 // plano só muda quando o pagamento for confirmado, e até lá a empresa continua
 // exatamente no acesso que já tinha.
-export async function assinar({ companyId, plan, method, card }) {
+export async function assinar({ companyId, plan, method, card, payer }) {
   const jaPendente = store.pendingPayment(companyId);
   if (jaPendente) {
     const err = new Error("Já existe uma cobrança em aberto. Pague ou aguarde o vencimento dela.");
@@ -189,7 +195,7 @@ export async function assinar({ companyId, plan, method, card }) {
 
   let providerSubscriptionId = null;
   if (metodoTemDebitoAutomatico(method)) {
-    const r = await gateway.criarAssinatura({ plan, method, card });
+    const r = await gateway.criarAssinatura({ plan, method, card, payer, amountCents: priceCentsOf(plan) });
     if (r.status === "failed") {
       const err = new Error("O cartão foi recusado.");
       err.code = "CARD_DECLINED";
@@ -209,6 +215,8 @@ export async function assinar({ companyId, plan, method, card }) {
     // Fica sem próxima cobrança até o primeiro pagamento entrar: quem define o
     // ciclo é a data em que o acesso passa a valer.
     nextChargeAt: null,
+    payerEmail: payer?.email,
+    payerDoc: payer?.doc,
   });
 
   const pagamento = await emitirCobranca({
@@ -217,6 +225,7 @@ export async function assinar({ companyId, plan, method, card }) {
     method,
     subscriptionId: assinatura.id,
     card,
+    payer,
   });
 
   return { subscription: store.getSubscription(assinatura.id), payment: pagamento };
@@ -311,6 +320,9 @@ export async function varrerCobranca(now = new Date()) {
         plan: assinatura.plan,
         method: assinatura.method,
         subscriptionId: assinatura.id,
+        // O pagador vem da assinatura porque a varredura roda fora do contexto da
+        // empresa e não teria como abrir o banco de cada uma para achar o e-mail.
+        payer: { email: assinatura.payer_email, doc: assinatura.payer_doc },
         periodStart: assinatura.next_charge_at,
         attempt: tentativas + 1,
       });

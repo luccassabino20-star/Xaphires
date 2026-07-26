@@ -42,6 +42,28 @@ if (!PROVEDORES[escolhido]) {
   );
 }
 
+// Confere a configuração no arranque, e não na primeira cobrança. Um provedor real
+// sem credencial só falharia quando alguém tentasse pagar — no pior momento
+// possível, e com o cliente na frente da tela. Aqui o erro aparece no log de quem
+// subiu o servidor, que é quem pode consertar.
+if (gateway.nome !== "fake") {
+  const faltando = [];
+  if (gateway.nome === "mercadopago") {
+    if (!process.env.MERCADOPAGO_ACCESS_TOKEN) faltando.push("MERCADOPAGO_ACCESS_TOKEN");
+    // Sem o segredo do webhook a validação de assinatura recusa tudo, de propósito,
+    // e nenhum pagamento seria confirmado pelo aviso do gateway.
+    if (!process.env.MERCADOPAGO_WEBHOOK_SECRET) faltando.push("MERCADOPAGO_WEBHOOK_SECRET");
+  }
+  if (faltando.length > 0) {
+    console.error(
+      `[billing] PROVEDOR "${gateway.nome}" SELECIONADO SEM CONFIGURAÇÃO COMPLETA. Faltando: ${faltando.join(", ")}. ` +
+        `As cobranças vão falhar. Defina as variáveis ou rode com BILLING_PROVIDER=fake.`
+    );
+  } else {
+    console.log(`[billing] provedor ativo: ${gateway.nome}`);
+  }
+}
+
 export const METODOS = ["card", "pix", "boleto"];
 
 export function metodoValido(metodo) {
