@@ -13,7 +13,10 @@ router.patch(
   "/:id",
   ah(async (req, res) => {
     const { title, color, stuckHours } = req.body || {};
-    if (title !== undefined) await repo.renameList(req.params.id, title.trim() || "Lista");
+    if (title !== undefined) {
+      if (typeof title !== "string") return res.status(400).json({ error: "Título inválido", code: "INVALID_TITLE" });
+      await repo.renameList(req.params.id, title.trim() || "Lista");
+    }
     if (color !== undefined) await repo.setListColor(req.params.id, color);
     if (stuckHours !== undefined) {
       const h = stuckHours === null ? null : Number(stuckHours);

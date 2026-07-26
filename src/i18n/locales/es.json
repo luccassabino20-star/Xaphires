@@ -662,7 +662,10 @@
     "trialEnding_other": "Tu prueba termina en {{count}} días",
     "expiredMessage": "Tu plan expiró. Todavía ves todo, pero no puedes crear ni editar.",
     "continueOnBasic": "Continuar en el plan Básico gratis",
-    "movedToBasic": "Plan cambiado a Básico"
+    "movedToBasic": "Plan cambiado a Básico",
+    "selectTitle": "Elegir plan",
+    "freeChoiceHint": "Tu plan no está vigente, así que puedes elegir cualquier plan de abajo, incluido el Básico gratuito, que no caduca.",
+    "selectFreeConfirm": "¿Pasar al plan {{plan}}? Es gratuito y no tiene fecha de vencimiento."
   },
   "errors": {
     "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Intermedio.",
@@ -716,6 +719,9 @@
     "INVALID_URL": "URL inválida",
     "FILE_REQUIRED": "Selecciona un archivo",
     "FILE_TOO_LARGE": "El archivo supera el límite de tu plan.",
-    "ATTACHMENT_NOT_FOUND": "Adjunto no encontrado"
+    "ATTACHMENT_NOT_FOUND": "Adjunto no encontrado",
+    "LIST_NOT_IN_BOARD": "Esa columna no pertenece a este tablero.",
+    "TOO_MANY_GEOCODE_REQUESTS": "Demasiadas búsquedas de dirección en poco tiempo. Espera un momento e intenta de nuevo.",
+    "INVALID_TITLE": "Título no válido."
   }
 }

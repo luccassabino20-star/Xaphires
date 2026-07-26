@@ -662,7 +662,10 @@
     "trialEnding_other": "Your trial ends in {{count}} days",
     "expiredMessage": "Your plan expired. You can still see everything, but not create or edit.",
     "continueOnBasic": "Continue on the free Basic plan",
-    "movedToBasic": "Plan changed to Basic"
+    "movedToBasic": "Plan changed to Basic",
+    "selectTitle": "Choose a plan",
+    "freeChoiceHint": "Your plan is no longer active, so you can pick any plan below - including the free Basic, which never expires.",
+    "selectFreeConfirm": "Switch to the {{plan}} plan? It is free and never expires."
   },
   "errors": {
     "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Intermediate plan up.",
@@ -716,6 +719,9 @@
     "INVALID_URL": "Invalid URL",
     "FILE_REQUIRED": "Select a file",
     "FILE_TOO_LARGE": "The file is larger than your plan allows.",
-    "ATTACHMENT_NOT_FOUND": "Attachment not found"
+    "ATTACHMENT_NOT_FOUND": "Attachment not found",
+    "LIST_NOT_IN_BOARD": "That column does not belong to this board.",
+    "TOO_MANY_GEOCODE_REQUESTS": "Too many address lookups in a short time. Wait a moment and try again.",
+    "INVALID_TITLE": "Invalid title."
   }
 }

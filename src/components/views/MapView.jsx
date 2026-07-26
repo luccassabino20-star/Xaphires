@@ -15,13 +15,34 @@ export default function MapView({ board, searchQuery, memberFilter, onOpenCard }
   const markersLayerRef = useRef(null);
 
   const allCards = useMemo(() => flattenCards(board), [board]);
-  const filtered = allCards.filter((c) => {
-    const matchesSearch = !searchQuery || c.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesMember = !memberFilter || (c.memberIds || []).includes(memberFilter);
-    return matchesSearch && matchesMember;
-  });
-  const located = filtered.filter((c) => c.location?.lat != null && c.location?.lng != null);
-  const unlocatedCount = filtered.filter((c) => c.location?.address && c.location?.lat == null).length;
+  // filtered/located precisam ser memoizados: sem isso cada render produzia arrays
+  // novos, o efeito dos marcadores rodava sempre e o enquadramento era refeito a
+  // cada tecla digitada na busca — não dava para arrastar o mapa.
+  const filtered = useMemo(
+    () =>
+      allCards.filter((c) => {
+        const matchesSearch = !searchQuery || c.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesMember = !memberFilter || (c.memberIds || []).includes(memberFilter);
+        return matchesSearch && matchesMember;
+      }),
+    [allCards, searchQuery, memberFilter]
+  );
+  const located = useMemo(
+    () => filtered.filter((c) => c.location?.lat != null && c.location?.lng != null),
+    [filtered]
+  );
+  const unlocatedCount = useMemo(
+    () => filtered.filter((c) => c.location?.address && c.location?.lat == null).length,
+    [filtered]
+  );
+
+  // Assinatura de quais pontos estão no mapa. O reenquadramento automático olha só
+  // para ela: mudou o conjunto de pontos, reenquadra; mudou qualquer outra coisa no
+  // cartão (título, etiqueta, responsável), o mapa fica onde o usuário deixou.
+  const locatedKey = useMemo(
+    () => located.map((c) => `${c.id}:${c.location.lat},${c.location.lng}`).join("|"),
+    [located]
+  );
 
   useEffect(() => {
     if (!mapElRef.current || mapRef.current) return;
@@ -63,7 +84,12 @@ export default function MapView({ board, searchQuery, memberFilter, onOpenCard }
       marker.on("click", () => onOpenCard(c.id));
       marker.addTo(layer);
     });
+  }, [located, onOpenCard]);
 
+  // Enquadramento em efeito separado, dependente só da assinatura dos pontos.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
     if (located.length === 1) {
       map.setView([located[0].location.lat, located[0].location.lng], 12);
     } else if (located.length > 1) {
@@ -72,7 +98,10 @@ export default function MapView({ board, searchQuery, memberFilter, onOpenCard }
     } else {
       map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
     }
-  }, [located, onOpenCard]);
+    // located sai de propósito das dependências: locatedKey já resume o que
+    // interessa, e incluir o array faria o reenquadramento voltar a disparar sozinho.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locatedKey]);
 
   return (
     <div className="map-view-wrap">

@@ -69,6 +69,12 @@ export function reducer(state, action) {
         const list = b.lists.find((l) => l.id === action.listId);
         const cards = { ...b.cards };
         (list?.cardIds || []).forEach((cid) => delete cards[cid]);
+        // Os arquivados da coluna não estão em cardIds, mas o servidor apaga tudo
+        // em cascata com a lista. Sem tirá-los daqui, o modal de arquivados seguia
+        // listando cartões que já não existem até o próximo carregamento.
+        Object.values(b.cards).forEach((c) => {
+          if (c.archived && c.archivedFrom === action.listId) delete cards[c.id];
+        });
         return { ...b, lists: b.lists.filter((l) => l.id !== action.listId), cards };
       });
     case "REORDER_LISTS":
@@ -223,6 +229,11 @@ export function reducer(state, action) {
         }
         return { ...b, lists };
       });
+    // Só existe para o sync.js gravar, no fim do arraste, a ordem das colunas que
+    // o cartão atravessou. O estado local já está correto desde o primeiro
+    // MOVE_CARD, então aqui não há nada a mudar.
+    case "COMMIT_CARD_ORDER":
+      return state;
     case "TOGGLE_CARD_COMPLETED":
       return updateBoard(state, action.boardId, (b) => {
         const card = b.cards[action.cardId];

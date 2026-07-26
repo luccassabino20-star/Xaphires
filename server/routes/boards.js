@@ -43,7 +43,12 @@ router.patch(
   requireBoardAccess((req) => req.params.id),
   ah(async (req, res) => {
     const { title, background, autoArchiveDays } = req.body || {};
-    if (title !== undefined) await repo.renameBoard(req.params.id, title.trim() || "Quadro");
+    // typeof, e não !== undefined: com title: null o .trim() estourava e a rota
+    // devolvia 500 no lugar de um 400 explicando o que estava errado.
+    if (title !== undefined) {
+      if (typeof title !== "string") return res.status(400).json({ error: "Título inválido", code: "INVALID_TITLE" });
+      await repo.renameBoard(req.params.id, title.trim() || "Quadro");
+    }
     if (background !== undefined) await repo.setBoardBackground(req.params.id, background);
     if (autoArchiveDays !== undefined) {
       const dias = autoArchiveDays === null ? null : Number(autoArchiveDays);
@@ -106,7 +111,7 @@ router.put(
     const { orderedListIds } = req.body || {};
     if (!Array.isArray(orderedListIds))
       return res.status(400).json({ error: "orderedListIds obrigatório", code: "ORDERED_LIST_IDS_REQUIRED" });
-    await repo.setListOrder(orderedListIds);
+    await repo.setListOrder(req.params.boardId, orderedListIds);
     res.json({ ok: true });
   })
 );

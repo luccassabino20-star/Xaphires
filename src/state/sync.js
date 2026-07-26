@@ -73,12 +73,18 @@ export function syncAction(action, state) {
     case "ARCHIVE_COMPLETED_CARDS":
       api.archiveCompletedCards(action.listId).catch(logError);
       break;
-    case "MOVE_CARD": {
+    // MOVE_CARD não sincroniza: durante um arraste ele é despachado a cada posição
+    // por onde o cartão passa, e mandar um PUT em cada uma gerava dezenas de
+    // requisições concorrentes num único arraste. Como fetch não garante ordem de
+    // chegada, a ordem que ficava gravada podia não ser a que estava na tela.
+    // Quem persiste é o COMMIT_CARD_ORDER, uma vez, no fim do arraste.
+    case "COMMIT_CARD_ORDER": {
       const board = state.boards.find((b) => b.id === action.boardId);
-      const toList = board?.lists.find((l) => l.id === action.toListId);
-      const fromList = board?.lists.find((l) => l.id === action.fromListId);
-      if (toList) api.setCardOrder(action.toListId, toList.cardIds).catch(logError);
-      if (fromList && fromList.id !== toList?.id) api.setCardOrder(action.fromListId, fromList.cardIds).catch(logError);
+      if (!board) break;
+      for (const listId of action.listIds || []) {
+        const list = board.lists.find((l) => l.id === listId);
+        if (list) api.setCardOrder(listId, list.cardIds).catch(logError);
+      }
       break;
     }
     case "UPDATE_CARD":

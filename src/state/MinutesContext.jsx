@@ -14,7 +14,9 @@ export function MinutesProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    refresh().finally(() => setLoading(false));
+    refresh()
+      .catch((err) => console.error("Falha ao carregar as atas:", err))
+      .finally(() => setLoading(false));
   }, [refresh]);
 
   async function createMinute(data) {

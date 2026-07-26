@@ -54,6 +54,11 @@ export function deleteUser(id) {
   getDb().prepare("DELETE FROM users WHERE id = ?").run(id);
 }
 export function deletePrivateBoardsByOwner(userId) {
+  const ids = getDb()
+    .prepare("SELECT id FROM boards WHERE owner_id = ? AND visibility = 'private'")
+    .all(userId)
+    .map((r) => r.id);
+  removeAttachmentFilesOf(cardIdsOfBoards(ids));
   getDb().prepare("DELETE FROM boards WHERE owner_id = ? AND visibility = 'private'").run(userId);
 }
 export function publicUser(u) {
@@ -100,9 +105,11 @@ export function setBoardBackground(id, background) {
   getDb().prepare("UPDATE boards SET background = ? WHERE id = ?").run(background || null, id);
 }
 export function deleteBoard(id) {
+  removeAttachmentFilesOf(cardIdsOfBoards([id]));
   getDb().prepare("DELETE FROM boards WHERE id = ?").run(id);
 }
 export function clearBoard(id) {
+  removeAttachmentFilesOf(cardIdsOfBoards([id]));
   getDb().prepare("DELETE FROM lists WHERE board_id = ?").run(id);
 }
 export function getBoardAccessInfo(boardId) {
@@ -137,16 +144,24 @@ export function setListColor(id, color) {
   getDb().prepare("UPDATE lists SET color = ? WHERE id = ?").run(color || null, id);
 }
 export function deleteList(id) {
+  removeAttachmentFilesOf(cardIdsOfList(id));
   getDb().prepare("DELETE FROM lists WHERE id = ?").run(id);
 }
-export function setListOrder(orderedListIds) {
+// Só reordena listas do próprio quadro. Sem o filtro por board_id, um id de lista
+// de outro quadro no corpo da requisição teria a position reescrita, mesmo em
+// quadro privado a que o autor não tem acesso.
+export function setListOrder(boardId, orderedListIds) {
+  const doQuadro = new Set(
+    getDb().prepare("SELECT id FROM lists WHERE board_id = ?").all(boardId).map((r) => r.id)
+  );
   const stmt = getDb().prepare("UPDATE lists SET position = ? WHERE id = ?");
-  orderedListIds.forEach((id, idx) => stmt.run(idx, id));
+  orderedListIds.filter((id) => doQuadro.has(id)).forEach((id, idx) => stmt.run(idx, id));
 }
 export function clearListCards(listId) {
   // Preserva os arquivados: o reducer do cliente só apaga o que está em cardIds,
   // e arquivado não está lá. Sem o filtro, limpar a coluna apagaria no servidor
   // um histórico que continuaria aparecendo na tela até o próximo carregamento.
+  removeAttachmentFilesOf(cardIdsOfList(listId, { incluirArquivados: false }));
   getDb().prepare("DELETE FROM cards WHERE list_id = ? AND archived = 0").run(listId);
 }
 export function listExists(id) {
@@ -156,12 +171,16 @@ export function listExists(id) {
 export function createCard(listId, { id, title }) {
   const cardId = id || uid();
   const pos = nextPosition("cards", "list_id", listId);
+  // list_entered_at nasce preenchido: sem isso o cartão fica com NULL e o monitor
+  // de gargalos nunca o enxerga, porque hoursStuck() devolve null para NULL. Era
+  // justamente o cartão criado e esquecido numa coluna que passava batido.
   getDb().prepare(
-    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, member_ids, position) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', ?)"
-  ).run(cardId, listId, title, pos);
+    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, member_ids, position, list_entered_at) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', ?, ?)"
+  ).run(cardId, listId, title, pos, nowIso());
   return cardId;
 }
 export function deleteCard(id) {
+  removeAttachmentFilesOf([id]);
   getDb().prepare("DELETE FROM cards WHERE id = ?").run(id);
 }
 
@@ -261,6 +280,17 @@ export function updateCard(id, patch) {
   );
 }
 export function setCardOrder(listId, cardIds) {
+  // Só aceita cartões que já pertencem ao quadro da lista de destino.
+  //
+  // A rota autoriza o acesso à lista de destino, mas os ids no corpo vinham sem
+  // conferência nenhuma — e este UPDATE reescreve list_id. Um id de cartão de outro
+  // quadro, inclusive privado de outra pessoa, era puxado para dentro da lista e
+  // passava a ser legível. Filtrar aqui, e não na rota, protege todos os chamadores
+  // de uma vez.
+  const boardId = getBoardIdForList(listId);
+  if (!boardId) return;
+  const doQuadro = new Set(cardIdsOfBoards([boardId]));
+
   // O relógio do gargalo só reinicia quando o cartão TROCA de coluna. Reordenar
   // dentro da mesma lista chama esta função também, e zerar ali deixaria qualquer
   // arrastão esconder um gargalo real.
@@ -268,11 +298,19 @@ export function setCardOrder(listId, cardIds) {
   const stmt = getDb().prepare("UPDATE cards SET list_id = ?, position = ? WHERE id = ?");
   const marcaEntrada = getDb().prepare("UPDATE cards SET list_entered_at = ? WHERE id = ?");
   const agora = nowIso();
-  cardIds.forEach((id, idx) => {
-    const antes = atual.get(id);
-    stmt.run(listId, idx, id);
-    if (antes && antes.list_id !== listId) marcaEntrada.run(agora, id);
-  });
+  cardIds
+    .filter((id) => doQuadro.has(id))
+    .forEach((id, idx) => {
+      const antes = atual.get(id);
+      stmt.run(listId, idx, id);
+      if (antes && antes.list_id !== listId) marcaEntrada.run(agora, id);
+    });
+}
+
+// A lista pertence a este quadro? Usado para impedir que uma regra de recorrência
+// de um quadro despeje cartões numa coluna de outro.
+export function listBelongsToBoard(listId, boardId) {
+  return !!getDb().prepare("SELECT 1 FROM lists WHERE id = ? AND board_id = ?").get(listId, boardId);
 }
 
 export function setListStuckHours(listId, hours) {
@@ -292,6 +330,47 @@ function parseAttachments(row) {
   } catch {
     return [];
   }
+}
+
+// Apaga do disco os arquivos anexados a estes cartões.
+//
+// A linha do cartão desaparece por ON DELETE CASCADE quando a lista ou o quadro é
+// apagado, mas o arquivo no disco não tem cascade nenhum. Sem varrer ANTES de
+// deletar as linhas, todo excluir/limpar deixava os uploads órfãos para sempre em
+// companies/<id>/uploads, sem nada que os recolhesse depois.
+function removeAttachmentFilesOf(cardIds) {
+  if (!cardIds || cardIds.length === 0) return;
+  const marcadores = cardIds.map(() => "?").join(",");
+  const rows = getDb().prepare(`SELECT attachments FROM cards WHERE id IN (${marcadores})`).all(...cardIds);
+  let dir = null;
+  for (const row of rows) {
+    for (const anexo of parseAttachments(row)) {
+      // Link não tem arquivo; anexo sem id não tem como ser localizado.
+      if (anexo?.type !== "file" || !anexo.id) continue;
+      dir ||= attachmentsUploadsDir();
+      try {
+        fs.unlinkSync(path.join(dir, anexo.id));
+      } catch {
+        /* já pode ter sumido */
+      }
+    }
+  }
+}
+
+function cardIdsOfList(listId, { incluirArquivados = true } = {}) {
+  const sql = incluirArquivados
+    ? "SELECT id FROM cards WHERE list_id = ?"
+    : "SELECT id FROM cards WHERE list_id = ? AND archived = 0";
+  return getDb().prepare(sql).all(listId).map((r) => r.id);
+}
+
+function cardIdsOfBoards(boardIds) {
+  if (!boardIds || boardIds.length === 0) return [];
+  const marcadores = boardIds.map(() => "?").join(",");
+  return getDb()
+    .prepare(`SELECT id FROM cards WHERE list_id IN (SELECT id FROM lists WHERE board_id IN (${marcadores}))`)
+    .all(...boardIds)
+    .map((r) => r.id);
 }
 export function addLinkAttachment(cardId, { name, url }) {
   const row = getDb().prepare("SELECT attachments FROM cards WHERE id = ?").get(cardId);

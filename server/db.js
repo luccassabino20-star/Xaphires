@@ -140,6 +140,13 @@ function applySchema(companyDb) {
   companyDb
     .prepare("UPDATE cards SET list_entered_at = ? WHERE list_entered_at IS NULL")
     .run(new Date().toISOString());
+
+  // `due` é uma data civil (YYYY-MM-DD), o formato que o <input type="date"> produz
+  // e que todas as views esperam. As rotinas de recorrência gravaram por um tempo
+  // um timestamp ISO completo aqui, e esses cartões apareciam com "Invalid Date" no
+  // crachá, não casavam no Calendário e saíam com posição NaN na Linha do tempo.
+  // Corta o que veio errado; o horário não tinha uso nenhum.
+  companyDb.exec("UPDATE cards SET due = substr(due, 1, 10) WHERE due LIKE '____-__-__T%'");
 }
 
 const cache = new Map();

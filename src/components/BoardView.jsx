@@ -13,20 +13,31 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
   const [newListTitle, setNewListTitle] = useState("");
   const lastMoveKeyRef = useRef(null);
   const lastListOrderKeyRef = useRef(null);
+  // Colunas mexidas durante o arraste em curso. A gravação acontece uma vez, no
+  // fim, e não a cada posição por onde o cartão passa.
+  const touchedListsRef = useRef(new Set());
 
   function handleCardDragStart(cardId, fromListId) {
     setDragCard({ cardId, fromListId });
     lastMoveKeyRef.current = null;
+    touchedListsRef.current = new Set([fromListId]);
   }
   function handleCardDragEnd() {
+    const listIds = [...touchedListsRef.current];
+    touchedListsRef.current = new Set();
     setDragCard(null);
     lastMoveKeyRef.current = null;
+    if (listIds.length > 0) {
+      dispatch({ type: "COMMIT_CARD_ORDER", boardId: board.id, listIds });
+    }
   }
   function handleCardHover(targetListId, targetIndex) {
     if (!dragCard) return;
     const key = `${targetListId}:${targetIndex}`;
     if (lastMoveKeyRef.current === key) return;
     lastMoveKeyRef.current = key;
+    touchedListsRef.current.add(dragCard.fromListId);
+    touchedListsRef.current.add(targetListId);
     dispatch({
       type: "MOVE_CARD",
       boardId: board.id,

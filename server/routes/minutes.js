@@ -43,6 +43,9 @@ router.patch(
     if (!(await canEdit(req, req.params.id)))
       return res.status(403).json({ error: "Apenas o autor ou o usuário master pode editar esta ata", code: "FORBIDDEN_MINUTE_EDIT" });
     const { title, date, attendeeIds, agenda, decisions, actionItems } = req.body || {};
+    if (title !== undefined && typeof title !== "string") {
+      return res.status(400).json({ error: "Título inválido", code: "INVALID_TITLE" });
+    }
     await repo.updateMinute(req.params.id, {
       title: title !== undefined ? title.trim() || "Sem título" : undefined,
       date,

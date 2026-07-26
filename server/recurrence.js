@@ -7,14 +7,28 @@
 
 export const FREQUENCIES = ["daily", "weekly", "monthly"];
 
+// Toda a aritmética abaixo é em horário LOCAL do servidor, não em UTC. A hora que
+// a pessoa escolhe no formulário é a hora do relógio dela: com setUTCHours, "8h"
+// virava 5h da manhã no Brasil, e uma regra mensal do dia 1 à meia-noite disparava
+// às 21h do dia 31 anterior.
 function atHour(base, hour) {
   const d = new Date(base);
-  d.setUTCHours(hour, 0, 0, 0);
+  d.setHours(hour, 0, 0, 0);
   return d;
 }
 
 function lastDayOfMonth(year, monthIndex) {
-  return new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+  return new Date(year, monthIndex + 1, 0).getDate();
+}
+
+// Data civil local em YYYY-MM-DD. Não dá para usar toISOString().slice(0,10) aqui:
+// ele converte para UTC antes de cortar, e um vencimento às 22h no Brasil viraria
+// o dia seguinte.
+function toLocalISODate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 // Retorna o instante da última ocorrência devida, ou null se a regra ainda não
@@ -27,17 +41,19 @@ export function lastDueOccurrence(rule, now = new Date()) {
     if (hoje <= now) return hoje;
     // Antes da hora de hoje: a última devida foi ontem.
     const ontem = new Date(hoje);
-    ontem.setUTCDate(ontem.getUTCDate() - 1);
+    ontem.setDate(ontem.getDate() - 1);
     return ontem;
   }
 
   if (rule.freq === "weekly") {
-    const alvo = Number.isInteger(rule.weekday) ? rule.weekday : 1; // 0=domingo
+    // 0=domingo. Fora da faixa cai no padrão, para uma regra gravada com valor
+    // inválido não gerar em dia imprevisível.
+    const alvo = Number.isInteger(rule.weekday) && rule.weekday >= 0 && rule.weekday <= 6 ? rule.weekday : 1;
     const d = atHour(now, hour);
     // Recua até cair no dia da semana pedido, sem passar do agora.
-    const diff = (d.getUTCDay() - alvo + 7) % 7;
-    d.setUTCDate(d.getUTCDate() - diff);
-    if (d > now) d.setUTCDate(d.getUTCDate() - 7);
+    const diff = (d.getDay() - alvo + 7) % 7;
+    d.setDate(d.getDate() - diff);
+    if (d > now) d.setDate(d.getDate() - 7);
     return d;
   }
 
@@ -45,16 +61,16 @@ export function lastDueOccurrence(rule, now = new Date()) {
     const dia = Number.isInteger(rule.monthday) ? rule.monthday : 1;
     // Mês corrente, com o dia limitado ao tamanho do mês: regra do dia 31 cai
     // no dia 28 em fevereiro em vez de vazar para março.
-    const ano = now.getUTCFullYear();
-    const mes = now.getUTCMonth();
+    const ano = now.getFullYear();
+    const mes = now.getMonth();
     const diaEsteMes = Math.min(dia, lastDayOfMonth(ano, mes));
-    const candidato = atHour(new Date(Date.UTC(ano, mes, diaEsteMes)), hour);
+    const candidato = atHour(new Date(ano, mes, diaEsteMes), hour);
     if (candidato <= now) return candidato;
     // Ainda não chegou neste mês: a última devida foi no mês anterior.
     const anoAnt = mes === 0 ? ano - 1 : ano;
     const mesAnt = mes === 0 ? 11 : mes - 1;
     const diaAnt = Math.min(dia, lastDayOfMonth(anoAnt, mesAnt));
-    return atHour(new Date(Date.UTC(anoAnt, mesAnt, diaAnt)), hour);
+    return atHour(new Date(anoAnt, mesAnt, diaAnt), hour);
   }
 
   return null;
@@ -74,9 +90,14 @@ export function shouldGenerate(rule, now = new Date()) {
 }
 
 // Data de vencimento do cartão gerado, se a regra pedir prazo.
+//
+// Devolve YYYY-MM-DD, e não um timestamp: é o formato que o campo `due` usa em
+// todo o resto do app, porque vem de um <input type="date">. Gravar ISO completo
+// aqui fazia o cartão gerado aparecer com "Invalid Date" no crachá, não casar no
+// Calendário e sair com posição NaN na Linha do tempo.
 export function dueDateFor(rule, occurrence) {
   if (!Number.isInteger(rule.due_in_days) || rule.due_in_days < 0) return null;
   const d = new Date(occurrence);
-  d.setUTCDate(d.getUTCDate() + rule.due_in_days);
-  return d.toISOString();
+  d.setDate(d.getDate() + rule.due_in_days);
+  return toLocalISODate(d);
 }

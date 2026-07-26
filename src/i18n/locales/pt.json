@@ -978,7 +978,10 @@
     "trialEnding_other": "Seu teste termina em {{count}} dias",
     "expiredMessage": "Seu plano expirou. Você ainda vê tudo, mas não pode criar nem editar.",
     "continueOnBasic": "Continuar no Básico grátis",
-    "movedToBasic": "Plano alterado para Básico"
+    "movedToBasic": "Plano alterado para Básico",
+    "selectTitle": "Escolher plano",
+    "freeChoiceHint": "Seu plano não está em vigor, então você pode escolher qualquer plano abaixo - inclusive o Básico gratuito, que não expira.",
+    "selectFreeConfirm": "Passar para o plano {{plan}}? Ele é gratuito e não tem prazo de validade."
   },
   "errors": {
     "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Intermediário.",
@@ -1032,6 +1035,9 @@
     "INVALID_URL": "URL inválida",
     "FILE_REQUIRED": "Selecione um arquivo",
     "FILE_TOO_LARGE": "O arquivo é maior que o limite do seu plano.",
-    "ATTACHMENT_NOT_FOUND": "Anexo não encontrado"
+    "ATTACHMENT_NOT_FOUND": "Anexo não encontrado",
+    "LIST_NOT_IN_BOARD": "Essa coluna não pertence a este quadro.",
+    "TOO_MANY_GEOCODE_REQUESTS": "Muitas buscas de endereço em pouco tempo. Aguarde um instante e tente de novo.",
+    "INVALID_TITLE": "Título inválido."
   }
 }

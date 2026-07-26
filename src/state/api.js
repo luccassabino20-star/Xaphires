@@ -111,8 +111,32 @@ export const updateMinute = (id, patch) => request(`/minutes/${id}`, { method: "
 export const deleteMinute = (id) => request(`/minutes/${id}`, { method: "DELETE" });
 
 // ---------- Plano ----------
-export const getPlan = () => request("/plan");
-export const setPlan = (plan, expiresAt) => request("/plan", { method: "POST", body: { plan, expiresAt } });
+// Cache curto do resumo do plano. CardModal, ArchiveModal e ListMenu consultam
+// isto de forma independente ao abrir, e sem cache eram três requisições iguais
+// quase simultâneas. A janela é curta de propósito: o resumo carrega dias
+// restantes e status, que não podem congelar pela sessão inteira.
+const PLAN_TTL_MS = 30_000;
+let planoCache = null; // { em, promessa }
+
+export function getPlan() {
+  const agora = Date.now();
+  if (planoCache && agora - planoCache.em < PLAN_TTL_MS) return planoCache.promessa;
+  // Falha não fica em cache: senão um erro de rede passageiro travaria a consulta
+  // por 30 segundos.
+  const promessa = request("/plan").catch((err) => {
+    planoCache = null;
+    throw err;
+  });
+  planoCache = { em: agora, promessa };
+  return promessa;
+}
+
+export function setPlan(plan) {
+  return request("/plan", { method: "POST", body: { plan } }).then((resumo) => {
+    planoCache = null;
+    return resumo;
+  });
+}
 
 // ---------- Cartões recorrentes ----------
 export const listRecurrences = (boardId) => request(`/recurrences/board/${boardId}`);

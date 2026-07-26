@@ -9,7 +9,7 @@ import {
   getPlan,
   effectiveStatus,
   daysLeft,
-  canSelfUpgradeTo,
+  canSelfSelectPlan,
   canUseAutoArchive,
   canUseBottleneckMonitor,
   attachmentLimitFor,
@@ -42,8 +42,9 @@ function resumo(companyId) {
       id,
       price: PLANS[id].price,
       maxUsers: PLANS[id].maxUsers,
+      paid: PLANS[id].paid,
       current: id === (company?.plan || "basic"),
-      selfUpgradable: canSelfUpgradeTo(company?.plan, id),
+      selfSelectable: canSelfSelectPlan(company, id),
     })),
   };
 }
@@ -65,18 +66,24 @@ router.post(
     }
 
     const company = getCompany(req.companyId);
-    // Descer de plano significa pagar menos e cancelar significa parar de pagar;
-    // nenhum dos dois pode acontecer por um clique sem passar por quem cobra.
-    if (!canSelfUpgradeTo(company?.plan, plan)) {
+    // Com plano pago em vigor, descer por um clique não pode: pagar menos no meio
+    // do ciclo passa por quem cobra. Vencido ou no gratuito, a escolha é livre.
+    if (!canSelfSelectPlan(company, plan)) {
       return res.status(403).json({
         error: "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",
         code: "PLAN_DOWNGRADE_NOT_SELF_SERVICE",
       });
     }
 
+    const alvo = getPlan(plan);
     const usuarios = countUsers();
-    const limite = getPlan(plan).maxUsers;
-    if (limite !== null && usuarios > limite) {
+    const limite = alvo.maxUsers;
+    // O limite barra a CONTRATAÇÃO de um plano pago apertado demais para a equipe
+    // atual. Não barra a ida para o gratuito: senão a empresa que passou do limite
+    // durante o teste ficaria sem nenhuma saída, presa em somente-leitura para
+    // sempre. Os usuários que já existem continuam; criar novos é que fica travado,
+    // pelo canAddUser na rota de usuários.
+    if (alvo.paid && limite !== null && usuarios > limite) {
       return res.status(400).json({
         error: `O plano escolhido permite ${limite} usuários e a empresa tem ${usuarios}.`,
         code: "PLAN_USER_LIMIT_EXCEEDED",
@@ -85,13 +92,15 @@ router.post(
       });
     }
 
-    // Contratar reinicia o ciclo: vale a partir de agora e vence daqui a um mês.
+    // Plano pago reinicia o ciclo: vale de agora e vence daqui a um mês. O gratuito
+    // não tem prazo — gravar um vencimento nele faria effectiveStatus voltar a
+    // expirar mais tarde uma empresa que não deve mais nada.
     const agora = new Date().toISOString();
     setCompanyPlan(req.companyId, {
       plan,
       status: "active",
       contractedAt: agora,
-      expiresAt: addOneMonth(agora),
+      expiresAt: alvo.paid ? addOneMonth(agora) : null,
     });
     res.json(resumo(req.companyId));
   })

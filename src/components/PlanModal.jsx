@@ -37,11 +37,14 @@ export default function PlanModal({ onClose }) {
   const ehMaster = user?.role === "master";
 
   // Contratar gera cobrança, então pede confirmação com o valor à vista — bem
-  // diferente do clique-e-muda que existia antes.
-  async function subirPara(alvo) {
+  // diferente do clique-e-muda que existia antes. Passar para o gratuito não cobra
+  // nada, então a pergunta é outra: não faz sentido confirmar "por R$ 0,00/mês".
+  async function trocarPara(alvo) {
     const nome = t(`plan.names.${alvo.id}`);
-    const valorFmt = formatarValor(alvo.price, i18n.language);
-    if (!confirm(t("plan.upgradeConfirm", { plan: nome, price: valorFmt }))) return;
+    const pergunta = alvo.paid
+      ? t("plan.upgradeConfirm", { plan: nome, price: formatarValor(alvo.price, i18n.language) })
+      : t("plan.selectFreeConfirm", { plan: nome });
+    if (!confirm(pergunta)) return;
 
     setTrocando(alvo.id);
     try {
@@ -60,7 +63,12 @@ export default function PlanModal({ onClose }) {
   // Ilimitado vira traço em vez de "null" na tela.
   const limite = plano && (plano.maxUsers === null ? t("plan.unlimited") : plano.maxUsers);
   // O servidor já decidiu o que é autoatendimento; aqui só se exibe.
-  const podeSubir = plano?.catalog?.filter((p) => p.selfUpgradable) || [];
+  const podeEscolher = plano?.catalog?.filter((p) => p.selfSelectable) || [];
+  // Sem plano pago em vigor a lista deixa de ser só "subir": entram o Básico e o
+  // próprio plano atual, para renovar. O título e a dica mudam junto, senão a tela
+  // continuaria dizendo "só é possível subir" embaixo de um botão de Básico.
+  const planoAtual = plano?.catalog?.find((p) => p.current);
+  const escolhaLivre = !!plano && (!planoAtual?.paid || plano.status === "expired");
 
   return (
     <div
@@ -129,15 +137,15 @@ export default function PlanModal({ onClose }) {
 
               {ehMaster ? (
                 <div className="plan-switch">
-                  {podeSubir.length > 0 && (
+                  {podeEscolher.length > 0 && (
                     <>
-                      <h3>{t("plan.upgradeTitle")}</h3>
+                      <h3>{escolhaLivre ? t("plan.selectTitle") : t("plan.upgradeTitle")}</h3>
                       <div className="plan-switch-list">
-                        {podeSubir.map((p) => (
+                        {podeEscolher.map((p) => (
                           <button
                             key={p.id}
                             className="plan-switch-btn"
-                            onClick={() => subirPara(p)}
+                            onClick={() => trocarPara(p)}
                             disabled={trocando !== null}
                           >
                             <span className="plan-switch-name">{t(`plan.names.${p.id}`)}</span>
@@ -150,7 +158,9 @@ export default function PlanModal({ onClose }) {
                       </div>
                     </>
                   )}
-                  <p className="plan-switch-hint">{t("plan.downgradeHint")}</p>
+                  <p className="plan-switch-hint">
+                    {escolhaLivre ? t("plan.freeChoiceHint") : t("plan.downgradeHint")}
+                  </p>
                 </div>
               ) : (
                 <p className="plan-switch-hint">{t("plan.masterOnly")}</p>

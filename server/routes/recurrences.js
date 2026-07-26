@@ -23,7 +23,10 @@ function validar(body) {
   if (!body?.title?.trim()) return { error: "Título obrigatório", code: "TITLE_REQUIRED" };
   if (!body?.listId) return { error: "Escolha a coluna de destino", code: "LIST_REQUIRED" };
   if (!FREQUENCIES.includes(body.freq)) return { error: "Frequência inválida", code: "INVALID_FREQUENCY" };
-  if (body.freq === "weekly" && !Number.isInteger(body.weekday)) {
+  // A faixa importa: weekday: 99 passava como "inteiro" e a regra acabava gerando
+  // num dia imprevisível, porque o cálculo do resto com número fora de 0-6 sai
+  // negativo em JS.
+  if (body.freq === "weekly" && !(Number.isInteger(body.weekday) && body.weekday >= 0 && body.weekday <= 6)) {
     return { error: "Escolha o dia da semana", code: "WEEKDAY_REQUIRED" };
   }
   if (body.freq === "monthly" && !(Number.isInteger(body.monthday) && body.monthday >= 1 && body.monthday <= 31)) {
@@ -53,8 +56,10 @@ router.post(
   ah(async (req, res) => {
     const erro = validar(req.body);
     if (erro) return res.status(400).json(erro);
-    if (!(await repo.listExists(req.body.listId))) {
-      return res.status(400).json({ error: "Coluna não encontrada", code: "LIST_NOT_FOUND" });
+    // Precisa ser coluna DESTE quadro. Só checar a existência deixava uma regra
+    // despejar cartões numa coluna de outro quadro, inclusive privado alheio.
+    if (!(await repo.listBelongsToBoard(req.body.listId, req.params.boardId))) {
+      return res.status(400).json({ error: "Coluna não encontrada neste quadro", code: "LIST_NOT_IN_BOARD" });
     }
     const criada = await repo.createRecurrence(req.params.boardId, { ...req.body, title: req.body.title.trim() });
     res.status(201).json(criada);
@@ -71,6 +76,14 @@ router.patch(
     if (Object.keys(req.body || {}).length > 1 || req.body?.active === undefined) {
       const erro = validar({ ...(await repo.getRecurrence(req.params.id)), ...req.body });
       if (erro) return res.status(400).json(erro);
+    }
+    // Trocar a coluna de destino passava sem conferência alguma no PATCH, o que
+    // reabria pelo update o mesmo furo fechado na criação.
+    if (req.body?.listId !== undefined) {
+      const boardId = await repo.getBoardIdForRecurrence(req.params.id);
+      if (!(await repo.listBelongsToBoard(req.body.listId, boardId))) {
+        return res.status(400).json({ error: "Coluna não encontrada neste quadro", code: "LIST_NOT_IN_BOARD" });
+      }
     }
     const atualizada = await repo.updateRecurrence(req.params.id, req.body || {});
     if (!atualizada) return res.status(404).json({ error: "Recorrência não encontrada", code: "RECURRENCE_NOT_FOUND" });

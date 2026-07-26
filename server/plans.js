@@ -67,15 +67,29 @@ export function addOneMonth(iso) {
   return alvo.toISOString();
 }
 
-// Só subir de plano é autoatendimento. Descer significa pagar menos, e cancelar
-// significa parar de pagar — isso passa por contato, não por um clique.
-// O Empresarial fica de fora porque é "sob consulta": sem preço de tabela não há
-// o que contratar sozinho.
-export function canSelfUpgradeTo(currentPlanId, targetPlanId) {
-  const atual = getPlan(currentPlanId);
+// Que planos a empresa pode contratar sozinha, pelo próprio app.
+//
+// Com um plano pago EM VIGOR, só subir: descer significa pagar menos no meio de um
+// ciclo já contratado, e isso passa por quem cobra, não por um clique.
+//
+// Sem nada em vigor — plano gratuito, ou pago que já venceu — a escolha é livre
+// entre os planos com preço de tabela, inclusive o Básico e inclusive o mesmo
+// plano de novo. É o que destrava as duas saídas que antes não existiam: cair
+// para o Básico quando o teste termina, e renovar um plano que expirou. Não há
+// receita a perder aqui, porque enquanto está vencido a empresa não paga nada e
+// não consegue escrever.
+//
+// O Empresarial fica de fora sempre: é "sob consulta", sem preço de tabela, então
+// não há o que contratar sozinho.
+export function canSelfSelectPlan(company, targetPlanId) {
   const alvo = PLANS[targetPlanId];
   if (!alvo) return false;
   if (alvo.price === null) return false;
+
+  const atual = getPlan(company?.plan);
+  const emVigor = atual.paid && effectiveStatus(company) !== "expired";
+  if (!emVigor) return true;
+
   return alvo.rank > atual.rank;
 }
 

@@ -142,17 +142,14 @@ router.post("/:id/attachments/file", (req, res) => {
 
   bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
 
-  bb.on("close", () => {
+  // Os eventos do busboy são emitidos a partir do socket, que existe desde
+  // antes do requireAuth entrar no contexto da empresa — o AsyncLocalStorage
+  // não alcança aqui. Sem reentrar, getDb() não sabe qual banco abrir.
+  //
+  // O try/catch é essencial: uma exceção solta num handler de evento é
+  // uncaught e derruba o processo inteiro, não só esta requisição.
+  function registrar() {
     if (respondido || excedeu) return;
-    if (!nomeArquivo || bytes === 0) {
-      return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
-    }
-    // Os eventos do busboy são emitidos a partir do socket, que existe desde
-    // antes do requireAuth entrar no contexto da empresa — o AsyncLocalStorage
-    // não alcança aqui. Sem reentrar, getDb() não sabe qual banco abrir.
-    //
-    // O try/catch é essencial: uma exceção solta num handler de evento é
-    // uncaught e derruba o processo inteiro, não só esta requisição.
     try {
       const attachments = runWithCompany(req.companyId, () =>
         repo.registerFileAttachment(req.params.id, {
@@ -169,6 +166,34 @@ router.post("/:id/attachments/file", (req, res) => {
       console.error("Falha ao registrar anexo:", err);
       falhar(500, { error: "Erro ao salvar o anexo", code: "ATTACHMENT_SAVE_FAILED" });
     }
+  }
+
+  bb.on("close", () => {
+    if (respondido || excedeu) return;
+    if (!nomeArquivo || bytes === 0) {
+      return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    }
+    // O busboy fecha quando terminou de LER o corpo, mas a gravação em disco pode
+    // ainda estar em voo. Responder aqui anunciava um anexo que um download
+    // imediato podia pegar truncado — então espera o stream fechar de fato.
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  // Cliente que desiste no meio (aba fechada, rede caiu) não deixa arquivo parcial
+  // registrado como anexo válido nem lixo no disco.
+  req.on("aborted", () => {
+    if (respondido) return;
+    respondido = true;
+    // Nesta ordem: marcar o descarte primeiro, destruir depois. O unlink acontece
+    // no 'close' do stream, quando o arquivo já não está mais aberto — no Windows,
+    // remover com escrita em voo falha calado e deixa o arquivo lá.
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    saida?.destroy();
   });
 
   req.pipe(bb);
