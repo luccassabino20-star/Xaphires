@@ -225,7 +225,7 @@
     },
     "logos": {
       "label": "All of it in one place",
-      "items": ["Kanban board", "Table", "Calendar", "Timeline", "Dashboard", "Map", "Eisenhower matrix", "Meeting minutes"]
+      "items": ["Kanban board", "Table", "Calendar", "Timeline", "Dashboard", "Map", "Eisenhower matrix", "Meeting minutes", "Auto-archiving", "Bottleneck monitor", "Automatic routines", "Task ticker", "Attachments and links"]
     },
     "testimonials": {
       "title": "What teams are saying",

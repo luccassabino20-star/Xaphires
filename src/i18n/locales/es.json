@@ -225,7 +225,7 @@
     },
     "logos": {
       "label": "Todo esto en un solo lugar",
-      "items": ["Tablero Kanban", "Tabla", "Calendario", "Línea de tiempo", "Panel", "Mapa", "Matriz Eisenhower", "Actas de reunión"]
+      "items": ["Tablero Kanban", "Tabla", "Calendario", "Línea de tiempo", "Panel", "Mapa", "Matriz Eisenhower", "Actas de reunión", "Archivado automático", "Monitor de atascos", "Rutinas automáticas", "Letrero de tareas", "Adjuntos y enlaces"]
     },
     "testimonials": {
       "title": "Lo que dicen los equipos",
