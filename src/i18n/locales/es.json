@@ -287,6 +287,7 @@
       "clearBoardToast": "Tablero vaciado"
     },
     "dataMenu": {
+      "recurrences": "Rutinas automáticas",
       "bottlenecks": "Monitor de cuellos de botella",
       "archivedCards": "Tarjetas archivadas",
       "moreOptions": "Más opciones",
@@ -323,6 +324,54 @@
     }
   },
   "board": {
+    "recurrences": {
+      "title": "Rutinas automáticas",
+      "empty": "Todavía no hay rutinas. Una rutina crea la tarjeta sola en la fecha correcta, con el checklist listo.",
+      "planRequired": "Las rutinas automáticas están disponibles desde el plan Profesional. Puedes ver y eliminar las existentes.",
+      "newRule": "Nueva rutina",
+      "fieldTitle": "Título de la tarjeta",
+      "titlePlaceholder": "Ej: Cerrar el balance contable",
+      "fieldList": "Crear en la columna",
+      "fieldFreq": "Repetir",
+      "fieldWeekday": "Día de la semana",
+      "fieldMonthday": "Día del mes",
+      "fieldHour": "Hora",
+      "fieldDueInDays": "Vence en (días)",
+      "noDue": "sin fecha",
+      "fieldChecklist": "Checklist de la rutina",
+      "checklistPlaceholder": "Un ítem por línea:\nConciliar cuentas\nRevisar facturas\nEnviar al contador",
+      "save": "Crear rutina",
+      "created": "Rutina creada",
+      "deleted": "Rutina eliminada",
+      "deleteConfirm": "¿Eliminar la rutina \"{{title}}\"? Las tarjetas ya creadas siguen en el tablero.",
+      "pause": "Pausar",
+      "resume": "Reanudar",
+      "delete": "Eliminar",
+      "everyDay": "Todos los días a las {{hour}}h",
+      "everyWeek": "Cada {{day}} a las {{hour}}h",
+      "everyMonth": "Cada día {{day}} a las {{hour}}h",
+      "intoList": "en {{list}}",
+      "listGone": "columna eliminada",
+      "checklistCount": "{{count}} ítem en el checklist",
+      "checklistCount_other": "{{count}} ítems en el checklist",
+      "lastRun": "Última vez: {{date}}",
+      "monthdayWarning": "En meses más cortos, la rutina cae el último día del mes.",
+      "hint": "Las rutinas se revisan al cargar el tablero. Si pasan varias fechas sin que nadie abra la app, solo la más reciente se convierte en tarjeta.",
+      "freq": {
+        "daily": "Todos los días",
+        "weekly": "Cada semana",
+        "monthly": "Cada mes"
+      },
+      "weekdays": {
+        "0": "domingo",
+        "1": "lunes",
+        "2": "martes",
+        "3": "miércoles",
+        "4": "jueves",
+        "5": "viernes",
+        "6": "sábado"
+      }
+    },
     "bottlenecks": {
       "bareHours": "{{count}} hora",
       "bareHours_other": "{{count}} horas",
@@ -605,6 +654,14 @@
     "movedToBasic": "Plan cambiado a Básico"
   },
   "errors": {
+    "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Profesional.",
+    "INVALID_FREQUENCY": "Frecuencia inválida",
+    "WEEKDAY_REQUIRED": "Elige el día de la semana",
+    "MONTHDAY_REQUIRED": "Elige un día del mes entre 1 y 31",
+    "INVALID_HOUR": "La hora debe estar entre 0 y 23",
+    "LIST_REQUIRED": "Elige la columna de destino",
+    "LIST_NOT_FOUND": "Columna no encontrada",
+    "RECURRENCE_NOT_FOUND": "Rutina no encontrada",
     "INVALID_STUCK_HOURS": "Indica un número de horas entre 1 y 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Intermedio.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Aquí solo se puede subir de plan. Para bajar o cancelar, contacta al soporte.",

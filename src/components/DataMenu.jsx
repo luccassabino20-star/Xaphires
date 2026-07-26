@@ -9,6 +9,7 @@ import { BACKGROUND_COLORS, BACKGROUND_GRADIENTS, monochromaticGradient } from "
 import * as api from "../state/api.js";
 import ArchiveModal from "./ArchiveModal.jsx";
 import BottlenecksModal from "./BottlenecksModal.jsx";
+import RecurrencesModal from "./RecurrencesModal.jsx";
 
 function DotsIcon() {
   return (
@@ -43,6 +44,7 @@ export default function DataMenu({ board, onSelectBoard }) {
   const [view, setView] = useState("main"); // "main" | "background"
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [gargalosOpen, setGargalosOpen] = useState(false);
+  const [rotinasOpen, setRotinasOpen] = useState(false);
   const [importing, setImporting] = useState(false);
   const [customColor, setCustomColor] = useState("#4d7ea8");
   const [monoColor, setMonoColor] = useState("#4d7ea8");
@@ -166,6 +168,16 @@ export default function DataMenu({ board, onSelectBoard }) {
               >
                 {t("app.dataMenu.bottlenecks")}
               </div>
+              <div
+                className={"dropdown-item" + (!board ? " disabled" : "")}
+                onClick={() => {
+                  if (!board) return;
+                  setRotinasOpen(true);
+                  setOpen(false);
+                }}
+              >
+                {t("app.dataMenu.recurrences")}
+              </div>
               <div className="dropdown-divider" />
               <div className="board-bg-section-label">{t("app.dataMenu.dataSection")}</div>
               <div className={"dropdown-item" + (!board ? " disabled" : "")} onClick={handleExportCurrent}>
@@ -245,6 +257,7 @@ export default function DataMenu({ board, onSelectBoard }) {
       />
       {archiveOpen && board && <ArchiveModal board={board} onClose={() => setArchiveOpen(false)} />}
       {gargalosOpen && board && <BottlenecksModal board={board} onClose={() => setGargalosOpen(false)} />}
+      {rotinasOpen && board && <RecurrencesModal board={board} onClose={() => setRotinasOpen(false)} />}
     </div>
   );
 }

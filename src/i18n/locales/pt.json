@@ -546,6 +546,7 @@
       "clearBoardToast": "Quadro limpo"
     },
     "dataMenu": {
+      "recurrences": "Rotinas automáticas",
       "bottlenecks": "Monitor de gargalos",
       "archivedCards": "Cartões arquivados",
       "moreOptions": "Mais opções",
@@ -582,6 +583,54 @@
     }
   },
   "board": {
+    "recurrences": {
+      "title": "Rotinas automáticas",
+      "empty": "Nenhuma rotina criada. Uma rotina cria o cartão sozinha na data certa, com o checklist já preenchido.",
+      "planRequired": "As rotinas automáticas estão disponíveis a partir do plano Profissional. Você pode ver e apagar as que já existem.",
+      "newRule": "Nova rotina",
+      "fieldTitle": "Título do cartão",
+      "titlePlaceholder": "Ex: Fechar balancete da contabilidade",
+      "fieldList": "Criar na coluna",
+      "fieldFreq": "Repetir",
+      "fieldWeekday": "Dia da semana",
+      "fieldMonthday": "Dia do mês",
+      "fieldHour": "Hora",
+      "fieldDueInDays": "Prazo (dias)",
+      "noDue": "sem prazo",
+      "fieldChecklist": "Checklist da rotina",
+      "checklistPlaceholder": "Um item por linha:\nConciliar contas\nConferir notas\nEnviar ao contador",
+      "save": "Criar rotina",
+      "created": "Rotina criada",
+      "deleted": "Rotina removida",
+      "deleteConfirm": "Remover a rotina \"{{title}}\"? Os cartões já criados por ela continuam no quadro.",
+      "pause": "Pausar",
+      "resume": "Retomar",
+      "delete": "Remover",
+      "everyDay": "Todo dia às {{hour}}h",
+      "everyWeek": "Toda {{day}} às {{hour}}h",
+      "everyMonth": "Todo dia {{day}} às {{hour}}h",
+      "intoList": "em {{list}}",
+      "listGone": "coluna removida",
+      "checklistCount": "{{count}} item no checklist",
+      "checklistCount_other": "{{count}} itens no checklist",
+      "lastRun": "Última vez: {{date}}",
+      "monthdayWarning": "Em meses mais curtos, a rotina cai no último dia do mês.",
+      "hint": "As rotinas são conferidas quando o quadro é carregado. Se várias datas passarem sem ninguém abrir o app, apenas a mais recente vira cartão.",
+      "freq": {
+        "daily": "Todo dia",
+        "weekly": "Toda semana",
+        "monthly": "Todo mês"
+      },
+      "weekdays": {
+        "0": "domingo",
+        "1": "segunda",
+        "2": "terça",
+        "3": "quarta",
+        "4": "quinta",
+        "5": "sexta",
+        "6": "sábado"
+      }
+    },
     "bottlenecks": {
       "bareHours": "{{count}} hora",
       "bareHours_other": "{{count}} horas",
@@ -883,6 +932,14 @@
     "movedToBasic": "Plano alterado para Básico"
   },
   "errors": {
+    "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
+    "INVALID_FREQUENCY": "Frequência inválida",
+    "WEEKDAY_REQUIRED": "Escolha o dia da semana",
+    "MONTHDAY_REQUIRED": "Escolha um dia do mês entre 1 e 31",
+    "INVALID_HOUR": "Hora deve ser entre 0 e 23",
+    "LIST_REQUIRED": "Escolha a coluna de destino",
+    "LIST_NOT_FOUND": "Coluna não encontrada",
+    "RECURRENCE_NOT_FOUND": "Rotina não encontrada",
     "INVALID_STUCK_HOURS": "Informe um número de horas entre 1 e 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Intermediário.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",

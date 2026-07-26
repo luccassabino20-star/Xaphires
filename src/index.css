@@ -3127,3 +3127,83 @@ input, textarea { font-family: inherit; }
   background: var(--bg-app);
   color: var(--text-primary);
 }
+
+/* ---------- Cartões recorrentes ---------- */
+.recurrence-modal { max-width: 620px; }
+.recurrence-modal-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text-primary); }
+.recurrence-empty { font-size: 14px; line-height: 1.55; color: var(--text-secondary); text-align: center; padding: 24px 0; margin: 0; }
+.recurrence-locked {
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+.recurrence-list { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.recurrence-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+}
+.recurrence-item.inactive { opacity: 0.55; }
+.recurrence-item-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.recurrence-item-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.recurrence-item-meta { font-size: 12px; color: var(--text-muted); }
+.recurrence-item-last { font-size: 11.5px; color: var(--text-muted); font-style: italic; }
+.recurrence-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.recurrence-new { width: 100%; }
+
+.recurrence-form {
+  margin-top: 16px;
+  padding: 15px;
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.recurrence-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.recurrence-row .recurrence-field { flex: 1 1 130px; }
+.recurrence-field { display: flex; flex-direction: column; gap: 5px; }
+.recurrence-field > span { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.recurrence-field input,
+.recurrence-field select,
+.recurrence-field textarea {
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+}
+.recurrence-field textarea { resize: vertical; line-height: 1.5; }
+.recurrence-field input:focus,
+.recurrence-field select:focus,
+.recurrence-field textarea:focus { box-shadow: inset 0 0 0 2px var(--accent); }
+
+.recurrence-warning {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #f59e0b;
+}
+.recurrence-form-actions { display: flex; align-items: center; gap: 10px; }
+.recurrence-hint { margin: 16px 0 0; font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+
+@media (max-width: 560px) {
+  .recurrence-item { flex-direction: column; align-items: stretch; }
+  .recurrence-item-actions { justify-content: flex-end; }
+}

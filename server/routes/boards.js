@@ -3,7 +3,7 @@ import { requireAuth, requireBoardAccess } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
 import { getCompany } from "../directory.js";
-import { canUseAutoArchive } from "../plans.js";
+import { canUseAutoArchive, canUseRecurringCards } from "../plans.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -15,8 +15,14 @@ router.get(
     // volta já está varrido e o cliente nunca mostra um cartão que deveria ter saído.
     // Empresa sem direito à automação não é varrida, mesmo que tenha a regra
     // gravada de quando estava num plano superior.
-    if (canUseAutoArchive(getCompany(req.companyId)?.plan)) {
+    const plano = getCompany(req.companyId)?.plan;
+    if (canUseAutoArchive(plano)) {
       await repo.runAutoArchive();
+    }
+    // As rotinas geram antes da leitura pelo mesmo motivo: o quadro que volta já
+    // contém os cartões do dia, sem exigir um segundo carregamento.
+    if (canUseRecurringCards(plano)) {
+      await repo.runRecurrences();
     }
     res.json({ boards: await repo.getWorkspace(req.user.id) });
   })

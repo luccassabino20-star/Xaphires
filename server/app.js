@@ -14,6 +14,7 @@ import { router as cardsRouter } from "./routes/cards.js";
 import { router as geocodeRouter } from "./routes/geocode.js";
 import { router as minutesRouter } from "./routes/minutes.js";
 import { router as planRouter } from "./routes/plan.js";
+import { router as recurrencesRouter } from "./routes/recurrences.js";
 
 export const app = express();
 
@@ -44,6 +45,7 @@ app.use("/api/lists", requireAuth, requireWritablePlan, listsRouter);
 app.use("/api/cards", requireAuth, requireWritablePlan, cardsRouter);
 app.use("/api/geocode", geocodeRouter);
 app.use("/api/minutes", requireAuth, requireWritablePlan, minutesRouter);
+app.use("/api/recurrences", requireAuth, requireWritablePlan, recurrencesRouter);
 
 const distPath = path.join(process.cwd(), "dist");
 if (fs.existsSync(distPath)) {

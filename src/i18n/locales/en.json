@@ -287,6 +287,7 @@
       "clearBoardToast": "Board cleared"
     },
     "dataMenu": {
+      "recurrences": "Recurring routines",
       "bottlenecks": "Bottleneck monitor",
       "archivedCards": "Archived cards",
       "moreOptions": "More options",
@@ -323,6 +324,54 @@
     }
   },
   "board": {
+    "recurrences": {
+      "title": "Recurring routines",
+      "empty": "No routines yet. A routine creates the card on its own at the right date, with the checklist ready.",
+      "planRequired": "Recurring routines are available from the Professional plan up. You can still view and delete existing ones.",
+      "newRule": "New routine",
+      "fieldTitle": "Card title",
+      "titlePlaceholder": "e.g. Close the monthly books",
+      "fieldList": "Create in column",
+      "fieldFreq": "Repeat",
+      "fieldWeekday": "Day of week",
+      "fieldMonthday": "Day of month",
+      "fieldHour": "Hour",
+      "fieldDueInDays": "Due in (days)",
+      "noDue": "no due date",
+      "fieldChecklist": "Routine checklist",
+      "checklistPlaceholder": "One item per line:\nReconcile accounts\nCheck invoices\nSend to accountant",
+      "save": "Create routine",
+      "created": "Routine created",
+      "deleted": "Routine removed",
+      "deleteConfirm": "Remove the \"{{title}}\" routine? Cards it already created stay on the board.",
+      "pause": "Pause",
+      "resume": "Resume",
+      "delete": "Remove",
+      "everyDay": "Every day at {{hour}}:00",
+      "everyWeek": "Every {{day}} at {{hour}}:00",
+      "everyMonth": "Every {{day}} of the month at {{hour}}:00",
+      "intoList": "into {{list}}",
+      "listGone": "column removed",
+      "checklistCount": "{{count}} checklist item",
+      "checklistCount_other": "{{count}} checklist items",
+      "lastRun": "Last run: {{date}}",
+      "monthdayWarning": "In shorter months, the routine falls on the last day of the month.",
+      "hint": "Routines are checked when the board loads. If several dates pass without anyone opening the app, only the most recent becomes a card.",
+      "freq": {
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month"
+      },
+      "weekdays": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
+    },
     "bottlenecks": {
       "bareHours": "{{count}} hour",
       "bareHours_other": "{{count}} hours",
@@ -605,6 +654,14 @@
     "movedToBasic": "Plan changed to Basic"
   },
   "errors": {
+    "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Professional plan up.",
+    "INVALID_FREQUENCY": "Invalid frequency",
+    "WEEKDAY_REQUIRED": "Choose the day of the week",
+    "MONTHDAY_REQUIRED": "Choose a day of the month between 1 and 31",
+    "INVALID_HOUR": "Hour must be between 0 and 23",
+    "LIST_REQUIRED": "Choose the target column",
+    "LIST_NOT_FOUND": "Column not found",
+    "RECURRENCE_NOT_FOUND": "Routine not found",
     "INVALID_STUCK_HOURS": "Enter a number of hours between 1 and 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Intermediate plan up.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Only upgrades are available here. To move down or cancel, contact support.",

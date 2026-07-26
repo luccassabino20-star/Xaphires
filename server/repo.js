@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { getDb, companiesDir } from "./db.js";
 import { getCurrentCompanyId } from "./context.js";
+import { shouldGenerate, lastDueOccurrence, dueDateFor } from "./recurrence.js";
 
 export function uid() {
   return crypto.randomUUID();
@@ -468,4 +469,151 @@ export function getWorkspace(userId) {
       cards: cardsObj,
     };
   });
+}
+
+// ---------- Cartões recorrentes ----------
+function parseRecurrence(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    boardId: row.board_id,
+    listId: row.list_id,
+    title: row.title,
+    description: row.description,
+    checklist: JSON.parse(row.checklist || "[]"),
+    labels: JSON.parse(row.labels || "[]"),
+    memberIds: JSON.parse(row.member_ids || "[]"),
+    freq: row.freq,
+    weekday: row.weekday,
+    monthday: row.monthday,
+    hour: row.hour,
+    dueInDays: row.due_in_days,
+    active: !!row.active,
+    lastRunAt: row.last_run_at || null,
+    createdAt: row.created_at,
+  };
+}
+
+export function listRecurrences(boardId) {
+  const rows = boardId
+    ? getDb().prepare("SELECT * FROM recurrences WHERE board_id = ? ORDER BY created_at ASC").all(boardId)
+    : getDb().prepare("SELECT * FROM recurrences ORDER BY created_at ASC").all();
+  return rows.map(parseRecurrence);
+}
+
+export function getRecurrence(id) {
+  return parseRecurrence(getDb().prepare("SELECT * FROM recurrences WHERE id = ?").get(id));
+}
+
+export function getBoardIdForRecurrence(id) {
+  const row = getDb().prepare("SELECT board_id FROM recurrences WHERE id = ?").get(id);
+  return row ? row.board_id : null;
+}
+
+export function createRecurrence(boardId, data) {
+  const id = data.id || uid();
+  getDb()
+    .prepare(
+      `INSERT INTO recurrences
+       (id, board_id, list_id, title, description, checklist, labels, member_ids, freq, weekday, monthday, hour, due_in_days, active, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
+    )
+    .run(
+      id,
+      boardId,
+      data.listId,
+      data.title,
+      data.description || "",
+      JSON.stringify(data.checklist || []),
+      JSON.stringify(data.labels || []),
+      JSON.stringify(data.memberIds || []),
+      data.freq,
+      data.weekday ?? null,
+      data.monthday ?? null,
+      data.hour ?? 0,
+      data.dueInDays ?? null,
+      nowIso()
+    );
+  return getRecurrence(id);
+}
+
+export function updateRecurrence(id, patch) {
+  const atual = getRecurrence(id);
+  if (!atual) return null;
+  getDb()
+    .prepare(
+      `UPDATE recurrences SET list_id=?, title=?, description=?, checklist=?, labels=?, member_ids=?,
+       freq=?, weekday=?, monthday=?, hour=?, due_in_days=?, active=? WHERE id=?`
+    )
+    .run(
+      patch.listId ?? atual.listId,
+      patch.title ?? atual.title,
+      patch.description ?? atual.description,
+      JSON.stringify(patch.checklist ?? atual.checklist),
+      JSON.stringify(patch.labels ?? atual.labels),
+      JSON.stringify(patch.memberIds ?? atual.memberIds),
+      patch.freq ?? atual.freq,
+      patch.weekday === undefined ? atual.weekday : patch.weekday,
+      patch.monthday === undefined ? atual.monthday : patch.monthday,
+      patch.hour === undefined ? atual.hour : patch.hour,
+      patch.dueInDays === undefined ? atual.dueInDays : patch.dueInDays,
+      patch.active === undefined ? (atual.active ? 1 : 0) : patch.active ? 1 : 0,
+      id
+    );
+  return getRecurrence(id);
+}
+
+export function deleteRecurrence(id) {
+  getDb().prepare("DELETE FROM recurrences WHERE id = ?").run(id);
+}
+
+// Percorre as regras ativas e cria o cartão das que estão devendo. Roda na leitura
+// do workspace, como o arquivamento automático: sem agendador, e o que volta para
+// o cliente já reflete o que foi gerado.
+//
+// Gera no máximo UM cartão por regra, mesmo que várias ocorrências tenham passado:
+// last_run_at recebe o instante da ocorrência mais recente, e as anteriores são
+// dadas como perdidas. Voltar de férias não enche a coluna de tarefas vencidas.
+export function runRecurrences(now = new Date()) {
+  const rows = getDb().prepare("SELECT * FROM recurrences WHERE active = 1").all();
+  const criados = [];
+
+  for (const row of rows) {
+    if (!shouldGenerate(row, now)) continue;
+
+    // A lista pode ter sido apagada depois que a regra foi criada.
+    const listaExiste = getDb().prepare("SELECT 1 FROM lists WHERE id = ?").get(row.list_id);
+    if (!listaExiste) continue;
+
+    const ocorrencia = lastDueOccurrence(row, now);
+    const cardId = uid();
+    const pos = nextPosition("cards", "list_id", row.list_id);
+    const marca = nowIso();
+
+    getDb()
+      .prepare(
+        `INSERT INTO cards
+         (id, list_id, title, description, labels, due, checklist, member_ids, position, list_entered_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        cardId,
+        row.list_id,
+        row.title,
+        row.description || "",
+        row.labels || "[]",
+        dueDateFor(row, ocorrencia),
+        // O checklist do molde entra sempre desmarcado: é uma ocorrência nova da
+        // rotina, não a continuação da anterior.
+        JSON.stringify(JSON.parse(row.checklist || "[]").map((i) => ({ text: i.text, done: false }))),
+        row.member_ids || "[]",
+        pos,
+        marca
+      );
+
+    getDb().prepare("UPDATE recurrences SET last_run_at = ? WHERE id = ?").run(ocorrencia.toISOString(), row.id);
+    criados.push({ recurrenceId: row.id, cardId, occurrence: ocorrencia.toISOString() });
+  }
+
+  return criados;
 }

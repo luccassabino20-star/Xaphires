@@ -8,10 +8,10 @@ export const TRIAL_DAYS = 7;
 // autoArchive é o direito à regra de arquivamento automático: o arquivamento
 // manual está em todos os planos, só a automação é paga.
 export const PLANS = {
-  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false },
-  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true },
-  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true }, // null = ilimitado
-  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true },
+  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false, recurringCards: false },
+  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true, recurringCards: false },
+  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true, recurringCards: true }, // null = ilimitado
+  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true, recurringCards: true },
 };
 
 export const PLAN_IDS = Object.keys(PLANS);
@@ -83,4 +83,10 @@ export function canSelfUpgradeTo(currentPlanId, targetPlanId) {
 // todos os planos: o que se paga é a automação, não a funcionalidade inteira.
 export function canUseAutoArchive(planId) {
   return getPlan(planId).autoArchive === true;
+}
+
+// Direito aos cartões recorrentes. Um degrau acima do arquivamento automático:
+// este entra só do Profissional para cima.
+export function canUseRecurringCards(planId) {
+  return getPlan(planId).recurringCards === true;
 }

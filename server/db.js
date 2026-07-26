@@ -70,6 +70,27 @@ function applySchema(companyDb) {
       position INTEGER NOT NULL DEFAULT 0
     );
 
+    -- Rotinas que geram cartões sozinhas. O cartão nasce a partir deste molde;
+    -- alterar o molde depois não mexe nos cartões já criados.
+    CREATE TABLE IF NOT EXISTS recurrences (
+      id TEXT PRIMARY KEY,
+      board_id TEXT NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+      list_id TEXT NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      checklist TEXT NOT NULL DEFAULT '[]',
+      labels TEXT NOT NULL DEFAULT '[]',
+      member_ids TEXT NOT NULL DEFAULT '[]',
+      freq TEXT NOT NULL CHECK(freq IN ('daily','weekly','monthly')),
+      weekday INTEGER,
+      monthday INTEGER,
+      hour INTEGER NOT NULL DEFAULT 0,
+      due_in_days INTEGER,
+      active INTEGER NOT NULL DEFAULT 1,
+      last_run_at TEXT,
+      created_at TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS minutes (
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,

@@ -90,3 +90,10 @@ export const deleteMinute = (id) => request(`/minutes/${id}`, { method: "DELETE"
 // ---------- Plano ----------
 export const getPlan = () => request("/plan");
 export const setPlan = (plan, expiresAt) => request("/plan", { method: "POST", body: { plan, expiresAt } });
+
+// ---------- Cartões recorrentes ----------
+export const listRecurrences = (boardId) => request(`/recurrences/board/${boardId}`);
+export const createRecurrence = (boardId, data) =>
+  request(`/recurrences/board/${boardId}`, { method: "POST", body: data });
+export const updateRecurrence = (id, patch) => request(`/recurrences/${id}`, { method: "PATCH", body: patch });
+export const deleteRecurrence = (id) => request(`/recurrences/${id}`, { method: "DELETE" });
