@@ -50,7 +50,7 @@ export function exportAll(state, users) {
     boards: state.boards,
     members: users.map((u) => ({ id: u.id, name: u.name })),
   };
-  download(`kanban-backup-${dateStamp()}.json`, payload);
+  download(`cantiere-backup-${dateStamp()}.json`, payload);
 }
 
 function codedError(code, message) {

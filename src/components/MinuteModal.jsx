@@ -102,7 +102,7 @@ export default function MinuteModal({ minuteId, onClose }) {
 
   const attendees = attendeeIds.map((id) => users.find((u) => u.id === id)).filter(Boolean);
   const authorId = isNew ? user.id : existing.authorId;
-  const authorName = (isNew ? user.name : users.find((u) => u.id === existing.authorId)?.name) || "—";
+  const authorName = (isNew ? user.name : users.find((u) => u.id === existing.authorId)?.name) || "-";
 
   return (
     <div

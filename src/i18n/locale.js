@@ -14,7 +14,7 @@ export const LOCALE_TAGS = {
 };
 
 // i18n.language às vezes traz a tag bruta do navegador (ex: "en-US", "es-AR"), não só o código de
-// 2 letras — normaliza para um dos idiomas suportados antes de usar como chave de lookup.
+// 2 letras. Normaliza para um dos idiomas suportados antes de usar como chave de lookup.
 export function normalizeLanguage(lng) {
   const base = (lng || "").split("-")[0].toLowerCase();
   return SUPPORTED_LANGUAGES.includes(base) ? base : "pt";

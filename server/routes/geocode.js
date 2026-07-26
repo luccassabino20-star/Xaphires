@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   try {
     const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
     const resp = await fetch(url, {
-      headers: { "User-Agent": "kanban-board-app/1.0 (local self-hosted instance)" },
+      headers: { "User-Agent": "cantiere-app/1.0 (local self-hosted instance)" },
     });
     if (!resp.ok) throw new Error(`Nominatim respondeu ${resp.status}`);
     const results = await resp.json();

@@ -6,7 +6,7 @@ import { initials, colorForUser } from "../../utils/members.js";
 import { localeTag } from "../../i18n/locale.js";
 
 function formatDate(iso, lng) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Date(iso + "T00:00:00").toLocaleDateString(localeTag(lng));
 }
 
@@ -127,7 +127,7 @@ export default function TableView({ board, users, searchQuery, memberFilter, onO
                   </td>
                   <td>{formatDate(card.startDate, i18n.language)}</td>
                   <td>{formatDate(card.due, i18n.language)}</td>
-                  <td>{card.checklist.length ? `${done}/${card.checklist.length}` : "—"}</td>
+                  <td>{card.checklist.length ? `${done}/${card.checklist.length}` : "-"}</td>
                 </tr>
               );
             })}

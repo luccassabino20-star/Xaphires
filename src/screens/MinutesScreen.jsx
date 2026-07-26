@@ -13,12 +13,12 @@ export default function MinutesScreen({ onToggleSidebar }) {
   const [openId, setOpenId] = useState(undefined); // undefined = closed, null = new, string = editing
 
   function formatDate(iso) {
-    if (!iso) return "—";
+    if (!iso) return "-";
     return new Date(iso + "T00:00:00").toLocaleDateString(localeTag(i18n.language));
   }
 
   function authorName(authorId) {
-    return users.find((u) => u.id === authorId)?.name || "—";
+    return users.find((u) => u.id === authorId)?.name || "-";
   }
 
   return (
