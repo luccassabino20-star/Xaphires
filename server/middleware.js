@@ -58,6 +58,13 @@ export const requireAuth = ah(async (req, res, next) => {
   const token = req.cookies?.[COOKIE_NAME];
   const payload = token && verifyToken(token);
   if (!payload?.companyId) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+  // A empresa ainda existe? O token vale 7 dias e sobrevive à exclusão dela. Sem
+  // esta conferência, getCompanyDb() adiante faz mkdirSync e RECRIA um banco vazio
+  // a cada requisição da sessão órfã — ninguém entra, porque o usuário não existe
+  // no banco novo, mas a pasta ressuscita sozinha depois de apagada.
+  if (!getCompany(payload.companyId)) {
+    return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+  }
   return runWithCompany(payload.companyId, async () => {
     const user = await getUserById(payload.sub);
     if (!user) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
