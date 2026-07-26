@@ -42,6 +42,10 @@ router.get(
       // aqui — é o que mantém o projeto fora do escopo PCI.
       simulated: gateway.nome === "fake",
       provider: gateway.nome,
+      // Chave PÚBLICA do gateway, para o SDK tokenizar o cartão no navegador. É
+      // feita para ficar exposta — não autoriza cobrança, só a criação de token de
+      // uso único. A credencial que cobra (access token) nunca sai do servidor.
+      publicKey: gateway.nome === "mercadopago" ? process.env.MERCADOPAGO_PUBLIC_KEY || null : null,
       subscription: visaoAssinatura(store.getActiveSubscription(req.companyId), req.user.role === "master"),
       pendingPayment: store.publicPayment(pendente),
       payments: store.listPayments(req.companyId).map(store.publicPayment),

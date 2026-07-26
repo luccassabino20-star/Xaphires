@@ -50,6 +50,10 @@ if (gateway.nome !== "fake") {
   const faltando = [];
   if (gateway.nome === "mercadopago") {
     if (!process.env.MERCADOPAGO_ACCESS_TOKEN) faltando.push("MERCADOPAGO_ACCESS_TOKEN");
+    // Sem a chave pública o SDK não inicializa e o cartão fica indisponível na tela.
+    // Pix e boleto continuariam funcionando, então isto não impede subir — mas
+    // precisa aparecer, senão vira "o cartão sumiu e ninguém sabe por quê".
+    if (!process.env.MERCADOPAGO_PUBLIC_KEY) faltando.push("MERCADOPAGO_PUBLIC_KEY");
     // Sem o segredo do webhook a validação de assinatura recusa tudo, de propósito,
     // e nenhum pagamento seria confirmado pelo aviso do gateway.
     if (!process.env.MERCADOPAGO_WEBHOOK_SECRET) faltando.push("MERCADOPAGO_WEBHOOK_SECRET");

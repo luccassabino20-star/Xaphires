@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
-import { docValido, formatarDoc, normalizarDoc } from "../utils/doc.js";
+import { docValido, formatarDoc, normalizarDoc, tipoDoc } from "../utils/doc.js";
+import { montarCamposCartao } from "../utils/mercadopago.js";
+import { localeTag } from "../i18n/locale.js";
 import * as api from "../state/api.js";
 
 // Intervalo da consulta de status enquanto a cobrança está pendente. Webhook perdido
@@ -39,7 +41,7 @@ function IconeBoleto() {
 
 const ICONES = { pix: IconePix, card: IconeCartao, boleto: IconeBoleto };
 
-export default function CheckoutModal({ plan, priceCents, simulated, docInicial, onClose, onPaid }) {
+export default function CheckoutModal({ plan, priceCents, simulated, publicKey, docInicial, onClose, onPaid }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
 
@@ -58,6 +60,13 @@ export default function CheckoutModal({ plan, priceCents, simulated, docInicial,
   const [copiado, setCopiado] = useState(false);
   const timerRef = useRef(null);
 
+  // Campos seguros do Mercado Pago. `camposRef` guarda o objeto devolvido pelo SDK,
+  // que é a única forma de gerar o token: os valores vivem dentro dos iframes dele e
+  // nunca existem em estado nosso — é justamente o ponto de usar Secure Fields.
+  const camposRef = useRef(null);
+  const [camposProntos, setCamposProntos] = useState(false);
+  const [erroCampo, setErroCampo] = useState(null);
+
   // Consulta o estado enquanto a cobrança está pendente. Para no primeiro estado
   // final, e o clearInterval do cleanup evita seguir consultando com o modal fechado.
   useEffect(() => {
@@ -75,6 +84,39 @@ export default function CheckoutModal({ plan, priceCents, simulated, docInicial,
     }, INTERVALO_CONSULTA);
     return () => clearInterval(timerRef.current);
   }, [cobranca, onPaid]);
+
+  // Monta os campos seguros quando o cartão é escolhido no provedor real. Só aqui,
+  // e não no mount do modal: carrega um script de terceiro, e quem paga por Pix não
+  // tem por que baixá-lo.
+  useEffect(() => {
+    if (simulated || metodo !== "card" || !publicKey || cobranca) return;
+    let vivo = true;
+    setCamposProntos(false);
+    setErroCampo(null);
+    // Espera o React pintar os contêineres: o SDK monta por id e o elemento precisa
+    // já existir no DOM.
+    const tarefa = requestAnimationFrame(async () => {
+      try {
+        const campos = await montarCamposCartao({
+          publicKey,
+          locale: localeTag(i18n.language),
+          alvos: { numero: "mp-card-number", validade: "mp-card-expiry", cvv: "mp-card-cvv" },
+          onErroCampo: (m) => vivo && setErroCampo(m),
+        });
+        if (!vivo) return campos.desmontar();
+        camposRef.current = campos;
+        setCamposProntos(true);
+      } catch (err) {
+        if (vivo) setErro(err.message);
+      }
+    });
+    return () => {
+      vivo = false;
+      cancelAnimationFrame(tarefa);
+      camposRef.current?.desmontar();
+      camposRef.current = null;
+    };
+  }, [simulated, metodo, publicKey, cobranca, i18n.language]);
 
   useEffect(() => {
     function onKey(e) {
@@ -99,10 +141,25 @@ export default function CheckoutModal({ plan, priceCents, simulated, docInicial,
     }
     setEnviando(true);
     try {
-      // Com provedor real este objeto leva um token gerado pelo SDK no navegador, e
-      // nunca o número digitado. Ver o comentário em api.js.
-      const card =
-        metodo === "card" && simulated ? { number: numero.replace(/\s+/g, ""), name: nome, validade, cvv } : undefined;
+      let card;
+      if (metodo === "card") {
+        if (simulated) {
+          // Provedor simulado: os campos são nossos e o "número" é de mentira.
+          card = { number: numero.replace(/\s+/g, ""), name: nome, validade, cvv };
+        } else {
+          // Provedor real: os dados saem dos iframes do gateway direto para ele, e o
+          // que volta é um token de uso único. O número do cartão não passa por
+          // nenhuma variável nossa nem chega ao nosso servidor.
+          if (!camposRef.current) throw new Error(t("billing.cardFieldsNotReady"));
+          const documento = normalizarDoc(doc);
+          const token = await camposRef.current.gerarToken({
+            nomeTitular: nome,
+            tipoDoc: documento ? tipoDoc(doc) : undefined,
+            numeroDoc: documento || undefined,
+          });
+          card = { token };
+        }
+      }
       const r = await api.subscribe({ plan, method: metodo, card, payerDoc: normalizarDoc(doc) || undefined });
       setCobranca(r.payment);
       if (r.payment?.status === "paid") {
@@ -213,8 +270,52 @@ export default function CheckoutModal({ plan, priceCents, simulated, docInicial,
                 </label>
               )}
 
-              {metodo === "card" && !simulated && (
+              {/* Sem chave pública o SDK não inicializa. Pix e boleto seguem
+                  funcionando, então o aviso é só do cartão. */}
+              {metodo === "card" && !simulated && !publicKey && (
                 <p className="checkout-warning">{t("billing.cardUnavailable")}</p>
+              )}
+
+              {metodo === "card" && !simulated && publicKey && (
+                <div className="checkout-card-form">
+                  <label className="auth-field">
+                    <span>{t("billing.cardName")}</span>
+                    <input value={nome} onChange={(e) => setNome(e.target.value)} autoComplete="off" required />
+                  </label>
+
+                  {/* Estes três contêineres recebem iframes do Mercado Pago. Não
+                      coloque input nosso aqui: o número do cartão não pode existir em
+                      estado nosso — ver utils/mercadopago.js. */}
+                  <div className="auth-field">
+                    <span>{t("billing.cardNumber")}</span>
+                    <div id="mp-card-number" className="mp-field" />
+                  </div>
+                  <div className="checkout-card-row">
+                    <div className="auth-field">
+                      <span>{t("billing.cardExpiry")}</span>
+                      <div id="mp-card-expiry" className="mp-field" />
+                    </div>
+                    <div className="auth-field">
+                      <span>{t("billing.cardCvv")}</span>
+                      <div id="mp-card-cvv" className="mp-field" />
+                    </div>
+                  </div>
+
+                  {!camposProntos && <p className="checkout-testhint">{t("billing.loadingCardFields")}</p>}
+                  {erroCampo && <div className="auth-error">{erroCampo}</div>}
+
+                  <label className="auth-field">
+                    <span>{t("billing.docLabelCard")}</span>
+                    <input
+                      value={doc}
+                      onChange={(e) => setDoc(formatarDoc(e.target.value))}
+                      placeholder="000.000.000-00"
+                      inputMode="numeric"
+                      autoComplete="off"
+                    />
+                  </label>
+                  <p className="checkout-testhint">{t("billing.cardSecureNote")}</p>
+                </div>
               )}
 
               {metodo === "card" && simulated && (
@@ -260,7 +361,7 @@ export default function CheckoutModal({ plan, priceCents, simulated, docInicial,
               <button
                 type="submit"
                 className="btn-primary checkout-submit"
-                disabled={enviando || (metodo === "card" && !simulated)}
+                disabled={enviando || (metodo === "card" && !simulated && (!publicKey || !camposProntos))}
               >
                 {enviando ? t("billing.processing") : t("billing.payNow")}
               </button>

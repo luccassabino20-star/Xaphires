@@ -3383,3 +3383,17 @@ input, textarea { font-family: inherit; }
 .plan-history-status.pending { color: #c9922f; }
 .plan-history-status.failed, .plan-history-status.canceled { color: #b3444a; }
 .plan-history-status.refunded { color: var(--text-muted); }
+
+/* Contêineres dos campos seguros do Mercado Pago. Cada um recebe um iframe do
+   gateway, então a altura precisa vir daqui: iframe sem altura declarada colapsa
+   para zero e o campo some da tela sem nenhum erro. */
+.mp-field {
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+}
+.mp-field iframe { width: 100%; height: 100%; border: 0; display: block; }
