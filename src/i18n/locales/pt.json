@@ -807,6 +807,31 @@
     "passwordMinLength": "A nova senha deve ter ao menos 6 caracteres"
   },
   "plan": {
+    "menuItem": "Meu plano",
+    "title": "Plano da empresa",
+    "unlimited": "ilimitado",
+    "usersLabel": "Usuários",
+    "renewsOnLabel": "Válido até",
+    "expiredOnLabel": "Expirou em",
+    "daysLeftLabel": "Tempo restante",
+    "daysLeftValue": "{{count}} dia",
+    "daysLeftValue_other": "{{count}} dias",
+    "userLimitReached": "Você atingiu o limite de usuários deste plano. Mude de plano para adicionar mais pessoas.",
+    "changeTitle": "Mudar de plano",
+    "changeHint": "A troca vale na hora. Ainda não há cobrança automática, então o pagamento é combinado à parte.",
+    "masterOnly": "Só o usuário master pode mudar o plano da empresa.",
+    "changed": "Plano alterado para {{plan}}",
+    "names": {
+      "basic": "Básico",
+      "intermediate": "Intermediário",
+      "professional": "Profissional",
+      "enterprise": "Empresarial"
+    },
+    "status": {
+      "active": "Ativo",
+      "trialing": "Em teste",
+      "expired": "Expirado"
+    },
     "trialEnding": "Seu teste termina em {{count}} dia",
     "trialEnding_other": "Seu teste termina em {{count}} dias",
     "expiredMessage": "Seu plano expirou. Você ainda vê tudo, mas não pode criar nem editar.",

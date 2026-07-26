@@ -2986,3 +2986,69 @@ input, textarea { font-family: inherit; }
   border-bottom-color: color-mix(in srgb, var(--danger) 40%, transparent);
 }
 .plan-banner-text { text-align: center; }
+
+/* ---------- Modal do plano ---------- */
+.plan-modal { max-width: 480px; }
+.plan-modal-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text-primary); }
+.plan-modal-loading { font-size: 14px; color: var(--text-secondary); margin: 0; }
+
+.plan-current {
+  padding: 16px;
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+.plan-current-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+.plan-status {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.plan-status-active { background: color-mix(in srgb, var(--success) 22%, transparent); color: var(--success); }
+.plan-status-trialing { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--text-primary); }
+.plan-status-expired { background: color-mix(in srgb, var(--danger) 22%, transparent); color: var(--danger); }
+
+.plan-facts { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.plan-facts > div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.plan-facts dt { font-size: 13px; color: var(--text-secondary); }
+.plan-facts dd { margin: 0; font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+
+.plan-warning {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--danger);
+}
+
+.plan-switch { margin-top: 20px; }
+.plan-switch h3 { font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text-primary); }
+.plan-switch-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.plan-switch-btn {
+  flex: 1 1 auto;
+  min-width: 110px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.plan-switch-btn:hover:not(:disabled) { background: var(--bg-card-hover); }
+.plan-switch-btn.active { border-color: var(--accent); cursor: default; }
+.plan-switch-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.plan-switch-hint { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }

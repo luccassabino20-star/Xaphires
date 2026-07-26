@@ -532,6 +532,31 @@
     "passwordMinLength": "The new password must be at least 6 characters"
   },
   "plan": {
+    "menuItem": "My plan",
+    "title": "Company plan",
+    "unlimited": "unlimited",
+    "usersLabel": "Users",
+    "renewsOnLabel": "Valid until",
+    "expiredOnLabel": "Expired on",
+    "daysLeftLabel": "Time left",
+    "daysLeftValue": "{{count}} day",
+    "daysLeftValue_other": "{{count}} days",
+    "userLimitReached": "You reached this plan's user limit. Change plans to add more people.",
+    "changeTitle": "Change plan",
+    "changeHint": "The change applies immediately. There is no automatic billing yet, so payment is arranged separately.",
+    "masterOnly": "Only the master user can change the company plan.",
+    "changed": "Plan changed to {{plan}}",
+    "names": {
+      "basic": "Basic",
+      "intermediate": "Intermediate",
+      "professional": "Professional",
+      "enterprise": "Enterprise"
+    },
+    "status": {
+      "active": "Active",
+      "trialing": "Trial",
+      "expired": "Expired"
+    },
     "trialEnding": "Your trial ends in {{count}} day",
     "trialEnding_other": "Your trial ends in {{count}} days",
     "expiredMessage": "Your plan expired. You can still see everything, but not create or edit.",

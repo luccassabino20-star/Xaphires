@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
+import PlanModal from "./PlanModal.jsx";
 import * as api from "../state/api.js";
 import { initials, colorForUser } from "../utils/members.js";
 
@@ -12,6 +13,7 @@ export default function AccountMenu() {
   const showToast = useToast();
   const [open, setOpen] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
@@ -90,6 +92,9 @@ export default function AccountMenu() {
             </form>
           ) : (
             <>
+              <div className="dropdown-item" onClick={() => { setPlanOpen(true); setOpen(false); }}>
+                {t("plan.menuItem")}
+              </div>
               <div className="dropdown-item" onClick={() => setChangingPassword(true)}>
                 {t("app.accountMenu.changePassword")}
               </div>
@@ -100,6 +105,7 @@ export default function AccountMenu() {
           )}
         </div>
       )}
+      {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
     </div>
   );
 }
