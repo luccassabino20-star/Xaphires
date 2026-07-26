@@ -21,6 +21,17 @@ directoryDb.exec(`
   );
 `);
 
+// Empresas criadas antes do sistema de planos entram como Profissional ativo e sem
+// prazo: quem já usava não pode ser interrompido por uma regra criada depois.
+// O default da coluna cobre as linhas existentes no próprio ALTER TABLE.
+function addColumnIfMissing(table, name, ddl) {
+  const columns = directoryDb.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+  if (!columns.includes(name)) directoryDb.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+}
+addColumnIfMissing("companies", "plan", "plan TEXT NOT NULL DEFAULT 'professional'");
+addColumnIfMissing("companies", "status", "status TEXT NOT NULL DEFAULT 'active'");
+addColumnIfMissing("companies", "expires_at", "expires_at TEXT");
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -32,9 +43,29 @@ export function countCompanies() {
   return directoryDb.prepare("SELECT COUNT(*) as c FROM companies").get().c;
 }
 
-export function createCompany({ id, name }) {
-  directoryDb.prepare("INSERT INTO companies (id, name, created_at) VALUES (?, ?, ?)").run(id, name, nowIso());
+export function createCompany({ id, name, plan, status, expiresAt }) {
+  directoryDb
+    .prepare("INSERT INTO companies (id, name, created_at, plan, status, expires_at) VALUES (?, ?, ?, ?, ?, ?)")
+    .run(id, name, nowIso(), plan || "professional", status || "active", expiresAt || null);
   return id;
+}
+
+export function getCompany(id) {
+  return directoryDb.prepare("SELECT * FROM companies WHERE id = ?").get(id) || null;
+}
+
+export function setCompanyPlan(id, { plan, status, expiresAt }) {
+  const atual = getCompany(id);
+  if (!atual) return null;
+  directoryDb
+    .prepare("UPDATE companies SET plan = ?, status = ?, expires_at = ? WHERE id = ?")
+    .run(
+      plan ?? atual.plan,
+      status ?? atual.status,
+      expiresAt === undefined ? atual.expires_at : expiresAt,
+      id
+    );
+  return getCompany(id);
 }
 
 export function getCompanyIdForEmail(email) {

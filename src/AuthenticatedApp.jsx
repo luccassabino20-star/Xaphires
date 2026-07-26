@@ -15,6 +15,7 @@ import CardModal from "./components/CardModal.jsx";
 import MinutesScreen from "./screens/MinutesScreen.jsx";
 import { useBoardState } from "./state/BoardContext.jsx";
 import { useUsers } from "./state/UsersContext.jsx";
+import PlanBanner from "./components/PlanBanner.jsx";
 
 export default function AuthenticatedApp() {
   const { t } = useTranslation();
@@ -58,6 +59,7 @@ export default function AuthenticatedApp() {
         onOpenMinutes={() => setScreen("minutes")}
       />
       <div className="main-area">
+        <PlanBanner />
         {screen === "minutes" ? (
           <MinutesScreen onToggleSidebar={() => setSidebarOpen((o) => !o)} />
         ) : (

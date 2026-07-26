@@ -3,8 +3,10 @@ import { hashPassword, verifyPassword, signToken, verifyToken, COOKIE_NAME } fro
 import { requireAuth } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
 import { runWithCompany } from "../context.js";
+import { rateLimit } from "../rateLimit.js";
 import * as directory from "../directory.js";
 import { getSeedContent } from "../seedContent.js";
+import { DEFAULT_TRIAL_PLAN, trialEndsAt } from "../plans.js";
 import {
   uid,
   getUserByEmail,
@@ -24,7 +26,8 @@ const CROSS_SITE = Boolean(process.env.FRONTEND_URL);
 const COOKIE_OPTS = {
   httpOnly: true,
   sameSite: CROSS_SITE ? "none" : "lax",
-  secure: CROSS_SITE,
+  // sameSite=none exige Secure; em produção o cookie de sessão nunca deve trafegar em HTTP.
+  secure: CROSS_SITE || process.env.NODE_ENV === "production",
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: "/",
 };
@@ -32,6 +35,34 @@ const COOKIE_OPTS = {
 function setAuthCookie(res, user, companyId) {
   res.cookie(COOKIE_NAME, signToken(user, companyId), COOKIE_OPTS);
 }
+
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
+
+// Dois limites combinados: por IP trava quem varre vários e-mails da mesma origem,
+// por e-mail trava quem distribui as tentativas contra uma conta específica.
+const loginLimitByIp = rateLimit({
+  windowMs: FIFTEEN_MINUTES,
+  max: 20,
+  keyFn: (req) => req.ip,
+  message: "Muitas tentativas de login. Aguarde alguns minutos e tente novamente.",
+  code: "TOO_MANY_LOGIN_ATTEMPTS",
+});
+
+const loginLimitByEmail = rateLimit({
+  windowMs: FIFTEEN_MINUTES,
+  max: 8,
+  keyFn: (req) => (req.body?.email || "").trim().toLowerCase(),
+  message: "Muitas tentativas de login para esta conta. Aguarde alguns minutos e tente novamente.",
+  code: "TOO_MANY_LOGIN_ATTEMPTS",
+});
+
+const registerLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  keyFn: (req) => req.ip,
+  message: "Muitos cadastros a partir deste endereço. Tente novamente mais tarde.",
+  code: "TOO_MANY_REGISTRATIONS",
+});
 
 function validateCredentials(name, email, password) {
   if (!name?.trim() || !email?.trim() || !password || password.length < 6) {
@@ -54,6 +85,7 @@ router.get(
 
 router.post(
   "/register-company",
+  registerLimit,
   ah(async (req, res) => {
     const { companyName, name, email, password, locale } = req.body || {};
     if (!companyName?.trim()) return res.status(400).json({ error: "Informe o nome da empresa", code: "COMPANY_NAME_REQUIRED" });
@@ -62,8 +94,17 @@ router.post(
     if (directory.getCompanyIdForEmail(email))
       return res.status(409).json({ error: "E-mail já cadastrado", code: "EMAIL_ALREADY_REGISTERED" });
 
+    // Empresa nova entra no teste de 7 dias do plano Profissional, que é o que a
+    // landing promete. Vencido o prazo, vira somente leitura até escolher um plano
+    // — inclusive o Básico gratuito, que não expira.
     const companyId = uid();
-    directory.createCompany({ id: companyId, name: companyName.trim() });
+    directory.createCompany({
+      id: companyId,
+      name: companyName.trim(),
+      plan: DEFAULT_TRIAL_PLAN,
+      status: "trialing",
+      expiresAt: trialEndsAt(),
+    });
     const seed = getSeedContent(locale);
 
     const user = await runWithCompany(companyId, async () => {
@@ -105,6 +146,8 @@ router.post(
 
 router.post(
   "/login",
+  loginLimitByIp,
+  loginLimitByEmail,
   ah(async (req, res) => {
     const { email, password } = req.body || {};
     const companyId = email && directory.getCompanyIdForEmail(email);
@@ -114,13 +157,21 @@ router.post(
     if (!user || !verifyPassword(password || "", user.password_hash)) {
       return res.status(401).json({ error: "E-mail ou senha inválidos", code: "INVALID_CREDENTIALS" });
     }
+    // Acertou a senha: o dono legítimo da conta não fica preso pelas tentativas anteriores.
+    loginLimitByEmail.reset(req);
     setAuthCookie(res, user, companyId);
     res.json(publicUser(user));
   })
 );
 
 router.post("/logout", (req, res) => {
-  res.clearCookie(COOKIE_NAME, { path: "/" });
+  // Os atributos precisam bater com os do cookie original, senão o navegador não o remove.
+  res.clearCookie(COOKIE_NAME, {
+    httpOnly: true,
+    sameSite: COOKIE_OPTS.sameSite,
+    secure: COOKIE_OPTS.secure,
+    path: "/",
+  });
   res.json({ ok: true });
 });
 

@@ -2957,3 +2957,22 @@ input, textarea { font-family: inherit; }
 }
 
 
+/* ---------- Aviso de plano ---------- */
+.plan-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-topbar));
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.plan-banner.expired {
+  background: color-mix(in srgb, var(--danger) 18%, var(--bg-topbar));
+  border-bottom-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+.plan-banner-text { text-align: center; }

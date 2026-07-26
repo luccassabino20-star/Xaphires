@@ -85,3 +85,7 @@ export const listMinutes = () => request("/minutes");
 export const createMinute = (data) => request("/minutes", { method: "POST", body: data });
 export const updateMinute = (id, patch) => request(`/minutes/${id}`, { method: "PATCH", body: patch });
 export const deleteMinute = (id) => request(`/minutes/${id}`, { method: "DELETE" });
+
+// ---------- Plano ----------
+export const getPlan = () => request("/plan");
+export const setPlan = (plan, expiresAt) => request("/plan", { method: "POST", body: { plan, expiresAt } });

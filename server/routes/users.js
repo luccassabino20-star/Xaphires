@@ -14,7 +14,9 @@ import {
   setUserRole,
   scrubUserFromCards,
   deletePrivateBoardsByOwner,
+  countUsers,
 } from "../repo.js";
+import { canAddUser, getPlan } from "../plans.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -40,6 +42,17 @@ router.post(
       return res
         .status(409)
         .json({ error: "E-mail já cadastrado (pode já pertencer a outra empresa)", code: "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY" });
+    }
+    // Limite do plano, checado antes de qualquer escrita — se passasse daqui, o
+    // e-mail já teria entrado no diretório e sobraria lixo a limpar.
+    const company = directory.getCompany(req.companyId);
+    if (!canAddUser(company, countUsers())) {
+      const limite = getPlan(company?.plan).maxUsers;
+      return res.status(403).json({
+        error: `Seu plano permite até ${limite} usuários. Mude de plano para adicionar mais.`,
+        code: "PLAN_USER_LIMIT",
+        maxUsers: limite,
+      });
     }
     try {
       directory.addUserToDirectory(email, req.companyId);
