@@ -656,7 +656,8 @@
     "status": {
       "active": "Active",
       "trialing": "Trial",
-      "expired": "Expired"
+      "expired": "Expired",
+      "grace": "Payment outstanding"
     },
     "trialEnding": "Your trial ends in {{count}} day",
     "trialEnding_other": "Your trial ends in {{count}} days",
@@ -722,6 +723,14 @@
     "ATTACHMENT_NOT_FOUND": "Attachment not found",
     "LIST_NOT_IN_BOARD": "That column does not belong to this board.",
     "TOO_MANY_GEOCODE_REQUESTS": "Too many address lookups in a short time. Wait a moment and try again.",
-    "INVALID_TITLE": "Invalid title."
+    "INVALID_TITLE": "Invalid title.",
+    "PLAN_REQUIRES_PAYMENT": "Subscribing to a paid plan goes through payment.",
+    "PLAN_NOT_CHARGEABLE": "That plan is not charged automatically.",
+    "INVALID_PAYMENT_METHOD": "Choose a payment method.",
+    "PAYMENT_ALREADY_PENDING": "There is already an open charge. Pay it or wait for it to expire.",
+    "CARD_DECLINED": "The card was declined. Check the details or try another one.",
+    "PAYMENT_NOT_FOUND": "Charge not found.",
+    "NO_SUBSCRIPTION": "There is no active subscription.",
+    "BILLING_PROVIDER_NOT_CONFIGURED": "The payment method is not configured yet. Contact support."
   }
 }

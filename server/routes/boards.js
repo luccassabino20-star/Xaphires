@@ -4,6 +4,7 @@ import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
 import { getCompany } from "../directory.js";
 import { canUseAutoArchive, canUseRecurringCards } from "../plans.js";
+import { varrerCobranca } from "../billing/lifecycle.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -23,6 +24,16 @@ router.get(
     // contém os cartões do dia, sem exigir um segundo carregamento.
     if (canUseRecurringCards(plano)) {
       await repo.runRecurrences();
+    }
+    // Renovação, tentativa de cartão e carência. Aqui pelo mesmo motivo das duas
+    // acima: o projeto não tem agendador, e abrir o quadro é o momento em que se
+    // sabe que a empresa está viva. É idempotente e sai barato quando não há nada a
+    // fazer. Nunca derruba a leitura: cobrança com problema não pode impedir alguém
+    // de ver o próprio quadro.
+    try {
+      await varrerCobranca();
+    } catch (err) {
+      console.error("[billing] varredura falhou:", err.message);
     }
     res.json({ boards: await repo.getWorkspace(req.user.id) });
   })

@@ -36,6 +36,18 @@ addColumnIfMissing("companies", "contracted_at", "contracted_at TEXT");
 // Empresas anteriores a esta coluna herdam a data de criação: é a melhor
 // aproximação disponível e evita o campo ficar vazio para sempre na tela.
 directoryDb.exec("UPDATE companies SET contracted_at = created_at WHERE contracted_at IS NULL");
+// Até quando a empresa continua escrevendo apesar do vencimento. Quem concede é a
+// cobrança, e só para quem tem assinatura tentando pagar: boleto leva dias para
+// compensar, e trancar no segundo seguinte puniria quem pagou em dia. Teste que
+// terminou não recebe carência, porque já foi tempo livre.
+addColumnIfMissing("companies", "grace_until", "grace_until TEXT");
+
+// A cobrança guarda os dados dela no mesmo banco global, porque pagamento é da
+// empresa e não de dentro de um quadro. Fica em server/billing/store.js, que cria
+// as próprias tabelas — este arquivo continua sendo só o cadastro de empresas.
+export function getDirectoryDb() {
+  return directoryDb;
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -73,6 +85,13 @@ export function setCompanyPlan(id, { plan, status, expiresAt, contractedAt }) {
       contractedAt === undefined ? atual.contracted_at : contractedAt,
       id
     );
+  return getCompany(id);
+}
+
+// Estende (ou remove, com null) a carência. Separado do setCompanyPlan porque a
+// carência muda no ritmo da cobrança, não no da contratação.
+export function setCompanyGrace(id, graceUntil) {
+  directoryDb.prepare("UPDATE companies SET grace_until = ? WHERE id = ?").run(graceUntil || null, id);
   return getCompany(id);
 }
 

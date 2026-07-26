@@ -15,6 +15,8 @@ import { router as geocodeRouter } from "./routes/geocode.js";
 import { router as minutesRouter } from "./routes/minutes.js";
 import { router as planRouter } from "./routes/plan.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
+import { router as billingRouter } from "./routes/billing.js";
+import { router as billingWebhookRouter } from "./routes/billingWebhook.js";
 
 export const app = express();
 
@@ -32,12 +34,22 @@ if (frontendUrl) {
 
 app.use(express.json({ limit: "12mb" }));
 app.use(cookieParser());
+
+// O webhook de pagamento entra ANTES do verifyOrigin. Gateway não é navegador: manda
+// POST sem Origin nem Referer, e a checagem de CSRF recusaria todo aviso de
+// pagamento com 403. Quem autentica essa rota é a assinatura do provedor, dentro
+// dela — ver o comentário em routes/billingWebhook.js.
+app.use("/api/billing/webhook", billingWebhookRouter);
+
 app.use("/api", verifyOrigin);
 
 // Auth e plano ficam fora do bloqueio de escrita: sem isso, uma empresa vencida
 // não conseguiria nem entrar nem trocar de plano para voltar a escrever.
 app.use("/api/auth", authRouter);
 app.use("/api/plan", planRouter);
+// Cobrança fica fora do bloqueio de escrita pelo mesmo motivo do plano: empresa
+// vencida precisa poder pagar para voltar a escrever.
+app.use("/api/billing", billingRouter);
 
 app.use("/api/users", requireAuth, requireWritablePlan, usersRouter);
 app.use("/api/boards", requireAuth, requireWritablePlan, boardsRouter);

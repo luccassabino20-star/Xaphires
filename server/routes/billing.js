@@ -1,0 +1,169 @@
+import { Router } from "express";
+import { requireAuth, requireMaster } from "../middleware.js";
+import { ah } from "../asyncHandler.js";
+import { getCompany } from "../directory.js";
+import { countUsers } from "../repo.js";
+import { canSelfSelectPlan, getPlan, priceCentsOf } from "../plans.js";
+import { metodoValido, METODOS } from "../billing/gateway.js";
+import * as store from "../billing/store.js";
+import * as ciclo from "../billing/lifecycle.js";
+
+const router = Router();
+router.use(requireAuth);
+
+function visaoAssinatura(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    plan: row.plan,
+    method: row.method,
+    status: row.status,
+    nextChargeAt: row.next_charge_at,
+    canceledAt: row.canceled_at,
+    createdAt: row.created_at,
+  };
+}
+
+// Estado da cobrança da empresa: assinatura, cobrança em aberto e extrato.
+router.get(
+  "/",
+  ah(async (req, res) => {
+    const pendente = store.pendingPayment(req.companyId);
+    res.json({
+      methods: METODOS,
+      subscription: visaoAssinatura(store.getActiveSubscription(req.companyId)),
+      pendingPayment: store.publicPayment(pendente),
+      payments: store.listPayments(req.companyId).map(store.publicPayment),
+      graceUntil: getCompany(req.companyId)?.grace_until || null,
+    });
+  })
+);
+
+// Confere no gateway se uma cobrança pendente já foi paga. O cliente chama isto ao
+// abrir a tela de pagamento e ao voltar do checkout: webhook perdido é comum, e sem
+// esta conferência o cliente pagaria e ficaria esperando.
+router.post(
+  "/payments/:id/check",
+  ah(async (req, res) => {
+    const pagamento = store.getPayment(req.params.id);
+    // Confere o dono antes de qualquer coisa: id de pagamento não pode servir para
+    // olhar cobrança de outra empresa.
+    if (!pagamento || pagamento.company_id !== req.companyId) {
+      return res.status(404).json({ error: "Cobrança não encontrada", code: "PAYMENT_NOT_FOUND" });
+    }
+    res.json({ payment: store.publicPayment(await ciclo.conferirPagamento(req.params.id)) });
+  })
+);
+
+// Contrata um plano pago. Só o master, porque gera cobrança.
+router.post(
+  "/subscribe",
+  requireMaster,
+  ah(async (req, res) => {
+    const { plan, method, card } = req.body || {};
+    const empresa = getCompany(req.companyId);
+
+    // Pagar pelo plano que já se tem é sempre permitido: é renovação, e o ciclo novo
+    // começa no fim do atual, então não se perde dia nenhum. A regra de "só subir"
+    // existe para troca de plano, não para o cliente quitar o próprio.
+    const mesmoPlano = plan === (empresa?.plan || "basic");
+    if (!mesmoPlano && !canSelfSelectPlan(empresa, plan)) {
+      return res.status(403).json({
+        error: "Esse plano não pode ser contratado por aqui.",
+        code: "PLAN_DOWNGRADE_NOT_SELF_SERVICE",
+      });
+    }
+    if (!getPlan(plan).paid) {
+      return res.status(400).json({
+        error: "Plano gratuito não passa por cobrança. Use a troca de plano.",
+        code: "PLAN_NOT_CHARGEABLE",
+      });
+    }
+    if (priceCentsOf(plan) === null) {
+      return res.status(400).json({ error: "Plano sob consulta", code: "PLAN_NOT_CHARGEABLE" });
+    }
+    if (!metodoValido(method)) {
+      return res.status(400).json({ error: "Escolha uma forma de pagamento", code: "INVALID_PAYMENT_METHOD" });
+    }
+
+    // Mesma regra da troca de plano: não deixa contratar um plano pago apertado
+    // demais para a equipe atual, senão a empresa pagaria por algo que já nasce
+    // bloqueado. countUsers() lê o banco da empresa, e o contexto vem do requireAuth.
+    const limite = getPlan(plan).maxUsers;
+    const usuarios = await countUsers();
+    if (limite !== null && usuarios > limite) {
+      return res.status(400).json({
+        error: `O plano escolhido permite ${limite} usuários e a empresa tem ${usuarios}.`,
+        code: "PLAN_USER_LIMIT_EXCEEDED",
+        userCount: usuarios,
+        maxUsers: limite,
+      });
+    }
+
+    try {
+      const r = await ciclo.assinar({ companyId: req.companyId, plan, method, card });
+      res.status(201).json({
+        subscription: visaoAssinatura(r.subscription),
+        payment: store.publicPayment(r.payment),
+      });
+    } catch (err) {
+      if (err.code === "PAYMENT_ALREADY_PENDING") {
+        return res.status(409).json({
+          error: err.message,
+          code: err.code,
+          payment: store.publicPayment(err.payment),
+        });
+      }
+      if (err.code === "CARD_DECLINED") {
+        return res.status(402).json({ error: err.message, code: err.code, failureReason: err.failureReason });
+      }
+      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED") {
+        return res.status(503).json({ error: err.message, code: err.code });
+      }
+      throw err;
+    }
+  })
+);
+
+// Troca a forma de pagamento da assinatura, SEM cobrar nada agora. É operação de
+// cadastro, não renovação antecipada: o meio novo vale a partir do próximo ciclo.
+// Sem esta rota, um cliente com cartão vencido não teria como consertar — assinar de
+// novo o mesmo plano cobraria na hora, o que não é o que ele pediu.
+router.put(
+  "/method",
+  requireMaster,
+  ah(async (req, res) => {
+    const { method, card } = req.body || {};
+    if (!metodoValido(method)) {
+      return res.status(400).json({ error: "Escolha uma forma de pagamento", code: "INVALID_PAYMENT_METHOD" });
+    }
+    const assinatura = store.getActiveSubscription(req.companyId);
+    if (!assinatura) return res.status(404).json({ error: "Sem assinatura ativa", code: "NO_SUBSCRIPTION" });
+
+    try {
+      const atualizada = await ciclo.trocarMetodo(assinatura.id, method, card);
+      res.json({ subscription: visaoAssinatura(atualizada) });
+    } catch (err) {
+      if (err.code === "CARD_DECLINED") {
+        return res.status(402).json({ error: err.message, code: err.code, failureReason: err.failureReason });
+      }
+      if (err.code === "BILLING_PROVIDER_NOT_CONFIGURED") {
+        return res.status(503).json({ error: err.message, code: err.code });
+      }
+      throw err;
+    }
+  })
+);
+
+// Cancela a renovação. O acesso já pago continua até o fim do ciclo.
+router.post(
+  "/cancel",
+  requireMaster,
+  ah(async (req, res) => {
+    const assinatura = await ciclo.cancelarAssinatura(req.companyId);
+    if (!assinatura) return res.status(404).json({ error: "Sem assinatura ativa", code: "NO_SUBSCRIPTION" });
+    res.json({ subscription: visaoAssinatura(assinatura) });
+  })
+);
+
+export { router };

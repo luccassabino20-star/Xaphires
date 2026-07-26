@@ -3,22 +3,50 @@
 
 export const TRIAL_DAYS = 7;
 
-// rank ordena os planos; price é a mensalidade em BRL. price null significa
-// "sob consulta" — sem valor de tabela, então não pode ser contratado sozinho.
+// rank ordena os planos; priceCents é a mensalidade em centavos de BRL.
+// priceCents null significa "sob consulta" — sem valor de tabela, então não pode
+// ser contratado sozinho.
 // autoArchive é o direito à regra de arquivamento automático: o arquivamento
 // manual está em todos os planos, só a automação é paga.
-export const PLANS = {
-  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024 },
-  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
-  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 }, // null = ilimitado
-  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
+//
+// O valor é em CENTAVOS INTEIROS, e não em reais decimais, porque é ele que entra
+// em soma, proporcional e comparação com o que o gateway confirma. Float em
+// dinheiro acumula erro: 349.99 não é representável em binário, e um cálculo de
+// proporcional em cima disso fecha com centavo de diferença do extrato. O campo
+// `price` em reais continua existindo, derivado, só para exibição.
+const DEFINICOES = {
+  basic: { rank: 0, maxUsers: 3, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024 },
+  intermediate: { rank: 1, maxUsers: 10, paid: true, priceCents: 34999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
+  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 }, // null = ilimitado
+  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
 };
+
+// price derivado de priceCents num único lugar, para os dois nunca discordarem.
+export const PLANS = Object.fromEntries(
+  Object.entries(DEFINICOES).map(([id, def]) => [
+    id,
+    { id, ...def, price: def.priceCents === null ? null : def.priceCents / 100 },
+  ])
+);
 
 export const PLAN_IDS = Object.keys(PLANS);
 export const DEFAULT_TRIAL_PLAN = "professional";
 
 export function getPlan(planId) {
   return PLANS[planId] || PLANS.basic;
+}
+
+// Valor a cobrar por um ciclo do plano, em centavos. null quando não há preço de
+// tabela: o Empresarial é sob consulta e não passa por cobrança automática.
+export function priceCentsOf(planId) {
+  return getPlan(planId).priceCents;
+}
+
+// Formata centavos como moeda para texto de servidor (mensagem de erro, e-mail).
+// A tela usa Intl no cliente, com o idioma de quem está olhando.
+export function formatCents(cents) {
+  if (cents === null || cents === undefined) return null;
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 }
 
 export function trialEndsAt(from = new Date()) {
@@ -34,7 +62,12 @@ export function effectiveStatus(company, now = new Date()) {
   const plan = getPlan(company?.plan);
   if (!plan.paid) return "active";
   if (!company?.expires_at) return "active";
-  return new Date(company.expires_at) > now ? (company.status === "trialing" ? "trialing" : "active") : "expired";
+  if (new Date(company.expires_at) > now) return company.status === "trialing" ? "trialing" : "active";
+  // Venceu, mas a cobrança concedeu carência: continua escrevendo até o prazo dela.
+  // Estado próprio, e não "active", para a tela poder avisar que há pagamento em
+  // aberto em vez de dar a impressão de que está tudo resolvido.
+  if (company.grace_until && new Date(company.grace_until) > now) return "grace";
+  return "expired";
 }
 
 export function isWritable(company, now = new Date()) {
@@ -86,8 +119,12 @@ export function canSelfSelectPlan(company, targetPlanId) {
   if (!alvo) return false;
   if (alvo.price === null) return false;
 
+  // "Em vigor" é só o plano pago ATIVO. Teste e carência não contam: em nenhum dos
+  // dois a empresa está pagando, então não há ciclo contratado a proteger — e tratar
+  // teste como vigente travava a conversão, porque durante o teste do Profissional
+  // nenhum destino passava, nem pagar pelo próprio plano.
   const atual = getPlan(company?.plan);
-  const emVigor = atual.paid && effectiveStatus(company) !== "expired";
+  const emVigor = atual.paid && effectiveStatus(company) === "active";
   if (!emVigor) return true;
 
   return alvo.rank > atual.rank;

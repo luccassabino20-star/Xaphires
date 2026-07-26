@@ -972,7 +972,8 @@
     "status": {
       "active": "Ativo",
       "trialing": "Em teste",
-      "expired": "Expirado"
+      "expired": "Expirado",
+      "grace": "Pagamento em aberto"
     },
     "trialEnding": "Seu teste termina em {{count}} dia",
     "trialEnding_other": "Seu teste termina em {{count}} dias",
@@ -1038,6 +1039,14 @@
     "ATTACHMENT_NOT_FOUND": "Anexo não encontrado",
     "LIST_NOT_IN_BOARD": "Essa coluna não pertence a este quadro.",
     "TOO_MANY_GEOCODE_REQUESTS": "Muitas buscas de endereço em pouco tempo. Aguarde um instante e tente de novo.",
-    "INVALID_TITLE": "Título inválido."
+    "INVALID_TITLE": "Título inválido.",
+    "PLAN_REQUIRES_PAYMENT": "Contratar um plano pago passa pelo pagamento.",
+    "PLAN_NOT_CHARGEABLE": "Esse plano não é cobrado automaticamente.",
+    "INVALID_PAYMENT_METHOD": "Escolha uma forma de pagamento.",
+    "PAYMENT_ALREADY_PENDING": "Já existe uma cobrança em aberto. Pague ou aguarde o vencimento dela.",
+    "CARD_DECLINED": "O cartão foi recusado. Confira os dados ou tente outro.",
+    "PAYMENT_NOT_FOUND": "Cobrança não encontrada.",
+    "NO_SUBSCRIPTION": "Não há assinatura ativa.",
+    "BILLING_PROVIDER_NOT_CONFIGURED": "O meio de pagamento ainda não está configurado. Fale com o suporte."
   }
 }

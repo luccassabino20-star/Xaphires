@@ -13,7 +13,6 @@ import {
   canUseAutoArchive,
   canUseBottleneckMonitor,
   attachmentLimitFor,
-  addOneMonth,
 } from "../plans.js";
 
 const router = Router();
@@ -76,31 +75,31 @@ router.post(
     }
 
     const alvo = getPlan(plan);
-    const usuarios = countUsers();
-    const limite = alvo.maxUsers;
-    // O limite barra a CONTRATAÇÃO de um plano pago apertado demais para a equipe
-    // atual. Não barra a ida para o gratuito: senão a empresa que passou do limite
-    // durante o teste ficaria sem nenhuma saída, presa em somente-leitura para
-    // sempre. Os usuários que já existem continuam; criar novos é que fica travado,
-    // pelo canAddUser na rota de usuários.
-    if (alvo.paid && limite !== null && usuarios > limite) {
+
+    // Plano pago NÃO é concedido por aqui. Esta rota gravava status active e
+    // vencimento um mês adiante sem nenhuma cobrança: bastava clicar para ter o
+    // Profissional de graça, indefinidamente. Contratar plano pago passa por
+    // POST /api/billing/subscribe, e o acesso só muda quando o pagamento é
+    // confirmado. Aqui fica apenas a troca para plano gratuito, que não cobra nada.
+    if (alvo.paid) {
       return res.status(400).json({
-        error: `O plano escolhido permite ${limite} usuários e a empresa tem ${usuarios}.`,
-        code: "PLAN_USER_LIMIT_EXCEEDED",
-        userCount: usuarios,
-        maxUsers: limite,
+        error: "Contratar um plano pago passa pelo pagamento.",
+        code: "PLAN_REQUIRES_PAYMENT",
       });
     }
 
-    // Plano pago reinicia o ciclo: vale de agora e vence daqui a um mês. O gratuito
-    // não tem prazo — gravar um vencimento nele faria effectiveStatus voltar a
-    // expirar mais tarde uma empresa que não deve mais nada.
-    const agora = new Date().toISOString();
+    // Daqui para baixo o plano é sempre gratuito, então não há limite de usuários a
+    // conferir: quem passou do limite durante o teste precisa poder cair para o
+    // Básico, senão fica preso em somente-leitura para sempre. Os usuários que já
+    // existem continuam; criar novos é que fica travado, pelo canAddUser.
+    //
+    // Vencimento nulo porque o gratuito não expira — gravar uma data aqui faria o
+    // effectiveStatus expirar mais tarde uma empresa que não deve mais nada.
     setCompanyPlan(req.companyId, {
       plan,
       status: "active",
-      contractedAt: agora,
-      expiresAt: alvo.paid ? addOneMonth(agora) : null,
+      contractedAt: new Date().toISOString(),
+      expiresAt: null,
     });
     res.json(resumo(req.companyId));
   })
