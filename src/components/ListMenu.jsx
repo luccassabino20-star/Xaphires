@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { LIST_COLORS, brightListColor } from "../utils/backgrounds.js";
+import * as api from "../state/api.js";
 
 export default function ListMenu({ board, list, onClose, anchorRef }) {
   const { t } = useTranslation();
@@ -11,6 +12,19 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [stuckOpen, setStuckOpen] = useState(false);
   const [stuckHoras, setStuckHoras] = useState(String(list.stuckHours || 48));
+  // O direito vem do plano; enquanto não chega, o controle fica travado — melhor
+  // do que liberar e o servidor recusar depois do clique.
+  const [podeMonitorar, setPodeMonitorar] = useState(null);
+  useEffect(() => {
+    let ativo = true;
+    api
+      .getPlan()
+      .then((p) => ativo && setPodeMonitorar(!!p.canUseBottleneckMonitor))
+      .catch(() => ativo && setPodeMonitorar(false));
+    return () => {
+      ativo = false;
+    };
+  }, []);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -28,6 +42,10 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
     onClose();
   }
   function salvarMonitor(horas) {
+    if (horas !== null && podeMonitorar === false) {
+      showToast(t("board.listMenu.stuckPlanRequired"));
+      return;
+    }
     const n = Number(horas);
     if (horas !== null && (!Number.isInteger(n) || n < 1 || n > 8760)) {
       showToast(t("board.listMenu.stuckInvalid"));
@@ -103,7 +121,7 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
       </div>
       {stuckOpen && (
         <div className="list-stuck-config">
-          <p>{t("board.listMenu.stuckHint")}</p>
+          <p>{podeMonitorar === false ? t("board.listMenu.stuckPlanRequired") : t("board.listMenu.stuckHint")}</p>
           <div className="list-stuck-row">
             <input
               type="number"
@@ -113,7 +131,7 @@ export default function ListMenu({ board, list, onClose, anchorRef }) {
               onChange={(e) => setStuckHoras(e.target.value)}
             />
             <span>{t("board.listMenu.stuckHoursSuffix")}</span>
-            <button className="btn-primary btn-small" onClick={() => salvarMonitor(stuckHoras)}>
+            <button className="btn-primary btn-small" onClick={() => salvarMonitor(stuckHoras)} disabled={podeMonitorar !== true}>
               {t("board.listMenu.stuckSave")}
             </button>
           </div>

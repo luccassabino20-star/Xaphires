@@ -8,10 +8,10 @@ export const TRIAL_DAYS = 7;
 // autoArchive é o direito à regra de arquivamento automático: o arquivamento
 // manual está em todos os planos, só a automação é paga.
 export const PLANS = {
-  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false, recurringCards: false },
-  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true, recurringCards: false },
-  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true, recurringCards: true }, // null = ilimitado
-  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true, recurringCards: true },
+  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false },
+  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true, recurringCards: false, bottleneckMonitor: true },
+  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true, recurringCards: true, bottleneckMonitor: true }, // null = ilimitado
+  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true },
 };
 
 export const PLAN_IDS = Object.keys(PLANS);
@@ -89,4 +89,9 @@ export function canUseAutoArchive(planId) {
 // este entra só do Profissional para cima.
 export function canUseRecurringCards(planId) {
   return getPlan(planId).recurringCards === true;
+}
+
+// Direito ao monitor de gargalos. Mesmo degrau do arquivamento automático.
+export function canUseBottleneckMonitor(planId) {
+  return getPlan(planId).bottleneckMonitor === true;
 }

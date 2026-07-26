@@ -281,6 +281,7 @@
             "Todas as visões (Calendário, Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
             "Atas de reunião",
             "Arquivamento automático de concluídos",
+            "Monitor de gargalos",
             "Suporte por e-mail"
           ]
         },
@@ -297,6 +298,8 @@
             "Atas de reunião",
             "Quadros privados e compartilhados",
             "Arquivamento automático de concluídos",
+            "Monitor de gargalos",
+            "Rotinas que criam cartões sozinhas",
             "Suporte prioritário"
           ]
         },
@@ -676,6 +679,7 @@
       "deletedToast": "Cartão excluído"
     },
     "listMenu": {
+      "stuckPlanRequired": "O monitor de gargalos está disponível a partir do plano Intermediário.",
       "stuckConfigure": "Monitorar gargalo nesta coluna",
       "stuckConfigured": "Gargalo: alerta em {{hours}}h",
       "stuckHint": "Avisa quando um cartão passar deste tempo parado nesta coluna.",
@@ -932,6 +936,7 @@
     "movedToBasic": "Plano alterado para Básico"
   },
   "errors": {
+    "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Intermediário.",
     "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
     "INVALID_FREQUENCY": "Frequência inválida",
     "WEEKDAY_REQUIRED": "Escolha o dia da semana",

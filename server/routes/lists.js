@@ -2,6 +2,8 @@ import { Router } from "express";
 import { requireAuth, requireBoardAccessParam } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
+import { getCompany } from "../directory.js";
+import { canUseBottleneckMonitor } from "../plans.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -15,6 +17,14 @@ router.patch(
     if (color !== undefined) await repo.setListColor(req.params.id, color);
     if (stuckHours !== undefined) {
       const h = stuckHours === null ? null : Number(stuckHours);
+      // Desligar é sempre permitido, para uma coluna herdada de plano superior
+      // não ficar monitorada sem como remover.
+      if (h !== null && !canUseBottleneckMonitor(getCompany(req.companyId)?.plan)) {
+        return res.status(403).json({
+          error: "O monitor de gargalos está disponível a partir do plano Intermediário.",
+          code: "PLAN_FEATURE_BOTTLENECK",
+        });
+      }
       if (h !== null && (!Number.isInteger(h) || h < 1 || h > 8760)) {
         return res.status(400).json({ error: "Horas deve ser entre 1 e 8760", code: "INVALID_STUCK_HOURS" });
       }

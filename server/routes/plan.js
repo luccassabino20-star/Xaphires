@@ -11,6 +11,7 @@ import {
   daysLeft,
   canSelfUpgradeTo,
   canUseAutoArchive,
+  canUseBottleneckMonitor,
   addOneMonth,
 } from "../plans.js";
 
@@ -32,6 +33,7 @@ function resumo(companyId) {
     maxUsers: plano.maxUsers,
     canAddUser: plano.maxUsers === null || usuarios < plano.maxUsers,
     canUseAutoArchive: canUseAutoArchive(company?.plan),
+    canUseBottleneckMonitor: canUseBottleneckMonitor(company?.plan),
     // Catálogo com a decisão de autoatendimento já resolvida no servidor, para o
     // cliente não reimplementar a regra e as duas pontas discordarem.
     catalog: PLAN_IDS.map((id) => ({

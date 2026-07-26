@@ -115,8 +115,8 @@
       "mostPopular": "Most popular",
       "plans": [
         { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 3 users", "Unlimited boards", "Kanban board, Table and Calendar", "Card archiving", "Email support"] },
-        { "name": "Intermediate", "price": "R$ 349.99", "period": "/month", "tagline": "For teams that outgrew three people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 10 users", "Unlimited boards", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Auto-archiving of completed cards", "Email support"] },
-        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Private and shared boards", "Auto-archiving of completed cards", "Priority support"] },
+        { "name": "Intermediate", "price": "R$ 349.99", "period": "/month", "tagline": "For teams that outgrew three people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 10 users", "Unlimited boards", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Auto-archiving of completed cards", "Bottleneck monitor", "Email support"] },
+        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Private and shared boards", "Auto-archiving of completed cards", "Bottleneck monitor", "Routines that create cards on their own", "Priority support"] },
         { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
       ]
     },
@@ -417,6 +417,7 @@
       "deletedToast": "Card deleted"
     },
     "listMenu": {
+      "stuckPlanRequired": "The bottleneck monitor is available from the Intermediate plan up.",
       "stuckConfigure": "Monitor bottlenecks in this column",
       "stuckConfigured": "Bottleneck: alert at {{hours}}h",
       "stuckHint": "Warns when a card sits in this column longer than this.",
@@ -654,6 +655,7 @@
     "movedToBasic": "Plan changed to Basic"
   },
   "errors": {
+    "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Intermediate plan up.",
     "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Professional plan up.",
     "INVALID_FREQUENCY": "Invalid frequency",
     "WEEKDAY_REQUIRED": "Choose the day of the week",
