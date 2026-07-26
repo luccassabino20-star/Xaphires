@@ -114,9 +114,9 @@
       "headerText": "Elige el plan ideal para tu equipo y cámbialo cuando crezca.",
       "mostPopular": "Más popular",
       "plans": [
-        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 3 usuarios", "Tableros ilimitados", "Tablero Kanban, Tabla y Calendario", "Soporte por correo"] },
-        { "name": "Intermedio", "price": "R$ 349,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de tres personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 10 usuarios", "Tableros ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Soporte por correo"] },
-        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Tableros privados y compartidos", "Soporte prioritario"] },
+        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 3 usuarios", "Tableros ilimitados", "Tablero Kanban, Tabla y Calendario", "Archivado de tarjetas", "Soporte por correo"] },
+        { "name": "Intermedio", "price": "R$ 349,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de tres personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 10 usuarios", "Tableros ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Archivado automático de completadas", "Soporte por correo"] },
+        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Tableros privados y compartidos", "Archivado automático de completadas", "Soporte prioritario"] },
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo de Profesional", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
     },
@@ -323,6 +323,7 @@
   },
   "board": {
     "archive": {
+      "autoPlanRequired": "El archivado automático está disponible desde el plan Intermedio. El archivado manual sigue disponible.",
       "autoLabel": "Archivar completadas automáticamente",
       "autoDaysSuffix": "días",
       "autoOnHint": "Las tarjetas completadas hace más de {{days}} días pasan al archivo cuando se carga el tablero. Desmarcar una tarjeta reinicia el conteo.",
@@ -569,6 +570,7 @@
     "movedToBasic": "Plan cambiado a Básico"
   },
   "errors": {
+    "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Intermedio.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Aquí solo se puede subir de plan. Para bajar o cancelar, contacta al soporte.",
     "PLAN_EXPIRED": "Tu plan expiró. Renueva para volver a editar.",
     "PLAN_USER_LIMIT": "Tu plan alcanzó el límite de usuarios. Cambia de plan para agregar más.",

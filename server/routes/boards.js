@@ -2,6 +2,8 @@ import { Router } from "express";
 import { requireAuth, requireBoardAccess } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
+import { getCompany } from "../directory.js";
+import { canUseAutoArchive } from "../plans.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -11,7 +13,11 @@ router.get(
   ah(async (req, res) => {
     // A regra de arquivamento automático roda aqui, antes da leitura: assim o que
     // volta já está varrido e o cliente nunca mostra um cartão que deveria ter saído.
-    await repo.runAutoArchive();
+    // Empresa sem direito à automação não é varrida, mesmo que tenha a regra
+    // gravada de quando estava num plano superior.
+    if (canUseAutoArchive(getCompany(req.companyId)?.plan)) {
+      await repo.runAutoArchive();
+    }
     res.json({ boards: await repo.getWorkspace(req.user.id) });
   })
 );
@@ -35,6 +41,14 @@ router.patch(
     if (background !== undefined) await repo.setBoardBackground(req.params.id, background);
     if (autoArchiveDays !== undefined) {
       const dias = autoArchiveDays === null ? null : Number(autoArchiveDays);
+      // Desligar é sempre permitido: um plano que perdeu o direito precisa poder
+      // remover a regra que já tinha, senão ela ficaria presa ligada.
+      if (dias !== null && !canUseAutoArchive(getCompany(req.companyId)?.plan)) {
+        return res.status(403).json({
+          error: "O arquivamento automático está disponível a partir do plano Intermediário.",
+          code: "PLAN_FEATURE_AUTO_ARCHIVE",
+        });
+      }
       if (dias !== null && (!Number.isInteger(dias) || dias < 1 || dias > 365)) {
         return res.status(400).json({ error: "Dias deve ser entre 1 e 365", code: "INVALID_AUTO_ARCHIVE_DAYS" });
       }

@@ -265,6 +265,7 @@
             "Até 3 usuários",
             "Quadros ilimitados",
             "Quadro Kanban, Tabela e Calendário",
+            "Arquivamento de cartões",
             "Suporte por e-mail"
           ]
         },
@@ -279,6 +280,7 @@
             "Quadros ilimitados",
             "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
             "Atas de reunião",
+            "Arquivamento automático de concluídos",
             "Suporte por e-mail"
           ]
         },
@@ -294,6 +296,7 @@
             "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
             "Atas de reunião",
             "Quadros privados e compartilhados",
+            "Arquivamento automático de concluídos",
             "Suporte prioritário"
           ]
         },
@@ -579,6 +582,7 @@
   },
   "board": {
     "archive": {
+      "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Intermediário. O arquivamento manual continua liberado.",
       "autoLabel": "Arquivar concluídos automaticamente",
       "autoDaysSuffix": "dias",
       "autoOnHint": "Cartões concluídos há mais de {{days}} dias vão para o arquivo quando o quadro é carregado. Desmarcar um cartão reinicia a contagem.",
@@ -844,6 +848,7 @@
     "movedToBasic": "Plano alterado para Básico"
   },
   "errors": {
+    "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Intermediário.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",
     "PLAN_EXPIRED": "Seu plano expirou. Renove para voltar a editar.",
     "PLAN_USER_LIMIT": "Seu plano atingiu o limite de usuários. Mude de plano para adicionar mais.",

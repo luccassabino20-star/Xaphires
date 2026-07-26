@@ -5,11 +5,13 @@ export const TRIAL_DAYS = 7;
 
 // rank ordena os planos; price é a mensalidade em BRL. price null significa
 // "sob consulta" — sem valor de tabela, então não pode ser contratado sozinho.
+// autoArchive é o direito à regra de arquivamento automático: o arquivamento
+// manual está em todos os planos, só a automação é paga.
 export const PLANS = {
-  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0 },
-  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99 },
-  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99 }, // null = ilimitado
-  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null },
+  basic: { id: "basic", rank: 0, maxUsers: 3, paid: false, price: 0, autoArchive: false },
+  intermediate: { id: "intermediate", rank: 1, maxUsers: 10, paid: true, price: 349.99, autoArchive: true },
+  professional: { id: "professional", rank: 2, maxUsers: null, paid: true, price: 679.99, autoArchive: true }, // null = ilimitado
+  enterprise: { id: "enterprise", rank: 3, maxUsers: null, paid: true, price: null, autoArchive: true },
 };
 
 export const PLAN_IDS = Object.keys(PLANS);
@@ -75,4 +77,10 @@ export function canSelfUpgradeTo(currentPlanId, targetPlanId) {
   if (!alvo) return false;
   if (alvo.price === null) return false;
   return alvo.rank > atual.rank;
+}
+
+// Direito à regra de arquivamento automático. O arquivamento manual continua em
+// todos os planos: o que se paga é a automação, não a funcionalidade inteira.
+export function canUseAutoArchive(planId) {
+  return getPlan(planId).autoArchive === true;
 }

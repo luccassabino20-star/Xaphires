@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
+import { translateError } from "../utils/errors.js";
+import * as api from "../state/api.js";
 
 function formatArchivedAt(iso, locale) {
   if (!iso) return "";
@@ -20,6 +22,21 @@ export default function ArchiveModal({ board, onClose }) {
   // com a regra desligada, para religar não obrigar a digitar de novo.
   const ligada = !!board.autoArchiveDays;
   const [dias, setDias] = useState(String(board.autoArchiveDays || 7));
+
+  // O direito à automação vem do plano. Enquanto não chega, o controle fica
+  // desabilitado — melhor do que habilitar e o servidor recusar depois do clique.
+  const [temAutomacao, setTemAutomacao] = useState(null);
+  useEffect(() => {
+    let ativo = true;
+    api
+      .getPlan()
+      .then((p) => ativo && setTemAutomacao(!!p.canUseAutoArchive))
+      .catch(() => ativo && setTemAutomacao(false));
+    return () => {
+      ativo = false;
+    };
+  }, []);
+  const automacaoLiberada = temAutomacao === true;
 
   function salvarRegra(ativa, valorDias) {
     const n = Number(valorDias);
@@ -84,6 +101,7 @@ export default function ArchiveModal({ board, onClose }) {
               <input
                 type="checkbox"
                 checked={ligada}
+                disabled={!automacaoLiberada}
                 onChange={(e) => salvarRegra(e.target.checked, dias)}
               />
               <span>{t("board.archive.autoLabel")}</span>
@@ -94,16 +112,18 @@ export default function ArchiveModal({ board, onClose }) {
                 min="1"
                 max="365"
                 value={dias}
-                disabled={!ligada}
+                disabled={!ligada || !automacaoLiberada}
                 onChange={(e) => setDias(e.target.value)}
                 onBlur={() => ligada && salvarRegra(true, dias)}
               />
               <span>{t("board.archive.autoDaysSuffix")}</span>
             </div>
             <p className="archive-rule-hint">
-              {ligada
-                ? t("board.archive.autoOnHint", { days: Number(dias) || board.autoArchiveDays })
-                : t("board.archive.autoOffHint")}
+              {temAutomacao === false
+                ? t("board.archive.autoPlanRequired")
+                : ligada
+                  ? t("board.archive.autoOnHint", { days: Number(dias) || board.autoArchiveDays })
+                  : t("board.archive.autoOffHint")}
             </p>
           </div>
 
