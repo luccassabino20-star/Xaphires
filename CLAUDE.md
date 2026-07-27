@@ -131,9 +131,17 @@ Sem token CSRF: `verifyOrigin` confere `Origin`/`Referer` em todo método que al
 
 O webhook responde **200 mesmo quando ignora** o aviso. Erro ensinaria um atacante a distinguir aviso aceito de rejeitado, e faria o gateway legítimo reenviar sem parar. Só falha nossa ao aplicar devolve 500, porque aí o reenvio é o que queremos.
 
-### Painel da plataforma (`/admin`)
+### Painel da plataforma
 
-Aplicação à parte, servida no mesmo endereço. Cliente em `src/admin/`, servidor em `server/admin/` e `routes/admin.js`. Gerencia empresas, abre os quadros de qualquer cliente, mostra métricas globais e controla permissões.
+Gerencia empresas, abre os quadros de qualquer cliente, mostra métricas globais e controla permissões. Servidor em `server/admin/` e `routes/admin.js`; componentes em `src/admin/`.
+
+**Abre em dois lugares, com os mesmos componentes.** Dentro do app, num modal pelo menu da conta (`components/PlataformaModal.jsx`), que é o caminho normal; e na página `/admin`, montada no `main.jsx`. Os quatro componentes de `src/admin/` (`Empresas`, `Metricas`, `Auditoria`, `Admins`) foram escritos independentes da casca justamente para servirem nos dois — mexer neles afeta as duas telas.
+
+**O item no menu só aparece para quem administra a plataforma.** `GET /api/auth/me` devolve `platformAdmin`, comparando o e-mail do usuário do app com o cadastro de administradores. Essa marca **não autoriza nada** e não é lida em nenhuma decisão de acesso: serve só para decidir se o item aparece. Por isso o casamento por e-mail basta — criar uma conta de cliente com o e-mail de um administrador mostraria o item e não abriria porta nenhuma.
+
+**O acesso é por elevação, no espírito do `sudo`.** Estar logado no app não abre o painel: os dados vêm todos de `/api/admin`, que exige a sessão de administrador, e a primeira abertura pede a senha. Vale 4h, e há um "Encerrar acesso" que derruba a elevação sem sair do app. É isso que mantém a barreira mesmo com as duas coisas na mesma tela — sessão de cliente roubada não carrega a elevação.
+
+**Para o item aparecer, o e-mail do usuário do app e o do administrador precisam ser idênticos.** É a primeira coisa a conferir quando alguém disser que o item sumiu.
 
 **A autenticação é separada em todas as camadas, e isso não é redundância.** Tabela `platform_admins` em vez de uma coluna em `users`; segredo de assinatura próprio (`admin-jwt-secret.txt`, nunca o do app); cookie `cantiere_admin`; sessão de 4h contra os 7 dias do app. Um token do app não é aceito no painel nem por bug futuro de verificação, porque a assinatura não bate. `requireAdmin` lê **só** o cookie de admin e reconfere `active` a cada requisição — desativar alguém tira o acesso na mesma chamada, sem esperar o token expirar.
 
@@ -145,9 +153,13 @@ Aplicação à parte, servida no mesmo endereço. Cliente em `src/admin/`, servi
 
 **Bloqueio administrativo é estado próprio** (`companies.blocked_at`), não um valor de `status`. Vencido é quem não pagou e volta pagando; bloqueado é decisão da plataforma e pagar não desfaz. `effectiveStatus` devolve `blocked`, `isWritable` recusa, e `canSelfSelectPlan` recusa — sem essa última, a empresa sairia do bloqueio contratando um plano.
 
-O primeiro admin é criado por `node server/admin/criarAdmin.js "Nome" email@dominio`, com a senha pedida no terminal. Não existe tela pública de primeiro acesso de propósito: seria uma corrida que se perde uma vez só, para sempre.
+O primeiro admin é criado por `node server/admin/criarAdmin.js "Nome" email@dominio`, com a senha pedida no terminal. Não existe tela pública de primeiro acesso de propósito: seria uma corrida que se perde uma vez só, para sempre. O script tem dois modos — terminal esconde o eco da senha, entrada redirecionada lê o fluxo inteiro de uma vez. Perguntar uma de cada vez no cano perde a segunda linha, porque ela chega antes de a segunda pergunta existir.
 
-O painel entra por `React.lazy` no `main.jsx`, fora dos provedores do app (sem AuthProvider, sem i18n, sem tema — são duas sessões distintas, e compartilhar contexto convidaria a confundir "usuário logado" com "administrador logado"). Vira um pedaço de ~21 kB que o cliente nunca baixa. Os textos são só em português: é ferramenta interna, com um público só.
+`POST /api/admin/senha` troca a própria senha e **exige a atual mesmo com a sessão aberta**: sessão esquecida numa máquina destravada não pode trancar o dono para fora da conta que enxerga todos os clientes. É o que permite entregar uma conta com senha provisória.
+
+**Os dois pontos de entrada carregam por `lazy`, e precisam continuar assim.** No `main.jsx` para a página `/admin`, e no `AccountMenu.jsx` para o modal. Importar o modal direto coloca ~22 kB de ferramenta interna no pacote que todo cliente baixa — já aconteceu, o bundle foi de 677 para 699 kB.
+
+Na página `/admin` o painel fica fora dos provedores do app (sem AuthProvider, sem i18n, sem tema): são duas sessões distintas, e compartilhar contexto convidaria a confundir "usuário logado" com "administrador logado". Os textos são só em português — é ferramenta interna, com um público só.
 
 Em desenvolvimento o StrictMode chama os efeitos duas vezes, então a auditoria mostra entradas duplicadas. No build de produção não acontece.
 
