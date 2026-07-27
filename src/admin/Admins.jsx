@@ -1,6 +1,64 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "./api.js";
 
+// Troca da própria senha, dentro do painel. Sem isto, uma conta criada com senha
+// provisória por outra pessoa ficaria com essa senha para sempre.
+function TrocarSenha() {
+  const [aberto, setAberto] = useState(false);
+  const [atual, setAtual] = useState("");
+  const [nova, setNova] = useState("");
+  const [msg, setMsg] = useState(null);
+  const [enviando, setEnviando] = useState(false);
+
+  async function enviar(e) {
+    e.preventDefault();
+    setMsg(null);
+    setEnviando(true);
+    try {
+      await api.trocarSenha(atual, nova);
+      setAtual("");
+      setNova("");
+      setAberto(false);
+      setMsg({ tipo: "ok", texto: "Senha alterada." });
+    } catch (err) {
+      setMsg({ tipo: "erro", texto: err.message });
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  return (
+    <div className="adm-secao">
+      <h3>Minha senha</h3>
+      {msg && <div className={msg.tipo === "ok" ? "adm-fraco" : "adm-erro"}>{msg.texto}</div>}
+      {!aberto ? (
+        <button className="adm-btn" onClick={() => setAberto(true)}>
+          Trocar minha senha
+        </button>
+      ) : (
+        <form className="adm-grade2" onSubmit={enviar}>
+          <label className="adm-campo">
+            <span>Senha atual</span>
+            <input type="password" value={atual} onChange={(e) => setAtual(e.target.value)} required autoFocus />
+          </label>
+          <label className="adm-campo">
+            <span>Nova senha (mínimo 10 caracteres)</span>
+            <input type="password" minLength={10} value={nova} onChange={(e) => setNova(e.target.value)} required />
+          </label>
+          <div className="adm-botoes">
+            <button className="adm-btn adm-btn-primario" disabled={enviando}>
+              {enviando ? "Salvando..." : "Salvar"}
+            </button>
+            <button type="button" className="adm-btn adm-btn-fantasma" onClick={() => setAberto(false)}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function Admins({ euId }) {
   const [lista, setLista] = useState(null);
   const [erro, setErro] = useState("");
@@ -48,6 +106,9 @@ export default function Admins({ euId }) {
   return (
     <div className="adm-painel">
       {erro && <div className="adm-erro">{erro}</div>}
+
+      <TrocarSenha />
+
       <div className="adm-barra">
         <p className="adm-fraco">
           Cada conta aqui enxerga os dados de todos os clientes. Desativar tira o acesso na hora, sem esperar a sessão expirar.

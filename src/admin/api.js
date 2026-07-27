@@ -50,6 +50,8 @@ export const auditoria = (params = {}) => {
   return req(`/audit${q ? `?${q}` : ""}`);
 };
 
+export const trocarSenha = (senhaAtual, novaSenha) => req("/senha", { method: "POST", body: { senhaAtual, novaSenha } });
+
 export const listarAdmins = () => req("/admins");
 export const criarAdmin = (dados) => req("/admins", { method: "POST", body: dados });
 export const definirAdminAtivo = (id, active) => req(`/admins/${id}/active`, { method: "POST", body: { active } });

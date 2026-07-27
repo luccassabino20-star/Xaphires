@@ -335,6 +335,25 @@ router.get(
 
 // ---------- Administradores da plataforma ----------
 
+// Troca da própria senha. Exige a atual mesmo já estando logado: sessão aberta e
+// esquecida numa máquina não pode virar troca de senha, que é o que tranca o dono
+// para fora da própria conta.
+router.post(
+  "/senha",
+  ah(async (req, res) => {
+    const { senhaAtual, novaSenha } = req.body || {};
+    if (!novaSenha || novaSenha.length < 10) {
+      return res.status(400).json({ error: "A nova senha deve ter ao menos 10 caracteres", code: "PASSWORD_TOO_SHORT" });
+    }
+    if (!conferirSenha(senhaAtual || "", req.admin.password_hash)) {
+      return res.status(401).json({ error: "Senha atual incorreta", code: "CURRENT_PASSWORD_INCORRECT" });
+    }
+    store.definirSenhaAdmin(req.admin.id, hashSenha(novaSenha));
+    auditar(req, "trocar_senha", { alvo: req.admin.email });
+    res.json({ ok: true });
+  })
+);
+
 router.get("/admins", (req, res) => res.json({ admins: store.listarAdmins().map(store.publicAdmin) }));
 
 router.post(

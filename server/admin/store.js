@@ -99,6 +99,11 @@ export function marcarLogin(id) {
   db.prepare("UPDATE platform_admins SET last_login_at = ? WHERE id = ?").run(nowIso(), id);
 }
 
+export function definirSenhaAdmin(id, passwordHash) {
+  db.prepare("UPDATE platform_admins SET password_hash = ? WHERE id = ?").run(passwordHash, id);
+  return acharAdmin(id);
+}
+
 export function definirAdminAtivo(id, ativo) {
   db.prepare("UPDATE platform_admins SET active = ? WHERE id = ?").run(ativo ? 1 : 0, id);
   return acharAdmin(id);
