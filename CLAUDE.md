@@ -40,7 +40,7 @@ Para exercitar fluxo que depende de sessão, sobe a API num banco temporário e 
 
 Dois níveis de banco em `server/data/`:
 
-- `directory.sqlite` — cadastro de empresas (plano, status, vencimento, carência) e o mapa `email → company_id`, em `directory.js`. Guarda também `subscriptions` e `payments`, criadas por `billing/store.js` via `getDirectoryDb()`: cobrança é da empresa, não de dentro de um quadro. Único banco global.
+- `directory.sqlite` — cadastro de empresas (plano, status, vencimento, carência, contato, bloqueio) e o mapa `email → company_id`, em `directory.js`. Guarda também `subscriptions` e `payments` (`billing/store.js`) e `platform_admins` e `admin_audit` (`admin/store.js`), todas criadas via `getDirectoryDb()`: cobrança e administração são da empresa, não de dentro de um quadro. Único banco global.
 - `companies/<id>/app.sqlite` — um banco por empresa, com usuários, quadros, listas, cartões, recorrências e atas. Anexos em `companies/<id>/uploads/`.
 
 O `companyId` viaja por `AsyncLocalStorage` (`server/context.js`), não por parâmetro. `getDb()` resolve o banco a partir desse contexto, então **qualquer código que chegue a `repo.js` precisa estar dentro de `runWithCompany`**. O `requireAuth` faz isso para as rotas normais; handlers assíncronos que nascem do socket escapam do ALS e têm de reentrar na mão — é o caso do upload em `routes/cards.js`.
@@ -71,7 +71,7 @@ Colunas adicionadas depois costumam vir com um `UPDATE ... WHERE <coluna> IS NUL
 
 **`canSelfSelectPlan(company, alvo)` decide o autoatendimento.** Com plano pago em vigor, só subir. "Em vigor" é só `effectiveStatus === "active"` — teste, carência e vencido dão escolha livre, inclusive cair para o Básico e renovar o mesmo plano. Tratar teste como vigente travava a conversão de teste em cliente pagante, que é a coisa mais importante do produto.
 
-`effectiveStatus` tem quatro valores: `active`, `trialing`, `grace` e `expired`. `grace` é vencido com `companies.grace_until` no futuro — quem concede é a cobrança, e só para quem tem assinatura tentando pagar. Teste que terminou não recebe carência.
+`effectiveStatus` tem cinco valores: `blocked`, `active`, `trialing`, `grace` e `expired`. `blocked` vem antes de tudo e é bloqueio administrativo (ver a seção do painel). `grace` é vencido com `companies.grace_until` no futuro — quem concede é a cobrança, e só para quem tem assinatura tentando pagar. Teste que terminou não recebe carência.
 
 ### Cobrança
 
@@ -130,6 +130,26 @@ Sem token CSRF: `verifyOrigin` confere `Origin`/`Referer` em todo método que al
 > **`/api/billing/webhook` é montado ANTES do `verifyOrigin`, e a ordem no `app.js` importa.** Gateway não é navegador: manda POST sem `Origin` nem `Referer`, e a checagem de CSRF recusaria todo aviso de pagamento com 403 — as cobranças seriam confirmadas no gateway e nunca aqui. Quem autentica essa rota é a assinatura do provedor, dentro dela. Mexer na ordem dos `app.use` quebra os pagamentos sem erro visível.
 
 O webhook responde **200 mesmo quando ignora** o aviso. Erro ensinaria um atacante a distinguir aviso aceito de rejeitado, e faria o gateway legítimo reenviar sem parar. Só falha nossa ao aplicar devolve 500, porque aí o reenvio é o que queremos.
+
+### Painel da plataforma (`/admin`)
+
+Aplicação à parte, servida no mesmo endereço. Cliente em `src/admin/`, servidor em `server/admin/` e `routes/admin.js`. Gerencia empresas, abre os quadros de qualquer cliente, mostra métricas globais e controla permissões.
+
+**A autenticação é separada em todas as camadas, e isso não é redundância.** Tabela `platform_admins` em vez de uma coluna em `users`; segredo de assinatura próprio (`admin-jwt-secret.txt`, nunca o do app); cookie `cantiere_admin`; sessão de 4h contra os 7 dias do app. Um token do app não é aceito no painel nem por bug futuro de verificação, porque a assinatura não bate. `requireAdmin` lê **só** o cookie de admin e reconfere `active` a cada requisição — desativar alguém tira o acesso na mesma chamada, sem esperar o token expirar.
+
+> **`comAcessoAEmpresa()` (`admin/tenant.js`) é o único caminho pelo qual o painel toca em dado de cliente.** Ele registra a auditoria **antes** de conceder o acesso, no mesmo lugar que concede — não dá para ler os dados de alguém e esquecer de registrar. Rota nova que chame `runWithCompany` direto no `routes/admin.js` fura a trilha em silêncio. Se precisar de acesso novo, use essa função.
+
+`admin_audit` é append-only: não existe função de update nem de delete no store, de propósito. Trilha que o auditado pode editar não vale nada.
+
+`getWorkspaceCompleto()` no `repo.js` ignora a visibilidade e devolve inclusive quadros privados. Existe só para o painel em auditoria — **não chame do app do cliente**, que é onde a regra de quadro privado precisa continuar valendo.
+
+**Bloqueio administrativo é estado próprio** (`companies.blocked_at`), não um valor de `status`. Vencido é quem não pagou e volta pagando; bloqueado é decisão da plataforma e pagar não desfaz. `effectiveStatus` devolve `blocked`, `isWritable` recusa, e `canSelfSelectPlan` recusa — sem essa última, a empresa sairia do bloqueio contratando um plano.
+
+O primeiro admin é criado por `node server/admin/criarAdmin.js "Nome" email@dominio`, com a senha pedida no terminal. Não existe tela pública de primeiro acesso de propósito: seria uma corrida que se perde uma vez só, para sempre.
+
+O painel entra por `React.lazy` no `main.jsx`, fora dos provedores do app (sem AuthProvider, sem i18n, sem tema — são duas sessões distintas, e compartilhar contexto convidaria a confundir "usuário logado" com "administrador logado"). Vira um pedaço de ~21 kB que o cliente nunca baixa. Os textos são só em português: é ferramenta interna, com um público só.
+
+Em desenvolvimento o StrictMode chama os efeitos duas vezes, então a auditoria mostra entradas duplicadas. No build de produção não acontece.
 
 ### Estado do cliente: otimista, com sync separado
 
