@@ -322,6 +322,7 @@
     },
     "accountMenu": {
       "changePassword": "Change password",
+      "platformPanel": "Platform panel",
       "logout": "Sign out",
       "currentPassword": "Current password",
       "newPassword": "New password",

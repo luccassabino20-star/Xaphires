@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import PlanModal from "./PlanModal.jsx";
+
+// Carregado sob demanda: o painel arrasta junto os quatro componentes de
+// administração, e importá-lo direto colocava ~22 kB de ferramenta interna no
+// pacote que TODO cliente baixa. Assim ele só é buscado por quem abre o painel.
+const PlataformaModal = lazy(() => import("./PlataformaModal.jsx"));
 import * as api from "../state/api.js";
 import { initials, colorForUser } from "../utils/members.js";
 
@@ -14,6 +19,7 @@ export default function AccountMenu() {
   const [open, setOpen] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
+  const [plataformaOpen, setPlataformaOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
@@ -92,6 +98,14 @@ export default function AccountMenu() {
             </form>
           ) : (
             <>
+              {/* Só aparece para quem também administra a plataforma. Abrir o item
+                  não concede nada: o painel busca tudo da API de administração, que
+                  exige a sessão própria, e pede a senha na primeira vez. */}
+              {user.platformAdmin && (
+                <div className="dropdown-item" onClick={() => { setPlataformaOpen(true); setOpen(false); }}>
+                  {t("app.accountMenu.platformPanel")}
+                </div>
+              )}
               <div className="dropdown-item" onClick={() => { setPlanOpen(true); setOpen(false); }}>
                 {t("plan.menuItem")}
               </div>
@@ -106,6 +120,11 @@ export default function AccountMenu() {
         </div>
       )}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
+      {plataformaOpen && (
+        <Suspense fallback={null}>
+          <PlataformaModal onClose={() => setPlataformaOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }

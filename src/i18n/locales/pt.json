@@ -619,6 +619,7 @@
     },
     "accountMenu": {
       "changePassword": "Alterar senha",
+      "platformPanel": "Painel da plataforma",
       "logout": "Sair",
       "currentPassword": "Senha atual",
       "newPassword": "Nova senha",

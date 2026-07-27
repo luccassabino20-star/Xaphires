@@ -5,6 +5,7 @@ import { ah } from "../asyncHandler.js";
 import { runWithCompany } from "../context.js";
 import { rateLimit } from "../rateLimit.js";
 import * as directory from "../directory.js";
+import { acharAdminPorEmail } from "../admin/store.js";
 import { getSeedContent } from "../seedContent.js";
 import { DEFAULT_TRIAL_PLAN, trialEndsAt } from "../plans.js";
 import {
@@ -21,6 +22,22 @@ import {
 } from "../repo.js";
 
 const router = Router();
+
+// Este usuário também administra a plataforma? Serve APENAS para o app decidir se
+// mostra o atalho para o painel — não concede nada e não é lido em lugar nenhum
+// para autorizar. Abrir o painel continua exigindo a senha do cadastro separado.
+//
+// Por isso o casamento por e-mail é suficiente: mesmo que alguém criasse uma conta
+// de cliente com o e-mail de um administrador só para ver o link, o link não abre
+// porta nenhuma. Mostrar um atalho não é permitir passar por ele.
+function ehAdminDaPlataforma(user) {
+  const admin = acharAdminPorEmail(user?.email);
+  return !!admin && !!admin.active;
+}
+
+function usuarioComAtalho(user) {
+  return { ...publicUser(user), platformAdmin: ehAdminDaPlataforma(user) };
+}
 
 const CROSS_SITE = Boolean(process.env.FRONTEND_URL);
 const COOKIE_OPTS = {
@@ -79,7 +96,7 @@ router.get(
     if (!payload?.companyId) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
     const user = await runWithCompany(payload.companyId, () => getUserById(payload.sub));
     if (!user) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
-    res.json(publicUser(user));
+    res.json(usuarioComAtalho(user));
   })
 );
 
@@ -140,7 +157,7 @@ router.post(
     }
 
     setAuthCookie(res, user, companyId);
-    res.status(201).json(publicUser(user));
+    res.status(201).json(usuarioComAtalho(user));
   })
 );
 
@@ -160,7 +177,7 @@ router.post(
     // Acertou a senha: o dono legítimo da conta não fica preso pelas tentativas anteriores.
     loginLimitByEmail.reset(req);
     setAuthCookie(res, user, companyId);
-    res.json(publicUser(user));
+    res.json(usuarioComAtalho(user));
   })
 );
 
