@@ -3397,3 +3397,174 @@ input, textarea { font-family: inherit; }
   align-items: center;
 }
 .mp-field iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+/* ---------- Painel da plataforma (/admin) ---------- */
+/* Paleta própria, e mais clara que a do app. É ferramenta de trabalho para leitura
+   de tabela e número, onde tela escura cansa mais; e o contraste visível ajuda a
+   lembrar que não se está dentro do produto do cliente. */
+.adm-shell, .adm-login, .adm-carregando {
+  --adm-fundo: #f6f7f9;
+  --adm-superficie: #ffffff;
+  --adm-borda: #dcdfe4;
+  --adm-texto: #1a1c20;
+  --adm-fraco: #6b7280;
+  --adm-acento: #2563eb;
+  --adm-perigo: #b3444a;
+  --adm-ok: #16a34a;
+  --adm-alerta: #c9922f;
+  font-family: var(--font);
+  color: var(--adm-texto);
+  background: var(--adm-fundo);
+  min-height: 100vh;
+}
+.adm-carregando, .adm-login { display: flex; align-items: center; justify-content: center; }
+.adm-carregando { color: var(--adm-fraco); font-size: 14px; }
+
+.adm-login-card {
+  width: 100%; max-width: 360px; padding: 28px;
+  background: var(--adm-superficie); border: 1px solid var(--adm-borda);
+  border-radius: 12px; display: flex; flex-direction: column; gap: 12px;
+  box-shadow: 0 6px 24px rgba(20,22,30,0.08);
+}
+.adm-login-marca { font-family: "Playfair Display", serif; font-size: 26px; font-weight: 700; }
+.adm-login-sub { font-size: 13px; color: var(--adm-fraco); margin-bottom: 6px; }
+.adm-login-nota { margin: 4px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--adm-fraco); }
+
+.adm-topo {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 20px; height: 56px;
+  background: var(--adm-superficie); border-bottom: 1px solid var(--adm-borda);
+  position: sticky; top: 0; z-index: 10;
+}
+.adm-marca { font-family: "Playfair Display", serif; font-size: 19px; font-weight: 700; }
+.adm-marca span { font-family: var(--font); font-size: 11px; font-weight: 600; color: var(--adm-fraco); text-transform: uppercase; letter-spacing: 0.06em; margin-left: 6px; }
+.adm-abas { display: flex; gap: 4px; margin-left: 12px; }
+.adm-aba {
+  padding: 7px 13px; border: 0; border-radius: 7px; background: transparent;
+  font-size: 13.5px; font-weight: 500; color: var(--adm-fraco); cursor: pointer;
+}
+.adm-aba:hover { background: var(--adm-fundo); color: var(--adm-texto); }
+.adm-aba.ativa { background: var(--adm-texto); color: #fff; }
+.adm-conta { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--adm-fraco); }
+
+/* Aviso permanente sobre a auditoria. Faixa fixa, sem botão de fechar: quem opera
+   precisa lembrar o tempo todo de que está mexendo em dado de cliente. */
+.adm-aviso {
+  padding: 9px 20px; font-size: 12.5px; line-height: 1.5;
+  background: color-mix(in srgb, var(--adm-alerta) 14%, var(--adm-superficie));
+  border-bottom: 1px solid color-mix(in srgb, var(--adm-alerta) 30%, var(--adm-borda));
+  color: color-mix(in srgb, var(--adm-alerta) 70%, var(--adm-texto));
+}
+
+.adm-conteudo { padding: 20px; max-width: 1200px; margin: 0 auto; }
+.adm-painel, .adm-detalhe { display: flex; flex-direction: column; gap: 16px; }
+.adm-barra { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.adm-barra .adm-fraco { flex: 1; margin: 0; }
+.adm-busca {
+  flex: 1; min-width: 200px; padding: 8px 11px; font-size: 13.5px;
+  border: 1px solid var(--adm-borda); border-radius: 8px; background: var(--adm-superficie); color: inherit;
+}
+
+.adm-btn {
+  padding: 8px 13px; font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--adm-borda); border-radius: 8px;
+  background: var(--adm-superficie); color: var(--adm-texto);
+}
+.adm-btn:hover:not(:disabled) { border-color: var(--adm-fraco); }
+.adm-btn:disabled { opacity: 0.45; cursor: default; }
+.adm-btn-primario { background: var(--adm-texto); color: #fff; border-color: var(--adm-texto); }
+.adm-btn-perigo { background: var(--adm-perigo); color: #fff; border-color: var(--adm-perigo); }
+.adm-btn-fantasma { background: transparent; border-color: transparent; color: var(--adm-fraco); }
+.adm-btn-fantasma:hover { background: var(--adm-fundo); color: var(--adm-texto); }
+.adm-perigo-texto { color: var(--adm-perigo); }
+.adm-botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.adm-campo { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--adm-fraco); }
+.adm-campo input, .adm-campo select, .adm-campo textarea {
+  padding: 8px 11px; font-size: 13.5px; font-family: inherit;
+  border: 1px solid var(--adm-borda); border-radius: 8px;
+  background: var(--adm-superficie); color: var(--adm-texto);
+}
+.adm-grade2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.adm-form-nova {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px;
+  background: var(--adm-superficie); border: 1px solid var(--adm-borda); border-radius: 10px;
+}
+.adm-form-nova .adm-btn-primario { align-self: flex-start; }
+
+.adm-erro {
+  padding: 9px 12px; border-radius: 8px; font-size: 13px;
+  background: color-mix(in srgb, var(--adm-perigo) 12%, transparent); color: var(--adm-perigo);
+}
+.adm-fraco { color: var(--adm-fraco); font-size: 12.5px; }
+.adm-direita { text-align: right; }
+.adm-nowrap { white-space: nowrap; }
+
+.adm-tabela {
+  width: 100%; border-collapse: collapse; font-size: 13.5px;
+  background: var(--adm-superficie); border: 1px solid var(--adm-borda); border-radius: 10px; overflow: hidden;
+}
+.adm-tabela th {
+  text-align: left; padding: 9px 12px; font-size: 11.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--adm-fraco);
+  border-bottom: 1px solid var(--adm-borda);
+}
+.adm-tabela td { padding: 10px 12px; border-bottom: 1px solid var(--adm-borda); vertical-align: middle; }
+.adm-tabela tr:last-child td { border-bottom: 0; }
+.adm-linha-clicavel { cursor: pointer; }
+.adm-linha-clicavel:hover { background: var(--adm-fundo); }
+
+.adm-chip {
+  display: inline-block; padding: 2px 8px; margin-right: 4px;
+  border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: var(--adm-fundo); color: var(--adm-fraco); border: 1px solid var(--adm-borda);
+}
+.adm-chip-active { background: color-mix(in srgb, var(--adm-ok) 15%, transparent); color: var(--adm-ok); border-color: transparent; }
+.adm-chip-trialing { background: color-mix(in srgb, var(--adm-acento) 15%, transparent); color: var(--adm-acento); border-color: transparent; }
+.adm-chip-grace, .adm-chip-expired { background: color-mix(in srgb, var(--adm-alerta) 18%, transparent); color: var(--adm-alerta); border-color: transparent; }
+.adm-chip-blocked { background: color-mix(in srgb, var(--adm-perigo) 15%, transparent); color: var(--adm-perigo); border-color: transparent; }
+.adm-chip-master { background: var(--adm-texto); color: #fff; border-color: transparent; }
+.adm-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.adm-bloqueio {
+  padding: 10px 12px; border-radius: 8px; font-size: 13px;
+  background: color-mix(in srgb, var(--adm-perigo) 10%, transparent); color: var(--adm-perigo);
+}
+
+.adm-secao {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px;
+  background: var(--adm-superficie); border: 1px solid var(--adm-borda); border-radius: 10px;
+}
+.adm-secao h3 { margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--adm-fraco); }
+.adm-secao .adm-tabela { border: 0; }
+.adm-detalhe-topo { display: flex; align-items: center; justify-content: space-between; }
+.adm-detalhe-topo h2 { margin: 0; font-size: 21px; }
+
+.adm-cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.adm-cartao { padding: 14px; background: var(--adm-superficie); border: 1px solid var(--adm-borda); border-radius: 10px; }
+.adm-cartao-valor { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.adm-cartao-rotulo { font-size: 11.5px; color: var(--adm-fraco); margin-top: 2px; }
+.adm-metricas { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 10px; }
+.adm-metrica { text-align: center; padding: 10px; background: var(--adm-fundo); border-radius: 8px; }
+.adm-metrica-valor { font-size: 19px; font-weight: 700; }
+.adm-metrica-nome { font-size: 11px; color: var(--adm-fraco); }
+
+.adm-barra-trilho { height: 6px; background: var(--adm-fundo); border-radius: 999px; overflow: hidden; min-width: 80px; }
+.adm-barra-preenchida { height: 100%; background: var(--adm-acento); border-radius: 999px; }
+
+.adm-quadros { display: flex; flex-direction: column; gap: 14px; }
+.adm-quadro { padding: 12px; background: var(--adm-fundo); border-radius: 8px; }
+.adm-quadro-titulo { font-weight: 600; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+/* Rolagem horizontal contida na própria faixa: quadro com muitas colunas não pode
+   empurrar a largura da página inteira. */
+.adm-quadro-listas { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.adm-quadro-lista { min-width: 170px; flex-shrink: 0; }
+.adm-quadro-lista-nome { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+.adm-quadro-cartao {
+  padding: 6px 8px; margin-bottom: 4px; font-size: 12px;
+  background: var(--adm-superficie); border: 1px solid var(--adm-borda); border-radius: 6px;
+}
+
+.adm-acao { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.adm-acao.sensivel { color: var(--adm-acento); font-weight: 600; }
+.adm-acao.destrutiva { color: var(--adm-perigo); font-weight: 600; }

@@ -491,10 +491,44 @@ export function deleteMinute(id) {
   getDb().prepare("DELETE FROM minutes WHERE id = ?").run(id);
 }
 
+// Um cartão isolado, para o painel de plataforma poder registrar o antes e o depois
+// de uma correção de suporte.
+export function getCardById(id) {
+  const c = getDb().prepare("SELECT * FROM cards WHERE id = ?").get(id);
+  if (!c) return null;
+  return {
+    id: c.id,
+    listId: c.list_id,
+    title: c.title,
+    description: c.description,
+    labels: JSON.parse(c.labels || "[]"),
+    due: c.due || null,
+    startDate: c.start_date || null,
+    checklist: JSON.parse(c.checklist || "[]"),
+    memberIds: JSON.parse(c.member_ids || "[]"),
+    completed: !!c.completed,
+    urgent: !!c.urgent,
+    important: !!c.important,
+    archived: !!c.archived,
+  };
+}
+
+// Workspace sem filtro de visibilidade, incluindo quadros privados. Existe só para
+// o painel de plataforma em modo auditoria, e o acesso a ele é registrado em
+// admin/tenant.js — nunca chame daqui do app do cliente, que é onde a regra de
+// quadro privado precisa continuar valendo.
+export function getWorkspaceCompleto() {
+  return montarWorkspace(getDb().prepare("SELECT * FROM boards ORDER BY position ASC").all());
+}
+
 export function getWorkspace(userId) {
   const boards = getDb()
     .prepare("SELECT * FROM boards WHERE visibility = 'shared' OR owner_id = ? ORDER BY position ASC")
     .all(userId);
+  return montarWorkspace(boards);
+}
+
+function montarWorkspace(boards) {
   const lists = getDb().prepare("SELECT * FROM lists ORDER BY position ASC").all();
   const cards = getDb().prepare("SELECT * FROM cards ORDER BY position ASC").all();
 

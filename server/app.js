@@ -17,6 +17,7 @@ import { router as planRouter } from "./routes/plan.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as billingRouter } from "./routes/billing.js";
 import { router as billingWebhookRouter } from "./routes/billingWebhook.js";
+import { router as adminRouter } from "./routes/admin.js";
 
 export const app = express();
 
@@ -45,6 +46,11 @@ app.use("/api", verifyOrigin);
 
 // Auth e plano ficam fora do bloqueio de escrita: sem isso, uma empresa vencida
 // não conseguiria nem entrar nem trocar de plano para voltar a escrever.
+// Painel de plataforma. Fora do requireAuth e do requireWritablePlan do app: tem
+// autenticação própria, com credencial, cookie e segredo separados — ver
+// admin/auth.js. Nenhuma sessão de cliente vale aqui.
+app.use("/api/admin", adminRouter);
+
 app.use("/api/auth", authRouter);
 app.use("/api/plan", planRouter);
 // Cobrança fica fora do bloqueio de escrita pelo mesmo motivo do plano: empresa

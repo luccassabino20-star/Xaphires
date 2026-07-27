@@ -59,6 +59,10 @@ export function trialEndsAt(from = new Date()) {
 // O plano gratuito não expira: só planos pagos têm prazo. Isso é o que permite
 // alguém cair para o Básico depois do teste e continuar usando.
 export function effectiveStatus(company, now = new Date()) {
+  // Bloqueio administrativo vence tudo, inclusive plano pago em dia. É decisão da
+  // plataforma, e por isso não pode ser desfeito por pagamento nem por troca de
+  // plano — só pelo painel que bloqueou.
+  if (company?.blocked_at) return "blocked";
   const plan = getPlan(company?.plan);
   if (!plan.paid) return "active";
   if (!company?.expires_at) return "active";
@@ -70,8 +74,10 @@ export function effectiveStatus(company, now = new Date()) {
   return "expired";
 }
 
+const SEM_ESCRITA = new Set(["expired", "blocked"]);
+
 export function isWritable(company, now = new Date()) {
-  return effectiveStatus(company, now) !== "expired";
+  return !SEM_ESCRITA.has(effectiveStatus(company, now));
 }
 
 // Quantos dias faltam. Negativo significa vencido; null quando não há prazo.
@@ -118,6 +124,9 @@ export function canSelfSelectPlan(company, targetPlanId) {
   const alvo = PLANS[targetPlanId];
   if (!alvo) return false;
   if (alvo.price === null) return false;
+  // Empresa bloqueada não sai do bloqueio contratando plano. O bloqueio é decisão
+  // da plataforma; pagar não deve desfazê-lo.
+  if (company?.blocked_at) return false;
 
   // "Em vigor" é só o plano pago ATIVO. Teste e carência não contam: em nenhum dos
   // dois a empresa está pagando, então não há ciclo contratado a proteger — e tratar
