@@ -15,8 +15,8 @@ export const TRIAL_DAYS = 7;
 // proporcional em cima disso fecha com centavo de diferença do extrato. O campo
 // `price` em reais continua existindo, derivado, só para exibição.
 const DEFINICOES = {
-  basic: { rank: 0, maxUsers: 3, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024 },
-  intermediate: { rank: 1, maxUsers: 10, paid: true, priceCents: 34999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
+  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024 },
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 34999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
   professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 }, // null = ilimitado
   enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
 };
