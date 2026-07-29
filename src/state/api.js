@@ -209,3 +209,71 @@ export const createRecurrence = (boardId, data) =>
   request(`/recurrences/board/${boardId}`, { method: "POST", body: data });
 export const updateRecurrence = (id, patch) => request(`/recurrences/${id}`, { method: "PATCH", body: patch });
 export const deleteRecurrence = (id) => request(`/recurrences/${id}`, { method: "DELETE" });
+
+// ---------- Relatórios ----------
+
+// Os filtros viram query string num só lugar, para o contador e o download nunca
+// pedirem coisas diferentes: se divergissem, o número na tela deixaria de descrever
+// o arquivo que o botão baixa.
+function filtrosDoRelatorio({ boardId, memberId, status }) {
+  const p = new URLSearchParams();
+  if (boardId) p.set("boardId", boardId);
+  // memberId ausente significa "todos os responsáveis" para o servidor, então o
+  // vazio do seletor não pode virar `memberId=` na URL.
+  if (memberId) p.set("memberId", memberId);
+  if (status) p.set("status", status);
+  return p;
+}
+
+export const contarCartoesDoRelatorio = (filtros) => request(`/reports/contagem?${filtrosDoRelatorio(filtros)}`);
+
+/**
+ * Baixa o relatório gerado pelo servidor.
+ *
+ * Vai por fetch e não por <a href> ou window.open de propósito: com FRONTEND_URL
+ * definida a API mora em outra origem, e só o fetch com `credentials` leva o cookie
+ * de sessão junto. Um href simples baixaria uma página de erro 401 com nome de
+ * planilha, e o usuário só descobriria ao abrir o arquivo.
+ */
+export async function baixarRelatorio({ formato, lang, ...filtros }) {
+  const p = filtrosDoRelatorio(filtros);
+  if (lang) p.set("lang", lang);
+  let res;
+  try {
+    res = await fetch(`${BASE}/reports/${formato}?${p}`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    // O corpo do erro é JSON mesmo numa rota que responde arquivo, então dá para
+    // traduzir pelo code como no `request()`. Resposta ilegível vira erro genérico
+    // em vez de estourar o JSON.parse por cima do erro real.
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      /* resposta sem corpo JSON */
+    }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+
+  // O nome do arquivo é o que o servidor decidiu no Content-Disposition - ele já
+  // monta um nome sem acento e com a data. Cai para um padrão só se o cabeçalho não
+  // vier, o que acontece atrás de proxy que o remove.
+  const disposicao = res.headers.get("Content-Disposition") || "";
+  const casado = /filename="?([^";]+)"?/i.exec(disposicao);
+  const nome = casado ? casado[1] : `relatorio.${formato}`;
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}

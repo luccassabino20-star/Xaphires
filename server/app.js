@@ -9,6 +9,7 @@ import { verifyOrigin, requireAuth, requireWritablePlan } from "./middleware.js"
 import { router as authRouter } from "./routes/auth.js";
 import { router as usersRouter } from "./routes/users.js";
 import { router as boardsRouter } from "./routes/boards.js";
+import { router as reportsRouter } from "./routes/reports.js";
 import { router as listsRouter } from "./routes/lists.js";
 import { router as cardsRouter } from "./routes/cards.js";
 import { router as geocodeRouter } from "./routes/geocode.js";
@@ -64,6 +65,9 @@ app.use("/api/cards", requireAuth, requireWritablePlan, cardsRouter);
 app.use("/api/geocode", geocodeRouter);
 app.use("/api/minutes", requireAuth, requireWritablePlan, minutesRouter);
 app.use("/api/recurrences", requireAuth, requireWritablePlan, recurrencesRouter);
+// Relatório é leitura, e requireWritablePlan já libera GET - fica no mesmo grupo por
+// coerência, e empresa vencida continua conseguindo exportar os próprios dados.
+app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);
 
 const distPath = path.join(process.cwd(), "dist");
 if (fs.existsSync(distPath)) {

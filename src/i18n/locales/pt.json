@@ -605,6 +605,7 @@
       "moreOptions": "Mais opções",
       "personalize": "Personalizar",
       "dataSection": "Dados",
+      "exportReport": "Exportar relatório",
       "exportCurrent": "Exportar quadro atual",
       "exportAll": "Exportar tudo (backup)",
       "importJson": "Importar JSON",
@@ -684,6 +685,26 @@
         "5": "sexta",
         "6": "sábado"
       }
+    },
+    "exportReport": {
+      "title": "Exportar relatório do Kanban",
+      "scope": "Quadro: {{board}}",
+      "userLabel": "Usuário",
+      "allUsers": "Todos os usuários",
+      "statusLabel": "Status do cartão",
+      "statusAll": "Todos",
+      "statusOpen": "Apenas abertos",
+      "statusDone": "Apenas concluídos",
+      "count": "{{count}} cartão encontrado",
+      "count_other": "{{count}} cartões encontrados",
+      "counting": "Contando cartões...",
+      "countFailed": "Não foi possível contar os cartões",
+      "emptyHint": "Nenhum cartão corresponde aos filtros escolhidos. O arquivo sai só com o cabeçalho.",
+      "downloadCsv": "Baixar relatório (CSV)",
+      "downloadPdf": "Baixar relatório (PDF)",
+      "downloadExcel": "Baixar relatório (Excel)",
+      "generating": "Gerando...",
+      "downloadStarted": "Relatório gerado"
     },
     "bottlenecks": {
       "bareHours": "{{count}} hora",

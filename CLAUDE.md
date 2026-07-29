@@ -55,7 +55,9 @@ Excluir uma empresa é: apagar `payments`, `subscriptions`, `user_directory` e `
 
 `db.js applySchema()` roda a cada abertura de banco: `CREATE TABLE IF NOT EXISTS` mais `addColumnIfMissing` para tudo que veio depois. Coluna nova entra ali, com o comentário do porquê do default — não existe pasta de migrations. O mesmo padrão vale para `directory.js`.
 
-Colunas adicionadas depois costumam vir com um `UPDATE ... WHERE <coluna> IS NULL` de retrocompatibilidade logo abaixo (ver `completed_at`, `list_entered_at`): sem isso, ligar um recurso novo faria o histórico inteiro parecer vencido de uma vez.
+Colunas adicionadas depois costumam vir com um `UPDATE ... WHERE <coluna> IS NULL` de retrocompatibilidade logo abaixo (ver `completed_at`, `list_entered_at`, `created_at`): sem isso, ligar um recurso novo faria o histórico inteiro parecer vencido de uma vez. **A ordem entre eles importa quando um preenche a partir do outro** — o de `created_at` usa `COALESCE(list_entered_at, agora)` e por isso roda depois do de `list_entered_at`.
+
+**O `applySchema` de empresa é preguiçoso.** O banco de empresa só abre quando alguém a usa, então coluna nova não aparece no arranque do servidor — ela entra na primeira requisição autenticada daquela empresa. Não conte com a migração tendo acontecido só porque o processo subiu.
 
 ### Planos
 
@@ -131,6 +133,25 @@ Sem token CSRF: `verifyOrigin` confere `Origin`/`Referer` em todo método que al
 
 O webhook responde **200 mesmo quando ignora** o aviso. Erro ensinaria um atacante a distinguir aviso aceito de rejeitado, e faria o gateway legítimo reenviar sem parar. Só falha nossa ao aplicar devolve 500, porque aí o reenvio é o que queremos.
 
+### Quadro privado e permissões
+
+Quadro tem duas visibilidades. `shared` é da empresa inteira: todo mundo entra e escreve, e não existe convite. `private` é do dono, e só chega a quem ele convidar, um a um.
+
+`board_permissions (board_id, user_id, role)` guarda os convites, no banco da empresa. Três papéis: `owner`, `editor` (colabora como em quadro compartilhado) e `viewer` (só lê).
+
+> **A autoridade sobre o dono é `boards.owner_id`, não a linha `owner` da tabela.** Essa linha é derivada, existe para o modal listar todo mundo com acesso numa consulta só, e nenhuma decisão de acesso a lê — autorização que dependesse dela abriria a porta a qualquer escrita capaz de inserir uma linha ali. `POST .../permissions` recusa o papel `owner`, e `revokeBoardPermission` tem `AND role <> 'owner'` no `DELETE`: sem isso um id errado deixaria o quadro sem ninguém que pudesse administrá-lo.
+
+`boardRoleFor(user, access)` em `middleware.js` é a autoridade única do papel, e é o que `requireBoardAccess` / `requireBoardAccessParam` chamam. Duas consequências:
+
+1. **Leitor é barrado no mesmo lugar em que o acesso é conferido** (`role === "viewer"` e método que não é seguro → 403 `FORBIDDEN_BOARD_READ_ONLY`). Cartão, lista, recorrência e anexo passam todos por um desses dois middlewares, então rota nova nasce protegida — como no `requireWritablePlan`.
+2. **Master não fura quadro privado**, e nunca furou. Privado é privado inclusive para o master da empresa; quem enxerga tudo é o painel da plataforma, com auditoria.
+
+O filtro do workspace é a primeira camada, não a segunda: `getWorkspace(userId)` só traz o quadro privado alheio se houver concessão, e é isso que o mantém fora da barra lateral. `GET /api/boards/:id` existe para o acesso direto por id devolver 403 em vez de conteúdo.
+
+`GET /api/boards` devolve por quadro o **papel já resolvido** (`myRole`) e os convidados (`sharedWith`), mesmo princípio de `/api/plan`: o cliente desenha o que veio e não reimplementa a regra. Ler `myRole === "viewer"` é como TopBar, BoardView, ListColumn, CardItem, CardModal e DataMenu decidem o que esconder. Esconder importa mesmo com o servidor recusando: o estado do cliente é otimista e sem rollback, então uma escrita que a API nega ficaria visível na tela até o próximo carregamento.
+
+Administrar o quadro privado (excluir, limpar, compartilhar) é do dono. Antes das permissões, ter acesso a um privado e ser dono eram a mesma coisa, e a checagem de visibilidade bastava — hoje não basta: veja o `req.boardRole !== "owner"` no `DELETE /api/boards/:id`.
+
 ### Painel da plataforma
 
 Gerencia empresas, abre os quadros de qualquer cliente, mostra métricas globais e controla permissões. Servidor em `server/admin/` e `routes/admin.js`; componentes em `src/admin/`.
@@ -191,11 +212,35 @@ A varredura de cobrança fica dentro de `try/catch` na rota: gateway fora do ar 
 
 Upload em streaming com busboy, fora do `request()` do `api.js`. O teto do plano é verificado **durante** a transferência (`limits.fileSize`), então arquivo grande é abortado no meio. Arquivo no disco da empresa, metadados no JSON `cards.attachments`. Subir o limite é trocar o número em `plans.js` — o arquivo nunca fica inteiro na memória.
 
+### Relatório exportado
+
+Modal em `components/ExportReportModal.jsx`, aberto pelo menu de dados. Dois filtros (responsável e situação), um contador que reage a eles, e download em CSV, PDF ou Excel. Servidor em `server/reports/` e `routes/reports.js`.
+
+> **`reports/dados.js` é a fonte única dos números.** O CSV, o Excel e o PDF só desenham o que `montarRelatorio()` devolveu — nenhum deles decide o que é "concluído", o que entra ou o que fica de fora. Regra nova de conteúdo entra ali, uma vez, senão os três formatos passam a discordar entre si sobre o mesmo filtro.
+
+> **A leitura é sempre `repo.getWorkspace(usuarioLogado)`,** nunca `getWorkspaceCompleto` nem consulta própria em `cards`. É essa função que aplica a regra de quadro privado. Filtrar por responsável **depois** não protege nada: pedir o relatório "do Fulano" não pode devolver os cartões dele em quadro que quem pediu não enxerga.
+
+**O contador do modal chama o mesmo `montarRelatorio`** (`GET /api/reports/contagem`), e devolve `kpis.total`. Contar de novo no cliente sairia mais barato e criaria uma segunda definição de "cartão que conta" — o número na tela deixaria de descrever o arquivo que o botão baixa.
+
+**Concluído é o checkbox do cartão OU a coluna em que ele está.** `colunaDeConclusao()` compara o título da lista normalizado (sem acento, sem caixa, sem pontuação) contra um conjunto fechado de palavras nos três idiomas. A comparação é por igualdade, e não por `includes`, de propósito: com `includes` uma coluna "A concluir" ou "Não concluído" — que é o oposto — entraria como concluída e inflaria a taxa de conclusão.
+
+**`cards.created_at` foi adicionada para este recurso.** O quadro nunca precisou da data de nascimento do cartão; quem precisa é a coluna "Criado em" do arquivo. Cartões anteriores herdam `list_entered_at` no backfill, que é a marca mais antiga que existe deles — é aproximação, e o banco antigo mostra a data da migração. O backfill roda **depois** do de `list_entered_at`, senão o `COALESCE` não acha nada.
+
+Três decisões do CSV que vêm de "abrir no Excel com dois cliques", e não do RFC: separador `;` (o Excel pt-BR lê vírgula como decimal e joga tudo na coluna A), BOM UTF-8 no início (sem ele "Concluído" vira "ConcluÃ­do"), e fim de linha CRLF.
+
+**Título de cartão é texto de usuário, então o CSV neutraliza fórmula:** campo começando por `=`, `+`, `-` ou `@` ganha apóstrofo. Sem isso um cartão chamado `=HYPERLINK(...)` vira fórmula ativa na planilha de quem abrir o relatório.
+
+A coluna Situação é **binária** (concluída ou pendente). Atrasado continua pendente e não vira terceira categoria: quem abre o CSV faz tabela dinâmica por essa coluna, e um terceiro valor quebraria a soma. O atraso está no prazo, na coluna ao lado, e o PDF e o Excel continuam destacando-o.
+
+`/reports/contagem` é registrada **antes** de `/reports/:formato`, senão o parâmetro engole "contagem".
+
 ### i18n e erros
 
 Três locales em `src/i18n/locales/` (`pt` é o fallback), detecção por `localStorage` na chave `kanban-language`. O servidor semeia o quadro inicial no idioma do cadastro (`seedContent.js`).
 
 Erro de API tem mensagem em português **e** um `code` estável. O cliente traduz pelo code (`utils/errors.js translateError`) e cai na mensagem do servidor quando não há tradução. Portanto: erro novo precisa de `code`, e a chave `errors.<CODE>` nos três JSONs.
+
+**Falha de rede não é resposta de erro, e por isso não tem `code` vindo do servidor.** O `fetch()` só rejeita quando a requisição não chegou a acontecer — servidor fora do ar, porta errada, rede caída. Deixado cru, o `translateError` cai no `err.message` e mostra o "Failed to fetch" do navegador, em inglês, no meio de um app traduzido. Os quatro pontos de `fetch` do projeto convertem isso em `NETWORK_UNREACHABLE`: `request()`, `addFileAttachment()` e `baixarRelatorio()` pelo helper `erroDeRede()` em `state/api.js`, e `admin/api.js` com a mensagem escrita à mão, porque o painel não passa pelo i18n e mostra `err.message` direto. **Ponto de `fetch` novo precisa do mesmo tratamento** — não há interceptador global que o faça por você.
 
 ## Convenções
 

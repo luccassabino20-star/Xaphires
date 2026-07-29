@@ -233,9 +233,13 @@ export function createCard(listId, { id, title }) {
   // list_entered_at nasce preenchido: sem isso o cartão fica com NULL e o monitor
   // de gargalos nunca o enxerga, porque hoursStuck() devolve null para NULL. Era
   // justamente o cartão criado e esquecido numa coluna que passava batido.
+  // created_at e list_entered_at nascem com a mesma marca: no instante da criação o
+  // cartão acabou de entrar na primeira coluna, e gerar dois nowIso() diferentes só
+  // criaria uma diferença de milissegundos para alguém estranhar depois no relatório.
+  const agora = nowIso();
   getDb().prepare(
-    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, member_ids, position, list_entered_at) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', ?, ?)"
-  ).run(cardId, listId, title, pos, nowIso());
+    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, member_ids, position, list_entered_at, created_at) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', ?, ?, ?)"
+  ).run(cardId, listId, title, pos, agora, agora);
   return cardId;
 }
 export function deleteCard(id) {
@@ -792,8 +796,8 @@ export function runRecurrences(now = new Date()) {
     getDb()
       .prepare(
         `INSERT INTO cards
-         (id, list_id, title, description, labels, due, checklist, member_ids, position, list_entered_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         (id, list_id, title, description, labels, due, checklist, member_ids, position, list_entered_at, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         cardId,
@@ -807,6 +811,10 @@ export function runRecurrences(now = new Date()) {
         JSON.stringify(JSON.parse(row.checklist || "[]").map((i) => ({ text: i.text, done: false }))),
         row.member_ids || "[]",
         pos,
+        marca,
+        // A ocorrência da rotina nasce agora, não na data da ocorrência devida: o
+        // relatório pergunta quando o cartão passou a existir, e é hoje que ele
+        // apareceu no quadro para alguém fazer.
         marca
       );
 

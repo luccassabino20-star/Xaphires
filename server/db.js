@@ -139,6 +139,10 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "cards", "completed_at", "completed_at TEXT");
   // Quando o cartão entrou na coluna atual. Base do monitor de gargalos.
   addColumnIfMissing(companyDb, "cards", "list_entered_at", "list_entered_at TEXT");
+  // Quando o cartão nasceu. A tabela viveu muito tempo sem esta coluna porque o
+  // quadro nunca precisou dela - quem precisa é o relatório exportado, que traz
+  // "Data de Criação". Fica TEXT ISO, como as outras datas com hora.
+  addColumnIfMissing(companyDb, "cards", "created_at", "created_at TEXT");
   // Horas até a coluna acusar gargalo. NULL = coluna não monitorada, que é o padrão:
   // "parado" significa coisas diferentes por coluna, e um prazo global acusaria
   // gargalo em espera legítima como Backlog.
@@ -156,6 +160,29 @@ function applySchema(companyDb) {
   // agora, senão apareceriam todos como parados desde sempre no primeiro uso.
   companyDb
     .prepare("UPDATE cards SET list_entered_at = ? WHERE list_entered_at IS NULL")
+    .run(new Date().toISOString());
+  // Cartão anterior a created_at não tem data de nascimento em lugar nenhum - ela
+  // nunca foi gravada, então não há como recuperá-la. Herda list_entered_at, que é
+  // a marca mais antiga que existe do cartão, e só cai para agora quando nem essa
+  // existe. Roda DEPOIS do preenchimento acima de propósito: assim o COALESCE
+  // encontra list_entered_at já preenchido e os dois contam a mesma história.
+  // O relatório de um banco antigo mostra, portanto, a data da migração para os
+  // cartões velhos - é aproximação, não invenção de data plausível.
+  companyDb
+    .prepare("UPDATE cards SET created_at = COALESCE(list_entered_at, ?) WHERE created_at IS NULL")
+    .run(new Date().toISOString());
+
+  // Quadros privados criados antes da tabela de permissões não têm a linha do dono.
+  // Sem este preenchimento o modal de compartilhamento abriria sem ninguém na lista,
+  // como se o quadro não tivesse dono. O JOIN com users é proposital: quadro cujo
+  // dono já foi excluído tem owner_id órfão, e a chave estrangeira recusaria a linha.
+  companyDb
+    .prepare(
+      `INSERT OR IGNORE INTO board_permissions (board_id, user_id, role, created_at)
+       SELECT b.id, b.owner_id, 'owner', ?
+         FROM boards b JOIN users u ON u.id = b.owner_id
+        WHERE b.visibility = 'private'`
+    )
     .run(new Date().toISOString());
 
   // `due` é uma data civil (YYYY-MM-DD), o formato que o <input type="date"> produz

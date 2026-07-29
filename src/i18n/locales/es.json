@@ -308,6 +308,7 @@
       "moreOptions": "Más opciones",
       "personalize": "Personalizar",
       "dataSection": "Datos",
+      "exportReport": "Exportar informe",
       "exportCurrent": "Exportar tablero actual",
       "exportAll": "Exportar todo (respaldo)",
       "importJson": "Importar JSON",
@@ -387,6 +388,26 @@
         "5": "viernes",
         "6": "sábado"
       }
+    },
+    "exportReport": {
+      "title": "Exportar informe del Kanban",
+      "scope": "Tablero: {{board}}",
+      "userLabel": "Usuario",
+      "allUsers": "Todos los usuarios",
+      "statusLabel": "Estado de la tarjeta",
+      "statusAll": "Todos",
+      "statusOpen": "Solo abiertas",
+      "statusDone": "Solo completadas",
+      "count": "{{count}} tarjeta encontrada",
+      "count_other": "{{count}} tarjetas encontradas",
+      "counting": "Contando tarjetas...",
+      "countFailed": "No se pudieron contar las tarjetas",
+      "emptyHint": "Ninguna tarjeta coincide con los filtros elegidos. El archivo saldrá solo con el encabezado.",
+      "downloadCsv": "Descargar informe (CSV)",
+      "downloadPdf": "Descargar informe (PDF)",
+      "downloadExcel": "Descargar informe (Excel)",
+      "generating": "Generando...",
+      "downloadStarted": "Informe generado"
     },
     "bottlenecks": {
       "bareHours": "{{count}} hora",

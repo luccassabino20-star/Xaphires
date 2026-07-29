@@ -308,6 +308,7 @@
       "moreOptions": "More options",
       "personalize": "Customize",
       "dataSection": "Data",
+      "exportReport": "Export report",
       "exportCurrent": "Export current board",
       "exportAll": "Export everything (backup)",
       "importJson": "Import JSON",
@@ -387,6 +388,26 @@
         "5": "Friday",
         "6": "Saturday"
       }
+    },
+    "exportReport": {
+      "title": "Export Kanban report",
+      "scope": "Board: {{board}}",
+      "userLabel": "User",
+      "allUsers": "All users",
+      "statusLabel": "Card status",
+      "statusAll": "All",
+      "statusOpen": "Open only",
+      "statusDone": "Completed only",
+      "count": "{{count}} card found",
+      "count_other": "{{count}} cards found",
+      "counting": "Counting cards...",
+      "countFailed": "The cards could not be counted",
+      "emptyHint": "No card matches the selected filters. The file will contain only the header row.",
+      "downloadCsv": "Download report (CSV)",
+      "downloadPdf": "Download report (PDF)",
+      "downloadExcel": "Download report (Excel)",
+      "generating": "Generating...",
+      "downloadStarted": "Report generated"
     },
     "bottlenecks": {
       "bareHours": "{{count}} hour",

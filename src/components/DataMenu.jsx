@@ -10,6 +10,7 @@ import * as api from "../state/api.js";
 import ArchiveModal from "./ArchiveModal.jsx";
 import BottlenecksModal from "./BottlenecksModal.jsx";
 import RecurrencesModal from "./RecurrencesModal.jsx";
+import ExportReportModal from "./ExportReportModal.jsx";
 
 function DotsIcon() {
   return (
@@ -45,12 +46,18 @@ export default function DataMenu({ board, onSelectBoard }) {
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [gargalosOpen, setGargalosOpen] = useState(false);
   const [rotinasOpen, setRotinasOpen] = useState(false);
+  const [relatorioOpen, setRelatorioOpen] = useState(false);
   const [importing, setImporting] = useState(false);
   const [customColor, setCustomColor] = useState("#4d7ea8");
   const [monoColor, setMonoColor] = useState("#4d7ea8");
   const ref = useRef(null);
   const btnRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Convidado como leitor não personaliza o quadro, não restaura arquivado e não
+  // mexe nas rotinas. Exportar e importar continuam: exportar é leitura, e importar
+  // cria quadros novos dele, sem tocar neste.
+  const readOnly = board?.myRole === "viewer";
 
   useEffect(() => {
     function handleClick(e) {
@@ -141,23 +148,27 @@ export default function DataMenu({ board, onSelectBoard }) {
         <div className="dropdown data-dropdown" ref={ref}>
           {view === "main" ? (
             <>
-              <div
-                className={"dropdown-item" + (!board ? " disabled" : "")}
-                onClick={() => board && setView("background")}
-              >
-                {t("app.dataMenu.personalize")}
-                <ChevronRightIcon />
-              </div>
-              <div
-                className={"dropdown-item" + (!board ? " disabled" : "")}
-                onClick={() => {
-                  if (!board) return;
-                  setArchiveOpen(true);
-                  setOpen(false);
-                }}
-              >
-                {t("app.dataMenu.archivedCards")}
-              </div>
+              {!readOnly && (
+                <>
+                  <div
+                    className={"dropdown-item" + (!board ? " disabled" : "")}
+                    onClick={() => board && setView("background")}
+                  >
+                    {t("app.dataMenu.personalize")}
+                    <ChevronRightIcon />
+                  </div>
+                  <div
+                    className={"dropdown-item" + (!board ? " disabled" : "")}
+                    onClick={() => {
+                      if (!board) return;
+                      setArchiveOpen(true);
+                      setOpen(false);
+                    }}
+                  >
+                    {t("app.dataMenu.archivedCards")}
+                  </div>
+                </>
+              )}
               <div
                 className={"dropdown-item" + (!board ? " disabled" : "")}
                 onClick={() => {
@@ -168,18 +179,32 @@ export default function DataMenu({ board, onSelectBoard }) {
               >
                 {t("app.dataMenu.bottlenecks")}
               </div>
+              {!readOnly && (
+                <div
+                  className={"dropdown-item" + (!board ? " disabled" : "")}
+                  onClick={() => {
+                    if (!board) return;
+                    setRotinasOpen(true);
+                    setOpen(false);
+                  }}
+                >
+                  {t("app.dataMenu.recurrences")}
+                </div>
+              )}
+              <div className="dropdown-divider" />
+              <div className="board-bg-section-label">{t("app.dataMenu.dataSection")}</div>
+              {/* Fora do `!readOnly` de propósito, como o resto da exportação:
+                  gerar relatório é leitura, e o convidado leitor pode ler. */}
               <div
                 className={"dropdown-item" + (!board ? " disabled" : "")}
                 onClick={() => {
                   if (!board) return;
-                  setRotinasOpen(true);
+                  setRelatorioOpen(true);
                   setOpen(false);
                 }}
               >
-                {t("app.dataMenu.recurrences")}
+                {t("app.dataMenu.exportReport")}
               </div>
-              <div className="dropdown-divider" />
-              <div className="board-bg-section-label">{t("app.dataMenu.dataSection")}</div>
               <div className={"dropdown-item" + (!board ? " disabled" : "")} onClick={handleExportCurrent}>
                 {t("app.dataMenu.exportCurrent")}
               </div>
@@ -258,6 +283,7 @@ export default function DataMenu({ board, onSelectBoard }) {
       {archiveOpen && board && <ArchiveModal board={board} onClose={() => setArchiveOpen(false)} />}
       {gargalosOpen && board && <BottlenecksModal board={board} onClose={() => setGargalosOpen(false)} />}
       {rotinasOpen && board && <RecurrencesModal board={board} onClose={() => setRotinasOpen(false)} />}
+      {relatorioOpen && board && <ExportReportModal board={board} onClose={() => setRelatorioOpen(false)} />}
     </div>
   );
 }
