@@ -93,9 +93,11 @@ function nextPosition(table, whereCol, whereVal) {
 export function createBoard({ id, title, ownerId, visibility }) {
   const boardId = id || uid();
   const pos = nextPosition("boards");
+  const vis = visibility === "private" ? "private" : "shared";
   getDb().prepare(
     "INSERT INTO boards (id, title, owner_id, visibility, position, created_at) VALUES (?, ?, ?, ?, ?, ?)"
-  ).run(boardId, title, ownerId || null, visibility === "private" ? "private" : "shared", pos, nowIso());
+  ).run(boardId, title, ownerId || null, vis, pos, nowIso());
+  if (vis === "private" && ownerId) registrarDono(boardId, ownerId);
   return boardId;
 }
 export function renameBoard(id, title) {
@@ -115,7 +117,64 @@ export function clearBoard(id) {
 export function getBoardAccessInfo(boardId) {
   const row = getDb().prepare("SELECT owner_id, visibility FROM boards WHERE id = ?").get(boardId);
   if (!row) return null;
-  return { ownerId: row.owner_id, visibility: row.visibility };
+  // O mapa de convidados só é consultado no quadro privado: é a única visibilidade
+  // em que ele decide alguma coisa, e esta função roda em toda requisição que toca
+  // cartão, lista ou recorrência.
+  const roles = new Map();
+  if (row.visibility === "private") {
+    for (const p of getDb().prepare("SELECT user_id, role FROM board_permissions WHERE board_id = ?").all(boardId)) {
+      roles.set(p.user_id, p.role);
+    }
+  }
+  return { boardId, ownerId: row.owner_id, visibility: row.visibility, roles };
+}
+
+// ---------- Permissões de quadro privado ----------
+// O dono entra na tabela junto com o quadro. Não é o que autoriza o dono (isso é
+// boards.owner_id), é o que faz a lista de acesso sair completa numa consulta só.
+function registrarDono(boardId, ownerId) {
+  getDb()
+    .prepare(
+      `INSERT INTO board_permissions (board_id, user_id, role, created_at) VALUES (?, ?, 'owner', ?)
+       ON CONFLICT(board_id, user_id) DO UPDATE SET role = 'owner'`
+    )
+    .run(boardId, ownerId, nowIso());
+}
+
+// Lista quem tem acesso, já com nome e e-mail: o modal mostra pessoas, não ids.
+export function listBoardPermissions(boardId) {
+  return getDb()
+    .prepare(
+      `SELECT p.user_id, p.role, p.created_at, u.name, u.email
+         FROM board_permissions p JOIN users u ON u.id = p.user_id
+        WHERE p.board_id = ?
+        ORDER BY CASE p.role WHEN 'owner' THEN 0 ELSE 1 END, u.name COLLATE NOCASE ASC`
+    )
+    .all(boardId)
+    .map((r) => ({ userId: r.user_id, role: r.role, name: r.name, email: r.email, createdAt: r.created_at }));
+}
+
+// Conceder é idempotente e serve também para trocar o papel de quem já está na
+// lista: o modal usa o mesmo caminho para adicionar e para alternar leitura/edição.
+export function grantBoardPermission(boardId, userId, role) {
+  getDb()
+    .prepare(
+      `INSERT INTO board_permissions (board_id, user_id, role, created_at) VALUES (?, ?, ?, ?)
+       ON CONFLICT(board_id, user_id) DO UPDATE SET role = excluded.role`
+    )
+    .run(boardId, userId, role, nowIso());
+}
+
+// O dono nunca sai por aqui — quem quiser tirá-lo do quadro exclui o quadro. Sem
+// esta guarda, um erro de digitação no id deixaria um quadro privado sem ninguém
+// que pudesse administrá-lo.
+export function revokeBoardPermission(boardId, userId) {
+  getDb().prepare("DELETE FROM board_permissions WHERE board_id = ? AND user_id = ? AND role <> 'owner'").run(boardId, userId);
+}
+
+export function getBoardPermission(boardId, userId) {
+  const row = getDb().prepare("SELECT role FROM board_permissions WHERE board_id = ? AND user_id = ?").get(boardId, userId);
+  return row ? row.role : null;
 }
 export function getBoardIdForList(listId) {
   const row = getDb().prepare("SELECT board_id FROM lists WHERE id = ?").get(listId);
@@ -522,15 +581,33 @@ export function getWorkspaceCompleto() {
 }
 
 export function getWorkspace(userId) {
+  // O quadro privado de outra pessoa só entra na lista se houver concessão
+  // explícita. É esta cláusula que o mantém fora da barra lateral de quem não foi
+  // convidado — a recusa por rota é a segunda camada, não a primeira.
   const boards = getDb()
-    .prepare("SELECT * FROM boards WHERE visibility = 'shared' OR owner_id = ? ORDER BY position ASC")
-    .all(userId);
-  return montarWorkspace(boards);
+    .prepare(
+      `SELECT * FROM boards
+        WHERE visibility = 'shared'
+           OR owner_id = ?
+           OR id IN (SELECT board_id FROM board_permissions WHERE user_id = ?)
+        ORDER BY position ASC`
+    )
+    .all(userId, userId);
+  return montarWorkspace(boards, userId);
 }
 
-function montarWorkspace(boards) {
+function papelNoQuadro(board, permissoesDoQuadro, userId) {
+  if (!userId) return null;
+  if (board.owner_id === userId) return "owner";
+  return permissoesDoQuadro.find((p) => p.user_id === userId)?.role || null;
+}
+
+// userId opcional: o painel de plataforma monta o workspace sem usuário, e ali
+// `myRole` sai null porque administrador não tem papel dentro do quadro do cliente.
+function montarWorkspace(boards, userId) {
   const lists = getDb().prepare("SELECT * FROM lists ORDER BY position ASC").all();
   const cards = getDb().prepare("SELECT * FROM cards ORDER BY position ASC").all();
+  const permissoes = getDb().prepare("SELECT board_id, user_id, role FROM board_permissions").all();
 
   return boards.map((b) => {
     const boardLists = lists.filter((l) => l.board_id === b.id);
@@ -557,18 +634,27 @@ function montarWorkspace(boards) {
             archivedAt: c.archived_at || null,
             completedAt: c.completed_at || null,
             listEnteredAt: c.list_entered_at || null,
+            createdAt: c.created_at || null,
             // Coluna de origem, para o modal de arquivados mostrar de onde veio
             // e para o restaurar saber para onde devolver.
             archivedFrom: c.archived ? l.id : null,
           };
         });
     });
+    const doQuadro = b.visibility === "private" ? permissoes.filter((p) => p.board_id === b.id) : [];
     return {
       id: b.id,
       title: b.title,
       background: b.background || null,
       ownerId: b.owner_id || null,
       visibility: b.visibility || "shared",
+      // Papel de quem está lendo, já resolvido no servidor: o cliente não
+      // reimplementa a regra, só desenha o que veio (mesmo princípio de /api/plan).
+      // null no quadro compartilhado, onde não existe papel — todos editam.
+      myRole: b.visibility === "private" ? papelNoQuadro(b, doQuadro, userId) : null,
+      // Só os convidados, sem o dono: é o que a barra lateral usa para dizer
+      // "compartilhado com N pessoas" sem contar quem compartilhou.
+      sharedWith: doQuadro.filter((p) => p.role !== "owner").map((p) => p.user_id),
       autoArchiveDays: b.auto_archive_days || null,
       lists: boardLists.map((l) => ({
         id: l.id,

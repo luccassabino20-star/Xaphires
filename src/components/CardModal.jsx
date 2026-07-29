@@ -59,6 +59,9 @@ export default function CardModal({ boardId, cardId, onClose }) {
   const showToast = useToast();
   const board = state.boards.find((b) => b.id === boardId);
   const card = board?.cards[cardId];
+  // Quem foi convidado só para ler abre o cartão e vê tudo, sem nada para mexer.
+  // O papel vem do servidor no workspace; aqui só se desenha a consequência.
+  const readOnly = board?.myRole === "viewer";
 
   const [title, setTitle] = useState(card?.title || "");
   const [description, setDescription] = useState(card?.description || "");
@@ -101,12 +104,16 @@ export default function CardModal({ boardId, cardId, onClose }) {
 
   if (!card) return null;
 
+  // Os dois gravam no blur, que dispara mesmo sem edição: sem a guarda, abrir e
+  // fechar o cartão como leitor mandaria um PATCH que a API recusa com 403.
   function commitTitle() {
+    if (readOnly) return;
     const val = title.trim() || t("board.cardModal.untitled");
     dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { title: val } });
     setTitle(val);
   }
   function commitDescription() {
+    if (readOnly) return;
     dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { description } });
   }
   function handleDueChange(e) {
@@ -254,6 +261,7 @@ export default function CardModal({ boardId, cardId, onClose }) {
             className="modal-title-input"
             value={title}
             spellCheck={false}
+            readOnly={readOnly}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={commitTitle}
             onKeyDown={(e) => {
@@ -263,8 +271,15 @@ export default function CardModal({ boardId, cardId, onClose }) {
         </div>
 
         <div className="modal-body">
+          {readOnly && <div className="board-readonly-note">{t("board.cardModal.readOnlyNote")}</div>}
+
           <div className="modal-section">
-            <button type="button" className={"card-complete-toggle-row" + (card.completed ? " checked" : "")} onClick={toggleCompleted}>
+            <button
+              type="button"
+              className={"card-complete-toggle-row" + (card.completed ? " checked" : "")}
+              disabled={readOnly}
+              onClick={toggleCompleted}
+            >
               <span className={"card-complete-check" + (card.completed ? " checked" : "")}>
                 {card.completed && (
                   <svg viewBox="0 0 24 24" width="12" height="12">
@@ -284,9 +299,11 @@ export default function CardModal({ boardId, cardId, onClose }) {
                   {initials(m.name)}
                 </span>
               ))}
-              <button type="button" className="avatar avatar-add" onClick={() => setMemberPickerOpen((o) => !o)}>
-                +
-              </button>
+              {!readOnly && (
+                <button type="button" className="avatar avatar-add" onClick={() => setMemberPickerOpen((o) => !o)}>
+                  +
+                </button>
+              )}
             </div>
             {memberPickerOpen && (
               <div className="member-picker">
@@ -313,6 +330,7 @@ export default function CardModal({ boardId, cardId, onClose }) {
                   type="button"
                   className={"label-chip" + (card.labels.includes(meta.id) ? " active" : "")}
                   style={{ background: meta.color }}
+                  disabled={readOnly}
                   onClick={() => toggleLabel(meta.id)}
                 >
                   {card.labels.includes(meta.id) ? "✓" : ""}
@@ -327,6 +345,7 @@ export default function CardModal({ boardId, cardId, onClose }) {
               <button
                 type="button"
                 className={"priority-chip priority-chip-urgent" + (card.urgent ? " active" : "")}
+                disabled={readOnly}
                 onClick={toggleUrgent}
               >
                 <UrgentIcon /> {t("board.cardModal.urgent")}
@@ -334,6 +353,7 @@ export default function CardModal({ boardId, cardId, onClose }) {
               <button
                 type="button"
                 className={"priority-chip priority-chip-important" + (card.important ? " active" : "")}
+                disabled={readOnly}
                 onClick={toggleImportant}
               >
                 <ImportantIcon /> {t("board.cardModal.important")}
@@ -344,28 +364,32 @@ export default function CardModal({ boardId, cardId, onClose }) {
           <div className="modal-section modal-section-row">
             <div>
               <label className="modal-label">{t("board.cardModal.startDate")}</label>
-              <input type="date" className="modal-date" value={card.startDate || ""} onChange={handleStartDateChange} />
+              <input type="date" className="modal-date" value={card.startDate || ""} disabled={readOnly} onChange={handleStartDateChange} />
             </div>
             <div>
               <label className="modal-label">{t("board.cardModal.dueDate")}</label>
-              <input type="date" className="modal-date" value={card.due || ""} onChange={handleDueChange} />
+              <input type="date" className="modal-date" value={card.due || ""} disabled={readOnly} onChange={handleDueChange} />
             </div>
           </div>
 
           <div className="modal-section">
             <label className="modal-label">{t("board.cardModal.location")}</label>
-            <form className="location-form" onSubmit={handleLocateAddress}>
-              <input
-                type="text"
-                className="modal-date location-input"
-                placeholder={t("board.cardModal.addressPlaceholder")}
-                value={addressInput}
-                onChange={(e) => setAddressInput(e.target.value)}
-              />
-              <button type="submit" className="btn-primary btn-small" disabled={geocoding}>
-                {geocoding ? t("board.cardModal.locating") : t("board.cardModal.locate")}
-              </button>
-            </form>
+            {readOnly ? (
+              <div className="modal-readonly-value">{card.location?.address || t("board.cardModal.noLocation")}</div>
+            ) : (
+              <form className="location-form" onSubmit={handleLocateAddress}>
+                <input
+                  type="text"
+                  className="modal-date location-input"
+                  placeholder={t("board.cardModal.addressPlaceholder")}
+                  value={addressInput}
+                  onChange={(e) => setAddressInput(e.target.value)}
+                />
+                <button type="submit" className="btn-primary btn-small" disabled={geocoding}>
+                  {geocoding ? t("board.cardModal.locating") : t("board.cardModal.locate")}
+                </button>
+              </form>
+            )}
             {geocodeError && <div className="auth-error" style={{ marginTop: 8 }}>{geocodeError}</div>}
             {card.location?.lat != null && (
               <div className="location-confirmed">
@@ -383,6 +407,7 @@ export default function CardModal({ boardId, cardId, onClose }) {
               className="modal-textarea"
               placeholder={t("board.cardModal.descriptionPlaceholder")}
               value={description}
+              readOnly={readOnly}
               onChange={(e) => setDescription(e.target.value)}
               onBlur={commitDescription}
             />
@@ -401,25 +426,29 @@ export default function CardModal({ boardId, cardId, onClose }) {
             <ul className="checklist">
               {card.checklist.map((item, idx) => (
                 <li key={idx} className={"checklist-item" + (item.done ? " done" : "")}>
-                  <input type="checkbox" checked={item.done} onChange={() => toggleChecklistItem(idx)} />
+                  <input type="checkbox" checked={item.done} disabled={readOnly} onChange={() => toggleChecklistItem(idx)} />
                   <span>{item.text}</span>
-                  <button type="button" className="checklist-item-remove" onClick={() => removeChecklistItem(idx)}>
-                    &times;
-                  </button>
+                  {!readOnly && (
+                    <button type="button" className="checklist-item-remove" onClick={() => removeChecklistItem(idx)}>
+                      &times;
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
-            <form className="checklist-add" onSubmit={addChecklistItem}>
-              <input
-                type="text"
-                placeholder={t("board.cardModal.addItemPlaceholder")}
-                value={checklistText}
-                onChange={(e) => setChecklistText(e.target.value)}
-              />
-              <button type="submit" className="btn-primary btn-small">
-                {t("common.add")}
-              </button>
-            </form>
+            {!readOnly && (
+              <form className="checklist-add" onSubmit={addChecklistItem}>
+                <input
+                  type="text"
+                  placeholder={t("board.cardModal.addItemPlaceholder")}
+                  value={checklistText}
+                  onChange={(e) => setChecklistText(e.target.value)}
+                />
+                <button type="submit" className="btn-primary btn-small">
+                  {t("common.add")}
+                </button>
+              </form>
+            )}
           </div>
 
           <div className="modal-section">
@@ -439,38 +468,46 @@ export default function CardModal({ boardId, cardId, onClose }) {
                       {a.name}
                     </a>
                     {a.type === "file" && a.size != null && <span className="attachment-size">{formatBytes(a.size)}</span>}
-                    <button
-                      type="button"
-                      className="checklist-item-remove"
-                      onClick={() => handleRemoveAttachment(a.id)}
-                      aria-label={t("common.remove")}
-                    >
-                      &times;
-                    </button>
+                    {!readOnly && (
+                      <button
+                        type="button"
+                        className="checklist-item-remove"
+                        onClick={() => handleRemoveAttachment(a.id)}
+                        aria-label={t("common.remove")}
+                      >
+                        &times;
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
             )}
-            <div className="attachment-actions">
-              <input
-                ref={fileInputRef}
-                type="file"
-                style={{ display: "none" }}
-                onChange={handleFilePicked}
-              />
-              <button
-                type="button"
-                className="btn-secondary btn-small"
-                disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {uploading ? t("board.cardModal.uploading") : t("board.cardModal.attachFile")}
-              </button>
-              <button type="button" className="btn-secondary btn-small" onClick={() => setLinkFormOpen((o) => !o)}>
-                {t("board.cardModal.attachLink")}
-              </button>
-            </div>
-            {linkFormOpen && (
+            {/* Leitor continua baixando o que já está anexado; o que some é o que sobe.
+                Tirar do DOM, e não `hidden`: .attachment-actions declara display:flex,
+                que vence a regra display:none do atributo - os botões continuavam
+                aparecendo, e só o clique é que morria. */}
+            {!readOnly && (
+              <div className="attachment-actions">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  style={{ display: "none" }}
+                  onChange={handleFilePicked}
+                />
+                <button
+                  type="button"
+                  className="btn-secondary btn-small"
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {uploading ? t("board.cardModal.uploading") : t("board.cardModal.attachFile")}
+                </button>
+                <button type="button" className="btn-secondary btn-small" onClick={() => setLinkFormOpen((o) => !o)}>
+                  {t("board.cardModal.attachLink")}
+                </button>
+              </div>
+            )}
+            {linkFormOpen && !readOnly && (
               <form className="checklist-add" style={{ marginTop: 8, flexWrap: "wrap" }} onSubmit={submitLinkAttachment}>
                 <input
                   type="text"
@@ -494,14 +531,16 @@ export default function CardModal({ boardId, cardId, onClose }) {
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button className="btn-secondary" onClick={archiveCard}>
-            {t("board.cardModal.archiveCard")}
-          </button>
-          <button className="btn-danger" onClick={deleteCard}>
-            {t("board.cardModal.deleteCard")}
-          </button>
-        </div>
+        {!readOnly && (
+          <div className="modal-footer">
+            <button className="btn-secondary" onClick={archiveCard}>
+              {t("board.cardModal.archiveCard")}
+            </button>
+            <button className="btn-danger" onClick={deleteCard}>
+              {t("board.cardModal.deleteCard")}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

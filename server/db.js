@@ -42,6 +42,23 @@ function applySchema(companyDb) {
       created_at TEXT NOT NULL
     );
 
+    -- Quem enxerga um quadro privado além do dono. Só o quadro privado usa esta
+    -- tabela: no compartilhado todo mundo da empresa entra, e uma linha por
+    -- usuário ali seria ruído que precisaria ser mantido em dia a cada cadastro.
+    --
+    -- A AUTORIDADE SOBRE O DONO CONTINUA SENDO boards.owner_id. A linha com role
+    -- 'owner' existe para o painel de compartilhamento listar todo mundo com
+    -- acesso numa consulta só, e é derivada — nenhuma decisão de acesso a lê.
+    -- Repare no ON DELETE CASCADE dos dois lados: excluir o quadro ou o usuário
+    -- leva junto as permissões, senão sobraria concessão apontando para o vazio.
+    CREATE TABLE IF NOT EXISTS board_permissions (
+      board_id TEXT NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      role TEXT NOT NULL CHECK(role IN ('owner','editor','viewer')),
+      created_at TEXT NOT NULL,
+      PRIMARY KEY (board_id, user_id)
+    );
+
     CREATE TABLE IF NOT EXISTS lists (
       id TEXT PRIMARY KEY,
       board_id TEXT NOT NULL REFERENCES boards(id) ON DELETE CASCADE,

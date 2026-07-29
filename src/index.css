@@ -3610,3 +3610,179 @@ input, textarea { font-family: inherit; }
 .plataforma-elevacao p { margin: 0; line-height: 1.5; }
 .plataforma-elevacao input:disabled { opacity: 0.6; }
 .plataforma-elevacao .adm-btn-primario { align-self: flex-start; }
+
+/* ---------- Compartilhamento de quadro privado ---------- */
+/* Só as variáveis que existem no :root: --border-subtle, --bg-card, --bg-list,
+   --text-secondary, --text-muted, --accent. Uma inventada aqui derrubaria a
+   declaração inteira em silêncio. */
+.share-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.share-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.share-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--bg-card);
+}
+/* min-width: 0 para o e-mail longo truncar em vez de empurrar o papel e o botão
+   para fora da linha. */
+.share-person { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.share-name { font-size: 13px; font-weight: 600; }
+.share-email {
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.share-role-select {
+  padding: 5px 8px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+}
+.share-empty {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.share-add { margin-top: 14px; }
+.share-add-head { display: flex; gap: 8px; margin-bottom: 10px; }
+.share-search {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+}
+/* Contador de quem tem acesso, no botão da barra superior e no item da lateral. */
+.share-count,
+.board-share-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bg-app);
+  background: var(--accent);
+  border-radius: 8px;
+}
+.board-share-count { margin-left: auto; }
+.board-readonly-badge {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+.board-readonly-note {
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+}
+.modal-readonly-value { font-size: 13px; color: var(--text-secondary); }
+/* Os controles do cartão viram só enfeite no acesso somente leitura: sem uma pista
+   visual, o crachá colorido e o chip de prioridade continuavam com cara de clicável
+   e o clique morria calado. */
+.label-chip:disabled,
+.priority-chip:disabled,
+.card-complete-check:disabled,
+.card-complete-toggle-row:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* ---------- Exportar relatório ---------- */
+/* 600px e não os 520 de um formulário de dois campos: os três botões de download
+   somam 547px numa linha, e abaixo disso o de Excel quebra sozinho para a segunda
+   linha e o rodapé fica torto. Medido no navegador, não no olho. */
+.export-report-modal { max-width: 600px; }
+.export-report-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text-primary); }
+.export-report-scope {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.export-report-field { display: block; margin-bottom: 14px; }
+.export-report-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+/* O select ocupa a largura toda porque nome de pessoa é longo e a caixa estreita
+   cortaria justamente o que se precisa ler para escolher. */
+.export-report-field select {
+  width: 100%;
+  padding: 9px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
+}
+.export-report-field select:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+/* O contador é o retorno de que o filtro pegou, então tem peso visual de número
+   e não de legenda - é o que a pessoa procura depois de mexer no seletor. */
+.export-report-count {
+  margin-top: 18px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-column);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  text-align: center;
+}
+.export-report-count.is-empty { color: var(--text-muted); }
+.export-report-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: center;
+}
+.export-report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}

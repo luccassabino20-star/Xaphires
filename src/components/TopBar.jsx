@@ -7,6 +7,7 @@ import { useToast } from "../state/ToastContext.jsx";
 import { initials, colorForUser } from "../utils/members.js";
 import AccountMenu from "./AccountMenu.jsx";
 import UsersPanel from "./UsersPanel.jsx";
+import ShareBoardModal from "./ShareBoardModal.jsx";
 import DataMenu from "./DataMenu.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
@@ -19,13 +20,22 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
   const showToast = useToast();
   const [title, setTitle] = useState(board?.title || "");
   const [usersPanelOpen, setUsersPanelOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  // O papel vem calculado do servidor (board.myRole). Compartilhar é do dono;
+  // leitor não renomeia nem limpa. É espelho da regra, não a regra: quem recusa
+  // de verdade é a API.
+  const isOwner = board?.visibility === "private" && board.myRole === "owner";
+  const readOnly = board?.myRole === "viewer";
 
   useEffect(() => {
     setTitle(board?.title || "");
   }, [board?.id, board?.title]);
 
   function commitTitle() {
-    if (!board) return;
+    // O leitor não é bloqueado só pelo readOnly do input: o blur dispara mesmo sem
+    // edição, e sairia daqui um PATCH que a API recusaria com 403 a cada clique fora.
+    if (!board || readOnly) return;
     const val = title.trim() || t("app.topbar.defaultBoardName");
     dispatch({ type: "RENAME_BOARD", boardId: board.id, title: val });
     setTitle(val);
@@ -53,6 +63,7 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
               className="board-title"
               value={title}
               spellCheck={false}
+              readOnly={readOnly}
               onChange={(e) => setTitle(e.target.value)}
               onBlur={commitTitle}
               onKeyDown={(e) => {
@@ -60,12 +71,16 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
               }}
             />
             {board.visibility === "private" && (
-              <span className="board-title-lock" title={t("app.topbar.privateBoardTitle")}>
+              <span
+                className="board-title-lock"
+                title={isOwner ? t("app.topbar.privateBoardTitle") : t("app.topbar.sharedWithYouTitle")}
+              >
                 <svg viewBox="0 0 24 24" width="14" height="14">
                   <path fill="currentColor" d="M12 2a4 4 0 0 1 4 4v3h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h1V6a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v3h4V6a2 2 0 0 0-2-2z" />
                 </svg>
               </span>
             )}
+            {readOnly && <span className="board-readonly-badge">{t("app.topbar.readOnlyBadge")}</span>}
           </>
         )}
       </div>
@@ -104,7 +119,13 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <button className="btn-ghost" onClick={clearBoard} disabled={!board}>
+        {isOwner && (
+          <button className="btn-ghost" onClick={() => setShareOpen(true)}>
+            {t("app.topbar.shareBtn")}
+            {board.sharedWith?.length > 0 && <span className="share-count">{board.sharedWith.length}</span>}
+          </button>
+        )}
+        <button className="btn-ghost" onClick={clearBoard} disabled={!board || readOnly}>
           {t("app.topbar.clearBoard")}
         </button>
         <LanguageSwitcher />
@@ -113,6 +134,7 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
         <AccountMenu />
       </div>
       {usersPanelOpen && <UsersPanel onClose={() => setUsersPanelOpen(false)} />}
+      {shareOpen && board && <ShareBoardModal board={board} onClose={() => setShareOpen(false)} />}
     </header>
   );
 }

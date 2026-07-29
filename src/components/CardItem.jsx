@@ -67,7 +67,7 @@ function ImportantIcon() {
   );
 }
 
-export default function CardItem({ card, list, boardId, members, searchQuery, memberFilter, onOpen, onDragStart, onDragEnd }) {
+export default function CardItem({ card, list, boardId, members, searchQuery, memberFilter, onOpen, readOnly, onDragStart, onDragEnd }) {
   const { t, i18n } = useTranslation();
   const dispatch = useBoardDispatch();
   const matchesSearch = !searchQuery || card.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -88,7 +88,7 @@ export default function CardItem({ card, list, boardId, members, searchQuery, me
   return (
     <div
       className={"card" + (dimmed ? " dimmed" : "") + (card.completed ? " completed" : "")}
-      draggable
+      draggable={!readOnly}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onClick={onOpen}
@@ -117,6 +117,7 @@ export default function CardItem({ card, list, boardId, members, searchQuery, me
         <button
           type="button"
           className={"card-complete-check" + (card.completed ? " checked" : "")}
+          disabled={readOnly}
           onClick={toggleCompleted}
           title={card.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
         >

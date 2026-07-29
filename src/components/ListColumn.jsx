@@ -13,6 +13,7 @@ export default function ListColumn({
   searchQuery,
   memberFilter,
   onOpenCard,
+  readOnly,
   dragCard,
   dragListId,
   onCardDragStart,
@@ -36,6 +37,9 @@ export default function ListColumn({
   }, [list.title]);
 
   function commitTitle() {
+    // Mesmo motivo do título do quadro: o blur dispara sem edição nenhuma, e o
+    // leitor sairia daqui mandando um PATCH que a API recusa.
+    if (readOnly) return;
     const val = title.trim() || t("board.listColumn.defaultListName");
     dispatch({ type: "RENAME_LIST", boardId: board.id, listId: list.id, title: val });
     setTitle(val);
@@ -78,11 +82,17 @@ export default function ListColumn({
       style={listStyle}
       onDragOver={(e) => { if (dragListId && dragListId !== list.id) { e.preventDefault(); onListHover(list.id); } }}
     >
-      <div className="list-header" draggable onDragStart={() => onListDragStart(list.id)} onDragEnd={onListDragEnd}>
+      <div
+        className="list-header"
+        draggable={!readOnly}
+        onDragStart={() => onListDragStart(list.id)}
+        onDragEnd={onListDragEnd}
+      >
         <input
           className="list-title"
           value={title}
           spellCheck={false}
+          readOnly={readOnly}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={commitTitle}
           onKeyDown={(e) => {
@@ -90,11 +100,14 @@ export default function ListColumn({
           }}
         />
         <span className="list-count">{list.cardIds.length}</span>
-        <button ref={menuBtnRef} className="list-menu-btn" onClick={() => setMenuOpen((o) => !o)}>
-          <svg viewBox="0 0 24 24" width="16" height="16">
-            <path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-          </svg>
-        </button>
+        {/* O menu da coluna é só ação de escrita (cor, prazo de gargalo, limpar, excluir). */}
+        {!readOnly && (
+          <button ref={menuBtnRef} className="list-menu-btn" onClick={() => setMenuOpen((o) => !o)}>
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+            </svg>
+          </button>
+        )}
         {menuOpen && <ListMenu board={board} list={list} onClose={() => setMenuOpen(false)} anchorRef={menuBtnRef} />}
       </div>
 
@@ -112,6 +125,7 @@ export default function ListColumn({
               searchQuery={searchQuery}
               memberFilter={memberFilter}
               onOpen={() => onOpenCard(card.id)}
+              readOnly={readOnly}
               onDragStart={() => onCardDragStart(card.id, list.id)}
               onDragEnd={onCardDragEnd}
             />
@@ -120,7 +134,7 @@ export default function ListColumn({
       </div>
 
       <div className="add-card-wrap">
-        {addingCard ? (
+        {readOnly ? null : addingCard ? (
           <div className="card-composer">
             <textarea
               autoFocus

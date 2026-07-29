@@ -64,7 +64,10 @@ export default function MatrixView({ board, users, searchQuery, memberFilter, on
   }
 
   function handleDrop(q) {
-    if (dragCardId) {
+    // Arrastar entre quadrantes reescreve urgente/importante do cartão. Convidado
+    // como leitor não muda nada aqui - a API recusaria, e a mudança ficaria na
+    // tela até o próximo carregamento.
+    if (dragCardId && board.myRole !== "viewer") {
       dispatch({
         type: "UPDATE_CARD",
         boardId: board.id,

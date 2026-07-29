@@ -33,7 +33,11 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
   const [editingTitle, setEditingTitle] = useState("");
 
   const sharedBoards = state.boards.filter((b) => b.visibility !== "private");
-  const privateBoards = state.boards.filter((b) => b.visibility === "private");
+  // "Meus" é o que a pessoa criou. Quadro privado de outra pessoa só chega aqui se
+  // ela tiver sido convidada, e fica numa seção própria — listar junto com os
+  // próprios daria a impressão de que ela pode excluir e compartilhar.
+  const privateBoards = state.boards.filter((b) => b.visibility === "private" && b.myRole === "owner");
+  const sharedWithMe = state.boards.filter((b) => b.visibility === "private" && b.myRole !== "owner");
 
   function addBoard() {
     const title = newTitle.trim();
@@ -65,7 +69,9 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
   }
 
   function renderBoardItem(b) {
-    const canDelete = b.visibility === "private" || user.role === "master";
+    // No privado quem exclui é o dono, não quem tem acesso: o convidado veria o
+    // botão e levaria 403, ou pior, apagaria o quadro de quem o convidou.
+    const canDelete = b.visibility === "private" ? b.myRole === "owner" : user.role === "master";
     return (
       <div key={b.id} className={"board-list-item" + (screen === "board" && b.id === activeBoardId ? " active" : "")}>
         {editingId === b.id ? (
@@ -81,10 +87,19 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
             }}
           />
         ) : (
-          <button className="board-list-btn" onClick={() => onSelectBoard(b.id)} onDoubleClick={() => startRename(b)}>
+          <button
+            className="board-list-btn"
+            onClick={() => onSelectBoard(b.id)}
+            onDoubleClick={() => b.myRole !== "viewer" && startRename(b)}
+          >
             <span className="board-swatch" />
             <span className="board-list-title">{b.title}</span>
             {b.visibility === "private" && <LockIcon />}
+            {b.sharedWith?.length > 0 && (
+              <span className="board-share-count" title={t("app.sidebar.sharedWithCount", { count: b.sharedWith.length })}>
+                {b.sharedWith.length}
+              </span>
+            )}
           </button>
         )}
         {canDelete && (
@@ -113,6 +128,15 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
             <LockIcon /> {t("app.sidebar.myPrivateBoards")}
           </div>
           <div className="board-list">{privateBoards.map(renderBoardItem)}</div>
+        </>
+      )}
+
+      {sharedWithMe.length > 0 && (
+        <>
+          <div className="sidebar-header sidebar-header-secondary">
+            <LockIcon /> {t("app.sidebar.sharedWithMe")}
+          </div>
+          <div className="board-list">{sharedWithMe.map(renderBoardItem)}</div>
         </>
       )}
 

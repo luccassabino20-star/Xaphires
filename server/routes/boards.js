@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAuth, requireBoardAccess } from "../middleware.js";
+import { requireAuth, requireBoardAccess, requireBoardOwner } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
 import { getCompany } from "../directory.js";
@@ -49,6 +49,19 @@ router.post(
   })
 );
 
+// Um quadro só. Existe para o acesso direto por id: quem não foi convidado leva
+// 403 aqui em vez de descobrir o conteúdo, e é o que o cliente consulta quando
+// alguém chega a um quadro que não está no workspace que ele carregou.
+router.get(
+  "/:id",
+  requireBoardAccess((req) => req.params.id),
+  ah(async (req, res) => {
+    const board = (await repo.getWorkspace(req.user.id)).find((b) => b.id === req.params.id);
+    if (!board) return res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
+    res.json({ board });
+  })
+);
+
 router.patch(
   "/:id",
   requireBoardAccess((req) => req.params.id),
@@ -90,6 +103,12 @@ router.delete(
         .status(403)
         .json({ error: "Apenas o usuário master pode excluir quadros compartilhados", code: "FORBIDDEN_DELETE_SHARED_BOARD" });
     }
+    // No privado, ter acesso não é ser dono. Antes das permissões as duas coisas
+    // eram a mesma, e a checagem de visibilidade acima bastava; agora um convidado
+    // com direito de edição chegaria até aqui e apagaria o quadro de quem o convidou.
+    if (access.visibility === "private" && req.boardRole !== "owner") {
+      return res.status(403).json({ error: "Apenas o dono do quadro pode fazer isso", code: "FORBIDDEN_BOARD_OWNER_ONLY" });
+    }
     await repo.deleteBoard(req.params.id);
     res.json({ ok: true });
   })
@@ -124,6 +143,57 @@ router.put(
       return res.status(400).json({ error: "orderedListIds obrigatório", code: "ORDERED_LIST_IDS_REQUIRED" });
     await repo.setListOrder(req.params.boardId, orderedListIds);
     res.json({ ok: true });
+  })
+);
+
+// ---------- Compartilhamento de quadro privado ----------
+const PAPEIS = new Set(["editor", "viewer"]);
+
+// Ver quem tem acesso é permitido a quem já tem acesso: quem trabalha no quadro
+// precisa saber com quem está trabalhando. Mudar a lista é só do dono.
+router.get(
+  "/:id/permissions",
+  requireBoardAccess((req) => req.params.id),
+  ah(async (req, res) => {
+    if (req.boardAccess.visibility !== "private") {
+      return res.status(400).json({ error: "Só quadros privados têm lista de acesso", code: "BOARD_NOT_PRIVATE" });
+    }
+    res.json({ permissions: await repo.listBoardPermissions(req.params.id), myRole: req.boardRole });
+  })
+);
+
+// Adiciona alguém, ou troca o papel de quem já está na lista — é a mesma escrita.
+router.post(
+  "/:id/permissions",
+  requireBoardAccess((req) => req.params.id),
+  requireBoardOwner,
+  ah(async (req, res) => {
+    if (req.boardAccess.visibility !== "private") {
+      return res.status(400).json({ error: "Só quadros privados têm lista de acesso", code: "BOARD_NOT_PRIVATE" });
+    }
+    const { userId, role } = req.body || {};
+    if (!userId) return res.status(400).json({ error: "Usuário obrigatório", code: "USER_ID_REQUIRED" });
+    if (!PAPEIS.has(role)) return res.status(400).json({ error: "Papel inválido", code: "INVALID_BOARD_ROLE" });
+    // getUserById lê o banco da empresa em curso, então isto também é o que impede
+    // conceder acesso ao usuário de outra empresa: lá o id simplesmente não existe.
+    const alvo = await repo.getUserById(userId);
+    if (!alvo) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
+    // O dono já tem tudo, e rebaixá-lo a leitor o trancaria fora do próprio quadro.
+    if (alvo.id === req.boardAccess.ownerId) {
+      return res.status(400).json({ error: "O dono já tem acesso ao quadro", code: "CANNOT_CHANGE_BOARD_OWNER" });
+    }
+    await repo.grantBoardPermission(req.params.id, alvo.id, role);
+    res.status(201).json({ permissions: await repo.listBoardPermissions(req.params.id) });
+  })
+);
+
+router.delete(
+  "/:id/permissions/:userId",
+  requireBoardAccess((req) => req.params.id),
+  requireBoardOwner,
+  ah(async (req, res) => {
+    await repo.revokeBoardPermission(req.params.id, req.params.userId);
+    res.json({ permissions: await repo.listBoardPermissions(req.params.id) });
   })
 );
 

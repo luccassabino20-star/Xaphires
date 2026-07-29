@@ -93,10 +93,51 @@ export function requireMaster(req, res, next) {
   next();
 }
 
+// Papel de um usuário num quadro, ou null quando ele não tem acesso nenhum.
+// Quadro compartilhado devolve "editor": é o comportamento que sempre valeu, todo
+// mundo da empresa entra e escreve, e não existe convite ali.
+//
+// O dono é reconhecido por boards.owner_id, e não pela linha 'owner' da tabela de
+// permissões: a tabela é derivada, e uma autorização que dependesse dela abriria a
+// porta a qualquer escrita que conseguisse inserir uma linha lá.
+//
+// Repare que master não passa por aqui. Privado é privado inclusive para o master
+// da empresa — sempre foi assim, e afrouxar isso agora esvaziaria o recurso.
+export function boardRoleFor(user, access) {
+  if (!access || !user) return null;
+  if (access.visibility !== "private") return "editor";
+  if (access.ownerId === user.id) return "owner";
+  return access.roles?.get(user.id) || null;
+}
+
 export function hasBoardAccess(user, access) {
-  if (!access) return false;
-  if (access.visibility !== "private") return true;
-  return access.ownerId === user.id;
+  return boardRoleFor(user, access) !== null;
+}
+
+// Guarda comum aos dois middlewares. Devolve o papel quando libera, ou responde e
+// devolve null quando recusa.
+function autorizarQuadro(req, res, access) {
+  if (!access) {
+    res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
+    return null;
+  }
+  const role = boardRoleFor(req.user, access);
+  // 403, e não 404: o quadro existe e o pedido é legítimo, só não é dele. Esconder
+  // a existência aqui não protegeria nada, porque o id só chega a quem já o viu.
+  if (!role) {
+    res.status(403).json({ error: "Você não tem acesso a este quadro", code: "FORBIDDEN_BOARD_ACCESS" });
+    return null;
+  }
+  // Convidado como leitor não escreve. A checagem fica aqui, no mesmo lugar em que
+  // o acesso é conferido, e não rota a rota: cartão, lista, recorrência e anexo
+  // passam todos por um destes dois middlewares, então rota nova nasce protegida.
+  if (role === "viewer" && !SAFE_METHODS.has(req.method)) {
+    res.status(403).json({ error: "Seu acesso a este quadro é somente leitura", code: "FORBIDDEN_BOARD_READ_ONLY" });
+    return null;
+  }
+  req.boardAccess = access;
+  req.boardRole = role;
+  return role;
 }
 
 // getBoardId(req) resolves the board id to check from the request (directly or via a list/card lookup).
@@ -105,10 +146,7 @@ export function requireBoardAccess(getBoardId) {
   return ah(async (req, res, next) => {
     const boardId = getBoardId(req);
     if (!boardId) return res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
-    const access = await getBoardAccessInfo(boardId);
-    if (!access) return res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
-    if (!hasBoardAccess(req.user, access))
-      return res.status(403).json({ error: "Você não tem acesso a este quadro", code: "FORBIDDEN_BOARD_ACCESS" });
+    if (!autorizarQuadro(req, res, await getBoardAccessInfo(boardId))) return;
     next();
   });
 }
@@ -119,10 +157,16 @@ export function requireBoardAccessParam(resolveBoardId) {
   return ah(async (req, res, next, value) => {
     const boardId = await resolveBoardId(value);
     if (!boardId) return res.status(404).json({ error: "Não encontrado", code: "NOT_FOUND" });
-    const access = await getBoardAccessInfo(boardId);
-    if (!access) return res.status(404).json({ error: "Quadro não encontrado", code: "BOARD_NOT_FOUND" });
-    if (!hasBoardAccess(req.user, access))
-      return res.status(403).json({ error: "Você não tem acesso a este quadro", code: "FORBIDDEN_BOARD_ACCESS" });
+    if (!autorizarQuadro(req, res, await getBoardAccessInfo(boardId))) return;
     next();
   });
+}
+
+// Administrar o quadro privado (compartilhar, excluir) é só do dono. Depende de
+// requireBoardAccess ter rodado antes, que é quem carrega req.boardRole.
+export function requireBoardOwner(req, res, next) {
+  if (req.boardRole !== "owner") {
+    return res.status(403).json({ error: "Apenas o dono do quadro pode fazer isso", code: "FORBIDDEN_BOARD_OWNER_ONLY" });
+  }
+  next();
 }

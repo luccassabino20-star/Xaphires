@@ -55,6 +55,15 @@ export const createList = (boardId, data) => request(`/boards/${boardId}/lists`,
 export const setListOrder = (boardId, orderedListIds) =>
   request(`/boards/${boardId}/list-order`, { method: "PUT", body: { orderedListIds } });
 
+// ---------- Compartilhamento de quadro privado ----------
+// Adicionar e trocar o papel de alguém é a mesma chamada: o servidor grava por
+// (quadro, usuário), então repetir com outro papel troca em vez de duplicar.
+export const listBoardPermissions = (boardId) => request(`/boards/${boardId}/permissions`);
+export const grantBoardPermission = (boardId, userId, role) =>
+  request(`/boards/${boardId}/permissions`, { method: "POST", body: { userId, role } });
+export const revokeBoardPermission = (boardId, userId) =>
+  request(`/boards/${boardId}/permissions/${userId}`, { method: "DELETE" });
+
 // ---------- Lists ----------
 export const renameList = (id, title) => request(`/lists/${id}`, { method: "PATCH", body: { title } });
 export const setListColor = (id, color) => request(`/lists/${id}`, { method: "PATCH", body: { color } });
