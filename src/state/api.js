@@ -3,13 +3,34 @@ import { normalizeLanguage } from "../i18n/locale.js";
 
 const BASE = "/api";
 
+/**
+ * O fetch() só rejeita quando a requisição não chegou a acontecer: servidor fora do
+ * ar, porta errada, rede caída. Não é resposta de erro - é ausência de resposta, e
+ * por isso não tem status nem corpo com `code` para o translateError usar.
+ *
+ * Sem esta conversão o erro sobe com a mensagem crua do navegador ("Failed to
+ * fetch"), que aparece em inglês no meio de um app traduzido em três idiomas e não
+ * diz a quem lê o que fazer. Vira código estável, e a tradução mora em
+ * `errors.NETWORK_UNREACHABLE` como a de qualquer erro da API.
+ */
+function erroDeRede() {
+  const err = new Error("Não foi possível falar com o servidor");
+  err.code = "NETWORK_UNREACHABLE";
+  return err;
+}
+
 async function request(path, options = {}) {
-  const res = await fetch(BASE + path, {
-    method: options.method || "GET",
-    headers: options.body ? { "Content-Type": "application/json" } : undefined,
-    body: options.body ? JSON.stringify(options.body) : undefined,
-    credentials: "same-origin",
-  });
+  let res;
+  try {
+    res = await fetch(BASE + path, {
+      method: options.method || "GET",
+      headers: options.body ? { "Content-Type": "application/json" } : undefined,
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      credentials: "same-origin",
+    });
+  } catch {
+    throw erroDeRede();
+  }
   let data = null;
   try {
     data = await res.json();
@@ -87,11 +108,19 @@ export const addLinkAttachment = (cardId, data) => request(`/cards/${cardId}/att
 export async function addFileAttachment(cardId, file) {
   const form = new FormData();
   form.append("file", file, file.name);
-  const res = await fetch(`${BASE}/cards/${cardId}/attachments/file`, {
-    method: "POST",
-    body: form,
-    credentials: "same-origin",
-  });
+  // Mesmo tratamento do request(): sem ele, servidor fora do ar no meio de um
+  // upload mostra "Failed to fetch" cru. Aqui o caso é ainda mais provável, porque
+  // a transferência é longa - dá tempo de a conexão cair durante o envio.
+  let res;
+  try {
+    res = await fetch(`${BASE}/cards/${cardId}/attachments/file`, {
+      method: "POST",
+      body: form,
+      credentials: "same-origin",
+    });
+  } catch {
+    throw erroDeRede();
+  }
   let data = null;
   try {
     data = await res.json();

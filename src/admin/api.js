@@ -8,12 +8,26 @@
 const BASE = "/api/admin";
 
 async function req(caminho, { method = "GET", body } = {}) {
-  const res = await fetch(BASE + caminho, {
-    method,
-    headers: body ? { "Content-Type": "application/json" } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-    credentials: "same-origin",
-  });
+  // O fetch() só rejeita quando a requisição não chegou a acontecer: servidor fora
+  // do ar, porta errada, rede caída. Sem esta conversão sobe o "Failed to fetch" cru
+  // do navegador, que não diz a quem lê o que fazer.
+  //
+  // A mensagem vai inteira aqui, e não como `code` para traduzir depois: o painel
+  // não passa pelo i18n - os componentes mostram err.message direto na tela, e os
+  // textos são só em português de propósito, por ser ferramenta interna.
+  let res;
+  try {
+    res = await fetch(BASE + caminho, {
+      method,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "same-origin",
+    });
+  } catch {
+    const err = new Error("O servidor não respondeu. Verifique se ele está em execução e tente de novo.");
+    err.code = "NETWORK_UNREACHABLE";
+    throw err;
+  }
   let dados = null;
   try {
     dados = await res.json();

@@ -765,6 +765,9 @@
     }
   },
   "errors": {
+    "NETWORK_UNREACHABLE": "El servidor no respondió. Comprueba que esté en ejecución e inténtalo de nuevo.",
+    "REPORT_FORMAT_INVALID": "Formato de informe no admitido",
+    "REPORT_STATUS_INVALID": "Filtro de estado inválido",
     "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Intermedio.",
     "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Profesional.",
     "INVALID_FREQUENCY": "Frecuencia inválida",

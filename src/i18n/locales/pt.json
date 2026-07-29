@@ -1081,6 +1081,9 @@
     }
   },
   "errors": {
+    "NETWORK_UNREACHABLE": "O servidor não respondeu. Verifique se ele está em execução e tente de novo.",
+    "REPORT_FORMAT_INVALID": "Formato de relatório não suportado",
+    "REPORT_STATUS_INVALID": "Filtro de situação inválido",
     "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Intermediário.",
     "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
     "INVALID_FREQUENCY": "Frequência inválida",

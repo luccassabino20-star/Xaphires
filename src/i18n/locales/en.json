@@ -765,6 +765,9 @@
     }
   },
   "errors": {
+    "NETWORK_UNREACHABLE": "The server did not respond. Check that it is running and try again.",
+    "REPORT_FORMAT_INVALID": "Unsupported report format",
+    "REPORT_STATUS_INVALID": "Invalid status filter",
     "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Intermediate plan up.",
     "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Professional plan up.",
     "INVALID_FREQUENCY": "Invalid frequency",
