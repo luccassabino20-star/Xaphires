@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBoardState } from "../state/BoardContext.jsx";
 import { useUsers } from "../state/UsersContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
@@ -17,9 +18,18 @@ const STATUS = [
 
 export default function ExportReportModal({ board, onClose }) {
   const { t, i18n } = useTranslation();
+  const { boards } = useBoardState();
   const { users } = useUsers();
   const showToast = useToast();
 
+  // Vazio = todos os quadros. É o mesmo contrato do servidor, onde `boardId`
+  // ausente significa "o workspace inteiro" - o valor do seletor viaja como está,
+  // sem tabela de conversão para alguém esquecer de atualizar de um lado só.
+  //
+  // O padrão é o quadro aberto, e não "todos": quem abre o modal a partir de um
+  // quadro está olhando para ele, e um relatório da empresa inteira por omissão
+  // seria uma surpresa cara de notar - só se percebe depois de abrir o arquivo.
+  const [quadroId, setQuadroId] = useState(board.id);
   const [membroId, setMembroId] = useState("");
   const [status, setStatus] = useState("todos");
   const [contagem, setContagem] = useState(null);
@@ -27,18 +37,29 @@ export default function ExportReportModal({ board, onClose }) {
   const [erroContagem, setErroContagem] = useState(false);
   const [baixando, setBaixando] = useState(null);
 
-  // Quem pode aparecer no seletor. Em quadro compartilhado é a empresa inteira,
-  // que é justamente quem tem acesso a ele. Em quadro privado é só quem foi
-  // convidado - listar a empresa toda ali contaria a quem tem acesso ao quadro
-  // quem mais existe na empresa, e o convidado só precisa ver os colegas de quadro.
+  const quadroEscolhido = quadroId ? boards.find((b) => b.id === quadroId) : null;
+
+  // Quem pode aparecer no seletor de responsável. Em quadro compartilhado é a
+  // empresa inteira, que é justamente quem tem acesso a ele. Em quadro privado é só
+  // quem foi convidado - listar a empresa toda ali contaria a quem tem acesso ao
+  // quadro quem mais existe na empresa, e o convidado só precisa ver os colegas de
+  // quadro. Com "todos os quadros" volta a ser a empresa inteira, porque aí o
+  // relatório atravessa quadros com composições diferentes.
   const membros = useMemo(() => {
-    if (board.visibility !== "private") return users;
+    if (!quadroEscolhido || quadroEscolhido.visibility !== "private") return users;
     // sharedWith já traz a linha do dono, e é por isso que ela existe - o modal
     // lista todo mundo com acesso numa consulta só.
-    const comAcesso = new Set((board.sharedWith || []).map((p) => p.userId));
-    if (board.ownerId) comAcesso.add(board.ownerId);
+    const comAcesso = new Set((quadroEscolhido.sharedWith || []).map((p) => p.userId));
+    if (quadroEscolhido.ownerId) comAcesso.add(quadroEscolhido.ownerId);
     return users.filter((u) => comAcesso.has(u.id));
-  }, [board.visibility, board.sharedWith, board.ownerId, users]);
+  }, [quadroEscolhido, users]);
+
+  // Trocar de quadro pode deixar o responsável escolhido fora da lista - some com o
+  // filtro em vez de manter um id invisível selecionado, que faria o contador
+  // mostrar zero sem nada na tela explicando por quê.
+  useEffect(() => {
+    if (membroId && !membros.some((u) => u.id === membroId)) setMembroId("");
+  }, [membros, membroId]);
 
   // O contador vem do servidor, e não de uma contagem sobre o estado local, porque
   // é o servidor que decide o que entra no arquivo (quadro privado, arquivado,
@@ -52,7 +73,7 @@ export default function ExportReportModal({ board, onClose }) {
     setContando(true);
     setErroContagem(false);
     api
-      .contarCartoesDoRelatorio({ boardId: board.id, memberId: membroId || null, status })
+      .contarCartoesDoRelatorio({ boardId: quadroId || null, memberId: membroId || null, status })
       .then((r) => {
         if (cancelado) return;
         setContagem(r.total);
@@ -70,14 +91,14 @@ export default function ExportReportModal({ board, onClose }) {
     return () => {
       cancelado = true;
     };
-  }, [board.id, membroId, status]);
+  }, [quadroId, membroId, status]);
 
   async function baixar(formato) {
     setBaixando(formato);
     try {
       await api.baixarRelatorio({
         formato,
-        boardId: board.id,
+        boardId: quadroId || null,
         memberId: membroId || null,
         status,
         // O arquivo sai no idioma em que a pessoa está usando o app, e não num
@@ -111,7 +132,22 @@ export default function ExportReportModal({ board, onClose }) {
         </div>
 
         <div className="modal-body">
-          <p className="export-report-scope">{t("board.exportReport.scope", { board: board.title })}</p>
+          <label className="export-report-field">
+            <span className="export-report-label">{t("board.exportReport.boardLabel")}</span>
+            <select value={quadroId} onChange={(e) => setQuadroId(e.target.value)}>
+              <option value="">{t("board.exportReport.allBoards")}</option>
+              {boards.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {/* O quadro privado é marcado na lista para o relatório de "todos"
+                      não parecer trazer coisa que não deveria: quem exporta precisa
+                      saber que aquele conteúdo entrou, e que ele é restrito. */}
+                  {b.visibility === "private" ? `${b.title} (${t("board.exportReport.privateTag")})` : b.title}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {!quadroId && <p className="export-report-scope">{t("board.exportReport.allBoardsHint")}</p>}
 
           <label className="export-report-field">
             <span className="export-report-label">{t("board.exportReport.userLabel")}</span>

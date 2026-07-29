@@ -391,7 +391,10 @@
     },
     "exportReport": {
       "title": "Export Kanban report",
-      "scope": "Board: {{board}}",
+      "boardLabel": "Board",
+      "allBoards": "All boards",
+      "privateTag": "private",
+      "allBoardsHint": "Includes every board you have access to, private ones included.",
       "userLabel": "User",
       "allUsers": "All users",
       "statusLabel": "Card status",

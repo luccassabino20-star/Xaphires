@@ -3725,10 +3725,10 @@ input, textarea { font-family: inherit; }
 }
 
 /* ---------- Exportar relatório ---------- */
-/* 600px e não os 520 de um formulário de dois campos: os três botões de download
-   somam 547px numa linha, e abaixo disso o de Excel quebra sozinho para a segunda
-   linha e o rodapé fica torto. Medido no navegador, não no olho. */
-.export-report-modal { max-width: 600px; }
+/* 660px e não os 520 de um formulário simples: os três botões de download precisam
+   caber numa linha só, e o rótulo mais largo é o inglês ("Download report (Excel)"),
+   que soma 579px. Medido no navegador nos dois idiomas, não no olho. */
+.export-report-modal { max-width: 660px; }
 .export-report-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text-primary); }
 .export-report-scope {
   margin: 0 0 18px;
@@ -3784,5 +3784,12 @@ input, textarea { font-family: inherit; }
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: flex-end;
+}
+/* Os três esticam para dividir a linha em partes iguais. É o que torna o rodapé
+   independente do idioma: a largura passa a ser dada pelo modal, e não pelo
+   comprimento do rótulo traduzido - foi ele que jogou o botão de Excel para uma
+   segunda linha em inglês depois de eu medir só em português. */
+.export-report-actions button {
+  flex: 1 1 auto;
+  white-space: nowrap;
 }

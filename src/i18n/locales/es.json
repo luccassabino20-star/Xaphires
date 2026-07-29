@@ -391,7 +391,10 @@
     },
     "exportReport": {
       "title": "Exportar informe del Kanban",
-      "scope": "Tablero: {{board}}",
+      "boardLabel": "Tablero",
+      "allBoards": "Todos los tableros",
+      "privateTag": "privado",
+      "allBoardsHint": "Incluye todos los tableros a los que tienes acceso, incluidos los privados.",
       "userLabel": "Usuario",
       "allUsers": "Todos los usuarios",
       "statusLabel": "Estado de la tarjeta",

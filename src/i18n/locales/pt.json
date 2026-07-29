@@ -688,7 +688,10 @@
     },
     "exportReport": {
       "title": "Exportar relatório do Kanban",
-      "scope": "Quadro: {{board}}",
+      "boardLabel": "Quadro",
+      "allBoards": "Todos os quadros",
+      "privateTag": "privado",
+      "allBoardsHint": "Inclui todos os quadros a que você tem acesso, inclusive os privados.",
       "userLabel": "Usuário",
       "allUsers": "Todos os usuários",
       "statusLabel": "Status do cartão",
