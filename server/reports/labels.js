@@ -32,6 +32,7 @@ const PT = {
   // Colunas da tabela
   colId: "ID do cartão",
   colTitulo: "Tarefa",
+  colDescricao: "Descrição",
   colQuadro: "Quadro",
   colColuna: "Coluna",
   colCriacao: "Criado em",
@@ -86,6 +87,7 @@ const EN = {
   checklist: "Checklist",
   colId: "Card ID",
   colTitulo: "Task",
+  colDescricao: "Description",
   colQuadro: "Board",
   colColuna: "List",
   colCriacao: "Created on",
@@ -139,6 +141,7 @@ const ES = {
   checklist: "Checklist",
   colId: "ID de la tarjeta",
   colTitulo: "Tarea",
+  colDescricao: "Descripción",
   colQuadro: "Tablero",
   colColuna: "Lista",
   colCriacao: "Creado el",

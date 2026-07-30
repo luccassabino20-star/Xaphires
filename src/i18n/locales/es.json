@@ -31,6 +31,11 @@
       "pricing": "Precios",
       "enter": "Ingresar"
     },
+    "promoPopup": {
+      "copy": "Copiar",
+      "copied": "¡Copiado!",
+      "defaultButton": "Aprovechar oferta"
+    },
     "home": {
       "heroTitle": "Tu equipo organizado, sin esfuerzo extra",
       "heroText": "Cantiere reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
@@ -395,6 +400,7 @@
       "allBoards": "Todos los tableros",
       "privateTag": "privado",
       "allBoardsHint": "Incluye todos los tableros a los que tienes acceso, incluidos los privados.",
+      "noBoardsHint": "Selecciona al menos un tablero para exportar el informe.",
       "userLabel": "Usuario",
       "allUsers": "Todos los usuarios",
       "statusLabel": "Estado de la tarjeta",

@@ -1988,7 +1988,20 @@ input, textarea { font-family: inherit; }
 .landing-plan-price-value { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; }
 .landing-plan-price-period { font-size: 13px; color: var(--text-secondary); }
 .landing-plan-card .btn-primary,
-.landing-plan-card .btn-secondary { width: 100%; padding: 10px; font-size: 13.5px; margin-bottom: 22px; }
+.landing-plan-card .btn-secondary {
+  width: 100%;
+  padding: 10px;
+  font-size: 13.5px;
+  margin-bottom: 22px;
+  box-sizing: border-box;
+}
+/* CTA do Empresarial é um <a> para o WhatsApp, não um <button>: precisa das regras que o botão ganha de graça. */
+.landing-plan-card a.btn-primary,
+.landing-plan-card a.btn-secondary {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
 .landing-plan-features { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .landing-plan-features li {
   font-size: 13.5px;
@@ -2417,12 +2430,16 @@ input, textarea { font-family: inherit; }
   justify-content: center;
 }
 
-/* ---------- Landing e login: tema dark fixo ---------- */
-/* Landing e tela de login usam sempre a paleta escura do template, independente
-   do tema do app. Como as variáveis são redefinidas no escopo desses dois shells,
-   todo componente filho (inclusive .btn-primary/.btn-secondary) se adapta sem
-   regra extra. As duas telas dividem a mesma paleta de propósito: sair da landing
-   e cair no login não pode ter salto de tom. */
+/* ---------- Landing e login: tema dark por padrão, com escolha explícita ---------- */
+/* Landing e tela de login usam a paleta escura do template por padrão, independente
+   do tema do app — é escolha de marca, não deve seguir o --prefers-color-scheme do
+   SO. Como as variáveis são redefinidas no escopo desses dois shells, todo componente
+   filho (inclusive .btn-primary/.btn-secondary) se adapta sem regra extra. As duas
+   telas dividem a mesma paleta de propósito: sair da landing e cair no login não pode
+   ter salto de tom — por isso o par de blocos abaixo (dark e light) é sempre editado
+   junto, e o toggle nas duas telas usa o mesmo ThemeContext do app (LandingThemeToggle).
+   "system" e "dark" caem no bloco de baixo (dark); só data-theme="light" explícito,
+   escolhido no toggle, ativa o branco neve. */
 .landing-shell,
 .auth-shell {
   --bg-app: #050505;
@@ -2442,6 +2459,27 @@ input, textarea { font-family: inherit; }
   --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.5), 0 12px 28px rgba(0,0,0,0.4);
   color-scheme: dark;
 }
+:root[data-theme="light"] .landing-shell,
+:root[data-theme="light"] .auth-shell {
+  --bg-app: #f7f8fa;
+  --bg-topbar: #ffffff;
+  --bg-list: #ffffff;
+  --bg-column: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f2f4;
+  --border-subtle: #e3e5e9;
+  --border-strong: #cdd1d8;
+  --text-primary: #14151a;
+  --text-secondary: #52565f;
+  --text-muted: #8b8f98;
+  --accent: #14151a;
+  --accent-hover: #2c2e35;
+  --shadow-card: 0 1px 2px rgba(20,20,30,0.05), 0 2px 8px rgba(20,20,30,0.06);
+  --shadow-card-hover: 0 4px 12px rgba(20,20,30,0.08), 0 12px 28px rgba(20,20,30,0.10);
+  color-scheme: light;
+}
+:root[data-theme="light"] .landing-shell ::selection,
+:root[data-theme="light"] .auth-shell ::selection { background: #d8dade; color: #14151a; }
 .landing-shell ::selection { background: #404040; color: #fff; }
 .landing-shell .btn-primary,
 .landing-shell .btn-secondary { border-radius: 9999px; padding: 10px 22px; }
@@ -2472,30 +2510,6 @@ input, textarea { font-family: inherit; }
 }
 @media (prefers-reduced-motion: reduce) {
   .landing-char { transition: none; opacity: 1; transform: none; clip-path: none; }
-}
-
-/* ---------- Landing: grade animada de fundo no hero ---------- */
-.landing-hero-main { position: relative; overflow: hidden; }
-.landing-hero-grid {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(var(--cols, 12), 1fr);
-  opacity: 0.2;
-  pointer-events: none;
-  z-index: 0;
-}
-.landing-hero-col {
-  height: 100%;
-  border-right: 1px solid rgba(38, 38, 38, 0.5);
-  background: linear-gradient(to bottom, rgba(23, 23, 23, 0), rgba(23, 23, 23, 0.5));
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path 1.5s cubic-bezier(0.65, 0, 0.35, 1);
-}
-.landing-hero-col.active { clip-path: inset(0 0 0 0); }
-.landing-hero-main > *:not(.landing-hero-grid) { position: relative; z-index: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .landing-hero-col { transition: none; clip-path: inset(0 0 0 0); }
 }
 
 /* ---------- Landing: cards com efeito flashlight ---------- */
@@ -2750,9 +2764,14 @@ input, textarea { font-family: inherit; }
 
 /* ---------- Landing: border beam nos CTAs ---------- */
 /* O feixe é um conic-gradient girando, recortado por mask para virar só um anel.
-   O ângulo precisa ser uma custom property registrada via @property, senão o
-   navegador trata --beam-angle como texto e não consegue interpolar. Sem suporte
-   a @property o feixe aparece parado no hover — degradação aceitável.
+   O ângulo já foi uma custom property animada via @keyframes + @property — o Chrome
+   interpolava --beam-angle certinho (dava pra ver no DevTools), mas não repintava o
+   conic-gradient que a usa: o anel aparecia no hover e ficava parado. É um --beam-angle
+   consumido só dentro de paint (background + mask), sem nada de layout/transform junto
+   que force o repaint a cada frame, e nem `will-change` resolveu. Por isso quem gira o
+   ângulo agora é um requestAnimationFrame, escrevendo direto no style do botão (o efeito
+   de hover em LandingScreen.jsx): é uma mutação de style de verdade a cada frame, não
+   uma animação CSS, então força o recompute que faltava.
 
    O anel fica em inset/padding negativo de propósito: assim ele é desenhado na
    faixa de 2px FORA do fundo do botão. Como o .btn-primary da landing é branco,
@@ -2761,16 +2780,6 @@ input, textarea { font-family: inherit; }
    Vale nos dois botões, com leituras diferentes: no .btn-primary (pílula branca)
    o feixe fica sutil, um halo; no .btn-secondary (fundo escuro, borda fina) ele
    aparece como a luz percorrendo a borda, que é o efeito do template. */
-@property --beam-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes landing-beam-spin {
-  to { --beam-angle: 360deg; }
-}
-
 .landing-shell .btn-primary,
 .landing-shell .btn-secondary { position: relative; }
 .landing-shell .btn-primary::after,
@@ -2795,19 +2804,58 @@ input, textarea { font-family: inherit; }
   pointer-events: none;
 }
 .landing-shell .btn-primary:hover::after,
-.landing-shell .btn-secondary:hover::after {
-  opacity: 1;
-  animation: landing-beam-spin 2s linear infinite;
-}
+.landing-shell .btn-secondary:hover::after { opacity: 1; }
 .landing-shell .btn-primary:active,
 .landing-shell .btn-secondary:active { transform: scale(0.97); }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-shell .btn-primary:hover::after,
-  .landing-shell .btn-secondary:hover::after { animation: none; }
   .landing-shell .btn-primary:active,
   .landing-shell .btn-secondary:active { transform: none; }
 }
+
+/* ---------- Landing: pop-up promocional ---------- */
+/* Reaproveita .modal/.modal-overlay (as mesmas variáveis de tema resolvem certo
+   dentro de .landing-shell, dark ou branco neve) - só o conteúdo de dentro é novo. */
+/* Sangra até a borda do .modal (padding 20px 24px 24px) com margem negativa, e fica
+   por baixo do .modal-close (position: absolute sempre vence position: static, sem
+   precisar de z-index) - o X continua clicável em cima da imagem.
+
+   Sem max-height nem object-fit: a imagem é o post inteiro que o admin já desenhou
+   com o texto da oferta dentro - cortar (object-fit: cover) arriscava cortar
+   justamente a parte com informação. height: auto respeita a proporção de qualquer
+   banner que o admin suba. */
+.promo-popup-image {
+  display: block;
+  width: calc(100% + 48px);
+  height: auto;
+  margin: -20px -24px 10px;
+  border-radius: 10px 10px 0 0;
+}
+/* Texto e cupom mais compactos: com a imagem carregando a oferta, esse bloco é só
+   reforço, não a peça principal - o respiro generoso de antes competia com o post. */
+.promo-popup-title { margin: 0 0 4px; font-size: 18px; font-weight: 800; color: var(--text-primary); padding-right: 20px; }
+.promo-popup-message { margin: 0 0 10px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+.promo-popup-coupon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--bg-list);
+  border: 1px dashed var(--border-strong);
+  border-radius: 8px;
+}
+.promo-popup-coupon-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  user-select: all;
+}
+.promo-popup-cta { width: 100%; }
+.promo-popup { padding-bottom: 18px; }
 
 /* ---------- Login: superfícies e fundo blueprint ---------- */
 /* A paleta da landing serve para uma página de leitura, onde --bg-list e --bg-card
@@ -3569,6 +3617,19 @@ input, textarea { font-family: inherit; }
 .adm-acao.sensivel { color: var(--adm-acento); font-weight: 600; }
 .adm-acao.destrutiva { color: var(--adm-perigo); font-weight: 600; }
 
+/* ---------- Pop-ups: miniatura na lista e pré-visualização no formulário ---------- */
+.adm-popup-linha { display: flex; align-items: center; gap: 10px; }
+.adm-popup-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid var(--adm-borda); }
+.adm-popup-preview { margin: 8px 0; display: flex; align-items: center; gap: 12px; }
+.adm-popup-preview img {
+  max-width: 220px;
+  max-height: 120px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid var(--adm-borda);
+  background: var(--adm-fundo);
+}
+
 
 /* ---------- Painel da plataforma dentro do app ---------- */
 /* O mesmo painel de /admin, embutido num modal. Reaproveita as classes .adm-*,
@@ -3735,6 +3796,7 @@ input, textarea { font-family: inherit; }
   font-size: 13px;
   color: var(--text-secondary);
 }
+.export-report-scope.is-warning { color: var(--danger); }
 .export-report-field { display: block; margin-bottom: 14px; }
 .export-report-label {
   display: block;
@@ -3742,6 +3804,53 @@ input, textarea { font-family: inherit; }
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
+}
+/* Lista de quadros: "Todos" fica fora e sempre visível, fixo no topo; os quadros
+   individuais rolam por baixo dele quando passam de uns 6-7 - sem isso um workspace
+   com muitos quadros estoura a altura do modal. */
+.export-report-boards {
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
+  background: var(--bg-list);
+  overflow: hidden;
+}
+.export-report-boards-all {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.export-report-boards-list {
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 4px;
+}
+/* Some visualmente com a lista quando "Todos" está marcado, em vez de escondê-la:
+   ela continua ali, só não importa - trocar de opinião não perde a seleção anterior. */
+.export-report-boards-list.is-disabled { opacity: 0.45; }
+.export-report-board-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.export-report-board-item:hover { background: var(--bg-card-hover); }
+.export-report-boards-all input,
+.export-report-board-item input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 /* O select ocupa a largura toda porque nome de pessoa é longo e a caixa estreita
    cortaria justamente o que se precisa ler para escolher. */

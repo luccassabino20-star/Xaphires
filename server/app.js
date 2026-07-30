@@ -19,6 +19,8 @@ import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as billingRouter } from "./routes/billing.js";
 import { router as billingWebhookRouter } from "./routes/billingWebhook.js";
 import { router as adminRouter } from "./routes/admin.js";
+import { router as popupRouter } from "./routes/popup.js";
+import { popupUploadsDir } from "./admin/popupUploads.js";
 
 export const app = express();
 
@@ -54,6 +56,9 @@ app.use("/api/admin", adminRouter);
 
 app.use("/api/auth", authRouter);
 app.use("/api/plan", planRouter);
+// Pop-up promocional da landing: público de propósito, ninguém logou ainda nesse
+// ponto da visita. Só GET, então não precisa de verifyOrigin nem de rate limit.
+app.use("/api/popup", popupRouter);
 // Cobrança fica fora do bloqueio de escrita pelo mesmo motivo do plano: empresa
 // vencida precisa poder pagar para voltar a escrever.
 app.use("/api/billing", billingRouter);
@@ -69,10 +74,18 @@ app.use("/api/recurrences", requireAuth, requireWritablePlan, recurrencesRouter)
 // coerência, e empresa vencida continua conseguindo exportar os próprios dados.
 app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);
 
+// Imagem do pop-up é pública de propósito: quem monta é o admin da plataforma, quem
+// vê é qualquer visitante da landing, sem sessão nenhuma. Fora de /api, então o
+// verifyOrigin lá de cima não se aplica - é só GET de arquivo estático.
+app.use("/uploads/popups", express.static(popupUploadsDir()));
+
 const distPath = path.join(process.cwd(), "dist");
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get(/^(?!\/api).*/, (req, res) => {
+  // /uploads também fica de fora do catch-all: sem a exclusão, uma imagem de pop-up
+  // apagada ou nunca enviada caía aqui e voltava 200 com o HTML da SPA em vez de 404
+  // - foi assim que se descobriu, testando a troca de imagem.
+  app.get(/^(?!\/api|\/uploads).*/, (req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }

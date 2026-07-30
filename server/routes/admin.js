@@ -3,6 +3,10 @@ import { ah } from "../asyncHandler.js";
 import { rateLimit } from "../rateLimit.js";
 import * as dir from "../directory.js";
 import * as store from "../admin/store.js";
+import * as popupStore from "../admin/popupStore.js";
+import { novoDestinoDeImagem, extensaoValida, apagarImagem } from "../admin/popupUploads.js";
+import Busboy from "busboy";
+import fs from "node:fs";
 import { comAcessoAEmpresa, auditar } from "../admin/tenant.js";
 import {
   requireAdmin,
@@ -389,6 +393,155 @@ router.post(
     const atualizado = store.definirAdminAtivo(req.params.id, ativo);
     auditar(req, ativo ? "ativar_admin" : "desativar_admin", { alvo: alvo.email });
     res.json({ admin: store.publicAdmin(atualizado) });
+  })
+);
+
+// ---------- Pop-up promocional da landing ----------
+// Conteúdo de marketing da plataforma, não dado de empresa cliente - por isso não
+// passa por comAcessoAEmpresa (não há empresa envolvida), só por `auditar`.
+
+router.get("/popups", (req, res) => res.json({ popups: popupStore.listarPopups() }));
+
+router.post(
+  "/popups",
+  ah(async (req, res) => {
+    const { title, message, couponCode, buttonLabel, expiresAt } = req.body || {};
+    if (!title?.trim()) return res.status(400).json({ error: "Informe um título", code: "POPUP_TITLE_REQUIRED" });
+    if (!couponCode?.trim()) return res.status(400).json({ error: "Informe o código do cupom", code: "POPUP_COUPON_REQUIRED" });
+    const novo = popupStore.criarPopup({ title, message, couponCode, buttonLabel, expiresAt });
+    auditar(req, "criar_popup", { alvo: novo.title });
+    res.status(201).json({ popup: novo });
+  })
+);
+
+router.patch(
+  "/popups/:id",
+  ah(async (req, res) => {
+    const atual = popupStore.acharPopup(req.params.id);
+    if (!atual) return res.status(404).json({ error: "Campanha não encontrada", code: "POPUP_NOT_FOUND" });
+    const { title, message, couponCode, buttonLabel, expiresAt } = req.body || {};
+    if (title !== undefined && !title.trim()) return res.status(400).json({ error: "Informe um título", code: "POPUP_TITLE_REQUIRED" });
+    if (couponCode !== undefined && !couponCode.trim()) {
+      return res.status(400).json({ error: "Informe o código do cupom", code: "POPUP_COUPON_REQUIRED" });
+    }
+    const atualizado = popupStore.atualizarPopup(req.params.id, { title, message, couponCode, buttonLabel, expiresAt });
+    auditar(req, "editar_popup", { alvo: atualizado.title, detalhe: { campos: Object.keys(req.body || {}) } });
+    res.json({ popup: atualizado });
+  })
+);
+
+// Ativar/desativar é o "liga/desliga" do painel. Ativar passa por ativarPopup, que
+// desativa qualquer outra campanha na mesma transação - nunca duas ligadas juntas.
+router.post(
+  "/popups/:id/active",
+  ah(async (req, res) => {
+    const atual = popupStore.acharPopup(req.params.id);
+    if (!atual) return res.status(404).json({ error: "Campanha não encontrada", code: "POPUP_NOT_FOUND" });
+    const ativo = !!req.body?.active;
+    const atualizado = ativo ? popupStore.ativarPopup(req.params.id) : popupStore.desativarPopup(req.params.id);
+    auditar(req, ativo ? "ativar_popup" : "desativar_popup", { alvo: atual.title });
+    res.json({ popup: atualizado });
+  })
+);
+
+router.delete(
+  "/popups/:id",
+  ah(async (req, res) => {
+    const atual = popupStore.acharPopup(req.params.id);
+    if (!atual) return res.status(404).json({ error: "Campanha não encontrada", code: "POPUP_NOT_FOUND" });
+    popupStore.excluirPopup(req.params.id);
+    apagarImagem(atual.imageUrl);
+    auditar(req, "excluir_popup", { alvo: atual.title });
+    res.json({ ok: true });
+  })
+);
+
+const LIMITE_IMAGEM = 5 * 1024 * 1024; // 5 MB: é um banner de pop-up, não uma foto em resolução de impressão.
+
+// Upload em streaming, como o anexo de cartão (ver cards.js) - mesmo raciocínio de
+// não segurar o arquivo inteiro na memória, embora aqui a escala seja bem menor (um
+// admin, uma imagem por vez). A imagem antiga da campanha é apagada só depois que a
+// nova terminou de gravar, para uma falha no meio do upload não deixar a campanha
+// sem nenhuma imagem.
+router.post("/popups/:id/image", (req, res) => {
+  const atual = popupStore.acharPopup(req.params.id);
+  if (!atual) return res.status(404).json({ error: "Campanha não encontrada", code: "POPUP_NOT_FOUND" });
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: LIMITE_IMAGEM } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let destino = null;
+  let bytes = 0;
+  let respondido = false;
+  let saida = null;
+
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    if (destino && (!saida || saida.destroyed)) fs.unlink(destino.path, () => {});
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    const extensao = extensaoValida(info.mimeType);
+    if (!extensao) {
+      stream.resume(); // drena o stream sem gravar nada, senão a requisição trava esperando o cliente
+      return falhar(400, { error: "Envie um arquivo de imagem (JPEG, PNG, WEBP ou GIF)", code: "POPUP_IMAGE_INVALID_TYPE" });
+    }
+    destino = novoDestinoDeImagem(info.mimeType);
+    saida = fs.createWriteStream(destino.path);
+    saida.on("error", () => falhar(500, { error: "Erro ao gravar a imagem", code: "UPLOAD_FAILED" }));
+    stream.on("data", (chunk) => (bytes += chunk.length));
+    stream.on("limit", () => {
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, {
+        error: `A imagem deve ter até ${Math.round(LIMITE_IMAGEM / 1024 / 1024)} MB`,
+        code: "POPUP_IMAGE_TOO_LARGE",
+      });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber a imagem", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber a imagem", code: "UPLOAD_FAILED" }));
+
+  bb.on("close", () => {
+    if (respondido) return;
+    if (!destino || bytes === 0) return falhar(400, { error: "Selecione uma imagem", code: "POPUP_IMAGE_REQUIRED" });
+    const registrar = () => {
+      if (respondido) return;
+      respondido = true;
+      const imagemAntiga = atual.imageUrl;
+      const atualizado = popupStore.definirImagemPopup(req.params.id, destino.url);
+      if (imagemAntiga) apagarImagem(imagemAntiga);
+      auditar(req, "alterar_imagem_popup", { alvo: atual.title });
+      res.status(201).json({ popup: atualizado });
+    };
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  req.pipe(bb);
+});
+
+router.delete(
+  "/popups/:id/image",
+  ah(async (req, res) => {
+    const atual = popupStore.acharPopup(req.params.id);
+    if (!atual) return res.status(404).json({ error: "Campanha não encontrada", code: "POPUP_NOT_FOUND" });
+    const atualizado = popupStore.definirImagemPopup(req.params.id, null);
+    apagarImagem(atual.imageUrl);
+    auditar(req, "remover_imagem_popup", { alvo: atual.title });
+    res.json({ popup: atualizado });
   })
 );
 

@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
+import LandingThemeToggle from "../components/LandingThemeToggle.jsx";
+import PromoPopup from "../components/PromoPopup.jsx";
 
 const NAV_PAGES = ["home", "features", "solutions", "pricing"];
 
@@ -95,28 +97,6 @@ function RevealTitle({ text }) {
         </Fragment>
       ))}
     </>
-  );
-}
-
-function HeroGrid() {
-  const [active, setActive] = useState(false);
-  const cols = typeof window !== "undefined" && window.innerWidth < 768 ? 6 : 12;
-
-  useEffect(() => {
-    const id = setTimeout(() => setActive(true), 100);
-    return () => clearTimeout(id);
-  }, []);
-
-  return (
-    <div className="landing-hero-grid" style={{ "--cols": cols }} aria-hidden="true">
-      {Array.from({ length: cols }, (_, i) => (
-        <div
-          key={i}
-          className={"landing-hero-col" + (active ? " active" : "")}
-          style={{ transitionDelay: `${i * 100}ms` }}
-        />
-      ))}
-    </div>
   );
 }
 
@@ -292,7 +272,6 @@ function HomePage({ onEnter, onNavigate }) {
     <div ref={revealRef}>
       {/* O hero não usa .landing-reveal: a entrada dele é o reveal letra a letra do título. */}
       <section className="landing-hero landing-hero-main">
-        <HeroGrid />
         <h1>
           <RevealTitle text={t("landing.home.heroTitle")} />
         </h1>
@@ -514,6 +493,9 @@ function ProductTeamsPage({ onEnter, onNavigate }) {
   );
 }
 
+const WHATSAPP_VENDAS_URL =
+  "https://api.whatsapp.com/send?phone=5527988312023&text=Ol%C3%A1!%20Gostaria%20de%20receber%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20produtos%2Fservi%C3%A7os%20e%20solicitar%20um%20or%C3%A7amento.";
+
 function PricingPage({ onEnter }) {
   const { t } = useTranslation();
   const plans = t("landing.pricing.plans", { returnObjects: true });
@@ -527,27 +509,38 @@ function PricingPage({ onEnter }) {
 
       <section className="landing-pricing">
         <div className="landing-pricing-grid">
-          {plans.map((p) => (
-            <div className={"landing-plan-card" + (p.highlight ? " highlight" : "")} key={p.name}>
-              {p.highlight && <span className="landing-plan-badge">{t("landing.pricing.mostPopular")}</span>}
-              <h3>{p.name}</h3>
-              <p className="landing-plan-tagline">{p.tagline}</p>
-              <div className="landing-plan-price">
-                <span className="landing-plan-price-value">{p.price}</span>
-                <span className="landing-plan-price-period">{p.period}</span>
+          {plans.map((p, i) => {
+            // Só o último plano (Empresarial) fala com vendas; os demais entram direto no cadastro.
+            const isVendas = i === plans.length - 1;
+            const ctaClass = p.highlight ? "btn-primary" : "btn-secondary";
+            return (
+              <div className={"landing-plan-card" + (p.highlight ? " highlight" : "")} key={p.name}>
+                {p.highlight && <span className="landing-plan-badge">{t("landing.pricing.mostPopular")}</span>}
+                <h3>{p.name}</h3>
+                <p className="landing-plan-tagline">{p.tagline}</p>
+                <div className="landing-plan-price">
+                  <span className="landing-plan-price-value">{p.price}</span>
+                  <span className="landing-plan-price-period">{p.period}</span>
+                </div>
+                {isVendas ? (
+                  <a className={ctaClass} href={WHATSAPP_VENDAS_URL} target="_blank" rel="noopener noreferrer">
+                    {p.cta}
+                  </a>
+                ) : (
+                  <button className={ctaClass} onClick={onEnter}>
+                    {p.cta}
+                  </button>
+                )}
+                {/* Só os planos com período de teste trazem essa nota. */}
+                {p.note && <p className="landing-plan-note">{p.note}</p>}
+                <ul className="landing-plan-features">
+                  {p.features.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
               </div>
-              <button className={p.highlight ? "btn-primary" : "btn-secondary"} onClick={onEnter}>
-                {p.cta}
-              </button>
-              {/* Só os planos com período de teste trazem essa nota. */}
-              {p.note && <p className="landing-plan-note">{p.note}</p>}
-              <ul className="landing-plan-features">
-                {p.features.map((f) => (
-                  <li key={f}>{f}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </>
@@ -615,8 +608,56 @@ export default function LandingScreen({ onEnter }) {
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Gira --beam-angle (o feixe que percorre a borda dos CTAs) via rAF em vez de @keyframes:
+  // ver o comentário de ".landing-beam" em index.css sobre o Chrome não repintar a animação CSS.
+  useEffect(() => {
+    const root = shellRef.current;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const BEAM_SELECTOR = ".btn-primary, .btn-secondary";
+    const BEAM_DURATION_MS = 2000;
+    let target = null;
+    let start = 0;
+    let raf = null;
+
+    const tick = (now) => {
+      if (!target) return;
+      const angle = (((now - start) % BEAM_DURATION_MS) / BEAM_DURATION_MS) * 360;
+      target.style.setProperty("--beam-angle", angle + "deg");
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onOver = (e) => {
+      const btn = e.target.closest(BEAM_SELECTOR);
+      if (!btn || !root.contains(btn) || btn === target) return;
+      target = btn;
+      start = performance.now();
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    };
+
+    const onOut = (e) => {
+      const btn = e.target.closest(BEAM_SELECTOR);
+      if (!btn || btn !== target || btn.contains(e.relatedTarget)) return;
+      target = null;
+      if (raf) cancelAnimationFrame(raf);
+      raf = null;
+      btn.style.removeProperty("--beam-angle");
+    };
+
+    root.addEventListener("mouseover", onOver);
+    root.addEventListener("mouseout", onOut);
+    return () => {
+      root.removeEventListener("mouseover", onOver);
+      root.removeEventListener("mouseout", onOut);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <div className="landing-shell" ref={shellRef}>
+      <PromoPopup onEnter={onEnter} />
       <header className={"landing-nav" + (scrolled ? " scrolled" : "")}>
         <div className="landing-nav-brand">
           <span className="landing-nav-icon">C</span>
@@ -633,9 +674,8 @@ export default function LandingScreen({ onEnter }) {
             </button>
           ))}
         </nav>
-        {/* Sem ThemeToggle aqui: a landing é sempre dark, então o controle não teria efeito
-            visível. A troca de tema continua disponível dentro do app. */}
         <div className="landing-nav-actions">
+          <LandingThemeToggle />
           <LanguageSwitcher />
           <button className="btn-primary btn-small" onClick={onEnter}>
             {t("landing.nav.enter")}

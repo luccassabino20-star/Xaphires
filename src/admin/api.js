@@ -7,6 +7,22 @@
 
 const BASE = "/api/admin";
 
+async function tratarResposta(res) {
+  let dados = null;
+  try {
+    dados = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(dados?.error || `Erro ${res.status}`);
+    err.code = dados?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return dados;
+}
+
 async function req(caminho, { method = "GET", body } = {}) {
   // O fetch() só rejeita quando a requisição não chegou a acontecer: servidor fora
   // do ar, porta errada, rede caída. Sem esta conversão sobe o "Failed to fetch" cru
@@ -28,19 +44,25 @@ async function req(caminho, { method = "GET", body } = {}) {
     err.code = "NETWORK_UNREACHABLE";
     throw err;
   }
-  let dados = null;
+  return tratarResposta(res);
+}
+
+// Upload de arquivo: FormData, e por isso não passa pelo req() acima - com
+// Content-Type forçado para json/undefined ali, o boundary do multipart nunca sairia
+// certo. O navegador define o Content-Type sozinho (com boundary) quando o body é um
+// FormData, então o cabeçalho fica de fora daqui de propósito.
+async function reqUpload(caminho, arquivo) {
+  const form = new FormData();
+  form.append("file", arquivo);
+  let res;
   try {
-    dados = await res.json();
+    res = await fetch(BASE + caminho, { method: "POST", body: form, credentials: "same-origin" });
   } catch {
-    /* sem corpo */
-  }
-  if (!res.ok) {
-    const err = new Error(dados?.error || `Erro ${res.status}`);
-    err.code = dados?.code || null;
-    err.status = res.status;
+    const err = new Error("O servidor não respondeu. Verifique se ele está em execução e tente de novo.");
+    err.code = "NETWORK_UNREACHABLE";
     throw err;
   }
-  return dados;
+  return tratarResposta(res);
 }
 
 export const login = (email, password) => req("/login", { method: "POST", body: { email, password } });
@@ -69,3 +91,11 @@ export const trocarSenha = (senhaAtual, novaSenha) => req("/senha", { method: "P
 export const listarAdmins = () => req("/admins");
 export const criarAdmin = (dados) => req("/admins", { method: "POST", body: dados });
 export const definirAdminAtivo = (id, active) => req(`/admins/${id}/active`, { method: "POST", body: { active } });
+
+export const listarPopups = () => req("/popups");
+export const criarPopup = (dados) => req("/popups", { method: "POST", body: dados });
+export const editarPopup = (id, dados) => req(`/popups/${id}`, { method: "PATCH", body: dados });
+export const definirPopupAtivo = (id, active) => req(`/popups/${id}/active`, { method: "POST", body: { active } });
+export const excluirPopup = (id) => req(`/popups/${id}`, { method: "DELETE" });
+export const enviarImagemPopup = (id, arquivo) => reqUpload(`/popups/${id}/image`, arquivo);
+export const removerImagemPopup = (id) => req(`/popups/${id}/image`, { method: "DELETE" });

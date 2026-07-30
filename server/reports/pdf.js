@@ -1,9 +1,12 @@
 import PDFDocument from "pdfkit";
 import { nomeDoStatus } from "./labels.js";
 
-// Documento executivo: paisagem, uma seção por responsável, indicadores antes da
-// lista. Paisagem não é estética - são doze informações por tarefa, e em retrato a
-// tabela ou perde colunas ou vira fonte 6.
+// Documento executivo: paisagem, resumo geral e UMA tabela só com todo mundo junto
+// (pendentes e concluídas), em vez de uma seção nova por responsável. Cabe numa
+// página só no caso comum; transborda pra página 2+ só se a lista de tarefas for
+// grande demais para a folha - a paginação natural de `tabelaDeTarefas` cuida disso
+// sozinha, repetindo o cabeçalho da tabela. Paisagem não é estética - são nove
+// informações por tarefa, e em retrato a tabela ou perde colunas ou vira fonte 6.
 
 const COR = {
   tinta: "#111827",
@@ -23,14 +26,15 @@ const ALTURA_LINHA = 16;
 // (842 - 2*36 = 770 no A4 paisagem): sobrar faz a última coluna flutuar longe da
 // borda, faltar joga texto para fora do papel.
 const COLUNAS = [
-  { chave: "titulo", largura: 210 },
-  { chave: "quadro", largura: 105 },
-  { chave: "coluna", largura: 85 },
-  { chave: "responsaveis", largura: 110 },
-  { chave: "prazo", largura: 60 },
-  { chave: "situacao", largura: 65 },
-  { chave: "prioridade", largura: 75 },
-  { chave: "checklist", largura: 60 },
+  { chave: "titulo", largura: 180 },
+  { chave: "descricao", largura: 150 },
+  { chave: "quadro", largura: 80 },
+  { chave: "coluna", largura: 60 },
+  { chave: "responsaveis", largura: 90 },
+  { chave: "prazo", largura: 55 },
+  { chave: "situacao", largura: 60 },
+  { chave: "prioridade", largura: 55 },
+  { chave: "checklist", largura: 40 },
 ];
 
 function truncar(doc, texto, largura) {
@@ -97,6 +101,7 @@ function faixaDeKpis(doc, t, kpis, y) {
 function cabecalhoDaTabela(doc, t, y) {
   const titulos = {
     titulo: t.colTitulo,
+    descricao: t.colDescricao,
     quadro: t.colQuadro,
     coluna: t.colColuna,
     responsaveis: t.colResponsaveis,
@@ -125,6 +130,10 @@ function linhaDaTabela(doc, relatorio, cartao, y, indice) {
 
   const valores = {
     titulo: cartao.titulo,
+    // Achatada numa linha só: a célula do PDF não quebra texto (lineBreak: false),
+    // e uma descrição com quebras de linha ficaria com o cursor de texto pulando
+    // para fora da coluna. O CSV e o Excel trazem a descrição inteira, sem corte.
+    descricao: (cartao.descricao || "").replace(/\s+/g, " ").trim() || "-",
     quadro: cartao.quadro,
     coluna: cartao.coluna,
     responsaveis: cartao.responsaveis.join(", "),
@@ -222,6 +231,12 @@ function rodapes(doc, t) {
   const faixa = doc.bufferedPageRange();
   for (let i = 0; i < faixa.count; i++) {
     doc.switchToPage(faixa.start + i);
+    // O texto vai a 6pt do fundo, dentro da margem inferior de 36pt - mas o pdfkit
+    // mede a caixa de uma linha de 8pt como maior que esses 6pt e entende que
+    // "não coube", criando uma página nova em branco pra continuar o rodapé. Zerar
+    // a margem inferior só durante este texto engana essa conta sem mexer no layout;
+    // como é a última coisa escrita em cada página, não precisa restaurar depois.
+    doc.page.margins.bottom = 0;
     doc
       .fillColor(COR.suave)
       .font("Helvetica")
@@ -251,17 +266,11 @@ export function gerarPdf(relatorio) {
   doc.y = faixaDeKpis(doc, t, relatorio.kpis, doc.y);
   tabelaPorQuadro(doc, relatorio);
 
-  for (const secao of relatorio.secoes) {
-    // Cada responsável começa em página nova: o documento costuma ser recortado e
-    // repassado por pessoa, e seção que começa no meio da folha atrapalha isso.
-    doc.addPage();
-    doc.fillColor(COR.tinta).font("Helvetica-Bold").fontSize(14).text(secao.nome, MARGEM, MARGEM);
-    if (secao.email) {
-      doc.fillColor(COR.suave).font("Helvetica").fontSize(9).text(secao.email, MARGEM, doc.y + 2);
-    }
-    doc.y = faixaDeKpis(doc, t, secao.kpis, doc.y + 8);
-    tabelaDeTarefas(doc, relatorio, secao.cartoes);
-  }
+  // Uma tabela só, com todo mundo (o responsável já é uma das colunas) - ver o
+  // comentário no topo do arquivo sobre por que não é mais uma seção por pessoa.
+  doc.fillColor(COR.tinta).font("Helvetica-Bold").fontSize(11).text(t.total, MARGEM, doc.y);
+  doc.y += 6;
+  tabelaDeTarefas(doc, relatorio, relatorio.cartoes);
 
   rodapes(doc, t);
   doc.end();

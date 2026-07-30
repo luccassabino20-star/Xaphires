@@ -6,6 +6,7 @@ import Empresas from "../admin/Empresas.jsx";
 import Metricas from "../admin/Metricas.jsx";
 import Auditoria from "../admin/Auditoria.jsx";
 import Admins from "../admin/Admins.jsx";
+import Popups from "../admin/Popups.jsx";
 
 // Painel da plataforma dentro do app, para quem administra a plataforma.
 //
@@ -23,6 +24,7 @@ import Admins from "../admin/Admins.jsx";
 const ABAS = [
   { id: "empresas", nome: "Empresas" },
   { id: "metricas", nome: "Métricas" },
+  { id: "popups", nome: "Pop-ups" },
   { id: "auditoria", nome: "Auditoria" },
   { id: "admins", nome: "Administradores" },
 ];
@@ -148,6 +150,7 @@ export default function PlataformaModal({ onClose }) {
             <div className="plataforma-conteudo">
               {aba === "empresas" && <Empresas />}
               {aba === "metricas" && <Metricas />}
+              {aba === "popups" && <Popups />}
               {aba === "auditoria" && <Auditoria />}
               {aba === "admins" && <Admins euId={admin.id} />}
             </div>

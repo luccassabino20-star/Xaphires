@@ -93,7 +93,7 @@ function cabecalhoDeTabela(aba, titulos, larguras) {
   return linha;
 }
 
-const COLUNAS_TAREFA = [46, 20, 18, 26, 12, 12, 13, 14, 16, 12, 9, 26];
+const COLUNAS_TAREFA = [46, 40, 20, 18, 26, 12, 12, 13, 14, 16, 12, 9, 26];
 
 function linhasDeTarefas(aba, relatorio, cartoes) {
   const t = relatorio.t;
@@ -101,6 +101,7 @@ function linhasDeTarefas(aba, relatorio, cartoes) {
     aba,
     [
       t.colTitulo,
+      t.colDescricao,
       t.colQuadro,
       t.colColuna,
       t.colResponsaveis,
@@ -129,6 +130,7 @@ function linhasDeTarefas(aba, relatorio, cartoes) {
     const prioridade = [c.urgent ? t.urgente : null, c.important ? t.importante : null].filter(Boolean).join(" + ");
     const linha = aba.addRow([
       c.titulo,
+      c.descricao,
       c.quadro,
       c.coluna,
       c.responsaveis.join(", "),

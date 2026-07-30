@@ -22,14 +22,15 @@ export default function ExportReportModal({ board, onClose }) {
   const { users } = useUsers();
   const showToast = useToast();
 
-  // Vazio = todos os quadros. É o mesmo contrato do servidor, onde `boardId`
-  // ausente significa "o workspace inteiro" - o valor do seletor viaja como está,
-  // sem tabela de conversão para alguém esquecer de atualizar de um lado só.
+  // Todos os quadros é um modo à parte, e não "nenhum quadro marcado na lista":
+  // desmarcar tudo por engano não pode virar silenciosamente "a empresa inteira" -
+  // isso é escolha explícita, feita marcando o "Todos os quadros" no topo da lista.
   //
-  // O padrão é o quadro aberto, e não "todos": quem abre o modal a partir de um
+  // O padrão é só o quadro aberto, e não "todos": quem abre o modal a partir de um
   // quadro está olhando para ele, e um relatório da empresa inteira por omissão
   // seria uma surpresa cara de notar - só se percebe depois de abrir o arquivo.
-  const [quadroId, setQuadroId] = useState(board.id);
+  const [todosOsQuadros, setTodosOsQuadros] = useState(false);
+  const [quadroIds, setQuadroIds] = useState([board.id]);
   const [membroId, setMembroId] = useState("");
   const [status, setStatus] = useState("todos");
   const [contagem, setContagem] = useState(null);
@@ -37,22 +38,40 @@ export default function ExportReportModal({ board, onClose }) {
   const [erroContagem, setErroContagem] = useState(false);
   const [baixando, setBaixando] = useState(null);
 
-  const quadroEscolhido = quadroId ? boards.find((b) => b.id === quadroId) : null;
+  function alternarTodosOsQuadros() {
+    setTodosOsQuadros((v) => !v);
+  }
+  function alternarQuadro(id) {
+    setQuadroIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
+  // [] pro servidor quando "todos" está marcado, do mesmo jeito que fazia o seletor
+  // único vazio antes - é o contrato que `filtrosDoRelatorio` (api.js) já espera.
+  const boardIdsEfetivos = todosOsQuadros ? [] : quadroIds;
+  const semQuadroSelecionado = !todosOsQuadros && quadroIds.length === 0;
+
+  const quadrosEscolhidos = todosOsQuadros ? boards : boards.filter((b) => quadroIds.includes(b.id));
+  // Só restringe o seletor de responsável quando TODOS os quadros escolhidos são
+  // privados - um único quadro compartilhado no meio já expõe a empresa inteira
+  // pra quem está vendo o modal, então listar todo mundo deixa de vazar algo que
+  // esse quadro compartilhado já não escondia.
+  const soQuadrosPrivados = quadrosEscolhidos.length > 0 && quadrosEscolhidos.every((b) => b.visibility === "private");
 
   // Quem pode aparecer no seletor de responsável. Em quadro compartilhado é a
-  // empresa inteira, que é justamente quem tem acesso a ele. Em quadro privado é só
-  // quem foi convidado - listar a empresa toda ali contaria a quem tem acesso ao
-  // quadro quem mais existe na empresa, e o convidado só precisa ver os colegas de
-  // quadro. Com "todos os quadros" volta a ser a empresa inteira, porque aí o
-  // relatório atravessa quadros com composições diferentes.
+  // empresa inteira, que é justamente quem tem acesso a ele. Com só quadro(s)
+  // privado(s) é a união de quem foi convidado neles - listar a empresa toda ali
+  // contaria a quem só tem acesso ao(s) privado(s) quem mais existe na empresa.
   const membros = useMemo(() => {
-    if (!quadroEscolhido || quadroEscolhido.visibility !== "private") return users;
+    if (!soQuadrosPrivados) return users;
     // sharedWith já traz a linha do dono, e é por isso que ela existe - o modal
     // lista todo mundo com acesso numa consulta só.
-    const comAcesso = new Set((quadroEscolhido.sharedWith || []).map((p) => p.userId));
-    if (quadroEscolhido.ownerId) comAcesso.add(quadroEscolhido.ownerId);
+    const comAcesso = new Set();
+    for (const b of quadrosEscolhidos) {
+      for (const p of b.sharedWith || []) comAcesso.add(p.userId);
+      if (b.ownerId) comAcesso.add(b.ownerId);
+    }
     return users.filter((u) => comAcesso.has(u.id));
-  }, [quadroEscolhido, users]);
+  }, [soQuadrosPrivados, quadrosEscolhidos, users]);
 
   // Trocar de quadro pode deixar o responsável escolhido fora da lista - some com o
   // filtro em vez de manter um id invisível selecionado, que faria o contador
@@ -66,6 +85,14 @@ export default function ExportReportModal({ board, onClose }) {
   // coluna de conclusão). Contar aqui daria um número que discordaria do arquivo
   // baixado justamente nos casos de borda.
   useEffect(() => {
+    // Nada marcado: não tem o que contar, e pedir ao servidor devolveria "todos os
+    // quadros" - contrato que aqui só vale para o modo "Todos os quadros" explícito.
+    if (semQuadroSelecionado) {
+      setContando(false);
+      setErroContagem(false);
+      setContagem(0);
+      return;
+    }
     // Guarda contra resposta fora de ordem: trocar dois seletores rápido dispara
     // duas buscas, e a primeira pode voltar depois da segunda e sobrescrever o
     // número certo pelo antigo.
@@ -73,7 +100,7 @@ export default function ExportReportModal({ board, onClose }) {
     setContando(true);
     setErroContagem(false);
     api
-      .contarCartoesDoRelatorio({ boardId: quadroId || null, memberId: membroId || null, status })
+      .contarCartoesDoRelatorio({ boardIds: todosOsQuadros ? [] : quadroIds, memberId: membroId || null, status })
       .then((r) => {
         if (cancelado) return;
         setContagem(r.total);
@@ -91,14 +118,14 @@ export default function ExportReportModal({ board, onClose }) {
     return () => {
       cancelado = true;
     };
-  }, [quadroId, membroId, status]);
+  }, [todosOsQuadros, quadroIds, semQuadroSelecionado, membroId, status]);
 
   async function baixar(formato) {
     setBaixando(formato);
     try {
       await api.baixarRelatorio({
         formato,
-        boardId: quadroId || null,
+        boardIds: boardIdsEfetivos,
         memberId: membroId || null,
         status,
         // O arquivo sai no idioma em que a pessoa está usando o app, e não num
@@ -132,22 +159,34 @@ export default function ExportReportModal({ board, onClose }) {
         </div>
 
         <div className="modal-body">
-          <label className="export-report-field">
+          <div className="export-report-field">
             <span className="export-report-label">{t("board.exportReport.boardLabel")}</span>
-            <select value={quadroId} onChange={(e) => setQuadroId(e.target.value)}>
-              <option value="">{t("board.exportReport.allBoards")}</option>
-              {boards.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {/* O quadro privado é marcado na lista para o relatório de "todos"
-                      não parecer trazer coisa que não deveria: quem exporta precisa
-                      saber que aquele conteúdo entrou, e que ele é restrito. */}
-                  {b.visibility === "private" ? `${b.title} (${t("board.exportReport.privateTag")})` : b.title}
-                </option>
-              ))}
-            </select>
-          </label>
+            <div className="export-report-boards">
+              <label className="export-report-boards-all">
+                <input type="checkbox" checked={todosOsQuadros} onChange={alternarTodosOsQuadros} />
+                <span>{t("board.exportReport.allBoards")}</span>
+              </label>
+              <div className={"export-report-boards-list" + (todosOsQuadros ? " is-disabled" : "")}>
+                {boards.map((b) => (
+                  <label className="export-report-board-item" key={b.id}>
+                    <input
+                      type="checkbox"
+                      checked={todosOsQuadros || quadroIds.includes(b.id)}
+                      disabled={todosOsQuadros}
+                      onChange={() => alternarQuadro(b.id)}
+                    />
+                    {/* O quadro privado é marcado na lista para não parecer trazer
+                        coisa que não deveria: quem exporta precisa saber que aquele
+                        conteúdo entrou, e que ele é restrito. */}
+                    <span>{b.visibility === "private" ? `${b.title} (${t("board.exportReport.privateTag")})` : b.title}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
 
-          {!quadroId && <p className="export-report-scope">{t("board.exportReport.allBoardsHint")}</p>}
+          {todosOsQuadros && <p className="export-report-scope">{t("board.exportReport.allBoardsHint")}</p>}
+          {semQuadroSelecionado && <p className="export-report-scope is-warning">{t("board.exportReport.noBoardsHint")}</p>}
 
           <label className="export-report-field">
             <span className="export-report-label">{t("board.exportReport.userLabel")}</span>
@@ -172,28 +211,34 @@ export default function ExportReportModal({ board, onClose }) {
             </select>
           </label>
 
-          <div className={"export-report-count" + (vazio ? " is-empty" : "")} aria-live="polite">
-            {contando
-              ? t("board.exportReport.counting")
-              : erroContagem
-                ? t("board.exportReport.countFailed")
-                : t("board.exportReport.count", { count: contagem ?? 0 })}
-          </div>
+          {!semQuadroSelecionado && (
+            <>
+              <div className={"export-report-count" + (vazio ? " is-empty" : "")} aria-live="polite">
+                {contando
+                  ? t("board.exportReport.counting")
+                  : erroContagem
+                    ? t("board.exportReport.countFailed")
+                    : t("board.exportReport.count", { count: contagem ?? 0 })}
+              </div>
 
-          {vazio && <p className="export-report-hint">{t("board.exportReport.emptyHint")}</p>}
+              {vazio && <p className="export-report-hint">{t("board.exportReport.emptyHint")}</p>}
+            </>
+          )}
         </div>
 
         <div className="modal-footer export-report-actions">
           {/* Baixar continua permitido com zero cartões: o arquivo sai só com o
               cabeçalho, e travar o botão faria parecer defeito em vez de filtro
-              que não achou nada - por isso o aviso acima explica o vazio. */}
-          <button className="btn-primary" onClick={() => baixar("csv")} disabled={baixando !== null}>
+              que não achou nada - por isso o aviso acima explica o vazio. Sem
+              nenhum quadro marcado, aí sim trava: não tem contrato pro servidor
+              gerar "o relatório de nenhum quadro". */}
+          <button className="btn-primary" onClick={() => baixar("csv")} disabled={baixando !== null || semQuadroSelecionado}>
             {baixando === "csv" ? t("board.exportReport.generating") : t("board.exportReport.downloadCsv")}
           </button>
-          <button className="btn-secondary" onClick={() => baixar("pdf")} disabled={baixando !== null}>
+          <button className="btn-secondary" onClick={() => baixar("pdf")} disabled={baixando !== null || semQuadroSelecionado}>
             {baixando === "pdf" ? t("board.exportReport.generating") : t("board.exportReport.downloadPdf")}
           </button>
-          <button className="btn-secondary" onClick={() => baixar("xlsx")} disabled={baixando !== null}>
+          <button className="btn-secondary" onClick={() => baixar("xlsx")} disabled={baixando !== null || semQuadroSelecionado}>
             {baixando === "xlsx" ? t("board.exportReport.generating") : t("board.exportReport.downloadExcel")}
           </button>
         </div>

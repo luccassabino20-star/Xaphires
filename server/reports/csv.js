@@ -73,12 +73,13 @@ export function gerarCsv(relatorio) {
   const { t, idioma } = relatorio;
   const linhas = [];
 
-  // As oito colunas pedidas, nesta ordem. O cabeçalho vem traduzido porque o
+  // As nove colunas pedidas, nesta ordem. O cabeçalho vem traduzido porque o
   // arquivo segue o idioma escolhido na exportação, como o Excel e o PDF.
   linhas.push(
     linha([
       t.colId,
       t.colTitulo,
+      t.colDescricao,
       t.colResponsaveis,
       t.colColuna,
       t.colSituacao,
@@ -102,6 +103,7 @@ export function gerarCsv(relatorio) {
         linha([
           c.id,
           c.titulo,
+          c.descricao,
           c.responsaveis.length ? c.responsaveis.join(", ") : t.semResponsavel,
           c.coluna,
           // Binário de propósito, só concluído ou aberto. O atrasado continua

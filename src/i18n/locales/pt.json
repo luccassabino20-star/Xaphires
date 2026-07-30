@@ -31,6 +31,11 @@
       "pricing": "Preços",
       "enter": "Entrar"
     },
+    "promoPopup": {
+      "copy": "Copiar",
+      "copied": "Copiado!",
+      "defaultButton": "Aproveitar oferta"
+    },
     "home": {
       "heroTitle": "Sua equipe organizada, sem esforço extra",
       "heroText": "O Cantiere substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
@@ -692,6 +697,7 @@
       "allBoards": "Todos os quadros",
       "privateTag": "privado",
       "allBoardsHint": "Inclui todos os quadros a que você tem acesso, inclusive os privados.",
+      "noBoardsHint": "Selecione ao menos um quadro para exportar o relatório.",
       "userLabel": "Usuário",
       "allUsers": "Todos os usuários",
       "statusLabel": "Status do cartão",

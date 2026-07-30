@@ -94,17 +94,18 @@ function kpisDe(cartoes, hoje) {
 /**
  * @param userId    quem pediu o relatório - define o que pode ser lido
  * @param companyId empresa em curso, só para o nome no cabeçalho
- * @param boardId   null = todos os quadros visíveis; id = só aquele quadro
+ * @param boardIds  null/[] = todos os quadros visíveis; array = só aqueles quadros
  * @param memberId  null = todo mundo; id = só os cartões daquele responsável
  * @param status    "todos" | "pendentes" | "concluidos"
  * @param idioma    pt | en | es, para os textos do arquivo gerado
  */
-export function montarRelatorio({ userId, companyId, boardId = null, memberId = null, status = "todos", idioma = "pt" }) {
+export function montarRelatorio({ userId, companyId, boardIds = null, memberId = null, status = "todos", idioma = "pt" }) {
   const t = rotulos(idioma);
   const agora = new Date();
   const hoje = hojeCivil(agora);
 
-  const quadros = repo.getWorkspace(userId).filter((b) => !boardId || b.id === boardId);
+  const filtroDeQuadros = Array.isArray(boardIds) && boardIds.length > 0 ? new Set(boardIds) : null;
+  const quadros = repo.getWorkspace(userId).filter((b) => !filtroDeQuadros || filtroDeQuadros.has(b.id));
   const usuarios = repo.listUsers();
   const nomePorId = new Map(usuarios.map((u) => [u.id, u.name]));
 
@@ -203,13 +204,20 @@ export function montarRelatorio({ userId, companyId, boardId = null, memberId = 
     t,
     geradoEm: agora,
     empresa: getCompany(companyId)?.name || "",
-    escopo: boardId ? quadros[0]?.title || "" : t.todosOsQuadros,
+    // Com filtro, o escopo lista os quadros escolhidos pelo título - "Vendas, TI" -
+    // em vez de um id que não diz nada a quem abre o arquivo depois. `quadros` já
+    // está filtrado pra esse mesmo conjunto, então não há segunda fonte de verdade.
+    escopo: filtroDeQuadros ? quadros.map((q) => q.title).join(", ") || t.todosOsQuadros : t.todosOsQuadros,
     membroEscolhido: memberId ? secoes[0].nome : null,
     status,
     hoje,
     kpis: kpisDe(doRelatorio, hoje),
     porQuadro,
     secoes,
+    // Lista achatada, um cartão por linha (sem a duplicata por responsável que as
+    // seções têm de propósito). É o que o PDF usa pra montar uma tabela única com
+    // todo mundo junto, em vez de uma seção por pessoa - ver gerarPdf.
+    cartoes: doRelatorio,
     // Marca cartão atrasado uma vez só, aqui, para o Excel e o PDF não repetirem a
     // regra e discordarem na virada do dia.
     atrasado: (cartao) => estaAtrasado(cartao, hoje),

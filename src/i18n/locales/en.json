@@ -31,6 +31,11 @@
       "pricing": "Pricing",
       "enter": "Sign in"
     },
+    "promoPopup": {
+      "copy": "Copy",
+      "copied": "Copied!",
+      "defaultButton": "Claim offer"
+    },
     "home": {
       "heroTitle": "Your team organized, with no extra effort",
       "heroText": "Cantiere replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
@@ -395,6 +400,7 @@
       "allBoards": "All boards",
       "privateTag": "private",
       "allBoardsHint": "Includes every board you have access to, private ones included.",
+      "noBoardsHint": "Select at least one board to export the report.",
       "userLabel": "User",
       "allUsers": "All users",
       "statusLabel": "Card status",

@@ -46,6 +46,12 @@ async function request(path, options = {}) {
   return data;
 }
 
+// ---------- Pop-up promocional da landing ----------
+// Único endpoint chamado antes de qualquer sessão existir - por isso mora aqui e
+// não atrás de AuthProvider. Falha aqui não pode virar toast: é conteúdo de
+// marketing opcional, e quem chama (LandingScreen) já ignora o erro em silêncio.
+export const getPopupAtivo = () => request("/popup");
+
 // ---------- Auth ----------
 export const getMe = () => request("/auth/me");
 export const registerCompany = (data) =>
@@ -215,9 +221,11 @@ export const deleteRecurrence = (id) => request(`/recurrences/${id}`, { method: 
 // Os filtros viram query string num só lugar, para o contador e o download nunca
 // pedirem coisas diferentes: se divergissem, o número na tela deixaria de descrever
 // o arquivo que o botão baixa.
-function filtrosDoRelatorio({ boardId, memberId, status }) {
+function filtrosDoRelatorio({ boardIds, memberId, status }) {
   const p = new URLSearchParams();
-  if (boardId) p.set("boardId", boardId);
+  // Vazio (ou ausente) significa "todos os quadros" pros dois lados - mesmo
+  // contrato de antes, só que agora a lista pode ter mais de um id.
+  if (boardIds && boardIds.length > 0) p.set("boardIds", boardIds.join(","));
   // memberId ausente significa "todos os responsáveis" para o servidor, então o
   // vazio do seletor não pode virar `memberId=` na URL.
   if (memberId) p.set("memberId", memberId);
