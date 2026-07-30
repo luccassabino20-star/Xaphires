@@ -526,6 +526,8 @@
       "untitled": "Sin título",
       "complete": "Completada",
       "markComplete": "Marcar como completada",
+      "moveToList": "Mover a lista",
+      "movedToList": "Tarjeta movida a \"{{list}}\"",
       "members": "Miembros",
       "noUsersYet": "Aún no hay usuarios registrados.",
       "labels": "Etiquetas",

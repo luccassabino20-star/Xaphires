@@ -149,6 +149,26 @@ export default function CardModal({ boardId, cardId, onClose }) {
   function toggleCompleted() {
     dispatch({ type: "TOGGLE_CARD_COMPLETED", boardId, cardId });
   }
+  // Alternativa ao arrastar: essencial no toque, onde o board usa drag and drop
+  // nativo do HTML5 e não existe arraste por dedo. Sempre entra no fim da lista
+  // de destino - escolher a posição exata é o que o arraste ainda resolve melhor.
+  function moveToList(e) {
+    const toListId = e.target.value;
+    const fromList = board.lists.find((l) => l.cardIds.includes(cardId));
+    const toList = board.lists.find((l) => l.id === toListId);
+    if (!fromList || !toList || fromList.id === toList.id) return;
+    dispatch({
+      type: "MOVE_CARD",
+      boardId,
+      cardId,
+      fromListId: fromList.id,
+      toListId: toList.id,
+      toIndex: toList.cardIds.length,
+      at: new Date().toISOString(),
+    });
+    dispatch({ type: "COMMIT_CARD_ORDER", boardId, listIds: [fromList.id, toList.id] });
+    showToast(t("board.cardModal.movedToList", { list: toList.title }));
+  }
   function toggleUrgent() {
     dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { urgent: !card.urgent } });
   }
@@ -290,6 +310,23 @@ export default function CardModal({ boardId, cardId, onClose }) {
               <span>{card.completed ? t("board.cardModal.complete") : t("board.cardModal.markComplete")}</span>
             </button>
           </div>
+
+          {!readOnly && (
+            <div className="modal-section">
+              <label className="modal-label">{t("board.cardModal.moveToList")}</label>
+              <select
+                className="modal-select"
+                value={board.lists.find((l) => l.cardIds.includes(cardId))?.id || ""}
+                onChange={moveToList}
+              >
+                {board.lists.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="modal-section">
             <label className="modal-label">{t("board.cardModal.members")}</label>

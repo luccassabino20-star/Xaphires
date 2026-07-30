@@ -593,11 +593,15 @@ export default function LandingScreen({ onEnter }) {
   const shellRef = useRef(null);
   const [page, setPage] = useState("home");
   const [scrolled, setScrolled] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
     // O .landing-shell usa scroll-behavior: smooth, então uma rolagem animada até o topo é
     // atropelada pela troca de conteúdo e a nova página abre no meio. "instant" força o salto.
     shellRef.current?.scrollTo({ top: 0, behavior: "instant" });
+    // O menu mobile é por página, não por sessão: trocar de página sem fechar deixaria
+    // o painel sobreposto ao conteúdo novo.
+    setNavOpen(false);
   }, [page]);
 
   useEffect(() => {
@@ -681,6 +685,46 @@ export default function LandingScreen({ onEnter }) {
             {t("landing.nav.enter")}
           </button>
         </div>
+        {/* Só existe espaço para a marca e um botão no cabeçalho estreito - o resto
+            (páginas, idioma, tema, entrar) migra para este painel, que sobrepõe o
+            conteúdo em vez de disputar largura com ele. */}
+        <button
+          type="button"
+          className="landing-nav-hamburger"
+          onClick={() => setNavOpen((o) => !o)}
+          aria-label={t("app.topbar.menu")}
+          aria-expanded={navOpen}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" />
+          </svg>
+        </button>
+        {navOpen && (
+          <div className="landing-nav-mobile">
+            {NAV_PAGES.map((p) => (
+              <button
+                key={p}
+                className={"landing-nav-mobile-link" + (page === p ? " active" : "")}
+                onClick={() => setPage(p)}
+              >
+                {t(`landing.nav.${p}`)}
+              </button>
+            ))}
+            <div className="landing-nav-mobile-actions">
+              <LandingThemeToggle />
+              <LanguageSwitcher />
+            </div>
+            <button
+              className="btn-primary"
+              onClick={() => {
+                setNavOpen(false);
+                onEnter();
+              }}
+            >
+              {t("landing.nav.enter")}
+            </button>
+          </div>
+        )}
       </header>
 
       {page === "home" && <HomePage onEnter={onEnter} onNavigate={setPage} />}

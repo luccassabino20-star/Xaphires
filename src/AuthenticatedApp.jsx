@@ -25,7 +25,10 @@ export default function AuthenticatedApp() {
   const [activeCardId, setActiveCardId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [memberFilter, setMemberFilter] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // No celular o sidebar é um painel sobreposto (ver @media em index.css), e abrir
+  // por cima do quadro na primeira visita seria uma surpresa - só em telas largas
+  // ele começa aberto, empurrando o layout como sempre foi.
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 720);
   const [view, setView] = useState("board");
   const [screen, setScreen] = useState("board"); // "board" | "minutes"
 
@@ -41,6 +44,14 @@ export default function AuthenticatedApp() {
   function selectBoard(id) {
     setScreen("board");
     setActiveBoardId(id);
+    // No overlay do celular, escolher um quadro deixaria o painel em cima dele até
+    // o próximo toque no hambúrguer - fecha sozinho, como qualquer menu de navegação.
+    if (window.innerWidth <= 720) setSidebarOpen(false);
+  }
+
+  function openMinutes() {
+    setScreen("minutes");
+    if (window.innerWidth <= 720) setSidebarOpen(false);
   }
 
   if (!state.hydrated) {
@@ -56,8 +67,11 @@ export default function AuthenticatedApp() {
         activeBoardId={activeBoardId}
         onSelectBoard={selectBoard}
         screen={screen}
-        onOpenMinutes={() => setScreen("minutes")}
+        onOpenMinutes={openMinutes}
       />
+      {/* Some sozinho fora do celular via CSS - no desktop o sidebar empurra o
+          layout em vez de sobrepor, e um véu escurecendo o resto não faria sentido. */}
+      {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
       <div className="main-area">
         <PlanBanner />
         {screen === "minutes" ? (

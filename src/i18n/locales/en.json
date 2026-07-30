@@ -526,6 +526,8 @@
       "untitled": "Untitled",
       "complete": "Complete",
       "markComplete": "Mark as complete",
+      "moveToList": "Move to list",
+      "movedToList": "Card moved to \"{{list}}\"",
       "members": "Members",
       "noUsersYet": "No users registered yet.",
       "labels": "Labels",

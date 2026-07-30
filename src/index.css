@@ -1227,6 +1227,18 @@ input, textarea { font-family: inherit; }
 }
 .modal-narrow { max-width: 420px; }
 
+@media (max-width: 640px) {
+  /* Menos moldura ao redor, mais área de verdade pro conteúdo - numa tela de
+     360-390px de largura, os 48px de padding do overlay sozinhos já comiam um
+     quarto da largura disponível. */
+  .modal-overlay { padding: 16px 8px; }
+  .modal { padding: 16px 16px 20px; }
+  .modal-wide { width: 96vw; }
+  /* Início/Entrega lado a lado cabem num tablet, mas espremem demais num celular -
+     empilha em vez de cortar o campo de data pela metade. */
+  .modal-section-row { flex-direction: column; gap: 14px; }
+}
+
 .modal-close {
   position: absolute;
   top: 12px;
@@ -1366,6 +1378,18 @@ input, textarea { font-family: inherit; }
   background: var(--bg-card);
   color: var(--text-primary);
   font-family: inherit;
+}
+
+.modal-select {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .modal-section-row { display: flex; gap: 20px; }
@@ -1550,10 +1574,62 @@ input, textarea { font-family: inherit; }
 .sidebar::-webkit-scrollbar { width: 8px; }
 .sidebar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
 
+/* Escondido fora do celular por padrão: nas telas largas o sidebar empurra o
+   layout via flex, então não há conteúdo "por baixo" para escurecer. */
+.sidebar-backdrop { display: none; }
+
 @media (max-width: 720px) {
   .sidebar { position: fixed; z-index: 300; height: 100%; box-shadow: var(--shadow-modal); }
+  /* No celular o toggle desliza (transform), não encolhe (width): a transição de
+     width com position:fixed grudava num valor intermediário (~1px) em vez de
+     chegar aos 260px, de forma consistente e reproduzível - não é flakiness de
+     teste, é a combinação das duas propriedades que trava o Chrome. Transform
+     nunca dispara layout, então não tem o que travar.*/
+  .sidebar,
+  .sidebar.collapsed {
+    width: 260px;
+    min-width: 260px;
+    padding: 14px 12px;
+    opacity: 1;
+    transition: transform 0.2s ease;
+  }
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+    pointer-events: none;
+    border-right: none;
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 290;
+  }
   .board-title { max-width: 30vw; }
   .search-box input { width: 110px; }
+
+  .topbar { padding: 0 8px; gap: 8px; }
+  /* .topbar-left é flex:1 na regra base, o que empurra .topbar-right (flex-shrink:0)
+     para o tamanho natural e zera o espaço do lado esquerdo - hambúrguer e título
+     desapareciam atrás da fileira de botões da direita. Aqui os dois trocam de papel:
+     a esquerda vira o tamanho fixo (hambúrguer + título truncado por max-width) e a
+     direita é quem cede espaço. */
+  .topbar-left { flex: 0 1 auto; gap: 4px; min-width: 0; }
+  /* Nada em .topbar-right é removido - a fileira vira uma tira que rola no dedo em
+     vez de quebrar linha ou espremer cada botão. Some a barra de rolagem porque o
+     próprio gesto de arrastar já indica que há mais coisa pros lados. */
+  .topbar-right {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .topbar-right::-webkit-scrollbar { display: none; }
+  .topbar-right > * { flex-shrink: 0; }
+  .topbar-members { display: none; }
+
+  .task-ticker { padding: 0 10px; }
+  .view-tabs { padding: 0 8px; }
 }
 
 /* ---------- App loading ---------- */
@@ -1681,6 +1757,59 @@ input, textarea { font-family: inherit; }
 }
 .landing-nav-link:hover { background: var(--bg-list); color: var(--text-primary); }
 .landing-nav-link.active { color: var(--text-primary); background: var(--bg-list); }
+
+.landing-nav-hamburger {
+  display: none;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.landing-nav-hamburger:hover { background: var(--bg-list); }
+
+/* .landing-nav já é position: sticky (um valor "positioned"), então este painel
+   absoluto ancora nela mesmo com a página rolada - sem isso ele ficaria preso ao
+   topo do documento em vez de logo abaixo do cabeçalho. */
+.landing-nav-mobile {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 18px 20px;
+  background: var(--bg-topbar);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+}
+.landing-nav-mobile-link {
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 11px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.landing-nav-mobile-link:hover,
+.landing-nav-mobile-link.active { background: var(--bg-list); color: var(--text-primary); }
+.landing-nav-mobile-actions { display: flex; align-items: center; gap: 8px; padding: 6px 10px; }
+.landing-nav-mobile .btn-primary { margin-top: 8px; text-align: center; }
+
+@media (max-width: 720px) {
+  .landing-nav-links,
+  .landing-nav-actions { display: none; }
+  .landing-nav-hamburger { display: flex; }
+}
 
 .landing-page-header {
   text-align: center;

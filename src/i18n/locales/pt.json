@@ -823,6 +823,8 @@
       "untitled": "Sem título",
       "complete": "Concluído",
       "markComplete": "Marcar como concluído",
+      "moveToList": "Mover para lista",
+      "movedToList": "Cartão movido para \"{{list}}\"",
       "members": "Membros",
       "noUsersYet": "Nenhum usuário cadastrado ainda.",
       "labels": "Etiquetas",
