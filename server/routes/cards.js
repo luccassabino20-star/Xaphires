@@ -207,14 +207,25 @@ router.delete(
   })
 );
 
+// mimeType do anexo vem do Content-Type que o navegador de quem fez upload mandou -
+// não é confiável, e ninguém valida contra nada no upload. Servir esse valor cru
+// como Content-Type, "inline", deixa qualquer colega de empresa subir um arquivo
+// com mimeType "text/html" e um payload de script, que roda na mesma origem do app
+// quando outro usuário do quadro abre o link - furto de sessão sem tocar no cookie
+// httpOnly. Só os tipos abaixo, que os navegadores não interpretam como HTML/script,
+// são servidos inline; o resto força download (Content-Disposition: attachment).
+const TIPOS_SEGUROS_PARA_INLINE = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "application/pdf"]);
+
 router.get(
   "/:id/attachments/:attachmentId/download",
   ah(async (req, res) => {
     const file = await repo.getAttachmentFile(req.params.id, req.params.attachmentId);
     if (!file) return res.status(404).json({ error: "Arquivo não encontrado", code: "ATTACHMENT_NOT_FOUND" });
     const safeName = String(file.name).replace(/[\r\n"]/g, "");
-    res.setHeader("Content-Type", file.mimeType || "application/octet-stream");
-    res.setHeader("Content-Disposition", `inline; filename="${safeName}"`);
+    const inline = TIPOS_SEGUROS_PARA_INLINE.has(file.mimeType);
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", inline ? file.mimeType : "application/octet-stream");
+    res.setHeader("Content-Disposition", `${inline ? "inline" : "attachment"}; filename="${safeName}"`);
     res.sendFile(file.path);
   })
 );
