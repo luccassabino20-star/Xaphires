@@ -41,6 +41,10 @@ directoryDb.exec("UPDATE companies SET contracted_at = created_at WHERE contract
 // compensar, e trancar no segundo seguinte puniria quem pagou em dia. Teste que
 // terminou não recebe carência, porque já foi tempo livre.
 addColumnIfMissing("companies", "grace_until", "grace_until TEXT");
+// CNPJ é opcional (empresa pode nunca preencher) e não tem índice único no schema -
+// checar duplicidade é responsabilidade de quem grava (setCompanyCnpj), não do
+// banco. Guardado só com dígitos, mesmo formato que normalizarDoc produz.
+addColumnIfMissing("companies", "cnpj", "cnpj TEXT");
 
 // A cobrança guarda os dados dela no mesmo banco global, porque pagamento é da
 // empresa e não de dentro de um quadro. Fica em server/billing/store.js, que cria
@@ -92,6 +96,20 @@ export function setCompanyPlan(id, { plan, status, expiresAt, contractedAt }) {
 // carência muda no ritmo da cobrança, não no da contratação.
 export function setCompanyGrace(id, graceUntil) {
   directoryDb.prepare("UPDATE companies SET grace_until = ? WHERE id = ?").run(graceUntil || null, id);
+  return getCompany(id);
+}
+
+// Só encontra empresa com CNPJ preenchido - `cnpj IS NULL` nunca bate com `?`
+// mesmo passando string vazia, então empresas sem CNPJ cadastrado não aparecem
+// aqui à toa (o que seria um jeito de "achar" uma empresa aleatória sem CNPJ).
+export function getCompanyIdForCnpj(cnpj) {
+  if (!cnpj) return null;
+  const row = directoryDb.prepare("SELECT id FROM companies WHERE cnpj = ?").get(cnpj);
+  return row ? row.id : null;
+}
+
+export function setCompanyCnpj(id, cnpj) {
+  directoryDb.prepare("UPDATE companies SET cnpj = ? WHERE id = ?").run(cnpj || null, id);
   return getCompany(id);
 }
 

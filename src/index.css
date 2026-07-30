@@ -2379,6 +2379,23 @@ input, textarea { font-family: inherit; }
 .auth-submit { width: 100%; padding: 11px; font-size: 14.5px; margin-top: 4px; }
 .auth-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
+.auth-join-intro { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 4px; }
+.auth-join-found { color: var(--text-primary); font-weight: 600; }
+.auth-join-change-cnpj {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  padding: 2px;
+}
+.auth-join-change-cnpj:hover { color: var(--text-primary); text-decoration: underline; }
+.auth-join-success { display: flex; flex-direction: column; gap: 12px; text-align: center; }
+.auth-join-success-title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0; }
+.auth-join-success p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
 @media (max-width: 860px) {
   .auth-shell {
     height: auto;
@@ -2477,6 +2494,27 @@ input, textarea { font-family: inherit; }
   margin-top: 12px;
   max-width: 320px;
 }
+
+.company-cnpj-form { display: flex; gap: 8px; max-width: 320px; }
+.company-cnpj-form input { flex: 1; }
+.company-cnpj-hint { font-size: 12px; color: var(--text-muted); margin: 6px 0 0; }
+
+.join-requests-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.join-requests-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-list);
+  border-radius: 8px;
+  padding: 10px 12px;
+  flex-wrap: wrap;
+}
+.join-requests-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.join-requests-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.join-requests-email { font-size: 12.5px; color: var(--text-muted); }
+.join-requests-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
 /* ---------- Board background menu ---------- */
 .board-bg-section-label {

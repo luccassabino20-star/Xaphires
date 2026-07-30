@@ -29,7 +29,7 @@ function cpfValido(cpf) {
   return true;
 }
 
-function cnpjValido(cnpj) {
+export function cnpjValido(cnpj) {
   if (cnpj.length !== 14) return false;
   if (digitosIguais(cnpj)) return false;
   const pesos = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];

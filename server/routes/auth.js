@@ -8,6 +8,8 @@ import * as directory from "../directory.js";
 import { acharAdminPorEmail } from "../admin/store.js";
 import { getSeedContent } from "../seedContent.js";
 import { DEFAULT_TRIAL_PLAN, trialEndsAt } from "../plans.js";
+import { normalizarDoc, cnpjValido } from "../doc.js";
+import { createJoinRequest, hasPendingRequestForEmail } from "../joinRequestStore.js";
 import {
   uid,
   getUserByEmail,
@@ -79,6 +81,25 @@ const registerLimit = rateLimit({
   keyFn: (req) => req.ip,
   message: "Muitos cadastros a partir deste endereço. Tente novamente mais tarde.",
   code: "TOO_MANY_REGISTRATIONS",
+});
+
+// Mais generoso que o de cadastro: CNPJ tem 14 dígitos e é fácil de errar um
+// número digitando, então a mesma pessoa legitimamente tenta várias vezes. Ainda
+// limita o suficiente para não virar uma varredura de CNPJs existentes no diretório.
+const cnpjLookupLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  keyFn: (req) => req.ip,
+  message: "Muitas buscas por CNPJ a partir deste endereço. Tente novamente mais tarde.",
+  code: "TOO_MANY_CNPJ_LOOKUPS",
+});
+
+const joinRequestLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  keyFn: (req) => req.ip,
+  message: "Muitas solicitações a partir deste endereço. Tente novamente mais tarde.",
+  code: "TOO_MANY_JOIN_REQUESTS",
 });
 
 function validateCredentials(name, email, password) {
@@ -158,6 +179,55 @@ router.post(
 
     setAuthCookie(res, user, companyId);
     res.status(201).json(usuarioComAtalho(user));
+  })
+);
+
+// Público de propósito: quem pede acesso ainda não tem sessão nenhuma. Devolve só
+// o nome, nunca o cnpj de volta (a pessoa já digitou) nem qualquer outro dado -
+// é o suficiente para confirmar "sim, é essa empresa" antes de mandar o pedido.
+router.get(
+  "/company-by-cnpj",
+  cnpjLookupLimit,
+  ah(async (req, res) => {
+    const cnpj = normalizarDoc(req.query.cnpj);
+    if (!cnpjValido(cnpj)) return res.status(400).json({ error: "CNPJ inválido", code: "CNPJ_INVALID" });
+    const companyId = directory.getCompanyIdForCnpj(cnpj);
+    if (!companyId) return res.status(404).json({ error: "Nenhuma empresa com esse CNPJ", code: "COMPANY_NOT_FOUND" });
+    const company = directory.getCompany(companyId);
+    res.json({ id: company.id, name: company.name });
+  })
+);
+
+router.post(
+  "/join-request",
+  joinRequestLimit,
+  ah(async (req, res) => {
+    const { cnpj, name, email, password, locale } = req.body || {};
+    const cnpjNormalizado = normalizarDoc(cnpj);
+    if (!cnpjValido(cnpjNormalizado)) return res.status(400).json({ error: "CNPJ inválido", code: "CNPJ_INVALID" });
+    const companyId = directory.getCompanyIdForCnpj(cnpjNormalizado);
+    if (!companyId) return res.status(404).json({ error: "Nenhuma empresa com esse CNPJ", code: "COMPANY_NOT_FOUND" });
+
+    const validationError = validateCredentials(name, email, password);
+    if (validationError) return res.status(400).json({ error: validationError, code: "VALIDATION_MISSING_FIELDS" });
+
+    if (directory.getCompanyIdForEmail(email))
+      return res.status(409).json({ error: "E-mail já cadastrado", code: "EMAIL_ALREADY_REGISTERED" });
+    // Sem isso a mesma pessoa clicando duas vezes (ou tentando em duas empresas)
+    // empilhava pedidos - e o segundo, se aprovado primeiro, faria o
+    // getCompanyIdForEmail acima não pegar o primeiro a tempo.
+    if (hasPendingRequestForEmail(email))
+      return res.status(409).json({ error: "Já existe uma solicitação pendente para este e-mail", code: "JOIN_REQUEST_PENDING" });
+
+    createJoinRequest({
+      id: uid(),
+      companyId,
+      name: name.trim(),
+      email: email.trim(),
+      passwordHash: hashPassword(password),
+      locale,
+    });
+    res.status(201).json({ ok: true });
   })
 );
 

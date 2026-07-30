@@ -59,6 +59,11 @@ export const registerCompany = (data) =>
 export const login = (data) => request("/auth/login", { method: "POST", body: data });
 export const logout = () => request("/auth/logout", { method: "POST" });
 export const changePassword = (data) => request("/auth/change-password", { method: "POST", body: data });
+// Os dois de baixo não precisam de sessão - é assim que alguém sem conta ainda
+// acha a empresa do empregador e pede entrada nela.
+export const getCompanyByCnpj = (cnpj) => request(`/auth/company-by-cnpj?cnpj=${encodeURIComponent(cnpj)}`);
+export const sendJoinRequest = (data) =>
+  request("/auth/join-request", { method: "POST", body: { ...data, locale: normalizeLanguage(i18n.language) } });
 
 // ---------- Users ----------
 export const listUsers = () => request("/users");
@@ -68,6 +73,11 @@ export const resetUserPassword = (id, newPassword) =>
   request(`/users/${id}/reset-password`, { method: "POST", body: { newPassword } });
 export const setUserRole = (id, role) => request(`/users/${id}/role`, { method: "POST", body: { role } });
 export const deleteUser = (id) => request(`/users/${id}`, { method: "DELETE" });
+export const getMyCompany = () => request("/users/company");
+export const setCompanyCnpj = (cnpj) => request("/users/company", { method: "PATCH", body: { cnpj } });
+export const listJoinRequests = () => request("/users/join-requests");
+export const approveJoinRequest = (id) => request(`/users/join-requests/${id}/approve`, { method: "POST" });
+export const rejectJoinRequest = (id) => request(`/users/join-requests/${id}/reject`, { method: "POST" });
 
 // ---------- Boards ----------
 export const getWorkspace = () => request("/boards");
