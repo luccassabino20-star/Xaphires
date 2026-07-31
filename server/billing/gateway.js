@@ -11,16 +11,18 @@
 //   criarCobranca({..., paymentId})  emite uma cobrança avulsa de um ciclo.
 //                               Devolve { providerChargeId, status, checkoutUrl?,
 //                               pixCode?, boletoLine?, dueAt? }. providerChargeId
-//                               pode vir null (checkout hospedado que ainda não
-//                               foi completado) — nesse caso o pagamento local
-//                               nasce sem id de cobrança, e só o webhook, casando
-//                               por externalReference (= paymentId, que o
-//                               chamador já gerou e passou), preenche depois.
+//                               pode vir um pseudo-id (ex.: "checkout:<id>", ver
+//                               providers/asaas.js) quando o provedor só sabe o id
+//                               de cobrança de verdade depois que a pessoa termina
+//                               de pagar numa página hospedada — nesse caso o
+//                               webhook é quem preenche o id real, casando pelo
+//                               que o próprio aviso trouxer (ver lerWebhook abaixo).
 //   consultarCobranca(id)       estado atual no gateway. Devolve { status } —
 //                               usado para conferir sem depender do webhook.
-//                               Chamado com null quando ainda não há
-//                               providerChargeId (checkout pendente): o provedor
-//                               deve devolver { status: null } sem falhar.
+//                               Chamado com um providerChargeId que pode ser um
+//                               pseudo-id não consultável: o provedor deve
+//                               devolver { status: null } sem falhar, não tentar
+//                               montar uma requisição com ele.
 //   criarAssinatura({...})      débito recorrente. Devolve
 //                               { providerSubscriptionId, status }.
 //                               providerSubscriptionId pode vir null quando o
@@ -30,9 +32,9 @@
 //   cancelarAssinatura(id)      encerra o débito recorrente.
 //   lerWebhook(req)             traduz o aviso do gateway para
 //                               { providerChargeId, status?, consultar?,
-//                               externalReference?, providerSubscriptionId? }, ou
+//                               checkoutSessionId?, providerSubscriptionId? }, ou
 //                               null se não reconhecer / autenticação inválida.
-//                               externalReference e providerSubscriptionId são
+//                               checkoutSessionId e providerSubscriptionId são
 //                               opcionais — só provedores com checkout hospedado
 //                               e renovação nativa (Asaas) os usam; a rota do
 //                               webhook trata a ausência deles normalmente.

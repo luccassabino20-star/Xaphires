@@ -38,10 +38,13 @@ function nowIso() {
 // Acha a linha local de duas formas que não são "achar pelo id de cobrança",
 // para os dois casos em que esse id ainda não existia quando a linha nasceu:
 //
-//   1. externalReference: a cobrança veio de um checkout hospedado (cartão, no
-//      Asaas). O pagamento local nasceu com provider_charge_id nulo, guardando
-//      o PRÓPRIO id como o que foi mandado de externalReference - agora que o
-//      aviso trouxe o id real de cobrança, só falta preencher.
+//   1. checkoutSessionId: a cobrança veio de um checkout hospedado (cartão, no
+//      Asaas). O pagamento local nasceu com "checkout:" + id-do-checkout como
+//      provider_charge_id, porque esse era o único id que existia na hora -
+//      testado contra o sandbox, o Asaas NÃO propaga externalReference do
+//      checkout para o pagamento gerado, e checkoutSession é o único campo do
+//      aviso que aponta de volta pro checkout que deu origem a ele. Agora que
+//      chegou o id real de cobrança, só falta preencher.
 //
 //   2. providerSubscriptionId: a cobrança é uma renovação de cartão que o
 //      próprio gateway disparou sozinho (débito automático de verdade), sem
@@ -53,11 +56,11 @@ function acharOuCriarPagamento(aviso) {
   let pagamento = store.getPaymentByProviderCharge(aviso.providerChargeId);
   if (pagamento) return pagamento;
 
-  if (aviso.externalReference) {
-    const porReferencia = store.getPayment(aviso.externalReference);
-    if (porReferencia && porReferencia.provider_charge_id == null) {
-      store.setPaymentStatus(porReferencia.id, porReferencia.status, { providerChargeId: aviso.providerChargeId });
-      pagamento = store.getPayment(porReferencia.id);
+  if (aviso.checkoutSessionId) {
+    const porCheckout = store.getPaymentByProviderCharge(`checkout:${aviso.checkoutSessionId}`);
+    if (porCheckout) {
+      store.setPaymentStatus(porCheckout.id, porCheckout.status, { providerChargeId: aviso.providerChargeId });
+      pagamento = store.getPayment(porCheckout.id);
       // Primeira confirmação de uma assinatura nascida de checkout: só agora se
       // sabe o id real dela no gateway - criarAssinatura() não tinha como saber,
       // porque a assinatura só passa a existir quando a pessoa termina de pagar

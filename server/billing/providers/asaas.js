@@ -3,11 +3,11 @@
 // Implementa o contrato de billing/gateway.js contra a API real. Ligar é definir
 // BILLING_PROVIDER=asaas, ASAAS_API_KEY e ASAAS_WEBHOOK_TOKEN.
 //
-// AINDA NÃO FOI EXERCITADO CONTRA A API — mesmo aviso que o adaptador do Mercado
-// Pago carregava. Os formatos conferem com a documentação pública, mas nenhuma
-// chamada de rede daqui rodou de verdade ainda. Rode
-// `node server/billing/verificarCredencial.js` com a credencial de TESTE antes de
-// apontar para produção — é o que troca "código plausível" por "código provado".
+// Exercitado contra a API de sandbox de verdade, inclusive um pagamento de cartão
+// completo (checkout hospedado + webhook real, via túnel local) — não é só código
+// que confere com a documentação. Rode `node server/billing/verificarCredencial.js`
+// com a credencial de TESTE antes de trocar para produção, e depois de qualquer
+// mudança neste arquivo.
 //
 // Decisões que valem conhecer antes de mexer:
 //
@@ -28,8 +28,19 @@
 // aqui é só um placeholder (devolve status "active" sem id nenhum), e quem de
 // fato cria o checkout é criarCobranca() com method "card", chamada logo em
 // seguida por emitirCobranca() (ver lifecycle.js). O id real da assinatura no
-// Asaas (e da primeira cobrança) só chegam depois, pelo webhook — ver o
-// tratamento de externalReference/providerSubscriptionId em routes/billingWebhook.js.
+// Asaas (e da primeira cobrança) só chegam depois, pelo webhook.
+//
+// O ELO NÃO É externalReference — TESTADO, E É FALSO. A intuição óbvia seria
+// mandar o id do pagamento local como externalReference do checkout e reencontrá-lo
+// no aviso; testado contra o sandbox de verdade, o Asaas NÃO propaga esse campo do
+// checkout para o pagamento que ele gera (volta null). O campo que sobrevive é
+// `checkoutSession`, com o id do próprio checkout. Por isso o pagamento local nasce
+// com `provider_charge_id: "checkout:" + id-do-checkout` em vez de nulo — é
+// pseudo-id, nunca mandado pro Asaas, só serve para o webhook (que traz
+// payment.checkoutSession) achar a linha de volta em routes/billingWebhook.js.
+// consultarCobranca() sabe que esse prefixo não é uma cobrança de verdade e nem
+// tenta consultar - só o webhook resolve isso, então o cliente que fica consultando
+// enquanto o checkout está aberto (POST /payments/:id/check) só vê "ainda pendente".
 //
 // RENOVAÇÃO DE CARTÃO NÃO PASSA POR NÓS. Uma vez criada, a assinatura no Asaas
 // cobra o cartão sozinha a cada ciclo — é justamente o que o checkout hospedado
@@ -189,10 +200,12 @@ function urlFrontend() {
 
 // Cartão: cria o checkout hospedado, com chargeTypes RECURRENT + subscription -
 // é o que faz o Asaas montar a assinatura E a primeira cobrança juntas, do lado
-// dele, quando a pessoa terminar de pagar. externalReference recebe o id do
-// pagamento local (gerado antes por lifecycle.js/emitirCobranca): é a única forma
-// de casar o webhook, que chega bem depois, com a linha que já existe aqui —
-// ver o comentário grande no topo do arquivo.
+// dele, quando a pessoa terminar de pagar. externalReference vai preenchido só
+// para reconciliação manual no painel do Asaas (aparece na tela do checkout) -
+// testado contra o sandbox, ele NÃO volta no pagamento gerado, então não é essa a
+// forma de achar a linha local depois. Quem faz esse papel é o pseudo-id
+// "checkout:" + id-do-checkout devolvido como providerChargeId - ver o comentário
+// grande no topo do arquivo.
 async function criarCheckoutAssinatura({ amountCents, plan, paymentId }) {
   const corpo = {
     billingTypes: ["CREDIT_CARD"],
@@ -215,10 +228,15 @@ async function criarCheckoutAssinatura({ amountCents, plan, paymentId }) {
     externalReference: paymentId,
   };
   const resposta = await chamar("/checkouts", { method: "POST", body: corpo });
+  if (!resposta?.id) {
+    const err = new Error("O Asaas não devolveu o id do checkout criado.");
+    err.code = "GATEWAY_ERROR";
+    throw err;
+  }
   return {
-    providerChargeId: null, // só existe depois que a pessoa terminar de pagar - ver o topo do arquivo.
+    providerChargeId: `checkout:${resposta.id}`,
     status: "pending",
-    checkoutUrl: resposta?.link || null,
+    checkoutUrl: resposta.link || null,
   };
 }
 
@@ -280,7 +298,10 @@ export const asaas = {
   },
 
   async consultarCobranca(providerChargeId) {
-    if (!providerChargeId) return { status: null };
+    // Sem id real ainda (checkout aberto, ninguém terminou de pagar) não há o
+    // que consultar - GET /payments/checkout:xxx só devolveria 404. Só o
+    // webhook resolve esse caso; até lá o pagamento fica "ainda pendente".
+    if (!providerChargeId || providerChargeId.startsWith("checkout:")) return { status: null };
     const r = await chamar(`/payments/${providerChargeId}`);
     return { status: traduzirStatus(r?.status), failureReason: null };
   },
@@ -308,10 +329,12 @@ export const asaas = {
   // de consulta, do mesmo jeito que o Mercado Pago - o corpo do webhook não é
   // confiável por hábito do projeto, mesmo o Asaas mandando mais dado nele.
   //
-  // externalReference e providerSubscriptionId alimentam o encaixe que
+  // checkoutSessionId e providerSubscriptionId alimentam o encaixe que
   // routes/billingWebhook.js faz quando ainda NÃO existe uma linha local
-  // encontrável pelo id de cobrança (checkout que acabou de completar, ou
-  // renovação de assinatura que o próprio Asaas disparou sozinho).
+  // encontrável pelo id de cobrança real: checkout que acabou de completar
+  // (achado pelo pseudo-id "checkout:" + checkoutSessionId, testado - é o único
+  // campo que sobrevive do checkout até aqui, externalReference não propaga), ou
+  // renovação de assinatura que o próprio Asaas disparou sozinho.
   lerWebhook(req) {
     if (!validarToken(req)) return null;
     const corpo = req.body || {};
@@ -319,7 +342,7 @@ export const asaas = {
     if (!pagamento?.id) return null;
     return {
       providerChargeId: String(pagamento.id),
-      externalReference: pagamento.externalReference || null,
+      checkoutSessionId: pagamento.checkoutSession || null,
       providerSubscriptionId: pagamento.subscription || null,
       consultar: true,
     };

@@ -107,7 +107,7 @@ try {
     payer: PAGADOR,
     paymentId: `verificacao-checkout-${Date.now()}`,
   });
-  checa(r.providerChargeId === null, "nasce sem id de cobrança (só existe depois do checkout completar)", String(r.providerChargeId));
+  checa(/^checkout:/.test(r.providerChargeId || ""), "nasce com pseudo-id de checkout (id real só existe depois de completar)", String(r.providerChargeId));
   checa(r.status === "pending", "nasce pendente", r.status);
   checa(!!r.checkoutUrl, "VEIO O LINK DO CHECKOUT", r.checkoutUrl || "VAZIO - o caminho de leitura está errado");
   if (r.checkoutUrl) console.log(`        abra no navegador pra conferir visualmente: ${r.checkoutUrl}`);
@@ -129,9 +129,13 @@ checa(traduzirStatus("ALGO_NOVO_DO_ASAAS") === null, "estado desconhecido -> nul
 console.log(
   falhas === 0
     ? "\nTUDO PASSOU. O adaptador conversa com a API de verdade.\n" +
-        "Falta ainda: 1) completar o checkout acima com um cartão de teste, para ver o\n" +
-        "webhook de RECURRENT chegando; 2) apontar um webhook de sandbox para este servidor\n" +
-        "(ngrok ou similar) e conferir se o token asaas-access-token bate."
+        "O checkout acima (URL no log) ainda não foi completado por este script - se\n" +
+        "quiser exercitar o webhook de ponta a ponta, abra o link, pague com o cartão de\n" +
+        "teste 4444 4444 4444 4444 (validade futura, CVV qualquer), e aponte um webhook\n" +
+        "de sandbox (painel Asaas, ou PUT /v3/webhooks/{id}) para um túnel local\n" +
+        "(ngrok/localtunnel) apontando pra /api/billing/webhook. Já foi feito uma vez\n" +
+        "manualmente - foi assim que se descobriu que checkoutSession, não\n" +
+        "externalReference, é o campo que casa o pagamento de volta ao checkout."
     : `\n${falhas} FALHARAM. Nada foi cobrado de verdade (Pix/boleto de sandbox não compensam).`
 );
 process.exit(falhas === 0 ? 0 : 1);

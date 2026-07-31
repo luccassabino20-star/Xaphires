@@ -135,10 +135,13 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
   const inicio = periodStart || nowIso();
   const tentativa = attempt || 1;
   // Gerado ANTES da chamada ao gateway, e não depois: um checkout hospedado (ver
-  // providers/asaas.js) não devolve um id de cobrança na hora - o pagamento local
-  // nasce sem providerChargeId, e o webhook que chega bem depois precisa de algo
-  // já conhecido para casar de volta com esta linha. paymentId é esse elo,
-  // mandado como externalReference.
+  // providers/asaas.js) não devolve um id de cobrança de verdade na hora - o
+  // pagamento local nasce com um pseudo-id ("checkout:<id-do-checkout>"), e o
+  // webhook que chega bem depois é quem casa de volta com esta linha (pelo
+  // checkoutSession do aviso, não por este paymentId - ver routes/billingWebhook.js).
+  // paymentId ainda vai como externalReference do checkout, só para reconciliação
+  // manual no painel do Asaas: testado, esse campo não propaga para o pagamento
+  // gerado, então o sistema não depende dele para nada.
   const paymentId = uid();
   const resposta = await gateway.criarCobranca({
     amountCents: centavos,
