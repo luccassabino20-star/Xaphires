@@ -16,7 +16,7 @@ npm start         # produção: um processo só, Express serve dist/ e a API
 
 Node >= 22.5 é obrigatório (`node:sqlite`). O `.node-version` fixa 24, onde o módulo já não precisa de flag.
 
-Variáveis de ambiente em `.env.example`, incluindo as da cobrança: `BILLING_PROVIDER` (padrão `fake`), `BILLING_WEBHOOK_SECRET`, e o trio do Mercado Pago `MERCADOPAGO_ACCESS_TOKEN` / `MERCADOPAGO_PUBLIC_KEY` / `MERCADOPAGO_WEBHOOK_SECRET`. Provedor real sem configuração completa grita no log no arranque, e não na primeira cobrança.
+Variáveis de ambiente em `.env.example`, incluindo as da cobrança: `BILLING_PROVIDER` (padrão `fake`), `BILLING_WEBHOOK_SECRET`, e o trio do Asaas `ASAAS_API_KEY` / `ASAAS_ENV` / `ASAAS_WEBHOOK_TOKEN`. Provedor real sem configuração completa grita no log no arranque, e não na primeira cobrança.
 
 **O Vite recarrega o cliente sozinho, o Express não.** Mudou algo em `server/`, reinicie o `npm run dev` — senão você testa contra o código antigo e conclui que a correção não funcionou.
 
@@ -93,7 +93,7 @@ Três regras que governam tudo ali:
 
 `POST /api/plan` **só troca para plano gratuito**. Plano pago passa por `POST /api/billing/subscribe`, e o acesso muda só na confirmação. Trocar a forma de pagamento é `PUT /api/billing/method`, que não cobra nada — é cadastro, não renovação antecipada.
 
-Carência e tentativas são constantes no topo de `lifecycle.js` (`GRACE_DAYS`, `MAX_TENTATIVAS_CARTAO`, `ESPACAMENTO_DIAS`).
+Carência e tentativas são constantes no topo de `lifecycle.js` (`GRACE_DAYS`, `MAX_TENTATIVAS_CARTAO`, `ESPACAMENTO_DIAS`) — só valem para Pix e boleto, que são cobranças que nós reemitimos a cada ciclo. Cartão não usa nenhuma das duas: ver a seção da renovação de cartão, abaixo.
 
 Pix e boleto exigem CPF ou CNPJ do pagador. Validado com dígito verificador nos dois lados (`server/doc.js` é a autoridade, `src/utils/doc.js` dá a resposta imediata), e gravado em `subscriptions.payer_doc` — a renovação roda fora do contexto da empresa e não teria como buscar o dado depois. O documento só volta no `GET /api/billing` para o master.
 
@@ -101,27 +101,34 @@ Pix e boleto exigem CPF ou CNPJ do pagador. Validado com dígito verificador nos
 
 Esta é a regra mais importante do checkout, e a mais fácil de destruir sem perceber.
 
-> **Não existe, e não pode passar a existir, um estado com o número do cartão.** Com provedor real os campos de número, validade e CVV são iframes do Mercado Pago (Secure Fields, em `utils/mercadopago.js`): o número sai deles direto para o gateway e o que volta é um token de uso único. Se aparecer um `useState` guardando PAN em algum lugar, o desenho foi perdido — o escopo de conformidade sobe de SAQ A para SAQ A-EP.
+> **Não existe, e não pode passar a existir, um estado com o número do cartão.** A tokenização de cartão do Asaas exige a chave secreta e só pode ser chamada do servidor (diferente do Mercado Pago, que este projeto usava antes, e cuja Secure Fields tokenizava direto no navegador) — então, em vez de um formulário embutido, o cartão é pago numa **página hospedada pelo próprio Asaas** (`asaas.com/checkoutSession`): `pagar()`, em `CheckoutModal.jsx`, redireciona o navegador inteiro para lá com `window.location.href` assim que `POST /api/billing/subscribe` devolve um `checkoutUrl`. Nosso servidor e nosso JavaScript nunca veem o número do cartão. Se aparecer um `useState` guardando PAN em algum lugar, ou um campo de número fora do modo simulado, o desenho foi perdido — o escopo de conformidade sobe de SAQ A para SAQ A-EP.
 
 O formulário com campo de número só aparece quando `GET /api/billing` devolve `simulated: true`, e ali o número é de mentira. A rota `dev/confirm` responde 404 fora do modo simulado.
 
-O SDK é carregado por `await import()` dentro de `carregarSdk()`, e o import precisa continuar dinâmico: com import estático o Vite o coloca no bundle principal e todo visitante da landing baixa código de pagamento. O build confirma a separação — o SDK fica num pedaço próprio de ~1,6 kB, e só ele contém a URL `sdk.mercadopago.com`.
+Sem SDK de pagamento no cliente: como o cartão é a página do próprio Asaas, não existe script de terceiro para carregar nem chave pública para expor — a antiga preocupação com import dinâmico e code-splitting do SDK do Mercado Pago não se aplica mais.
 
-A chave pública vai no `GET /api/billing` e é feita para ficar exposta; a que cobra (`MERCADOPAGO_ACCESS_TOKEN`) nunca sai do servidor.
+### A assinatura de cartão nasce no checkout, não em `criarAssinatura()`
 
-### O adaptador do Mercado Pago não foi testado contra a API
+O checkout hospedado, criado com `chargeTypes: ["RECURRENT"]` e um bloco `subscription`, é o que faz o Asaas montar a assinatura **e** a primeira cobrança de uma vez só — do lado dele, quando a pessoa termina de pagar, bem depois da resposta de `POST /api/billing/subscribe`. Por isso `criarAssinatura()` em `providers/asaas.js` é só um placeholder (devolve `status: "active"` sem nenhum id), e quem de fato cria o checkout é `criarCobranca()` com `method: "card"`, chamada logo em seguida por `emitirCobranca()`. O id real da assinatura, e o da primeira cobrança, só chegam depois — pelo webhook.
 
-Usa os SDKs oficiais: `mercadopago` no servidor (`Payment`, `PreApproval`) e `@mercadopago/sdk-js` no navegador. Não monte requisição à mão — os tipos que vêm no pacote são o que permite conferir formato de corpo e caminho de leitura **localmente, sem credencial**, e foi assim que se descobriu que a linha do boleto mora em `transaction_details.digitable_line` e não na raiz.
+**Renovação de cartão não passa por nós — só com o Asaas.** Uma vez criada, a assinatura cobra o cartão sozinha a cada ciclo. `confirmarPagamento()` sabe disso e não agenda `next_charge_at` quando `metodoRenovaSozinho()` (`gateway.js`) diz que o provedor ativo tem motor de renovação próprio — sem essa checagem, a varredura tentaria emitir um checkout novo por cima da renovação que o próprio Asaas já dispara. O mesmo vale em `registrarFalha()`: quem decide se tenta de novo é o gateway, não `MAX_TENTATIVAS_CARTAO`. O simulado (`providers/fake.js`) declara `renovaCartaoSozinho: false` de propósito — sem motor próprio, cartão nele continua sendo reagendado por nós como Pix e boleto sempre foram, e é isso que deixa renovação e cancelamento exercitáveis em desenvolvimento sem credencial nenhuma.
 
-O que já está verificado offline: tradução de status, conversão centavos/reais, validação de assinatura HMAC, recusas por dado faltando, e o corpo enviado em cada meio de pagamento (suíte que intercepta o `fetch` antes da rede).
+**O webhook precisa achar (ou criar) a linha local de dois jeitos que não são "pelo id de cobrança".** `paymentId` é gerado em `emitirCobranca()` **antes** de chamar o gateway, e mandado como `externalReference` do checkout — é o único elo entre a linha que nasce aqui, sem `provider_charge_id`, e o pagamento que o Asaas cria bem depois. Quando o aviso chega, `acharOuCriarPagamento()` em `routes/billingWebhook.js` resolve por `externalReference` (preenchendo o `provider_charge_id` que faltava, e junto o `provider_subscription_id` da assinatura). A partir da segunda cobrança, não existe nem isso: é uma renovação que o Asaas disparou sozinho, sem `externalReference` nenhum — aí quem casa é `providerSubscriptionId`, e a linha local nasce ali mesmo, na hora, com `store.createPayment()`. Sem esse segundo caminho, cada renovação a partir da segunda ficaria sem registro no extrato, com a empresa achando que não foi cobrada.
 
-**Nenhuma chamada de rede foi exercitada.** Falta o teste com credencial de teste, e o `conferir:` que resta é o formato do manifesto da assinatura do webhook — esse não está nos tipos. Se a validação recusar avisos legítimos, os pagamentos param de ser confirmados pelo webhook e só a consulta do cliente salva.
+### O adaptador do Asaas não foi testado contra a API
 
-Três decisões dele que não são óbvias:
+Não usa SDK — chamadas HTTP puras (`fetch`) contra `api-sandbox.asaas.com` ou `api.asaas.com`, escolhido por `ASAAS_ENV`. Os formatos conferem com a documentação pública (`docs.asaas.com`), mas ainda não foram exercitados contra o serviço de verdade.
+
+Rode `node server/billing/verificarCredencial.js` com `ASAAS_API_KEY` de **sandbox** no `.env` antes de apontar para produção — é o que troca "código plausível" por "código provado". Ele cria uma cobrança Pix, uma boleto e um checkout de cartão de verdade (sandbox, nada é cobrado), e confere se os campos que `providers/asaas.js` espera (`payload` do QR do Pix, `identificationField` do boleto, `link` do checkout) realmente vêm preenchidos.
+
+**Falta ainda exercitar o webhook de verdade** — completar um checkout com cartão de teste e conferir se o `asaas-access-token` que chega bate com `ASAAS_WEBHOOK_TOKEN`, e se `payment.subscription`/`payment.externalReference` vêm no formato que `lerWebhook()` espera. Se algum desses campos vier diferente, os pagamentos por cartão param de ser confirmados e só a consulta do cliente (`POST /billing/payments/:id/check`) salva — Pix e boleto não são afetados, porque `criarCobranca()` já devolve o `providerChargeId` na hora, sem depender do webhook para existir.
+
+Decisões que não são óbvias:
 
 - **Valor vai em reais decimais**, não centavos. A conversão acontece só na borda e volta a inteiro com `Math.round`, porque o JSON devolve `349.98999999999995`.
-- **O webhook não traz o estado.** `lerWebhook` devolve `consultar: true` e a rota pergunta ao gateway antes de aplicar — um POST forjado não pode liberar plano.
+- **O webhook manda o estado no corpo** (diferente do Mercado Pago, que mandava só o id), mas `lerWebhook` devolve `consultar: true` do mesmo jeito — a autenticação aqui é um token fixo no cabeçalho (`asaas-access-token`), não uma assinatura HMAC do payload, e o hábito do projeto é não confiar no corpo quando dá pra confirmar de outro jeito.
 - **Status desconhecido traduz para `null`**, não para um palpite. Estado novo na API deles não vira "pago" por omissão.
+- **Cliente é resolvido por CPF/CNPJ a cada cobrança** (`GET /customers?cpfCnpj=`), sem tabela própria de mapeamento — o volume é baixo (uma cobrança por empresa por mês), e uma consulta a mais não pesa.
 
 ### Autenticação
 
@@ -129,7 +136,7 @@ JWT em cookie httpOnly `kanban_token`, com `companyId` no payload. Segredo em `J
 
 Sem token CSRF: `verifyOrigin` confere `Origin`/`Referer` em todo método que altera estado, comparando **host** em vez de origem completa por causa de proxy reverso. Necessário porque com `FRONTEND_URL` definida o cookie usa `sameSite=none`. Login, cadastro e geocode passam por `rateLimit.js`.
 
-> **`/api/billing/webhook` é montado ANTES do `verifyOrigin`, e a ordem no `app.js` importa.** Gateway não é navegador: manda POST sem `Origin` nem `Referer`, e a checagem de CSRF recusaria todo aviso de pagamento com 403 — as cobranças seriam confirmadas no gateway e nunca aqui. Quem autentica essa rota é a assinatura do provedor, dentro dela. Mexer na ordem dos `app.use` quebra os pagamentos sem erro visível.
+> **`/api/billing/webhook` é montado ANTES do `verifyOrigin`, e a ordem no `app.js` importa.** Gateway não é navegador: manda POST sem `Origin` nem `Referer`, e a checagem de CSRF recusaria todo aviso de pagamento com 403 — as cobranças seriam confirmadas no gateway e nunca aqui. Quem autentica essa rota é o token do provedor, dentro dela. Mexer na ordem dos `app.use` quebra os pagamentos sem erro visível.
 
 O webhook responde **200 mesmo quando ignora** o aviso. Erro ensinaria um atacante a distinguir aviso aceito de rejeitado, e faria o gateway legítimo reenviar sem parar. Só falha nossa ao aplicar devolve 500, porque aí o reenvio é o que queremos.
 

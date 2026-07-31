@@ -3599,20 +3599,6 @@ input, textarea { font-family: inherit; }
 .plan-history-status.failed, .plan-history-status.canceled { color: #b3444a; }
 .plan-history-status.refunded { color: var(--text-muted); }
 
-/* Contêineres dos campos seguros do Mercado Pago. Cada um recebe um iframe do
-   gateway, então a altura precisa vir daqui: iframe sem altura declarada colapsa
-   para zero e o campo some da tela sem nenhum erro. */
-.mp-field {
-  height: 40px;
-  padding: 0 10px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  background: var(--bg-card);
-  display: flex;
-  align-items: center;
-}
-.mp-field iframe { width: 100%; height: 100%; border: 0; display: block; }
-
 /* ---------- Painel da plataforma (/admin) ---------- */
 /* Paleta própria, e mais clara que a do app. É ferramenta de trabalho para leitura
    de tabela e número, onde tela escura cansa mais; e o contraste visível ajuda a

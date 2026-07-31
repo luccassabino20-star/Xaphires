@@ -41,6 +41,10 @@ function emDias(dias) {
 
 export const fake = {
   nome: "fake",
+  // Sem motor de renovação próprio: cartão só cobra de novo quando emitirCobranca()
+  // chama criarCobranca() de novo, do mesmo jeito que Pix e boleto - é o que deixa
+  // renovação e cancelamento exercitáveis em desenvolvimento, pela varredura normal.
+  renovaCartaoSozinho: false,
 
   async criarCobranca({ amountCents, method, plan, companyId, card }) {
     const chargeId = id("chg");

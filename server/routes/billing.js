@@ -37,15 +37,11 @@ router.get(
     res.json({
       methods: METODOS,
       // O cliente precisa saber que está no provedor simulado para só então mostrar
-      // campo de número de cartão. Com provedor real, os dados do cartão são
-      // trocados por um token no navegador, pelo SDK dele, e o número NUNCA chega
-      // aqui — é o que mantém o projeto fora do escopo PCI.
+      // campo de número de cartão. Com provedor real, o cartão é pago numa página
+      // hospedada pelo próprio gateway (ver providers/asaas.js) — o número nunca
+      // chega no nosso servidor nem no nosso JavaScript.
       simulated: gateway.nome === "fake",
       provider: gateway.nome,
-      // Chave PÚBLICA do gateway, para o SDK tokenizar o cartão no navegador. É
-      // feita para ficar exposta — não autoriza cobrança, só a criação de token de
-      // uso único. A credencial que cobra (access token) nunca sai do servidor.
-      publicKey: gateway.nome === "mercadopago" ? process.env.MERCADOPAGO_PUBLIC_KEY || null : null,
       subscription: visaoAssinatura(store.getActiveSubscription(req.companyId), req.user.role === "master"),
       pendingPayment: store.publicPayment(pendente),
       payments: store.listPayments(req.companyId).map(store.publicPayment),
@@ -130,8 +126,8 @@ router.post(
 
     try {
       // O pagador sai da sessão, não do corpo: e-mail de cobrança não é campo que o
-      // cliente escolhe. O documento vem do formulário porque não temos CPF no
-      // cadastro — ver o aviso em providers/mercadopago.js.
+      // cliente escolhe. O documento vem do formulário porque não temos CPF/CNPJ no
+      // cadastro.
       const payer = { email: req.user.email, name: req.user.name, doc: docPagador || null };
       const r = await ciclo.assinar({ companyId: req.companyId, plan, method, card, payer });
       res.status(201).json({

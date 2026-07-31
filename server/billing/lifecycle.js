@@ -14,7 +14,7 @@
 import crypto from "node:crypto";
 import { getCompany, setCompanyPlan, setCompanyGrace } from "../directory.js";
 import { getPlan, priceCentsOf, addOneMonth, effectiveStatus } from "../plans.js";
-import { gateway, metodoTemDebitoAutomatico } from "./gateway.js";
+import { gateway, metodoTemDebitoAutomatico, metodoRenovaSozinho } from "./gateway.js";
 import * as store from "./store.js";
 
 // Dias de escrita liberada depois do vencimento, enquanto a cobrança tenta. Boleto
@@ -77,7 +77,13 @@ export function confirmarPagamento(paymentId, { paidAt } = {}) {
     store.updateSubscription(pagamento.subscription_id, {
       plan: pagamento.plan,
       status: "active",
-      nextChargeAt: novoVencimento,
+      // Só pula o agendamento quando o PROVEDOR ATIVO renova esse método sozinho
+      // (Asaas, cartão) - agendar aqui faria a varredura emitir uma SEGUNDA
+      // cobrança por cima da que o próprio gateway já vai gerar. O simulado não
+      // tem esse motor (nem tinha o Mercado Pago, antes), então cartão nele
+      // continua sendo agendado como Pix e boleto sempre foram - é o que deixa
+      // renovação exercitável em desenvolvimento.
+      nextChargeAt: metodoRenovaSozinho(pagamento.method) ? null : novoVencimento,
     });
   }
   return store.getPayment(paymentId);
@@ -96,9 +102,14 @@ export function registrarFalha(paymentId, motivo) {
   const assinatura = store.getSubscription(pagamento.subscription_id);
   const vencimento = pagamento.period_start || nowIso();
 
-  if (tentativas >= MAX_TENTATIVAS_CARTAO) {
-    // Esgotou. A assinatura fica inadimplente e para de tentar; a carência não é
-    // estendida, então o acesso cai quando o prazo dela terminar.
+  // Cartão que o próprio provedor renova sozinho (Asaas): quem decide se tenta de
+  // novo é ele (tem a política de retentativa própria), não nós - reagendar um
+  // next_charge_at aqui faria a varredura emitir um checkout novo por cima da
+  // renovação que o gateway já está tentando sozinho. Fica só marcado como
+  // inadimplente; se o gateway desistir de vez, o acesso cai quando a carência
+  // (companies.grace_until) esgotar, sem precisar de um agendamento nosso. No
+  // simulado, sem esse motor, cartão continua reagendando como sempre.
+  if (tentativas >= MAX_TENTATIVAS_CARTAO || metodoRenovaSozinho(pagamento.method)) {
     store.updateSubscription(pagamento.subscription_id, { status: "past_due", nextChargeAt: null });
   } else {
     // Reagenda para a próxima janela, contada do vencimento e não de agora, para
@@ -123,6 +134,12 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
 
   const inicio = periodStart || nowIso();
   const tentativa = attempt || 1;
+  // Gerado ANTES da chamada ao gateway, e não depois: um checkout hospedado (ver
+  // providers/asaas.js) não devolve um id de cobrança na hora - o pagamento local
+  // nasce sem providerChargeId, e o webhook que chega bem depois precisa de algo
+  // já conhecido para casar de volta com esta linha. paymentId é esse elo,
+  // mandado como externalReference.
+  const paymentId = uid();
   const resposta = await gateway.criarCobranca({
     amountCents: centavos,
     method,
@@ -130,6 +147,7 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
     companyId,
     card,
     payer,
+    paymentId,
     // Estável para a mesma tentativa do mesmo ciclo, diferente entre tentativas.
     // É o que impede a varredura, ao rodar duas vezes por retry de rede, de virar
     // duas cobranças no cartão do cliente.
@@ -137,7 +155,7 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
   });
 
   const pagamento = store.createPayment({
-    id: uid(),
+    id: paymentId,
     companyId,
     subscriptionId,
     plan,

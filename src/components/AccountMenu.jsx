@@ -36,6 +36,19 @@ export default function AccountMenu() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Volta do checkout hospedado do cartão (ver providers/asaas.js e o comentário
+  // em pagar(), no CheckoutModal): a pessoa saiu do app pra pagar e a página de
+  // retorno do gateway manda de volta pra cá com ?billing=return. Reabre o plano
+  // sozinho, sem precisar procurar o menu de novo - é lá que o pagamento pendente
+  // (ou já confirmado, se o webhook chegou primeiro) aparece.
+  useEffect(() => {
+    if (!window.location.search.includes("billing=return")) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("billing");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    setPlanOpen(true);
+  }, []);
+
   async function submitChangePassword(e) {
     e.preventDefault();
     setError("");

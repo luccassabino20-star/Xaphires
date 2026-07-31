@@ -104,6 +104,14 @@ export function getSubscription(id) {
   return db.prepare("SELECT * FROM subscriptions WHERE id = ?").get(id) || null;
 }
 
+// Usado pelo webhook para achar a assinatura local quando o gateway avisa de uma
+// cobrança nova que nasceu sozinha do lado dele (renovação de cartão com débito
+// automático, que não passa por emitirCobranca) - ver routes/billingWebhook.js.
+export function getSubscriptionByProviderSubscriptionId(providerSubscriptionId) {
+  if (!providerSubscriptionId) return null;
+  return db.prepare("SELECT * FROM subscriptions WHERE provider_subscription_id = ?").get(providerSubscriptionId) || null;
+}
+
 export function createSubscription({
   id,
   companyId,

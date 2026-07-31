@@ -8,26 +8,43 @@
 // Um provedor implementa:
 //
 //   nome                        string, gravada em payments.provider
-//   criarCobranca({...})        emite uma cobrança avulsa de um ciclo.
+//   criarCobranca({..., paymentId})  emite uma cobrança avulsa de um ciclo.
 //                               Devolve { providerChargeId, status, checkoutUrl?,
-//                               pixCode?, boletoLine?, dueAt? }
+//                               pixCode?, boletoLine?, dueAt? }. providerChargeId
+//                               pode vir null (checkout hospedado que ainda não
+//                               foi completado) — nesse caso o pagamento local
+//                               nasce sem id de cobrança, e só o webhook, casando
+//                               por externalReference (= paymentId, que o
+//                               chamador já gerou e passou), preenche depois.
 //   consultarCobranca(id)       estado atual no gateway. Devolve { status } —
 //                               usado para conferir sem depender do webhook.
-//   criarAssinatura({...})      débito recorrente no cartão. Devolve
-//                               { providerSubscriptionId, status }
+//                               Chamado com null quando ainda não há
+//                               providerChargeId (checkout pendente): o provedor
+//                               deve devolver { status: null } sem falhar.
+//   criarAssinatura({...})      débito recorrente. Devolve
+//                               { providerSubscriptionId, status }.
+//                               providerSubscriptionId pode vir null quando o
+//                               provedor só sabe o id real depois que a pessoa
+//                               completa um checkout hospedado — o webhook
+//                               preenche via providerSubscriptionId (ver abaixo).
 //   cancelarAssinatura(id)      encerra o débito recorrente.
 //   lerWebhook(req)             traduz o aviso do gateway para
-//                               { providerChargeId, status } ou null se não
-//                               reconhecer / assinatura inválida.
+//                               { providerChargeId, status?, consultar?,
+//                               externalReference?, providerSubscriptionId? }, ou
+//                               null se não reconhecer / autenticação inválida.
+//                               externalReference e providerSubscriptionId são
+//                               opcionais — só provedores com checkout hospedado
+//                               e renovação nativa (Asaas) os usam; a rota do
+//                               webhook trata a ausência deles normalmente.
 //
 // `status` é sempre um dos nossos: pending | paid | failed | canceled | refunded.
 // Traduzir o vocabulário do provedor para o nosso é responsabilidade dele, para o
-// resto do sistema não precisar conhecer "approved", "accredited" e afins.
+// resto do sistema não precisar conhecer "approved", "RECEIVED_IN_CASH" e afins.
 
 import { fake } from "./providers/fake.js";
-import { mercadoPago } from "./providers/mercadopago.js";
+import { asaas } from "./providers/asaas.js";
 
-const PROVEDORES = { fake, mercadopago: mercadoPago };
+const PROVEDORES = { fake, asaas };
 
 // Padrão é o simulado: uma instalação sem credencial configurada não deve começar a
 // tentar cobrança real, e um esquecimento de variável de ambiente não pode virar
@@ -48,15 +65,11 @@ if (!PROVEDORES[escolhido]) {
 // subiu o servidor, que é quem pode consertar.
 if (gateway.nome !== "fake") {
   const faltando = [];
-  if (gateway.nome === "mercadopago") {
-    if (!process.env.MERCADOPAGO_ACCESS_TOKEN) faltando.push("MERCADOPAGO_ACCESS_TOKEN");
-    // Sem a chave pública o SDK não inicializa e o cartão fica indisponível na tela.
-    // Pix e boleto continuariam funcionando, então isto não impede subir — mas
-    // precisa aparecer, senão vira "o cartão sumiu e ninguém sabe por quê".
-    if (!process.env.MERCADOPAGO_PUBLIC_KEY) faltando.push("MERCADOPAGO_PUBLIC_KEY");
-    // Sem o segredo do webhook a validação de assinatura recusa tudo, de propósito,
-    // e nenhum pagamento seria confirmado pelo aviso do gateway.
-    if (!process.env.MERCADOPAGO_WEBHOOK_SECRET) faltando.push("MERCADOPAGO_WEBHOOK_SECRET");
+  if (gateway.nome === "asaas") {
+    if (!process.env.ASAAS_API_KEY) faltando.push("ASAAS_API_KEY");
+    // Sem o token do webhook a validação recusa tudo, de propósito, e nenhum
+    // pagamento seria confirmado pelo aviso do gateway.
+    if (!process.env.ASAAS_WEBHOOK_TOKEN) faltando.push("ASAAS_WEBHOOK_TOKEN");
   }
   if (faltando.length > 0) {
     console.error(
@@ -74,8 +87,23 @@ export function metodoValido(metodo) {
   return METODOS.includes(metodo);
 }
 
-// Só o cartão renova sozinho. Pix e boleto não têm débito automático: a recorrência
-// deles é uma cobrança nova que nós emitimos a cada ciclo, e o cliente paga.
+// Só o cartão tem débito automático. Pix e boleto não: a recorrência deles é uma
+// cobrança nova que nós emitimos a cada ciclo, e o cliente paga.
 export function metodoTemDebitoAutomatico(metodo) {
   return metodo === "card";
+}
+
+// Débito automático não é sempre "o gateway cobra sozinho, sem depender de nós de
+// novo" — depende do PROVEDOR, não só do método. O Asaas cria uma assinatura de
+// verdade no checkout hospedado, que renova o cartão sem nenhuma chamada nossa; o
+// simulado (fake.js) não tem esse motor, e cobra de novo só quando emitirCobranca()
+// é chamada, do mesmo jeito que Pix e boleto — é assim que dá para exercitar
+// renovação e cancelamento em desenvolvimento, sem credencial nenhuma. Cada
+// provedor declara `renovaCartaoSozinho` para dizer de qual lado está.
+//
+// lifecycle.js usa isto (não metodoTemDebitoAutomatico) para decidir se agenda
+// next_charge_at: agendar quando o próprio gateway já vai cobrar de novo criaria
+// uma segunda cobrança por cima da automática.
+export function metodoRenovaSozinho(metodo) {
+  return metodoTemDebitoAutomatico(metodo) && !!gateway.renovaCartaoSozinho;
 }
