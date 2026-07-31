@@ -247,7 +247,12 @@ export const asaas = {
   // e o comentário grande no topo deste arquivo.
   renovaCartaoSozinho: true,
 
-  async criarCobranca({ amountCents, method, plan, payer, paymentId }) {
+  // discountCents só chega até aqui para Pix e boleto - o checkout hospedado do
+  // cartão (criarCheckoutAssinatura) ainda não tem o campo "discount" do bloco
+  // subscription verificado contra a API real, então por enquanto cartão cobra
+  // sempre o preço cheio. Se algum dia existir cliente com desconto pagando de
+  // cartão, é aqui que falta entrar.
+  async criarCobranca({ amountCents, discountCents, method, plan, payer, paymentId }) {
     if (method === "card") return criarCheckoutAssinatura({ amountCents, plan, paymentId });
 
     exigeDocumento(payer);
@@ -261,6 +266,11 @@ export const asaas = {
         dueDate: dataISO(method === "pix" ? 1 : 3),
         description: `Xaphires - plano ${plan}`,
         externalReference: paymentId,
+        // dueDateLimitDays: 0 = desconto vale até a própria data de vencimento
+        // (inclusive) - testado contra a doc do Asaas. Sem isso o padrão é exigir
+        // pagamento adiantado, e o desconto combinado "some" se a pessoa pagar no
+        // dia certo em vez de antes.
+        ...(discountCents > 0 ? { discount: { value: reais(discountCents), type: "FIXED", dueDateLimitDays: 0 } } : {}),
       },
     });
 

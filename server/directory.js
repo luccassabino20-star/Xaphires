@@ -47,6 +47,22 @@ addColumnIfMissing("companies", "grace_until", "grace_until TEXT");
 // checar duplicidade é responsabilidade de quem grava (setCompanyCnpj), não do
 // banco. Guardado só com dígitos, mesmo formato que normalizarDoc produz.
 addColumnIfMissing("companies", "cnpj", "cnpj TEXT");
+// Desconto fixo negociado por fora, em centavos, subtraído do preço de tabela do
+// plano em toda cobrança emitida (ver emitirCobranca em billing/lifecycle.js). Não
+// é percentual porque nasceu de um valor fechado em reais com o cliente, não de uma
+// regra proporcional - e fixo não muda se o preço do plano for reajustado depois,
+// o que é a intenção: o combinado foi "paga X a menos", não "paga Y% a menos".
+// Vai como discount na cobrança do Asaas (dueDateLimitDays: 0, ver providers/asaas.js),
+// então o boleto/Pix mostra o valor cheio com o desconto aplicado, não escondido.
+addColumnIfMissing("companies", "discount_cents", "discount_cents INTEGER NOT NULL DEFAULT 0");
+// Exceções numéricas por empresa, por fora do que o plano dela dá direito (ver
+// maxUsersFor/attachmentLimitFor em plans.js). NULL = sem exceção, usa o teto do
+// plano normalmente. Não existe valor para "ilimitado por override" de propósito:
+// quem precisa de ilimitado muda para um plano que já é ilimitado (Profissional/
+// Empresarial) - a exceção aqui é só para destravar um número específico maior (ou
+// menor) que o plano moldaria, não para reimplementar o que plano já resolve.
+addColumnIfMissing("companies", "max_users_override", "max_users_override INTEGER");
+addColumnIfMissing("companies", "max_attachment_bytes_override", "max_attachment_bytes_override INTEGER");
 
 // A cobrança guarda os dados dela no mesmo banco global, porque pagamento é da
 // empresa e não de dentro de um quadro. Fica em server/billing/store.js, que cria
@@ -112,6 +128,20 @@ export function getCompanyIdForCnpj(cnpj) {
 
 export function setCompanyCnpj(id, cnpj) {
   directoryDb.prepare("UPDATE companies SET cnpj = ? WHERE id = ?").run(cnpj || null, id);
+  return getCompany(id);
+}
+
+export function setCompanyDiscount(id, discountCents) {
+  directoryDb.prepare("UPDATE companies SET discount_cents = ? WHERE id = ?").run(Math.max(0, discountCents || 0), id);
+  return getCompany(id);
+}
+
+// null limpa a exceção (volta a valer o teto do plano); número fixa o teto
+// específico desta empresa. A rota que chama isto valida os dois campos antes.
+export function setCompanyLimits(id, { maxUsersOverride, maxAttachmentBytesOverride }) {
+  directoryDb
+    .prepare("UPDATE companies SET max_users_override = ?, max_attachment_bytes_override = ? WHERE id = ?")
+    .run(maxUsersOverride ?? null, maxAttachmentBytesOverride ?? null, id);
   return getCompany(id);
 }
 

@@ -18,7 +18,7 @@ import {
   deletePrivateBoardsByOwner,
   countUsers,
 } from "../repo.js";
-import { canAddUser, getPlan } from "../plans.js";
+import { canAddUser, maxUsersFor } from "../plans.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -71,7 +71,7 @@ router.post(
 
     const company = directory.getCompany(req.companyId);
     if (!canAddUser(company, countUsers())) {
-      const limite = getPlan(company?.plan).maxUsers;
+      const limite = maxUsersFor(company);
       return res.status(403).json({
         error: `Seu plano permite até ${limite} usuários. Mude de plano para adicionar mais.`,
         code: "PLAN_USER_LIMIT",
@@ -146,7 +146,7 @@ router.post(
     // e-mail já teria entrado no diretório e sobraria lixo a limpar.
     const company = directory.getCompany(req.companyId);
     if (!canAddUser(company, countUsers())) {
-      const limite = getPlan(company?.plan).maxUsers;
+      const limite = maxUsersFor(company);
       return res.status(403).json({
         error: `Seu plano permite até ${limite} usuários. Mude de plano para adicionar mais.`,
         code: "PLAN_USER_LIMIT",

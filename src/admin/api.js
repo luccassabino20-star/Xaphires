@@ -75,6 +75,9 @@ export const criarEmpresa = (dados) => req("/companies", { method: "POST", body:
 export const editarEmpresa = (id, dados) => req(`/companies/${id}`, { method: "PATCH", body: dados });
 export const definirPlano = (id, plan, expiresAt) => req(`/companies/${id}/plan`, { method: "POST", body: { plan, expiresAt } });
 export const bloquear = (id, blocked, reason) => req(`/companies/${id}/block`, { method: "POST", body: { blocked, reason } });
+export const definirDesconto = (id, discountCents) => req(`/companies/${id}/discount`, { method: "POST", body: { discountCents } });
+export const definirLimites = (id, maxUsersOverride, maxAttachmentBytesOverride) =>
+  req(`/companies/${id}/limits`, { method: "POST", body: { maxUsersOverride, maxAttachmentBytesOverride } });
 
 export const verQuadros = (id) => req(`/companies/${id}/boards`);
 export const alterarCartao = (id, cardId, patch) => req(`/companies/${id}/cards/${cardId}`, { method: "PATCH", body: patch });

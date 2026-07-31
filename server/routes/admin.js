@@ -18,7 +18,7 @@ import {
 } from "../admin/auth.js";
 import * as repo from "../repo.js";
 import * as billing from "../billing/store.js";
-import { PLAN_IDS, getPlan, effectiveStatus, daysLeft, addOneMonth } from "../plans.js";
+import { PLAN_IDS, getPlan, effectiveStatus, daysLeft, addOneMonth, maxUsersFor, attachmentLimitFor } from "../plans.js";
 
 const router = Router();
 
@@ -92,7 +92,15 @@ function visaoEmpresa(e) {
     name: e.name,
     plan: e.plan,
     planName: plano.id,
-    maxUsers: plano.maxUsers,
+    // maxUsers/maxAttachmentBytes já vêm com a exceção da empresa aplicada (ver
+    // maxUsersFor/attachmentLimitFor em plans.js); planMaxUsers é o valor cru do
+    // plano, só para a tela poder mostrar "o padrão seria X" ao lado da exceção.
+    maxUsers: maxUsersFor(e),
+    planMaxUsers: plano.maxUsers,
+    maxUsersOverride: e.max_users_override ?? null,
+    maxAttachmentBytes: attachmentLimitFor(e),
+    planMaxAttachmentBytes: plano.maxAttachmentBytes,
+    maxAttachmentBytesOverride: e.max_attachment_bytes_override ?? null,
     status: effectiveStatus(e),
     blocked: !!e.blocked_at,
     blockedAt: e.blocked_at,
@@ -106,6 +114,7 @@ function visaoEmpresa(e) {
     contactPhone: e.contact_phone,
     doc: e.doc,
     notes: e.notes,
+    discountCents: e.discount_cents || 0,
   };
 }
 
@@ -200,6 +209,59 @@ router.post(
       contractedAt: e.plan === plan ? e.contracted_at : new Date().toISOString(),
     });
     auditar(req, "definir_plano", { companyId: e.id, alvo: e.name, detalhe: { de: e.plan, para: plan } });
+    res.json({ company: visaoEmpresa(atualizada) });
+  })
+);
+
+// Desconto fixo negociado por fora, aplicado em toda cobrança futura (ver
+// emitirCobranca em billing/lifecycle.js). Zerar manda discountCents: 0, não
+// omitir o campo - omitir seria "não mexer", zerar é "remover o desconto".
+router.post(
+  "/companies/:id/discount",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    const { discountCents } = req.body || {};
+    if (!Number.isInteger(discountCents) || discountCents < 0) {
+      return res.status(400).json({ error: "Desconto inválido", code: "INVALID_DISCOUNT" });
+    }
+    const atualizada = dir.setCompanyDiscount(req.params.id, discountCents);
+    auditar(req, "definir_desconto", {
+      companyId: e.id,
+      alvo: e.name,
+      detalhe: { de: e.discount_cents || 0, para: discountCents },
+    });
+    res.json({ company: visaoEmpresa(atualizada) });
+  })
+);
+
+// Exceções numéricas por empresa (ver o comentário na coluna, em directory.js).
+// Campo vazio no corpo (null) limpa a exceção; número fixa um teto específico.
+// Sem suporte a "ilimitado por exceção" de propósito - quem precisa disso muda
+// de plano, que já oferece.
+router.post(
+  "/companies/:id/limits",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    const { maxUsersOverride, maxAttachmentBytesOverride } = req.body || {};
+    for (const [nome, valor] of [
+      ["maxUsersOverride", maxUsersOverride],
+      ["maxAttachmentBytesOverride", maxAttachmentBytesOverride],
+    ]) {
+      if (valor !== null && valor !== undefined && (!Number.isInteger(valor) || valor <= 0)) {
+        return res.status(400).json({ error: `${nome} inválido`, code: "INVALID_LIMIT" });
+      }
+    }
+    const atualizada = dir.setCompanyLimits(req.params.id, { maxUsersOverride, maxAttachmentBytesOverride });
+    auditar(req, "definir_limites", {
+      companyId: e.id,
+      alvo: e.name,
+      detalhe: {
+        de: { maxUsers: e.max_users_override, maxAttachmentBytes: e.max_attachment_bytes_override },
+        para: { maxUsers: maxUsersOverride ?? null, maxAttachmentBytes: maxAttachmentBytesOverride ?? null },
+      },
+    });
     res.json({ company: visaoEmpresa(atualizada) });
   })
 );

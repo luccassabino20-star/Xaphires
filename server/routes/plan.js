@@ -13,6 +13,7 @@ import {
   canUseAutoArchive,
   canUseBottleneckMonitor,
   attachmentLimitFor,
+  maxUsersFor,
 } from "../plans.js";
 
 const router = Router();
@@ -22,6 +23,7 @@ function resumo(companyId) {
   const company = getCompany(companyId);
   const plano = getPlan(company?.plan);
   const usuarios = countUsers();
+  const maxUsers = maxUsersFor(company);
   return {
     plan: company?.plan || "basic",
     status: effectiveStatus(company),
@@ -30,11 +32,11 @@ function resumo(companyId) {
     daysLeft: daysLeft(company),
     price: plano.price,
     userCount: usuarios,
-    maxUsers: plano.maxUsers,
-    canAddUser: plano.maxUsers === null || usuarios < plano.maxUsers,
+    maxUsers,
+    canAddUser: maxUsers === null || usuarios < maxUsers,
     canUseAutoArchive: canUseAutoArchive(company?.plan),
     canUseBottleneckMonitor: canUseBottleneckMonitor(company?.plan),
-    maxAttachmentBytes: attachmentLimitFor(company?.plan),
+    maxAttachmentBytes: attachmentLimitFor(company),
     // Catálogo com a decisão de autoatendimento já resolvida no servidor, para o
     // cliente não reimplementar a regra e as duas pontas discordarem.
     catalog: PLAN_IDS.map((id) => ({

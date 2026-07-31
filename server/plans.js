@@ -86,9 +86,18 @@ export function daysLeft(company, now = new Date()) {
   return Math.ceil((new Date(company.expires_at) - now) / 86400000);
 }
 
+// Teto de usuários efetivo: a exceção administrativa da empresa
+// (companies.max_users_override) vence o do plano quando presente. NULL no
+// override significa "sem exceção, usa o do plano" - ver o comentário na coluna,
+// em directory.js, sobre por que não existe um valor de override para "ilimitado".
+export function maxUsersFor(company) {
+  if (company?.max_users_override != null) return company.max_users_override;
+  return getPlan(company?.plan).maxUsers;
+}
+
 // null como limite significa ilimitado, então qualquer contagem cabe.
 export function canAddUser(company, currentUserCount) {
-  const max = getPlan(company?.plan).maxUsers;
+  const max = maxUsersFor(company);
   return max === null || currentUserCount < max;
 }
 
@@ -156,9 +165,13 @@ export function canUseBottleneckMonitor(planId) {
   return getPlan(planId).bottleneckMonitor === true;
 }
 
-// Teto de anexo por plano, em bytes. O gratuito fica com 10 MB e os pagos com 50.
-// Subir para 200 MB é trocar este número: o upload é em streaming e o arquivo
-// nunca fica inteiro na memória, então o limite é política, não restrição técnica.
-export function attachmentLimitFor(planId) {
-  return getPlan(planId).maxAttachmentBytes;
+// Teto de anexo efetivo, em bytes. O gratuito fica com 10 MB e os pagos com 50; a
+// exceção administrativa da empresa (companies.max_attachment_bytes_override)
+// vence esse padrão quando presente, mesma regra de maxUsersFor. Recebe a empresa
+// inteira (não só o id do plano) por causa disso - subir o teto do plano em si
+// continua sendo só trocar o número em DEFINICOES, o upload é em streaming e o
+// arquivo nunca fica inteiro na memória.
+export function attachmentLimitFor(company) {
+  if (company?.max_attachment_bytes_override != null) return company.max_attachment_bytes_override;
+  return getPlan(company?.plan).maxAttachmentBytes;
 }

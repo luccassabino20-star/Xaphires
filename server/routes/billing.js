@@ -113,7 +113,10 @@ router.post(
     // Mesma regra da troca de plano: não deixa contratar um plano pago apertado
     // demais para a equipe atual, senão a empresa pagaria por algo que já nasce
     // bloqueado. countUsers() lê o banco da empresa, e o contexto vem do requireAuth.
-    const limite = getPlan(plan).maxUsers;
+    // A exceção administrativa da empresa (max_users_override) vale por cima do
+    // teto do plano escolhido, porque é da empresa, não do plano - trocar de plano
+    // não devolve o teto ao padrão sozinho.
+    const limite = empresa?.max_users_override ?? getPlan(plan).maxUsers;
     const usuarios = await countUsers();
     if (limite !== null && usuarios > limite) {
       return res.status(400).json({

@@ -18,6 +18,11 @@ function Detalhe({ id, onFechar, onMudou }) {
   const [quadros, setQuadros] = useState(null);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState(null);
+  const [desconto, setDesconto] = useState("");
+  const [salvandoDesconto, setSalvandoDesconto] = useState(false);
+  const [limiteUsuarios, setLimiteUsuarios] = useState("");
+  const [limiteAnexoMb, setLimiteAnexoMb] = useState("");
+  const [salvandoLimites, setSalvandoLimites] = useState(false);
 
   const carregar = useCallback(async () => {
     try {
@@ -31,6 +36,13 @@ function Detalhe({ id, onFechar, onMudou }) {
         doc: d.company.doc || "",
         notes: d.company.notes || "",
       });
+      // Centavos -> reais só para exibir; a conversão de volta é feita ao salvar,
+      // igual ao padrão de plans.js (nunca soma/subtrai o decimal).
+      setDesconto(d.company.discountCents ? String(d.company.discountCents / 100) : "");
+      setLimiteUsuarios(d.company.maxUsersOverride != null ? String(d.company.maxUsersOverride) : "");
+      setLimiteAnexoMb(
+        d.company.maxAttachmentBytesOverride != null ? String(Math.round(d.company.maxAttachmentBytesOverride / (1024 * 1024))) : ""
+      );
     } catch (e) {
       setErro(e.message);
     }
@@ -50,6 +62,46 @@ function Detalhe({ id, onFechar, onMudou }) {
       setErro(e.message);
     } finally {
       setSalvando(false);
+    }
+  }
+
+  async function salvarDesconto() {
+    const reais = parseFloat((desconto || "0").replace(",", "."));
+    if (Number.isNaN(reais) || reais < 0) {
+      setErro("Desconto inválido");
+      return;
+    }
+    setSalvandoDesconto(true);
+    try {
+      await api.definirDesconto(id, Math.round(reais * 100));
+      await carregar();
+      onMudou?.();
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setSalvandoDesconto(false);
+    }
+  }
+
+  async function salvarLimites() {
+    // Campo vazio -> null -> limpa a exceção e volta a valer o teto do plano.
+    // Preenchido tem que ser inteiro positivo - não existe exceção para
+    // "ilimitado" nem para "zero usuários" (ver o comentário na coluna).
+    const usuarios = limiteUsuarios.trim() === "" ? null : parseInt(limiteUsuarios, 10);
+    const anexoMb = limiteAnexoMb.trim() === "" ? null : parseInt(limiteAnexoMb, 10);
+    if ((usuarios !== null && (!Number.isInteger(usuarios) || usuarios <= 0)) || (anexoMb !== null && (!Number.isInteger(anexoMb) || anexoMb <= 0))) {
+      setErro("Limite inválido");
+      return;
+    }
+    setSalvandoLimites(true);
+    try {
+      await api.definirLimites(id, usuarios, anexoMb !== null ? anexoMb * 1024 * 1024 : null);
+      await carregar();
+      onMudou?.();
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setSalvandoLimites(false);
     }
   }
 
@@ -174,6 +226,60 @@ function Detalhe({ id, onFechar, onMudou }) {
         </div>
         <button className={"adm-btn " + (c.blocked ? "adm-btn-primario" : "adm-btn-perigo")} onClick={alternarBloqueio}>
           {c.blocked ? "Desbloquear empresa" : "Bloquear empresa"}
+        </button>
+
+        <div className="adm-grade2" style={{ marginTop: 14 }}>
+          <label className="adm-campo">
+            <span>Desconto fixo mensal (R$)</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="0,00"
+              value={desconto}
+              onChange={(e) => setDesconto(e.target.value)}
+            />
+          </label>
+        </div>
+        <p className="adm-fraco">
+          Aplicado como desconto do Asaas em cima do preço de tabela em toda cobrança futura (Pix e boleto). Zerar
+          remove o desconto.
+        </p>
+        <button className="adm-btn adm-btn-primario" onClick={salvarDesconto} disabled={salvandoDesconto}>
+          {salvandoDesconto ? "Salvando..." : "Salvar desconto"}
+        </button>
+      </div>
+
+      <div className="adm-secao">
+        <h3>Exceções de limite</h3>
+        <p className="adm-fraco">
+          Por padrão do plano {NOMES[c.plan]}: {c.planMaxUsers === null ? "usuários ilimitados" : `até ${c.planMaxUsers} usuários`},
+          anexos até {(c.planMaxAttachmentBytes / (1024 * 1024)).toFixed(0)} MB. Preencher aqui sobrepõe só esta
+          empresa; deixar em branco volta a valer o padrão do plano.
+        </p>
+        <div className="adm-grade2">
+          <label className="adm-campo">
+            <span>Máximo de usuários</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder={c.planMaxUsers === null ? "ilimitado" : String(c.planMaxUsers)}
+              value={limiteUsuarios}
+              onChange={(e) => setLimiteUsuarios(e.target.value)}
+            />
+          </label>
+          <label className="adm-campo">
+            <span>Máximo de anexo (MB)</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder={String(Math.round(c.planMaxAttachmentBytes / (1024 * 1024)))}
+              value={limiteAnexoMb}
+              onChange={(e) => setLimiteAnexoMb(e.target.value)}
+            />
+          </label>
+        </div>
+        <button className="adm-btn adm-btn-primario" onClick={salvarLimites} disabled={salvandoLimites}>
+          {salvandoLimites ? "Salvando..." : "Salvar exceções"}
         </button>
       </div>
 

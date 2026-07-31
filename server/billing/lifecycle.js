@@ -131,6 +131,14 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
     err.code = "PLAN_NOT_CHARGEABLE";
     throw err;
   }
+  // Desconto fixo negociado por fora (companies.discount_cents, ver directory.js).
+  // Vai como discount na cobrança do Asaas em cima do preço de tabela, não
+  // subtraído aqui - o boleto/Pix precisa mostrar os dois valores, não só o líquido.
+  // O que esta função registra localmente em amountCents É o líquido, porque é o
+  // que a empresa de fato paga; o preço de tabela sem desconto some deste ponto em
+  // diante e só existe para o gateway montar o documento.
+  const descontoCentavos = Math.min(getCompany(companyId)?.discount_cents || 0, centavos);
+  const centavosLiquidos = centavos - descontoCentavos;
 
   const inicio = periodStart || nowIso();
   const tentativa = attempt || 1;
@@ -145,6 +153,7 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
   const paymentId = uid();
   const resposta = await gateway.criarCobranca({
     amountCents: centavos,
+    discountCents: descontoCentavos,
     method,
     plan,
     companyId,
@@ -162,7 +171,7 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
     companyId,
     subscriptionId,
     plan,
-    amountCents: centavos,
+    amountCents: centavosLiquidos,
     method,
     provider: gateway.nome,
     providerChargeId: resposta.providerChargeId,

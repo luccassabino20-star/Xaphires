@@ -75,7 +75,7 @@ router.post(
 // demais é abortado no meio, em vez de ser recebido por completo para só então
 // ser recusado.
 router.post("/:id/attachments/file", (req, res) => {
-  const limite = attachmentLimitFor(getCompany(req.companyId)?.plan);
+  const limite = attachmentLimitFor(getCompany(req.companyId));
   const alvo = repo.newAttachmentTarget();
 
   let bb;

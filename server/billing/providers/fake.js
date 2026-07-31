@@ -46,7 +46,10 @@ export const fake = {
   // renovação e cancelamento exercitáveis em desenvolvimento, pela varredura normal.
   renovaCartaoSozinho: false,
 
-  async criarCobranca({ amountCents, method, plan, companyId, card }) {
+  // discountCents aceito só para a assinatura bater com o provedor real - o
+  // simulado não gera documento nenhum de verdade, então não há onde mostrar um
+  // desconto separado do valor líquido.
+  async criarCobranca({ amountCents, discountCents, method, plan, companyId, card }) {
     const chargeId = id("chg");
 
     if (method === "card") {
