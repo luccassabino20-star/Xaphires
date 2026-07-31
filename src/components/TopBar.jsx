@@ -4,10 +4,12 @@ import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { useUsers } from "../state/UsersContext.jsx";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
+import { useChat } from "../state/ChatContext.jsx";
 import { initials, colorForUser } from "../utils/members.js";
 import AccountMenu from "./AccountMenu.jsx";
 import UsersPanel from "./UsersPanel.jsx";
 import ShareBoardModal from "./ShareBoardModal.jsx";
+import ChatModal from "./ChatModal.jsx";
 import DataMenu from "./DataMenu.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
@@ -18,6 +20,7 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
   const { users } = useUsers();
   const { user } = useAuth();
   const showToast = useToast();
+  const { open: chatOpen, totalUnread, openChat, closeChat } = useChat();
   const [title, setTitle] = useState(board?.title || "");
   const [usersPanelOpen, setUsersPanelOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -128,6 +131,12 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
         <button className="btn-ghost" onClick={clearBoard} disabled={!board || readOnly}>
           {t("app.topbar.clearBoard")}
         </button>
+        <button className="icon-btn chat-toggle-btn" onClick={openChat} title={t("chat.title")} aria-label={t("chat.title")}>
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M4 4h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8l-4.4 3.3A.5.5 0 0 1 3 21V5a1 1 0 0 1 1-1z" />
+          </svg>
+          {totalUnread > 0 && <span className="chat-unread-badge">{totalUnread > 9 ? "9+" : totalUnread}</span>}
+        </button>
         <LanguageSwitcher />
         <ThemeToggle />
         <DataMenu board={board} onSelectBoard={onSelectBoard} />
@@ -135,6 +144,7 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
       </div>
       {usersPanelOpen && <UsersPanel onClose={() => setUsersPanelOpen(false)} />}
       {shareOpen && board && <ShareBoardModal board={board} onClose={() => setShareOpen(false)} />}
+      {chatOpen && <ChatModal onClose={closeChat} />}
     </header>
   );
 }

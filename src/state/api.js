@@ -164,6 +164,21 @@ export const createMinute = (data) => request("/minutes", { method: "POST", body
 export const updateMinute = (id, patch) => request(`/minutes/${id}`, { method: "PATCH", body: patch });
 export const deleteMinute = (id) => request(`/minutes/${id}`, { method: "DELETE" });
 
+// ---------- Chat ----------
+export const listChatConversations = () => request("/chat/conversations");
+export const createChatConversation = (userId) => request("/chat/conversations", { method: "POST", body: { userId } });
+export const listChatMessages = (conversationId, afterId) => {
+  const params = new URLSearchParams();
+  if (conversationId) params.set("conversationId", conversationId);
+  if (afterId) params.set("after", afterId);
+  const qs = params.toString();
+  return request(`/chat/messages${qs ? `?${qs}` : ""}`);
+};
+export const sendChatMessage = (body, conversationId) =>
+  request("/chat/messages", { method: "POST", body: { body, conversationId } });
+export const markChatRead = (conversationId, lastMessageId) =>
+  request("/chat/read", { method: "POST", body: { conversationId, lastMessageId } });
+
 // ---------- Plano ----------
 // Cache curto do resumo do plano. CardModal, ArchiveModal e ListMenu consultam
 // isto de forma independente ao abrir, e sem cache eram três requisições iguais

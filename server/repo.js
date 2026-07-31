@@ -554,6 +554,157 @@ export function deleteMinute(id) {
   getDb().prepare("DELETE FROM minutes WHERE id = ?").run(id);
 }
 
+// ---------- Chat (geral da empresa + conversas privadas) ----------
+// O geral é sem quadro nem canal, mesmo alcance de quem vê o quadro compartilhado.
+// Conversas privadas são sempre a dois. MAX_CHAT_BODY_LENGTH espelha o limite
+// validado em routes/chat.js.
+export const MAX_CHAT_BODY_LENGTH = 2000;
+const CHAT_HISTORY_LIMIT = 200;
+// Chave de chat_reads para o geral - texto estável, nunca colide com um id de
+// conversa (uid() gera UUID, não essa palavra).
+const GENERAL_CHAT_KEY = "general";
+
+function publicChatMessage(row) {
+  return {
+    id: row.id,
+    authorId: row.author_id,
+    conversationId: row.conversation_id,
+    body: row.body,
+    createdAt: row.created_at,
+  };
+}
+
+function chatScope(conversationId) {
+  return conversationId ? { clause: "conversation_id = ?", params: [conversationId] } : { clause: "conversation_id IS NULL", params: [] };
+}
+
+// O cursor de paginação é o rowid implícito da tabela, não created_at: duas
+// mensagens no mesmo milissegundo (poll rápido, dois usuários digitando juntos)
+// empatariam no timestamp, e ">" estrito faria uma delas sumir do próximo poll.
+// rowid nunca empata, porque cresce por inserção. Não há rota de exclusão de
+// mensagem — se um dia existir, um afterId apagado passa a devolver lista vazia
+// para sempre, e este comentário é o aviso de que o cursor precisa mudar junto.
+export function listChatMessages({ conversationId, afterId } = {}) {
+  const db = getDb();
+  const { clause, params } = chatScope(conversationId);
+  if (afterId) {
+    return db
+      .prepare(
+        `SELECT * FROM chat_messages WHERE ${clause} AND rowid > (SELECT rowid FROM chat_messages WHERE id = ?) ORDER BY rowid ASC`
+      )
+      .all(...params, afterId)
+      .map(publicChatMessage);
+  }
+  const rows = db
+    .prepare(`SELECT * FROM chat_messages WHERE ${clause} ORDER BY rowid DESC LIMIT ?`)
+    .all(...params, CHAT_HISTORY_LIMIT);
+  return rows.reverse().map(publicChatMessage);
+}
+
+export function createChatMessage({ authorId, body, conversationId }) {
+  const id = uid();
+  const createdAt = nowIso();
+  getDb()
+    .prepare("INSERT INTO chat_messages (id, author_id, conversation_id, body, created_at) VALUES (?, ?, ?, ?, ?)")
+    .run(id, authorId || null, conversationId || null, body, createdAt);
+  return publicChatMessage({
+    id,
+    author_id: authorId || null,
+    conversation_id: conversationId || null,
+    body,
+    created_at: createdAt,
+  });
+}
+
+// user_a_id < user_b_id sempre, para "A conversando com B" e "B conversando com A"
+// caírem na mesma linha em vez de criar duas conversas para o mesmo par.
+function normalizedPair(userId, otherUserId) {
+  return userId < otherUserId ? [userId, otherUserId] : [otherUserId, userId];
+}
+
+export function getOrCreateDirectConversation(userId, otherUserId) {
+  const db = getDb();
+  const [a, b] = normalizedPair(userId, otherUserId);
+  const existing = db.prepare("SELECT id FROM chat_conversations WHERE user_a_id = ? AND user_b_id = ?").get(a, b);
+  if (existing) return existing.id;
+  const id = uid();
+  db.prepare("INSERT INTO chat_conversations (id, user_a_id, user_b_id, created_at) VALUES (?, ?, ?, ?)").run(id, a, b, nowIso());
+  return id;
+}
+
+function getConversationById(id) {
+  return getDb().prepare("SELECT * FROM chat_conversations WHERE id = ?").get(id) || null;
+}
+
+// Autorização de leitura/escrita de uma conversa privada: só quem é um dos dois
+// participantes. Chamado pela rota antes de qualquer GET/POST com conversationId.
+export function isConversationParticipant(conversationId, userId) {
+  const c = getConversationById(conversationId);
+  return !!c && (c.user_a_id === userId || c.user_b_id === userId);
+}
+
+function chatKeyFor(conversationId) {
+  return conversationId || GENERAL_CHAT_KEY;
+}
+
+export function markChatRead(userId, conversationId, lastMessageId) {
+  getDb()
+    .prepare(
+      `INSERT INTO chat_reads (user_id, conversation_key, last_read_message_id, updated_at) VALUES (?, ?, ?, ?)
+       ON CONFLICT(user_id, conversation_key)
+       DO UPDATE SET last_read_message_id = excluded.last_read_message_id, updated_at = excluded.updated_at`
+    )
+    .run(userId, chatKeyFor(conversationId), lastMessageId || null, nowIso());
+}
+
+function unreadCountFor(db, userId, conversationId) {
+  const { clause, params } = chatScope(conversationId);
+  const read = db
+    .prepare("SELECT last_read_message_id FROM chat_reads WHERE user_id = ? AND conversation_key = ?")
+    .get(userId, chatKeyFor(conversationId));
+  if (!read?.last_read_message_id) {
+    return db.prepare(`SELECT COUNT(*) c FROM chat_messages WHERE ${clause}`).get(...params).c;
+  }
+  return db
+    .prepare(`SELECT COUNT(*) c FROM chat_messages WHERE ${clause} AND rowid > (SELECT rowid FROM chat_messages WHERE id = ?)`)
+    .get(...params, read.last_read_message_id).c;
+}
+
+function lastMessageFor(db, conversationId) {
+  const { clause, params } = chatScope(conversationId);
+  const row = db.prepare(`SELECT * FROM chat_messages WHERE ${clause} ORDER BY rowid DESC LIMIT 1`).get(...params);
+  return row ? publicChatMessage(row) : null;
+}
+
+// Lista as conversas do usuário para a barra lateral do chat: o geral sempre entra,
+// em seguida as privadas em que ele é um dos dois participantes. O geral fica
+// fixo no topo (como um canal fixo); as privadas vêm ordenadas pela mensagem mais
+// recente, para a conversa ativa subir como numa caixa de entrada comum.
+export function listConversationsFor(userId) {
+  const db = getDb();
+  const directs = db.prepare("SELECT * FROM chat_conversations WHERE user_a_id = ? OR user_b_id = ?").all(userId, userId);
+
+  const general = {
+    id: null,
+    kind: "general",
+    otherUserId: null,
+    lastMessage: lastMessageFor(db, null),
+    unreadCount: unreadCountFor(db, userId, null),
+  };
+
+  const directItems = directs
+    .map((c) => ({
+      id: c.id,
+      kind: "direct",
+      otherUserId: c.user_a_id === userId ? c.user_b_id : c.user_a_id,
+      lastMessage: lastMessageFor(db, c.id),
+      unreadCount: unreadCountFor(db, userId, c.id),
+    }))
+    .sort((x, y) => (y.lastMessage?.createdAt || "").localeCompare(x.lastMessage?.createdAt || ""));
+
+  return [general, ...directItems];
+}
+
 // Um cartão isolado, para o painel de plataforma poder registrar o antes e o depois
 // de uma correção de suporte.
 export function getCardById(id) {

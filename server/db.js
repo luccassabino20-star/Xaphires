@@ -119,6 +119,50 @@ function applySchema(companyDb) {
       action_items TEXT NOT NULL DEFAULT '[]',
       created_at TEXT NOT NULL
     );
+
+    -- Uma conversa privada é sempre entre exatamente dois usuários da empresa.
+    -- user_a_id < user_b_id por convenção (normalizado em repo.js), para o índice
+    -- único enxergar "A com B" e "B com A" como a mesma linha. Excluir qualquer um
+    -- dos dois apaga a conversa inteira (CASCADE) - é dado privado dos dois, não
+    -- histórico da empresa como o chat geral, então não faz sentido sobreviver ao
+    -- usuário como o chat geral faz com author_id SET NULL.
+    CREATE TABLE IF NOT EXISTS chat_conversations (
+      id TEXT PRIMARY KEY,
+      user_a_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      user_b_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_chat_conversations_pair ON chat_conversations(user_a_id, user_b_id);
+
+    -- O chat geral da empresa (todo mundo vê e escreve, sem convite - mesmo alcance
+    -- do quadro compartilhado) e as conversas privadas moram na mesma tabela.
+    -- conversation_id NULL é o geral; preenchido é uma linha de chat_conversations.
+    -- author_id some (SET NULL) se o usuário for excluído - no geral a mensagem
+    -- sobrevive como histórico da empresa; numa privada isso não chega a acontecer,
+    -- porque excluir o usuário já apaga a conversa inteira via chat_conversations.
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id TEXT PRIMARY KEY,
+      author_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+      conversation_id TEXT REFERENCES chat_conversations(id) ON DELETE CASCADE,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_chat_messages_created ON chat_messages(created_at);
+    CREATE INDEX IF NOT EXISTS idx_chat_messages_conversation ON chat_messages(conversation_id);
+
+    -- Até onde cada usuário já leu, por conversa. conversation_key é "general" para
+    -- o chat geral (chave estável em texto, não NULL - NULL em PRIMARY KEY composta
+    -- do SQLite não deduplica do jeito que se espera) ou o id da conversa privada.
+    -- Existe para o contador de não lidas sobreviver a um recarregamento de página -
+    -- sem isso, era estado só de sessão, e reabrir o app sempre mostraria tudo como
+    -- lido ou tudo como não lido.
+    CREATE TABLE IF NOT EXISTS chat_reads (
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      conversation_key TEXT NOT NULL,
+      last_read_message_id TEXT,
+      updated_at TEXT NOT NULL,
+      PRIMARY KEY (user_id, conversation_key)
+    );
   `);
 
   addColumnIfMissing(companyDb, "cards", "completed", "completed INTEGER NOT NULL DEFAULT 0");
@@ -149,6 +193,10 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "lists", "stuck_hours", "stuck_hours INTEGER");
   // Dias até arquivar um concluído. NULL = regra desligada, que é o padrão.
   addColumnIfMissing(companyDb, "boards", "auto_archive_days", "auto_archive_days INTEGER");
+  // chat_messages nasceu só com o chat geral; conversation_id chegou depois para
+  // separar as conversas privadas sem duplicar a tabela. NULL preserva as mensagens
+  // do geral já gravadas antes desta coluna existir.
+  addColumnIfMissing(companyDb, "chat_messages", "conversation_id", "conversation_id TEXT REFERENCES chat_conversations(id) ON DELETE CASCADE");
 
   // Cartões já concluídos antes desta coluna existir não têm data. Preenche com o
   // instante da migração, para o relógio deles começar agora: quem ligar a regra

@@ -983,6 +983,17 @@
       "saveChanges": "Salvar alterações"
     }
   },
+  "chat": {
+    "title": "Bate-papo da empresa",
+    "you": "Você",
+    "unknownAuthor": "Usuário removido",
+    "empty": "Nenhuma mensagem ainda. Comece a conversa.",
+    "placeholder": "Escreva uma mensagem...",
+    "send": "Enviar",
+    "generalTitle": "Geral",
+    "newConversation": "+ Nova conversa",
+    "noCandidates": "Ninguém mais para chamar"
+  },
   "users": {
     "title": "Painel de usuários",
     "you": " (você)",
@@ -1173,6 +1184,11 @@
     "CNPJ_IN_USE": "Esse CNPJ ou CPF já está em uso por outra empresa",
     "JOIN_REQUEST_PENDING": "Já existe uma solicitação pendente para este e-mail",
     "JOIN_REQUEST_NOT_FOUND": "Solicitação não encontrada",
+    "CHAT_MESSAGE_REQUIRED": "Escreva uma mensagem antes de enviar",
+    "CHAT_MESSAGE_TOO_LONG": "Mensagem muito longa",
+    "CHAT_USER_REQUIRED": "Selecione outro usuário",
+    "CHAT_USER_NOT_FOUND": "Usuário não encontrado",
+    "FORBIDDEN_CHAT_CONVERSATION": "Você não participa desta conversa",
     "TOO_MANY_CNPJ_LOOKUPS": "Muitas buscas por CNPJ a partir deste endereço. Tente novamente mais tarde.",
     "TOO_MANY_JOIN_REQUESTS": "Muitas solicitações a partir deste endereço. Tente novamente mais tarde.",
     "PASSWORD_TOO_SHORT": "A nova senha deve ter ao menos 6 caracteres",

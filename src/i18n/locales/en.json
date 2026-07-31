@@ -667,6 +667,17 @@
       "saveChanges": "Save changes"
     }
   },
+  "chat": {
+    "title": "Company chat",
+    "you": "You",
+    "unknownAuthor": "Removed user",
+    "empty": "No messages yet. Start the conversation.",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "generalTitle": "General",
+    "newConversation": "+ New conversation",
+    "noCandidates": "No one else to add"
+  },
   "users": {
     "title": "Users panel",
     "you": " (you)",
@@ -857,6 +868,11 @@
     "CNPJ_IN_USE": "That CNPJ or CPF is already used by another company",
     "JOIN_REQUEST_PENDING": "There's already a pending request for this email",
     "JOIN_REQUEST_NOT_FOUND": "Request not found",
+    "CHAT_MESSAGE_REQUIRED": "Write a message before sending",
+    "CHAT_MESSAGE_TOO_LONG": "Message is too long",
+    "CHAT_USER_REQUIRED": "Select another user",
+    "CHAT_USER_NOT_FOUND": "User not found",
+    "FORBIDDEN_CHAT_CONVERSATION": "You're not part of this conversation",
     "TOO_MANY_CNPJ_LOOKUPS": "Too many CNPJ lookups from this address. Try again later.",
     "TOO_MANY_JOIN_REQUESTS": "Too many requests from this address. Try again later.",
     "PASSWORD_TOO_SHORT": "The new password must be at least 6 characters",
