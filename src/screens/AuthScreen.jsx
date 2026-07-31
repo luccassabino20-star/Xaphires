@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
 import { translateError } from "../utils/errors.js";
-import { normalizarDoc, formatarDoc, cnpjValido } from "../utils/doc.js";
+import { normalizarDoc, formatarDoc, docValido } from "../utils/doc.js";
 import { getCompanyByCnpj, sendJoinRequest } from "../state/api.js";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import LandingThemeToggle from "../components/LandingThemeToggle.jsx";
@@ -31,7 +31,7 @@ function JoinForm({ onDone }) {
     e.preventDefault();
     setCnpjError("");
     const digits = normalizarDoc(cnpjInput);
-    if (!cnpjValido(digits)) {
+    if (!docValido(digits)) {
       setCnpjError(t("errors.CNPJ_INVALID"));
       return;
     }
@@ -84,7 +84,6 @@ function JoinForm({ onDone }) {
           <input
             type="text"
             inputMode="numeric"
-            placeholder={t("auth.cnpjPlaceholder")}
             value={cnpjInput}
             onChange={(e) => setCnpjInput(formatarDoc(e.target.value))}
             required
@@ -136,6 +135,7 @@ export default function AuthScreen({ onBack }) {
   const { login, registerCompany } = useAuth();
   const [mode, setMode] = useState("login"); // "login" | "signup" | "join"
   const [companyName, setCompanyName] = useState("");
+  const [companyDoc, setCompanyDoc] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -150,12 +150,16 @@ export default function AuthScreen({ onBack }) {
       setError(t("auth.passwordsMismatch"));
       return;
     }
+    if (mode === "signup" && !docValido(normalizarDoc(companyDoc))) {
+      setError(t("errors.CNPJ_INVALID"));
+      return;
+    }
     setSubmitting(true);
     try {
       if (mode === "login") {
         await login({ email, password });
       } else {
-        await registerCompany({ companyName, name, email, password });
+        await registerCompany({ companyName, name, email, password, cnpj: normalizarDoc(companyDoc) });
       }
     } catch (err) {
       setError(translateError(err, t));
@@ -181,7 +185,7 @@ export default function AuthScreen({ onBack }) {
         </button>
       )}
       <div className="auth-brand">
-        <div className="auth-brand-icon">C</div>
+        <div className="auth-brand-icon">X</div>
         <h1>{t("auth.brandTitle")}</h1>
         <p>{t("auth.brandText")}</p>
       </div>
@@ -213,6 +217,16 @@ export default function AuthScreen({ onBack }) {
                       onChange={(e) => setCompanyName(e.target.value)}
                       required
                       autoFocus
+                    />
+                  </label>
+                  <label className="auth-field">
+                    <span>{t("auth.companyDocLabel")}</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={companyDoc}
+                      onChange={(e) => setCompanyDoc(formatarDoc(e.target.value))}
+                      required
                     />
                   </label>
                   <label className="auth-field">

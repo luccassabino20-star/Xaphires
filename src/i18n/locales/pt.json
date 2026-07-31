@@ -24,7 +24,7 @@
   },
   "landing": {
     "nav": {
-      "brand": "Cantiere",
+      "brand": "Xaphires",
       "home": "Início",
       "features": "Recursos",
       "solutions": "Soluções",
@@ -38,7 +38,7 @@
     },
     "home": {
       "heroTitle": "Sua equipe organizada, sem esforço extra",
-      "heroText": "O Cantiere substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
+      "heroText": "O Xaphires substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
       "ctaStart": "Comece agora",
       "ctaPlans": "Ver planos",
       "heroNote": "Sem burocracia. Cancele quando quiser.",
@@ -74,19 +74,19 @@
           "text": "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis."
         }
       ],
-      "exploreTitle": "Explore o Cantiere",
+      "exploreTitle": "Explore o Xaphires",
       "exploreLinks": [
         {
           "page": "features",
           "badge": "R",
           "title": "Recursos",
-          "text": "Conheça as ferramentas do Cantiere: quadro, tabela, calendário, mapa e mais."
+          "text": "Conheça as ferramentas do Xaphires: quadro, tabela, calendário, mapa e mais."
         },
         {
           "page": "solutions",
           "badge": "S",
           "title": "Soluções",
-          "text": "Veja como times de projeto, campo, gestão e operações usam o Cantiere no dia a dia."
+          "text": "Veja como times de projeto, campo, gestão e operações usam o Xaphires no dia a dia."
         },
         {
           "page": "pricing",
@@ -97,7 +97,7 @@
       ]
     },
     "features": {
-      "automationsTitle": "O que o Cantiere faz sozinho",
+      "automationsTitle": "O que o Xaphires faz sozinho",
       "automationsText": "Automações que trabalham em segundo plano, para você não precisar lembrar nem cobrar na mão.",
       "automations": [
         {
@@ -188,7 +188,7 @@
     },
     "solutions": {
       "headerTitle": "Soluções para cada tipo de equipe",
-      "headerText": "O mesmo Cantiere, organizado do jeito que cada time precisa trabalhar.",
+      "headerText": "O mesmo Xaphires, organizado do jeito que cada time precisa trabalhar.",
       "items": [
         {
           "title": "Agências e times de projeto",
@@ -440,12 +440,12 @@
       "title": "Pronto para organizar sua equipe?",
       "cta": "Comece agora",
       "privacy": "Política de Privacidade",
-      "copyright": "Direitos autorais © 2026 Cantiere"
+      "copyright": "Direitos autorais © 2026 Xaphires"
     },
     "privacy": {
       "backLink": "← Voltar",
       "headerTitle": "Política de Privacidade",
-      "headerText": "Como o Cantiere coleta, usa, armazena e protege os dados da sua equipe.",
+      "headerText": "Como o Xaphires coleta, usa, armazena e protege os dados da sua equipe.",
       "updatedLabel": "Última atualização",
       "updatedDate": "25 de julho de 2026",
       "sections": [
@@ -531,7 +531,7 @@
         {
           "title": "8. Crianças e adolescentes",
           "paragraphs": [
-            "O Cantiere é uma ferramenta corporativa, destinada ao uso profissional. Não direcionamos o serviço a menores de 18 anos e não coletamos intencionalmente dados de crianças. Cadastros identificados nessas condições serão removidos."
+            "O Xaphires é uma ferramenta corporativa, destinada ao uso profissional. Não direcionamos o serviço a menores de 18 anos e não coletamos intencionalmente dados de crianças. Cadastros identificados nessas condições serão removidos."
           ]
         },
         {
@@ -556,7 +556,7 @@
     }
   },
   "auth": {
-    "brandTitle": "Cantiere",
+    "brandTitle": "Xaphires",
     "brandText": "Organize seus projetos em quadros Kanban simples, rápidos e colaborativos.",
     "back": "← Voltar",
     "tabLogin": "Entrar",
@@ -571,13 +571,13 @@
     "submitWait": "Aguarde...",
     "submitLogin": "Entrar",
     "submitSignup": "Criar empresa",
-    "joinIntro": "Sua empresa já usa o Cantiere? Informe o CNPJ dela para pedir acesso.",
-    "cnpjLabel": "CNPJ da empresa",
-    "cnpjPlaceholder": "00.000.000/0000-00",
+    "companyDocLabel": "CNPJ ou CPF da empresa",
+    "joinIntro": "Sua empresa já usa o Xaphires? Informe o CNPJ ou CPF dela para pedir acesso.",
+    "cnpjLabel": "CNPJ ou CPF da empresa",
     "cnpjSearch": "Buscar",
     "cnpjSearching": "Buscando...",
     "companyFound": "Empresa encontrada: {{name}}",
-    "notThisCompany": "Não é essa empresa? Trocar CNPJ",
+    "notThisCompany": "Não é essa empresa? Trocar CNPJ/CPF",
     "joinSubmit": "Enviar pedido",
     "joinSubmitWait": "Enviando...",
     "joinSuccessTitle": "Pedido enviado!",
@@ -1009,9 +1009,8 @@
     "userDeletedToast": "Usuário excluído",
     "passwordResetToast": "Senha redefinida",
     "passwordMinLength": "A nova senha deve ter ao menos 6 caracteres",
-    "companyCnpjLabel": "CNPJ da empresa",
+    "companyCnpjLabel": "CNPJ ou CPF da empresa",
     "companyCnpjHint": "Quem quiser pedir acesso à sua empresa vai precisar digitar esse número.",
-    "companyCnpjPlaceholder": "00.000.000/0000-00",
     "companyCnpjSave": "Salvar",
     "companyCnpjSaved": "CNPJ salvo",
     "joinRequestsTitle": "Pedidos de acesso",
@@ -1169,9 +1168,9 @@
     "EMAIL_ALREADY_REGISTERED": "E-mail já cadastrado",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "E-mail já cadastrado (pode já pertencer a outra empresa)",
     "INVALID_CREDENTIALS": "E-mail ou senha inválidos",
-    "CNPJ_INVALID": "CNPJ inválido",
-    "COMPANY_NOT_FOUND": "Nenhuma empresa encontrada com esse CNPJ",
-    "CNPJ_IN_USE": "Esse CNPJ já está em uso por outra empresa",
+    "CNPJ_INVALID": "CNPJ ou CPF inválido",
+    "COMPANY_NOT_FOUND": "Nenhuma empresa encontrada com esse CNPJ ou CPF",
+    "CNPJ_IN_USE": "Esse CNPJ ou CPF já está em uso por outra empresa",
     "JOIN_REQUEST_PENDING": "Já existe uma solicitação pendente para este e-mail",
     "JOIN_REQUEST_NOT_FOUND": "Solicitação não encontrada",
     "TOO_MANY_CNPJ_LOOKUPS": "Muitas buscas por CNPJ a partir deste endereço. Tente novamente mais tarde.",

@@ -158,7 +158,6 @@ export default function UsersPanel({ onClose }) {
                 type="text"
                 className="modal-date"
                 inputMode="numeric"
-                placeholder={t("users.companyCnpjPlaceholder")}
                 value={cnpjInput}
                 onChange={(e) => setCnpjInput(formatarDoc(e.target.value))}
               />

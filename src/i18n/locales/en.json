@@ -24,7 +24,7 @@
   },
   "landing": {
     "nav": {
-      "brand": "Cantiere",
+      "brand": "Xaphires",
       "home": "Home",
       "features": "Features",
       "solutions": "Solutions",
@@ -38,7 +38,7 @@
     },
     "home": {
       "heroTitle": "Your team organized, with no extra effort",
-      "heroText": "Cantiere replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
+      "heroText": "Xaphires replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
       "ctaStart": "Get started",
       "ctaPlans": "See plans",
       "heroNote": "No red tape. Cancel anytime.",
@@ -53,15 +53,15 @@
         { "title": "Your team already gets it", "text": "Simple interface, no training needed. Anyone who's used a Kanban board starts using it in minutes." },
         { "title": "Grows with you", "text": "From a small team to multiple departments, with private and shared boards, access control and roles." }
       ],
-      "exploreTitle": "Explore Cantiere",
+      "exploreTitle": "Explore Xaphires",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Cantiere's tools: board, table, calendar, map and more." },
-        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Cantiere day to day." },
+        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Xaphires's tools: board, table, calendar, map and more." },
+        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Xaphires day to day." },
         { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Basic, Professional and Enterprise plans and pick the right one for your team." }
       ]
     },
     "features": {
-      "automationsTitle": "What Cantiere does on its own",
+      "automationsTitle": "What Xaphires does on its own",
       "automationsText": "Automations running in the background, so you don't have to remember or chase things by hand.",
       "automations": [
         { "badge": "A", "title": "Card archiving", "text": "Take finished work off the board without deleting it. Archived cards leave every view and return to their original column whenever you want." },
@@ -90,7 +90,7 @@
     },
     "solutions": {
       "headerTitle": "Solutions for every kind of team",
-      "headerText": "The same Cantiere, organized the way each team needs to work.",
+      "headerText": "The same Xaphires, organized the way each team needs to work.",
       "items": [
         { "title": "Agencies and project teams", "text": "One board per client or project, with a timeline for deadlines and a dashboard ready to show progress in meetings.", "tags": ["Kanban board", "Timeline", "Dashboard"] },
         { "title": "Field teams", "text": "Tasks with addresses plotted on the map. Ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
@@ -138,7 +138,7 @@
     "privacy": {
       "backLink": "← Back",
       "headerTitle": "Privacy Policy",
-      "headerText": "How Cantiere collects, uses, stores and protects your team's data.",
+      "headerText": "How Xaphires collects, uses, stores and protects your team's data.",
       "updatedLabel": "Last updated",
       "updatedDate": "July 25, 2026",
       "sections": [
@@ -211,7 +211,7 @@
         },
         {
           "title": "8. Our policy towards children",
-          "paragraphs": ["Cantiere is a corporate tool intended for professional use. We do not direct the service to anyone under 18 and do not knowingly collect children's data. Accounts identified in those conditions will be removed."]
+          "paragraphs": ["Xaphires is a corporate tool intended for professional use. We do not direct the service to anyone under 18 and do not knowingly collect children's data. Accounts identified in those conditions will be removed."]
         },
         {
           "title": "9. Changes to this policy",
@@ -255,17 +255,18 @@
       "title": "Ready to organize your team?",
       "cta": "Get started",
       "privacy": "Privacy Policy",
-      "copyright": "Copyright © 2026 Cantiere"
+      "copyright": "Copyright © 2026 Xaphires"
     }
   },
   "auth": {
-    "brandTitle": "Cantiere",
+    "brandTitle": "Xaphires",
     "brandText": "Organize your projects in simple, fast and collaborative Kanban boards.",
     "back": "← Back",
     "tabLogin": "Sign in",
     "tabSignup": "Create company",
     "tabJoin": "Request access",
     "companyName": "Company name",
+    "companyDocLabel": "Company CNPJ or CPF",
     "yourName": "Your name",
     "email": "Email",
     "password": "Password",
@@ -274,13 +275,12 @@
     "submitWait": "Please wait...",
     "submitLogin": "Sign in",
     "submitSignup": "Create company",
-    "joinIntro": "Does your company already use Cantiere? Enter its CNPJ to request access.",
-    "cnpjLabel": "Company CNPJ",
-    "cnpjPlaceholder": "00.000.000/0000-00",
+    "joinIntro": "Does your company already use Xaphires? Enter its CNPJ or CPF to request access.",
+    "cnpjLabel": "Company CNPJ or CPF",
     "cnpjSearch": "Search",
     "cnpjSearching": "Searching...",
     "companyFound": "Company found: {{name}}",
-    "notThisCompany": "Not the right company? Change CNPJ",
+    "notThisCompany": "Not the right company? Change CNPJ/CPF",
     "joinSubmit": "Send request",
     "joinSubmitWait": "Sending...",
     "joinSuccessTitle": "Request sent!",
@@ -693,9 +693,8 @@
     "userDeletedToast": "User deleted",
     "passwordResetToast": "Password reset",
     "passwordMinLength": "The new password must be at least 6 characters",
-    "companyCnpjLabel": "Company CNPJ",
+    "companyCnpjLabel": "Company CNPJ or CPF",
     "companyCnpjHint": "Anyone requesting access to your company will need to enter this number.",
-    "companyCnpjPlaceholder": "00.000.000/0000-00",
     "companyCnpjSave": "Save",
     "companyCnpjSaved": "CNPJ saved",
     "joinRequestsTitle": "Access requests",
@@ -853,9 +852,9 @@
     "EMAIL_ALREADY_REGISTERED": "Email already registered",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Email already registered (it may already belong to another company)",
     "INVALID_CREDENTIALS": "Invalid email or password",
-    "CNPJ_INVALID": "Invalid CNPJ",
-    "COMPANY_NOT_FOUND": "No company found with that CNPJ",
-    "CNPJ_IN_USE": "That CNPJ is already used by another company",
+    "CNPJ_INVALID": "Invalid CNPJ or CPF",
+    "COMPANY_NOT_FOUND": "No company found with that CNPJ or CPF",
+    "CNPJ_IN_USE": "That CNPJ or CPF is already used by another company",
     "JOIN_REQUEST_PENDING": "There's already a pending request for this email",
     "JOIN_REQUEST_NOT_FOUND": "Request not found",
     "TOO_MANY_CNPJ_LOOKUPS": "Too many CNPJ lookups from this address. Try again later.",

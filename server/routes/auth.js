@@ -8,7 +8,7 @@ import * as directory from "../directory.js";
 import { acharAdminPorEmail } from "../admin/store.js";
 import { getSeedContent } from "../seedContent.js";
 import { DEFAULT_TRIAL_PLAN, trialEndsAt } from "../plans.js";
-import { normalizarDoc, cnpjValido } from "../doc.js";
+import { normalizarDoc, docValido } from "../doc.js";
 import { createJoinRequest, hasPendingRequestForEmail } from "../joinRequestStore.js";
 import {
   uid,
@@ -125,10 +125,17 @@ router.post(
   "/register-company",
   registerLimit,
   ah(async (req, res) => {
-    const { companyName, name, email, password, locale } = req.body || {};
+    const { companyName, name, email, password, locale, cnpj } = req.body || {};
     if (!companyName?.trim()) return res.status(400).json({ error: "Informe o nome da empresa", code: "COMPANY_NAME_REQUIRED" });
     const validationError = validateCredentials(name, email, password);
     if (validationError) return res.status(400).json({ error: validationError, code: "VALIDATION_MISSING_FIELDS" });
+    // Toda empresa nova precisa se identificar com CNPJ ou CPF - é o mesmo documento
+    // que quem pede acesso depois vai digitar para achar essa empresa (ver
+    // company-by-cnpj e join-request logo abaixo), então não pode ficar de fora.
+    const cnpjNormalizado = normalizarDoc(cnpj);
+    if (!docValido(cnpjNormalizado)) return res.status(400).json({ error: "Informe um CNPJ ou CPF válido", code: "CNPJ_INVALID" });
+    if (directory.getCompanyIdForCnpj(cnpjNormalizado))
+      return res.status(409).json({ error: "Esse CNPJ ou CPF já está em uso por outra empresa", code: "CNPJ_IN_USE" });
     if (directory.getCompanyIdForEmail(email))
       return res.status(409).json({ error: "E-mail já cadastrado", code: "EMAIL_ALREADY_REGISTERED" });
 
@@ -143,6 +150,7 @@ router.post(
       status: "trialing",
       expiresAt: trialEndsAt(),
     });
+    directory.setCompanyCnpj(companyId, cnpjNormalizado);
     const seed = getSeedContent(locale);
 
     const user = await runWithCompany(companyId, async () => {
@@ -190,9 +198,9 @@ router.get(
   cnpjLookupLimit,
   ah(async (req, res) => {
     const cnpj = normalizarDoc(req.query.cnpj);
-    if (!cnpjValido(cnpj)) return res.status(400).json({ error: "CNPJ inválido", code: "CNPJ_INVALID" });
+    if (!docValido(cnpj)) return res.status(400).json({ error: "CNPJ ou CPF inválido", code: "CNPJ_INVALID" });
     const companyId = directory.getCompanyIdForCnpj(cnpj);
-    if (!companyId) return res.status(404).json({ error: "Nenhuma empresa com esse CNPJ", code: "COMPANY_NOT_FOUND" });
+    if (!companyId) return res.status(404).json({ error: "Nenhuma empresa com esse CNPJ ou CPF", code: "COMPANY_NOT_FOUND" });
     const company = directory.getCompany(companyId);
     res.json({ id: company.id, name: company.name });
   })
@@ -204,9 +212,9 @@ router.post(
   ah(async (req, res) => {
     const { cnpj, name, email, password, locale } = req.body || {};
     const cnpjNormalizado = normalizarDoc(cnpj);
-    if (!cnpjValido(cnpjNormalizado)) return res.status(400).json({ error: "CNPJ inválido", code: "CNPJ_INVALID" });
+    if (!docValido(cnpjNormalizado)) return res.status(400).json({ error: "CNPJ ou CPF inválido", code: "CNPJ_INVALID" });
     const companyId = directory.getCompanyIdForCnpj(cnpjNormalizado);
-    if (!companyId) return res.status(404).json({ error: "Nenhuma empresa com esse CNPJ", code: "COMPANY_NOT_FOUND" });
+    if (!companyId) return res.status(404).json({ error: "Nenhuma empresa com esse CNPJ ou CPF", code: "COMPANY_NOT_FOUND" });
 
     const validationError = validateCredentials(name, email, password);
     if (validationError) return res.status(400).json({ error: validationError, code: "VALIDATION_MISSING_FIELDS" });

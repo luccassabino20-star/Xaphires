@@ -3,7 +3,7 @@ import { requireAuth, requireMaster } from "../middleware.js";
 import { hashPassword } from "../auth.js";
 import { ah } from "../asyncHandler.js";
 import * as directory from "../directory.js";
-import { normalizarDoc, cnpjValido } from "../doc.js";
+import { normalizarDoc, docValido } from "../doc.js";
 import { listJoinRequestsForCompany, getJoinRequest, deleteJoinRequest } from "../joinRequestStore.js";
 import {
   listUsers,
@@ -41,10 +41,10 @@ router.patch(
   requireMaster,
   ah(async (req, res) => {
     const cnpj = normalizarDoc(req.body?.cnpj);
-    if (!cnpjValido(cnpj)) return res.status(400).json({ error: "CNPJ inválido", code: "CNPJ_INVALID" });
+    if (!docValido(cnpj)) return res.status(400).json({ error: "CNPJ ou CPF inválido", code: "CNPJ_INVALID" });
     const donoAtual = directory.getCompanyIdForCnpj(cnpj);
     if (donoAtual && donoAtual !== req.companyId)
-      return res.status(409).json({ error: "Esse CNPJ já está em uso por outra empresa", code: "CNPJ_IN_USE" });
+      return res.status(409).json({ error: "Esse CNPJ ou CPF já está em uso por outra empresa", code: "CNPJ_IN_USE" });
     const company = directory.setCompanyCnpj(req.companyId, cnpj);
     res.json({ name: company.name, cnpj: company.cnpj });
   })

@@ -24,7 +24,7 @@
   },
   "landing": {
     "nav": {
-      "brand": "Cantiere",
+      "brand": "Xaphires",
       "home": "Inicio",
       "features": "Funciones",
       "solutions": "Soluciones",
@@ -38,7 +38,7 @@
     },
     "home": {
       "heroTitle": "Tu equipo organizado, sin esfuerzo extra",
-      "heroText": "Cantiere reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
+      "heroText": "Xaphires reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
       "ctaStart": "Empieza ahora",
       "ctaPlans": "Ver planes",
       "heroNote": "Sin burocracia. Cancela cuando quieras.",
@@ -53,15 +53,15 @@
         { "title": "Tu equipo ya lo entiende", "text": "Interfaz simple, sin necesidad de capacitación. Quien ya usó un tablero Kanban empieza a usarlo en minutos." },
         { "title": "Crece contigo", "text": "De un equipo pequeño a varias áreas, con tableros privados y compartidos, control de accesos y roles." }
       ],
-      "exploreTitle": "Explora Cantiere",
+      "exploreTitle": "Explora Xaphires",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las herramientas de Cantiere: tablero, tabla, calendario, mapa y más." },
-        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Cantiere en el día a día." },
+        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las herramientas de Xaphires: tablero, tabla, calendario, mapa y más." },
+        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Xaphires en el día a día." },
         { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Básico, Profesional y Empresarial y elige el ideal para tu equipo." }
       ]
     },
     "features": {
-      "automationsTitle": "Lo que Cantiere hace solo",
+      "automationsTitle": "Lo que Xaphires hace solo",
       "automationsText": "Automatizaciones que trabajan en segundo plano, para que no tengas que recordar ni reclamar a mano.",
       "automations": [
         { "badge": "A", "title": "Archivado de tarjetas", "text": "Saca lo terminado del tablero sin borrar nada. Lo archivado sale de todas las vistas y vuelve a su columna cuando quieras." },
@@ -90,7 +90,7 @@
     },
     "solutions": {
       "headerTitle": "Soluciones para cada tipo de equipo",
-      "headerText": "El mismo Cantiere, organizado como cada equipo necesita trabajar.",
+      "headerText": "El mismo Xaphires, organizado como cada equipo necesita trabajar.",
       "items": [
         { "title": "Agencias y equipos de proyecto", "text": "Un tablero por cliente o proyecto, con línea de tiempo para plazos y panel de métricas listo para mostrar el progreso en reuniones.", "tags": ["Tablero Kanban", "Línea de tiempo", "Panel"] },
         { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa. Ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
@@ -138,7 +138,7 @@
     "privacy": {
       "backLink": "← Volver",
       "headerTitle": "Política de Privacidad",
-      "headerText": "Cómo Cantiere recopila, usa, almacena y protege los datos de tu equipo.",
+      "headerText": "Cómo Xaphires recopila, usa, almacena y protege los datos de tu equipo.",
       "updatedLabel": "Última actualización",
       "updatedDate": "25 de julio de 2026",
       "sections": [
@@ -211,7 +211,7 @@
         },
         {
           "title": "8. Niños y adolescentes",
-          "paragraphs": ["Cantiere es una herramienta corporativa, destinada al uso profesional. No dirigimos el servicio a menores de 18 años y no recopilamos intencionalmente datos de niños. Los registros identificados en esas condiciones serán eliminados."]
+          "paragraphs": ["Xaphires es una herramienta corporativa, destinada al uso profesional. No dirigimos el servicio a menores de 18 años y no recopilamos intencionalmente datos de niños. Los registros identificados en esas condiciones serán eliminados."]
         },
         {
           "title": "9. Cambios en esta política",
@@ -255,17 +255,18 @@
       "title": "¿Listo para organizar tu equipo?",
       "cta": "Empieza ahora",
       "privacy": "Política de Privacidad",
-      "copyright": "Derechos de autor © 2026 Cantiere"
+      "copyright": "Derechos de autor © 2026 Xaphires"
     }
   },
   "auth": {
-    "brandTitle": "Cantiere",
+    "brandTitle": "Xaphires",
     "brandText": "Organiza tus proyectos en tableros Kanban simples, rápidos y colaborativos.",
     "back": "← Volver",
     "tabLogin": "Ingresar",
     "tabSignup": "Crear empresa",
     "tabJoin": "Pedir acceso",
     "companyName": "Nombre de la empresa",
+    "companyDocLabel": "CNPJ o CPF de la empresa",
     "yourName": "Tu nombre",
     "email": "Correo electrónico",
     "password": "Contraseña",
@@ -274,13 +275,12 @@
     "submitWait": "Espera...",
     "submitLogin": "Ingresar",
     "submitSignup": "Crear empresa",
-    "joinIntro": "¿Tu empresa ya usa Cantiere? Ingresa su CNPJ para pedir acceso.",
-    "cnpjLabel": "CNPJ de la empresa",
-    "cnpjPlaceholder": "00.000.000/0000-00",
+    "joinIntro": "¿Tu empresa ya usa Xaphires? Ingresa su CNPJ o CPF para pedir acceso.",
+    "cnpjLabel": "CNPJ o CPF de la empresa",
     "cnpjSearch": "Buscar",
     "cnpjSearching": "Buscando...",
     "companyFound": "Empresa encontrada: {{name}}",
-    "notThisCompany": "¿No es esta empresa? Cambiar CNPJ",
+    "notThisCompany": "¿No es esta empresa? Cambiar CNPJ/CPF",
     "joinSubmit": "Enviar pedido",
     "joinSubmitWait": "Enviando...",
     "joinSuccessTitle": "¡Pedido enviado!",
@@ -693,9 +693,8 @@
     "userDeletedToast": "Usuario eliminado",
     "passwordResetToast": "Contraseña restablecida",
     "passwordMinLength": "La nueva contraseña debe tener al menos 6 caracteres",
-    "companyCnpjLabel": "CNPJ de la empresa",
+    "companyCnpjLabel": "CNPJ o CPF de la empresa",
     "companyCnpjHint": "Quien quiera pedir acceso a tu empresa deberá ingresar este número.",
-    "companyCnpjPlaceholder": "00.000.000/0000-00",
     "companyCnpjSave": "Guardar",
     "companyCnpjSaved": "CNPJ guardado",
     "joinRequestsTitle": "Solicitudes de acceso",
@@ -853,9 +852,9 @@
     "EMAIL_ALREADY_REGISTERED": "Correo electrónico ya registrado",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Correo electrónico ya registrado (puede pertenecer a otra empresa)",
     "INVALID_CREDENTIALS": "Correo electrónico o contraseña inválidos",
-    "CNPJ_INVALID": "CNPJ inválido",
-    "COMPANY_NOT_FOUND": "Ninguna empresa encontrada con ese CNPJ",
-    "CNPJ_IN_USE": "Ese CNPJ ya está en uso por otra empresa",
+    "CNPJ_INVALID": "CNPJ o CPF inválido",
+    "COMPANY_NOT_FOUND": "Ninguna empresa encontrada con ese CNPJ o CPF",
+    "CNPJ_IN_USE": "Ese CNPJ o CPF ya está en uso por otra empresa",
     "JOIN_REQUEST_PENDING": "Ya existe una solicitud pendiente para este correo electrónico",
     "JOIN_REQUEST_NOT_FOUND": "Solicitud no encontrada",
     "TOO_MANY_CNPJ_LOOKUPS": "Demasiadas búsquedas por CNPJ desde esta dirección. Inténtalo de nuevo más tarde.",

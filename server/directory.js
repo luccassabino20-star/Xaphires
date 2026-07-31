@@ -41,7 +41,9 @@ directoryDb.exec("UPDATE companies SET contracted_at = created_at WHERE contract
 // compensar, e trancar no segundo seguinte puniria quem pagou em dia. Teste que
 // terminou não recebe carência, porque já foi tempo livre.
 addColumnIfMissing("companies", "grace_until", "grace_until TEXT");
-// CNPJ é opcional (empresa pode nunca preencher) e não tem índice único no schema -
+// CNPJ ou CPF: obrigatório para empresa nova desde que o cadastro passou a exigir
+// (ver register-company em routes/auth.js), mas a coluna não tem NOT NULL porque
+// empresa criada antes disso pode não ter. Não tem índice único no schema também -
 // checar duplicidade é responsabilidade de quem grava (setCompanyCnpj), não do
 // banco. Guardado só com dígitos, mesmo formato que normalizarDoc produz.
 addColumnIfMissing("companies", "cnpj", "cnpj TEXT");
