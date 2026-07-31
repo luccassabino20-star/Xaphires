@@ -185,7 +185,16 @@ export default function TimelineView({ board, searchQuery, memberFilter, onOpenC
                   <button
                     key={c.id}
                     className={"timeline-bar" + (c.completed ? " completed" : "")}
-                    style={{ left, width, background: labelMeta ? labelMeta.color : "var(--accent)" }}
+                    // Sem etiqueta a barra cai no --accent do tema, que no escuro é
+                    // quase branco (#e5e5e5) - texto branco fixo (.timeline-bar)
+                    // fica ilegível nesse caso. var(--bg-app) é o par que
+                    // .btn-primary já usa para textos sobre --accent.
+                    style={{
+                      left,
+                      width,
+                      background: labelMeta ? labelMeta.color : "var(--accent)",
+                      color: labelMeta ? undefined : "var(--bg-app)",
+                    }}
                     onClick={() => onOpenCard(c.id)}
                     title={c.title}
                   >
