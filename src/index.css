@@ -2792,7 +2792,7 @@ input, textarea { font-family: inherit; }
 .landing-testimonial-card p {
   font-size: 14px;
   line-height: 1.6;
-  color: #d4d4d4;
+  color: var(--text-secondary);
   margin: 0 0 18px;
 }
 .landing-testimonial-author { display: flex; align-items: center; gap: 12px; margin-top: auto; }
