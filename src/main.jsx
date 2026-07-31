@@ -17,8 +17,15 @@ import "./index.css";
 // tema. São duas sessões distintas, e compartilhar contexto convidaria a confundir
 // "usuário logado" com "administrador logado".
 const AdminApp = React.lazy(() => import("./admin/AdminApp.jsx"));
+// Página isolada para olhar o componente de Gantt genérico (src/components/gantt)
+// sem precisar de login - ele não lê nenhum dado real do app, então não faz
+// sentido pendurar a rota atrás de AuthProvider. Mesmo padrão de lazy load do
+// painel: ninguém além de quem for testar/integrar isto abre esse caminho.
+const GanttChartDemo = React.lazy(() => import("./components/gantt/GanttChartDemo.jsx"));
 
-const ehPainel = window.location.pathname.replace(/\/+$/, "") === "/admin";
+const path = window.location.pathname.replace(/\/+$/, "");
+const ehPainel = path === "/admin";
+const ehGanttDemo = path === "/gantt-demo";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -26,6 +33,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Suspense fallback={<div className="adm-carregando">Carregando painel...</div>}>
         <AdminApp />
       </Suspense>
+    ) : ehGanttDemo ? (
+      <ThemeProvider>
+        <Suspense fallback={null}>
+          <GanttChartDemo />
+        </Suspense>
+      </ThemeProvider>
     ) : (
       <ThemeProvider>
         <ToastProvider>

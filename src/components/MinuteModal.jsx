@@ -55,7 +55,7 @@ export default function MinuteModal({ minuteId, onClose }) {
     e.preventDefault();
     const val = actionText.trim();
     if (!val) return;
-    setActionItems((prev) => [...prev, { id: uid(), text: val, done: false, assigneeId: null }]);
+    setActionItems((prev) => [...prev, { id: uid(), text: val, done: false, assigneeId: null, dueDate: null }]);
     setActionText("");
   }
   function toggleActionItem(id) {
@@ -66,6 +66,11 @@ export default function MinuteModal({ minuteId, onClose }) {
   }
   function setActionAssignee(id, assigneeId) {
     setActionItems((prev) => prev.map((it) => (it.id === id ? { ...it, assigneeId: assigneeId || null } : it)));
+  }
+  // Sem prazo o item não vira barra no Gantt (ver MinutesGanttView) - fica só na
+  // lista, do jeito que os itens de ação sempre funcionaram.
+  function setActionDueDate(id, dueDate) {
+    setActionItems((prev) => prev.map((it) => (it.id === id ? { ...it, dueDate: dueDate || null } : it)));
   }
 
   async function handleSave() {
@@ -220,6 +225,14 @@ export default function MinuteModal({ minuteId, onClose }) {
                         </option>
                       ))}
                     </select>
+                    <input
+                      type="date"
+                      className="minutes-action-due"
+                      title={t("minutes.modal.dueDate")}
+                      value={item.dueDate || ""}
+                      onChange={(e) => setActionDueDate(item.id, e.target.value)}
+                      disabled={!canEdit}
+                    />
                     {canEdit && (
                       <button type="button" className="checklist-item-remove" onClick={() => removeActionItem(item.id)}>
                         &times;

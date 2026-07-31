@@ -637,12 +637,45 @@
       "dropHere": "Drag cards here"
     }
   },
+  "gantt": {
+    "columns": { "activity": "Activity", "status": "Status" },
+    "toolbar": {
+      "new": "New",
+      "open": "Open",
+      "save": "Save",
+      "share": "Share",
+      "undo": "Undo",
+      "print": "Print",
+      "importExport": "Import / export",
+      "search": "Filter / search",
+      "zoom": "Zoom",
+      "resetZoom": "Reset zoom",
+      "settings": "Settings",
+      "help": "Help",
+      "contact": "Contact"
+    },
+    "status": {
+      "done": "Done",
+      "todo": "To do",
+      "inProgress": "In progress",
+      "late": "Late",
+      "agency": "Advertising agency",
+      "lateFlag": "late!"
+    },
+    "legend": {
+      "icons": { "meeting": "meeting", "call": "conference call", "mail": "mailing", "check": "check progress" }
+    },
+    "meta": { "event": "event:", "venue": "venue:", "date": "date:" },
+    "emptyState": "Nothing to show in the Gantt yet."
+  },
   "minutes": {
     "screen": {
       "title": "Meeting Minutes",
       "newMinute": "+ New minute",
       "loading": "Loading minutes...",
-      "empty": "No minutes recorded yet."
+      "empty": "No minutes recorded yet.",
+      "viewList": "List",
+      "viewGantt": "Gantt"
     },
     "modal": {
       "titlePlaceholder": "Meeting title",
@@ -656,6 +689,7 @@
       "decisionsPlaceholder": "What was decided...",
       "actionItems": "Action items",
       "assignee": "Assignee",
+      "dueDate": "Due date",
       "addActionPlaceholder": "Add an action item",
       "deleteMinute": "Delete minute",
       "deleteConfirm": "Delete this minute permanently?",

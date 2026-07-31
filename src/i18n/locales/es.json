@@ -637,12 +637,45 @@
       "dropHere": "Arrastra tarjetas aquí"
     }
   },
+  "gantt": {
+    "columns": { "activity": "Actividad", "status": "Estado" },
+    "toolbar": {
+      "new": "Nuevo",
+      "open": "Abrir",
+      "save": "Guardar",
+      "share": "Compartir",
+      "undo": "Deshacer",
+      "print": "Imprimir",
+      "importExport": "Importar / exportar",
+      "search": "Filtrar / buscar",
+      "zoom": "Zoom",
+      "resetZoom": "Restablecer zoom",
+      "settings": "Configuración",
+      "help": "Ayuda",
+      "contact": "Contacto"
+    },
+    "status": {
+      "done": "Hecho",
+      "todo": "Por hacer",
+      "inProgress": "En curso",
+      "late": "Atrasado",
+      "agency": "Agencia de publicidad",
+      "lateFlag": "¡atrasado!"
+    },
+    "legend": {
+      "icons": { "meeting": "reunión", "call": "llamada", "mail": "correo", "check": "revisar progreso" }
+    },
+    "meta": { "event": "evento:", "venue": "lugar:", "date": "fecha:" },
+    "emptyState": "Nada para mostrar en el Gantt todavía."
+  },
   "minutes": {
     "screen": {
       "title": "Actas de Reunión",
       "newMinute": "+ Nueva acta",
       "loading": "Cargando actas...",
-      "empty": "Aún no hay actas registradas."
+      "empty": "Aún no hay actas registradas.",
+      "viewList": "Lista",
+      "viewGantt": "Gantt"
     },
     "modal": {
       "titlePlaceholder": "Título de la reunión",
@@ -656,6 +689,7 @@
       "decisionsPlaceholder": "Qué se decidió...",
       "actionItems": "Tareas",
       "assignee": "Responsable",
+      "dueDate": "Plazo",
       "addActionPlaceholder": "Agregar una tarea",
       "deleteMinute": "Eliminar acta",
       "deleteConfirm": "¿Eliminar esta acta de forma permanente?",
