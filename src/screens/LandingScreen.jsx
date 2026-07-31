@@ -664,7 +664,7 @@ export default function LandingScreen({ onEnter }) {
       <PromoPopup onEnter={onEnter} />
       <header className={"landing-nav" + (scrolled ? " scrolled" : "")}>
         <div className="landing-nav-brand">
-          <span className="landing-nav-icon">C</span>
+          <span className="landing-nav-icon">X</span>
           <span>{t("landing.nav.brand")}</span>
         </div>
         <nav className="landing-nav-links">

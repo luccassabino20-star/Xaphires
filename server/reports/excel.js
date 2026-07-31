@@ -178,7 +178,7 @@ function linhasDeTarefas(aba, relatorio, cartoes) {
 export async function gerarExcel(relatorio) {
   const t = relatorio.t;
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Cantiere";
+  wb.creator = "Xaphires";
   wb.created = relatorio.geradoEm;
 
   // ---------- Aba de resumo ----------

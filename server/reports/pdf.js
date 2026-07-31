@@ -242,7 +242,7 @@ function rodapes(doc, t) {
       .font("Helvetica")
       .fontSize(8)
       .text(
-        `Cantiere      ${t.pagina} ${i + 1} ${t.de} ${faixa.count}`,
+        `Xaphires      ${t.pagina} ${i + 1} ${t.de} ${faixa.count}`,
         MARGEM,
         doc.page.height - MARGEM - 6,
         { width: doc.page.width - MARGEM * 2, align: "right", lineBreak: false }

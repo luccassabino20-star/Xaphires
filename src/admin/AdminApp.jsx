@@ -40,7 +40,7 @@ function Login({ onEntrar }) {
   return (
     <div className="adm-login">
       <form className="adm-login-card" onSubmit={enviar}>
-        <div className="adm-login-marca">Cantiere</div>
+        <div className="adm-login-marca">Xaphires</div>
         <div className="adm-login-sub">Painel da plataforma</div>
         <label className="adm-campo">
           <span>E-mail</span>
@@ -93,7 +93,7 @@ export default function AdminApp() {
     <div className="adm-shell">
       <header className="adm-topo">
         <div className="adm-marca">
-          Cantiere <span>plataforma</span>
+          Xaphires <span>plataforma</span>
         </div>
         <nav className="adm-abas">
           {ABAS.map((a) => (

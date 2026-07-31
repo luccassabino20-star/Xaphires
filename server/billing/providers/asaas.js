@@ -216,7 +216,7 @@ async function criarCheckoutAssinatura({ amountCents, plan, paymentId }) {
       cancelUrl: `${urlFrontend()}/?billing=return`,
       expiredUrl: `${urlFrontend()}/?billing=return`,
     },
-    items: [{ name: `Cantiere - plano ${plan}`, quantity: 1, value: reais(amountCents) }],
+    items: [{ name: `Xaphires - plano ${plan}`, quantity: 1, value: reais(amountCents) }],
     // SEM customerData de propósito: testado contra a API de sandbox, mandar
     // QUALQUER campo aqui (mesmo só e-mail) faz o Asaas exigir o conjunto
     // inteiro de uma vez - nome, cpfCnpj, telefone, endereço, número, CEP,
@@ -259,7 +259,7 @@ export const asaas = {
         billingType: method === "pix" ? "PIX" : "BOLETO",
         value: reais(amountCents),
         dueDate: dataISO(method === "pix" ? 1 : 3),
-        description: `Cantiere - plano ${plan}`,
+        description: `Xaphires - plano ${plan}`,
         externalReference: paymentId,
       },
     });

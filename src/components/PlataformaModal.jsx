@@ -96,7 +96,7 @@ export default function PlataformaModal({ onClose }) {
       <div className="modal adm-shell plataforma-modal">
         <div className="plataforma-topo">
           <div className="adm-marca">
-            Cantiere <span>plataforma</span>
+            Xaphires <span>plataforma</span>
           </div>
           {admin && (
             <nav className="adm-abas">

@@ -3059,7 +3059,7 @@ input, textarea { font-family: inherit; }
 /* O hover do botão voltar usava --bg-list, que agora é a cor da própria página. */
 .auth-shell .auth-back-btn:hover { background: #1a1a1a; }
 
-/* ---------- Logotipo Cantiere ---------- */
+/* ---------- Logotipo Xaphires ---------- */
 /* Playfair Display só no nome da marca — na nav da landing e no painel do login.
    O resto da interface continua na Inter, e o contraste entre as duas é proposital:
    a serifa marca o logotipo, a sem-serifa carrega o texto. */

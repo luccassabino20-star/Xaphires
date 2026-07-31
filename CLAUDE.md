@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Cantiere — quadro Kanban multiempresa. React 18 + Vite no cliente, Express + `node:sqlite` no servidor. Sem build step no servidor: ESM puro, rodado direto pelo Node.
+Xaphires — quadro Kanban multiempresa. React 18 + Vite no cliente, Express + `node:sqlite` no servidor. Sem build step no servidor: ESM puro, rodado direto pelo Node.
 
 ## Comandos
 
@@ -260,7 +260,7 @@ Erro de API tem mensagem em português **e** um `code` estável. O cliente tradu
 - **Comentários em português, explicando o porquê, não o quê.** É a marca do repositório: decisões de produto, armadilhas já pagas e defaults justificados ficam registrados junto do código. Mantenha essa densidade em código novo.
 - **Mensagens de commit em português, no imperativo:** "Adiciona…", "Corrige…", "Atualiza…".
 - **Texto de interface usa hífen, não travessão** (`—` foi removido da UI de propósito). Em comentários de código o travessão é usado normalmente.
-- O produto chama-se **Cantiere**; o nome antigo sobrevive em identificadores estáveis (`kanban-board`, `kanban_token`, `KANBAN_DATA_DIR`). Não renomeie esses.
+- O produto chama-se **Xaphires** (antes, Cantiere); os nomes antigos sobrevivem em identificadores estáveis (`kanban-board`, `kanban_token`, `KANBAN_DATA_DIR`, cookie `cantiere_admin`, User-Agent `cantiere-app`). Não renomeie esses — só o nome exibido para quem usa o produto muda a cada rebranding, os identificadores internos ficam.
 - Identificadores em inglês, com locais em português em código de regra de negócio (`limite`, `alvo`, `plano`, `resumo`). Siga o arquivo em que estiver.
 - CSS todo em `src/index.css` (~3400 linhas), dividido por marcadores `/* ---------- Seção ---------- */`. Landing e login são dark por padrão (decisão de marca, não seguem `prefers-color-scheme`), com um branco neve opcional via `LandingThemeToggle` — mesmo `ThemeContext`/`data-theme` do app, então a escolha do visitante já chega pronta se ele criar conta. O par de blocos `.landing-shell`/`.auth-shell` (dark) e `:root[data-theme="light"] .landing-shell`/`.auth-shell` (branco neve) em `index.css` é sempre editado junto — variável nova num precisa entrar no outro.
 - **Variáveis CSS: os nomes são `--border-subtle`, `--border-strong`, `--bg-card`, `--bg-list`, `--bg-column`, `--text-primary/secondary/muted`, `--accent`, `--success`, `--danger`.** Não há `--border` nem `--bg-input`. Confira o `:root` antes de usar uma: variável inexistente derruba a declaração inteira sem avisar.
