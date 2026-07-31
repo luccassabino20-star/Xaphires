@@ -3,6 +3,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 const STORAGE_KEY = "kanban-theme";
 const ThemeContext = createContext(null);
 
+// Sem escolha salva, o padrão do site é o branco - não "system". Landing e login
+// usam o mesmo ThemeContext (ver LandingThemeToggle), então isto também decide a
+// primeira impressão de quem nunca visitou: branco neve, não o dark de marca.
 function getStoredTheme() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -10,7 +13,7 @@ function getStoredTheme() {
   } catch {
     /* localStorage unavailable */
   }
-  return "system";
+  return "light";
 }
 
 export function ThemeProvider({ children }) {
