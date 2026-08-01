@@ -140,7 +140,12 @@ export default function CardItem({ card, list, boardId, members, searchQuery, me
               </span>
             )}
             {hasDue && (
-              <span className={"card-meta-item" + (isOverdue(card.due, card.checklist) ? " due-overdue" : "")}>
+              <span
+                className={
+                  "card-meta-item" +
+                  (isOverdue(card.due, card.checklist) ? " due-overdue" : card.completed ? " due-done" : "")
+                }
+              >
                 <ClockIcon /> {formatDate(card.due, i18n.language)}
               </span>
             )}

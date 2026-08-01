@@ -72,8 +72,16 @@ export default function ListColumn({
 
   // Converte o tom antigo gravado no dado para a versão viva, sem migrar o banco.
   const listColor = brightListColor(list.color);
+  // --list-accent/--list-accent-bg alimentam a pill do título e o botão de
+  // adicionar tarefa (ver index.css) - sem cor própria, os dois caem no par
+  // neutro --status-pill-bg/--status-pill-text definido em :root.
   const listStyle = listColor
-    ? { background: `color-mix(in srgb, ${listColor} 16%, var(--bg-column))`, borderTop: `3px solid ${listColor}` }
+    ? {
+        background: `color-mix(in srgb, ${listColor} 16%, var(--bg-column))`,
+        borderTop: `3px solid ${listColor}`,
+        "--list-accent": listColor,
+        "--list-accent-bg": `color-mix(in srgb, ${listColor} 20%, var(--bg-card))`,
+      }
     : undefined;
 
   return (
