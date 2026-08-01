@@ -7,6 +7,7 @@ import { translateError } from "../utils/errors.js";
 import { LABEL_COLORS } from "../utils/labels.js";
 import { initials, colorForUser } from "../utils/members.js";
 import { geocodeAddress, addLinkAttachment, addFileAttachment, removeCardAttachment, attachmentDownloadUrl, getPlan } from "../state/api.js";
+import DatePicker from "./DatePicker.jsx";
 
 function AttachmentFileIcon() {
   return (
@@ -50,6 +51,55 @@ function PinIcon() {
     </svg>
   );
 }
+function StatusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16z" />
+    </svg>
+  );
+}
+function MembersIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z" />
+    </svg>
+  );
+}
+function TagIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M2 11.5V4a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.41.59l8.5 8.5a2 2 0 0 1 0 2.82l-7.5 7.5a2 2 0 0 1-2.82 0l-8.5-8.5A2 2 0 0 1 2 11.5zM7 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+    </svg>
+  );
+}
+function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2zm12 8v9H5v-9z" />
+    </svg>
+  );
+}
+function ListIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z" />
+    </svg>
+  );
+}
+function CollapseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="13" height="13">
+      <path fill="currentColor" d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l7-7z" />
+    </svg>
+  );
+}
+function EditIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15">
+      <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zm17.71-10.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0l-1.96 1.96 3.75 3.75z" />
+    </svg>
+  );
+}
 
 export default function CardModal({ boardId, cardId, onClose }) {
   const { t } = useTranslation();
@@ -77,8 +127,14 @@ export default function CardModal({ boardId, cardId, onClose }) {
   // Teto de anexo do plano da empresa. Fica null até a consulta voltar; nesse
   // intervalo a checagem local é pulada e quem barra é o servidor.
   const [limiteAnexo, setLimiteAnexo] = useState(null);
+  // Começa mostrando tudo (mesmo estado inicial da referência: "Recolher
+  // campos vazios" é a ação ainda não tomada). Campo vazio some da grade só
+  // depois que a pessoa recolhe - e aqui parte de dado real (tem valor ou não),
+  // não de uma lista fixa de nomes de campo.
+  const [hideEmpty, setHideEmpty] = useState(false);
   const titleRef = useRef(null);
   const fileInputRef = useRef(null);
+  const descriptionRef = useRef(null);
 
   useEffect(() => {
     let ativo = true;
@@ -116,11 +172,11 @@ export default function CardModal({ boardId, cardId, onClose }) {
     if (readOnly) return;
     dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { description } });
   }
-  function handleDueChange(e) {
-    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { due: e.target.value || null } });
+  function handleDueChange(iso) {
+    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { due: iso || null } });
   }
-  function handleStartDateChange(e) {
-    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { startDate: e.target.value || null } });
+  function handleStartDateChange(iso) {
+    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { startDate: iso || null } });
   }
   async function handleLocateAddress(e) {
     e.preventDefault();
@@ -260,6 +316,11 @@ export default function CardModal({ boardId, cardId, onClose }) {
   const done = card.checklist.filter((i) => i.done).length;
   const pct = card.checklist.length ? Math.round((done / card.checklist.length) * 100) : 0;
   const cardMembers = (card.memberIds || []).map((id) => users.find((m) => m.id === id)).filter(Boolean);
+  const currentList = board.lists.find((l) => l.cardIds.includes(cardId));
+  const hasDates = !!(card.startDate || card.due);
+  const hasPriority = !!(card.urgent || card.important);
+  const hasLabels = card.labels.length > 0;
+  const hasLocation = !!card.location?.address;
 
   return (
     <div
@@ -268,17 +329,22 @@ export default function CardModal({ boardId, cardId, onClose }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="modal">
+      <div className="modal card-detail-modal">
         <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
           &times;
         </button>
-        <div className="modal-header">
-          <svg viewBox="0 0 24 24" width="20" height="20" className="modal-icon">
-            <path fill="currentColor" d="M3 5h18v2H3zm0 6h18v2H3zm0 6h12v2H3z" />
-          </svg>
+
+        <div className="card-detail-breadcrumb">
+          {board.title}
+          {currentList && <> / {currentList.title}</>}
+        </div>
+
+        <span className="card-detail-type-badge">{t("board.cardModal.typeBadge")}</span>
+
+        <div className="modal-header card-detail-header">
           <input
             ref={titleRef}
-            className="modal-title-input"
+            className="modal-title-input card-detail-title"
             value={title}
             spellCheck={false}
             readOnly={readOnly}
@@ -290,157 +356,186 @@ export default function CardModal({ boardId, cardId, onClose }) {
           />
         </div>
 
+        {/* Sem IA neste app - o clique só leva pra descrição, que é a ação real
+            mais próxima do que essa caixa sugere visualmente. */}
+        {!readOnly && (
+          <button type="button" className="ai-input-box" onClick={() => descriptionRef.current?.focus()}>
+            <EditIcon /> {t("board.cardModal.descriptionShortcut")}
+          </button>
+        )}
+
         <div className="modal-body">
           {readOnly && <div className="board-readonly-note">{t("board.cardModal.readOnlyNote")}</div>}
 
-          <div className="modal-section">
-            <button
-              type="button"
-              className={"card-complete-toggle-row" + (card.completed ? " checked" : "")}
-              disabled={readOnly}
-              onClick={toggleCompleted}
-            >
-              <span className={"card-complete-check" + (card.completed ? " checked" : "")}>
-                {card.completed && (
-                  <svg viewBox="0 0 24 24" width="12" height="12">
-                    <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
-                  </svg>
-                )}
+          <div className="metadata-grid">
+            <div className="metadata-row">
+              <span className="metadata-row-label">
+                <StatusIcon /> {t("board.cardModal.status")}
               </span>
-              <span>{card.completed ? t("board.cardModal.complete") : t("board.cardModal.markComplete")}</span>
-            </button>
-          </div>
-
-          {!readOnly && (
-            <div className="modal-section">
-              <label className="modal-label">{t("board.cardModal.moveToList")}</label>
-              <select
-                className="modal-select"
-                value={board.lists.find((l) => l.cardIds.includes(cardId))?.id || ""}
-                onChange={moveToList}
+              <button
+                type="button"
+                className={"status-pill" + (card.completed ? " status-pill-success" : " status-pill-neutral")}
+                disabled={readOnly}
+                onClick={toggleCompleted}
               >
-                {board.lists.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.title}
-                  </option>
-                ))}
-              </select>
+                {card.completed ? t("board.cardModal.complete") : t("board.cardModal.statusOpen")}
+              </button>
             </div>
-          )}
 
-          <div className="modal-section">
-            <label className="modal-label">{t("board.cardModal.members")}</label>
-            <div className="member-avatars-row">
-              {cardMembers.map((m) => (
-                <span key={m.id} className="avatar" style={{ background: colorForUser(m.id) }} title={m.name}>
-                  {initials(m.name)}
-                </span>
-              ))}
-              {!readOnly && (
-                <button type="button" className="avatar avatar-add" onClick={() => setMemberPickerOpen((o) => !o)}>
-                  +
-                </button>
-              )}
-            </div>
-            {memberPickerOpen && (
-              <div className="member-picker">
-                {users.length === 0 && <div className="member-picker-empty">{t("board.cardModal.noUsersYet")}</div>}
-                {users.map((m) => (
-                  <label key={m.id} className="member-picker-row">
-                    <input type="checkbox" checked={(card.memberIds || []).includes(m.id)} onChange={() => toggleMember(m.id)} />
-                    <span className="avatar avatar-small" style={{ background: colorForUser(m.id) }}>
+            <div className="metadata-row">
+              <span className="metadata-row-label">
+                <MembersIcon /> {t("board.cardModal.members")}
+              </span>
+              <div className="metadata-row-value">
+                <div className="member-avatars-row">
+                  {cardMembers.map((m) => (
+                    <span key={m.id} className="avatar" style={{ background: colorForUser(m.id) }} title={m.name}>
                       {initials(m.name)}
                     </span>
-                    <span>{m.name}</span>
-                  </label>
-                ))}
+                  ))}
+                  {cardMembers.length === 0 && <span className="metadata-empty">{t("board.cardModal.empty")}</span>}
+                  {!readOnly && (
+                    <button type="button" className="avatar avatar-add" onClick={() => setMemberPickerOpen((o) => !o)}>
+                      +
+                    </button>
+                  )}
+                </div>
+                {memberPickerOpen && (
+                  <div className="member-picker">
+                    {users.length === 0 && <div className="member-picker-empty">{t("board.cardModal.noUsersYet")}</div>}
+                    {users.map((m) => (
+                      <label key={m.id} className="member-picker-row">
+                        <input type="checkbox" checked={(card.memberIds || []).includes(m.id)} onChange={() => toggleMember(m.id)} />
+                        <span className="avatar avatar-small" style={{ background: colorForUser(m.id) }}>
+                          {initials(m.name)}
+                        </span>
+                        <span>{m.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {(!hideEmpty || hasDates) && (
+              <div className="metadata-row">
+                <span className="metadata-row-label">
+                  <CalendarIcon /> {t("board.cardModal.datesLabel")}
+                </span>
+                <div className="metadata-row-value date-range">
+                  <DatePicker value={card.startDate} onChange={handleStartDateChange} label={t("board.cardModal.startDate")} disabled={readOnly} />
+                  <span className="date-range-arrow">→</span>
+                  <DatePicker value={card.due} onChange={handleDueChange} label={t("board.cardModal.dueDate")} disabled={readOnly} />
+                </div>
+              </div>
+            )}
+
+            {(!hideEmpty || hasPriority) && (
+              <div className="metadata-row">
+                <span className="metadata-row-label">{t("board.cardModal.priority")}</span>
+                <div className="metadata-row-value priority-toggle-row priority-toggle-row-compact">
+                  <button
+                    type="button"
+                    className={"priority-chip priority-chip-urgent" + (card.urgent ? " active" : "")}
+                    disabled={readOnly}
+                    onClick={toggleUrgent}
+                  >
+                    <UrgentIcon /> {t("board.cardModal.urgent")}
+                  </button>
+                  <button
+                    type="button"
+                    className={"priority-chip priority-chip-important" + (card.important ? " active" : "")}
+                    disabled={readOnly}
+                    onClick={toggleImportant}
+                  >
+                    <ImportantIcon /> {t("board.cardModal.important")}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {(!hideEmpty || hasLabels) && (
+              <div className="metadata-row">
+                <span className="metadata-row-label">
+                  <TagIcon /> {t("board.cardModal.labels")}
+                </span>
+                <div className="metadata-row-value label-picker">
+                  {LABEL_COLORS.map((meta) => (
+                    <button
+                      key={meta.id}
+                      type="button"
+                      className={"label-chip" + (card.labels.includes(meta.id) ? " active" : "")}
+                      style={{ background: meta.color }}
+                      disabled={readOnly}
+                      onClick={() => toggleLabel(meta.id)}
+                    >
+                      {card.labels.includes(meta.id) ? "✓" : ""}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(!hideEmpty || hasLocation) && (
+              <div className="metadata-row">
+                <span className="metadata-row-label">
+                  <PinIcon /> {t("board.cardModal.location")}
+                </span>
+                <div className="metadata-row-value">
+                  {readOnly ? (
+                    <div className="modal-readonly-value">{card.location?.address || t("board.cardModal.noLocation")}</div>
+                  ) : (
+                    <form className="location-form" onSubmit={handleLocateAddress}>
+                      <input
+                        type="text"
+                        className="modal-date location-input"
+                        placeholder={t("board.cardModal.addressPlaceholder")}
+                        value={addressInput}
+                        onChange={(e) => setAddressInput(e.target.value)}
+                      />
+                      <button type="submit" className="btn-primary btn-small" disabled={geocoding}>
+                        {geocoding ? t("board.cardModal.locating") : t("board.cardModal.locate")}
+                      </button>
+                    </form>
+                  )}
+                  {geocodeError && <div className="auth-error" style={{ marginTop: 8 }}>{geocodeError}</div>}
+                  {card.location?.lat != null && (
+                    <div className="location-confirmed">
+                      <PinIcon /> {t("board.cardModal.locationFound")}
+                    </div>
+                  )}
+                  {card.location?.address && card.location?.lat == null && !geocoding && (
+                    <div className="location-pending">{t("board.cardModal.locationPending")}</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!readOnly && (
+              <div className="metadata-row">
+                <span className="metadata-row-label">
+                  <ListIcon /> {t("board.cardModal.moveToList")}
+                </span>
+                <select className="modal-select metadata-row-value" value={currentList?.id || ""} onChange={moveToList}>
+                  {board.lists.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.title}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
           </div>
 
-          <div className="modal-section">
-            <label className="modal-label">{t("board.cardModal.labels")}</label>
-            <div className="label-picker">
-              {LABEL_COLORS.map((meta) => (
-                <button
-                  key={meta.id}
-                  type="button"
-                  className={"label-chip" + (card.labels.includes(meta.id) ? " active" : "")}
-                  style={{ background: meta.color }}
-                  disabled={readOnly}
-                  onClick={() => toggleLabel(meta.id)}
-                >
-                  {card.labels.includes(meta.id) ? "✓" : ""}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="modal-section">
-            <label className="modal-label">{t("board.cardModal.priority")}</label>
-            <div className="priority-toggle-row">
-              <button
-                type="button"
-                className={"priority-chip priority-chip-urgent" + (card.urgent ? " active" : "")}
-                disabled={readOnly}
-                onClick={toggleUrgent}
-              >
-                <UrgentIcon /> {t("board.cardModal.urgent")}
-              </button>
-              <button
-                type="button"
-                className={"priority-chip priority-chip-important" + (card.important ? " active" : "")}
-                disabled={readOnly}
-                onClick={toggleImportant}
-              >
-                <ImportantIcon /> {t("board.cardModal.important")}
-              </button>
-            </div>
-          </div>
-
-          <div className="modal-section modal-section-row">
-            <div>
-              <label className="modal-label">{t("board.cardModal.startDate")}</label>
-              <input type="date" className="modal-date" value={card.startDate || ""} disabled={readOnly} onChange={handleStartDateChange} />
-            </div>
-            <div>
-              <label className="modal-label">{t("board.cardModal.dueDate")}</label>
-              <input type="date" className="modal-date" value={card.due || ""} disabled={readOnly} onChange={handleDueChange} />
-            </div>
-          </div>
-
-          <div className="modal-section">
-            <label className="modal-label">{t("board.cardModal.location")}</label>
-            {readOnly ? (
-              <div className="modal-readonly-value">{card.location?.address || t("board.cardModal.noLocation")}</div>
-            ) : (
-              <form className="location-form" onSubmit={handleLocateAddress}>
-                <input
-                  type="text"
-                  className="modal-date location-input"
-                  placeholder={t("board.cardModal.addressPlaceholder")}
-                  value={addressInput}
-                  onChange={(e) => setAddressInput(e.target.value)}
-                />
-                <button type="submit" className="btn-primary btn-small" disabled={geocoding}>
-                  {geocoding ? t("board.cardModal.locating") : t("board.cardModal.locate")}
-                </button>
-              </form>
-            )}
-            {geocodeError && <div className="auth-error" style={{ marginTop: 8 }}>{geocodeError}</div>}
-            {card.location?.lat != null && (
-              <div className="location-confirmed">
-                <PinIcon /> {t("board.cardModal.locationFound")}
-              </div>
-            )}
-            {card.location?.address && card.location?.lat == null && !geocoding && (
-              <div className="location-pending">{t("board.cardModal.locationPending")}</div>
-            )}
-          </div>
+          <button type="button" className="collapse-empty-toggle" onClick={() => setHideEmpty((v) => !v)}>
+            <CollapseIcon />
+            {hideEmpty ? t("board.cardModal.showEmpty") : t("board.cardModal.collapseEmpty")}
+          </button>
 
           <div className="modal-section">
             <label className="modal-label">{t("board.cardModal.description")}</label>
             <textarea
+              ref={descriptionRef}
               className="modal-textarea"
               placeholder={t("board.cardModal.descriptionPlaceholder")}
               value={description}

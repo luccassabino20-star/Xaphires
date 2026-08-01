@@ -2,7 +2,7 @@
   --bg-app: #dee2e8;
   --bg-topbar: #ffffff;
   --bg-list: #e6e9ed;
-  --bg-column: #f4f5f7;
+  --bg-column: #f7f8f9;
   --bg-card: #ffffff;
   --bg-card-hover: #ffffff;
   --border-subtle: #ced3da;
@@ -22,8 +22,19 @@
   --shadow-card-hover: 0 2px 4px rgba(20,22,30,0.05), 0 8px 18px rgba(20,22,30,0.10);
   --shadow-list: 0 1px 2px rgba(20,22,30,0.04);
   --shadow-modal: 0 20px 50px rgba(0,0,0,0.25);
-  --radius-card: 10px;
-  --radius-list: 14px;
+  --radius-card: 12px;
+  --radius-list: 16px;
+  /* Borda do quadro (coluna/cartão) é mais clara que --border-subtle de propósito -
+     pedido de visual estilo ClickUp 3.0, mais neutro que o cinza-azulado do resto do
+     app. Escopada aqui (não é --border-subtle) para não mudar borda de botão/input/
+     modal no app inteiro. */
+  --list-border: #eaeaea;
+  --card-border: #e0e0e0;
+  /* Pill de status neutro (coluna sem cor própria escolhida - ver list.color em
+     ListColumn.jsx). Cor com dono (list.color) usa --list-accent/--list-accent-bg,
+     calculadas ali por color-mix a partir da cor escolhida. */
+  --status-pill-bg: #f0f1f3;
+  --status-pill-text: #616161;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -54,6 +65,10 @@
     --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
     --shadow-list: 0 1px 3px rgba(0,0,0,0.2);
     --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
+    --list-border: #262626;
+    --card-border: #2e2e2e;
+    --status-pill-bg: #2a2a2a;
+    --status-pill-text: #a3a3a3;
   }
 }
 
@@ -77,12 +92,16 @@
   --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
   --shadow-list: 0 1px 3px rgba(0,0,0,0.2);
   --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
+  --list-border: #262626;
+  --card-border: #2e2e2e;
+  --status-pill-bg: #2a2a2a;
+  --status-pill-text: #a3a3a3;
 }
 :root[data-theme="light"] {
   --bg-app: #dee2e8;
   --bg-topbar: #ffffff;
   --bg-list: #e6e9ed;
-  --bg-column: #f4f5f7;
+  --bg-column: #f7f8f9;
   --bg-card: #ffffff;
   --bg-card-hover: #ffffff;
   --border-subtle: #ced3da;
@@ -97,6 +116,10 @@
   --shadow-card-hover: 0 2px 4px rgba(20,22,30,0.05), 0 8px 18px rgba(20,22,30,0.10);
   --shadow-list: 0 1px 2px rgba(20,22,30,0.04);
   --shadow-modal: 0 20px 50px rgba(0,0,0,0.25);
+  --list-border: #eaeaea;
+  --card-border: #e0e0e0;
+  --status-pill-bg: #f0f1f3;
+  --status-pill-text: #616161;
 }
 
 * { box-sizing: border-box; }
@@ -620,90 +643,13 @@ input, textarea { font-family: inherit; }
   .calendar-weekday { font-size: 9.5px; padding: 6px 4px; }
 }
 
-/* ---------- Timeline view ---------- */
-.timeline-scroll { padding: 20px; overflow-y: auto; overflow-x: hidden; }
-.timeline-wrap {
-  background: var(--bg-topbar);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  width: 100%;
-}
-
-.timeline-labels-col { flex-shrink: 0; width: 180px; display: flex; flex-direction: column; border-right: 1px solid var(--border-subtle); background: var(--bg-list); }
-.timeline-row-label {
-  padding: 0 14px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-}
-.timeline-labels-col .timeline-row-label:last-child { border-bottom: none; }
-.timeline-axis-spacer { background: var(--bg-list); }
-
-.timeline-scale-col { position: relative; flex: 1; min-width: 0; cursor: grab; touch-action: none; user-select: none; }
-.timeline-scale-col:active { cursor: grabbing; }
-
-.timeline-axis-svg { display: block; background: var(--bg-list); border-bottom: 1px solid var(--border-subtle); }
-.timeline-axis .domain { stroke: var(--border-subtle); }
-.timeline-axis .tick line { stroke: var(--border-subtle); }
-.timeline-axis .tick text { fill: var(--text-muted); font-size: 10.5px; }
-
-.timeline-grid { position: absolute; left: 0; right: 0; bottom: 0; pointer-events: none; }
-.timeline-grid-line { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--border-subtle); }
-.timeline-today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--danger); opacity: 0.6; z-index: 1; }
-
-.timeline-row-track { position: relative; border-bottom: 1px solid var(--border-subtle); }
-.timeline-row-track:last-child { border-bottom: none; }
-
-.timeline-toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 12px; }
-.timeline-hint { font-size: 12.5px; color: var(--text-muted); }
-.timeline-reset-btn {
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-topbar);
-  color: var(--text-primary);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.timeline-reset-btn:hover { background: var(--bg-list); }
-
-.timeline-bar {
-  position: absolute;
-  top: 8px;
-  height: 30px;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-size: 11.5px;
-  font-weight: 600;
-  padding: 0 8px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  text-align: left;
-  z-index: 2;
-  box-shadow: var(--shadow-card);
-}
-.timeline-bar.completed { opacity: 0.55; text-decoration: line-through; }
-.timeline-bar:hover { filter: brightness(1.08); }
-
-.timeline-footnote { margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
-
 /* ---------- Gantt chart genérico (src/components/gantt) ----------
-   Usado pela Timeline de atas (MinutesGanttView) e pela demo isolada
-   (/gantt-demo) - prefixo próprio "gnt-" porque é um componente à parte, não
-   deriva de .timeline-*. Cores de status são hex fixo (mesmo padrão de
-   LABEL_COLORS em utils/labels.js), não var(--accent) - precisam parecer
-   iguais nos dois temas. */
+   Usado pela visão Gantt do quadro (BoardGanttView, no lugar onde a Linha do
+   Tempo ficava no ViewSwitcher), pela visão Gantt das atas (MinutesGanttView)
+   e pela demo isolada (/gantt-demo) - prefixo próprio "gnt-" porque é um
+   componente à parte, desacoplado de qualquer entidade real. Cores de status
+   são hex fixo (mesmo padrão de LABEL_COLORS em utils/labels.js), não
+   var(--accent) - precisam parecer iguais nos dois temas. */
 /* body é overflow:hidden no app inteiro (cada tela rola dentro de si mesma,
    ver .view-scroll) - esta página precisa da própria rolagem, "min-height:
    100vh" sozinho ficaria cortado sem barra nenhuma pra descer. */
@@ -897,6 +843,7 @@ input, textarea { font-family: inherit; }
 }
 .gnt-bar.dragging { cursor: grabbing; filter: brightness(1.1); z-index: 3; }
 .gnt-bar:hover { filter: brightness(1.06); }
+.gnt-bar-readonly { cursor: pointer; }
 .gnt-bar-label { overflow: hidden; text-overflow: ellipsis; }
 .gnt-bar-icon { flex-shrink: 0; opacity: 0.95; }
 .gnt-bar-late-badge {
@@ -1154,7 +1101,7 @@ input, textarea { font-family: inherit; }
 /* ---------- List ---------- */
 .list {
   background: var(--bg-column);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--list-border);
   box-shadow: var(--shadow-list);
   border-radius: var(--radius-list);
   width: 276px;
@@ -1162,44 +1109,51 @@ input, textarea { font-family: inherit; }
   max-height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 6px;
+  padding: 10px 8px;
 }
 
 .list-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 8px 10px 8px;
+  padding: 2px 6px 12px 6px;
   gap: 6px;
   cursor: grab;
   position: relative;
 }
 
+/* Pill de status: bg/texto pastel vindos de --list-accent-bg/--list-accent quando a
+   lista tem cor própria (ver listStyle em ListColumn.jsx); sem cor, cai no par
+   neutro --status-pill-bg/--status-pill-text (equivalente ao "Pendente" cinza do
+   ClickUp). O input continua editável - field-sizing deixa a pill abraçar o texto
+   em vez de esticar; sem suporte (fora do Chrome/Edge recentes) ele só volta a
+   ocupar a largura padrão do input, sem quebrar a edição. */
 .list-title {
-  font-size: 13.5px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: -0.01em;
-  background: transparent;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  background: var(--list-accent-bg, var(--status-pill-bg));
+  color: var(--list-accent, var(--status-pill-text));
   border: none;
   outline: none;
-  color: var(--text-primary);
-  width: 100%;
-  padding: 4px 6px;
-  border-radius: 6px;
+  border-radius: 9999px;
+  padding: 5px 14px;
   min-width: 0;
+  max-width: 100%;
+  field-sizing: content;
 }
-.list-title:focus { background: var(--bg-card); box-shadow: inset 0 0 0 2px var(--border-strong); }
+.list-title:focus { box-shadow: inset 0 0 0 2px var(--list-accent, var(--border-strong)); }
 
 .list-count {
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 1px 8px;
-  margin-left: 4px;
+  background: transparent;
+  border: none;
+  padding: 1px 4px;
+  margin-left: 2px;
   flex-shrink: 0;
 }
 
@@ -1235,9 +1189,9 @@ input, textarea { font-family: inherit; }
 /* ---------- Card ---------- */
 .card {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-card);
-  padding: 9px 11px;
+  padding: 10px 12px;
   box-shadow: var(--shadow-card);
   cursor: grab;
   position: relative;
@@ -1261,7 +1215,7 @@ input, textarea { font-family: inherit; }
 .card-title-text {
   flex: 1;
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: -0.006em;
   color: var(--text-primary);
   line-height: 1.42;
@@ -1305,6 +1259,7 @@ input, textarea { font-family: inherit; }
 .card-meta-item { display: flex; align-items: center; gap: 3px; }
 .card-meta-item svg { display: block; }
 .card-meta-item.due-overdue { color: var(--danger); font-weight: 600; }
+.card-meta-item.due-done { color: var(--success); font-weight: 600; }
 
 .card-avatars { display: flex; align-items: center; }
 
@@ -1340,20 +1295,23 @@ input, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-secondary);
+  /* Cor temática: acompanha --list-accent quando a lista tem cor própria (ver
+     ListColumn.jsx), senão cai no cinza padrão - é o mesmo par usado na pill do
+     título logo acima, para o botão ler como parte daquela coluna. */
+  color: var(--list-accent, var(--text-secondary));
+  font-weight: 600;
   background: transparent;
   border: none;
   border-radius: 8px;
   padding: 8px 8px;
   font-size: 13.5px;
-  font-weight: 500;
   cursor: pointer;
   text-align: left;
   width: 100%;
   transition: background 0.12s ease, color 0.12s ease;
 }
-.add-card-btn:hover { background: rgba(0,0,0,0.06); color: var(--text-primary); }
-@media (prefers-color-scheme: dark) { .add-card-btn:hover { background: rgba(255,255,255,0.08); } }
+.add-card-btn:hover { background: var(--list-accent-bg, rgba(0,0,0,0.06)); }
+@media (prefers-color-scheme: dark) { .add-card-btn:hover { background: var(--list-accent-bg, rgba(255,255,255,0.08)); } }
 
 .add-list-btn {
   background: var(--bg-card);
@@ -1668,6 +1626,159 @@ input, textarea { font-family: inherit; }
   font-family: inherit;
 }
 
+/* ---------- Datepicker (estilo Todoist/ClickUp) ----------
+   Componente próprio, sem lib externa - dois campos (início/vencimento) que
+   abrem o mesmo popover de atalhos + calendário. Cor do dia selecionado é hex
+   fixo (#DD4B39, o coral do Todoist), não var(--accent) - é a identidade do
+   componente, igual LABEL_COLORS/GANTT_STATUS já fazem em outros lugares. */
+.datepicker { position: relative; flex-shrink: 0; }
+
+.datepicker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  background: var(--status-pill-bg);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.datepicker-trigger:hover { background: var(--border-subtle); }
+.datepicker-trigger.has-value { color: var(--text-primary); font-weight: 600; }
+.datepicker-trigger.open { border-color: var(--text-primary); background: var(--bg-card); }
+.datepicker-trigger:disabled { cursor: default; opacity: 0.7; }
+.datepicker-trigger svg { flex-shrink: 0; color: var(--text-muted); }
+
+.datepicker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+
+.datepicker-presets {
+  width: 190px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-subtle);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.datepicker-preset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+.datepicker-preset:hover { background: var(--status-pill-bg); }
+.datepicker-preset.active { background: var(--status-pill-bg); }
+.datepicker-preset-date { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+.datepicker-recurrence { margin-top: 6px; padding-top: 9px; border-top: 1px solid var(--border-subtle); color: var(--text-secondary); }
+.datepicker-clear {
+  margin-top: 6px;
+  border: none;
+  background: transparent;
+  color: var(--danger);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 10px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+.datepicker-clear:hover { background: var(--status-pill-bg); border-radius: 8px; }
+
+.datepicker-calendar { width: 300px; padding: 12px 14px 14px; }
+.datepicker-cal-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.datepicker-cal-month { flex: 1; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+.datepicker-today-btn {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-topbar);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.datepicker-today-btn:hover { background: var(--status-pill-bg); }
+.datepicker-nav-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.datepicker-nav-btn:hover { background: var(--status-pill-bg); color: var(--text-primary); }
+
+.datepicker-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+.datepicker-weekdays span {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.datepicker-days { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; }
+.datepicker-day {
+  aspect-ratio: 1;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.datepicker-day:hover { background: var(--status-pill-bg); }
+.datepicker-day.outside { color: var(--text-muted); opacity: 0.55; font-weight: 500; }
+.datepicker-day.today { box-shadow: inset 0 0 0 1.5px var(--text-muted); }
+.datepicker-day.selected { background: #dd4b39; color: white; box-shadow: none; }
+.datepicker-day.selected:hover { background: #c8402f; }
+
+@media (max-width: 640px) {
+  .datepicker-popover { flex-direction: column; left: -8px; }
+  .datepicker-presets { width: auto; border-right: none; border-bottom: 1px solid var(--border-subtle); flex-direction: row; flex-wrap: wrap; }
+  .datepicker-calendar { width: 260px; }
+}
+
 .modal-select {
   width: 100%;
   border: 1px solid var(--border-strong);
@@ -1762,6 +1873,129 @@ input, textarea { font-family: inherit; }
 
 .modal-footer { border-top: 1px solid var(--border-subtle); padding-top: 16px; margin-top: 4px; }
 .modal-footer-split { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+/* ---------- Card detail modal (estilo ClickUp) ----------
+   Escopado em .card-detail-modal de propósito: .modal/.modal-overlay/.modal-*
+   são a base compartilhada por 13 modais do app (arquivo, cobrança, atas,
+   compartilhar...). Mexer nessas regras direto mudaria todos eles - aqui só o
+   cartão ganha o visual novo, via seletor descendente. */
+.card-detail-modal {
+  max-width: 720px;
+  border-radius: 24px;
+  padding: 36px 40px 40px;
+  box-shadow: 0 24px 60px rgba(20,22,30,0.16), var(--shadow-modal);
+}
+@media (max-width: 640px) {
+  .card-detail-modal { padding: 20px 18px 24px; border-radius: 16px; }
+}
+
+.card-detail-breadcrumb { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+
+.card-detail-type-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  margin-bottom: 12px;
+}
+
+.card-detail-header { margin-bottom: 14px; padding-right: 0; }
+.card-detail-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  padding: 4px 8px;
+}
+
+/* Sem IA no app - o clique leva pra descrição (ver onClick em CardModal.jsx).
+   O visual imita a caixa "Ask Brain" da referência, o texto não promete IA. */
+.ai-input-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: var(--bg-list);
+  border: none;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: background 0.12s ease;
+}
+.ai-input-box:hover { background: var(--border-subtle); }
+.ai-input-box svg { flex-shrink: 0; color: var(--text-muted); }
+
+.metadata-grid {
+  display: grid;
+  /* minmax(0, 1fr): sem o minmax, um valor de célula largo (o select de lista,
+     o input de endereço) força a track a crescer além da metade, e as duas
+     colunas do grid saem de tamanhos diferentes - minmax(0, ...) tira o
+     min-content mínimo automático do cálculo, então 1fr volta a valer 50/50. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 32px;
+  row-gap: 18px;
+  margin-bottom: 6px;
+}
+@media (max-width: 640px) {
+  .metadata-grid { grid-template-columns: 1fr; row-gap: 16px; }
+}
+.metadata-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-height: 30px; min-width: 0; }
+.metadata-row-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+.metadata-row-value { flex: 1; min-width: 0; display: flex; justify-content: flex-end; flex-wrap: wrap; }
+.metadata-empty { font-size: 13.5px; color: var(--text-muted); }
+
+.status-pill {
+  border: none;
+  border-radius: 14px;
+  padding: 5px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.status-pill-success { background: var(--success); color: white; }
+.status-pill-neutral { background: var(--status-pill-bg); color: var(--status-pill-text); }
+.status-pill:disabled { cursor: default; opacity: 0.9; }
+
+.date-range { display: flex; align-items: center; gap: 4px; color: var(--text-muted); flex-wrap: nowrap; min-width: 0; }
+.date-range-arrow { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+
+.priority-toggle-row-compact { justify-content: flex-end; }
+.priority-toggle-row-compact .priority-chip { flex: 0 0 auto; padding: 6px 10px; font-size: 12.5px; }
+
+.collapse-empty-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 0 0;
+  margin: 4px 0 20px;
+  cursor: pointer;
+  width: 100%;
+}
+.collapse-empty-toggle:hover { color: var(--text-primary); }
 
 .minutes-author-tag { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-primary); padding: 8px 0; }
 

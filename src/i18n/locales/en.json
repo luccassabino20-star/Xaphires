@@ -537,8 +537,16 @@
       "archiveCard": "Archive",
       "cardArchivedToast": "Card archived",
       "untitled": "Untitled",
+      "typeBadge": "Task",
       "complete": "Complete",
       "markComplete": "Mark as complete",
+      "status": "Status",
+      "statusOpen": "Open",
+      "empty": "Empty",
+      "datesLabel": "Dates",
+      "descriptionShortcut": "Add a description",
+      "collapseEmpty": "Collapse empty fields",
+      "showEmpty": "Show empty fields",
       "moveToList": "Move to list",
       "movedToList": "Card moved to \"{{list}}\"",
       "members": "Members",
@@ -578,7 +586,7 @@
       "board": "Board",
       "table": "Table",
       "calendar": "Calendar",
-      "timeline": "Timeline",
+      "gantt": "Gantt",
       "dashboard": "Dashboard",
       "map": "Map",
       "matrix": "Eisenhower Matrix"
@@ -601,13 +609,6 @@
       "prevMonth": "Previous month",
       "nextMonth": "Next month",
       "more": "+{{count}} more"
-    },
-    "timeline": {
-      "empty": "No cards with a start or due date to show on the timeline.",
-      "undated_one": "{{count}} card with no start/due date not shown.",
-      "undated_other": "{{count}} cards with no start/due date not shown.",
-      "zoomHint": "Drag to pan, scroll to zoom",
-      "resetZoom": "Reset zoom"
     },
     "dashboard": {
       "totalCards": "Total cards",
@@ -635,6 +636,21 @@
       "delegate": { "title": "Delegate", "subtitle": "Urgent, not important" },
       "eliminate": { "title": "Eliminate", "subtitle": "Neither urgent nor important" },
       "dropHere": "Drag cards here"
+    }
+  },
+  "datePicker": {
+    "today": "Today",
+    "clear": "Remove date",
+    "recurrence": "Set up recurrence",
+    "recurrenceHint": "Recurring cards are set up from the board's data menu, not from here",
+    "presets": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "weekend": "Next weekend",
+      "nextWeek": "Next week",
+      "twoWeeks": "2 weeks",
+      "fourWeeks": "4 weeks",
+      "eightWeeks": "8 weeks"
     }
   },
   "gantt": {

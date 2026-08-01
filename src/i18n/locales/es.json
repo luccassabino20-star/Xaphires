@@ -537,8 +537,16 @@
       "archiveCard": "Archivar",
       "cardArchivedToast": "Tarjeta archivada",
       "untitled": "Sin título",
+      "typeBadge": "Tarea",
       "complete": "Completada",
       "markComplete": "Marcar como completada",
+      "status": "Estado",
+      "statusOpen": "Abierta",
+      "empty": "Vacío",
+      "datesLabel": "Fechas",
+      "descriptionShortcut": "Añade una descripción",
+      "collapseEmpty": "Ocultar campos vacíos",
+      "showEmpty": "Mostrar campos vacíos",
       "moveToList": "Mover a lista",
       "movedToList": "Tarjeta movida a \"{{list}}\"",
       "members": "Miembros",
@@ -578,7 +586,7 @@
       "board": "Tablero",
       "table": "Tabla",
       "calendar": "Calendario",
-      "timeline": "Línea de tiempo",
+      "gantt": "Gantt",
       "dashboard": "Panel",
       "map": "Mapa",
       "matrix": "Matriz de Eisenhower"
@@ -601,13 +609,6 @@
       "prevMonth": "Mes anterior",
       "nextMonth": "Mes siguiente",
       "more": "+{{count}} más"
-    },
-    "timeline": {
-      "empty": "No hay tarjetas con fecha de inicio o entrega para mostrar en la línea de tiempo.",
-      "undated_one": "{{count}} tarjeta sin fecha de inicio/entrega no mostrada.",
-      "undated_other": "{{count}} tarjetas sin fecha de inicio/entrega no mostradas.",
-      "zoomHint": "Arrastra para desplazar, usa la rueda para hacer zoom",
-      "resetZoom": "Restablecer zoom"
     },
     "dashboard": {
       "totalCards": "Total de tarjetas",
@@ -635,6 +636,21 @@
       "delegate": { "title": "Delegar", "subtitle": "Urgente, no importante" },
       "eliminate": { "title": "Eliminar", "subtitle": "Ni urgente ni importante" },
       "dropHere": "Arrastra tarjetas aquí"
+    }
+  },
+  "datePicker": {
+    "today": "Hoy",
+    "clear": "Quitar fecha",
+    "recurrence": "Configurar recurrencia",
+    "recurrenceHint": "Las tarjetas recurrentes se configuran desde el menú de datos del tablero, no desde aquí",
+    "presets": {
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "weekend": "Próximo fin de semana",
+      "nextWeek": "Próxima semana",
+      "twoWeeks": "2 semanas",
+      "fourWeeks": "4 semanas",
+      "eightWeeks": "8 semanas"
     }
   },
   "gantt": {

@@ -834,8 +834,16 @@
       "archiveCard": "Arquivar",
       "cardArchivedToast": "Cartão arquivado",
       "untitled": "Sem título",
+      "typeBadge": "Tarefa",
       "complete": "Concluído",
       "markComplete": "Marcar como concluído",
+      "status": "Status",
+      "statusOpen": "Em aberto",
+      "empty": "Vazio",
+      "datesLabel": "Datas",
+      "descriptionShortcut": "Adicione uma descrição",
+      "collapseEmpty": "Recolher campos vazios",
+      "showEmpty": "Mostrar campos vazios",
       "moveToList": "Mover para lista",
       "movedToList": "Cartão movido para \"{{list}}\"",
       "members": "Membros",
@@ -875,7 +883,7 @@
       "board": "Quadro",
       "table": "Tabela",
       "calendar": "Calendário",
-      "timeline": "Linha do tempo",
+      "gantt": "Gantt",
       "dashboard": "Painel",
       "map": "Mapa",
       "matrix": "Matriz Eisenhower"
@@ -898,13 +906,6 @@
       "prevMonth": "Mês anterior",
       "nextMonth": "Próximo mês",
       "more": "+{{count}} mais"
-    },
-    "timeline": {
-      "empty": "Nenhum cartão com data de início ou entrega para mostrar na linha do tempo.",
-      "undated_one": "{{count}} cartão sem data de início/entrega não exibido.",
-      "undated_other": "{{count}} cartões sem data de início/entrega não exibidos.",
-      "zoomHint": "Arraste para navegar, use a roda do mouse para dar zoom",
-      "resetZoom": "Redefinir zoom"
     },
     "dashboard": {
       "totalCards": "Total de cartões",
@@ -951,6 +952,21 @@
         "subtitle": "Nem urgente, nem importante"
       },
       "dropHere": "Arraste cartões para cá"
+    }
+  },
+  "datePicker": {
+    "today": "Hoje",
+    "clear": "Remover data",
+    "recurrence": "Configurar recorrência",
+    "recurrenceHint": "Cartões recorrentes se configuram pelo menu de dados do quadro, não por aqui",
+    "presets": {
+      "today": "Hoje",
+      "tomorrow": "Amanhã",
+      "weekend": "Próximo final de semana",
+      "nextWeek": "Semana que vem",
+      "twoWeeks": "2 semanas",
+      "fourWeeks": "4 semanas",
+      "eightWeeks": "8 semanas"
     }
   },
   "gantt": {
