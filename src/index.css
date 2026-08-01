@@ -302,26 +302,6 @@ input, textarea { font-family: inherit; }
   padding: 2px 8px 4px;
 }
 
-/* ---------- Sidebar: Atas de Reunião nav ---------- */
-.sidebar-minutes-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  padding: 9px 8px;
-  border-radius: 6px;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.sidebar-minutes-nav:hover { background: var(--bg-list); color: var(--text-primary); }
-.sidebar-minutes-nav.active { background: var(--bg-list); color: var(--text-primary); }
-.sidebar-minutes-nav-icon { display: flex; align-items: center; flex-shrink: 0; }
-
 /* ---------- Main area / Topbar ---------- */
 .main-area {
   flex: 1;
@@ -645,11 +625,11 @@ input, textarea { font-family: inherit; }
 
 /* ---------- Gantt chart genérico (src/components/gantt) ----------
    Usado pela visão Gantt do quadro (BoardGanttView, no lugar onde a Linha do
-   Tempo ficava no ViewSwitcher), pela visão Gantt das atas (MinutesGanttView)
-   e pela demo isolada (/gantt-demo) - prefixo próprio "gnt-" porque é um
-   componente à parte, desacoplado de qualquer entidade real. Cores de status
-   são hex fixo (mesmo padrão de LABEL_COLORS em utils/labels.js), não
-   var(--accent) - precisam parecer iguais nos dois temas. */
+   Tempo ficava no ViewSwitcher) e pela demo isolada (/gantt-demo) - prefixo
+   próprio "gnt-" porque é um componente à parte, desacoplado de qualquer
+   entidade real. Cores de status são hex fixo (mesmo padrão de LABEL_COLORS
+   em utils/labels.js), não var(--accent) - precisam parecer iguais nos dois
+   temas. */
 /* body é overflow:hidden no app inteiro (cada tela rola dentro de si mesma,
    ver .view-scroll) - esta página precisa da própria rolagem, "min-height:
    100vh" sozinho ficaria cortado sem barra nenhuma pra descer. */
@@ -1207,6 +1187,188 @@ input, textarea { font-family: inherit; }
 .card.dimmed { opacity: 0.25; pointer-events: none; }
 .card.completed { background: var(--bg-card); }
 
+/* Barra de ações rápidas (hover, estilo ClickUp) - .card já é position:relative
+   acima. Some por padrão e só aparece no hover do card, sem ocupar espaço no
+   layout quando fechada (visibility, não display, para a transição de opacity
+   não ficar seca). */
+.quick-actions-bar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  padding: 4px 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  box-shadow: var(--shadow-card-hover);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+.card:hover .quick-actions-bar { opacity: 1; visibility: visible; }
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.quick-action-btn:hover { background: var(--bg-list); color: var(--text-primary); }
+
+/* Dropdown do "..." por portal em document.body (mesmo motivo do popover do
+   DatePicker: a coluna do quadro rola com overflow, e um menu relativo ao
+   card cortaria perto do fim da lista). Fixed + coordenadas calculadas no
+   componente. */
+.quick-actions-dropdown {
+  position: fixed;
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  padding: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: var(--shadow-modal);
+}
+.quick-actions-dropdown button {
+  text-align: left;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+.quick-actions-dropdown button:hover { background: var(--bg-list); }
+.quick-actions-dropdown-danger { color: var(--danger) !important; }
+
+/* ---------- Subtarefas expansíveis (accordion, estilo ClickUp) ----------
+   .kanban-card-wrapper substitui o .card como filho direto de .cards-container:
+   o gap:7px do container passa a separar cartões pai (com sua cauda de
+   subtarefas) uns dos outros, e um gap menor aqui dentro cola a lista de
+   subtarefas no pai a que pertence. */
+.kanban-card-wrapper { display: flex; flex-direction: column; gap: 4px; }
+
+.subtasks-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 8px;
+  background: var(--status-pill-bg);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.subtasks-toggle-btn:hover { color: var(--text-primary); background: var(--border-subtle); }
+.subtasks-toggle-btn svg { transition: transform 0.18s ease; }
+.subtasks-toggle-btn.expanded svg { transform: rotate(180deg); }
+
+/* max-height fixo (não medido) é de propósito - simples e cobre o caso real
+   (poucas subtarefas por card); ver pedido original por essa abordagem em
+   vez de JS medindo altura a cada toggle. Recuo só por margin-left, sem linha
+   vertical - a hierarquia fica só no espaçamento, estilo ClickUp. */
+.subtasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 16px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+}
+.subtasks-container.open { max-height: 900px; opacity: 1; margin-top: 8px; }
+
+/* .subtask-card reaproveita card-title-row/card-footer-row/card-meta/
+   card-avatars/quick-actions-bar do card pai (ver CardItem.jsx), só troca o
+   cursor (cartão normal é arrastável, a mini-cópia não) e afina cantos/
+   padding pra ficar visivelmente mais compacto que o pai, não uma cópia do
+   mesmo tamanho apenas recuada. */
+.subtask-card {
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.subtask-card:active { cursor: pointer; }
+
+/* O DatePicker (compact) fora do modal herdaria o botão-pílula cinza do
+   sidebar do CardModal (.datepicker-trigger, padding 7px 12px, fundo
+   --status-pill-bg) - vira uma caixa cinza grande e vazia num rodapé deste
+   tamanho. Sem valor: só o ícone, discreto, do tamanho dos outros botões da
+   linha. Com valor: texto compacto, sem fundo sólido. */
+.subtask-card .datepicker-trigger-compact {
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  justify-content: center;
+}
+.subtask-card .datepicker-trigger-compact:hover { background: var(--bg-list); color: var(--text-secondary); }
+.subtask-card .datepicker-trigger-compact.has-value {
+  width: auto;
+  padding: 0 6px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/* Prioridade/prazo/responsável editáveis direto no mini-card (SubtaskCard.jsx)
+   - mesmo par urgente/importante do card principal, só que como botão em vez
+   de emblema fixo. */
+.subtask-priority-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.subtask-priority-btn:hover { background: var(--bg-list); color: var(--text-secondary); }
+.subtask-priority-btn.active-urgent { color: var(--danger); }
+.subtask-priority-btn.active-important { color: var(--accent); }
+.subtask-priority-btn:disabled { cursor: default; }
+
+/* Picker de responsável do mini-card, por portal (mesmo motivo do dropdown
+   de ações e do popover do DatePicker: escapar do overflow da coluna). */
+.subtask-card-member-picker {
+  position: fixed;
+  z-index: 600;
+  width: 190px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: var(--shadow-modal);
+}
+
 .card-labels { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
 .card-label { height: 7px; width: 34px; border-radius: 4px; }
 
@@ -1461,6 +1623,11 @@ input, textarea { font-family: inherit; }
   padding: 48px 16px;
   overflow-y: auto;
 }
+/* Modal do cartão é o único com altura própria controlada (max-height, ver
+   .card-detail-modal) - os outros 12 modais do app dependem do padding do
+   overlay pra não colar na borda da tela em conteúdo curto. Reduzir só aqui
+   sobra mais altura de verdade pro modal grande, sem mudar os outros. */
+.modal-overlay:has(.card-detail-modal) { padding: 20px 16px; }
 
 .modal {
   background: var(--bg-topbar);
@@ -1653,11 +1820,14 @@ input, textarea { font-family: inherit; }
 .datepicker-trigger:disabled { cursor: default; opacity: 0.7; }
 .datepicker-trigger svg { flex-shrink: 0; color: var(--text-muted); }
 
+/* position:fixed + portal em document.body (ver DatePicker.jsx) - top/left vêm
+   por style inline, calculados a partir do gatilho a cada abertura. Escapa de
+   qualquer overflow:hidden/auto de ancestral, necessário porque o modal de
+   cartão tem coluna com rolagem própria (.card-detail-sidebar) estreita
+   demais pro popover, que é bem mais largo que ela. */
 .datepicker-popover {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 30;
+  position: fixed;
+  z-index: 600;
   display: flex;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -1774,7 +1944,9 @@ input, textarea { font-family: inherit; }
 .datepicker-day.selected:hover { background: #c8402f; }
 
 @media (max-width: 640px) {
-  .datepicker-popover { flex-direction: column; left: -8px; }
+  /* left/top continuam vindo do style inline (calculado em JS) - só a forma
+     muda pra caber na largura da tela. */
+  .datepicker-popover { flex-direction: column; }
   .datepicker-presets { width: auto; border-right: none; border-bottom: 1px solid var(--border-subtle); flex-direction: row; flex-wrap: wrap; }
   .datepicker-calendar { width: 260px; }
 }
@@ -1794,7 +1966,10 @@ input, textarea { font-family: inherit; }
 .modal-section-row { display: flex; gap: 20px; }
 .modal-section-row > div { flex: 1; }
 
-.location-form { display: flex; gap: 8px; }
+.location-form { display: flex; gap: 8px; width: 100%; }
+/* Barra lateral estreita - input + botão lado a lado não cabem; empilha. */
+.metadata-row-value .location-form { flex-direction: column; }
+.metadata-row-value .location-input { width: 100%; }
 .location-input { flex: 1; width: auto; }
 .location-confirmed { margin-top: 8px; font-size: 12.5px; color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 5px; }
 .location-pending { margin-top: 8px; font-size: 12.5px; color: var(--text-muted); }
@@ -1871,6 +2046,147 @@ input, textarea { font-family: inherit; }
 .attachment-item:hover .checklist-item-remove { opacity: 1; }
 .attachment-actions { display: flex; gap: 8px; }
 
+/* ---------- Subtarefas (estilo ClickUp) ----------
+   Separado do Checklist de propósito: subtarefa carrega responsável, prazo e
+   urgência (ver card.subtasks); checklist continua sendo item de texto raso.
+   As duas seções convivem no modal, cada uma com o peso que já tinha. */
+.subtasks-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.subtasks-label { margin-bottom: 0; }
+.subtasks-progress { display: flex; align-items: center; gap: 8px; }
+.subtasks-progress-bar { width: 64px; height: 6px; background: var(--bg-list); border-radius: 4px; overflow: hidden; }
+.subtasks-progress-fill { height: 100%; background: var(--success); border-radius: 4px; transition: width 0.15s; }
+.subtasks-progress span { font-size: 11.5px; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.subtask-list { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.subtask-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.subtask-row:hover { background: var(--bg-list); }
+
+.subtask-check {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  background: var(--bg-card);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+.subtask-check:hover { border-color: var(--success); }
+.subtask-check.checked { background: var(--success); border-color: var(--success); }
+.subtask-check:disabled { cursor: default; }
+
+.subtask-title { flex: 1; min-width: 0; font-size: 13.5px; color: var(--text-primary); overflow-wrap: break-word; }
+.subtask-row.done .subtask-title { color: var(--text-muted); text-decoration: line-through; }
+
+.subtask-badges { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+
+.subtask-flag-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+}
+.subtask-row:hover .subtask-flag-btn, .subtask-flag-btn.active { opacity: 1; }
+.subtask-flag-btn:hover { background: var(--border-subtle); }
+.subtask-flag-urgent.active { color: var(--danger); }
+.subtask-flag-important.active { color: var(--accent); }
+.subtask-flag-btn:disabled { cursor: default; }
+
+/* Badge de prazo compacto - reaproveita o DatePicker (ver prop `compact`),
+   só encolhido pra caber numa linha que já tem outros badges. */
+.subtask-badges .datepicker-trigger-compact {
+  padding: 4px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  gap: 0;
+}
+.subtask-badges .datepicker-trigger-compact:hover { background: var(--border-subtle); }
+.subtask-badges .datepicker-trigger-compact.has-value { color: var(--text-secondary); font-weight: 700; font-size: 11px; padding: 4px 6px; }
+
+.subtask-assignee { position: relative; flex-shrink: 0; }
+.subtask-avatar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+.subtask-avatar-btn:hover { background: var(--border-subtle); }
+.subtask-avatar-btn .avatar-small { width: 22px; height: 22px; font-size: 9px; margin-left: 0; }
+.subtask-member-picker { position: absolute; top: calc(100% + 4px); right: 0; z-index: 20; width: 180px; }
+
+.subtask-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  flex-shrink: 0;
+}
+.subtask-row:hover .subtask-remove { opacity: 1; }
+.subtask-remove:hover { background: var(--border-subtle); color: var(--danger); }
+
+.add-subtask-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.add-subtask-btn:hover { background: var(--bg-list); color: var(--text-primary); }
+
+.subtask-add-form input {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13.5px;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+}
+.subtask-add-form input:focus { box-shadow: inset 0 0 0 2px var(--accent); }
+
 .modal-footer { border-top: 1px solid var(--border-subtle); padding-top: 16px; margin-top: 4px; }
 .modal-footer-split { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 
@@ -1879,15 +2195,54 @@ input, textarea { font-family: inherit; }
    são a base compartilhada por 13 modais do app (arquivo, cobrança, atas,
    compartilhar...). Mexer nessas regras direto mudaria todos eles - aqui só o
    cartão ganha o visual novo, via seletor descendente. */
+/* Duas colunas (conteúdo principal rolável + barra lateral de metadados) pra
+   caber na tela sem esticar verticalmente - a versão anterior, empilhada,
+   passava fácil de 1200px de altura com checklist+anexos preenchidos. Cada
+   coluna rola por conta própria; só o cabeçalho (fora daqui) e o rodapé ficam
+   fixos. overflow:hidden aqui é só pra arredondar os cantos por cima das
+   colunas - quem rola são .card-detail-main/.card-detail-sidebar, não isto. */
 .card-detail-modal {
-  max-width: 720px;
+  max-width: 1280px;
+  width: 100%;
   border-radius: 24px;
-  padding: 36px 40px 40px;
+  padding: 0;
   box-shadow: 0 24px 60px rgba(20,22,30,0.16), var(--shadow-modal);
+  display: flex;
+  flex-direction: column;
+  /* calc() em vez de só vh: o overlay pai reserva 20px em cima/embaixo pra
+     este modal (ver .modal-overlay:has(.card-detail-modal)), então "vh"
+     sozinho ainda podia sobrar menos espaço do que parece e forçar o overlay
+     inteiro a rolar em vez da coluna certa por dentro. */
+  max-height: min(calc(100vh - 40px), 1040px);
+  overflow: hidden;
 }
-@media (max-width: 640px) {
-  .card-detail-modal { padding: 20px 18px 24px; border-radius: 16px; }
+@media (max-width: 780px) {
+  .card-detail-modal { border-radius: 16px; max-height: 92vh; }
 }
+
+.card-detail-columns { display: flex; flex: 1; min-height: 0; }
+@media (max-width: 780px) {
+  /* Empilha e deixa UMA rolagem só - duas regiões de rolagem independentes
+     dentro uma da outra é ruim no toque (fica ambíguo qual delas responde
+     ao arraste). */
+  .card-detail-columns { flex-direction: column; overflow-y: auto; }
+}
+
+.card-detail-main { flex: 1; min-width: 0; overflow-y: auto; padding: 32px 24px 24px 36px; }
+.card-detail-sidebar {
+  width: 330px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-list);
+  padding: 22px 30px 14px;
+}
+@media (max-width: 780px) {
+  .card-detail-main, .card-detail-sidebar { overflow-y: visible; padding: 20px; }
+  .card-detail-sidebar { width: auto; border-left: none; border-top: 1px solid var(--border-subtle); }
+}
+
+.card-detail-footer { flex-shrink: 0; border-top: 1px solid var(--border-subtle); padding: 14px 36px; margin: 0; }
 
 .card-detail-breadcrumb { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
 
@@ -1906,10 +2261,11 @@ input, textarea { font-family: inherit; }
 
 .card-detail-header { margin-bottom: 14px; padding-right: 0; }
 .card-detail-title {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.01em;
   padding: 4px 8px;
+  width: 100%;
 }
 
 /* Sem IA no app - o clique leva pra descrição (ver onClick em CardModal.jsx).
@@ -1920,7 +2276,7 @@ input, textarea { font-family: inherit; }
   gap: 10px;
   width: 100%;
   text-align: left;
-  background: var(--bg-list);
+  background: var(--bg-card);
   border: none;
   border-radius: 10px;
   padding: 14px 16px;
@@ -1933,31 +2289,21 @@ input, textarea { font-family: inherit; }
 .ai-input-box:hover { background: var(--border-subtle); }
 .ai-input-box svg { flex-shrink: 0; color: var(--text-muted); }
 
-.metadata-grid {
-  display: grid;
-  /* minmax(0, 1fr): sem o minmax, um valor de célula largo (o select de lista,
-     o input de endereço) força a track a crescer além da metade, e as duas
-     colunas do grid saem de tamanhos diferentes - minmax(0, ...) tira o
-     min-content mínimo automático do cálculo, então 1fr volta a valer 50/50. */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: 32px;
-  row-gap: 18px;
-  margin-bottom: 6px;
-}
-@media (max-width: 640px) {
-  .metadata-grid { grid-template-columns: 1fr; row-gap: 16px; }
-}
-.metadata-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-height: 30px; min-width: 0; }
+/* Barra lateral é estreita (300px, menos padding) - rótulo em cima e valor
+   embaixo em largura cheia, ao contrário da grade de 2 colunas larga que a
+   versão empilhada anterior usava e que não cabe aqui. */
+.metadata-grid { display: flex; flex-direction: column; gap: 13px; margin-bottom: 6px; }
+.metadata-row { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
 .metadata-row-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
   flex-shrink: 0;
-  padding-top: 4px;
 }
-.metadata-row-value { flex: 1; min-width: 0; display: flex; justify-content: flex-end; flex-wrap: wrap; }
+.metadata-row-value { width: 100%; min-width: 0; display: flex; justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
 .metadata-empty { font-size: 13.5px; color: var(--text-muted); }
 
 .status-pill {
@@ -1974,10 +2320,16 @@ input, textarea { font-family: inherit; }
 .status-pill-neutral { background: var(--status-pill-bg); color: var(--status-pill-text); }
 .status-pill:disabled { cursor: default; opacity: 0.9; }
 
-.date-range { display: flex; align-items: center; gap: 4px; color: var(--text-muted); flex-wrap: nowrap; min-width: 0; }
+.date-range { display: flex; align-items: center; gap: 4px; color: var(--text-muted); flex-wrap: nowrap; min-width: 0; width: 100%; }
 .date-range-arrow { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+/* Barra lateral estreita - as duas pílulas de data lado a lado não cabem no
+   padding/tamanho padrão do gatilho, então encolhe só aqui (mas cabe o ícone,
+   com a barra em 330px). */
+.date-range .datepicker { min-width: 0; flex: 1; }
+.date-range .datepicker-trigger { padding: 6px 8px; font-size: 12px; gap: 4px; width: 100%; justify-content: center; }
+.date-range .datepicker-trigger span { overflow: hidden; text-overflow: ellipsis; }
 
-.priority-toggle-row-compact { justify-content: flex-end; }
+.priority-toggle-row-compact { justify-content: flex-start; }
 .priority-toggle-row-compact .priority-chip { flex: 0 0 auto; padding: 6px 10px; font-size: 12.5px; }
 
 .collapse-empty-toggle {
@@ -1990,37 +2342,12 @@ input, textarea { font-family: inherit; }
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 600;
-  padding: 12px 0 0;
-  margin: 4px 0 20px;
+  padding: 9px 0 0;
+  margin: 2px 0 0;
   cursor: pointer;
   width: 100%;
 }
 .collapse-empty-toggle:hover { color: var(--text-primary); }
-
-.minutes-author-tag { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-primary); padding: 8px 0; }
-
-.minutes-action-assignee {
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-  padding: 4px 6px;
-  font-size: 12.5px;
-  font-family: inherit;
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  flex-shrink: 0;
-  max-width: 120px;
-}
-.minutes-action-due {
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-  padding: 3px 6px;
-  font-size: 12.5px;
-  font-family: inherit;
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  flex-shrink: 0;
-  width: 132px;
-}
 
 .btn-danger {
   background: transparent;
@@ -2175,56 +2502,6 @@ input, textarea { font-family: inherit; }
   color: var(--text-muted);
   font-size: 14px;
   background: var(--bg-app);
-}
-
-/* ---------- Atas de Reunião ---------- */
-.minutes-screen-title { font-size: 15px; font-weight: 700; padding: 0 4px; }
-.minutes-scroll { padding: 20px; overflow: auto; }
-.minutes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-width: 880px;
-  margin: 0 auto;
-}
-.minutes-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  text-align: left;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-card);
-  border-radius: 8px;
-  padding: 12px 14px;
-  cursor: pointer;
-  box-shadow: var(--shadow-card);
-}
-.minutes-row:hover { background: var(--bg-card-hover); }
-.minutes-row-date {
-  flex-shrink: 0;
-  width: 78px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
-.minutes-row-title {
-  flex: 1;
-  min-width: 0;
-  font-size: 14px;
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.minutes-row-author {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--text-secondary);
 }
 
 /* ---------- Auth / Setup screens ---------- */

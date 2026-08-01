@@ -7,7 +7,10 @@ import { translateError } from "../utils/errors.js";
 import { LABEL_COLORS } from "../utils/labels.js";
 import { initials, colorForUser } from "../utils/members.js";
 import { geocodeAddress, addLinkAttachment, addFileAttachment, removeCardAttachment, attachmentDownloadUrl, getPlan } from "../state/api.js";
+import { uid } from "../utils/id.js";
 import DatePicker from "./DatePicker.jsx";
+import SubtaskItem from "./SubtaskItem.jsx";
+import RecurrencesModal from "./RecurrencesModal.jsx";
 
 function AttachmentFileIcon() {
   return (
@@ -101,7 +104,7 @@ function EditIcon() {
   );
 }
 
-export default function CardModal({ boardId, cardId, onClose }) {
+export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
   const { t } = useTranslation();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -116,6 +119,8 @@ export default function CardModal({ boardId, cardId, onClose }) {
   const [title, setTitle] = useState(card?.title || "");
   const [description, setDescription] = useState(card?.description || "");
   const [checklistText, setChecklistText] = useState("");
+  const [subtaskText, setSubtaskText] = useState("");
+  const [addingSubtask, setAddingSubtask] = useState(false);
   const [memberPickerOpen, setMemberPickerOpen] = useState(false);
   const [addressInput, setAddressInput] = useState(card?.location?.address || "");
   const [geocoding, setGeocoding] = useState(false);
@@ -132,9 +137,18 @@ export default function CardModal({ boardId, cardId, onClose }) {
   // depois que a pessoa recolhe - e aqui parte de dado real (tem valor ou não),
   // não de uma lista fixa de nomes de campo.
   const [hideEmpty, setHideEmpty] = useState(false);
+  const [recurrenceOpen, setRecurrenceOpen] = useState(false);
   const titleRef = useRef(null);
   const fileInputRef = useRef(null);
   const descriptionRef = useRef(null);
+
+  // "+" na barra de ações rápidas do card (CardItem) abre já com o campo de
+  // nova subtarefa aberto - roda só no mount porque o componente inteiro
+  // remonta a cada troca de cardId (key={activeCardId} em AuthenticatedApp).
+  useEffect(() => {
+    if (initialFocus === "subtask" && !readOnly) setAddingSubtask(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let ativo = true;
@@ -250,6 +264,25 @@ export default function CardModal({ boardId, cardId, onClose }) {
   function removeChecklistItem(index) {
     dispatch({ type: "REMOVE_CHECKLIST_ITEM", boardId, cardId, index });
   }
+  function addSubtask(e) {
+    e.preventDefault();
+    const val = subtaskText.trim();
+    if (!val) {
+      setAddingSubtask(false);
+      return;
+    }
+    dispatch({ type: "ADD_SUBTASK", boardId, cardId, id: uid(), title: val });
+    setSubtaskText("");
+  }
+  function toggleSubtask(subtaskId) {
+    dispatch({ type: "TOGGLE_SUBTASK", boardId, cardId, subtaskId });
+  }
+  function updateSubtask(subtaskId, patch) {
+    dispatch({ type: "UPDATE_SUBTASK", boardId, cardId, subtaskId, patch });
+  }
+  function removeSubtask(subtaskId) {
+    dispatch({ type: "REMOVE_SUBTASK", boardId, cardId, subtaskId });
+  }
   function deleteCard() {
     if (!confirm(t("board.cardModal.deleteCardConfirm"))) return;
     dispatch({ type: "DELETE_CARD", boardId, cardId });
@@ -315,6 +348,9 @@ export default function CardModal({ boardId, cardId, onClose }) {
 
   const done = card.checklist.filter((i) => i.done).length;
   const pct = card.checklist.length ? Math.round((done / card.checklist.length) * 100) : 0;
+  const subtasks = card.subtasks || [];
+  const subtasksDone = subtasks.filter((s) => s.done).length;
+  const subtasksPct = subtasks.length ? Math.round((subtasksDone / subtasks.length) * 100) : 0;
   const cardMembers = (card.memberIds || []).map((id) => users.find((m) => m.id === id)).filter(Boolean);
   const currentList = board.lists.find((l) => l.cardIds.includes(cardId));
   const hasDates = !!(card.startDate || card.due);
@@ -323,6 +359,7 @@ export default function CardModal({ boardId, cardId, onClose }) {
   const hasLocation = !!card.location?.address;
 
   return (
+    <>
     <div
       className="modal-overlay"
       onClick={(e) => {
@@ -334,337 +371,419 @@ export default function CardModal({ boardId, cardId, onClose }) {
           &times;
         </button>
 
-        <div className="card-detail-breadcrumb">
-          {board.title}
-          {currentList && <> / {currentList.title}</>}
-        </div>
-
-        <span className="card-detail-type-badge">{t("board.cardModal.typeBadge")}</span>
-
-        <div className="modal-header card-detail-header">
-          <input
-            ref={titleRef}
-            className="modal-title-input card-detail-title"
-            value={title}
-            spellCheck={false}
-            readOnly={readOnly}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={commitTitle}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") e.currentTarget.blur();
-            }}
-          />
-        </div>
-
-        {/* Sem IA neste app - o clique só leva pra descrição, que é a ação real
-            mais próxima do que essa caixa sugere visualmente. */}
-        {!readOnly && (
-          <button type="button" className="ai-input-box" onClick={() => descriptionRef.current?.focus()}>
-            <EditIcon /> {t("board.cardModal.descriptionShortcut")}
-          </button>
-        )}
-
-        <div className="modal-body">
-          {readOnly && <div className="board-readonly-note">{t("board.cardModal.readOnlyNote")}</div>}
-
-          <div className="metadata-grid">
-            <div className="metadata-row">
-              <span className="metadata-row-label">
-                <StatusIcon /> {t("board.cardModal.status")}
-              </span>
-              <button
-                type="button"
-                className={"status-pill" + (card.completed ? " status-pill-success" : " status-pill-neutral")}
-                disabled={readOnly}
-                onClick={toggleCompleted}
-              >
-                {card.completed ? t("board.cardModal.complete") : t("board.cardModal.statusOpen")}
-              </button>
+        {/* Duas colunas com rolagem própria cada uma (ver index.css) - modal
+            empilhado (versão anterior) passava fácil de 1200px de altura com
+            checklist+anexos preenchidos e estourava a tela. */}
+        <div className="card-detail-columns">
+          <div className="card-detail-main">
+            <div className="card-detail-breadcrumb">
+              {board.title}
+              {currentList && <> / {currentList.title}</>}
             </div>
 
-            <div className="metadata-row">
-              <span className="metadata-row-label">
-                <MembersIcon /> {t("board.cardModal.members")}
-              </span>
-              <div className="metadata-row-value">
-                <div className="member-avatars-row">
-                  {cardMembers.map((m) => (
-                    <span key={m.id} className="avatar" style={{ background: colorForUser(m.id) }} title={m.name}>
-                      {initials(m.name)}
+            <span className="card-detail-type-badge">{t("board.cardModal.typeBadge")}</span>
+
+            <div className="modal-header card-detail-header">
+              <input
+                ref={titleRef}
+                className="modal-title-input card-detail-title"
+                value={title}
+                spellCheck={false}
+                readOnly={readOnly}
+                onChange={(e) => setTitle(e.target.value)}
+                onBlur={commitTitle}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.currentTarget.blur();
+                }}
+              />
+            </div>
+
+            {/* Sem IA neste app - o clique só leva pra descrição, que é a ação
+                real mais próxima do que essa caixa sugere visualmente. */}
+            {!readOnly && (
+              <button type="button" className="ai-input-box" onClick={() => descriptionRef.current?.focus()}>
+                <EditIcon /> {t("board.cardModal.descriptionShortcut")}
+              </button>
+            )}
+
+            {readOnly && <div className="board-readonly-note">{t("board.cardModal.readOnlyNote")}</div>}
+
+            <div className="modal-section">
+              <label className="modal-label">{t("board.cardModal.description")}</label>
+              <textarea
+                ref={descriptionRef}
+                className="modal-textarea"
+                placeholder={t("board.cardModal.descriptionPlaceholder")}
+                value={description}
+                readOnly={readOnly}
+                onChange={(e) => setDescription(e.target.value)}
+                onBlur={commitDescription}
+              />
+            </div>
+
+            <div className="modal-section">
+              <div className="subtasks-header">
+                <label className="modal-label subtasks-label">{t("board.cardModal.subtasks")}</label>
+                {subtasks.length > 0 && (
+                  <div className="subtasks-progress">
+                    <div className="subtasks-progress-bar">
+                      <div className="subtasks-progress-fill" style={{ width: subtasksPct + "%" }} />
+                    </div>
+                    <span>
+                      {subtasksDone}/{subtasks.length}
                     </span>
-                  ))}
-                  {cardMembers.length === 0 && <span className="metadata-empty">{t("board.cardModal.empty")}</span>}
-                  {!readOnly && (
-                    <button type="button" className="avatar avatar-add" onClick={() => setMemberPickerOpen((o) => !o)}>
-                      +
-                    </button>
-                  )}
-                </div>
-                {memberPickerOpen && (
-                  <div className="member-picker">
-                    {users.length === 0 && <div className="member-picker-empty">{t("board.cardModal.noUsersYet")}</div>}
-                    {users.map((m) => (
-                      <label key={m.id} className="member-picker-row">
-                        <input type="checkbox" checked={(card.memberIds || []).includes(m.id)} onChange={() => toggleMember(m.id)} />
-                        <span className="avatar avatar-small" style={{ background: colorForUser(m.id) }}>
-                          {initials(m.name)}
-                        </span>
-                        <span>{m.name}</span>
-                      </label>
-                    ))}
                   </div>
                 )}
               </div>
+              {subtasks.length > 0 && (
+                <ul className="subtask-list">
+                  {subtasks.map((s) => (
+                    <SubtaskItem
+                      key={s.id}
+                      subtask={s}
+                      users={users}
+                      readOnly={readOnly}
+                      onToggle={() => toggleSubtask(s.id)}
+                      onUpdate={(patch) => updateSubtask(s.id, patch)}
+                      onRemove={() => removeSubtask(s.id)}
+                    />
+                  ))}
+                </ul>
+              )}
+              {!readOnly &&
+                (addingSubtask ? (
+                  <form className="subtask-add-form" onSubmit={addSubtask}>
+                    <input
+                      autoFocus
+                      type="text"
+                      placeholder={t("board.cardModal.addSubtaskPlaceholder")}
+                      value={subtaskText}
+                      onChange={(e) => setSubtaskText(e.target.value)}
+                      onBlur={() => {
+                        // Enter já submete (onSubmit); só blur sem texto fecha o
+                        // campo sozinho, sem exigir clicar em algo pra cancelar.
+                        if (!subtaskText.trim()) setAddingSubtask(false);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") {
+                          // stopPropagation: sem isso o Escape fecha o campo E o
+                          // modal do cartão juntos (o modal também ouve Escape,
+                          // no document - mesmo problema já corrigido no popover
+                          // do DatePicker).
+                          e.stopPropagation();
+                          setSubtaskText("");
+                          setAddingSubtask(false);
+                        }
+                      }}
+                    />
+                  </form>
+                ) : (
+                  <button type="button" className="add-subtask-btn" onClick={() => setAddingSubtask(true)}>
+                    + {t("board.cardModal.addSubtask")}
+                  </button>
+                ))}
             </div>
 
-            {(!hideEmpty || hasDates) && (
-              <div className="metadata-row">
-                <span className="metadata-row-label">
-                  <CalendarIcon /> {t("board.cardModal.datesLabel")}
-                </span>
-                <div className="metadata-row-value date-range">
-                  <DatePicker value={card.startDate} onChange={handleStartDateChange} label={t("board.cardModal.startDate")} disabled={readOnly} />
-                  <span className="date-range-arrow">→</span>
-                  <DatePicker value={card.due} onChange={handleDueChange} label={t("board.cardModal.dueDate")} disabled={readOnly} />
+            <div className="modal-section">
+              <label className="modal-label">{t("board.cardModal.checklist")}</label>
+              {card.checklist.length > 0 && (
+                <div className="checklist-progress">
+                  <div className="checklist-progress-bar">
+                    <div className="checklist-progress-fill" style={{ width: pct + "%" }} />
+                  </div>
+                  <span>{pct}%</span>
                 </div>
-              </div>
-            )}
-
-            {(!hideEmpty || hasPriority) && (
-              <div className="metadata-row">
-                <span className="metadata-row-label">{t("board.cardModal.priority")}</span>
-                <div className="metadata-row-value priority-toggle-row priority-toggle-row-compact">
-                  <button
-                    type="button"
-                    className={"priority-chip priority-chip-urgent" + (card.urgent ? " active" : "")}
-                    disabled={readOnly}
-                    onClick={toggleUrgent}
-                  >
-                    <UrgentIcon /> {t("board.cardModal.urgent")}
-                  </button>
-                  <button
-                    type="button"
-                    className={"priority-chip priority-chip-important" + (card.important ? " active" : "")}
-                    disabled={readOnly}
-                    onClick={toggleImportant}
-                  >
-                    <ImportantIcon /> {t("board.cardModal.important")}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {(!hideEmpty || hasLabels) && (
-              <div className="metadata-row">
-                <span className="metadata-row-label">
-                  <TagIcon /> {t("board.cardModal.labels")}
-                </span>
-                <div className="metadata-row-value label-picker">
-                  {LABEL_COLORS.map((meta) => (
-                    <button
-                      key={meta.id}
-                      type="button"
-                      className={"label-chip" + (card.labels.includes(meta.id) ? " active" : "")}
-                      style={{ background: meta.color }}
-                      disabled={readOnly}
-                      onClick={() => toggleLabel(meta.id)}
-                    >
-                      {card.labels.includes(meta.id) ? "✓" : ""}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {(!hideEmpty || hasLocation) && (
-              <div className="metadata-row">
-                <span className="metadata-row-label">
-                  <PinIcon /> {t("board.cardModal.location")}
-                </span>
-                <div className="metadata-row-value">
-                  {readOnly ? (
-                    <div className="modal-readonly-value">{card.location?.address || t("board.cardModal.noLocation")}</div>
-                  ) : (
-                    <form className="location-form" onSubmit={handleLocateAddress}>
-                      <input
-                        type="text"
-                        className="modal-date location-input"
-                        placeholder={t("board.cardModal.addressPlaceholder")}
-                        value={addressInput}
-                        onChange={(e) => setAddressInput(e.target.value)}
-                      />
-                      <button type="submit" className="btn-primary btn-small" disabled={geocoding}>
-                        {geocoding ? t("board.cardModal.locating") : t("board.cardModal.locate")}
-                      </button>
-                    </form>
-                  )}
-                  {geocodeError && <div className="auth-error" style={{ marginTop: 8 }}>{geocodeError}</div>}
-                  {card.location?.lat != null && (
-                    <div className="location-confirmed">
-                      <PinIcon /> {t("board.cardModal.locationFound")}
-                    </div>
-                  )}
-                  {card.location?.address && card.location?.lat == null && !geocoding && (
-                    <div className="location-pending">{t("board.cardModal.locationPending")}</div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {!readOnly && (
-              <div className="metadata-row">
-                <span className="metadata-row-label">
-                  <ListIcon /> {t("board.cardModal.moveToList")}
-                </span>
-                <select className="modal-select metadata-row-value" value={currentList?.id || ""} onChange={moveToList}>
-                  {board.lists.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-
-          <button type="button" className="collapse-empty-toggle" onClick={() => setHideEmpty((v) => !v)}>
-            <CollapseIcon />
-            {hideEmpty ? t("board.cardModal.showEmpty") : t("board.cardModal.collapseEmpty")}
-          </button>
-
-          <div className="modal-section">
-            <label className="modal-label">{t("board.cardModal.description")}</label>
-            <textarea
-              ref={descriptionRef}
-              className="modal-textarea"
-              placeholder={t("board.cardModal.descriptionPlaceholder")}
-              value={description}
-              readOnly={readOnly}
-              onChange={(e) => setDescription(e.target.value)}
-              onBlur={commitDescription}
-            />
-          </div>
-
-          <div className="modal-section">
-            <label className="modal-label">{t("board.cardModal.checklist")}</label>
-            {card.checklist.length > 0 && (
-              <div className="checklist-progress">
-                <div className="checklist-progress-bar">
-                  <div className="checklist-progress-fill" style={{ width: pct + "%" }} />
-                </div>
-                <span>{pct}%</span>
-              </div>
-            )}
-            <ul className="checklist">
-              {card.checklist.map((item, idx) => (
-                <li key={idx} className={"checklist-item" + (item.done ? " done" : "")}>
-                  <input type="checkbox" checked={item.done} disabled={readOnly} onChange={() => toggleChecklistItem(idx)} />
-                  <span>{item.text}</span>
-                  {!readOnly && (
-                    <button type="button" className="checklist-item-remove" onClick={() => removeChecklistItem(idx)}>
-                      &times;
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-            {!readOnly && (
-              <form className="checklist-add" onSubmit={addChecklistItem}>
-                <input
-                  type="text"
-                  placeholder={t("board.cardModal.addItemPlaceholder")}
-                  value={checklistText}
-                  onChange={(e) => setChecklistText(e.target.value)}
-                />
-                <button type="submit" className="btn-primary btn-small">
-                  {t("common.add")}
-                </button>
-              </form>
-            )}
-          </div>
-
-          <div className="modal-section">
-            <label className="modal-label">{t("board.cardModal.attachments")}</label>
-            {card.attachments?.length > 0 && (
-              <ul className="attachment-list">
-                {card.attachments.map((a) => (
-                  <li key={a.id} className="attachment-item">
-                    {a.type === "file" ? <AttachmentFileIcon /> : <AttachmentLinkIcon />}
-                    <a
-                      href={a.type === "file" ? attachmentDownloadUrl(cardId, a.id) : a.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="attachment-name"
-                      title={a.name}
-                    >
-                      {a.name}
-                    </a>
-                    {a.type === "file" && a.size != null && <span className="attachment-size">{formatBytes(a.size)}</span>}
+              )}
+              <ul className="checklist">
+                {card.checklist.map((item, idx) => (
+                  <li key={idx} className={"checklist-item" + (item.done ? " done" : "")}>
+                    <input type="checkbox" checked={item.done} disabled={readOnly} onChange={() => toggleChecklistItem(idx)} />
+                    <span>{item.text}</span>
                     {!readOnly && (
-                      <button
-                        type="button"
-                        className="checklist-item-remove"
-                        onClick={() => handleRemoveAttachment(a.id)}
-                        aria-label={t("common.remove")}
-                      >
+                      <button type="button" className="checklist-item-remove" onClick={() => removeChecklistItem(idx)}>
                         &times;
                       </button>
                     )}
                   </li>
                 ))}
               </ul>
-            )}
-            {/* Leitor continua baixando o que já está anexado; o que some é o que sobe.
-                Tirar do DOM, e não `hidden`: .attachment-actions declara display:flex,
-                que vence a regra display:none do atributo - os botões continuavam
-                aparecendo, e só o clique é que morria. */}
-            {!readOnly && (
-              <div className="attachment-actions">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={handleFilePicked}
-                />
+              {!readOnly && (
+                <form className="checklist-add" onSubmit={addChecklistItem}>
+                  <input
+                    type="text"
+                    placeholder={t("board.cardModal.addItemPlaceholder")}
+                    value={checklistText}
+                    onChange={(e) => setChecklistText(e.target.value)}
+                  />
+                  <button type="submit" className="btn-primary btn-small">
+                    {t("common.add")}
+                  </button>
+                </form>
+              )}
+            </div>
+
+            <div className="modal-section">
+              <label className="modal-label">{t("board.cardModal.attachments")}</label>
+              {card.attachments?.length > 0 && (
+                <ul className="attachment-list">
+                  {card.attachments.map((a) => (
+                    <li key={a.id} className="attachment-item">
+                      {a.type === "file" ? <AttachmentFileIcon /> : <AttachmentLinkIcon />}
+                      <a
+                        href={a.type === "file" ? attachmentDownloadUrl(cardId, a.id) : a.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="attachment-name"
+                        title={a.name}
+                      >
+                        {a.name}
+                      </a>
+                      {a.type === "file" && a.size != null && <span className="attachment-size">{formatBytes(a.size)}</span>}
+                      {!readOnly && (
+                        <button
+                          type="button"
+                          className="checklist-item-remove"
+                          onClick={() => handleRemoveAttachment(a.id)}
+                          aria-label={t("common.remove")}
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {/* Leitor continua baixando o que já está anexado; o que some é o que sobe.
+                  Tirar do DOM, e não `hidden`: .attachment-actions declara display:flex,
+                  que vence a regra display:none do atributo - os botões continuavam
+                  aparecendo, e só o clique é que morria. */}
+              {!readOnly && (
+                <div className="attachment-actions">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    style={{ display: "none" }}
+                    onChange={handleFilePicked}
+                  />
+                  <button
+                    type="button"
+                    className="btn-secondary btn-small"
+                    disabled={uploading}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {uploading ? t("board.cardModal.uploading") : t("board.cardModal.attachFile")}
+                  </button>
+                  <button type="button" className="btn-secondary btn-small" onClick={() => setLinkFormOpen((o) => !o)}>
+                    {t("board.cardModal.attachLink")}
+                  </button>
+                </div>
+              )}
+              {linkFormOpen && !readOnly && (
+                <form className="checklist-add" style={{ marginTop: 8, flexWrap: "wrap" }} onSubmit={submitLinkAttachment}>
+                  <input
+                    type="text"
+                    placeholder={t("board.cardModal.linkUrlPlaceholder")}
+                    value={linkUrl}
+                    onChange={(e) => setLinkUrl(e.target.value)}
+                    style={{ flex: "2 1 200px" }}
+                  />
+                  <input
+                    type="text"
+                    placeholder={t("board.cardModal.linkNamePlaceholder")}
+                    value={linkName}
+                    onChange={(e) => setLinkName(e.target.value)}
+                    style={{ flex: "1 1 140px" }}
+                  />
+                  <button type="submit" className="btn-primary btn-small">
+                    {t("common.add")}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+
+          <div className="card-detail-sidebar">
+            <div className="metadata-grid">
+              <div className="metadata-row">
+                <span className="metadata-row-label">
+                  <StatusIcon /> {t("board.cardModal.status")}
+                </span>
                 <button
                   type="button"
-                  className="btn-secondary btn-small"
-                  disabled={uploading}
-                  onClick={() => fileInputRef.current?.click()}
+                  className={"status-pill" + (card.completed ? " status-pill-success" : " status-pill-neutral")}
+                  disabled={readOnly}
+                  onClick={toggleCompleted}
                 >
-                  {uploading ? t("board.cardModal.uploading") : t("board.cardModal.attachFile")}
-                </button>
-                <button type="button" className="btn-secondary btn-small" onClick={() => setLinkFormOpen((o) => !o)}>
-                  {t("board.cardModal.attachLink")}
+                  {card.completed ? t("board.cardModal.complete") : t("board.cardModal.statusOpen")}
                 </button>
               </div>
-            )}
-            {linkFormOpen && !readOnly && (
-              <form className="checklist-add" style={{ marginTop: 8, flexWrap: "wrap" }} onSubmit={submitLinkAttachment}>
-                <input
-                  type="text"
-                  placeholder={t("board.cardModal.linkUrlPlaceholder")}
-                  value={linkUrl}
-                  onChange={(e) => setLinkUrl(e.target.value)}
-                  style={{ flex: "2 1 200px" }}
-                />
-                <input
-                  type="text"
-                  placeholder={t("board.cardModal.linkNamePlaceholder")}
-                  value={linkName}
-                  onChange={(e) => setLinkName(e.target.value)}
-                  style={{ flex: "1 1 140px" }}
-                />
-                <button type="submit" className="btn-primary btn-small">
-                  {t("common.add")}
-                </button>
-              </form>
-            )}
+
+              <div className="metadata-row">
+                <span className="metadata-row-label">
+                  <MembersIcon /> {t("board.cardModal.members")}
+                </span>
+                <div className="metadata-row-value">
+                  <div className="member-avatars-row">
+                    {cardMembers.map((m) => (
+                      <span key={m.id} className="avatar" style={{ background: colorForUser(m.id) }} title={m.name}>
+                        {initials(m.name)}
+                      </span>
+                    ))}
+                    {cardMembers.length === 0 && <span className="metadata-empty">{t("board.cardModal.empty")}</span>}
+                    {!readOnly && (
+                      <button type="button" className="avatar avatar-add" onClick={() => setMemberPickerOpen((o) => !o)}>
+                        +
+                      </button>
+                    )}
+                  </div>
+                  {memberPickerOpen && (
+                    <div className="member-picker">
+                      {users.length === 0 && <div className="member-picker-empty">{t("board.cardModal.noUsersYet")}</div>}
+                      {users.map((m) => (
+                        <label key={m.id} className="member-picker-row">
+                          <input type="checkbox" checked={(card.memberIds || []).includes(m.id)} onChange={() => toggleMember(m.id)} />
+                          <span className="avatar avatar-small" style={{ background: colorForUser(m.id) }}>
+                            {initials(m.name)}
+                          </span>
+                          <span>{m.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {(!hideEmpty || hasDates) && (
+                <div className="metadata-row">
+                  <span className="metadata-row-label">
+                    <CalendarIcon /> {t("board.cardModal.datesLabel")}
+                  </span>
+                  <div className="metadata-row-value date-range">
+                    <DatePicker
+                      value={card.startDate}
+                      onChange={handleStartDateChange}
+                      label={t("board.cardModal.startDate")}
+                      disabled={readOnly}
+                      onOpenRecurrence={readOnly ? undefined : () => setRecurrenceOpen(true)}
+                    />
+                    <span className="date-range-arrow">→</span>
+                    <DatePicker
+                      value={card.due}
+                      onChange={handleDueChange}
+                      label={t("board.cardModal.dueDate")}
+                      disabled={readOnly}
+                      onOpenRecurrence={readOnly ? undefined : () => setRecurrenceOpen(true)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {(!hideEmpty || hasPriority) && (
+                <div className="metadata-row">
+                  <span className="metadata-row-label">{t("board.cardModal.priority")}</span>
+                  <div className="metadata-row-value priority-toggle-row priority-toggle-row-compact">
+                    <button
+                      type="button"
+                      className={"priority-chip priority-chip-urgent" + (card.urgent ? " active" : "")}
+                      disabled={readOnly}
+                      onClick={toggleUrgent}
+                    >
+                      <UrgentIcon /> {t("board.cardModal.urgent")}
+                    </button>
+                    <button
+                      type="button"
+                      className={"priority-chip priority-chip-important" + (card.important ? " active" : "")}
+                      disabled={readOnly}
+                      onClick={toggleImportant}
+                    >
+                      <ImportantIcon /> {t("board.cardModal.important")}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {(!hideEmpty || hasLabels) && (
+                <div className="metadata-row">
+                  <span className="metadata-row-label">
+                    <TagIcon /> {t("board.cardModal.labels")}
+                  </span>
+                  <div className="metadata-row-value label-picker">
+                    {LABEL_COLORS.map((meta) => (
+                      <button
+                        key={meta.id}
+                        type="button"
+                        className={"label-chip" + (card.labels.includes(meta.id) ? " active" : "")}
+                        style={{ background: meta.color }}
+                        disabled={readOnly}
+                        onClick={() => toggleLabel(meta.id)}
+                      >
+                        {card.labels.includes(meta.id) ? "✓" : ""}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(!hideEmpty || hasLocation) && (
+                <div className="metadata-row">
+                  <span className="metadata-row-label">
+                    <PinIcon /> {t("board.cardModal.location")}
+                  </span>
+                  <div className="metadata-row-value">
+                    {readOnly ? (
+                      <div className="modal-readonly-value">{card.location?.address || t("board.cardModal.noLocation")}</div>
+                    ) : (
+                      <form className="location-form" onSubmit={handleLocateAddress}>
+                        <input
+                          type="text"
+                          className="modal-date location-input"
+                          placeholder={t("board.cardModal.addressPlaceholder")}
+                          value={addressInput}
+                          onChange={(e) => setAddressInput(e.target.value)}
+                        />
+                        <button type="submit" className="btn-primary btn-small" disabled={geocoding}>
+                          {geocoding ? t("board.cardModal.locating") : t("board.cardModal.locate")}
+                        </button>
+                      </form>
+                    )}
+                    {geocodeError && <div className="auth-error" style={{ marginTop: 8 }}>{geocodeError}</div>}
+                    {card.location?.lat != null && (
+                      <div className="location-confirmed">
+                        <PinIcon /> {t("board.cardModal.locationFound")}
+                      </div>
+                    )}
+                    {card.location?.address && card.location?.lat == null && !geocoding && (
+                      <div className="location-pending">{t("board.cardModal.locationPending")}</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {!readOnly && (
+                <div className="metadata-row">
+                  <span className="metadata-row-label">
+                    <ListIcon /> {t("board.cardModal.moveToList")}
+                  </span>
+                  <select className="modal-select metadata-row-value" value={currentList?.id || ""} onChange={moveToList}>
+                    {board.lists.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <button type="button" className="collapse-empty-toggle" onClick={() => setHideEmpty((v) => !v)}>
+              <CollapseIcon />
+              {hideEmpty ? t("board.cardModal.showEmpty") : t("board.cardModal.collapseEmpty")}
+            </button>
           </div>
         </div>
 
         {!readOnly && (
-          <div className="modal-footer">
+          <div className="modal-footer card-detail-footer">
             <button className="btn-secondary" onClick={archiveCard}>
               {t("board.cardModal.archiveCard")}
             </button>
@@ -675,5 +794,11 @@ export default function CardModal({ boardId, cardId, onClose }) {
         )}
       </div>
     </div>
+    {/* Sobrepõe o modal do cartão (mesmo z-index de .modal-overlay, mas
+        depois no DOM => por cima). "Configurar recorrência" no DatePicker
+        abre a mesma tela que o menu de dados do quadro abre - moldes de
+        cartão recorrente são do quadro, não do cartão que estava aberto. */}
+    {recurrenceOpen && board && <RecurrencesModal board={board} onClose={() => setRecurrenceOpen(false)} />}
+    </>
   );
 }

@@ -133,6 +133,7 @@ export default function ListColumn({
               searchQuery={searchQuery}
               memberFilter={memberFilter}
               onOpen={() => onOpenCard(card.id)}
+              onOpenSubtask={() => onOpenCard(card.id, "subtask")}
               readOnly={readOnly}
               onDragStart={() => onCardDragStart(card.id, list.id)}
               onDragEnd={onCardDragEnd}

@@ -38,7 +38,7 @@
     },
     "home": {
       "heroTitle": "Your team organized, with no extra effort",
-      "heroText": "Xaphires replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
+      "heroText": "Xaphires replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines and priorities, synced in real time for the whole team.",
       "ctaStart": "Get started",
       "ctaPlans": "See plans",
       "heroNote": "No red tape. Cancel anytime.",
@@ -80,8 +80,7 @@
         { "badge": "L", "title": "Timeline", "text": "The whole project schedule at a glance, period by period." },
         { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet." },
         { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams." },
-        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest." },
-        { "badge": "N", "title": "Meeting minutes", "text": "Agenda, decisions and action items recorded and followed up on later." }
+        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest." }
       ],
       "secondary": [
         { "title": "Private and shared boards", "text": "Separate what's the team's from what's just yours, with full visibility control." },
@@ -96,7 +95,6 @@
         { "title": "Field teams", "text": "Tasks with addresses plotted on the map. Ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
         { "title": "Management and leadership", "text": "Prioritize with the Eisenhower Matrix, track indicators on the Dashboard, and keep sensitive planning in private boards.", "tags": ["Eisenhower Matrix", "Dashboard", "Private boards"] },
         { "title": "Operations and routine", "text": "The Kanban board + Table pair covers day-to-day work, with a Calendar for recurring deadlines so nothing slips by.", "tags": ["Kanban board", "Table", "Calendar"] },
-        { "title": "Meetings and alignment", "text": "Meeting minutes with agenda, decisions and action items, recorded on the spot and followed up on later, without relying on memory.", "tags": ["Meeting minutes"] },
         { "title": "Product Teams", "text": "From roadmap to launch: organize initiatives on the Timeline, prioritize feature requests, and keep everything in one place.", "tags": ["Timeline", "Eisenhower Matrix", "Attachments"], "page": "productTeams" }
       ],
       "learnMore": "Learn more"
@@ -130,8 +128,8 @@
       "mostPopular": "Most popular",
       "plans": [
         { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Unlimited boards", "Kanban board, Table and Calendar", "Card archiving", "Card attachments and links (up to 10 MB)", "Pending tasks ticker", "Email support"] },
-        { "name": "Intermediate", "price": "R$ 359.99", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Unlimited boards", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Auto-archiving of completed cards", "Bottleneck monitor", "Card attachments and links (up to 50 MB)", "Pending tasks ticker", "Email support"] },
-        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Private and shared boards", "Auto-archiving of completed cards", "Bottleneck monitor", "Routines that create cards on their own", "Card attachments and links (up to 50 MB)", "Pending tasks ticker", "Priority support"] },
+        { "name": "Intermediate", "price": "R$ 359.99", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Unlimited boards", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Auto-archiving of completed cards", "Bottleneck monitor", "Card attachments and links (up to 50 MB)", "Pending tasks ticker", "Email support"] },
+        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Private and shared boards", "Auto-archiving of completed cards", "Bottleneck monitor", "Routines that create cards on their own", "Card attachments and links (up to 50 MB)", "Pending tasks ticker", "Priority support"] },
         { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
       ]
     },
@@ -147,7 +145,7 @@
           "paragraphs": ["We collect only what is needed to operate the platform. The data comes from what you provide when creating an account and from the content you produce while using it."],
           "bullets": [
             "Account data: name, email, password and the company name given at registration.",
-            "Content you create: boards, lists, cards, descriptions, due dates, checklists, labels, assignees, meeting minutes and attached files.",
+            "Content you create: boards, lists, cards, descriptions, due dates, checklists, labels, assignees and attached files.",
             "Addresses: only when you add an address to a card to show it on the Map.",
             "Session data: the information needed to keep you securely signed in."
           ]
@@ -240,14 +238,13 @@
     },
     "logos": {
       "label": "All of it in one place",
-      "items": ["Kanban board", "Table", "Calendar", "Timeline", "Dashboard", "Map", "Eisenhower matrix", "Meeting minutes", "Auto-archiving", "Bottleneck monitor", "Automatic routines", "Task ticker", "Attachments and links"]
+      "items": ["Kanban board", "Table", "Calendar", "Timeline", "Dashboard", "Map", "Eisenhower matrix", "Auto-archiving", "Bottleneck monitor", "Automatic routines", "Task ticker", "Attachments and links"]
     },
     "testimonials": {
       "title": "What teams are saying",
       "items": [
         { "quote": "We replaced three spreadsheets and WhatsApp groups with a single board. The team stopped losing tasks.", "name": "Alex Rivera", "role": "Team Lead" },
         { "quote": "The timeline became our Monday meeting. Everyone sees the same schedule and the version arguments are over. And I can check it all from my phone.", "name": "Ana Braga", "role": "Planning" },
-        { "quote": "Minutes with action items changed the most here. What gets decided now has an owner and a due date, nobody forgets anything, and I can check it all from my phone.", "name": "Carlos Santana", "role": "Team Lead" },
         { "quote": "I improved my time management with this kanban.", "name": "Lucas Sabino", "role": "Finance" }
       ]
     },
@@ -291,7 +288,6 @@
     "loadingBoards": "Loading boards...",
     "noBoards": "No boards. Create one in the sidebar.",
     "sidebar": {
-      "minutesNav": "Meeting Minutes",
       "sharedBoards": "Shared boards",
       "myPrivateBoards": "My private boards",
       "sharedWithMe": "Shared with me",
@@ -529,7 +525,14 @@
       "markComplete": "Mark as complete",
       "markIncomplete": "Mark as incomplete",
       "urgent": "Urgent",
-      "important": "Important"
+      "important": "Important",
+      "edit": "Edit",
+      "moreActions": "More actions",
+      "duplicate": "Duplicate",
+      "duplicateSuffix": " (copy)",
+      "cardDuplicatedToast": "Card duplicated",
+      "subtasksCount": "{{count}} subtask",
+      "subtasksCount_other": "{{count}} subtasks"
     },
     "cardModal": {
       "readOnlyNote": "You have read-only access to this board.",
@@ -565,6 +568,10 @@
       "locationPending": "Address saved, but not located on the map",
       "description": "Description",
       "descriptionPlaceholder": "Add a more detailed description...",
+      "subtasks": "Subtasks",
+      "addSubtask": "Add subtask",
+      "addSubtaskPlaceholder": "Subtask name...",
+      "unassign": "Remove assignee",
       "checklist": "Checklist",
       "addItemPlaceholder": "Add an item",
       "attachments": "Attachments",
@@ -683,39 +690,6 @@
     },
     "meta": { "event": "event:", "venue": "venue:", "date": "date:" },
     "emptyState": "Nothing to show in the Gantt yet."
-  },
-  "minutes": {
-    "screen": {
-      "title": "Meeting Minutes",
-      "newMinute": "+ New minute",
-      "loading": "Loading minutes...",
-      "empty": "No minutes recorded yet.",
-      "viewList": "List",
-      "viewGantt": "Gantt"
-    },
-    "modal": {
-      "titlePlaceholder": "Meeting title",
-      "date": "Date",
-      "author": "Author",
-      "participants": "Participants",
-      "noUsersYet": "No users registered yet.",
-      "agenda": "Agenda",
-      "agendaPlaceholder": "What will be discussed...",
-      "decisions": "Decisions",
-      "decisionsPlaceholder": "What was decided...",
-      "actionItems": "Action items",
-      "assignee": "Assignee",
-      "dueDate": "Due date",
-      "addActionPlaceholder": "Add an action item",
-      "deleteMinute": "Delete minute",
-      "deleteConfirm": "Delete this minute permanently?",
-      "minuteDeletedToast": "Minute deleted",
-      "minuteCreatedToast": "Minute created",
-      "minuteUpdatedToast": "Minute updated",
-      "saving": "Saving...",
-      "createMinute": "Create minute",
-      "saveChanges": "Save changes"
-    }
   },
   "chat": {
     "title": "Company chat",
@@ -935,9 +909,6 @@
     "EMAIL_IN_USE": "Email already in use",
     "INVALID_ROLE": "Invalid role",
     "CANNOT_DELETE_MASTER": "The master user cannot be deleted",
-    "MINUTE_NOT_FOUND": "Minute not found",
-    "FORBIDDEN_MINUTE_EDIT": "Only the author or the master user can edit this minute",
-    "FORBIDDEN_MINUTE_DELETE": "Only the author or the master user can delete this minute",
     "ADDRESS_REQUIRED": "Enter an address to search",
     "ADDRESS_NOT_FOUND": "Address not found",
     "GEOCODE_UNAVAILABLE": "Couldn't look up the address right now. Try again.",

@@ -108,18 +108,6 @@ function applySchema(companyDb) {
       created_at TEXT NOT NULL
     );
 
-    CREATE TABLE IF NOT EXISTS minutes (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      date TEXT NOT NULL,
-      author_id TEXT REFERENCES users(id) ON DELETE SET NULL,
-      attendee_ids TEXT NOT NULL DEFAULT '[]',
-      agenda TEXT NOT NULL DEFAULT '',
-      decisions TEXT NOT NULL DEFAULT '',
-      action_items TEXT NOT NULL DEFAULT '[]',
-      created_at TEXT NOT NULL
-    );
-
     -- Uma conversa privada é sempre entre exatamente dois usuários da empresa.
     -- user_a_id < user_b_id por convenção (normalizado em repo.js), para o índice
     -- único enxergar "A com B" e "B com A" como a mesma linha. Excluir qualquer um
@@ -175,6 +163,10 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "cards", "urgent", "urgent INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing(companyDb, "cards", "important", "important INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing(companyDb, "cards", "attachments", "attachments TEXT NOT NULL DEFAULT '[]'");
+  // Subtarefa é mais rica que item de checklist (responsável, prazo, prioridade),
+  // por isso é coluna própria e não um campo a mais no checklist existente - as
+  // duas seções convivem no modal, cada uma com o peso que já tinha.
+  addColumnIfMissing(companyDb, "cards", "subtasks", "subtasks TEXT NOT NULL DEFAULT '[]'");
   // O cartão arquivado mantém list_id e position, para restaurar de volta à coluna
   // de origem; o que muda é ele deixar de entrar em list.cardIds na leitura.
   addColumnIfMissing(companyDb, "cards", "archived", "archived INTEGER NOT NULL DEFAULT 0");

@@ -4,11 +4,11 @@ import { GANTT_ICONS } from "./ganttIcons.jsx";
 
 const STATUS_SWATCHES = { todo: GANTT_STATUS.todo.color, done: GANTT_STATUS.done.color, late: GANTT_LATE_COLOR, agency: GANTT_STATUS.agency.color };
 
-// meta é opcional - quem integra isto num contexto sem "evento/local/data" (ver
-// MinutesGanttView) simplesmente não passa a prop, e este bloco some. Mesma
-// ideia pra statusKeys/iconKeys: só mostra na legenda o que o dado real usa -
-// "agência de publicidade" ou ícone de reunião não fazem sentido pra item de
-// ação de ata, por exemplo.
+// meta é opcional - quem integra isto num contexto sem "evento/local/data"
+// simplesmente não passa a prop, e este bloco some. Mesma ideia pra
+// statusKeys/iconKeys: só mostra na legenda o que o dado real usa - um
+// contexto sem prioridade "agência de publicidade", por exemplo, não precisa
+// listar essa cor.
 export default function GanttLegend({ meta, statusKeys = ["todo", "done", "late", "agency"], iconKeys = ["meeting", "call", "mail", "check"] }) {
   const { t } = useTranslation();
   return (

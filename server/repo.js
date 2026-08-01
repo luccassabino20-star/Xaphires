@@ -238,7 +238,7 @@ export function createCard(listId, { id, title }) {
   // criaria uma diferença de milissegundos para alguém estranhar depois no relatório.
   const agora = nowIso();
   getDb().prepare(
-    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, member_ids, position, list_entered_at, created_at) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', ?, ?, ?)"
+    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, subtasks, member_ids, position, list_entered_at, created_at) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', '[]', ?, ?, ?)"
   ).run(cardId, listId, title, pos, agora, agora);
   return cardId;
 }
@@ -311,6 +311,7 @@ export function updateCard(id, patch) {
     start_date: patch.startDate !== undefined ? patch.startDate : row.start_date,
     location: patch.location !== undefined ? (patch.location ? JSON.stringify(patch.location) : null) : row.location,
     checklist: patch.checklist ? JSON.stringify(patch.checklist) : row.checklist,
+    subtasks: patch.subtasks ? JSON.stringify(patch.subtasks) : row.subtasks,
     member_ids: patch.memberIds ? JSON.stringify(patch.memberIds) : row.member_ids,
     completed: patch.completed !== undefined ? (patch.completed ? 1 : 0) : row.completed,
     urgent: patch.urgent !== undefined ? (patch.urgent ? 1 : 0) : row.urgent,
@@ -325,7 +326,7 @@ export function updateCard(id, patch) {
     else if (!virouConcluido) completedAt = null;
   }
   getDb().prepare(
-    "UPDATE cards SET title=?, description=?, labels=?, due=?, start_date=?, location=?, checklist=?, member_ids=?, completed=?, urgent=?, important=?, completed_at=? WHERE id=?"
+    "UPDATE cards SET title=?, description=?, labels=?, due=?, start_date=?, location=?, checklist=?, subtasks=?, member_ids=?, completed=?, urgent=?, important=?, completed_at=? WHERE id=?"
   ).run(
     next.title,
     next.description,
@@ -334,6 +335,7 @@ export function updateCard(id, patch) {
     next.start_date,
     next.location,
     next.checklist,
+    next.subtasks,
     next.member_ids,
     next.completed,
     next.urgent,
@@ -485,73 +487,6 @@ export function getAttachmentFile(cardId, attachmentId) {
   const filePath = path.join(attachmentsUploadsDir(), attachment.id);
   if (!fs.existsSync(filePath)) return null;
   return { path: filePath, name: attachment.name, mimeType: attachment.mimeType };
-}
-
-// ---------- Meeting Minutes (Atas) ----------
-function publicMinute(row) {
-  return {
-    id: row.id,
-    title: row.title,
-    date: row.date,
-    authorId: row.author_id,
-    attendeeIds: JSON.parse(row.attendee_ids || "[]"),
-    agenda: row.agenda || "",
-    decisions: row.decisions || "",
-    actionItems: JSON.parse(row.action_items || "[]"),
-    createdAt: row.created_at,
-  };
-}
-export function listMinutes() {
-  return getDb().prepare("SELECT * FROM minutes ORDER BY date DESC, created_at DESC").all().map(publicMinute);
-}
-export function getMinuteById(id) {
-  const row = getDb().prepare("SELECT * FROM minutes WHERE id = ?").get(id);
-  return row ? publicMinute(row) : null;
-}
-export function getMinuteAuthorId(id) {
-  const row = getDb().prepare("SELECT author_id FROM minutes WHERE id = ?").get(id);
-  return row ? row.author_id : null;
-}
-export function createMinute({ id, title, date, authorId, attendeeIds, agenda, decisions, actionItems }) {
-  const minuteId = id || uid();
-  getDb().prepare(
-    "INSERT INTO minutes (id, title, date, author_id, attendee_ids, agenda, decisions, action_items, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-  ).run(
-    minuteId,
-    title,
-    date,
-    authorId || null,
-    JSON.stringify(attendeeIds || []),
-    agenda || "",
-    decisions || "",
-    JSON.stringify(actionItems || []),
-    nowIso()
-  );
-  return minuteId;
-}
-export function updateMinute(id, patch) {
-  const row = getDb().prepare("SELECT * FROM minutes WHERE id = ?").get(id);
-  if (!row) return;
-  const next = {
-    title: patch.title ?? row.title,
-    date: patch.date ?? row.date,
-    attendee_ids: patch.attendeeIds ? JSON.stringify(patch.attendeeIds) : row.attendee_ids,
-    agenda: patch.agenda !== undefined ? patch.agenda : row.agenda,
-    decisions: patch.decisions !== undefined ? patch.decisions : row.decisions,
-    action_items: patch.actionItems ? JSON.stringify(patch.actionItems) : row.action_items,
-  };
-  getDb().prepare("UPDATE minutes SET title=?, date=?, attendee_ids=?, agenda=?, decisions=?, action_items=? WHERE id=?").run(
-    next.title,
-    next.date,
-    next.attendee_ids,
-    next.agenda,
-    next.decisions,
-    next.action_items,
-    id
-  );
-}
-export function deleteMinute(id) {
-  getDb().prepare("DELETE FROM minutes WHERE id = ?").run(id);
 }
 
 // ---------- Chat (geral da empresa + conversas privadas) ----------
@@ -719,6 +654,7 @@ export function getCardById(id) {
     due: c.due || null,
     startDate: c.start_date || null,
     checklist: JSON.parse(c.checklist || "[]"),
+    subtasks: JSON.parse(c.subtasks || "[]"),
     memberIds: JSON.parse(c.member_ids || "[]"),
     completed: !!c.completed,
     urgent: !!c.urgent,
@@ -780,6 +716,7 @@ function montarWorkspace(boards, userId) {
             startDate: c.start_date || null,
             location: c.location ? JSON.parse(c.location) : null,
             checklist: JSON.parse(c.checklist || "[]"),
+            subtasks: JSON.parse(c.subtasks || "[]"),
             memberIds: JSON.parse(c.member_ids || "[]"),
             completed: !!c.completed,
             urgent: !!c.urgent,

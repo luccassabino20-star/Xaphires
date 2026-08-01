@@ -38,7 +38,7 @@
     },
     "home": {
       "heroTitle": "Sua equipe organizada, sem esforço extra",
-      "heroText": "O Xaphires substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
+      "heroText": "O Xaphires substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos e prioridades, sincronizados em tempo real para toda a equipe.",
       "ctaStart": "Comece agora",
       "ctaPlans": "Ver planos",
       "heroNote": "Sem burocracia. Cancele quando quiser.",
@@ -168,11 +168,6 @@
           "badge": "E",
           "title": "Matriz Eisenhower",
           "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto."
-        },
-        {
-          "badge": "A",
-          "title": "Atas de reunião",
-          "text": "Pauta, decisões e itens de ação registrados e cobrados depois."
         }
       ],
       "secondary": [
@@ -223,13 +218,6 @@
             "Quadro Kanban",
             "Tabela",
             "Calendário"
-          ]
-        },
-        {
-          "title": "Reuniões e alinhamento",
-          "text": "Atas de reunião com pauta, decisões e itens de ação, registrados na hora e cobrados depois, sem depender de memória.",
-          "tags": [
-            "Atas de reunião"
           ]
         },
         {
@@ -320,7 +308,6 @@
             "Até 15 usuários",
             "Quadros ilimitados",
             "Todas as visões (Calendário, Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
-            "Atas de reunião",
             "Arquivamento automático de concluídos",
             "Monitor de gargalos",
             "Anexos e links nos cartões (até 50 MB)",
@@ -338,7 +325,6 @@
           "features": [
             "Usuários ilimitados",
             "Todas as visões (Calendário, Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
-            "Atas de reunião",
             "Quadros privados e compartilhados",
             "Arquivamento automático de concluídos",
             "Monitor de gargalos",
@@ -403,7 +389,6 @@
         "Painel",
         "Mapa",
         "Matriz Eisenhower",
-        "Atas de reunião",
         "Arquivamento automático",
         "Monitor de gargalos",
         "Rotinas automáticas",
@@ -423,11 +408,6 @@
           "quote": "A linha do tempo virou a reunião de segunda. Todo mundo vê o mesmo cronograma e acabou a discussão de versão. E ainda consigo ver tudo do meu celular.",
           "name": "Ana Braga",
           "role": "Planejamento"
-        },
-        {
-          "quote": "As atas com itens de ação foram o que mais mudou aqui. O que foi decidido agora tem dono e prazo de entrega e ninguém esquece de nada e ainda consigo ver tudo do meu celular.",
-          "name": "Carlos Santana",
-          "role": "Líder de equipe"
         },
         {
           "quote": "Melhorei a minha gestão de tempo com esse kanban.",
@@ -456,7 +436,7 @@
           ],
           "bullets": [
             "Dados de cadastro: nome, e-mail, senha e o nome da empresa informado no registro.",
-            "Conteúdo que você cria: quadros, listas, cartões, descrições, prazos, checklists, etiquetas, responsáveis, atas de reunião e arquivos anexados.",
+            "Conteúdo que você cria: quadros, listas, cartões, descrições, prazos, checklists, etiquetas, responsáveis e arquivos anexados.",
             "Endereços: apenas quando você adiciona um endereço a um cartão para exibi-lo no Mapa.",
             "Dados de sessão: as informações necessárias para manter você conectado com segurança."
           ]
@@ -588,7 +568,6 @@
     "loadingBoards": "Carregando quadros...",
     "noBoards": "Nenhum quadro. Crie um na barra lateral.",
     "sidebar": {
-      "minutesNav": "Atas de Reunião",
       "sharedBoards": "Quadros compartilhados",
       "myPrivateBoards": "Meus quadros privados",
       "sharedWithMe": "Compartilhados comigo",
@@ -826,7 +805,14 @@
       "markComplete": "Marcar como concluído",
       "markIncomplete": "Marcar como não concluído",
       "urgent": "Urgente",
-      "important": "Importante"
+      "important": "Importante",
+      "edit": "Editar",
+      "moreActions": "Mais ações",
+      "duplicate": "Duplicar",
+      "duplicateSuffix": " (cópia)",
+      "cardDuplicatedToast": "Cartão duplicado",
+      "subtasksCount": "{{count}} subtarefa",
+      "subtasksCount_other": "{{count}} subtarefas"
     },
     "cardModal": {
       "readOnlyNote": "Você tem acesso somente leitura a este quadro.",
@@ -862,6 +848,10 @@
       "locationPending": "Endereço salvo, mas não localizado no mapa",
       "description": "Descrição",
       "descriptionPlaceholder": "Adicione uma descrição mais detalhada...",
+      "subtasks": "Subtarefas",
+      "addSubtask": "Adicionar subtarefa",
+      "addSubtaskPlaceholder": "Nome da subtarefa...",
+      "unassign": "Remover responsável",
       "checklist": "Checklist",
       "addItemPlaceholder": "Adicionar um item",
       "attachments": "Anexos",
@@ -999,39 +989,6 @@
     },
     "meta": { "event": "evento:", "venue": "local:", "date": "data:" },
     "emptyState": "Nada para mostrar no Gantt ainda."
-  },
-  "minutes": {
-    "screen": {
-      "title": "Atas de Reunião",
-      "newMinute": "+ Nova ata",
-      "loading": "Carregando atas...",
-      "empty": "Nenhuma ata registrada ainda.",
-      "viewList": "Lista",
-      "viewGantt": "Gantt"
-    },
-    "modal": {
-      "titlePlaceholder": "Título da reunião",
-      "date": "Data",
-      "author": "Autor",
-      "participants": "Participantes",
-      "noUsersYet": "Nenhum usuário cadastrado ainda.",
-      "agenda": "Pauta",
-      "agendaPlaceholder": "O que será discutido...",
-      "decisions": "Decisões",
-      "decisionsPlaceholder": "O que foi decidido...",
-      "actionItems": "Itens de ação",
-      "assignee": "Responsável",
-      "dueDate": "Prazo",
-      "addActionPlaceholder": "Adicionar um item de ação",
-      "deleteMinute": "Excluir ata",
-      "deleteConfirm": "Excluir esta ata permanentemente?",
-      "minuteDeletedToast": "Ata excluída",
-      "minuteCreatedToast": "Ata criada",
-      "minuteUpdatedToast": "Ata atualizada",
-      "saving": "Salvando...",
-      "createMinute": "Criar ata",
-      "saveChanges": "Salvar alterações"
-    }
   },
   "chat": {
     "title": "Bate-papo da empresa",
@@ -1251,9 +1208,6 @@
     "EMAIL_IN_USE": "E-mail já em uso",
     "INVALID_ROLE": "Papel inválido",
     "CANNOT_DELETE_MASTER": "Não é possível excluir o usuário master",
-    "MINUTE_NOT_FOUND": "Ata não encontrada",
-    "FORBIDDEN_MINUTE_EDIT": "Apenas o autor ou o usuário master pode editar esta ata",
-    "FORBIDDEN_MINUTE_DELETE": "Apenas o autor ou o usuário master pode excluir esta ata",
     "ADDRESS_REQUIRED": "Informe um endereço para buscar",
     "ADDRESS_NOT_FOUND": "Endereço não encontrado",
     "GEOCODE_UNAVAILABLE": "Não foi possível buscar o endereço agora. Tente novamente.",

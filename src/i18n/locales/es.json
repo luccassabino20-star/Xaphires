@@ -38,7 +38,7 @@
     },
     "home": {
       "heroTitle": "Tu equipo organizado, sin esfuerzo extra",
-      "heroText": "Xaphires reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
+      "heroText": "Xaphires reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos y prioridades, sincronizados en tiempo real para todo el equipo.",
       "ctaStart": "Empieza ahora",
       "ctaPlans": "Ver planes",
       "heroNote": "Sin burocracia. Cancela cuando quieras.",
@@ -80,8 +80,7 @@
         { "badge": "L", "title": "Línea de tiempo", "text": "Todo el cronograma del proyecto de un vistazo, período a período." },
         { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla." },
         { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno." },
-        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte." },
-        { "badge": "A", "title": "Actas de reunión", "text": "Agenda, decisiones y tareas registradas y exigidas después." }
+        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte." }
       ],
       "secondary": [
         { "title": "Tableros privados y compartidos", "text": "Separa lo que es del equipo de lo que es solo tuyo, con control total de visibilidad." },
@@ -96,7 +95,6 @@
         { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa. Ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
         { "title": "Gestión y liderazgo", "text": "Prioriza con la Matriz de Eisenhower, sigue los indicadores en el Panel y mantén la planificación sensible en tableros privados.", "tags": ["Matriz de Eisenhower", "Panel", "Tableros privados"] },
         { "title": "Operaciones y rutina", "text": "El dúo Tablero Kanban + Tabla cubre el trabajo diario, con Calendario para plazos recurrentes y nada pasa desapercibido.", "tags": ["Tablero Kanban", "Tabla", "Calendario"] },
-        { "title": "Reuniones y alineación", "text": "Actas de reunión con agenda, decisiones y tareas, registradas al momento y exigidas después, sin depender de la memoria.", "tags": ["Actas de reunión"] },
         { "title": "Equipos de Producto", "text": "Del roadmap al lanzamiento: organiza iniciativas en la Línea de tiempo, prioriza pedidos de funciones y mantén todo en un solo lugar.", "tags": ["Línea de tiempo", "Matriz de Eisenhower", "Adjuntos"], "page": "productTeams" }
       ],
       "learnMore": "Saber más"
@@ -130,8 +128,8 @@
       "mostPopular": "Más popular",
       "plans": [
         { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Tableros ilimitados", "Tablero Kanban, Tabla y Calendario", "Archivado de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Letrero de tareas pendientes", "Soporte por correo"] },
-        { "name": "Intermedio", "price": "R$ 359,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Tableros ilimitados", "Todas las vistas (Calendario, Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Archivado automático de completadas", "Monitor de cuellos de botella", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)", "Letrero de tareas pendientes", "Soporte por correo"] },
-        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Calendario, Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Tableros privados y compartidos", "Archivado automático de completadas", "Monitor de cuellos de botella", "Rutinas que crean tarjetas solas", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)", "Letrero de tareas pendientes", "Soporte prioritario"] },
+        { "name": "Intermedio", "price": "R$ 359,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Tableros ilimitados", "Todas las vistas (Calendario, Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Archivado automático de completadas", "Monitor de cuellos de botella", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)", "Letrero de tareas pendientes", "Soporte por correo"] },
+        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Calendario, Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Tableros privados y compartidos", "Archivado automático de completadas", "Monitor de cuellos de botella", "Rutinas que crean tarjetas solas", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)", "Letrero de tareas pendientes", "Soporte prioritario"] },
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo lo incluido en Profesional, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
     },
@@ -147,7 +145,7 @@
           "paragraphs": ["Recopilamos solo lo necesario para operar la plataforma. Los datos provienen de lo que informas al crear la cuenta y del contenido que produces durante el uso."],
           "bullets": [
             "Datos de registro: nombre, correo electrónico, contraseña y el nombre de la empresa indicado en el registro.",
-            "Contenido que creas: tableros, listas, tarjetas, descripciones, plazos, listas de verificación, etiquetas, responsables, actas de reunión y archivos adjuntos.",
+            "Contenido que creas: tableros, listas, tarjetas, descripciones, plazos, listas de verificación, etiquetas, responsables y archivos adjuntos.",
             "Direcciones: solo cuando agregas una dirección a una tarjeta para mostrarla en el Mapa.",
             "Datos de sesión: la información necesaria para mantenerte conectado de forma segura."
           ]
@@ -240,14 +238,13 @@
     },
     "logos": {
       "label": "Todo esto en un solo lugar",
-      "items": ["Tablero Kanban", "Tabla", "Calendario", "Línea de tiempo", "Panel", "Mapa", "Matriz Eisenhower", "Actas de reunión", "Archivado automático", "Monitor de atascos", "Rutinas automáticas", "Letrero de tareas", "Adjuntos y enlaces"]
+      "items": ["Tablero Kanban", "Tabla", "Calendario", "Línea de tiempo", "Panel", "Mapa", "Matriz Eisenhower", "Archivado automático", "Monitor de atascos", "Rutinas automáticas", "Letrero de tareas", "Adjuntos y enlaces"]
     },
     "testimonials": {
       "title": "Lo que dicen los equipos",
       "items": [
         { "quote": "Reemplazamos tres planillas y grupos de WhatsApp por un solo tablero. El equipo dejó de perder tareas.", "name": "Alex Rivera", "role": "Líder de equipo" },
         { "quote": "La línea de tiempo se volvió la reunión del lunes. Todos ven el mismo cronograma y se acabó la discusión de versiones. Y además puedo ver todo desde el celular.", "name": "Ana Braga", "role": "Planificación" },
-        { "quote": "Las actas con ítems de acción fueron lo que más cambió acá. Lo que se decide ahora tiene responsable y fecha de entrega, nadie se olvida de nada y puedo ver todo desde el celular.", "name": "Carlos Santana", "role": "Líder de equipo" },
         { "quote": "Mejoré mi gestión del tiempo con este kanban.", "name": "Lucas Sabino", "role": "Finanzas" }
       ]
     },
@@ -291,7 +288,6 @@
     "loadingBoards": "Cargando tableros...",
     "noBoards": "Sin tableros. Crea uno en la barra lateral.",
     "sidebar": {
-      "minutesNav": "Actas de Reunión",
       "sharedBoards": "Tableros compartidos",
       "myPrivateBoards": "Mis tableros privados",
       "sharedWithMe": "Compartidos conmigo",
@@ -529,7 +525,14 @@
       "markComplete": "Marcar como completada",
       "markIncomplete": "Marcar como no completada",
       "urgent": "Urgente",
-      "important": "Importante"
+      "important": "Importante",
+      "edit": "Editar",
+      "moreActions": "Más acciones",
+      "duplicate": "Duplicar",
+      "duplicateSuffix": " (copia)",
+      "cardDuplicatedToast": "Tarjeta duplicada",
+      "subtasksCount": "{{count}} subtarea",
+      "subtasksCount_other": "{{count}} subtareas"
     },
     "cardModal": {
       "readOnlyNote": "Tienes acceso de solo lectura a este tablero.",
@@ -565,6 +568,10 @@
       "locationPending": "Dirección guardada, pero no ubicada en el mapa",
       "description": "Descripción",
       "descriptionPlaceholder": "Agrega una descripción más detallada...",
+      "subtasks": "Subtareas",
+      "addSubtask": "Agregar subtarea",
+      "addSubtaskPlaceholder": "Nombre de la subtarea...",
+      "unassign": "Quitar responsable",
       "checklist": "Lista de tareas",
       "addItemPlaceholder": "Agregar un ítem",
       "attachments": "Adjuntos",
@@ -683,39 +690,6 @@
     },
     "meta": { "event": "evento:", "venue": "lugar:", "date": "fecha:" },
     "emptyState": "Nada para mostrar en el Gantt todavía."
-  },
-  "minutes": {
-    "screen": {
-      "title": "Actas de Reunión",
-      "newMinute": "+ Nueva acta",
-      "loading": "Cargando actas...",
-      "empty": "Aún no hay actas registradas.",
-      "viewList": "Lista",
-      "viewGantt": "Gantt"
-    },
-    "modal": {
-      "titlePlaceholder": "Título de la reunión",
-      "date": "Fecha",
-      "author": "Autor",
-      "participants": "Participantes",
-      "noUsersYet": "Aún no hay usuarios registrados.",
-      "agenda": "Agenda",
-      "agendaPlaceholder": "Qué se va a discutir...",
-      "decisions": "Decisiones",
-      "decisionsPlaceholder": "Qué se decidió...",
-      "actionItems": "Tareas",
-      "assignee": "Responsable",
-      "dueDate": "Plazo",
-      "addActionPlaceholder": "Agregar una tarea",
-      "deleteMinute": "Eliminar acta",
-      "deleteConfirm": "¿Eliminar esta acta de forma permanente?",
-      "minuteDeletedToast": "Acta eliminada",
-      "minuteCreatedToast": "Acta creada",
-      "minuteUpdatedToast": "Acta actualizada",
-      "saving": "Guardando...",
-      "createMinute": "Crear acta",
-      "saveChanges": "Guardar cambios"
-    }
   },
   "chat": {
     "title": "Chat de la empresa",
@@ -935,9 +909,6 @@
     "EMAIL_IN_USE": "Correo electrónico ya en uso",
     "INVALID_ROLE": "Rol inválido",
     "CANNOT_DELETE_MASTER": "No se puede eliminar al usuario master",
-    "MINUTE_NOT_FOUND": "Acta no encontrada",
-    "FORBIDDEN_MINUTE_EDIT": "Solo el autor o el usuario master puede editar esta acta",
-    "FORBIDDEN_MINUTE_DELETE": "Solo el autor o el usuario master puede eliminar esta acta",
     "ADDRESS_REQUIRED": "Indica una dirección para buscar",
     "ADDRESS_NOT_FOUND": "Dirección no encontrada",
     "GEOCODE_UNAVAILABLE": "No se pudo buscar la dirección ahora. Intenta de nuevo.",

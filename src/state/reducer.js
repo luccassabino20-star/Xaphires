@@ -1,3 +1,5 @@
+import { isCompletionColumnTitle } from "../utils/columnCompletion.js";
+
 function updateBoard(state, boardId, updater) {
   return { ...state, boards: state.boards.map((b) => (b.id === boardId ? updater(b) : b)) };
 }
@@ -157,6 +159,35 @@ export function reducer(state, action) {
           lists: b.lists.map((l) => ({ ...l, cardIds: l.cardIds.filter((cid) => cid !== action.cardId) })),
         };
       });
+    // Duplicar entra logo depois do original na mesma lista (não no fim) - é
+    // onde quem duplicou espera achar a cópia, sem procurar. attachments fica
+    // vazio de propósito: duplicar arquivo é copiar bytes no disco da empresa,
+    // fora do escopo de uma ação rápida do card.
+    case "DUPLICATE_CARD":
+      return updateBoard(state, action.boardId, (b) => {
+        const source = b.cards[action.cardId];
+        if (!source) return b;
+        const card = {
+          ...source,
+          id: action.newId,
+          title: action.title,
+          completed: false,
+          attachments: [],
+          archived: false,
+          archivedAt: null,
+          archivedFrom: null,
+        };
+        return {
+          ...b,
+          cards: { ...b.cards, [action.newId]: card },
+          lists: b.lists.map((l) => {
+            if (!l.cardIds.includes(action.cardId)) return l;
+            const cardIds = [...l.cardIds];
+            cardIds.splice(cardIds.indexOf(action.cardId) + 1, 0, action.newId);
+            return { ...l, cardIds };
+          }),
+        };
+      });
     case "UNARCHIVE_CARD":
       return updateBoard(state, action.boardId, (b) => {
         const card = b.cards[action.cardId];
@@ -234,11 +265,30 @@ export function reducer(state, action) {
     // MOVE_CARD, então aqui não há nada a mudar.
     case "COMMIT_CARD_ORDER":
       return state;
+    // Concluir move o cartão pra coluna de conclusão do quadro (mesma definição
+    // do relatório, ver utils/columnCompletion.js), quando existe uma - sem
+    // isso "marcar concluído" e "estar na coluna Concluído" eram dois estados
+    // que só concordavam se a pessoa arrastasse o cartão na mão depois. Não
+    // existindo coluna assim (ou desmarcando), só o checkbox muda.
     case "TOGGLE_CARD_COMPLETED":
       return updateBoard(state, action.boardId, (b) => {
         const card = b.cards[action.cardId];
         if (!card) return b;
-        return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, completed: !card.completed } } };
+        const completed = !card.completed;
+        const cards = { ...b.cards, [action.cardId]: { ...card, completed } };
+        let lists = b.lists;
+        if (completed) {
+          const fromList = b.lists.find((l) => l.cardIds.includes(action.cardId));
+          const doneList = b.lists.find((l) => isCompletionColumnTitle(l.title));
+          if (fromList && doneList && fromList.id !== doneList.id) {
+            lists = b.lists.map((l) => {
+              if (l.id === fromList.id) return { ...l, cardIds: l.cardIds.filter((id) => id !== action.cardId) };
+              if (l.id === doneList.id) return { ...l, cardIds: [...l.cardIds, action.cardId] };
+              return l;
+            });
+          }
+        }
+        return { ...b, cards, lists };
       });
     case "TOGGLE_CARD_LABEL":
       return updateBoard(state, action.boardId, (b) => {
@@ -276,6 +326,42 @@ export function reducer(state, action) {
         if (!card) return b;
         const checklist = card.checklist.filter((_, i) => i !== action.index);
         return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, checklist } } };
+      });
+    // Subtarefa é mais rica que item de checklist (responsável, prazo,
+    // urgência), por isso identificada por id (gerado por quem despacha, ver
+    // CardModal.jsx) em vez de posição no array - com prazo/responsável
+    // editáveis fora de ordem, um índice reaproveitado pra tarefa errada
+    // depois de reordenar seria um jeito fácil de corromper o item vizinho.
+    case "ADD_SUBTASK":
+      return updateBoard(state, action.boardId, (b) => {
+        const card = b.cards[action.cardId];
+        if (!card) return b;
+        const subtasks = [
+          ...(card.subtasks || []),
+          { id: action.id, title: action.title, done: false, assigneeId: null, dueDate: null, urgent: false, important: false },
+        ];
+        return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, subtasks } } };
+      });
+    case "TOGGLE_SUBTASK":
+      return updateBoard(state, action.boardId, (b) => {
+        const card = b.cards[action.cardId];
+        if (!card) return b;
+        const subtasks = (card.subtasks || []).map((s) => (s.id === action.subtaskId ? { ...s, done: !s.done } : s));
+        return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, subtasks } } };
+      });
+    case "UPDATE_SUBTASK":
+      return updateBoard(state, action.boardId, (b) => {
+        const card = b.cards[action.cardId];
+        if (!card) return b;
+        const subtasks = (card.subtasks || []).map((s) => (s.id === action.subtaskId ? { ...s, ...action.patch } : s));
+        return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, subtasks } } };
+      });
+    case "REMOVE_SUBTASK":
+      return updateBoard(state, action.boardId, (b) => {
+        const card = b.cards[action.cardId];
+        if (!card) return b;
+        const subtasks = (card.subtasks || []).filter((s) => s.id !== action.subtaskId);
+        return { ...b, cards: { ...b.cards, [action.cardId]: { ...card, subtasks } } };
       });
     case "SET_CARD_ATTACHMENTS":
       return updateBoard(state, action.boardId, (b) => {

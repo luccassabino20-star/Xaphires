@@ -78,7 +78,6 @@ async function metricasDaEmpresa(req, companyId, acao = "ler_metricas") {
       listas: q("SELECT COUNT(*) c FROM lists"),
       cartoes: q("SELECT COUNT(*) c FROM cards WHERE archived = 0"),
       cartoesArquivados: q("SELECT COUNT(*) c FROM cards WHERE archived = 1"),
-      atas: q("SELECT COUNT(*) c FROM minutes"),
       recorrencias: q("SELECT COUNT(*) c FROM recurrences"),
       anexos: db.prepare("SELECT COUNT(*) c FROM cards WHERE attachments != '[]'").get().c,
     };
@@ -351,7 +350,7 @@ router.get(
   ah(async (req, res) => {
     const empresas = store.listarEmpresas();
     const porEmpresa = [];
-    let totais = { usuarios: 0, quadros: 0, cartoes: 0, atas: 0, anexos: 0 };
+    let totais = { usuarios: 0, quadros: 0, cartoes: 0, anexos: 0 };
 
     for (const e of empresas) {
       // Cada empresa aberta é uma leitura de dado de cliente, então cada uma é

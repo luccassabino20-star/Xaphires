@@ -44,7 +44,6 @@ export default function Metricas() {
           ["Usuários", m.totais.usuarios],
           ["Quadros", m.totais.quadros],
           ["Cartões ativos", m.totais.cartoes],
-          ["Atas", m.totais.atas],
           ["Cartões com anexo", m.totais.anexos],
         ].map(([rotulo, valor]) => (
           <div className="adm-cartao" key={rotulo}>

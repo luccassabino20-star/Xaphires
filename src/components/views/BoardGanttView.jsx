@@ -5,10 +5,9 @@ import GanttChart from "../gantt/GanttChart.jsx";
 import { toISO } from "../gantt/ganttDate.js";
 
 // Ponte entre cartão real e o componente genérico em src/components/gantt -
-// mesmo padrão de MinutesGanttView, mas mais simples: cartão já tem os dois
-// lados da barra como campos próprios e editáveis (startDate e due), então
-// arrastar qualquer ponta grava direto no campo correspondente - diferente da
-// ata, não existe uma "data fixa" no meio do caminho para proteger.
+// cartão já tem os dois lados da barra como campos próprios e editáveis
+// (startDate e due), então arrastar qualquer ponta grava direto no campo
+// correspondente, sem "data fixa" no meio do caminho para proteger.
 //
 // Um grupo por lista, uma barra por cartão com pelo menos uma das duas datas -
 // mesmo filtro que a Linha do Tempo usava (`c.startDate || c.due`), no lugar
@@ -55,9 +54,9 @@ export default function BoardGanttView({ board, searchQuery, memberFilter, onOpe
   return (
     // Sem onTaskClick: clicar na barra mostra o peek (título + datas), e
     // "Abrir" na barra de ferramentas usa essa seleção pra abrir o cartão de
-    // verdade - mesmo motivo de MinutesGanttView. "Novo" fica sem handler de
-    // propósito: cartão pertence a uma lista, não existe "cartão novo" solto
-    // pra este atalho criar - quem quiser cria pela lista, como sempre.
+    // verdade. "Novo" fica sem handler de propósito: cartão pertence a uma
+    // lista, não existe "cartão novo" solto pra este atalho criar - quem
+    // quiser cria pela lista, como sempre.
     <GanttChart
       groups={groups}
       meta={null}

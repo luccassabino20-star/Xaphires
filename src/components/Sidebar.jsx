@@ -12,15 +12,7 @@ function LockIcon() {
     </svg>
   );
 }
-function NotesIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="15" height="15">
-      <path fill="currentColor" d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z" />
-    </svg>
-  );
-}
-
-export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, screen, onOpenMinutes }) {
+export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
   const { t } = useTranslation();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -73,7 +65,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
     // botão e levaria 403, ou pior, apagaria o quadro de quem o convidou.
     const canDelete = b.visibility === "private" ? b.myRole === "owner" : user.role === "master";
     return (
-      <div key={b.id} className={"board-list-item" + (screen === "board" && b.id === activeBoardId ? " active" : "")}>
+      <div key={b.id} className={"board-list-item" + (b.id === activeBoardId ? " active" : "")}>
         {editingId === b.id ? (
           <input
             className="board-rename-input"
@@ -113,12 +105,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, scree
 
   return (
     <aside className={"sidebar" + (collapsed ? " collapsed" : "")}>
-      <button className={"sidebar-minutes-nav" + (screen === "minutes" ? " active" : "")} onClick={onOpenMinutes}>
-        <span className="sidebar-minutes-nav-icon"><NotesIcon /></span>
-        {t("app.sidebar.minutesNav")}
-      </button>
-      <div className="sidebar-divider" />
-
       <div className="sidebar-header">{t("app.sidebar.sharedBoards")}</div>
       <div className="board-list">{sharedBoards.map(renderBoardItem)}</div>
 

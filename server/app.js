@@ -13,7 +13,6 @@ import { router as reportsRouter } from "./routes/reports.js";
 import { router as listsRouter } from "./routes/lists.js";
 import { router as cardsRouter } from "./routes/cards.js";
 import { router as geocodeRouter } from "./routes/geocode.js";
-import { router as minutesRouter } from "./routes/minutes.js";
 import { router as chatRouter } from "./routes/chat.js";
 import { router as planRouter } from "./routes/plan.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
@@ -69,7 +68,6 @@ app.use("/api/boards", requireAuth, requireWritablePlan, boardsRouter);
 app.use("/api/lists", requireAuth, requireWritablePlan, listsRouter);
 app.use("/api/cards", requireAuth, requireWritablePlan, cardsRouter);
 app.use("/api/geocode", geocodeRouter);
-app.use("/api/minutes", requireAuth, requireWritablePlan, minutesRouter);
 app.use("/api/chat", requireAuth, requireWritablePlan, chatRouter);
 app.use("/api/recurrences", requireAuth, requireWritablePlan, recurrencesRouter);
 // Relatório é leitura, e requireWritablePlan já libera GET - fica no mesmo grupo por

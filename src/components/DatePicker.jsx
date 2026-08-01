@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../state/ToastContext.jsx";
 import { localeTag, normalizeLanguage } from "../i18n/locale.js";
@@ -22,17 +23,22 @@ function ChevronIcon({ dir }) {
 
 // Datepicker próprio, sem lib externa - Vanilla JS/React puro (useState +
 // Date nativo), estilo Todoist/ClickUp: dois campos (início/vencimento) que
-// abrem o mesmo popover (atalhos + calendário), um componente por campo. Ver
-// decisão sobre "Configurar recorrência" abaixo: não fica funcional aqui
-// dentro, porque cartão recorrente é outra tela, de outro escopo (o quadro
-// inteiro, não uma data de um cartão só).
-export default function DatePicker({ value, onChange, label, disabled }) {
+// abrem o mesmo popover (atalhos + calendário), um componente por campo.
+// "Configurar recorrência" abre outra tela, de outro escopo (moldes de
+// cartão recorrente são do quadro inteiro, não da data de um cartão só) -
+// por isso o componente não sabe abri-la sozinho. Quem chama passa
+// `onOpenRecurrence` quando faz sentido no contexto (cartão, que tem quadro);
+// sem o prop, o botão só explica onde o recurso vive (caso da subtarefa, que
+// não é candidata a virar molde).
+export default function DatePicker({ value, onChange, label, disabled, compact = false, onOpenRecurrence }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const lang = normalizeLanguage(i18n.language);
   const tag = localeTag(i18n.language);
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState(null);
   const rootRef = useRef(null);
+  const popoverRef = useRef(null);
 
   const selected = value ? parseISO(value) : null;
   const [viewDate, setViewDate] = useState(() => selected || today0());
@@ -42,19 +48,42 @@ export default function DatePicker({ value, onChange, label, disabled }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  // Popover vai por portal em document.body, posição fixa calculada a partir
+  // do gatilho - o modal de cartão tem coluna com rolagem própria (ver
+  // .card-detail-sidebar em index.css), e um popover posicionado relativo ao
+  // pai ficaria cortado nas bordas dessa coluna estreita. Fixed + portal
+  // escapa de qualquer overflow:hidden/auto de ancestral.
+  const POPOVER_WIDTH = 490;
+  useLayoutEffect(() => {
+    if (!open) return;
+    const rect = rootRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const left = Math.min(rect.left, window.innerWidth - POPOVER_WIDTH - 12);
+    setCoords({ top: rect.bottom + 6, left: Math.max(left, 12) });
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     function onDocClick(e) {
-      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+      if (rootRef.current?.contains(e.target)) return;
+      if (popoverRef.current?.contains(e.target)) return;
+      setOpen(false);
     }
     function onKey(e) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape") return;
+      // Fase de captura + stopPropagation: sem isso, o Escape fecha o popover
+      // E o modal do cartão juntos - os dois ouvem keydown no document, e o
+      // modal (registrado primeiro, no mount) fecharia antes deste handler
+      // (registrado depois, só quando o popover abre) ter chance de agir.
+      // Capture roda antes de bubble no mesmo alvo, então isto sempre vence.
+      e.stopPropagation();
+      setOpen(false);
     }
     document.addEventListener("mousedown", onDocClick);
-    document.addEventListener("keydown", onKey);
+    document.addEventListener("keydown", onKey, true);
     return () => {
       document.removeEventListener("mousedown", onDocClick);
-      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("keydown", onKey, true);
     };
   }, [open]);
 
@@ -94,16 +123,26 @@ export default function DatePicker({ value, onChange, label, disabled }) {
     <div className="datepicker" ref={rootRef}>
       <button
         type="button"
-        className={"datepicker-trigger" + (open ? " open" : "") + (selected ? " has-value" : "")}
+        className={"datepicker-trigger" + (compact ? " datepicker-trigger-compact" : "") + (open ? " open" : "") + (selected ? " has-value" : "")}
         disabled={disabled}
+        title={compact ? label : undefined}
         onClick={() => setOpen((o) => !o)}
       >
         <CalendarIcon />
-        <span>{selected ? new Intl.DateTimeFormat(tag, { day: "2-digit", month: "2-digit", year: "numeric" }).format(selected) : label}</span>
+        {/* Modo compacto (badge de subtarefa): sem data, só o ícone - o rótulo
+            completo vira title (tooltip) em vez de texto, pra não alargar a
+            pílula numa linha que já tem outros badges ao lado. Com data, mês/
+            dia sem ano - o ano quase nunca importa numa subtarefa de prazo
+            curto, e sobra mais espaço na linha. */}
+        <span>
+          {selected
+            ? new Intl.DateTimeFormat(tag, compact ? { day: "2-digit", month: "2-digit" } : { day: "2-digit", month: "2-digit", year: "numeric" }).format(selected)
+            : compact ? "" : label}
+        </span>
       </button>
 
-      {open && (
-        <div className="datepicker-popover">
+      {open && coords && createPortal(
+        <div className="datepicker-popover" ref={popoverRef} style={{ top: coords.top, left: coords.left }}>
           <div className="datepicker-presets">
             {presets.map((p) => (
               <button
@@ -120,7 +159,11 @@ export default function DatePicker({ value, onChange, label, disabled }) {
               type="button"
               className="datepicker-preset datepicker-recurrence"
               onClick={() => {
-                showToast(t("datePicker.recurrenceHint"));
+                if (onOpenRecurrence) {
+                  onOpenRecurrence();
+                } else {
+                  showToast(t("datePicker.recurrenceHint"));
+                }
                 setOpen(false);
               }}
             >
@@ -176,7 +219,8 @@ export default function DatePicker({ value, onChange, label, disabled }) {
               })}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

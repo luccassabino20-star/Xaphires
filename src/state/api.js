@@ -158,12 +158,6 @@ export const attachmentDownloadUrl = (cardId, attachmentId) => `${BASE}/cards/${
 // ---------- Geocoding ----------
 export const geocodeAddress = (q) => request(`/geocode?q=${encodeURIComponent(q)}`);
 
-// ---------- Meeting Minutes (Atas) ----------
-export const listMinutes = () => request("/minutes");
-export const createMinute = (data) => request("/minutes", { method: "POST", body: data });
-export const updateMinute = (id, patch) => request(`/minutes/${id}`, { method: "PATCH", body: patch });
-export const deleteMinute = (id) => request(`/minutes/${id}`, { method: "DELETE" });
-
 // ---------- Chat ----------
 export const listChatConversations = () => request("/chat/conversations");
 export const createChatConversation = (userId) => request("/chat/conversations", { method: "POST", body: { userId } });

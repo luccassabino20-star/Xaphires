@@ -60,6 +60,37 @@ export function syncAction(action, state) {
     case "ARCHIVE_CARD":
       api.archiveCard(action.cardId).catch(logError);
       break;
+    case "DUPLICATE_CARD": {
+      const board = state.boards.find((b) => b.id === action.boardId);
+      const card = board?.cards[action.newId];
+      const list = board?.lists.find((l) => l.cardIds.includes(action.newId));
+      if (card && list) {
+        api
+          .createCard(list.id, { id: action.newId, title: card.title })
+          .then(() =>
+            api.updateCard(action.newId, {
+              title: card.title,
+              description: card.description,
+              labels: card.labels,
+              due: card.due,
+              startDate: card.startDate,
+              location: card.location,
+              checklist: card.checklist,
+              subtasks: card.subtasks,
+              memberIds: card.memberIds,
+              completed: card.completed,
+              urgent: card.urgent,
+              important: card.important,
+            })
+          )
+          // O servidor sempre cria no fim da lista; a cópia entra logo após o
+          // original no estado local (ver reducer), então a ordem precisa ser
+          // reenviada - senão ela pula pro fim assim que a página recarregar.
+          .then(() => api.setCardOrder(list.id, list.cardIds))
+          .catch(logError);
+      }
+      break;
+    }
     case "UNARCHIVE_CARD": {
       api.unarchiveCard(action.cardId).catch(logError);
       // O servidor guarda a position original, mas o reducer devolve o cartão ao
@@ -87,13 +118,11 @@ export function syncAction(action, state) {
       }
       break;
     }
-    case "UPDATE_CARD":
-    case "TOGGLE_CARD_COMPLETED":
-    case "TOGGLE_CARD_LABEL":
-    case "TOGGLE_CARD_MEMBER":
-    case "ADD_CHECKLIST_ITEM":
-    case "TOGGLE_CHECKLIST_ITEM":
-    case "REMOVE_CHECKLIST_ITEM": {
+    // Tem case próprio (não entra no bloco genérico abaixo) porque concluir
+    // pode ter movido o cartão de lista (ver reducer) - o servidor só aprende
+    // list_id/position novos via setCardOrder, e sem reenviar a lista onde o
+    // cartão está agora, ele voltaria pra coluna antiga no próximo carregamento.
+    case "TOGGLE_CARD_COMPLETED": {
       const board = state.boards.find((b) => b.id === action.boardId);
       const card = board?.cards[action.cardId];
       if (card) {
@@ -106,6 +135,41 @@ export function syncAction(action, state) {
             startDate: card.startDate,
             location: card.location,
             checklist: card.checklist,
+            subtasks: card.subtasks,
+            memberIds: card.memberIds,
+            completed: card.completed,
+            urgent: card.urgent,
+            important: card.important,
+          })
+          .catch(logError);
+      }
+      const list = board?.lists.find((l) => l.cardIds.includes(action.cardId));
+      if (list) api.setCardOrder(list.id, list.cardIds).catch(logError);
+      break;
+    }
+    case "UPDATE_CARD":
+    case "TOGGLE_CARD_LABEL":
+    case "TOGGLE_CARD_MEMBER":
+    case "ADD_CHECKLIST_ITEM":
+    case "TOGGLE_CHECKLIST_ITEM":
+    case "REMOVE_CHECKLIST_ITEM":
+    case "ADD_SUBTASK":
+    case "TOGGLE_SUBTASK":
+    case "UPDATE_SUBTASK":
+    case "REMOVE_SUBTASK": {
+      const board = state.boards.find((b) => b.id === action.boardId);
+      const card = board?.cards[action.cardId];
+      if (card) {
+        api
+          .updateCard(action.cardId, {
+            title: card.title,
+            description: card.description,
+            labels: card.labels,
+            due: card.due,
+            startDate: card.startDate,
+            location: card.location,
+            checklist: card.checklist,
+            subtasks: card.subtasks,
             memberIds: card.memberIds,
             completed: card.completed,
             urgent: card.urgent,
