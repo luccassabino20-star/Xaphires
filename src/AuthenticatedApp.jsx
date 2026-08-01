@@ -7,7 +7,7 @@ import ViewSwitcher from "./components/ViewSwitcher.jsx";
 import BoardView from "./components/BoardView.jsx";
 import TableView from "./components/views/TableView.jsx";
 import CalendarView from "./components/views/CalendarView.jsx";
-import TimelineView from "./components/views/TimelineView.jsx";
+import BoardGanttView from "./components/views/BoardGanttView.jsx";
 import DashboardView from "./components/views/DashboardView.jsx";
 import MapView from "./components/views/MapView.jsx";
 import MatrixView from "./components/views/MatrixView.jsx";
@@ -96,7 +96,7 @@ export default function AuthenticatedApp() {
                 )}
                 {view === "table" && <TableView {...viewProps} />}
                 {view === "calendar" && <CalendarView {...viewProps} />}
-                {view === "timeline" && <TimelineView {...viewProps} />}
+                {view === "gantt" && <BoardGanttView {...viewProps} />}
                 {view === "dashboard" && <DashboardView {...viewProps} />}
                 {view === "map" && <MapView {...viewProps} />}
                 {view === "matrix" && <MatrixView {...viewProps} />}
@@ -108,7 +108,11 @@ export default function AuthenticatedApp() {
         )}
       </div>
       {activeCardId && board && board.cards[activeCardId] && (
-        <CardModal boardId={board.id} cardId={activeCardId} onClose={() => setActiveCardId(null)} />
+        // key força remount se activeCardId mudar com o modal já aberto - sem
+        // isso o título/descrição (estado local, só inicializado no primeiro
+        // mount) ficaria preso no cartão anterior, e o próximo blur gravaria
+        // o texto errado em cima do cartão novo.
+        <CardModal key={activeCardId} boardId={board.id} cardId={activeCardId} onClose={() => setActiveCardId(null)} />
       )}
     </div>
   );

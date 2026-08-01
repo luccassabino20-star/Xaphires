@@ -8,10 +8,10 @@ import { IconNew, IconOpen, IconSave, IconUndo, IconPrint, IconExport, IconSearc
 // via onNew/onOpenSelected/onSave (GanttChart); print, export e search são
 // genéricos e resolvidos inteiramente dentro do próprio GanttChart.
 const ACTIONS = [
-  { id: "new", icon: IconNew, key: "new" },
+  { id: "new", icon: IconNew, key: "new", disabledKey: "hasNew", lockedByReadOnly: true },
   { id: "open", icon: IconOpen, key: "open", disabledKey: "hasSelection" },
-  { id: "save", icon: IconSave, key: "save", disabledKey: "dirty", savingKey: true },
-  { id: "undo", icon: IconUndo, key: "undo", disabledKey: "dirty" },
+  { id: "save", icon: IconSave, key: "save", disabledKey: "dirty", savingKey: true, lockedByReadOnly: true },
+  { id: "undo", icon: IconUndo, key: "undo", disabledKey: "dirty", lockedByReadOnly: true },
   { id: "print", icon: IconPrint, key: "print" },
   { id: "export", icon: IconExport, key: "export" },
 ];
@@ -25,13 +25,23 @@ export default function GanttToolbar({
   dirty,
   saving,
   hasSelection,
+  hasNew = true,
   searchOpen,
+  readOnly,
 }) {
   const { t } = useTranslation();
   return (
     <div className="gnt-toolbar">
       {ACTIONS.map((a) => {
-        const disabled = a.disabledKey === "dirty" ? !dirty || saving : a.disabledKey === "hasSelection" ? !hasSelection : false;
+        const disabled =
+          (a.lockedByReadOnly && readOnly) ||
+          (a.disabledKey === "dirty"
+            ? !dirty || saving
+            : a.disabledKey === "hasSelection"
+            ? !hasSelection
+            : a.disabledKey === "hasNew"
+            ? !hasNew
+            : false);
         const label = a.savingKey && saving ? t("gantt.toolbar.saving") : t(`gantt.toolbar.${a.key}`);
         return (
           <button

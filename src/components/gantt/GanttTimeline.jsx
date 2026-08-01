@@ -2,7 +2,7 @@ import { buildDayColumns, groupHeaderRuns, diffDays, today0 } from "./ganttDate.
 import { ROW_HEIGHT, GROUP_HEIGHT, HEADER_ROW_HEIGHT, HEADER_HEIGHT } from "./ganttConstants.js";
 import GanttBar from "./GanttBar.jsx";
 
-export default function GanttTimeline({ rows, rangeStart, rangeEnd, dayWidth, tag, onChangeTask, onOpenTask }) {
+export default function GanttTimeline({ rows, rangeStart, rangeEnd, dayWidth, tag, onChangeTask, onOpenTask, readOnly }) {
   const days = buildDayColumns(rangeStart, rangeEnd);
   const totalWidth = days.length * dayWidth;
   const yearRuns = groupHeaderRuns(days, tag, "year");
@@ -61,7 +61,7 @@ export default function GanttTimeline({ rows, rangeStart, rangeEnd, dayWidth, ta
               />
             ) : (
               <div key={row.key} className={"gnt-row-track" + (idx % 2 ? " odd" : "")} style={{ height: ROW_HEIGHT }}>
-                <GanttBar task={row.task} rangeStart={rangeStart} dayWidth={dayWidth} onChange={onChangeTask} onOpen={onOpenTask} />
+                <GanttBar task={row.task} rangeStart={rangeStart} dayWidth={dayWidth} onChange={onChangeTask} onOpen={onOpenTask} readOnly={readOnly} />
               </div>
             )
           )}

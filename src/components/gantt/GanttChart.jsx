@@ -39,6 +39,7 @@ export default function GanttChart({
   onOpenSelected,
   legendStatusKeys,
   legendIconKeys,
+  readOnly = false,
 }) {
   const { t, i18n } = useTranslation();
   const tag = localeTag(i18n.language);
@@ -78,6 +79,7 @@ export default function GanttChart({
   }
 
   function updateTask(taskId, patch) {
+    if (readOnly) return; // defesa: GanttBar já não inicia o arrasto neste modo
     setGroups((prev) =>
       prev.map((group) => ({
         ...group,
@@ -178,6 +180,7 @@ export default function GanttChart({
   }
 
   function handleAction(id) {
+    if (readOnly && (id === "new" || id === "save" || id === "undo")) return;
     if (id === "new") return onNew?.();
     if (id === "open") return peekTask && onOpenSelected?.(peekTask);
     if (id === "save") return handleSave();
@@ -216,7 +219,9 @@ export default function GanttChart({
         dirty={dirty}
         saving={saving}
         hasSelection={!!peekTask}
+        hasNew={!!onNew}
         searchOpen={searchOpen}
+        readOnly={readOnly}
       />
 
       {searchOpen && (
@@ -248,6 +253,7 @@ export default function GanttChart({
             tag={tag}
             onChangeTask={updateTask}
             onOpenTask={onTaskClick || setPeekTask}
+            readOnly={readOnly}
           />
         </div>
       )}

@@ -9,7 +9,7 @@ import { GANTT_ICONS, IconWarning } from "./ganttIcons.jsx";
 // (ver ListColumn.jsx) - aqui precisamos da posição contínua do cursor durante
 // o gesto inteiro, inclusive fora dos limites da barra, e o DnD nativo não dá
 // isso sem gambiarra de imagem fantasma.
-export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen }) {
+export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen, readOnly }) {
   const [dragMode, setDragMode] = useState(null); // null | "move" | "start" | "end"
   const dragState = useRef(null);
   const movedRef = useRef(false);
@@ -25,6 +25,7 @@ export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen 
   const color = meta.color || GANTT_STATUS.todo.color;
 
   function beginDrag(mode, e) {
+    if (readOnly) return;
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
     movedRef.current = false;
@@ -62,7 +63,7 @@ export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen 
   return (
     <button
       type="button"
-      className={"gnt-bar" + (dragMode ? " dragging" : "")}
+      className={"gnt-bar" + (dragMode ? " dragging" : "") + (readOnly ? " gnt-bar-readonly" : "")}
       style={{ left, width, background: color }}
       onPointerDown={(e) => beginDrag("move", e)}
       onPointerMove={onPointerMove}
@@ -71,13 +72,15 @@ export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen 
       onClick={() => !movedRef.current && onOpen?.(task)}
       title={`${task.title} (${task.start} → ${task.end})`}
     >
-      <span
-        className="gnt-bar-handle gnt-bar-handle-start"
-        onPointerDown={(e) => beginDrag("start", e)}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-      />
+      {!readOnly && (
+        <span
+          className="gnt-bar-handle gnt-bar-handle-start"
+          onPointerDown={(e) => beginDrag("start", e)}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+        />
+      )}
       {task.late && (
         <span className="gnt-bar-late-badge" style={{ background: GANTT_LATE_COLOR }}>
           <IconWarning size={10} />
@@ -88,13 +91,15 @@ export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen 
         return Icon ? <Icon key={key} size={11} className="gnt-bar-icon" /> : null;
       })}
       <span className="gnt-bar-label">{task.title}</span>
-      <span
-        className="gnt-bar-handle gnt-bar-handle-end"
-        onPointerDown={(e) => beginDrag("end", e)}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-      />
+      {!readOnly && (
+        <span
+          className="gnt-bar-handle gnt-bar-handle-end"
+          onPointerDown={(e) => beginDrag("end", e)}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+        />
+      )}
     </button>
   );
 }

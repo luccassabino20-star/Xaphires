@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-const VIEW_IDS = ["board", "table", "calendar", "timeline", "dashboard", "map", "matrix"];
+const VIEW_IDS = ["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"];
 
 export default function ViewSwitcher({ view, onChange }) {
   const { t } = useTranslation();
