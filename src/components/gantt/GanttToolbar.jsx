@@ -1,41 +1,60 @@
 import { useTranslation } from "react-i18next";
-import {
-  IconNew, IconOpen, IconSave, IconShare, IconUndo, IconPrint,
-  IconImportExport, IconSearch, IconZoom, IconSettings, IconHelp, IconContact,
-} from "./ganttIcons.jsx";
+import { IconNew, IconOpen, IconSave, IconUndo, IconPrint, IconExport, IconSearch, IconZoom } from "./ganttIcons.jsx";
 
-// Réplica da barra do Tom's Planner. Só "Zoom" tem efeito real (existe grade de
-// dias para reduzir/ampliar de verdade); o resto é decorativo de propósito -
-// não têm equivalente aqui (não há "arquivo" para abrir/salvar, "compartilhar"
-// já é outra tela em quadros de verdade) - ver decisão registrada na conversa.
-// onAction(id) fica disponível para quem for integrar isto de verdade depois.
+// Cada botão tem efeito real (ver decisão registrada na conversa: Compartilhar,
+// Configurações, Ajuda e Contato saíram da barra por não terem equivalente aqui -
+// não há "arquivo" para compartilhar nem tela de config/ajuda para este
+// componente). "new"/"open"/"save"/"undo" dependem do que quem integra passar
+// via onNew/onOpenSelected/onSave (GanttChart); print, export e search são
+// genéricos e resolvidos inteiramente dentro do próprio GanttChart.
 const ACTIONS = [
   { id: "new", icon: IconNew, key: "new" },
-  { id: "open", icon: IconOpen, key: "open" },
-  { id: "save", icon: IconSave, key: "save" },
-  { id: "share", icon: IconShare, key: "share" },
-  { id: "undo", icon: IconUndo, key: "undo" },
+  { id: "open", icon: IconOpen, key: "open", disabledKey: "hasSelection" },
+  { id: "save", icon: IconSave, key: "save", disabledKey: "dirty", savingKey: true },
+  { id: "undo", icon: IconUndo, key: "undo", disabledKey: "dirty" },
   { id: "print", icon: IconPrint, key: "print" },
-  { id: "import-export", icon: IconImportExport, key: "importExport" },
-  { id: "search", icon: IconSearch, key: "search" },
+  { id: "export", icon: IconExport, key: "export" },
 ];
 
-const TAIL_ACTIONS = [
-  { id: "settings", icon: IconSettings, key: "settings" },
-  { id: "help", icon: IconHelp, key: "help" },
-  { id: "contact", icon: IconContact, key: "contact" },
-];
-
-export default function GanttToolbar({ onAction = () => {}, zoomPct, onZoomIn, onZoomOut, onZoomReset }) {
+export default function GanttToolbar({
+  onAction = () => {},
+  zoomPct,
+  onZoomIn,
+  onZoomOut,
+  onZoomReset,
+  dirty,
+  saving,
+  hasSelection,
+  searchOpen,
+}) {
   const { t } = useTranslation();
   return (
     <div className="gnt-toolbar">
-      {ACTIONS.map((a) => (
-        <button key={a.id} type="button" className="gnt-toolbar-btn" onClick={() => onAction(a.id)}>
-          <a.icon size={15} />
-          <span>{t(`gantt.toolbar.${a.key}`)}</span>
-        </button>
-      ))}
+      {ACTIONS.map((a) => {
+        const disabled = a.disabledKey === "dirty" ? !dirty || saving : a.disabledKey === "hasSelection" ? !hasSelection : false;
+        const label = a.savingKey && saving ? t("gantt.toolbar.saving") : t(`gantt.toolbar.${a.key}`);
+        return (
+          <button
+            key={a.id}
+            type="button"
+            className="gnt-toolbar-btn"
+            disabled={disabled}
+            onClick={() => onAction(a.id)}
+          >
+            <a.icon size={15} />
+            <span>{label}</span>
+          </button>
+        );
+      })}
+
+      <button
+        type="button"
+        className={"gnt-toolbar-btn" + (searchOpen ? " active" : "")}
+        onClick={() => onAction("search")}
+      >
+        <IconSearch size={15} />
+        <span>{t("gantt.toolbar.search")}</span>
+      </button>
 
       <div className="gnt-toolbar-zoom">
         <button type="button" className="gnt-toolbar-btn" onClick={onZoomReset} title={t("gantt.toolbar.resetZoom")}>
@@ -46,15 +65,6 @@ export default function GanttToolbar({ onAction = () => {}, zoomPct, onZoomIn, o
         <span className="gnt-zoom-pct">{zoomPct}%</span>
         <button type="button" className="gnt-zoom-step" onClick={onZoomIn} aria-label="Zoom in">+</button>
       </div>
-
-      <div className="gnt-toolbar-spacer" />
-
-      {TAIL_ACTIONS.map((a) => (
-        <button key={a.id} type="button" className="gnt-toolbar-btn" onClick={() => onAction(a.id)}>
-          <a.icon size={15} />
-          <span>{t(`gantt.toolbar.${a.key}`)}</span>
-        </button>
-      ))}
     </div>
   );
 }

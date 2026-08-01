@@ -753,7 +753,9 @@ input, textarea { font-family: inherit; }
   white-space: nowrap;
 }
 .gnt-toolbar-btn:hover { background: var(--bg-column); color: var(--text-primary); }
-.gnt-toolbar-spacer { flex: 1; }
+.gnt-toolbar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.gnt-toolbar-btn:disabled:hover { background: transparent; color: var(--text-secondary); }
+.gnt-toolbar-btn.active { background: var(--accent); color: var(--bg-app); }
 .gnt-toolbar-zoom { display: flex; align-items: center; gap: 4px; padding-left: 4px; border-left: 1px solid var(--border-subtle); margin-left: 2px; }
 .gnt-zoom-step {
   width: 20px;
@@ -943,6 +945,20 @@ input, textarea { font-family: inherit; }
   cursor: pointer;
 }
 
+.gnt-search-bar { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-list); }
+.gnt-search-bar input {
+  width: 100%;
+  max-width: 320px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-topbar);
+  color: var(--text-primary);
+  font-size: 12.5px;
+}
+.gnt-save-error { padding: 8px 14px; font-size: 12px; color: var(--danger); background: var(--bg-list); border-bottom: 1px solid var(--border-subtle); }
+.gnt-body-empty { padding: 24px; justify-content: center; }
+
 /* Rodapé: metadados + legenda */
 .gnt-footer { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding: 14px; border-top: 1px solid var(--border-subtle); background: var(--bg-list); }
 .gnt-meta { font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 2px; }
@@ -950,6 +966,25 @@ input, textarea { font-family: inherit; }
 .gnt-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; font-size: 11.5px; color: var(--text-secondary); }
 .gnt-legend-item { display: flex; align-items: center; gap: 5px; }
 .gnt-legend-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+/* Impressão: só a tabela do Gantt, sem o resto do app em volta. A classe é
+   posta no body pelo GanttChart antes de window.print() e tirada no evento
+   afterprint - não dá pra fazer só com @media print porque a árvore inteira
+   (sidebar, topbar, abas) precisa sumir, não só o que está dentro do gnt-root. */
+@media print {
+  body.gnt-printing .sidebar,
+  body.gnt-printing .sidebar-backdrop,
+  body.gnt-printing .topbar,
+  body.gnt-printing .view-tabs,
+  body.gnt-printing .gnt-toolbar,
+  body.gnt-printing .gnt-search-bar,
+  body.gnt-printing .gnt-peek {
+    display: none !important;
+  }
+  body.gnt-printing .gnt-root { border: none; }
+  body.gnt-printing .gnt-timeline-pane { overflow: visible !important; }
+  body.gnt-printing .gnt-body { align-items: flex-start; }
+}
 
 /* ---------- Dashboard view ---------- */
 .dash-stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }

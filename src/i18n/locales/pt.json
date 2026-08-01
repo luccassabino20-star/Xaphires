@@ -954,22 +954,22 @@
     }
   },
   "gantt": {
-    "columns": { "activity": "Atividade", "status": "Situação" },
+    "columns": { "activity": "Atividade", "status": "Situação", "group": "Grupo", "start": "Início", "due": "Prazo" },
     "toolbar": {
       "new": "Novo",
       "open": "Abrir",
       "save": "Salvar",
-      "share": "Compartilhar",
+      "saving": "Salvando...",
       "undo": "Desfazer",
       "print": "Imprimir",
-      "importExport": "Importar / exportar",
+      "export": "Exportar",
       "search": "Filtrar / buscar",
+      "searchPlaceholder": "Buscar por título...",
       "zoom": "Zoom",
-      "resetZoom": "Redefinir zoom",
-      "settings": "Configurações",
-      "help": "Ajuda",
-      "contact": "Contato"
+      "resetZoom": "Redefinir zoom"
     },
+    "saveError": "Não foi possível salvar: {{erro}}",
+    "noSearchResults": "Nenhuma tarefa encontrada para essa busca.",
     "status": {
       "done": "Concluído",
       "todo": "A fazer",

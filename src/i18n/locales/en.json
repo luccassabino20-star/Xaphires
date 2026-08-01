@@ -638,22 +638,22 @@
     }
   },
   "gantt": {
-    "columns": { "activity": "Activity", "status": "Status" },
+    "columns": { "activity": "Activity", "status": "Status", "group": "Group", "start": "Start", "due": "Due" },
     "toolbar": {
       "new": "New",
       "open": "Open",
       "save": "Save",
-      "share": "Share",
+      "saving": "Saving...",
       "undo": "Undo",
       "print": "Print",
-      "importExport": "Import / export",
+      "export": "Export",
       "search": "Filter / search",
+      "searchPlaceholder": "Search by title...",
       "zoom": "Zoom",
-      "resetZoom": "Reset zoom",
-      "settings": "Settings",
-      "help": "Help",
-      "contact": "Contact"
+      "resetZoom": "Reset zoom"
     },
+    "saveError": "Could not save: {{erro}}",
+    "noSearchResults": "No task found for that search.",
     "status": {
       "done": "Done",
       "todo": "To do",

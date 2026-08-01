@@ -78,7 +78,9 @@ export default function MinutesScreen({ onToggleSidebar }) {
         </div>
       )}
 
-      {!loading && view === "gantt" && <MinutesGanttView minutes={minutes} />}
+      {!loading && view === "gantt" && (
+        <MinutesGanttView onNewMinute={() => setOpenId(null)} onOpenMinute={(id) => setOpenId(id)} />
+      )}
 
       {openId !== undefined && <MinuteModal minuteId={openId} onClose={() => setOpenId(undefined)} />}
     </>

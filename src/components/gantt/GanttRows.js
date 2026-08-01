@@ -16,3 +16,17 @@ export function buildGanttRows(groups, collapsedIds) {
   });
   return rows;
 }
+
+// Mesmo achatamento de buildGanttRows, mas sem grupo/collapse - para quem
+// precisa da lista de tarefas em si (salvar o que foi arrastado, exportar CSV),
+// não da lista de linhas para desenhar.
+export function flattenTasks(groups) {
+  const tasks = [];
+  groups.forEach((group) => {
+    group.tasks.forEach((task) => {
+      tasks.push(task);
+      (task.children || []).forEach((child) => tasks.push(child));
+    });
+  });
+  return tasks;
+}
