@@ -298,7 +298,34 @@
       "create": "Create",
       "deleteBoardTitle": "Delete board",
       "deleteBoardConfirm": "Delete board \"{{title}}\" and all its content?",
-      "boardDeletedToast": "Board deleted"
+      "boardDeletedToast": "Board deleted",
+      "workspaceLabel": "{{name}}'s Workspace",
+      "spacesTitle": "Spaces",
+      "boardsFolder": "Projects",
+      "rail": {
+        "home": "Home",
+        "planner": "Planner",
+        "ai": "AI",
+        "team": "Teams",
+        "dashboards": "Dashboards",
+        "boards": "Boards",
+        "more": "More",
+        "invite": "Invite"
+      },
+      "shortcuts": {
+        "inbox": "Inbox",
+        "replies": "Replies",
+        "assignedComments": "Assigned comments",
+        "meetings": "Meetings",
+        "myTasks": "My tasks",
+        "allTasks": "All tasks"
+      },
+      "aiChatsTitle": "AI Chats",
+      "aiChatsPlaceholder": "Ask, build...",
+      "superagentsTitle": "Superagents",
+      "superagentSample1": "My assistant",
+      "superagentSample2": "Chief of Staff",
+      "newSuperagent": "New Superagent"
     },
     "topbar": {
       "toggleSidebar": "Show/hide sidebar",

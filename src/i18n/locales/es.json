@@ -298,7 +298,34 @@
       "create": "Crear",
       "deleteBoardTitle": "Eliminar tablero",
       "deleteBoardConfirm": "¿Eliminar el tablero \"{{title}}\" y todo su contenido?",
-      "boardDeletedToast": "Tablero eliminado"
+      "boardDeletedToast": "Tablero eliminado",
+      "workspaceLabel": "Workspace de {{name}}",
+      "spacesTitle": "Espacios",
+      "boardsFolder": "Proyectos",
+      "rail": {
+        "home": "Inicio",
+        "planner": "Planificador",
+        "ai": "IA",
+        "team": "Equipos",
+        "dashboards": "Paneles",
+        "boards": "Tableros",
+        "more": "Más",
+        "invite": "Invitar"
+      },
+      "shortcuts": {
+        "inbox": "Bandeja de entrada",
+        "replies": "Respuestas",
+        "assignedComments": "Comentarios asignados",
+        "meetings": "Reuniones",
+        "myTasks": "Mis tareas",
+        "allTasks": "Todas las tareas"
+      },
+      "aiChatsTitle": "Chats con IA",
+      "aiChatsPlaceholder": "Pregunta, crea...",
+      "superagentsTitle": "Superagentes",
+      "superagentSample1": "Mi asistente",
+      "superagentSample2": "Jefe de gabinete",
+      "newSuperagent": "Nuevo Superagente"
     },
     "topbar": {
       "toggleSidebar": "Mostrar/ocultar barra lateral",

@@ -150,157 +150,348 @@ input, textarea { font-family: inherit; }
   overflow: hidden;
 }
 
-/* ---------- Sidebar ---------- */
-.sidebar {
-  width: 260px;
-  min-width: 260px;
-  background: var(--bg-topbar);
-  border-right: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  padding: 14px 12px;
-  gap: 4px;
-  overflow-y: auto;
-  transition: width 0.15s ease, min-width 0.15s ease, opacity 0.1s ease, padding 0.15s ease;
-}
-.sidebar.collapsed {
-  width: 0;
-  min-width: 0;
-  padding: 14px 0;
-  opacity: 0;
-  border-right: none;
-  pointer-events: none;
-}
-
-.sidebar-header {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
-  padding: 4px 8px 8px;
-}
-.sidebar-header-secondary {
-  margin-top: 14px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.board-lock-icon { color: var(--text-muted); flex-shrink: 0; }
+/* ---------- Barra lateral dupla (estilo ClickUp 3.0) ----------
+   Paleta fixa (não usa var(--bg-card)/var(--text-primary) do tema claro/
+   escuro) de propósito: mesmo espírito de landing/login (ver CLAUDE.md) -
+   marca com hex exatos, pedidos assim, não uma superfície que deveria
+   acompanhar o ThemeContext do app. TopBar e o quadro em si continuam
+   seguindo o tema normalmente; só esta barra fica presa ao visual do
+   ClickUp. Classe .sidebar-divider (usada por ShareBoardModal/UsersPanel)
+   e .board-title-lock (usada pela TopBar) não são desta barra - ficam. */
 .board-title-lock { color: var(--text-muted); display: inline-flex; margin-left: -6px; flex-shrink: 0; }
 
-.board-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 6px; }
+.dsb-shell {
+  display: flex;
+  flex-shrink: 0;
+  height: 100%;
+  transition: width 0.15s ease, min-width 0.15s ease, opacity 0.1s ease;
+}
+.dsb-shell-collapsed { width: 0; min-width: 0; opacity: 0; pointer-events: none; }
 
-.board-list-item {
+/* ---- Barra primária: global, ~60px, sempre escura ---- */
+.dsb-rail {
+  width: 60px;
+  min-width: 60px;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 18px;
+}
+/* O logo genérico do ClickUp virou o menu da conta de verdade (ver
+   Sidebar.jsx) - mesmo componente/estado de AccountMenu.jsx, só do tamanho
+   do antigo "dsb-rail-logo" e com o dropdown abrindo pra direita (o padrão
+   right:0/left:auto de .account-dropdown corta pra fora da janela aqui,
+   colado na borda esquerda - mesmo motivo do fix em .dsb-panel-utilities). */
+.dsb-rail-top .account-menu-btn { width: 34px; height: 34px; border-radius: 9px; font-size: 13px; }
+.dsb-rail-top .account-dropdown { left: 0; right: auto; }
+
+.dsb-rail-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  overflow-y: auto;
+  width: 100%;
+}
+.dsb-rail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 46px;
+  padding: 6px 2px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #a1a1a1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dsb-rail-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.dsb-rail-item.active { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.dsb-rail-item:disabled { cursor: default; }
+.dsb-rail-item:disabled:hover { background: transparent; color: #a1a1a1; }
+.dsb-rail-item-icon { display: flex; position: relative; }
+.dsb-rail-item-badge { position: absolute; top: -5px; right: -7px; min-width: 14px; height: 14px; padding: 0 3px; font-size: 9px; }
+.dsb-rail-item-label {
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 46px;
+}
+
+.dsb-rail-bottom { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 8px; flex-shrink: 0; }
+.dsb-rail-upgrade {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7c3aed, #d6249f);
+}
+.dsb-rail-upgrade:hover { filter: brightness(1.12); }
+
+/* ---- Painel secundário: branco, ~240px ---- */
+.dsb-panel {
+  width: 240px;
+  min-width: 240px;
+  background: #ffffff;
+  border-right: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.dsb-panel::-webkit-scrollbar { width: 8px; }
+.dsb-panel::-webkit-scrollbar-thumb { background: #d8d8d8; border-radius: 8px; }
+
+.dsb-panel-header { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px 8px; }
+.dsb-workspace-btn {
   display: flex;
   align-items: center;
   gap: 4px;
-  border-radius: 6px;
+  border: none;
+  background: transparent;
+  padding: 4px 2px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1a1a1a;
+  cursor: default;
+  max-width: 100%;
 }
-.board-list-item:hover { background: var(--bg-list); }
-.board-list-item.active { background: var(--bg-list); }
-.board-list-item.active .board-list-btn { font-weight: 700; }
+.dsb-workspace-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dsb-workspace-btn svg { flex-shrink: 0; color: #8c8c8c; }
 
-.board-list-btn {
-  flex: 1;
+/* Chat/idioma/tema - vieram da TopBar pra cá (ver decisão da conversa) e
+   moraram um tempo sempre visíveis no cabeçalho do painel; agora ficam
+   dentro do flyout do "Mais" (ver .dsb-more-dropdown, mais abaixo, e o botão
+   em Sidebar.jsx) - a conta virou o próprio topo do rail escuro (ver
+   .dsb-rail-top .account-menu-btn). Cor fixa pra funcionar em cima do fundo
+   sempre branco do flyout, independente do tema claro/escuro do resto do
+   app (LanguageSwitcher/ThemeToggle usam .icon-btn, que segue
+   var(--text-secondary) por padrão - no tema escuro isso ficaria claro
+   demais pra ler num fundo sempre branco). */
+.dsb-utility-btn {
+  position: relative;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   border: none;
-  background: transparent;
-  color: var(--text-primary);
-  padding: 8px 8px;
   border-radius: 6px;
-  cursor: pointer;
-  font-size: 13.5px;
-  min-width: 0;
-  text-align: left;
-}
-.board-swatch {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--accent);
-  flex-shrink: 0;
-}
-.board-list-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.board-rename-input {
-  flex: 1;
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-  padding: 7px 8px;
-  font-size: 13.5px;
-  background: var(--bg-card);
-  color: var(--text-primary);
-  outline: none;
-  margin: 2px;
-}
-.board-list-delete {
-  border: none;
   background: transparent;
-  color: var(--text-muted);
-  width: 24px;
-  height: 24px;
-  border-radius: 5px;
+  color: #616161;
   cursor: pointer;
-  opacity: 0;
-  flex-shrink: 0;
-  font-size: 15px;
-  margin-right: 4px;
 }
-.board-list-item:hover .board-list-delete { opacity: 1; }
-.board-list-delete:hover { background: var(--danger); color: white; }
+.dsb-utility-btn:hover { background: #f5f5f5; color: #1a1a1a; }
+.dsb-utility-badge { position: absolute; top: 1px; right: 1px; min-width: 14px; height: 14px; padding: 0 3px; font-size: 9px; }
 
-.sidebar-add-board {
-  display: block;
-  width: 100%;
-  text-align: left;
+/* Flyout do botão "Mais" do rail (bate-papo/idioma/tema, e o painel da
+   plataforma para quem administra). Duas classes de propósito (especifi-
+   cidade 0,2,0) pra vencer .dropdown/.theme-dropdown/.language-dropdown sem
+   depender de ordem no arquivo - mesmo truque de .dsb-panel-utilities antes.
+   Fundo sempre branco (não var(--bg-topbar)): o flyout carrega os mesmos
+   controles do painel, que são sempre claros, mas ele mesmo é portado pra
+   document.body e herdaria a cor do tema do resto do app se não fosse fixo. */
+.dsb-more-dropdown.dropdown { background: #fff; border-color: #eaeaea; min-width: 0; right: auto; }
+.dsb-more-dropdown .dropdown { left: 0; right: auto; }
+.dsb-more-utilities { display: flex; align-items: center; gap: 2px; }
+.dsb-more-dropdown .dropdown-divider { background: #eaeaea; }
+.dsb-more-dropdown > .dropdown-item { color: #1a1a1a; }
+.dsb-more-dropdown > .dropdown-item:hover { background: #f5f5f5; }
+
+.dsb-panel-titlebar { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px 10px; }
+.dsb-panel-title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+.dsb-create-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  padding: 8px 8px;
   border-radius: 6px;
-  font-size: 13.5px;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
 }
-.sidebar-add-board:hover { background: var(--bg-list); color: var(--text-primary); }
+.dsb-create-btn:hover { background: #000; }
 
-.board-add-form { display: flex; flex-direction: column; gap: 6px; padding: 4px; }
-.board-add-form input {
-  border: 1px solid var(--border-strong);
+.dsb-shortcuts { display: flex; flex-direction: column; padding: 0 8px; gap: 1px; }
+.dsb-shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: none;
+  background: transparent;
+  padding: 7px 6px;
   border-radius: 6px;
-  padding: 7px 8px;
-  font-size: 13.5px;
-  background: var(--bg-card);
-  color: var(--text-primary);
+  font-size: 13px;
+  color: #424242;
+  cursor: pointer;
+  text-align: left;
+}
+.dsb-shortcut-row:hover { background: #f5f5f5; }
+.dsb-shortcut-row:disabled { cursor: default; }
+.dsb-shortcut-row:disabled:hover { background: transparent; }
+.dsb-shortcut-icon { flex-shrink: 0; display: flex; color: #616161; }
+.dsb-shortcut-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dsb-badge-pink {
+  flex-shrink: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ec4899;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dsb-divider { height: 1px; background: #eaeaea; margin: 8px 14px; }
+
+.dsb-spaces { display: flex; flex-direction: column; padding: 0 8px 4px; gap: 1px; }
+.dsb-section-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 6px; }
+.dsb-section-title { font-size: 12px; font-weight: 700; color: #8c8c8c; }
+.dsb-icon-btn {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #616161;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dsb-icon-btn:hover { background: #f5f5f5; color: #1a1a1a; }
+
+.dsb-space-group { display: flex; flex-direction: column; }
+.dsb-space-header { display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 6px; }
+.dsb-space-header:hover { background: #f5f5f5; }
+.dsb-space-swatch {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+}
+.dsb-swatch-a { background: #e8492b; }
+.dsb-swatch-b { background: #7c3aed; }
+.dsb-swatch-c { background: #0d9488; }
+.dsb-space-title { font-size: 13px; font-weight: 700; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.dsb-tree-folder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 22px;
+  color: #616161;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.dsb-tree-folder-icon { flex-shrink: 0; }
+
+.dsb-tree-list { display: flex; flex-direction: column; }
+.dsb-tree-item { display: flex; align-items: center; padding-left: 34px; border-radius: 6px; }
+.dsb-tree-item:hover { background: #f5f5f5; }
+.dsb-tree-item.active { background: #f0f0f0; }
+.dsb-tree-item.active .dsb-tree-title { font-weight: 700; color: #1a1a1a; }
+.dsb-tree-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 6px 6px;
+  font-size: 13px;
+  color: #424242;
+  cursor: pointer;
+  text-align: left;
+}
+.dsb-tree-list-icon { flex-shrink: 0; color: #8c8c8c; }
+.dsb-tree-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dsb-tree-lock { flex-shrink: 0; color: #8c8c8c; }
+.dsb-tree-count { flex-shrink: 0; font-size: 11px; color: #8c8c8c; padding-right: 2px; }
+.dsb-tree-rename-input {
+  flex: 1;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin: 2px 6px 2px 0;
+  font-size: 13px;
+  color: #1a1a1a;
   outline: none;
 }
-.board-add-private-toggle {
+.dsb-tree-delete {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #8c8c8c;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0;
+  font-size: 14px;
+  margin-right: 4px;
+}
+.dsb-tree-item:hover .dsb-tree-delete { opacity: 1; }
+.dsb-tree-delete:hover { background: var(--danger); color: #fff; }
+
+.dsb-new-space-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 2px;
+  border: none;
+  background: transparent;
+  color: #616161;
+  padding: 7px 6px;
+  border-radius: 6px;
   font-size: 12.5px;
-  color: var(--text-secondary);
+  font-weight: 600;
   cursor: pointer;
+  text-align: left;
 }
-.board-add-private-toggle input { width: 14px; height: 14px; cursor: pointer; }
+.dsb-new-space-btn:hover { background: #f5f5f5; color: #1a1a1a; }
 
-.sidebar-divider { height: 1px; background: var(--border-subtle); margin: 10px 4px; }
-.sidebar-section-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
-  padding: 2px 8px 4px;
+.dsb-add-form { display: flex; flex-direction: column; gap: 6px; padding: 6px; }
+.dsb-add-form input {
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  padding: 7px 8px;
+  font-size: 13px;
+  color: #1a1a1a;
+  outline: none;
 }
+.dsb-add-private-toggle { display: flex; align-items: center; gap: 6px; padding: 2px; font-size: 12px; color: #616161; cursor: pointer; }
+.dsb-add-private-toggle input { width: 14px; height: 14px; cursor: pointer; }
+
+/* PLACEHOLDER: Chats com IA e Superagentes não têm dado real por trás - ver
+   decisão registrada na conversa ("visual completo, com placeholders"). */
+.dsb-ai-section { display: flex; flex-direction: column; padding: 0 8px 10px; gap: 1px; }
 
 /* ---------- Main area / Topbar ---------- */
 .main-area {
@@ -1001,7 +1192,7 @@ input, textarea { font-family: inherit; }
    afterprint - não dá pra fazer só com @media print porque a árvore inteira
    (sidebar, topbar, abas) precisa sumir, não só o que está dentro do gnt-root. */
 @media print {
-  body.gnt-printing .sidebar,
+  body.gnt-printing .dsb-shell,
   body.gnt-printing .sidebar-backdrop,
   body.gnt-printing .topbar,
   body.gnt-printing .view-tabs,
@@ -2533,32 +2724,27 @@ input, textarea { font-family: inherit; }
 .board-wrapper::-webkit-scrollbar { height: 10px; }
 .board-wrapper::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
 .board-wrapper::-webkit-scrollbar-track { background: transparent; }
-.sidebar::-webkit-scrollbar { width: 8px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
-
-/* Escondido fora do celular por padrão: nas telas largas o sidebar empurra o
-   layout via flex, então não há conteúdo "por baixo" para escurecer. */
+/* Escondido fora do celular por padrão: nas telas largas a barra dupla empurra
+   o layout via flex, então não há conteúdo "por baixo" para escurecer. */
 .sidebar-backdrop { display: none; }
 
 @media (max-width: 720px) {
-  .sidebar { position: fixed; z-index: 300; height: 100%; box-shadow: var(--shadow-modal); }
+  .dsb-shell { position: fixed; z-index: 300; height: 100%; box-shadow: var(--shadow-modal); }
   /* No celular o toggle desliza (transform), não encolhe (width): a transição de
      width com position:fixed grudava num valor intermediário (~1px) em vez de
-     chegar aos 260px, de forma consistente e reproduzível - não é flakiness de
+     chegar aos 300px, de forma consistente e reproduzível - não é flakiness de
      teste, é a combinação das duas propriedades que trava o Chrome. Transform
      nunca dispara layout, então não tem o que travar.*/
-  .sidebar,
-  .sidebar.collapsed {
-    width: 260px;
-    min-width: 260px;
-    padding: 14px 12px;
+  .dsb-shell,
+  .dsb-shell.dsb-shell-collapsed {
+    width: 300px;
+    min-width: 300px;
     opacity: 1;
     transition: transform 0.2s ease;
   }
-  .sidebar.collapsed {
+  .dsb-shell.dsb-shell-collapsed {
     transform: translateX(-100%);
     pointer-events: none;
-    border-right: none;
   }
   .sidebar-backdrop {
     display: block;
@@ -4969,24 +5155,6 @@ input, textarea { font-family: inherit; }
 }
 
 /* ---------- Chat da empresa ---------- */
-.chat-toggle-btn { position: relative; }
-.chat-unread-badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 15px;
-  height: 15px;
-  padding: 0 3px;
-  border-radius: 999px;
-  background: var(--danger);
-  color: #fff;
-  font-size: 9.5px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
 /* Mesma técnica do .modal-wide (altura fixa, corpo rolável) - duas colunas em vez
    de uma tabela: lista de conversas à esquerda, mensagens à direita. */
 .chat-modal {
