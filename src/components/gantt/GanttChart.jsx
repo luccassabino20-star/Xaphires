@@ -220,6 +220,7 @@ export default function GanttChart({
         saving={saving}
         hasSelection={!!peekTask}
         hasNew={!!onNew}
+        showOpen={!onTaskClick}
         searchOpen={searchOpen}
         readOnly={readOnly}
       />
@@ -244,7 +245,7 @@ export default function GanttChart({
         </div>
       ) : (
         <div className="gnt-body">
-          <GanttSidebar rows={rows} onToggleGroup={toggleGroup} />
+          <GanttSidebar rows={rows} onToggleGroup={toggleGroup} onOpenTask={onTaskClick || setPeekTask} />
           <GanttTimeline
             rows={rows}
             rangeStart={rangeStart}

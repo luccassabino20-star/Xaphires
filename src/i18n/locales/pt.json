@@ -975,6 +975,7 @@
       "resetZoom": "Redefinir zoom"
     },
     "saveError": "Não foi possível salvar: {{erro}}",
+    "newTaskDefaultTitle": "Nova tarefa",
     "noSearchResults": "Nenhuma tarefa encontrada para essa busca.",
     "status": {
       "done": "Concluído",

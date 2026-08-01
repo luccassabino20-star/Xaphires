@@ -1,8 +1,10 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../../state/BoardContext.jsx";
 import { flattenCards } from "../../utils/boardCards.js";
+import { uid } from "../../utils/id.js";
 import GanttChart from "../gantt/GanttChart.jsx";
-import { toISO } from "../gantt/ganttDate.js";
+import { toISO, today0, isoAddDays } from "../gantt/ganttDate.js";
 
 // Ponte entre cartão real e o componente genérico em src/components/gantt -
 // cartão já tem os dois lados da barra como campos próprios e editáveis
@@ -36,6 +38,7 @@ function buildGroups(board, searchQuery, memberFilter) {
 }
 
 export default function BoardGanttView({ board, searchQuery, memberFilter, onOpenCard }) {
+  const { t } = useTranslation();
   const dispatch = useBoardDispatch();
   const readOnly = board.myRole === "viewer";
   const groups = useMemo(() => buildGroups(board, searchQuery, memberFilter), [board, searchQuery, memberFilter]);
@@ -51,19 +54,40 @@ export default function BoardGanttView({ board, searchQuery, memberFilter, onOpe
     });
   }
 
+  // Cartão pertence a uma lista, e o botão "Novo" da barra de ferramentas não
+  // sabe de qual - cai sempre na primeira do quadro (igual à ordem que a
+  // barra lateral do quadro mostra); mover pra outra depois é o "Mover para
+  // lista" que o CardModal já tem. Nasce com hoje→amanhã pra aparecer como
+  // barra na hora, em vez de sumir da timeline por não ter data nenhuma (ver
+  // filtro startDate||due em buildGroups) - e abre direto no cartão de
+  // verdade pra dar título, porque não existe um segundo formulário de
+  // criação só pra esta view.
+  function handleNew() {
+    const list = board.lists[0];
+    if (!list) return;
+    const id = uid();
+    const start = toISO(today0());
+    const due = isoAddDays(start, 1);
+    dispatch({ type: "ADD_CARD", boardId: board.id, listId: list.id, id, title: t("gantt.newTaskDefaultTitle") });
+    dispatch({ type: "UPDATE_CARD", boardId: board.id, cardId: id, patch: { startDate: start, due } });
+    onOpenCard?.(id, "title");
+  }
+
   return (
-    // Sem onTaskClick: clicar na barra mostra o peek (título + datas), e
-    // "Abrir" na barra de ferramentas usa essa seleção pra abrir o cartão de
-    // verdade. "Novo" fica sem handler de propósito: cartão pertence a uma
-    // lista, não existe "cartão novo" solto pra este atalho criar - quem
-    // quiser cria pela lista, como sempre.
+    // onTaskClick abre o cartão de verdade direto no clique (barra ou linha
+    // da árvore) - é ali que dá pra pôr responsável e escrever observação
+    // (descrição), não só ver título/data no "peek" interno do GanttChart.
+    // Sem seleção prévia, o botão "Abrir" da barra de ferramentas não tem
+    // mais função aqui - GanttChart o esconde sozinho quando onTaskClick
+    // está definido.
     <GanttChart
       groups={groups}
       meta={null}
       legendStatusKeys={["todo", "done", "late"]}
       legendIconKeys={[]}
       onSave={readOnly ? undefined : handleSave}
-      onOpenSelected={(task) => onOpenCard?.(task.id)}
+      onNew={readOnly ? undefined : handleNew}
+      onTaskClick={(task) => onOpenCard?.(task.id)}
       readOnly={readOnly}
     />
   );

@@ -18,6 +18,16 @@ export const IconExport = (p) => <Svg {...p} d="M8 3 3 8h3.5v7H3l5 5 5-5H9.5V8H1
 export const IconSearch = (p) => <Svg {...p} d="M10.5 3a7.5 7.5 0 0 1 5.92 12.12l5.23 5.23-1.42 1.42-5.23-5.23A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z" />;
 export const IconZoom = (p) => <Svg {...p} d="M10.5 3a7.5 7.5 0 0 1 5.92 12.12l5.23 5.23-1.42 1.42-5.23-5.23A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm-1 2h2v2.5H14v2h-2.5V14h-2v-2.5H7v-2h2.5V7z" />;
 export const IconChevron = (p) => <Svg {...p} d="M8.5 5 7 6.5 13.5 13 7 19.5 8.5 21 16.5 13z" />;
+export const IconFolder = (p) => <Svg {...p} d="M4 5a1 1 0 0 1 1-1h5l2 2h7a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5z" />;
+export const IconCircleCheck = (p) => (
+  <Svg {...p} d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.2 14.4-4.2-4.2 1.4-1.4 2.8 2.8 5.8-5.8 1.4 1.4z" />
+);
+export const IconCircleDot = (p) => (
+  <svg viewBox="0 0 24 24" width={p.size || 14} height={p.size || 14} className={p.className}>
+    <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
+    {p.filled && <circle cx="12" cy="12" r="4.5" fill="currentColor" />}
+  </svg>
+);
 
 export const IconMeeting = (p) => <Svg {...p} d="M9 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM3 19c0-3 3-5.5 6-5.5s6 2.5 6 5.5v1H3v-1zm12-3.4c2.3.4 4 2.2 4 4.4v1h-3v-1c0-1.7-.4-3.2-1-4.4z" />;
 export const IconCall = (p) => <Svg {...p} d="M6.6 10.8c1.4 2.7 3.6 4.9 6.3 6.3l2.1-2.1c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1.1z" />;

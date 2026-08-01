@@ -9,7 +9,7 @@ import { GANTT_ICONS, IconWarning } from "./ganttIcons.jsx";
 // (ver ListColumn.jsx) - aqui precisamos da posição contínua do cursor durante
 // o gesto inteiro, inclusive fora dos limites da barra, e o DnD nativo não dá
 // isso sem gambiarra de imagem fantasma.
-export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen, readOnly }) {
+export default function GanttBar({ task, depth = 0, rangeStart, dayWidth, onChange, onOpen, readOnly }) {
   const [dragMode, setDragMode] = useState(null); // null | "move" | "start" | "end"
   const dragState = useRef(null);
   const movedRef = useRef(false);
@@ -60,46 +60,62 @@ export default function GanttBar({ task, rangeStart, dayWidth, onChange, onOpen,
     setDragMode(null);
   }
 
+  // depth 0 é a barra "cheia" (linha da tarefa, com o título dentro, ver
+  // pedido original de estilo ClickUp) - depth > 0 (filho/subtarefa) fica
+  // menor e mais suave, com o título ao lado em vez de por cima: a cor de
+  // status continua sendo o dado real (não inventamos uma cor por
+  // hierarquia), só a intensidade/traço mudam com a profundidade.
+  const child = depth > 0;
   return (
-    <button
-      type="button"
-      className={"gnt-bar" + (dragMode ? " dragging" : "") + (readOnly ? " gnt-bar-readonly" : "")}
-      style={{ left, width, background: color }}
-      onPointerDown={(e) => beginDrag("move", e)}
-      onPointerMove={onPointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      onClick={() => !movedRef.current && onOpen?.(task)}
-      title={`${task.title} (${task.start} → ${task.end})`}
-    >
-      {!readOnly && (
-        <span
-          className="gnt-bar-handle gnt-bar-handle-start"
-          onPointerDown={(e) => beginDrag("start", e)}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-        />
-      )}
-      {task.late && (
-        <span className="gnt-bar-late-badge" style={{ background: GANTT_LATE_COLOR }}>
-          <IconWarning size={10} />
+    <>
+      <button
+        type="button"
+        className={"gnt-bar" + (child ? " gnt-bar-child" : "") + (dragMode ? " dragging" : "") + (readOnly ? " gnt-bar-readonly" : "")}
+        // Filho usa a cor pastel fixa da classe .gnt-bar-child (ver index.css) -
+        // subtarefa aqui é binária feito/pendente, não tem os mesmos estados que
+        // justificam cor de status na barra principal.
+        style={child ? { left, width } : { left, width, background: color }}
+        onPointerDown={(e) => beginDrag("move", e)}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onClick={() => !movedRef.current && onOpen?.(task)}
+        title={`${task.title} (${task.start} → ${task.end})`}
+      >
+        {!readOnly && (
+          <span
+            className="gnt-bar-handle gnt-bar-handle-start"
+            onPointerDown={(e) => beginDrag("start", e)}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+          />
+        )}
+        {task.late && (
+          <span className="gnt-bar-late-badge" style={{ background: GANTT_LATE_COLOR }}>
+            <IconWarning size={10} />
+          </span>
+        )}
+        {(task.icons || []).map((key) => {
+          const Icon = GANTT_ICONS[key];
+          return Icon ? <Icon key={key} size={11} className="gnt-bar-icon" /> : null;
+        })}
+        {!child && <span className="gnt-bar-label">{task.title}</span>}
+        {!readOnly && (
+          <span
+            className="gnt-bar-handle gnt-bar-handle-end"
+            onPointerDown={(e) => beginDrag("end", e)}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+          />
+        )}
+      </button>
+      {child && (
+        <span className="gnt-bar-outside-label" style={{ left: left + width + 8 }}>
+          {task.title}
         </span>
       )}
-      {(task.icons || []).map((key) => {
-        const Icon = GANTT_ICONS[key];
-        return Icon ? <Icon key={key} size={11} className="gnt-bar-icon" /> : null;
-      })}
-      <span className="gnt-bar-label">{task.title}</span>
-      {!readOnly && (
-        <span
-          className="gnt-bar-handle gnt-bar-handle-end"
-          onPointerDown={(e) => beginDrag("end", e)}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-        />
-      )}
-    </button>
+    </>
   );
 }

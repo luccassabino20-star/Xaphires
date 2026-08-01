@@ -676,6 +676,7 @@
       "resetZoom": "Restablecer zoom"
     },
     "saveError": "No se pudo guardar: {{erro}}",
+    "newTaskDefaultTitle": "Nueva tarea",
     "noSearchResults": "No se encontró ninguna tarea para esa búsqueda.",
     "status": {
       "done": "Hecho",

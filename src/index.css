@@ -648,33 +648,39 @@ input, textarea { font-family: inherit; }
 }
 
 .gnt-root {
-  background: var(--bg-topbar);
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   overflow: hidden;
   color: var(--text-primary);
 }
 
-/* Toolbar */
+/* Toolbar - pílulas estilo ClickUp 3.0. "Filtrar/buscar" já é o filtro real
+   que este componente tem (busca por título); não inventamos Classificar,
+   Filtro por responsável ou Semana só de enfeite - ver decisão registrada
+   na conversa. */
 .gnt-toolbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 2px;
-  padding: 6px 10px;
+  gap: 8px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-list);
+  background: var(--bg-card);
 }
+.gnt-toolbar-group { display: flex; align-items: center; flex-wrap: wrap; gap: 3px; }
 .gnt-toolbar-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 8px;
+  gap: 6px;
+  padding: 7px 12px;
   border: none;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 11.5px;
-  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -682,13 +688,18 @@ input, textarea { font-family: inherit; }
 .gnt-toolbar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .gnt-toolbar-btn:disabled:hover { background: transparent; color: var(--text-secondary); }
 .gnt-toolbar-btn.active { background: var(--accent); color: var(--bg-app); }
-.gnt-toolbar-zoom { display: flex; align-items: center; gap: 4px; padding-left: 4px; border-left: 1px solid var(--border-subtle); margin-left: 2px; }
+/* "Salvar" com alteração pendente - único destaque colorido da barra, cor
+   fixa (mesmo motivo das cores de status: precisa parecer igual nos dois
+   temas, não é um tom que o tema controla). */
+.gnt-toolbar-btn-highlight { background: #fff1db; color: #a35b00; }
+.gnt-toolbar-btn-highlight:hover { background: #ffe6bd; color: #8a4d00; }
+.gnt-toolbar-zoom { display: flex; align-items: center; gap: 4px; padding-left: 6px; margin-left: 3px; border-left: 1px solid var(--border-subtle); }
 .gnt-zoom-step {
   width: 20px;
   height: 20px;
-  border-radius: 5px;
+  border-radius: 999px;
   border: 1px solid var(--border-subtle);
-  background: var(--bg-topbar);
+  background: var(--bg-card);
   color: var(--text-primary);
   cursor: pointer;
   font-size: 13px;
@@ -698,60 +709,100 @@ input, textarea { font-family: inherit; }
 .gnt-zoom-step:hover { background: var(--bg-column); }
 .gnt-zoom-pct { font-size: 11px; color: var(--text-muted); width: 32px; text-align: center; }
 
+/* CTA principal ("+ Add Tarefa"), único botão sólido da barra - var(--accent)
+   já inverte sozinho por tema (escuro no claro, claro no escuro), então serve
+   pro "botão principal escuro" sem precisar de uma cor fixa nova. */
+.gnt-toolbar-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bg-app);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.gnt-toolbar-btn-primary:hover { filter: brightness(1.15); }
+.gnt-toolbar-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
 /* Corpo: sidebar fixa + timeline com rolagem horizontal própria */
 .gnt-body { display: flex; align-items: flex-start; width: 100%; }
 
-.gnt-sidebar { flex-shrink: 0; border-right: 1px solid var(--border-subtle); background: var(--bg-topbar); }
+.gnt-sidebar { flex-shrink: 0; border-right: 1px solid var(--border-subtle); background: var(--bg-card); }
 .gnt-sidebar-head {
   display: flex;
   align-items: center;
   padding: 0 14px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   color: var(--text-muted);
-  background: var(--bg-list);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-subtle);
 }
 .gnt-sidebar-head-activity { flex: 1; }
 .gnt-sidebar-head-status { flex-shrink: 0; }
 
+/* Árvore: pasta (grupo/lista) sem bloco colorido, fundo branco igual ao
+   resto - hierarquia fica só na tipografia/ícone/recuo, não em cor de fundo. */
 .gnt-group-row {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   padding: 0 14px;
   border: none;
   border-bottom: 1px solid var(--border-subtle);
-  background: #f59e0b;
-  color: #1a1200;
-  font-size: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   text-align: left;
 }
-.gnt-group-row:hover { filter: brightness(1.05); }
-.gnt-chevron { flex-shrink: 0; transition: transform 0.12s; }
+.gnt-group-row:hover { background: var(--bg-column); }
+.gnt-chevron { flex-shrink: 0; color: var(--text-muted); transition: transform 0.12s; }
 .gnt-chevron.collapsed { transform: rotate(-90deg); }
+.gnt-group-icon { flex-shrink: 0; color: var(--text-muted); }
 .gnt-group-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* É um <button> (linha inteira abre o cartão no clique) - reset do que o
+   navegador aplica por padrão em botão, resto igual a um <div>. */
 .gnt-task-row {
+  width: 100%;
   display: flex;
   align-items: center;
+  border: none;
   border-bottom: 1px solid var(--border-subtle);
-  font-size: 12px;
+  background: var(--bg-card);
+  font-size: 12.5px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
 }
+.gnt-task-row:hover { background: var(--bg-column); }
+/* Subtarefa (filha) não tem divisória própria - a fileira do pai já marca o
+   fim do grupo, uma linha a mais por filho é o "peso" que o pedido original
+   queria tirar. */
+.gnt-task-row-child { border-bottom-color: transparent; }
 .gnt-task-title {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--text-primary);
 }
-.gnt-task-dash { color: var(--text-muted); margin-right: 5px; }
+.gnt-task-status-dot { flex-shrink: 0; display: flex; }
 .gnt-task-status {
   flex-shrink: 0;
   display: flex;
@@ -769,10 +820,10 @@ input, textarea { font-family: inherit; }
    mas na prática prende a roda do mouse em vez de deixar passar pra página.
    overflow-y:hidden explícito evita isso; não recorta nada porque esta coluna
    não tem altura restrita. */
-.gnt-timeline-pane { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; }
+.gnt-timeline-pane { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; background: var(--bg-card); }
 .gnt-timeline-inner { position: relative; }
 
-.gnt-header { position: relative; background: var(--bg-list); border-bottom: 1px solid var(--border-subtle); }
+.gnt-header { position: relative; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); }
 .gnt-header-row { display: flex; border-bottom: 1px solid var(--border-subtle); }
 .gnt-header-row:last-child { border-bottom: none; }
 .gnt-header-cell {
@@ -788,21 +839,49 @@ input, textarea { font-family: inherit; }
 .gnt-header-year, .gnt-header-month { font-weight: 700; color: var(--text-secondary); }
 .gnt-header-day { color: var(--text-muted); }
 
+/* Pílula do dia de hoje, pendurada embaixo do cabeçalho, na ponta da linha
+   vermelha - cor fixa (mesmo motivo do resto: precisa parecer igual nos dois
+   temas, é sinal de conteúdo - "hoje" - não casca do app). */
+.gnt-today-pill {
+  position: absolute;
+  bottom: -1px;
+  transform: translate(-50%, 100%);
+  background: #e44235;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  z-index: 3;
+  pointer-events: none;
+}
+
 .gnt-grid { position: absolute; top: 0; bottom: 0; left: 0; pointer-events: none; }
 .gnt-grid-col { position: absolute; top: 0; bottom: 0; border-right: 1px solid var(--border-subtle); }
-.gnt-grid-col.weekend { background: var(--bg-column); opacity: 0.6; }
-.gnt-today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--danger); opacity: 0.65; z-index: 1; }
+/* Fim de semana: hachura diagonal bem sutil, em vez de um bloco cinza sólido. */
+.gnt-grid-col.weekend {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--border-subtle) 0,
+    var(--border-subtle) 1px,
+    transparent 1px,
+    transparent 7px
+  );
+}
+.gnt-today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #e44235; z-index: 1; }
 
 .gnt-rows { position: relative; }
 .gnt-row-track { position: relative; border-bottom: 1px solid var(--border-subtle); }
 .gnt-row-track.odd { background: var(--bg-column); }
-.gnt-group-track { background: #f59e0b; opacity: 0.18; }
+.gnt-group-track { background: var(--bg-column); }
 
 /* Barras */
 .gnt-bar {
   position: absolute;
-  top: 5px;
-  bottom: 5px;
+  top: 8px;
+  bottom: 8px;
   border: none;
   border-radius: 5px;
   color: white;
@@ -817,7 +896,6 @@ input, textarea { font-family: inherit; }
   cursor: grab;
   text-align: left;
   z-index: 2;
-  box-shadow: var(--shadow-card);
   touch-action: none;
   user-select: none;
 }
@@ -826,6 +904,30 @@ input, textarea { font-family: inherit; }
 .gnt-bar-readonly { cursor: pointer; }
 .gnt-bar-label { overflow: hidden; text-overflow: ellipsis; }
 .gnt-bar-icon { flex-shrink: 0; opacity: 0.95; }
+
+/* Subtarefa (depth > 0, ver GanttBar.jsx): traço fino, pastel, cantos bem
+   arredondados - sem o rótulo por dentro, ele fica fora à direita
+   (gnt-bar-outside-label). Cor fixa de propósito: aqui é binário
+   feito/pendente, não tem os mesmos estados que justificam cor de status na
+   barra principal, então não faz sentido herdar aquela paleta. */
+.gnt-bar-child {
+  top: 10px;
+  bottom: 10px;
+  border-radius: 6px;
+  background: #e0e8fe;
+  box-shadow: inset 0 0 0 1px #c8d6fa;
+}
+.gnt-bar-outside-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
 .gnt-bar-late-badge {
   flex-shrink: 0;
   width: 14px;
@@ -835,7 +937,7 @@ input, textarea { font-family: inherit; }
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 0 0 2px var(--bg-topbar);
+  box-shadow: 0 0 0 2px var(--bg-card);
 }
 .gnt-bar-handle {
   position: absolute;
@@ -872,22 +974,22 @@ input, textarea { font-family: inherit; }
   cursor: pointer;
 }
 
-.gnt-search-bar { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-list); }
+.gnt-search-bar { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-card); }
 .gnt-search-bar input {
   width: 100%;
   max-width: 320px;
   padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: 999px;
   border: 1px solid var(--border-subtle);
-  background: var(--bg-topbar);
+  background: var(--bg-card);
   color: var(--text-primary);
   font-size: 12.5px;
 }
-.gnt-save-error { padding: 8px 14px; font-size: 12px; color: var(--danger); background: var(--bg-list); border-bottom: 1px solid var(--border-subtle); }
+.gnt-save-error { padding: 8px 14px; font-size: 12px; color: var(--danger); background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); }
 .gnt-body-empty { padding: 24px; justify-content: center; }
 
 /* Rodapé: metadados + legenda */
-.gnt-footer { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding: 14px; border-top: 1px solid var(--border-subtle); background: var(--bg-list); }
+.gnt-footer { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding: 14px; border-top: 1px solid var(--border-subtle); background: var(--bg-card); }
 .gnt-meta { font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 2px; }
 .gnt-meta-label { color: var(--text-muted); margin-right: 4px; }
 .gnt-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; font-size: 11.5px; color: var(--text-secondary); }

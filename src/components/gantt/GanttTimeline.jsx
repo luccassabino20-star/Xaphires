@@ -12,6 +12,11 @@ export default function GanttTimeline({ rows, rangeStart, rangeEnd, dayWidth, ta
   const todayOffset = diffDays(rangeStart, today);
   const showToday = todayOffset >= 0 && todayOffset < days.length;
   const todayLeft = todayOffset * dayWidth + dayWidth / 2;
+  // "sá 1" - dia da semana abreviado + número, mesmo formato do rótulo que a
+  // pílula do dia de hoje mostra no estilo de referência.
+  const todayPillLabel = showToday
+    ? new Intl.DateTimeFormat(tag, { weekday: "short", day: "numeric" }).format(today).replace(".", "")
+    : "";
 
   return (
     <div className="gnt-timeline-pane">
@@ -38,6 +43,11 @@ export default function GanttTimeline({ rows, rangeStart, rangeEnd, dayWidth, ta
               </span>
             ))}
           </div>
+          {showToday && (
+            <span className="gnt-today-pill" style={{ left: todayLeft }}>
+              {todayPillLabel}
+            </span>
+          )}
         </div>
 
         <div className="gnt-grid" style={{ width: totalWidth }}>
@@ -61,7 +71,15 @@ export default function GanttTimeline({ rows, rangeStart, rangeEnd, dayWidth, ta
               />
             ) : (
               <div key={row.key} className={"gnt-row-track" + (idx % 2 ? " odd" : "")} style={{ height: ROW_HEIGHT }}>
-                <GanttBar task={row.task} rangeStart={rangeStart} dayWidth={dayWidth} onChange={onChangeTask} onOpen={onOpenTask} readOnly={readOnly} />
+                <GanttBar
+                  task={row.task}
+                  depth={row.depth}
+                  rangeStart={rangeStart}
+                  dayWidth={dayWidth}
+                  onChange={onChangeTask}
+                  onOpen={onOpenTask}
+                  readOnly={readOnly}
+                />
               </div>
             )
           )}

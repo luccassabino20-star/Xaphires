@@ -68,11 +68,15 @@ export const ganttMockData = {
           id: "t26",
           title: "Hire staff",
           status: "notStarted",
+          // Datas só nos filhos, não no pai: "Hire staff" continua sendo um
+          // contêiner sem barra própria, e os filhos com start/end são o
+          // único jeito de a demo mostrar a barra pastel de subtarefa
+          // (GanttBar.jsx só desenha barra quando task.start/end existem).
           children: [
-            { id: "t26a", title: "Caterer/bartenders", status: "notStarted" },
-            { id: "t27", title: "Security", status: "notStarted" },
-            { id: "t28", title: "Photographer", status: "notStarted" },
-            { id: "t29", title: "Cleanup Crew", status: "notStarted" },
+            { id: "t26a", title: "Caterer/bartenders", status: "notStarted", start: d(32), end: d(34) },
+            { id: "t27", title: "Security", status: "notStarted", start: d(33), end: d(36) },
+            { id: "t28", title: "Photographer", status: "notStarted", start: d(35), end: d(37) },
+            { id: "t29", title: "Cleanup Crew", status: "notStarted", start: d(50), end: d(52) },
           ],
         },
       ],

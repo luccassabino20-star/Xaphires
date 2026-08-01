@@ -676,6 +676,7 @@
       "resetZoom": "Reset zoom"
     },
     "saveError": "Could not save: {{erro}}",
+    "newTaskDefaultTitle": "New task",
     "noSearchResults": "No task found for that search.",
     "status": {
       "done": "Done",
