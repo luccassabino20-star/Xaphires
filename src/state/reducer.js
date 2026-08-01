@@ -23,6 +23,12 @@ export function reducer(state, action) {
             visibility: action.visibility === "private" ? "private" : "shared",
             lists: [],
             cards: {},
+            // Quem cria é sempre o dono - sem isto o quadro nasce com myRole
+            // indefinido, e Sidebar.jsx o classifica como "Compartilhado
+            // comigo" (myRole !== "owner") até o próximo refetch, escondendo
+            // o botão de excluir (que também exige myRole === "owner").
+            myRole: "owner",
+            sharedWith: [],
           },
         ],
       };
