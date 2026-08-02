@@ -167,8 +167,13 @@ function GanttPreview() {
   const rows = t("landing.features.ganttPreview.rows", { returnObjects: true });
   const todayLeft = GANTT_TODAY_INDEX * 10;
 
+  // Sem .landing-reveal aqui de propósito: essa classe só ganha .is-visible
+  // pelo IntersectionObserver que useReveal() monta, e quem chama esta função
+  // é FeaturesPage, que nunca usa useReveal() (só HomePage usa, para o hero e
+  // afins) - com a classe, este bloco ficava preso em opacity:0 pra sempre,
+  // presente no DOM mas invisível. Foi assim que o preview "sumiu".
   return (
-    <div className="landing-board-preview landing-reveal" aria-hidden="true">
+    <div className="landing-board-preview" aria-hidden="true">
       <div className="landing-board-preview-chrome">
         <span className="landing-board-preview-dot dot-a" />
         <span className="landing-board-preview-dot dot-b" />
