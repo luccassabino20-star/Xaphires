@@ -168,7 +168,7 @@
         {
           "badge": "L",
           "title": "Letreiro de tarefas",
-          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu."
+          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Intermediário para cima."
         },
         {
           "badge": "X",
@@ -202,22 +202,22 @@
         {
           "badge": "L",
           "title": "Linha do tempo (Gantt)",
-          "text": "Crie e abra tarefas direto na linha do tempo, com o cronograma inteiro do projeto num só olhar, período a período."
+          "text": "Crie e abra tarefas direto na linha do tempo, com o cronograma inteiro do projeto num só olhar, período a período. Disponível do plano Intermediário para cima."
         },
         {
           "badge": "P",
           "title": "Painel",
-          "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma."
+          "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma. Disponível do plano Intermediário para cima."
         },
         {
           "badge": "M",
           "title": "Mapa",
-          "text": "Tarefas com endereço plotadas num mapa interativo. Ótimo para equipes em campo."
+          "text": "Tarefas com endereço plotadas num mapa interativo. Ótimo para equipes em campo. Disponível do plano Intermediário para cima."
         },
         {
           "badge": "E",
           "title": "Matriz Eisenhower",
-          "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto."
+          "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto. Disponível do plano Intermediário para cima."
         }
       ],
       "ganttPreview": {
@@ -358,11 +358,10 @@
           "cta": "Começar grátis",
           "features": [
             "Até 7 usuários",
-            "Quadros ilimitados",
-            "Quadro Kanban, Tabela e Calendário",
-            "Arquivamento de cartões",
+            "Até 4 quadros, privados e compartilhados",
+            "Kanban, Tabela e Calendário",
+            "Arquivamento manual de cartões",
             "Anexos e links nos cartões (até 10 MB)",
-            "Letreiro de tarefas pendentes",
             "Suporte por e-mail"
           ]
         },
@@ -374,13 +373,13 @@
           "cta": "Experimente grátis", "note": "7 dias grátis para testar",
           "features": [
             "Até 15 usuários",
+            "Tudo do Básico, mais:",
             "Quadros ilimitados",
-            "Todas as visões (Calendário, Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
+            "Todas as 7 visões (+ Gantt, Painel, Mapa, Matriz Eisenhower)",
+            "Letreiro de tarefas pendentes",
             "Arquivamento automático de concluídos",
             "Monitor de gargalos",
-            "Anexos e links nos cartões (até 50 MB)",
-            "Letreiro de tarefas pendentes",
-            "Suporte por e-mail"
+            "Anexos e links nos cartões (até 50 MB)"
           ]
         },
         {
@@ -392,13 +391,8 @@
           "highlight": true,
           "features": [
             "Usuários ilimitados",
-            "Todas as visões (Calendário, Painel, Mapa, Linha do tempo, Matriz Eisenhower)",
-            "Quadros privados e compartilhados",
-            "Arquivamento automático de concluídos",
-            "Monitor de gargalos",
+            "Tudo do Intermediário, mais:",
             "Rotinas que criam cartões sozinhas",
-            "Anexos e links nos cartões (até 50 MB)",
-            "Letreiro de tarefas pendentes",
             "Suporte prioritário"
           ]
         },
@@ -1250,6 +1244,7 @@
     "NETWORK_UNREACHABLE": "O servidor não respondeu. Verifique se ele está em execução e tente de novo.",
     "REPORT_FORMAT_INVALID": "Formato de relatório não suportado",
     "REPORT_STATUS_INVALID": "Filtro de situação inválido",
+    "BOARD_LIMIT_REACHED": "Limite de quadros do plano atingido. Exclua um quadro ou faça upgrade para criar outro.",
     "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Intermediário.",
     "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
     "INVALID_FREQUENCY": "Frequência inválida",

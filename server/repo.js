@@ -90,6 +90,9 @@ function nextPosition(table, whereCol, whereVal) {
   return row.m + 1;
 }
 
+export function countBoards() {
+  return getDb().prepare("SELECT COUNT(*) as c FROM boards").get().c;
+}
 export function createBoard({ id, title, ownerId, visibility }) {
   const boardId = id || uid();
   const pos = nextPosition("boards");

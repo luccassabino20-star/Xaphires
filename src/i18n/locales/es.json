@@ -87,7 +87,7 @@
         { "badge": "R", "title": "Archivado automático", "text": "Define los días y las tarjetas completadas pasan al archivo solas. Disponible desde el plan Intermedio." },
         { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Intermedio." },
         { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Profesional." },
-        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció." },
+        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció. Disponible desde el plan Intermedio." },
         { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." },
         { "badge": "C", "title": "Finalización automática", "text": "Marcaste la tarjeta como completada y ella salta sola a la columna de completadas del tablero - sin arrastrar a mano." }
       ],
@@ -97,10 +97,10 @@
         { "badge": "T", "title": "Tablero Kanban", "text": "Se acabaron las tareas perdidas en capturas de chat. Arrastra y suelta entre listas y ve el avance real del equipo." },
         { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro, sin necesitar otra herramienta." },
         { "badge": "C", "title": "Calendario", "text": "Plazos y fechas de inicio en una vista mensual, para que nada pase desapercibido." },
-        { "badge": "L", "title": "Línea de tiempo (Gantt)", "text": "Crea y abre tareas directo desde la línea de tiempo, con todo el cronograma del proyecto de un vistazo, período a período." },
-        { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla." },
-        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno." },
-        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte." }
+        { "badge": "L", "title": "Línea de tiempo (Gantt)", "text": "Crea y abre tareas directo desde la línea de tiempo, con todo el cronograma del proyecto de un vistazo, período a período. Disponible desde el plan Intermedio." },
+        { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla. Disponible desde el plan Intermedio." },
+        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno. Disponible desde el plan Intermedio." },
+        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte. Disponible desde el plan Intermedio." }
       ],
       "ganttPreview": { "title": "El Gantt en acción", "text": "Cada tarea se convierte en una barra en la línea de tiempo, con la línea de hoy siempre visible - crea y edita justo aquí, sin otra herramienta.", "rows": [
         { "title": "Planificación", "status": "done" },
@@ -155,9 +155,9 @@
       "headerText": "Elige el plan ideal para tu equipo y cámbialo cuando crezca.",
       "mostPopular": "Más popular",
       "plans": [
-        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Tableros ilimitados", "Tablero Kanban, Tabla y Calendario", "Archivado de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Letrero de tareas pendientes", "Soporte por correo"] },
-        { "name": "Intermedio", "price": "R$ 369,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Tableros ilimitados", "Todas las vistas (Calendario, Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Archivado automático de completadas", "Monitor de cuellos de botella", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)", "Letrero de tareas pendientes", "Soporte por correo"] },
-        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Calendario, Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Tableros privados y compartidos", "Archivado automático de completadas", "Monitor de cuellos de botella", "Rutinas que crean tarjetas solas", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)", "Letrero de tareas pendientes", "Soporte prioritario"] },
+        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
+        { "name": "Intermedio", "price": "R$ 369,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
+        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo lo incluido en Profesional, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
     },
@@ -911,6 +911,7 @@
     "NETWORK_UNREACHABLE": "El servidor no respondió. Comprueba que esté en ejecución e inténtalo de nuevo.",
     "REPORT_FORMAT_INVALID": "Formato de informe no admitido",
     "REPORT_STATUS_INVALID": "Filtro de estado inválido",
+    "BOARD_LIMIT_REACHED": "Límite de tableros del plan alcanzado. Elimina un tablero o mejora tu plan para crear otro.",
     "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Intermedio.",
     "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Profesional.",
     "INVALID_FREQUENCY": "Frecuencia inválida",

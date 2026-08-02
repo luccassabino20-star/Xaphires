@@ -87,7 +87,7 @@
         { "badge": "R", "title": "Auto-archiving", "text": "Set the number of days and completed cards move to the archive on their own. Available from the Intermediate plan up." },
         { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Intermediate up." },
         { "badge": "T", "title": "Automatic routines", "text": "Fixed tasks become cards on their own at the right date, with the checklist already filled in. From the Professional plan up." },
-        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue." },
+        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue. Available from the Intermediate plan up." },
         { "badge": "X", "title": "Attachments and links", "text": "Contracts, plans and photos straight on the card, plus links to whatever lives outside the system." },
         { "badge": "D", "title": "Automatic completion", "text": "Mark a card as done and it jumps on its own to the board's completed column - no dragging by hand." }
       ],
@@ -97,10 +97,10 @@
         { "badge": "B", "title": "Kanban board", "text": "No more tasks lost in chat screenshots. Drag and drop between lists and see the team's real progress." },
         { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member. No need for another tool." },
         { "badge": "C", "title": "Calendar", "text": "Deadlines and start dates in a monthly view, so nothing slips by unnoticed." },
-        { "badge": "L", "title": "Timeline (Gantt)", "text": "Create and open tasks straight from the timeline, with the whole project schedule at a glance, period by period." },
-        { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet." },
-        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams." },
-        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest." }
+        { "badge": "L", "title": "Timeline (Gantt)", "text": "Create and open tasks straight from the timeline, with the whole project schedule at a glance, period by period. Available from the Intermediate plan up." },
+        { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet. Available from the Intermediate plan up." },
+        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams. Available from the Intermediate plan up." },
+        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest. Available from the Intermediate plan up." }
       ],
       "ganttPreview": { "title": "The Gantt in action", "text": "Every task becomes a bar on the timeline, with today's line always visible - create and edit right here, no other tool needed.", "rows": [
         { "title": "Planning", "status": "done" },
@@ -155,9 +155,9 @@
       "headerText": "Pick the right plan for your team and change it as it grows.",
       "mostPopular": "Most popular",
       "plans": [
-        { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Unlimited boards", "Kanban board, Table and Calendar", "Card archiving", "Card attachments and links (up to 10 MB)", "Pending tasks ticker", "Email support"] },
-        { "name": "Intermediate", "price": "R$ 369.99", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Unlimited boards", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Auto-archiving of completed cards", "Bottleneck monitor", "Card attachments and links (up to 50 MB)", "Pending tasks ticker", "Email support"] },
-        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "All views (Calendar, Dashboard, Map, Timeline, Eisenhower Matrix)", "Private and shared boards", "Auto-archiving of completed cards", "Bottleneck monitor", "Routines that create cards on their own", "Card attachments and links (up to 50 MB)", "Pending tasks ticker", "Priority support"] },
+        { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Up to 4 boards, private and shared", "Kanban, Table and Calendar", "Manual card archiving", "Card attachments and links (up to 10 MB)", "Email support"] },
+        { "name": "Intermediate", "price": "R$ 369.99", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Basic, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Card attachments and links (up to 50 MB)"] },
+        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Intermediate, plus:", "Routines that create cards on their own", "Priority support"] },
         { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
       ]
     },
@@ -911,6 +911,7 @@
     "NETWORK_UNREACHABLE": "The server did not respond. Check that it is running and try again.",
     "REPORT_FORMAT_INVALID": "Unsupported report format",
     "REPORT_STATUS_INVALID": "Invalid status filter",
+    "BOARD_LIMIT_REACHED": "Plan board limit reached. Delete a board or upgrade to create another one.",
     "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Intermediate plan up.",
     "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Professional plan up.",
     "INVALID_FREQUENCY": "Invalid frequency",

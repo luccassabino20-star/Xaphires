@@ -14,11 +14,17 @@ export const TRIAL_DAYS = 7;
 // dinheiro acumula erro: 349.99 não é representável em binário, e um cálculo de
 // proporcional em cima disso fecha com centavo de diferença do extrato. O campo
 // `price` em reais continua existindo, derivado, só para exibição.
+// Toda visão que existe no ViewSwitcher do cliente (src/components/ViewSwitcher.jsx)
+// - as duas listas precisam continuar em sincronia na mão, porque o cliente não
+// importa este arquivo (bundle separado). maxBoards e views null significam "sem
+// teto"/"todas liberadas", mesmo espírito do maxUsers null = ilimitado.
+export const ALL_VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"];
+
 const DEFINICOES = {
-  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024 },
-  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
-  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 }, // null = ilimitado
-  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
+  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false },
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true },
+  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true }, // null = ilimitado
+  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true },
 };
 
 // price derivado de priceCents num único lugar, para os dois nunca discordarem.
@@ -101,6 +107,28 @@ export function canAddUser(company, currentUserCount) {
   return max === null || currentUserCount < max;
 }
 
+// Mesmo par maxUsersFor/canAddUser, para quadros. Sem override por empresa (a
+// exceção administrativa de usuário/anexo existe porque cliente grande pede
+// caso a caso; teto de quadro do Básico não teve esse pedido até aqui - se
+// vier, é só seguir o mesmo padrão de company.max_users_override).
+export function maxBoardsFor(company) {
+  return getPlan(company?.plan).maxBoards;
+}
+
+export function canAddBoard(company, currentBoardCount) {
+  const max = maxBoardsFor(company);
+  return max === null || currentBoardCount < max;
+}
+
+// Visões liberadas para o plano - null em DEFINICOES.views significa "todas".
+// O Básico só recebe as três que não dependem de nenhuma automação paga
+// (Kanban, Tabela, Calendário); as outras quatro (Gantt, Painel, Mapa, Matriz
+// Eisenhower) só leem os mesmos dados do cartão, então a barreira aqui é só de
+// UI - o servidor não tem uma rota própria por visão para travar de verdade.
+export function viewsFor(planId) {
+  return getPlan(planId).views || ALL_VIEWS;
+}
+
 // Um mês adiante, preservando o dia da contratação. Contratou dia 31, vence dia 31
 // nos meses que têm — nos que não têm, cai no último dia, em vez de vazar para o
 // mês seguinte como faria um setMonth ingênuo.
@@ -163,6 +191,14 @@ export function canUseRecurringCards(planId) {
 // Direito ao monitor de gargalos. Mesmo degrau do arquivamento automático.
 export function canUseBottleneckMonitor(planId) {
   return getPlan(planId).bottleneckMonitor === true;
+}
+
+// Direito ao letreiro de tarefas pendentes. Só a partir do Intermediário -
+// mesmo espírito de canUseAutoArchive/canUseBottleneckMonitor, mas sem rota
+// própria pra travar: o letreiro só lê os cartões que o quadro já trouxe, então
+// a barreira aqui é de UI (mesmo caso de viewsFor, ver comentário lá).
+export function canUseTaskTicker(planId) {
+  return getPlan(planId).taskTicker === true;
 }
 
 // Teto de anexo efetivo, em bytes. O gratuito fica com 10 MB e os pagos com 50; a

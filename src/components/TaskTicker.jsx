@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import * as api from "../state/api.js";
 
 function isOverdue(card) {
   if (!card.due) return false;
@@ -9,7 +11,23 @@ function isOverdue(card) {
 
 export default function TaskTicker({ board, onOpenCard }) {
   const { t } = useTranslation();
-  if (!board) return null;
+  // Letreiro é só a partir do Intermediário (ver canUseTaskTicker em
+  // plans.js) - começa liberado pra não pipocar sumindo num plano que tem
+  // direito, enquanto a resposta não chega (getPlan() já cacheia 30s).
+  const [allowed, setAllowed] = useState(true);
+
+  useEffect(() => {
+    let ativo = true;
+    api
+      .getPlan()
+      .then((p) => ativo && setAllowed(p.canUseTaskTicker !== false))
+      .catch(() => {});
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  if (!board || !allowed) return null;
 
   const listTitleById = new Map(board.lists.map((l) => [l.id, l.title]));
   const pending = board.lists

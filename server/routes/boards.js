@@ -3,7 +3,7 @@ import { requireAuth, requireBoardAccess, requireBoardOwner } from "../middlewar
 import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
 import { getCompany } from "../directory.js";
-import { canUseAutoArchive, canUseRecurringCards } from "../plans.js";
+import { canUseAutoArchive, canUseRecurringCards, canAddBoard } from "../plans.js";
 import { varrerCobranca } from "../billing/lifecycle.js";
 
 const router = Router();
@@ -44,6 +44,10 @@ router.post(
   ah(async (req, res) => {
     const { id, title, visibility } = req.body || {};
     if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório", code: "TITLE_REQUIRED" });
+    const company = getCompany(req.companyId);
+    if (!canAddBoard(company, repo.countBoards())) {
+      return res.status(403).json({ error: "Limite de quadros do plano atingido", code: "BOARD_LIMIT_REACHED" });
+    }
     const boardId = await repo.createBoard({ id, title: title.trim(), ownerId: req.user.id, visibility });
     res.status(201).json({ id: boardId });
   })

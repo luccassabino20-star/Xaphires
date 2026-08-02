@@ -6,6 +6,7 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { useChat } from "../state/ChatContext.jsx";
 import { uid } from "../utils/id.js";
+import * as api from "../state/api.js";
 import UsersPanel from "./UsersPanel.jsx";
 import PlanModal from "./PlanModal.jsx";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
@@ -134,6 +135,22 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
   const [usersPanelOpen, setUsersPanelOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [plataformaOpen, setPlataformaOpen] = useState(false);
+  // null = sem teto (ou ainda não carregou - getPlan() tem cache de 30s em
+  // api.js, então não é uma requisição a mais por render). A contagem em si
+  // vem do estado real (state.boards.length), não desta resposta: ela muda a
+  // cada quadro criado/excluído, e recontar aqui ficaria sempre um passo atrás.
+  const [maxBoards, setMaxBoards] = useState(null);
+
+  useEffect(() => {
+    let ativo = true;
+    api
+      .getPlan()
+      .then((p) => ativo && setMaxBoards(p.maxBoards))
+      .catch(() => {});
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   // Flyout do "Mais": bate-papo/idioma/tema moraram na fileira sempre visível
   // do painel branco antes; agora só aparecem aqui, sob demanda. Portal +
@@ -172,6 +189,19 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
   // próprios daria a impressão de que ela pode excluir e compartilhar.
   const privateBoards = state.boards.filter((b) => b.visibility === "private" && b.myRole === "owner");
   const sharedWithMe = state.boards.filter((b) => b.visibility === "private" && b.myRole !== "owner");
+
+  // Gatilho dos três "+ novo quadro" (cabeçalho, ícone da seção, botão no fim
+  // da árvore) - checa o teto ANTES de abrir o formulário. O servidor também
+  // recusa (routes/boards.js), mas ADD_BOARD é otimista (ver reducer.js): se a
+  // checagem só existisse lá, o quadro apareceria na hora e sumiria sozinho no
+  // próximo refetch, sem explicação nenhuma - o erro de sync só vai pro console.
+  function startAdding() {
+    if (maxBoards !== null && state.boards.length >= maxBoards) {
+      showToast(t("errors.BOARD_LIMIT_REACHED"));
+      return;
+    }
+    setAdding(true);
+  }
 
   function addBoard() {
     const title = newTitle.trim();
@@ -332,7 +362,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
 
         <div className="dsb-panel-titlebar">
           <span className="dsb-panel-title">{t("app.sidebar.rail.home")}</span>
-          <button type="button" className="dsb-create-btn" onClick={() => setAdding(true)}>
+          <button type="button" className="dsb-create-btn" onClick={startAdding}>
             <IconPlus size={13} />
             {t("app.sidebar.create")}
           </button>
@@ -366,7 +396,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
         <div className="dsb-spaces">
           <div className="dsb-section-row">
             <span className="dsb-section-title">{t("app.sidebar.spacesTitle")}</span>
-            <button type="button" className="dsb-icon-btn" onClick={() => setAdding(true)} title={t("app.sidebar.newBoard")}>
+            <button type="button" className="dsb-icon-btn" onClick={startAdding} title={t("app.sidebar.newBoard")}>
               <IconPlus size={14} />
             </button>
           </div>
@@ -416,7 +446,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
               </div>
             </div>
           ) : (
-            <button type="button" className="dsb-new-space-btn" onClick={() => setAdding(true)}>
+            <button type="button" className="dsb-new-space-btn" onClick={startAdding}>
               <IconPlus size={13} />
               {t("app.sidebar.newBoard")}
             </button>
