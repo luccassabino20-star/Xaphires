@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "node:path";
@@ -35,6 +36,36 @@ const frontendUrl = process.env.FRONTEND_URL;
 if (frontendUrl) {
   app.use(cors({ origin: frontendUrl, credentials: true }));
 }
+
+// CSP fechada na mão, não o default do helmet: esta app carrega recurso externo
+// de só três lugares (fonte do Google Fonts, tile do OpenStreetMap no Mapa, e o
+// preview de imagem do pop-up promocional via blob: no painel) - liberar tudo com
+// useDefaults teria sido mais frouxo que o necessário. object-src/base-uri/
+// frame-ancestors travados: não há plugin, não há troca de <base>, e a app não
+// existe para ser embutida em iframe de terceiro.
+// crossOriginEmbedderPolicy fica desligado de propósito: o padrão do helmet
+// (require-corp) bloqueia a folha do Google Fonts e os tiles do OpenStreetMap,
+// que não respondem com Cross-Origin-Resource-Policy - nenhum dos dois é
+// recurso nosso para adicionar esse cabeçalho.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https://*.tile.openstreetmap.org"],
+        connectSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 app.use(express.json({ limit: "12mb" }));
 app.use(cookieParser());
