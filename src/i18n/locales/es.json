@@ -88,6 +88,7 @@
         { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Intermedio." },
         { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Profesional." },
         { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció. Disponible desde el plan Intermedio." },
+        { "badge": "P", "title": "Planificador personal", "text": "Una agenda fuera de los tableros, solo tuya: calendario y lista de tareas personales, con las completadas archivándose solas después de 2 días. Disponible desde el plan Intermedio." },
         { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." },
         { "badge": "C", "title": "Finalización automática", "text": "Marcaste la tarjeta como completada y ella salta sola a la columna de completadas del tablero - sin arrastrar a mano." }
       ],
@@ -156,7 +157,7 @@
       "mostPopular": "Más popular",
       "plans": [
         { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
-        { "name": "Intermedio", "price": "R$ 369,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
+        { "name": "Intermedio", "price": "R$ 369,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
         { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo lo incluido en Profesional, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
@@ -819,7 +820,8 @@
     "groupToday": "Hoy",
     "groupTomorrow": "Mañana",
     "groupUpcoming": "Próximas",
-    "groupCompleted": "Completadas"
+    "groupCompleted": "Completadas",
+    "planRequired": "El planificador personal está disponible desde el plan Intermedio. Puedes ver y borrar lo que ya existe."
   },
   "plan": {
     "monthlyLabel": "Mensualidad",
@@ -939,6 +941,7 @@
     "REPORT_STATUS_INVALID": "Filtro de estado inválido",
     "BOARD_LIMIT_REACHED": "Límite de tableros del plan alcanzado. Elimina un tablero o mejora tu plan para crear otro.",
     "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Intermedio.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "El planificador personal está disponible desde el plan Intermedio.",
     "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Profesional.",
     "INVALID_FREQUENCY": "Frecuencia inválida",
     "WEEKDAY_REQUIRED": "Elige el día de la semana",

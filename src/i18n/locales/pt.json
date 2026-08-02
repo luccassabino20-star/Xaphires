@@ -171,6 +171,11 @@
           "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Intermediário para cima."
         },
         {
+          "badge": "P",
+          "title": "Planejador pessoal",
+          "text": "Uma agenda fora dos quadros, só sua: calendário e lista de tarefas pessoais, com as concluídas arquivando sozinhas depois de 2 dias. Disponível do plano Intermediário para cima."
+        },
+        {
           "badge": "X",
           "title": "Anexos e links",
           "text": "Contratos, plantas e fotos direto no cartão, além de links para o que mora fora do sistema."
@@ -379,6 +384,7 @@
             "Letreiro de tarefas pendentes",
             "Arquivamento automático de concluídos",
             "Monitor de gargalos",
+            "Planejador pessoal",
             "Anexos e links nos cartões (até 50 MB)"
           ]
         },
@@ -1152,7 +1158,8 @@
     "groupToday": "Hoje",
     "groupTomorrow": "Amanhã",
     "groupUpcoming": "Em breve",
-    "groupCompleted": "Concluídas"
+    "groupCompleted": "Concluídas",
+    "planRequired": "O planejador pessoal está disponível a partir do plano Intermediário. Você pode ver e apagar o que já existe."
   },
   "plan": {
     "monthlyLabel": "Mensalidade",
@@ -1272,6 +1279,7 @@
     "REPORT_STATUS_INVALID": "Filtro de situação inválido",
     "BOARD_LIMIT_REACHED": "Limite de quadros do plano atingido. Exclua um quadro ou faça upgrade para criar outro.",
     "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Intermediário.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "O planejador pessoal está disponível a partir do plano Intermediário.",
     "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
     "INVALID_FREQUENCY": "Frequência inválida",
     "WEEKDAY_REQUIRED": "Escolha o dia da semana",

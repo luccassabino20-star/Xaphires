@@ -21,10 +21,10 @@ export const TRIAL_DAYS = 7;
 export const ALL_VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"];
 
 const DEFINICOES = {
-  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false },
-  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true },
-  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true }, // null = ilimitado
-  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true },
+  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false },
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
+  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true }, // null = ilimitado
+  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
 };
 
 // price derivado de priceCents num único lugar, para os dois nunca discordarem.
@@ -199,6 +199,12 @@ export function canUseBottleneckMonitor(planId) {
 // a barreira aqui é de UI (mesmo caso de viewsFor, ver comentário lá).
 export function canUseTaskTicker(planId) {
   return getPlan(planId).taskTicker === true;
+}
+
+// Direito ao Planejador pessoal (agenda fora de quadros). Mesmo degrau do
+// arquivamento automático e do monitor de gargalos - a partir do Intermediário.
+export function canUsePersonalPlanner(planId) {
+  return getPlan(planId).personalPlanner === true;
 }
 
 // Teto de anexo efetivo, em bytes. O gratuito fica com 10 MB e os pagos com 50; a

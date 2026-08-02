@@ -1002,6 +1002,8 @@ input, textarea { font-family: inherit; }
 .planner-task-check:hover { border-color: var(--success); }
 .planner-task-check.checked { background: var(--success); border-color: var(--success); }
 .planner-task-check svg { display: block; }
+.planner-task-check:disabled,
+.planner-grid .calendar-card-chip:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .planner-task-title { flex: 1; font-size: 14px; color: var(--text-primary); }
 .planner-task-title.completed { color: var(--text-muted); text-decoration: line-through; }

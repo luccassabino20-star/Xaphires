@@ -62,6 +62,7 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
 
   const [tab, setTab] = useState(initialTab);
   const [tasks, setTasks] = useState([]);
+  const [canUse, setCanUse] = useState(false);
   const [loading, setLoading] = useState(true);
   const [monthDate, setMonthDate] = useState(() => {
     const now = new Date();
@@ -76,7 +77,10 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
   useEffect(() => {
     api
       .listPersonalTasks()
-      .then(setTasks)
+      .then((data) => {
+        setTasks(data.tasks);
+        setCanUse(data.canUse);
+      })
       .catch((err) => showToast(translateError(err, t)))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -208,140 +212,154 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
         <div className="modal-body">
           {loading ? (
             <p className="share-empty">{t("common.loading")}</p>
-          ) : tab === "calendar" ? (
-            <>
-              <div className="calendar-header">
-                <div className="calendar-title">
-                  {MONTH_NAMES[monthDate.getMonth()]} {monthDate.getFullYear()}
-                </div>
-                <div className="calendar-nav">
-                  <button type="button" className="btn-ghost btn-small" onClick={goToday}>
-                    {t("views.calendar.today")}
-                  </button>
-                  <button type="button" className="icon-btn" onClick={goPrev} aria-label={t("views.calendar.prevMonth")}>
-                    <svg viewBox="0 0 24 24" width="16" height="16">
-                      <path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
-                    </svg>
-                  </button>
-                  <button type="button" className="icon-btn" onClick={goNext} aria-label={t("views.calendar.nextMonth")}>
-                    <svg viewBox="0 0 24 24" width="16" height="16">
-                      <path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <div className="calendar-grid planner-grid">
-                {WEEKDAYS.map((w) => (
-                  <div key={w} className="calendar-weekday">
-                    {w}
-                  </div>
-                ))}
-                {grid.map(({ date, inMonth }) => {
-                  const iso = toISODate(date);
-                  const dayTasks = tasksByDate[iso] || [];
-                  const isToday = iso === todayIso;
-                  return (
-                    <div key={iso} className={"calendar-cell" + (inMonth ? "" : " outside") + (isToday ? " today" : "")}>
-                      <div className="calendar-day-num-row">
-                        <span className="calendar-day-num">{date.getDate()}</span>
-                        <button
-                          type="button"
-                          className="planner-day-add"
-                          aria-label={t("planner.add")}
-                          onClick={() => {
-                            setAddingDate(iso);
-                            setDraftTitle("");
-                          }}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div className="calendar-day-cards">
-                        {dayTasks.map((tsk) => (
-                          <button
-                            key={tsk.id}
-                            className={"calendar-card-chip" + (tsk.completed ? " completed" : "")}
-                            onClick={() => toggleTask(tsk)}
-                            title={tsk.title}
-                          >
-                            {tsk.title}
-                          </button>
-                        ))}
-                      </div>
-                      {addingDate === iso && (
-                        <form className="planner-inline-add" onSubmit={(e) => e.preventDefault()}>
-                          <input
-                            autoFocus
-                            value={draftTitle}
-                            onChange={(e) => setDraftTitle(e.target.value)}
-                            onBlur={() => handleQuickAdd(iso)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                handleQuickAdd(iso);
-                              }
-                              if (e.key === "Escape") setAddingDate(null);
-                            }}
-                            placeholder={t("planner.addPlaceholder")}
-                          />
-                        </form>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
           ) : (
             <>
-              <form className="planner-list-add" onSubmit={handleFormAdd}>
-                <input
-                  type="text"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder={t("planner.addPlaceholder")}
-                />
-                <DatePicker value={newDue} onChange={setNewDue} label={t("board.cardModal.dueDate")} showRecurrence={false} />
-                <button className="btn-primary btn-small" type="submit" disabled={submitting || !newTitle.trim()}>
-                  {t("planner.add")}
-                </button>
-              </form>
-
-              {sortedTasks.length === 0 ? (
-                <div className="planner-empty">
-                  <EmptyPlannerIcon />
-                  <p>{t("planner.empty")}</p>
-                </div>
-              ) : (
-                groups.map((g) => (
-                  <div className="planner-group" key={g.key}>
-                    <div className={"planner-group-title" + (g.key === "overdue" ? " overdue" : "")}>
-                      {t(`planner.group${capitalize(g.key)}`)}
-                      <span className="planner-group-count">{g.items.length}</span>
+              {/* Recurso do Intermediário para cima (plans.js canUsePersonalPlanner) -
+                  quem caiu de plano continua vendo e podendo apagar o que já criou,
+                  só não cria nem edita nada novo. Mesmo padrão de RecurrencesModal. */}
+              {!canUse && <p className="recurrence-locked">{t("planner.planRequired")}</p>}
+              {tab === "calendar" ? (
+                <>
+                  <div className="calendar-header">
+                    <div className="calendar-title">
+                      {MONTH_NAMES[monthDate.getMonth()]} {monthDate.getFullYear()}
                     </div>
-                    <ul className="planner-task-list">
-                      {g.items.map((tsk) => (
-                        <li key={tsk.id} className={"planner-task-row" + (tsk.completed ? " completed" : "")}>
-                          <button
-                            type="button"
-                            className={"planner-task-check" + (tsk.completed ? " checked" : "")}
-                            onClick={() => toggleTask(tsk)}
-                            aria-label={tsk.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
-                          >
-                            {tsk.completed && <CheckMarkIcon />}
-                          </button>
-                          <span className={"planner-task-title" + (tsk.completed ? " completed" : "")}>{tsk.title}</span>
-                          <span className={"planner-task-due" + (g.key === "overdue" ? " overdue" : "")}>
-                            {formatDue(tsk.due, i18n.language)}
-                          </span>
-                          <button type="button" className="planner-task-delete" onClick={() => removeTask(tsk)} aria-label={t("common.delete")}>
-                            <TrashIcon />
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="calendar-nav">
+                      <button type="button" className="btn-ghost btn-small" onClick={goToday}>
+                        {t("views.calendar.today")}
+                      </button>
+                      <button type="button" className="icon-btn" onClick={goPrev} aria-label={t("views.calendar.prevMonth")}>
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                          <path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
+                        </svg>
+                      </button>
+                      <button type="button" className="icon-btn" onClick={goNext} aria-label={t("views.calendar.nextMonth")}>
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                          <path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                ))
+
+                  <div className="calendar-grid planner-grid">
+                    {WEEKDAYS.map((w) => (
+                      <div key={w} className="calendar-weekday">
+                        {w}
+                      </div>
+                    ))}
+                    {grid.map(({ date, inMonth }) => {
+                      const iso = toISODate(date);
+                      const dayTasks = tasksByDate[iso] || [];
+                      const isToday = iso === todayIso;
+                      return (
+                        <div key={iso} className={"calendar-cell" + (inMonth ? "" : " outside") + (isToday ? " today" : "")}>
+                          <div className="calendar-day-num-row">
+                            <span className="calendar-day-num">{date.getDate()}</span>
+                            {canUse && (
+                              <button
+                                type="button"
+                                className="planner-day-add"
+                                aria-label={t("planner.add")}
+                                onClick={() => {
+                                  setAddingDate(iso);
+                                  setDraftTitle("");
+                                }}
+                              >
+                                +
+                              </button>
+                            )}
+                          </div>
+                          <div className="calendar-day-cards">
+                            {dayTasks.map((tsk) => (
+                              <button
+                                key={tsk.id}
+                                className={"calendar-card-chip" + (tsk.completed ? " completed" : "")}
+                                onClick={() => toggleTask(tsk)}
+                                disabled={!canUse}
+                                title={tsk.title}
+                              >
+                                {tsk.title}
+                              </button>
+                            ))}
+                          </div>
+                          {addingDate === iso && (
+                            <form className="planner-inline-add" onSubmit={(e) => e.preventDefault()}>
+                              <input
+                                autoFocus
+                                value={draftTitle}
+                                onChange={(e) => setDraftTitle(e.target.value)}
+                                onBlur={() => handleQuickAdd(iso)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleQuickAdd(iso);
+                                  }
+                                  if (e.key === "Escape") setAddingDate(null);
+                                }}
+                                placeholder={t("planner.addPlaceholder")}
+                              />
+                            </form>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {canUse && (
+                    <form className="planner-list-add" onSubmit={handleFormAdd}>
+                      <input
+                        type="text"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        placeholder={t("planner.addPlaceholder")}
+                      />
+                      <DatePicker value={newDue} onChange={setNewDue} label={t("board.cardModal.dueDate")} showRecurrence={false} />
+                      <button className="btn-primary btn-small" type="submit" disabled={submitting || !newTitle.trim()}>
+                        {t("planner.add")}
+                      </button>
+                    </form>
+                  )}
+
+                  {sortedTasks.length === 0 ? (
+                    <div className="planner-empty">
+                      <EmptyPlannerIcon />
+                      <p>{t("planner.empty")}</p>
+                    </div>
+                  ) : (
+                    groups.map((g) => (
+                      <div className="planner-group" key={g.key}>
+                        <div className={"planner-group-title" + (g.key === "overdue" ? " overdue" : "")}>
+                          {t(`planner.group${capitalize(g.key)}`)}
+                          <span className="planner-group-count">{g.items.length}</span>
+                        </div>
+                        <ul className="planner-task-list">
+                          {g.items.map((tsk) => (
+                            <li key={tsk.id} className={"planner-task-row" + (tsk.completed ? " completed" : "")}>
+                              <button
+                                type="button"
+                                className={"planner-task-check" + (tsk.completed ? " checked" : "")}
+                                onClick={() => toggleTask(tsk)}
+                                disabled={!canUse}
+                                aria-label={tsk.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
+                              >
+                                {tsk.completed && <CheckMarkIcon />}
+                              </button>
+                              <span className={"planner-task-title" + (tsk.completed ? " completed" : "")}>{tsk.title}</span>
+                              <span className={"planner-task-due" + (g.key === "overdue" ? " overdue" : "")}>
+                                {formatDue(tsk.due, i18n.language)}
+                              </span>
+                              <button type="button" className="planner-task-delete" onClick={() => removeTask(tsk)} aria-label={t("common.delete")}>
+                                <TrashIcon />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))
+                  )}
+                </>
               )}
             </>
           )}

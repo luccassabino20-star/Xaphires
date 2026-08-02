@@ -13,6 +13,7 @@ import {
   canUseAutoArchive,
   canUseBottleneckMonitor,
   canUseTaskTicker,
+  canUsePersonalPlanner,
   attachmentLimitFor,
   maxUsersFor,
   maxBoardsFor,
@@ -47,6 +48,7 @@ function resumo(companyId) {
     canUseAutoArchive: canUseAutoArchive(company?.plan),
     canUseBottleneckMonitor: canUseBottleneckMonitor(company?.plan),
     canUseTaskTicker: canUseTaskTicker(company?.plan),
+    canUsePersonalPlanner: canUsePersonalPlanner(company?.plan),
     maxAttachmentBytes: attachmentLimitFor(company),
     // Catálogo com a decisão de autoatendimento já resolvida no servidor, para o
     // cliente não reimplementar a regra e as duas pontas discordarem.
