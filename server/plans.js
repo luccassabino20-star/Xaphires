@@ -16,7 +16,7 @@ export const TRIAL_DAYS = 7;
 // `price` em reais continua existindo, derivado, só para exibição.
 const DEFINICOES = {
   basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024 },
-  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 35999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
   professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 }, // null = ilimitado
   enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024 },
 };
