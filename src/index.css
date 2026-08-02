@@ -2977,6 +2977,189 @@ input, textarea { font-family: inherit; }
   margin-right: auto;
 }
 
+/* ---------- Prova visual do hero: miniatura do quadro ---------- */
+.landing-board-preview {
+  max-width: 900px;
+  margin: 0 auto 64px;
+  padding: 0 24px;
+}
+.landing-board-preview-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+}
+.landing-board-preview-dot { width: 9px; height: 9px; border-radius: 50%; }
+.landing-board-preview-dot.dot-a { background: #e8492b; }
+.landing-board-preview-dot.dot-b { background: #d9a441; }
+.landing-board-preview-dot.dot-c { background: #3fa66b; }
+.landing-board-preview-board {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  background: var(--bg-column);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0 0 14px 14px;
+  box-shadow: var(--shadow-modal);
+  overflow-x: auto;
+}
+.landing-board-preview-col { flex: 1 1 0; min-width: 190px; display: flex; flex-direction: column; gap: 10px; }
+.landing-board-preview-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  padding: 0 2px;
+}
+.landing-board-preview-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--bg-list);
+  color: var(--text-muted);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.landing-board-preview-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--card-border, var(--border-subtle));
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 12px 12px 10px;
+  overflow: hidden;
+}
+.landing-board-preview-card p { margin: 6px 0 10px; font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.4; }
+.landing-board-preview-card.done { opacity: 0.55; }
+.landing-board-preview-card.done p { text-decoration: line-through; }
+.landing-board-preview-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.landing-board-preview-bar.bar-0 { background: #3b82f6; }
+.landing-board-preview-bar.bar-1 { background: #22c55e; }
+.landing-board-preview-bar.bar-2 { background: #eab308; }
+.landing-board-preview-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.landing-board-preview-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-list);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.landing-board-preview-avatar {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #fff;
+}
+.landing-board-preview-avatar.avatar-0 { background: #6d5ce8; }
+.landing-board-preview-avatar.avatar-1 { background: #e8492b; }
+.landing-board-preview-avatar.avatar-2 { background: #0d9488; }
+
+/* Miniatura do Gantt: mesma "moldura de navegador" de .landing-board-preview
+   (reaproveitada), corpo próprio abaixo. Paleta de status e linha "hoje"
+   copiadas de ganttStatus.js/.gnt-today-line - ver comentário no componente. */
+.landing-gantt-preview-body {
+  display: flex;
+  background: var(--bg-column);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0 0 14px 14px;
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+.landing-gantt-preview-sidebar {
+  flex: 0 0 150px;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+.landing-gantt-preview-sidebar-row {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.landing-gantt-preview-chart { flex: 1; position: relative; overflow: hidden; }
+.landing-gantt-preview-header {
+  position: relative;
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.landing-gantt-preview-day {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  border-right: 1px solid var(--border-subtle);
+}
+.landing-gantt-preview-today-pill {
+  position: absolute;
+  bottom: -1px;
+  transform: translate(-50%, 100%);
+  background: #e44235;
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+  z-index: 3;
+}
+.landing-gantt-preview-rows { position: relative; }
+.landing-gantt-preview-row { position: relative; height: 44px; border-bottom: 1px solid var(--border-subtle); }
+.landing-gantt-preview-row:nth-child(even) { background: var(--bg-column); }
+.landing-gantt-preview-today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #e44235; z-index: 1; }
+.landing-gantt-preview-bar {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 2;
+}
+.landing-gantt-preview-bar.status-done { background: #22c55e; }
+.landing-gantt-preview-bar.status-inProgress { background: #3b82f6; }
+.landing-gantt-preview-bar.status-agency { background: #f59e0b; }
+.landing-gantt-preview-bar.child { background: #e0e8fe; box-shadow: inset 0 0 0 1px #c8d6fa; top: 13px; bottom: 13px; }
+
+@media (max-width: 720px) {
+  .landing-board-preview { margin-bottom: 48px; padding: 0 16px; }
+  .landing-board-preview-board { gap: 10px; padding: 14px; }
+  .landing-board-preview-col { min-width: 160px; }
+  .landing-gantt-preview-sidebar { flex-basis: 96px; }
+  .landing-gantt-preview-sidebar-row { padding: 0 8px; font-size: 11px; }
+  .landing-gantt-preview-day { font-size: 9px; }
+}
+
 /* ---------- Scroll reveal ---------- */
 .landing-reveal {
   opacity: 0;
@@ -3909,6 +4092,53 @@ input, textarea { font-family: inherit; }
 }
 .landing-testimonial-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
 .landing-testimonial-role { font-size: 10.5px; color: var(--text-muted); }
+
+/* ---------- Landing: FAQ ---------- */
+.landing-faq { max-width: 720px; margin: 0 auto; padding: 24px 24px 96px; }
+.landing-faq h2 { text-align: center; font-size: 26px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 32px; }
+.landing-faq-list { display: flex; flex-direction: column; gap: 10px; }
+.landing-faq-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--bg-topbar);
+  padding: 4px 20px;
+}
+/* Marcador nativo do <summary> (triângulo/seta do navegador) escondido - o
+   ícone "+"/"–" próprio (landing-faq-icon) é quem indica o estado, e precisa
+   ficar igual entre navegadores diferentes. */
+.landing-faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.landing-faq-item summary::-webkit-details-marker { display: none; }
+.landing-faq-icon {
+  flex-shrink: 0;
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+.landing-faq-icon::before,
+.landing-faq-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: var(--text-secondary);
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease;
+}
+.landing-faq-icon::before { width: 12px; height: 2px; }
+.landing-faq-icon::after { width: 2px; height: 12px; }
+.landing-faq-item[open] .landing-faq-icon::after { transform: translate(-50%, -50%) rotate(90deg); opacity: 0; }
+.landing-faq-item p { margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
 
 /* ---------- Landing: feature switcher + rotator ---------- */
 .landing-switcher {

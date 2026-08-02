@@ -100,6 +100,118 @@ function RevealTitle({ text }) {
   );
 }
 
+// Prova visual do hero: uma miniatura do quadro real, não uma ilustração
+// genérica. É markup próprio (não o CardItem de verdade) de propósito - decorativo
+// e sem estado, para não carregar contexto de quadro na landing só para isto.
+// As cores das colunas/avatares são só visuais, sem ligação com dado nenhum -
+// por isso aria-hidden: quem lê por leitor de tela já tem a proposta de valor
+// no texto do hero, este bloco só repete visualmente.
+function HeroBoardPreview() {
+  const { t } = useTranslation();
+  const columns = t("landing.home.boardPreview.columns", { returnObjects: true });
+
+  return (
+    <div className="landing-board-preview landing-reveal" style={{ transitionDelay: "300ms" }} aria-hidden="true">
+      <div className="landing-board-preview-chrome">
+        <span className="landing-board-preview-dot dot-a" />
+        <span className="landing-board-preview-dot dot-b" />
+        <span className="landing-board-preview-dot dot-c" />
+      </div>
+      <div className="landing-board-preview-board">
+        {columns.map((col, ci) => (
+          <div className="landing-board-preview-col" key={col.title}>
+            <div className="landing-board-preview-col-head">
+              <span>{col.title}</span>
+              <span className="landing-board-preview-count">{col.cards.length}</span>
+            </div>
+            {col.cards.map((card, cardi) => (
+              <div className={"landing-board-preview-card" + (card.done ? " done" : "")} key={card.title}>
+                <span className={"landing-board-preview-bar bar-" + ((ci + cardi) % 3)} />
+                <p>{card.title}</p>
+                <div className="landing-board-preview-card-footer">
+                  <span className="landing-board-preview-badge">{card.badge}</span>
+                  <span className={"landing-board-preview-avatar avatar-" + ((ci + cardi) % 3)}>{card.initials}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Dias do cabeçalho são só dígitos decorativos (sem mês/ano) - não precisam de
+// tradução, e propositalmente não usam a data real de hoje: um mockup "hoje"
+// fixo no dia 21 de outubro ficaria óbvio e datado assim que a página
+// envelhecesse um pouco. GANTT_TODAY_INDEX marca onde a linha "hoje" cai
+// dentro de GANTT_DAYS, e as barras (ver ganttPreview.rows no locale) usam
+// left/width em % desse mesmo intervalo de 10 dias.
+const GANTT_DAYS = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+const GANTT_TODAY_INDEX = 4;
+const GANTT_BAR_SPANS = [
+  { left: 0, width: 30 },
+  { left: 20, width: 40 },
+  { left: 50, width: 30 },
+  { left: 70, width: 20 },
+];
+
+// Segunda prova visual, mesma lógica da HeroBoardPreview: markup próprio (não
+// o GanttChart de verdade) que reaproveita a paleta real de status
+// (ganttStatus.js) e a linha "hoje" coral do Gantt de verdade, para não
+// desalinhar visualmente se aquela paleta mudar. A quarta linha usa o mesmo
+// tom pastel de .gnt-bar-child, para sugerir hierarquia (tarefa vs.
+// subtarefa) sem precisar simular o recolher/expandir de verdade.
+function GanttPreview() {
+  const { t } = useTranslation();
+  const rows = t("landing.features.ganttPreview.rows", { returnObjects: true });
+  const todayLeft = GANTT_TODAY_INDEX * 10;
+
+  return (
+    <div className="landing-board-preview landing-reveal" aria-hidden="true">
+      <div className="landing-board-preview-chrome">
+        <span className="landing-board-preview-dot dot-a" />
+        <span className="landing-board-preview-dot dot-b" />
+        <span className="landing-board-preview-dot dot-c" />
+      </div>
+      <div className="landing-gantt-preview-body">
+        <div className="landing-gantt-preview-sidebar">
+          {rows.map((row) => (
+            <div className="landing-gantt-preview-sidebar-row" key={row.title}>
+              {row.title}
+            </div>
+          ))}
+        </div>
+        <div className="landing-gantt-preview-chart">
+          <div className="landing-gantt-preview-header">
+            {GANTT_DAYS.map((day, i) => (
+              <span key={i} className="landing-gantt-preview-day">
+                {day}
+              </span>
+            ))}
+            <span className="landing-gantt-preview-today-pill" style={{ left: todayLeft + "%" }}>
+              {t("datePicker.today")}
+            </span>
+          </div>
+          <div className="landing-gantt-preview-rows">
+            <span className="landing-gantt-preview-today-line" style={{ left: todayLeft + "%" }} />
+            {rows.map((row, i) => (
+              <div className="landing-gantt-preview-row" key={row.title}>
+                <span
+                  className={"landing-gantt-preview-bar" + (row.child ? " child" : " status-" + row.status)}
+                  style={{ left: GANTT_BAR_SPANS[i].left + "%", width: GANTT_BAR_SPANS[i].width + "%" }}
+                >
+                  {!row.child && row.title}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LogoMarquee() {
   const { t } = useTranslation();
   const label = t("landing.logos.label");
@@ -156,6 +268,33 @@ function Testimonials() {
           {group(0)}
           {group(1)}
         </div>
+      </div>
+    </section>
+  );
+}
+
+// <details>/<summary> nativo: acordeão sem estado próprio, com abrir/fechar por
+// teclado de graça. Cada item some sozinho quando outro abre (attribute "name"
+// agrupa os <details>, suportado desde 2023 nos motores principais) - sem isso
+// a página deixaria vários abertos ao mesmo tempo, empurrando o conteúdo.
+function Faq() {
+  const { t } = useTranslation();
+  const title = t("landing.home.faq.title");
+  const items = t("landing.home.faq.items", { returnObjects: true });
+
+  return (
+    <section className="landing-faq">
+      <h2 className="landing-reveal">{title}</h2>
+      <div className="landing-faq-list">
+        {items.map((item, i) => (
+          <details className="landing-faq-item landing-reveal" name="landing-faq" style={{ transitionDelay: `${i * 60}ms` }} key={item.q}>
+            <summary>
+              {item.q}
+              <span className="landing-faq-icon" aria-hidden="true" />
+            </summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
       </div>
     </section>
   );
@@ -291,6 +430,8 @@ function HomePage({ onEnter, onNavigate }) {
         </p>
       </section>
 
+      <HeroBoardPreview />
+
       <LogoMarquee />
 
       <section className="landing-stats">
@@ -335,6 +476,8 @@ function HomePage({ onEnter, onNavigate }) {
       </section>
 
       <Testimonials />
+
+      <Faq />
     </div>
   );
 }
@@ -366,6 +509,12 @@ function FeaturesPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="landing-features">
+        <h2 className="landing-features-title">{t("landing.features.ganttPreview.title")}</h2>
+        <p className="landing-features-subtitle">{t("landing.features.ganttPreview.text")}</p>
+        <GanttPreview />
       </section>
 
       {/* As visões acima respondem "como eu olho o trabalho"; estas respondem

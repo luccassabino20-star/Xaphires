@@ -41,7 +41,20 @@
       "heroText": "Xaphires reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos y prioridades, sincronizados en tiempo real para todo el equipo.",
       "ctaStart": "Empieza ahora",
       "ctaPlans": "Ver planes",
-      "heroNote": "Sin burocracia. Cancela cuando quieras.",
+      "heroNote": "7 días gratis con todos los recursos, sin tarjeta de crédito. Después, quédate en el plan gratuito para siempre si quieres.",
+      "boardPreview": { "columns": [
+        { "title": "Por hacer", "cards": [
+          { "title": "Visita técnica - Sector 4", "badge": "Hoy", "initials": "LS" },
+          { "title": "Presupuesto - Reforma Sala 4", "badge": "Mañana", "initials": "MA" }
+        ] },
+        { "title": "En curso", "cards": [
+          { "title": "Comprar materiales - Fase 2", "badge": "2/4", "initials": "TC" },
+          { "title": "Revisar contrato del proveedor", "badge": "3 días", "initials": "LS" }
+        ] },
+        { "title": "Completado", "cards": [
+          { "title": "Entrega - Lote 12", "badge": "Listo", "initials": "MA", "done": true }
+        ] }
+      ] },
       "stats": [
         { "value": "13", "label": "Herramientas integradas en un solo lugar" },
         { "value": "100%", "label": "Sincronización en tiempo real entre el equipo" },
@@ -58,7 +71,13 @@
         { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las herramientas de Xaphires: tablero, tabla, calendario, mapa y más." },
         { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Xaphires en el día a día." },
         { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Básico, Profesional y Empresarial y elige el ideal para tu equipo." }
-      ]
+      ],
+      "faq": { "title": "Preguntas frecuentes", "items": [
+        { "q": "¿Necesito instalar algo?", "a": "No. Xaphires funciona directo en el navegador, en computadora o celular - sin aplicación para descargar ni servidor para configurar." },
+        { "q": "¿Tengo soporte si tengo algún problema?", "a": "Sí. Todo plan incluye soporte por correo; en los planes Profesional y Empresarial, el soporte es prioritario o dedicado, con atención más rápida." },
+        { "q": "¿Puedo cancelar cuando quiera?", "a": "Sí, sin multa. Al cancelar, mantienes acceso completo hasta el fin del período ya pagado; después, los datos siguen ahí - para volver a editar, solo elige el plan gratuito cuando quieras." },
+        { "q": "¿Mi equipo necesita capacitación para usarlo?", "a": "En la mayoría de los casos, no. Si alguien de tu equipo ya usó un tablero Kanban, aunque sea en papel con notas adhesivas, Xaphires sigue la misma lógica - se aprende en minutos." }
+      ] }
     },
     "features": {
       "automationsTitle": "Lo que Xaphires hace solo",
@@ -69,7 +88,8 @@
         { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Intermedio." },
         { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Profesional." },
         { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció." },
-        { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." }
+        { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." },
+        { "badge": "C", "title": "Finalización automática", "text": "Marcaste la tarjeta como completada y ella salta sola a la columna de completadas del tablero - sin arrastrar a mano." }
       ],
       "headerTitle": "Todo lo que tu equipo necesita",
       "headerText": "Herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
@@ -77,14 +97,22 @@
         { "badge": "T", "title": "Tablero Kanban", "text": "Se acabaron las tareas perdidas en capturas de chat. Arrastra y suelta entre listas y ve el avance real del equipo." },
         { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro, sin necesitar otra herramienta." },
         { "badge": "C", "title": "Calendario", "text": "Plazos y fechas de inicio en una vista mensual, para que nada pase desapercibido." },
-        { "badge": "L", "title": "Línea de tiempo", "text": "Todo el cronograma del proyecto de un vistazo, período a período." },
+        { "badge": "L", "title": "Línea de tiempo (Gantt)", "text": "Crea y abre tareas directo desde la línea de tiempo, con todo el cronograma del proyecto de un vistazo, período a período." },
         { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla." },
         { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno." },
         { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte." }
       ],
+      "ganttPreview": { "title": "El Gantt en acción", "text": "Cada tarea se convierte en una barra en la línea de tiempo, con la línea de hoy siempre visible - crea y edita justo aquí, sin otra herramienta.", "rows": [
+        { "title": "Planificación", "status": "done" },
+        { "title": "Desarrollo", "status": "inProgress" },
+        { "title": "Pruebas", "status": "agency" },
+        { "title": "Revisión final", "child": true }
+      ] },
       "secondary": [
         { "title": "Tableros privados y compartidos", "text": "Separa lo que es del equipo de lo que es solo tuyo, con control total de visibilidad." },
-        { "title": "Control de usuarios y roles", "text": "Define quién es administrador (master) y quién es miembro del equipo." }
+        { "title": "Control de usuarios y roles", "text": "Define quién es administrador (master) y quién es miembro del equipo." },
+        { "title": "Chat de la empresa", "text": "Un canal general para todos y conversaciones privadas entre compañeros, sin salir del sistema hacia WhatsApp." },
+        { "title": "Subtareas con responsable, plazo y prioridad", "text": "Divide la tarjeta en pasos más pequeños, cada uno con responsable, fecha y prioridad propios - no es solo una lista de casillas." }
       ]
     },
     "solutions": {

@@ -41,7 +41,31 @@
       "heroText": "O Xaphires substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos e prioridades, sincronizados em tempo real para toda a equipe.",
       "ctaStart": "Comece agora",
       "ctaPlans": "Ver planos",
-      "heroNote": "Sem burocracia. Cancele quando quiser.",
+      "heroNote": "7 dias grátis com todos os recursos, sem cartão de crédito. Depois, fique no plano gratuito para sempre, se quiser.",
+      "boardPreview": {
+        "columns": [
+          {
+            "title": "A Fazer",
+            "cards": [
+              { "title": "Visita técnica - Setor 4", "badge": "Hoje", "initials": "LS" },
+              { "title": "Orçamento - Reforma Sala 4", "badge": "Amanhã", "initials": "MA" }
+            ]
+          },
+          {
+            "title": "Em andamento",
+            "cards": [
+              { "title": "Comprar material - Fase 2", "badge": "2/4", "initials": "TC" },
+              { "title": "Revisar contrato do fornecedor", "badge": "3 dias", "initials": "LS" }
+            ]
+          },
+          {
+            "title": "Concluído",
+            "cards": [
+              { "title": "Entrega - Lote 12", "badge": "Feito", "initials": "MA", "done": true }
+            ]
+          }
+        ]
+      },
       "stats": [
         {
           "value": "13",
@@ -94,7 +118,28 @@
           "title": "Preços",
           "text": "Compare os planos Básico, Profissional e Empresarial e escolha o ideal pra sua equipe."
         }
-      ]
+      ],
+      "faq": {
+        "title": "Perguntas frequentes",
+        "items": [
+          {
+            "q": "Preciso instalar alguma coisa?",
+            "a": "Não. O Xaphires roda direto no navegador, no computador ou no celular - sem aplicativo para baixar nem servidor para configurar."
+          },
+          {
+            "q": "Tenho suporte se eu tiver algum problema?",
+            "a": "Sim. Todo plano inclui suporte por e-mail; nos planos Profissional e Empresarial, o suporte é prioritário ou dedicado, com atendimento mais rápido."
+          },
+          {
+            "q": "Posso cancelar quando quiser?",
+            "a": "Sim, sem multa. Ao cancelar, você mantém acesso completo até o fim do período já pago; depois, os dados continuam lá - para voltar a editar, é só escolher o plano gratuito quando quiser."
+          },
+          {
+            "q": "Preciso treinar minha equipe para usar?",
+            "a": "Na maioria dos casos, não. Se alguém do seu time já usou um quadro Kanban, mesmo em papel com post-it, o Xaphires segue a mesma lógica - o aprendizado é de minutos."
+          }
+        ]
+      }
     },
     "features": {
       "automationsTitle": "O que o Xaphires faz sozinho",
@@ -129,6 +174,11 @@
           "badge": "X",
           "title": "Anexos e links",
           "text": "Contratos, plantas e fotos direto no cartão, além de links para o que mora fora do sistema."
+        },
+        {
+          "badge": "C",
+          "title": "Conclusão automática",
+          "text": "Marcou o cartão como concluído, ele já pula sozinho para a coluna de concluído do quadro - sem arrastar na mão."
         }
       ],
       "headerTitle": "Tudo o que a sua equipe precisa",
@@ -151,8 +201,8 @@
         },
         {
           "badge": "L",
-          "title": "Linha do tempo",
-          "text": "O cronograma inteiro do projeto num só olhar, período a período."
+          "title": "Linha do tempo (Gantt)",
+          "text": "Crie e abra tarefas direto na linha do tempo, com o cronograma inteiro do projeto num só olhar, período a período."
         },
         {
           "badge": "P",
@@ -170,6 +220,16 @@
           "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto."
         }
       ],
+      "ganttPreview": {
+        "title": "O Gantt em ação",
+        "text": "Cada tarefa vira uma barra no tempo, com a linha do dia de hoje sempre visível - crie e edite direto por aqui, sem precisar de outra ferramenta.",
+        "rows": [
+          { "title": "Planejamento", "status": "done" },
+          { "title": "Desenvolvimento", "status": "inProgress" },
+          { "title": "Testes", "status": "agency" },
+          { "title": "Revisão final", "child": true }
+        ]
+      },
       "secondary": [
         {
           "title": "Quadros privados e compartilhados",
@@ -178,6 +238,14 @@
         {
           "title": "Controle de usuários e papéis",
           "text": "Defina quem é administrador (master) e quem é membro da equipe."
+        },
+        {
+          "title": "Bate-papo da empresa",
+          "text": "Um canal geral para todo mundo e conversas privadas entre colegas, sem sair do sistema para o WhatsApp."
+        },
+        {
+          "title": "Subtarefas com dono, prazo e prioridade",
+          "text": "Divida o cartão em etapas menores, cada uma com responsável, data e prioridade próprios - não é só uma lista de caixinhas."
         }
       ]
     },

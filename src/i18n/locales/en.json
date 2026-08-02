@@ -41,7 +41,20 @@
       "heroText": "Xaphires replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines and priorities, synced in real time for the whole team.",
       "ctaStart": "Get started",
       "ctaPlans": "See plans",
-      "heroNote": "No red tape. Cancel anytime.",
+      "heroNote": "7 days free with every feature, no credit card. After that, stay on the free plan forever if you want.",
+      "boardPreview": { "columns": [
+        { "title": "To do", "cards": [
+          { "title": "Site visit - Sector 4", "badge": "Today", "initials": "LS" },
+          { "title": "Quote - Room 4 renovation", "badge": "Tomorrow", "initials": "MA" }
+        ] },
+        { "title": "In progress", "cards": [
+          { "title": "Buy materials - Phase 2", "badge": "2/4", "initials": "TC" },
+          { "title": "Review supplier contract", "badge": "3 days", "initials": "LS" }
+        ] },
+        { "title": "Done", "cards": [
+          { "title": "Delivery - Lot 12", "badge": "Done", "initials": "MA", "done": true }
+        ] }
+      ] },
       "stats": [
         { "value": "13", "label": "Integrated tools in one place" },
         { "value": "100%", "label": "Real-time sync across the team" },
@@ -58,7 +71,13 @@
         { "page": "features", "badge": "F", "title": "Features", "text": "Discover Xaphires's tools: board, table, calendar, map and more." },
         { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Xaphires day to day." },
         { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Basic, Professional and Enterprise plans and pick the right one for your team." }
-      ]
+      ],
+      "faq": { "title": "Frequently asked questions", "items": [
+        { "q": "Do I need to install anything?", "a": "No. Xaphires runs straight in the browser, on desktop or mobile - no app to download and no server to set up." },
+        { "q": "Do I get support if something goes wrong?", "a": "Yes. Every plan includes email support; on the Professional and Enterprise plans, support is priority or dedicated, with faster response times." },
+        { "q": "Can I cancel anytime?", "a": "Yes, no penalty. When you cancel, you keep full access until the end of the period you already paid for; after that, your data stays put - just pick the free plan whenever you want to keep editing." },
+        { "q": "Does my team need training to use it?", "a": "In most cases, no. If anyone on your team has used a Kanban board before, even a whiteboard with sticky notes, Xaphires follows the same logic - it takes minutes to learn." }
+      ] }
     },
     "features": {
       "automationsTitle": "What Xaphires does on its own",
@@ -69,7 +88,8 @@
         { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Intermediate up." },
         { "badge": "T", "title": "Automatic routines", "text": "Fixed tasks become cards on their own at the right date, with the checklist already filled in. From the Professional plan up." },
         { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue." },
-        { "badge": "X", "title": "Attachments and links", "text": "Contracts, plans and photos straight on the card, plus links to whatever lives outside the system." }
+        { "badge": "X", "title": "Attachments and links", "text": "Contracts, plans and photos straight on the card, plus links to whatever lives outside the system." },
+        { "badge": "D", "title": "Automatic completion", "text": "Mark a card as done and it jumps on its own to the board's completed column - no dragging by hand." }
       ],
       "headerTitle": "Everything your team needs",
       "headerText": "Integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
@@ -77,14 +97,22 @@
         { "badge": "B", "title": "Kanban board", "text": "No more tasks lost in chat screenshots. Drag and drop between lists and see the team's real progress." },
         { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member. No need for another tool." },
         { "badge": "C", "title": "Calendar", "text": "Deadlines and start dates in a monthly view, so nothing slips by unnoticed." },
-        { "badge": "L", "title": "Timeline", "text": "The whole project schedule at a glance, period by period." },
+        { "badge": "L", "title": "Timeline (Gantt)", "text": "Create and open tasks straight from the timeline, with the whole project schedule at a glance, period by period." },
         { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet." },
         { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams." },
         { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest." }
       ],
+      "ganttPreview": { "title": "The Gantt in action", "text": "Every task becomes a bar on the timeline, with today's line always visible - create and edit right here, no other tool needed.", "rows": [
+        { "title": "Planning", "status": "done" },
+        { "title": "Development", "status": "inProgress" },
+        { "title": "Testing", "status": "agency" },
+        { "title": "Final review", "child": true }
+      ] },
       "secondary": [
         { "title": "Private and shared boards", "text": "Separate what's the team's from what's just yours, with full visibility control." },
-        { "title": "User and role management", "text": "Define who's an admin (master) and who's a team member." }
+        { "title": "User and role management", "text": "Define who's an admin (master) and who's a team member." },
+        { "title": "Company chat", "text": "A general channel for everyone and private conversations between teammates, without leaving the system for WhatsApp." },
+        { "title": "Subtasks with owner, due date and priority", "text": "Break a card into smaller steps, each with its own assignee, date and priority - not just a checklist." }
       ]
     },
     "solutions": {
