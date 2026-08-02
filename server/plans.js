@@ -20,9 +20,13 @@ export const TRIAL_DAYS = 7;
 // teto"/"todas liberadas", mesmo espírito do maxUsers null = ilimitado.
 export const ALL_VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"];
 
+// autoArchive/bottleneckMonitor/taskTicker/personalPlanner só entram no
+// Profissional para cima - o Intermediário fica só com teto maior de usuário/
+// anexo, quadros ilimitados e as 7 visões. recurringCards já era exclusivo do
+// Profissional antes disso; agora os cinco sobem juntos no mesmo degrau.
 const DEFINICOES = {
   basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false },
-  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: true, recurringCards: false, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false },
   professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true }, // null = ilimitado
   enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
 };
@@ -178,12 +182,14 @@ export function canSelfSelectPlan(company, targetPlanId) {
 
 // Direito à regra de arquivamento automático. O arquivamento manual continua em
 // todos os planos: o que se paga é a automação, não a funcionalidade inteira.
+// A partir do Profissional - mesmo degrau dos cartões recorrentes.
 export function canUseAutoArchive(planId) {
   return getPlan(planId).autoArchive === true;
 }
 
-// Direito aos cartões recorrentes. Um degrau acima do arquivamento automático:
-// este entra só do Profissional para cima.
+// Direito aos cartões recorrentes. Mesmo degrau do arquivamento automático,
+// do monitor de gargalos, do letreiro e do Planejador pessoal: todos entram
+// juntos a partir do Profissional.
 export function canUseRecurringCards(planId) {
   return getPlan(planId).recurringCards === true;
 }
@@ -193,8 +199,8 @@ export function canUseBottleneckMonitor(planId) {
   return getPlan(planId).bottleneckMonitor === true;
 }
 
-// Direito ao letreiro de tarefas pendentes. Só a partir do Intermediário -
-// mesmo espírito de canUseAutoArchive/canUseBottleneckMonitor, mas sem rota
+// Direito ao letreiro de tarefas pendentes. A partir do Profissional - mesmo
+// espírito de canUseAutoArchive/canUseBottleneckMonitor, mas sem rota
 // própria pra travar: o letreiro só lê os cartões que o quadro já trouxe, então
 // a barreira aqui é de UI (mesmo caso de viewsFor, ver comentário lá).
 export function canUseTaskTicker(planId) {
@@ -202,7 +208,7 @@ export function canUseTaskTicker(planId) {
 }
 
 // Direito ao Planejador pessoal (agenda fora de quadros). Mesmo degrau do
-// arquivamento automático e do monitor de gargalos - a partir do Intermediário.
+// arquivamento automático e do monitor de gargalos - a partir do Profissional.
 export function canUsePersonalPlanner(planId) {
   return getPlan(planId).personalPlanner === true;
 }

@@ -11,7 +11,7 @@ function isOverdue(card) {
 
 export default function TaskTicker({ board, onOpenCard }) {
   const { t } = useTranslation();
-  // Letreiro é só a partir do Intermediário (ver canUseTaskTicker em
+  // Letreiro é só a partir do Profissional (ver canUseTaskTicker em
   // plans.js) - começa liberado pra não pipocar sumindo num plano que tem
   // direito, enquanto a resposta não chega (getPlan() já cacheia 30s).
   const [allowed, setAllowed] = useState(true);

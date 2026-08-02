@@ -84,7 +84,7 @@ router.patch(
       // remover a regra que já tinha, senão ela ficaria presa ligada.
       if (dias !== null && !canUseAutoArchive(getCompany(req.companyId)?.plan)) {
         return res.status(403).json({
-          error: "O arquivamento automático está disponível a partir do plano Intermediário.",
+          error: "O arquivamento automático está disponível a partir do plano Profissional.",
           code: "PLAN_FEATURE_AUTO_ARCHIVE",
         });
       }

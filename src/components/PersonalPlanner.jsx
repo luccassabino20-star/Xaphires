@@ -214,7 +214,7 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
             <p className="share-empty">{t("common.loading")}</p>
           ) : (
             <>
-              {/* Recurso do Intermediário para cima (plans.js canUsePersonalPlanner) -
+              {/* Recurso do Profissional para cima (plans.js canUsePersonalPlanner) -
                   quem caiu de plano continua vendo e podendo apagar o que já criou,
                   só não cria nem edita nada novo. Mesmo padrão de RecurrencesModal. */}
               {!canUse && <p className="recurrence-locked">{t("planner.planRequired")}</p>}

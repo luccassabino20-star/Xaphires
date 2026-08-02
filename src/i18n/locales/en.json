@@ -84,11 +84,11 @@
       "automationsText": "Automations running in the background, so you don't have to remember or chase things by hand.",
       "automations": [
         { "badge": "A", "title": "Card archiving", "text": "Take finished work off the board without deleting it. Archived cards leave every view and return to their original column whenever you want." },
-        { "badge": "R", "title": "Auto-archiving", "text": "Set the number of days and completed cards move to the archive on their own. Available from the Intermediate plan up." },
-        { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Intermediate up." },
+        { "badge": "R", "title": "Auto-archiving", "text": "Set the number of days and completed cards move to the archive on their own. Available from the Professional plan up." },
+        { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Professional up." },
         { "badge": "T", "title": "Automatic routines", "text": "Fixed tasks become cards on their own at the right date, with the checklist already filled in. From the Professional plan up." },
-        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue. Available from the Intermediate plan up." },
-        { "badge": "P", "title": "Personal planner", "text": "A personal agenda outside the boards: your own calendar and task list, with completed ones archiving on their own after 2 days. Available from the Intermediate plan up." },
+        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue. Available from the Professional plan up." },
+        { "badge": "P", "title": "Personal planner", "text": "A personal agenda outside the boards: your own calendar and task list, with completed ones archiving on their own after 2 days. Available from the Professional plan up." },
         { "badge": "X", "title": "Attachments and links", "text": "Contracts, plans and photos straight on the card, plus links to whatever lives outside the system." },
         { "badge": "D", "title": "Automatic completion", "text": "Mark a card as done and it jumps on its own to the board's completed column - no dragging by hand." }
       ],
@@ -157,8 +157,8 @@
       "mostPopular": "Most popular",
       "plans": [
         { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Up to 4 boards, private and shared", "Kanban, Table and Calendar", "Manual card archiving", "Card attachments and links (up to 10 MB)", "Email support"] },
-        { "name": "Intermediate", "price": "R$ 369.99", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Basic, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Card attachments and links (up to 50 MB)"] },
-        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Intermediate, plus:", "Routines that create cards on their own", "Priority support"] },
+        { "name": "Intermediate", "price": "R$ 369.99", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Basic, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Card attachments and links (up to 50 MB)"] },
+        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Intermediate, plus:", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Routines that create cards on their own", "Priority support"] },
         { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
       ]
     },
@@ -513,7 +513,7 @@
       "msgClosing": "Could you let me know where it stands? Thanks!"
     },
     "archive": {
-      "autoPlanRequired": "Auto-archiving is available from the Intermediate plan up. Manual archiving stays available.",
+      "autoPlanRequired": "Auto-archiving is available from the Professional plan up. Manual archiving stays available.",
       "autoLabel": "Auto-archive completed cards",
       "autoDaysSuffix": "days",
       "autoOnHint": "Cards completed more than {{days}} days ago move to the archive when the board loads. Unchecking a card restarts the count.",
@@ -532,7 +532,7 @@
       "deletedToast": "Card deleted"
     },
     "listMenu": {
-      "stuckPlanRequired": "The bottleneck monitor is available from the Intermediate plan up.",
+      "stuckPlanRequired": "The bottleneck monitor is available from the Professional plan up.",
       "stuckConfigure": "Monitor bottlenecks in this column",
       "stuckConfigured": "Bottleneck: alert at {{hours}}h",
       "stuckHint": "Warns when a card sits in this column longer than this.",
@@ -821,7 +821,7 @@
     "groupTomorrow": "Tomorrow",
     "groupUpcoming": "Upcoming",
     "groupCompleted": "Completed",
-    "planRequired": "The personal planner is available from the Intermediate plan up. You can still view and delete what already exists."
+    "planRequired": "The personal planner is available from the Professional plan up. You can still view and delete what already exists."
   },
   "plan": {
     "monthlyLabel": "Monthly price",
@@ -940,8 +940,8 @@
     "REPORT_FORMAT_INVALID": "Unsupported report format",
     "REPORT_STATUS_INVALID": "Invalid status filter",
     "BOARD_LIMIT_REACHED": "Plan board limit reached. Delete a board or upgrade to create another one.",
-    "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Intermediate plan up.",
-    "PLAN_FEATURE_PERSONAL_PLANNER": "The personal planner is available from the Intermediate plan up.",
+    "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Professional plan up.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "The personal planner is available from the Professional plan up.",
     "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Professional plan up.",
     "INVALID_FREQUENCY": "Invalid frequency",
     "WEEKDAY_REQUIRED": "Choose the day of the week",
@@ -951,7 +951,7 @@
     "LIST_NOT_FOUND": "Column not found",
     "RECURRENCE_NOT_FOUND": "Routine not found",
     "INVALID_STUCK_HOURS": "Enter a number of hours between 1 and 8760",
-    "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Intermediate plan up.",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Professional plan up.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Only upgrades are available here. To move down or cancel, contact support.",
     "PLAN_EXPIRED": "Your plan expired. Renew to edit again.",
     "PLAN_USER_LIMIT": "Your plan reached its user limit. Change plans to add more.",

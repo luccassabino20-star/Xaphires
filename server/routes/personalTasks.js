@@ -6,13 +6,13 @@ import { canUsePersonalPlanner } from "../plans.js";
 
 const router = Router();
 
-// O Planejador é recurso do Intermediário para cima. A leitura (e o excluir)
+// O Planejador é recurso do Profissional para cima. A leitura (e o excluir)
 // ficam liberados para quem caiu de plano continuar vendo e podendo apagar o
 // que já criou - mesmo padrão de recurrences.js.
 function exigePlano(req, res, next) {
   if (canUsePersonalPlanner(getCompany(req.companyId)?.plan)) return next();
   return res.status(403).json({
-    error: "O planejador pessoal está disponível a partir do plano Intermediário.",
+    error: "O planejador pessoal está disponível a partir do plano Profissional.",
     code: "PLAN_FEATURE_PERSONAL_PLANNER",
   });
 }

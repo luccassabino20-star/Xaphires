@@ -84,11 +84,11 @@
       "automationsText": "Automatizaciones que trabajan en segundo plano, para que no tengas que recordar ni reclamar a mano.",
       "automations": [
         { "badge": "A", "title": "Archivado de tarjetas", "text": "Saca lo terminado del tablero sin borrar nada. Lo archivado sale de todas las vistas y vuelve a su columna cuando quieras." },
-        { "badge": "R", "title": "Archivado automático", "text": "Define los días y las tarjetas completadas pasan al archivo solas. Disponible desde el plan Intermedio." },
-        { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Intermedio." },
+        { "badge": "R", "title": "Archivado automático", "text": "Define los días y las tarjetas completadas pasan al archivo solas. Disponible desde el plan Profesional." },
+        { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Profesional." },
         { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Profesional." },
-        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció. Disponible desde el plan Intermedio." },
-        { "badge": "P", "title": "Planificador personal", "text": "Una agenda fuera de los tableros, solo tuya: calendario y lista de tareas personales, con las completadas archivándose solas después de 2 días. Disponible desde el plan Intermedio." },
+        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció. Disponible desde el plan Profesional." },
+        { "badge": "P", "title": "Planificador personal", "text": "Una agenda fuera de los tableros, solo tuya: calendario y lista de tareas personales, con las completadas archivándose solas después de 2 días. Disponible desde el plan Profesional." },
         { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." },
         { "badge": "C", "title": "Finalización automática", "text": "Marcaste la tarjeta como completada y ella salta sola a la columna de completadas del tablero - sin arrastrar a mano." }
       ],
@@ -157,8 +157,8 @@
       "mostPopular": "Más popular",
       "plans": [
         { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
-        { "name": "Intermedio", "price": "R$ 369,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
-        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
+        { "name": "Intermedio", "price": "R$ 369,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
+        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo lo incluido en Profesional, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
     },
@@ -513,7 +513,7 @@
       "msgClosing": "¿Me puedes contar cómo está avanzando? ¡Gracias!"
     },
     "archive": {
-      "autoPlanRequired": "El archivado automático está disponible desde el plan Intermedio. El archivado manual sigue disponible.",
+      "autoPlanRequired": "El archivado automático está disponible desde el plan Profesional. El archivado manual sigue disponible.",
       "autoLabel": "Archivar completadas automáticamente",
       "autoDaysSuffix": "días",
       "autoOnHint": "Las tarjetas completadas hace más de {{days}} días pasan al archivo cuando se carga el tablero. Desmarcar una tarjeta reinicia el conteo.",
@@ -532,7 +532,7 @@
       "deletedToast": "Tarjeta eliminada"
     },
     "listMenu": {
-      "stuckPlanRequired": "El monitor de cuellos de botella está disponible desde el plan Intermedio.",
+      "stuckPlanRequired": "El monitor de cuellos de botella está disponible desde el plan Profesional.",
       "stuckConfigure": "Monitorear atascos en esta columna",
       "stuckConfigured": "Atasco: alerta a las {{hours}}h",
       "stuckHint": "Avisa cuando una tarjeta pase este tiempo detenida en esta columna.",
@@ -821,7 +821,7 @@
     "groupTomorrow": "Mañana",
     "groupUpcoming": "Próximas",
     "groupCompleted": "Completadas",
-    "planRequired": "El planificador personal está disponible desde el plan Intermedio. Puedes ver y borrar lo que ya existe."
+    "planRequired": "El planificador personal está disponible desde el plan Profesional. Puedes ver y borrar lo que ya existe."
   },
   "plan": {
     "monthlyLabel": "Mensualidad",
@@ -940,8 +940,8 @@
     "REPORT_FORMAT_INVALID": "Formato de informe no admitido",
     "REPORT_STATUS_INVALID": "Filtro de estado inválido",
     "BOARD_LIMIT_REACHED": "Límite de tableros del plan alcanzado. Elimina un tablero o mejora tu plan para crear otro.",
-    "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Intermedio.",
-    "PLAN_FEATURE_PERSONAL_PLANNER": "El planificador personal está disponible desde el plan Intermedio.",
+    "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Profesional.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "El planificador personal está disponible desde el plan Profesional.",
     "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Profesional.",
     "INVALID_FREQUENCY": "Frecuencia inválida",
     "WEEKDAY_REQUIRED": "Elige el día de la semana",
@@ -951,7 +951,7 @@
     "LIST_NOT_FOUND": "Columna no encontrada",
     "RECURRENCE_NOT_FOUND": "Rutina no encontrada",
     "INVALID_STUCK_HOURS": "Indica un número de horas entre 1 y 8760",
-    "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Intermedio.",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Profesional.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Aquí solo se puede subir de plan. Para bajar o cancelar, contacta al soporte.",
     "PLAN_EXPIRED": "Tu plan expiró. Renueva para volver a editar.",
     "PLAN_USER_LIMIT": "Tu plan alcanzó el límite de usuarios. Cambia de plan para agregar más.",

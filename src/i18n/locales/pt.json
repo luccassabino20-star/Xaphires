@@ -153,12 +153,12 @@
         {
           "badge": "A",
           "title": "Arquivamento automático",
-          "text": "Defina os dias e os cartões concluídos vão para o arquivo sozinhos. Disponível do plano Intermediário para cima."
+          "text": "Defina os dias e os cartões concluídos vão para o arquivo sozinhos. Disponível do plano Profissional para cima."
         },
         {
           "badge": "G",
           "title": "Monitor de gargalos",
-          "text": "Marque o tempo aceitável de cada coluna e veja quais cartões passaram do prazo, com mensagem de cobrança pronta. Do Intermediário para cima."
+          "text": "Marque o tempo aceitável de cada coluna e veja quais cartões passaram do prazo, com mensagem de cobrança pronta. Do Profissional para cima."
         },
         {
           "badge": "T",
@@ -168,12 +168,12 @@
         {
           "badge": "L",
           "title": "Letreiro de tarefas",
-          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Intermediário para cima."
+          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Profissional para cima."
         },
         {
           "badge": "P",
           "title": "Planejador pessoal",
-          "text": "Uma agenda fora dos quadros, só sua: calendário e lista de tarefas pessoais, com as concluídas arquivando sozinhas depois de 2 dias. Disponível do plano Intermediário para cima."
+          "text": "Uma agenda fora dos quadros, só sua: calendário e lista de tarefas pessoais, com as concluídas arquivando sozinhas depois de 2 dias. Disponível do plano Profissional para cima."
         },
         {
           "badge": "X",
@@ -381,10 +381,6 @@
             "Tudo do Básico, mais:",
             "Quadros ilimitados",
             "Todas as 7 visões (+ Gantt, Painel, Mapa, Matriz Eisenhower)",
-            "Letreiro de tarefas pendentes",
-            "Arquivamento automático de concluídos",
-            "Monitor de gargalos",
-            "Planejador pessoal",
             "Anexos e links nos cartões (até 50 MB)"
           ]
         },
@@ -398,6 +394,10 @@
           "features": [
             "Usuários ilimitados",
             "Tudo do Intermediário, mais:",
+            "Letreiro de tarefas pendentes",
+            "Arquivamento automático de concluídos",
+            "Monitor de gargalos",
+            "Planejador pessoal",
             "Rotinas que criam cartões sozinhas",
             "Suporte prioritário"
           ]
@@ -832,7 +832,7 @@
       "msgClosing": "Consegue me dar um retorno sobre o andamento? Obrigado!"
     },
     "archive": {
-      "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Intermediário. O arquivamento manual continua liberado.",
+      "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Profissional. O arquivamento manual continua liberado.",
       "autoLabel": "Arquivar concluídos automaticamente",
       "autoDaysSuffix": "dias",
       "autoOnHint": "Cartões concluídos há mais de {{days}} dias vão para o arquivo quando o quadro é carregado. Desmarcar um cartão reinicia a contagem.",
@@ -851,7 +851,7 @@
       "deletedToast": "Cartão excluído"
     },
     "listMenu": {
-      "stuckPlanRequired": "O monitor de gargalos está disponível a partir do plano Intermediário.",
+      "stuckPlanRequired": "O monitor de gargalos está disponível a partir do plano Profissional.",
       "stuckConfigure": "Monitorar gargalo nesta coluna",
       "stuckConfigured": "Gargalo: alerta em {{hours}}h",
       "stuckHint": "Avisa quando um cartão passar deste tempo parado nesta coluna.",
@@ -1159,7 +1159,7 @@
     "groupTomorrow": "Amanhã",
     "groupUpcoming": "Em breve",
     "groupCompleted": "Concluídas",
-    "planRequired": "O planejador pessoal está disponível a partir do plano Intermediário. Você pode ver e apagar o que já existe."
+    "planRequired": "O planejador pessoal está disponível a partir do plano Profissional. Você pode ver e apagar o que já existe."
   },
   "plan": {
     "monthlyLabel": "Mensalidade",
@@ -1278,8 +1278,8 @@
     "REPORT_FORMAT_INVALID": "Formato de relatório não suportado",
     "REPORT_STATUS_INVALID": "Filtro de situação inválido",
     "BOARD_LIMIT_REACHED": "Limite de quadros do plano atingido. Exclua um quadro ou faça upgrade para criar outro.",
-    "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Intermediário.",
-    "PLAN_FEATURE_PERSONAL_PLANNER": "O planejador pessoal está disponível a partir do plano Intermediário.",
+    "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Profissional.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "O planejador pessoal está disponível a partir do plano Profissional.",
     "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
     "INVALID_FREQUENCY": "Frequência inválida",
     "WEEKDAY_REQUIRED": "Escolha o dia da semana",
@@ -1289,7 +1289,7 @@
     "LIST_NOT_FOUND": "Coluna não encontrada",
     "RECURRENCE_NOT_FOUND": "Rotina não encontrada",
     "INVALID_STUCK_HOURS": "Informe um número de horas entre 1 e 8760",
-    "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Intermediário.",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Profissional.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",
     "PLAN_EXPIRED": "Seu plano expirou. Renove para voltar a editar.",
     "PLAN_USER_LIMIT": "Seu plano atingiu o limite de usuários. Mude de plano para adicionar mais.",
