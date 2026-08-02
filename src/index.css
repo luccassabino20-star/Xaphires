@@ -4202,9 +4202,9 @@ input, textarea { font-family: inherit; }
   flex-direction: column;
   justify-content: space-between;
   padding: 24px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  background: linear-gradient(to bottom right, #262626, #000);
+  background: var(--bg-card);
   box-shadow: var(--shadow-card-hover);
   opacity: 0;
   transform: scale(0.9);
@@ -4219,13 +4219,71 @@ input, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent);
 }
-.landing-rotator-bars { display: flex; flex-direction: column; gap: 10px; }
-.landing-rotator-bar { height: 8px; border-radius: 4px; background: var(--border-strong); }
+
+/* Miniatura central do card giratório - uma variante por item (ver
+   RotatorVisual em LandingScreen.jsx), reaproveitando os avatares e cores de
+   .landing-board-preview-avatar para bater com a prova visual do hero. */
+.landing-rotator-visual { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+
+.landing-rotator-sync-card {
+  width: 100%;
+  max-width: 220px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+.landing-rotator-sync-bar { height: 8px; border-radius: 4px; background: var(--border-strong); }
+.landing-rotator-sync-bar.short { width: 60%; }
+.landing-rotator-sync-avatars { display: flex; align-items: center; margin-left: 14px; }
+.landing-rotator-sync-avatars .landing-board-preview-avatar { border: 2px solid var(--bg-card); }
+.landing-rotator-sync-avatars .avatar-1 { margin-left: -8px; }
+.landing-rotator-sync-pulse {
+  width: 9px;
+  height: 9px;
+  margin-left: 10px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: landing-rotator-pulse 1.8s ease-out infinite;
+}
+@keyframes landing-rotator-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent); }
+  70% { box-shadow: 0 0 0 9px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-rotator-sync-pulse { animation: none; }
+}
+
+.landing-rotator-visual.access { flex-direction: column; align-items: stretch; justify-content: center; gap: 12px; width: 100%; }
+.landing-rotator-access-row { display: flex; align-items: center; gap: 10px; }
+.landing-rotator-access-name { flex: 1; height: 8px; border-radius: 4px; background: var(--border-strong); }
+.landing-rotator-access-role {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.landing-rotator-chart { display: flex; align-items: flex-end; gap: 12px; height: 110px; width: 100%; max-width: 200px; }
+.landing-rotator-chart-bar {
+  flex: 1;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(to top, var(--accent), color-mix(in srgb, var(--accent) 35%, transparent));
+}
+
 .landing-rotator-status {
   display: flex;
   align-items: center;

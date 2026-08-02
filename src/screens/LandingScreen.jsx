@@ -305,6 +305,91 @@ function Faq() {
   );
 }
 
+// Ícone por item do FeatureSwitcher: um pictograma coerente com a descrição
+// (sincronia, escudo de acesso, gráfico de painel) no lugar de uma letra
+// abstrata. Inline e sem lib de ícones, no mesmo espírito das outras provas
+// visuais desta página.
+function RotatorIcon({ itemKey }) {
+  if (itemKey === "access") {
+    return (
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" />
+        <path d="m9.5 12 1.8 1.8L14.8 10" />
+      </svg>
+    );
+  }
+  if (itemKey === "insights") {
+    return (
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 20V10" />
+        <path d="M10 20V4" />
+        <path d="M16 20v-7" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 0 1 15.3-6.4L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15.3 6.4L3 16" />
+      <path d="M3 21v-5h5" />
+    </svg>
+  );
+}
+
+// Miniatura central do card, uma por item - mesma lógica de HeroBoardPreview/
+// GanttPreview: markup e cores reais do app (avatares, papéis de
+// board.share) em vez de barras genéricas, para a imagem condizer com o que
+// o texto descreve.
+function RotatorVisual({ itemKey }) {
+  const { t } = useTranslation();
+
+  if (itemKey === "access") {
+    const rows = [
+      { initials: "A", cls: "avatar-0", role: t("board.share.roleOwner") },
+      { initials: "B", cls: "avatar-1", role: t("board.share.roleEditor") },
+      { initials: "C", cls: "avatar-2", role: t("board.share.roleViewer") },
+    ];
+    return (
+      <div className="landing-rotator-visual access">
+        {rows.map((row) => (
+          <div className="landing-rotator-access-row" key={row.role}>
+            <span className={"landing-board-preview-avatar " + row.cls}>{row.initials}</span>
+            <span className="landing-rotator-access-name" />
+            <span className="landing-rotator-access-role">{row.role}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (itemKey === "insights") {
+    return (
+      <div className="landing-rotator-visual insights">
+        <div className="landing-rotator-chart">
+          {[38, 72, 54, 90].map((h, i) => (
+            <span key={i} className="landing-rotator-chart-bar" style={{ height: h + "%" }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="landing-rotator-visual sync">
+      <div className="landing-rotator-sync-card">
+        <span className="landing-rotator-sync-bar" />
+        <span className="landing-rotator-sync-bar short" />
+      </div>
+      <div className="landing-rotator-sync-avatars">
+        <span className="landing-board-preview-avatar avatar-0">A</span>
+        <span className="landing-board-preview-avatar avatar-1">B</span>
+        <span className="landing-rotator-sync-pulse" aria-hidden="true" />
+      </div>
+    </div>
+  );
+}
+
 function FeatureSwitcher() {
   const { t } = useTranslation();
   const title = t("landing.switcher.title");
@@ -348,12 +433,10 @@ function FeatureSwitcher() {
             className={"landing-rotator-card" + (i === active ? " active" : "")}
             aria-hidden={i === active ? undefined : "true"}
           >
-            <div className="landing-rotator-mark">{item.mark}</div>
-            <div className="landing-rotator-bars">
-              <div className="landing-rotator-bar" style={{ width: "66%" }} />
-              <div className="landing-rotator-bar" style={{ width: "50%" }} />
-              <div className="landing-rotator-bar" style={{ width: "75%" }} />
+            <div className="landing-rotator-mark">
+              <RotatorIcon itemKey={item.key} />
             </div>
+            <RotatorVisual itemKey={item.key} />
             <div className="landing-rotator-status">
               <span>{item.statusLabel}</span>
               <span>{item.statusValue}</span>
