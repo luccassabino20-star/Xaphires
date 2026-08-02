@@ -179,6 +179,20 @@ function applySchema(companyDb) {
     .prepare("UPDATE personal_tasks SET completed_at = ? WHERE completed = 1 AND completed_at IS NULL")
     .run(new Date().toISOString());
 
+  // Perfil pessoal (routes/profile.js): as únicas duas coisas que o próprio
+  // usuário edita sobre si mesmo. E-mail continua fora daqui de propósito -
+  // mexe no diretório global de login (directory.js), só master troca
+  // (routes/users.js).
+  addColumnIfMissing(companyDb, "users", "bio", "bio TEXT NOT NULL DEFAULT ''");
+  // uuid do arquivo em companies/<id>/uploads/avatars/, sem extensão - mesmo
+  // padrão dos anexos de cartão (attachmentsUploadsDir). NULL = sem foto,
+  // mostra iniciais coloridas (Avatar.jsx). avatar_mime é o Content-Type
+  // validado no upload (routes/profile.js só aceita imagem), servido de volta
+  // tal e qual - sem essa coluna a rota de download teria que adivinhar o
+  // tipo pela extensão, que o arquivo no disco não tem.
+  addColumnIfMissing(companyDb, "users", "avatar_path", "avatar_path TEXT");
+  addColumnIfMissing(companyDb, "users", "avatar_mime", "avatar_mime TEXT");
+
   addColumnIfMissing(companyDb, "cards", "completed", "completed INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing(companyDb, "cards", "start_date", "start_date TEXT");
   addColumnIfMissing(companyDb, "cards", "location", "location TEXT");

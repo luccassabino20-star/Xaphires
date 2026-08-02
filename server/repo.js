@@ -51,6 +51,17 @@ export function setUserRole(id, role) {
   return getUserById(id);
 }
 export function deleteUser(id) {
+  // Sem isto a foto de perfil de quem foi excluído ficava órfã em
+  // companies/<id>/uploads/avatars para sempre - a linha do usuário some
+  // (nada de ON DELETE aqui, é arquivo, não outra tabela).
+  const atual = getUserById(id);
+  if (atual?.avatar_path) {
+    try {
+      fs.unlinkSync(path.join(avatarsUploadsDir(), atual.avatar_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
   getDb().prepare("DELETE FROM users WHERE id = ?").run(id);
 }
 export function deletePrivateBoardsByOwner(userId) {
@@ -63,8 +74,92 @@ export function deletePrivateBoardsByOwner(userId) {
 }
 export function publicUser(u) {
   if (!u) return null;
-  return { id: u.id, name: u.name, email: u.email, role: u.role, createdAt: u.created_at };
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role,
+    bio: u.bio || "",
+    // ?v=avatar_path muda a cada troca de foto (o path é um uuid novo), então
+    // o navegador busca de novo sozinho - sem isso a mesma URL por usuário
+    // ficaria presa no cache com a foto antiga depois de trocar.
+    avatarUrl: u.avatar_path ? `/api/profile/${u.id}/avatar?v=${u.avatar_path}` : null,
+    createdAt: u.created_at,
+  };
 }
+
+// Espelhado no cliente (state/api.js) para o textarea recusar digitar além
+// disso, mas a autoridade continua sendo esta checagem no servidor.
+export const MAX_BIO_LENGTH = 280;
+
+export function updateProfile(userId, { name, bio }) {
+  const atual = getUserById(userId);
+  if (!atual) return null;
+  getDb()
+    .prepare("UPDATE users SET name = ?, bio = ? WHERE id = ?")
+    .run(name ?? atual.name, bio === undefined ? atual.bio || "" : bio, userId);
+  return getUserById(userId);
+}
+
+function avatarsUploadsDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "avatars");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+// Caminho de destino para uma foto em streaming - mesmo raciocínio do
+// newAttachmentTarget de cartão: o id nasce antes porque o arquivo começa a
+// ser escrito enquanto ainda está chegando.
+export function newAvatarTarget() {
+  const id = uid();
+  return { id, path: path.join(avatarsUploadsDir(), id) };
+}
+
+// Troca a foto (já gravada em disco por newAvatarTarget) e apaga a anterior,
+// se havia uma - sem isso, cada troca deixava a foto velha órfã no disco para
+// sempre, do mesmo jeito que um anexo removido sem o unlink correspondente.
+export function setUserAvatar(userId, { id, mimeType }) {
+  const atual = getUserById(userId);
+  getDb().prepare("UPDATE users SET avatar_path = ?, avatar_mime = ? WHERE id = ?").run(id, mimeType, userId);
+  if (atual?.avatar_path) {
+    try {
+      fs.unlinkSync(path.join(avatarsUploadsDir(), atual.avatar_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
+  return getUserById(userId);
+}
+
+export function clearUserAvatar(userId) {
+  const atual = getUserById(userId);
+  if (atual?.avatar_path) {
+    try {
+      fs.unlinkSync(path.join(avatarsUploadsDir(), atual.avatar_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
+  getDb().prepare("UPDATE users SET avatar_path = NULL, avatar_mime = NULL WHERE id = ?").run(userId);
+  return getUserById(userId);
+}
+
+export function getAvatarFile(userId) {
+  const u = getUserById(userId);
+  if (!u?.avatar_path) return null;
+  const filePath = path.join(avatarsUploadsDir(), u.avatar_path);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, mimeType: u.avatar_mime || "application/octet-stream" };
+}
+
+export function discardAvatarFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* já pode ter sumido */
+  }
+}
+
 export function scrubUserFromCards(userId) {
   const rows = getDb().prepare("SELECT id, member_ids FROM cards").all();
   const stmt = getDb().prepare("UPDATE cards SET member_ids = ? WHERE id = ?");
@@ -148,13 +243,20 @@ function registrarDono(boardId, ownerId) {
 export function listBoardPermissions(boardId) {
   return getDb()
     .prepare(
-      `SELECT p.user_id, p.role, p.created_at, u.name, u.email
+      `SELECT p.user_id, p.role, p.created_at, u.name, u.email, u.avatar_path
          FROM board_permissions p JOIN users u ON u.id = p.user_id
         WHERE p.board_id = ?
         ORDER BY CASE p.role WHEN 'owner' THEN 0 ELSE 1 END, u.name COLLATE NOCASE ASC`
     )
     .all(boardId)
-    .map((r) => ({ userId: r.user_id, role: r.role, name: r.name, email: r.email, createdAt: r.created_at }));
+    .map((r) => ({
+      userId: r.user_id,
+      role: r.role,
+      name: r.name,
+      email: r.email,
+      avatarUrl: r.avatar_path ? `/api/profile/${r.user_id}/avatar?v=${r.avatar_path}` : null,
+      createdAt: r.created_at,
+    }));
 }
 
 // Conceder é idempotente e serve também para trocar o papel de quem já está na

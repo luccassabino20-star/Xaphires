@@ -400,7 +400,14 @@
       "newPassword": "Nueva contraseña",
       "save": "Guardar",
       "passwordChangedToast": "Contraseña cambiada",
-      "master": "Master"
+      "master": "Master",
+      "myProfile": "Mi perfil",
+      "profileSavedToast": "Perfil actualizado",
+      "profileName": "Nombre",
+      "profileBio": "Descripción",
+      "profileBioPlaceholder": "Cuéntanos un poco sobre ti...",
+      "uploadPhoto": "Cambiar foto",
+      "removePhoto": "Quitar foto"
     },
     "taskTicker": {
       "pending": "Pendientes ({{count}})"
@@ -980,6 +987,14 @@
     "TITLE_REQUIRED": "El título es obligatorio",
     "DUE_REQUIRED": "Elige una fecha",
     "PERSONAL_TASK_NOT_FOUND": "Tarea no encontrada",
+    "NAME_REQUIRED": "El nombre es obligatorio",
+    "BIO_TOO_LONG": "La descripción es demasiado larga",
+    "INVALID_IMAGE_TYPE": "Sube una imagen PNG, JPEG, WEBP o GIF",
+    "AVATAR_TOO_LARGE": "La foto debe tener hasta 3 MB",
+    "AVATAR_NOT_FOUND": "Foto no encontrada",
+    "AVATAR_SAVE_FAILED": "Error al guardar la foto",
+    "UPLOAD_FAILED": "Error al recibir el archivo",
+    "INVALID_UPLOAD": "Envío inválido",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Solo el usuario master puede eliminar tableros compartidos",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds es obligatorio",
     "CARD_IDS_REQUIRED": "cardIds es obligatorio",

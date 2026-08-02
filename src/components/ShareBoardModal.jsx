@@ -6,7 +6,7 @@ import { useBoardRefetch } from "../state/BoardContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import * as api from "../state/api.js";
 import { translateError } from "../utils/errors.js";
-import { initials, colorForUser } from "../utils/members.js";
+import Avatar from "./Avatar.jsx";
 
 // Gestão de acesso de um quadro privado. Só o dono chega aqui — o botão que abre
 // este modal não aparece para convidado —, mas quem manda é o servidor: as rotas
@@ -99,9 +99,7 @@ export default function ShareBoardModal({ board, onClose }) {
             <ul className="share-list">
               {permissions.map((p) => (
                 <li key={p.userId} className="share-row">
-                  <span className="avatar avatar-small" style={{ background: colorForUser(p.userId) }}>
-                    {initials(p.name)}
-                  </span>
+                  <Avatar id={p.userId} name={p.name} avatarUrl={p.avatarUrl} className="avatar-small" />
                   <span className="share-person">
                     <span className="share-name">{p.name}</span>
                     <span className="share-email">{p.email}</span>
@@ -155,9 +153,7 @@ export default function ShareBoardModal({ board, onClose }) {
               <ul className="share-list">
                 {candidatos.map((u) => (
                   <li key={u.id} className="share-row">
-                    <span className="avatar avatar-small" style={{ background: colorForUser(u.id) }}>
-                      {initials(u.name)}
-                    </span>
+                    <Avatar id={u.id} name={u.name} avatarUrl={u.avatarUrl} className="avatar-small" />
                     <span className="share-person">
                       <span className="share-name">{u.name}</span>
                       <span className="share-email">{u.email}</span>

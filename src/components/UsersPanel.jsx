@@ -4,9 +4,9 @@ import { useUsers } from "../state/UsersContext.jsx";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
-import { initials, colorForUser } from "../utils/members.js";
 import { normalizarDoc, formatarDoc } from "../utils/doc.js";
 import * as api from "../state/api.js";
+import Avatar from "./Avatar.jsx";
 
 export default function UsersPanel({ onClose }) {
   const { t } = useTranslation();
@@ -220,9 +220,7 @@ export default function UsersPanel({ onClose }) {
                 {users.map((u) => (
                   <tr key={u.id}>
                     <td>
-                      <span className="avatar avatar-small" style={{ background: colorForUser(u.id) }}>
-                        {initials(u.name)}
-                      </span>
+                      <Avatar id={u.id} name={u.name} avatarUrl={u.avatarUrl} className="avatar-small" />
                     </td>
                     <td>
                       {u.name}

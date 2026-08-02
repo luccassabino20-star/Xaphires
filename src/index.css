@@ -1971,7 +1971,15 @@ input, textarea { font-family: inherit; }
   flex-shrink: 0;
   border: none;
   cursor: default;
+  overflow: hidden;
 }
+/* Avatar.jsx troca o <span> de iniciais por <img> quando o usuário tem foto -
+   mesma classe "avatar", então herda tamanho/raio/margem de sempre; só o
+   conteúdo muda. object-fit:cover evita distorcer foto que não é quadrada. */
+img.avatar { object-fit: cover; padding: 0; }
+/* account-menu-btn é um <button>, não pode virar <img> - a foto entra como
+   filho preenchendo o círculo por dentro (ver AccountMenu.jsx). */
+.avatar-img-fill { width: 100%; height: 100%; object-fit: cover; display: block; }
 .avatar-small { width: 20px; height: 20px; font-size: 9.5px; margin-left: -6px; }
 .avatar-small:first-child { margin-left: 0; }
 .avatar-large { width: 64px; height: 64px; font-size: 24px; }
@@ -3900,6 +3908,26 @@ input, textarea { font-family: inherit; }
 .auth-submit { width: 100%; padding: 11px; font-size: 14.5px; margin-top: 4px; }
 .auth-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* ---------- Meu perfil (ProfileModal) ---------- */
+.profile-photo-section { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+.profile-photo-actions { display: flex; gap: 8px; }
+.profile-form { display: flex; flex-direction: column; gap: 14px; }
+.profile-bio-label-row { display: flex; align-items: baseline; justify-content: space-between; }
+.profile-bio-count { font-weight: 400; color: var(--text-muted); font-size: 11px; }
+.profile-bio-input {
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+}
+.profile-bio-input:focus { box-shadow: inset 0 0 0 2px var(--accent); }
+
 .auth-join-intro { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 4px; }
 .auth-join-found { color: var(--text-primary); font-weight: 600; }
 .auth-join-change-cnpj {
@@ -4020,6 +4048,14 @@ input, textarea { font-family: inherit; }
 }
 .team-profile-name { margin: 4px 0 0; font-size: 18px; color: var(--text-primary); }
 .team-profile-email { margin: 0 0 8px; color: var(--text-muted); font-size: 13.5px; }
+.team-profile-bio {
+  max-width: 380px;
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
 
 .users-create-form, .users-reset-form {
   display: flex;

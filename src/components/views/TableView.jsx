@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
-import { initials, colorForUser } from "../../utils/members.js";
 import { localeTag } from "../../i18n/locale.js";
+import Avatar from "../Avatar.jsx";
 
 function formatDate(iso, lng) {
   if (!iso) return "-";
@@ -119,9 +119,7 @@ export default function TableView({ board, users, searchQuery, memberFilter, onO
                   <td>
                     <div className="card-avatars">
                       {cardMembers.map((m) => (
-                        <span key={m.id} className="avatar avatar-small" style={{ background: colorForUser(m.id) }} title={m.name}>
-                          {initials(m.name)}
-                        </span>
+                        <Avatar key={m.id} id={m.id} name={m.name} avatarUrl={m.avatarUrl} className="avatar-small" title={m.name} />
                       ))}
                     </div>
                   </td>

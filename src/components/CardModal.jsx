@@ -5,12 +5,12 @@ import { useUsers } from "../state/UsersContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import { LABEL_COLORS } from "../utils/labels.js";
-import { initials, colorForUser } from "../utils/members.js";
 import { geocodeAddress, addLinkAttachment, addFileAttachment, removeCardAttachment, attachmentDownloadUrl, getPlan } from "../state/api.js";
 import { uid } from "../utils/id.js";
 import DatePicker from "./DatePicker.jsx";
 import SubtaskItem from "./SubtaskItem.jsx";
 import RecurrencesModal from "./RecurrencesModal.jsx";
+import Avatar from "./Avatar.jsx";
 
 function AttachmentFileIcon() {
   return (
@@ -630,9 +630,7 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
                 <div className="metadata-row-value">
                   <div className="member-avatars-row">
                     {cardMembers.map((m) => (
-                      <span key={m.id} className="avatar" style={{ background: colorForUser(m.id) }} title={m.name}>
-                        {initials(m.name)}
-                      </span>
+                      <Avatar key={m.id} id={m.id} name={m.name} avatarUrl={m.avatarUrl} title={m.name} />
                     ))}
                     {cardMembers.length === 0 && <span className="metadata-empty">{t("board.cardModal.empty")}</span>}
                     {!readOnly && (
@@ -647,9 +645,7 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
                       {users.map((m) => (
                         <label key={m.id} className="member-picker-row">
                           <input type="checkbox" checked={(card.memberIds || []).includes(m.id)} onChange={() => toggleMember(m.id)} />
-                          <span className="avatar avatar-small" style={{ background: colorForUser(m.id) }}>
-                            {initials(m.name)}
-                          </span>
+                          <Avatar id={m.id} name={m.name} avatarUrl={m.avatarUrl} className="avatar-small" />
                           <span>{m.name}</span>
                         </label>
                       ))}

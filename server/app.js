@@ -9,6 +9,7 @@ import { verifyOrigin, requireAuth, requireWritablePlan } from "./middleware.js"
 
 import { router as authRouter } from "./routes/auth.js";
 import { router as usersRouter } from "./routes/users.js";
+import { router as profileRouter } from "./routes/profile.js";
 import { router as boardsRouter } from "./routes/boards.js";
 import { router as reportsRouter } from "./routes/reports.js";
 import { router as listsRouter } from "./routes/lists.js";
@@ -96,6 +97,7 @@ app.use("/api/popup", popupRouter);
 app.use("/api/billing", billingRouter);
 
 app.use("/api/users", requireAuth, requireWritablePlan, usersRouter);
+app.use("/api/profile", requireAuth, requireWritablePlan, profileRouter);
 app.use("/api/boards", requireAuth, requireWritablePlan, boardsRouter);
 app.use("/api/lists", requireAuth, requireWritablePlan, listsRouter);
 app.use("/api/cards", requireAuth, requireWritablePlan, cardsRouter);

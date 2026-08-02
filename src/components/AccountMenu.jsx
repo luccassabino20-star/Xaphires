@@ -4,6 +4,7 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import PlanModal from "./PlanModal.jsx";
+import ProfileModal from "./ProfileModal.jsx";
 
 // Carregado sob demanda: o painel arrasta junto os quatro componentes de
 // administração, e importá-lo direto colocava ~22 kB de ferramenta interna no
@@ -18,6 +19,7 @@ export default function AccountMenu() {
   const showToast = useToast();
   const [open, setOpen] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [plataformaOpen, setPlataformaOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -68,8 +70,12 @@ export default function AccountMenu() {
 
   return (
     <div className="account-menu" ref={ref}>
-      <button className="avatar account-menu-btn" style={{ background: colorForUser(user.id) }} onClick={() => setOpen((o) => !o)}>
-        {initials(user.name)}
+      <button
+        className="avatar account-menu-btn"
+        style={user.avatarUrl ? undefined : { background: colorForUser(user.id) }}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {user.avatarUrl ? <img className="avatar-img-fill" src={user.avatarUrl} alt="" /> : initials(user.name)}
       </button>
       {open && (
         <div className="dropdown account-dropdown">
@@ -119,6 +125,9 @@ export default function AccountMenu() {
                   {t("app.accountMenu.platformPanel")}
                 </div>
               )}
+              <div className="dropdown-item" onClick={() => { setProfileOpen(true); setOpen(false); }}>
+                {t("app.accountMenu.myProfile")}
+              </div>
               <div className="dropdown-item" onClick={() => { setPlanOpen(true); setOpen(false); }}>
                 {t("plan.menuItem")}
               </div>
@@ -132,6 +141,7 @@ export default function AccountMenu() {
           )}
         </div>
       )}
+      {profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
       {plataformaOpen && (
         <Suspense fallback={null}>

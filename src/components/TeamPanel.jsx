@@ -4,7 +4,7 @@ import { useUsers } from "../state/UsersContext.jsx";
 import { useAuth } from "../state/AuthContext.jsx";
 import { useChat } from "../state/ChatContext.jsx";
 import { translateError } from "../utils/errors.js";
-import { initials, colorForUser } from "../utils/members.js";
+import Avatar from "./Avatar.jsx";
 
 // Painel de equipe: aberto para qualquer papel (diferente do UsersPanel, que é
 // administração e continua master-only). Mostra todo mundo da empresa com duas
@@ -49,9 +49,7 @@ export default function TeamPanel({ onClose, onManageUsers }) {
         <div className="modal-body">
           {profileUser ? (
             <div className="team-profile">
-              <span className="avatar avatar-large" style={{ background: colorForUser(profileUser.id) }}>
-                {initials(profileUser.name)}
-              </span>
+              <Avatar id={profileUser.id} name={profileUser.name} avatarUrl={profileUser.avatarUrl} className="avatar-large" />
               <h3 className="team-profile-name">
                 {profileUser.name}
                 {profileUser.id === currentUser.id && <span className="users-table-you">{t("users.you")}</span>}
@@ -60,6 +58,7 @@ export default function TeamPanel({ onClose, onManageUsers }) {
                 {profileUser.role === "master" ? t("users.roleMaster") : t("users.roleMember")}
               </span>
               <p className="team-profile-email">{profileUser.email}</p>
+              {profileUser.bio && <p className="team-profile-bio">{profileUser.bio}</p>}
               <div className="composer-actions">
                 {profileUser.id !== currentUser.id && (
                   <button
@@ -96,9 +95,7 @@ export default function TeamPanel({ onClose, onManageUsers }) {
                     {users.map((u) => (
                       <tr key={u.id}>
                         <td>
-                          <span className="avatar avatar-small" style={{ background: colorForUser(u.id) }}>
-                            {initials(u.name)}
-                          </span>
+                          <Avatar id={u.id} name={u.name} avatarUrl={u.avatarUrl} className="avatar-small" />
                         </td>
                         <td>
                           {u.name}

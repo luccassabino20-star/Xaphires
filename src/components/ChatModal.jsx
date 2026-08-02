@@ -4,7 +4,7 @@ import { useChat, MAX_CHAT_BODY_LENGTH } from "../state/ChatContext.jsx";
 import { useUsers } from "../state/UsersContext.jsx";
 import { useAuth } from "../state/AuthContext.jsx";
 import { translateError } from "../utils/errors.js";
-import { initials, colorForUser } from "../utils/members.js";
+import Avatar from "./Avatar.jsx";
 
 export default function ChatModal({ onClose }) {
   const { t, i18n } = useTranslation();
@@ -34,6 +34,9 @@ export default function ChatModal({ onClose }) {
   function nomeDe(authorId) {
     if (authorId === user.id) return t("chat.you");
     return users.find((u) => u.id === authorId)?.name || t("chat.unknownAuthor");
+  }
+  function avatarUrlDe(authorId) {
+    return users.find((u) => u.id === authorId)?.avatarUrl || null;
   }
   function horaDe(iso) {
     return new Date(iso).toLocaleTimeString(i18n.language, { hour: "2-digit", minute: "2-digit" });
@@ -112,9 +115,7 @@ export default function ChatModal({ onClose }) {
                   {candidatos.length === 0 && <li className="share-empty">{t("chat.noCandidates")}</li>}
                   {candidatos.map((u) => (
                     <li key={u.id} className="chat-picker-item" onClick={() => escolher(u)}>
-                      <span className="avatar avatar-small" style={{ background: colorForUser(u.id) }}>
-                        {initials(u.name)}
-                      </span>
+                      <Avatar id={u.id} name={u.name} avatarUrl={u.avatarUrl} className="avatar-small" />
                       <span>{u.name}</span>
                     </li>
                   ))}
@@ -132,9 +133,7 @@ export default function ChatModal({ onClose }) {
                     onClick={() => selectConversation(conv.id)}
                   >
                     {conv.kind === "direct" ? (
-                      <span className="avatar avatar-small" style={{ background: colorForUser(conv.otherUserId) }}>
-                        {initials(titulo)}
-                      </span>
+                      <Avatar id={conv.otherUserId} name={titulo} avatarUrl={avatarUrlDe(conv.otherUserId)} className="avatar-small" />
                     ) : (
                       <span className="avatar avatar-small chat-general-icon">#</span>
                     )}
@@ -159,9 +158,7 @@ export default function ChatModal({ onClose }) {
                 return (
                   <div key={m.id} className={"chat-message" + (mine ? " chat-message-mine" : "")}>
                     {!mine && (
-                      <span className="avatar avatar-small" style={{ background: colorForUser(m.authorId) }}>
-                        {initials(nomeDe(m.authorId))}
-                      </span>
+                      <Avatar id={m.authorId} name={nomeDe(m.authorId)} avatarUrl={avatarUrlDe(m.authorId)} className="avatar-small" />
                     )}
                     <div className="chat-bubble">
                       {!mine && <div className="chat-bubble-author">{nomeDe(m.authorId)}</div>}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { initials, colorForUser } from "../utils/members.js";
 import DatePicker from "./DatePicker.jsx";
+import Avatar from "./Avatar.jsx";
 
 function FlagIcon() {
   return (
@@ -91,9 +91,7 @@ export default function SubtaskItem({ subtask, users, readOnly, onToggle, onUpda
             onClick={() => setPickerOpen((o) => !o)}
           >
             {assignee ? (
-              <span className="avatar avatar-small" style={{ background: colorForUser(assignee.id) }}>
-                {initials(assignee.name)}
-              </span>
+              <Avatar id={assignee.id} name={assignee.name} avatarUrl={assignee.avatarUrl} className="avatar-small" />
             ) : (
               <AssigneeIcon />
             )}
@@ -123,9 +121,7 @@ export default function SubtaskItem({ subtask, users, readOnly, onToggle, onUpda
                       setPickerOpen(false);
                     }}
                   />
-                  <span className="avatar avatar-small" style={{ background: colorForUser(u.id) }}>
-                    {initials(u.name)}
-                  </span>
+                  <Avatar id={u.id} name={u.name} avatarUrl={u.avatarUrl} className="avatar-small" />
                   <span>{u.name}</span>
                 </label>
               ))}

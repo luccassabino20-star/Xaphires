@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { initials, colorForUser } from "../utils/members.js";
 import DatePicker from "./DatePicker.jsx";
+import Avatar from "./Avatar.jsx";
 
 function QuickCheckIcon() {
   return (
@@ -150,9 +150,7 @@ export default function SubtaskCard({ subtask, members, readOnly, onOpen, onTogg
             onClick={() => setPickerOpen((o) => !o)}
           >
             {assignee ? (
-              <span className="avatar avatar-small" style={{ background: colorForUser(assignee.id) }}>
-                {initials(assignee.name)}
-              </span>
+              <Avatar id={assignee.id} name={assignee.name} avatarUrl={assignee.avatarUrl} className="avatar-small" />
             ) : (
               <AssigneeIcon />
             )}
@@ -188,9 +186,7 @@ export default function SubtaskCard({ subtask, members, readOnly, onOpen, onTogg
                         setPickerOpen(false);
                       }}
                     />
-                    <span className="avatar avatar-small" style={{ background: colorForUser(u.id) }}>
-                      {initials(u.name)}
-                    </span>
+                    <Avatar id={u.id} name={u.name} avatarUrl={u.avatarUrl} className="avatar-small" />
                     <span>{u.name}</span>
                   </label>
                 ))}

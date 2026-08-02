@@ -400,7 +400,14 @@
       "newPassword": "New password",
       "save": "Save",
       "passwordChangedToast": "Password changed",
-      "master": "Master"
+      "master": "Master",
+      "myProfile": "My profile",
+      "profileSavedToast": "Profile updated",
+      "profileName": "Name",
+      "profileBio": "Bio",
+      "profileBioPlaceholder": "Tell us a bit about yourself...",
+      "uploadPhoto": "Change photo",
+      "removePhoto": "Remove photo"
     },
     "taskTicker": {
       "pending": "Pending ({{count}})"
@@ -980,6 +987,14 @@
     "TITLE_REQUIRED": "Title is required",
     "DUE_REQUIRED": "Choose a date",
     "PERSONAL_TASK_NOT_FOUND": "Task not found",
+    "NAME_REQUIRED": "Name is required",
+    "BIO_TOO_LONG": "The bio is too long",
+    "INVALID_IMAGE_TYPE": "Upload a PNG, JPEG, WEBP or GIF image",
+    "AVATAR_TOO_LARGE": "The photo must be up to 3 MB",
+    "AVATAR_NOT_FOUND": "Photo not found",
+    "AVATAR_SAVE_FAILED": "Failed to save the photo",
+    "UPLOAD_FAILED": "Failed to receive the file",
+    "INVALID_UPLOAD": "Invalid upload",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Only the master user can delete shared boards",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds is required",
     "CARD_IDS_REQUIRED": "cardIds is required",

@@ -5,10 +5,10 @@ import { useBoardDispatch } from "../state/BoardContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { LABEL_COLORS } from "../utils/labels.js";
 import { isStuck, hoursStuck, formatDuration } from "../utils/bottlenecks.js";
-import { initials, colorForUser } from "../utils/members.js";
 import { localeTag } from "../i18n/locale.js";
 import { uid } from "../utils/id.js";
 import SubtaskCard from "./SubtaskCard.jsx";
+import Avatar from "./Avatar.jsx";
 
 function formatDate(iso, lng) {
   if (!iso) return "";
@@ -313,9 +313,7 @@ export default function CardItem({ card, list, boardId, members, searchQuery, me
           {cardMembers.length > 0 && (
             <div className="card-avatars">
               {cardMembers.map((m) => (
-                <span key={m.id} className="avatar avatar-small" style={{ background: colorForUser(m.id) }} title={m.name}>
-                  {initials(m.name)}
-                </span>
+                <Avatar key={m.id} id={m.id} name={m.name} avatarUrl={m.avatarUrl} className="avatar-small" title={m.name} />
               ))}
             </div>
           )}

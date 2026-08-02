@@ -79,6 +79,38 @@ export const listJoinRequests = () => request("/users/join-requests");
 export const approveJoinRequest = (id) => request(`/users/join-requests/${id}/approve`, { method: "POST" });
 export const rejectJoinRequest = (id) => request(`/users/join-requests/${id}/reject`, { method: "POST" });
 
+// ---------- Perfil (o próprio usuário logado) ----------
+// Espelha repo.js MAX_BIO_LENGTH no servidor: só para o textarea recusar
+// digitar além disso, a autoridade continua sendo a validação do lado de lá.
+export const MAX_BIO_LENGTH = 280;
+export const updateMyProfile = (data) => request("/profile", { method: "PATCH", body: data });
+export const removeMyAvatar = () => request("/profile/avatar", { method: "DELETE" });
+// Upload não passa pelo request(): o corpo é multipart, montado pelo próprio
+// navegador com o boundary correto - mesmo desenho de addFileAttachment.
+export async function uploadMyAvatar(file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/profile/avatar`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
 // ---------- Boards ----------
 export const getWorkspace = () => request("/boards");
 export const createBoard = (data) => request("/boards", { method: "POST", body: data });

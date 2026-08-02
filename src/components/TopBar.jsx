@@ -93,11 +93,11 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
               <button
                 key={m.id}
                 className={"avatar avatar-small topbar-avatar" + (memberFilter === m.id ? " active" : "")}
-                style={{ background: colorForUser(m.id) }}
+                style={m.avatarUrl ? undefined : { background: colorForUser(m.id) }}
                 title={t("app.topbar.filterBy", { name: m.name })}
                 onClick={() => onFilterChange(memberFilter === m.id ? null : m.id)}
               >
-                {initials(m.name)}
+                {m.avatarUrl ? <img className="avatar-img-fill" src={m.avatarUrl} alt="" /> : initials(m.name)}
               </button>
             ))}
           </div>
