@@ -342,8 +342,6 @@
       },
       "shortcuts": {
         "inbox": "Bandeja de entrada",
-        "replies": "Respuestas",
-        "assignedComments": "Comentarios asignados",
         "meetings": "Reuniones",
         "myTasks": "Mis tareas",
         "allTasks": "Todas las tareas"
@@ -352,7 +350,6 @@
       "aiChatsPlaceholder": "Pregunta, crea...",
       "superagentsTitle": "Superagentes",
       "superagentSample1": "Mi asistente",
-      "superagentSample2": "Jefe de gabinete",
       "newSuperagent": "Nuevo Superagente"
     },
     "topbar": {
@@ -795,6 +792,28 @@
     "requestApprovedToast": "{{name}} ahora es parte de la empresa",
     "requestRejectedToast": "Solicitud rechazada"
   },
+  "team": {
+    "title": "Equipo",
+    "viewProfile": "Ver perfil",
+    "sendMessage": "Enviar mensaje",
+    "back": "Volver",
+    "manageUsers": "Administrar usuarios"
+  },
+  "planner": {
+    "title": "Planificador personal",
+    "subtitle": "Tu agenda, fuera de los tableros",
+    "tabCalendar": "Calendario",
+    "tabList": "Mis tareas",
+    "addPlaceholder": "Nueva tarea personal...",
+    "add": "Agregar",
+    "empty": "Todavía no hay tareas personales.",
+    "deleteConfirm": "¿Eliminar la tarea \"{{title}}\"?",
+    "groupOverdue": "Atrasadas",
+    "groupToday": "Hoy",
+    "groupTomorrow": "Mañana",
+    "groupUpcoming": "Próximas",
+    "groupCompleted": "Completadas"
+  },
   "plan": {
     "monthlyLabel": "Mensualidad",
     "onRequest": "Bajo consulta",
@@ -959,6 +978,8 @@
     "PASSWORD_TOO_SHORT": "La nueva contraseña debe tener al menos 6 caracteres",
     "CURRENT_PASSWORD_INCORRECT": "La contraseña actual es incorrecta",
     "TITLE_REQUIRED": "El título es obligatorio",
+    "DUE_REQUIRED": "Elige una fecha",
+    "PERSONAL_TASK_NOT_FOUND": "Tarea no encontrada",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Solo el usuario master puede eliminar tableros compartidos",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds es obligatorio",
     "CARD_IDS_REQUIRED": "cardIds es obligatorio",

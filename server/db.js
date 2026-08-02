@@ -151,7 +151,33 @@ function applySchema(companyDb) {
       updated_at TEXT NOT NULL,
       PRIMARY KEY (user_id, conversation_key)
     );
+
+    -- Agenda pessoal (Planejador): tarefas fora de qualquer quadro, visíveis só
+    -- para quem criou. Não passam por lists/board_permissions de propósito - não
+    -- têm quadro, então "Minhas tarefas" as lê direto desta tabela por user_id.
+    CREATE TABLE IF NOT EXISTS personal_tasks (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      due TEXT NOT NULL,
+      completed INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_personal_tasks_user ON personal_tasks(user_id);
   `);
+
+  // Arquivamento automático da agenda pessoal: concluída há mais de 2 dias
+  // (PERSONAL_TASK_AUTO_ARCHIVE_DAYS, repo.js) some da lista sozinha, mesmo
+  // espírito do auto-arquivamento de cartão (completed_at/archived acima),
+  // só que sem o botão de configurar - aqui o prazo é fixo, não por usuário.
+  addColumnIfMissing(companyDb, "personal_tasks", "completed_at", "completed_at TEXT");
+  addColumnIfMissing(companyDb, "personal_tasks", "archived", "archived INTEGER NOT NULL DEFAULT 0");
+  // Tarefa pessoal concluída antes destas colunas existirem não tem data - herda o
+  // instante da migração, mesmo raciocínio do completed_at de cards: sem isto, o
+  // primeiro carregamento depois do deploy arquivaria um lote inteiro de uma vez.
+  companyDb
+    .prepare("UPDATE personal_tasks SET completed_at = ? WHERE completed = 1 AND completed_at IS NULL")
+    .run(new Date().toISOString());
 
   addColumnIfMissing(companyDb, "cards", "completed", "completed INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing(companyDb, "cards", "start_date", "start_date TEXT");

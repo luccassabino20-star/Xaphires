@@ -861,6 +861,77 @@ export function deleteRecurrence(id) {
   getDb().prepare("DELETE FROM recurrences WHERE id = ?").run(id);
 }
 
+// ---------- Personal tasks (Planejador pessoal) ----------
+// Fixo, não por usuário (diferente de boards.auto_archive_days) - o pedido foi
+// literal ("depois de 2 dias"), sem tela de configuração por trás.
+const PERSONAL_TASK_AUTO_ARCHIVE_DAYS = 2;
+
+function parsePersonalTask(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    userId: row.user_id,
+    title: row.title,
+    due: row.due,
+    completed: !!row.completed,
+    completedAt: row.completed_at || null,
+    archived: !!row.archived,
+    createdAt: row.created_at,
+  };
+}
+
+// Arquivada some daqui (não aparece mais no calendário nem em "Minhas
+// tarefas"), mas a linha continua no banco - mesmo "arquivar não apaga" dos
+// cartões de quadro, só que sem tela para reabrir depois, porque ninguém
+// pediu uma ainda.
+export function listPersonalTasks(userId) {
+  return getDb()
+    .prepare("SELECT * FROM personal_tasks WHERE user_id = ? AND archived = 0 ORDER BY due ASC, created_at ASC")
+    .all(userId)
+    .map(parsePersonalTask);
+}
+
+export function getPersonalTask(id) {
+  return parsePersonalTask(getDb().prepare("SELECT * FROM personal_tasks WHERE id = ?").get(id));
+}
+
+export function createPersonalTask(userId, data) {
+  const id = uid();
+  getDb()
+    .prepare("INSERT INTO personal_tasks (id, user_id, title, due, completed, created_at) VALUES (?, ?, ?, ?, 0, ?)")
+    .run(id, userId, data.title, data.due, nowIso());
+  return getPersonalTask(id);
+}
+
+export function updatePersonalTask(id, patch) {
+  const atual = getPersonalTask(id);
+  if (!atual) return null;
+  const completed = patch.completed === undefined ? atual.completed : !!patch.completed;
+  // completedAt é a base do arquivamento automático (ver
+  // runPersonalTaskAutoArchive) - nasce só quando a tarefa vira concluída, e
+  // some se ela for desmarcada, senão desmarcar e marcar de novo não
+  // reiniciaria a contagem dos 2 dias.
+  const completedAt = completed ? atual.completedAt || nowIso() : null;
+  getDb()
+    .prepare("UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=? WHERE id=?")
+    .run(patch.title ?? atual.title, patch.due ?? atual.due, completed ? 1 : 0, completedAt, id);
+  return getPersonalTask(id);
+}
+
+export function deletePersonalTask(id) {
+  getDb().prepare("DELETE FROM personal_tasks WHERE id = ?").run(id);
+}
+
+// Roda na leitura (GET /api/personal-tasks), mesmo padrão do auto-arquivamento
+// de cartão e das recorrências: sem agendador, a varredura acontece na hora em
+// que alguém abre a própria agenda.
+export function runPersonalTaskAutoArchive(userId, now = new Date()) {
+  const cutoff = new Date(now.getTime() - PERSONAL_TASK_AUTO_ARCHIVE_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  getDb()
+    .prepare("UPDATE personal_tasks SET archived = 1 WHERE user_id = ? AND completed = 1 AND archived = 0 AND completed_at <= ?")
+    .run(userId, cutoff);
+}
+
 // Percorre as regras ativas e cria o cartão das que estão devendo. Roda na leitura
 // do workspace, como o arquivamento automático: sem agendador, e o que volta para
 // o cliente já reflete o que foi gerado.

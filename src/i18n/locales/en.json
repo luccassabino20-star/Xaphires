@@ -342,8 +342,6 @@
       },
       "shortcuts": {
         "inbox": "Inbox",
-        "replies": "Replies",
-        "assignedComments": "Assigned comments",
         "meetings": "Meetings",
         "myTasks": "My tasks",
         "allTasks": "All tasks"
@@ -352,7 +350,6 @@
       "aiChatsPlaceholder": "Ask, build...",
       "superagentsTitle": "Superagents",
       "superagentSample1": "My assistant",
-      "superagentSample2": "Chief of Staff",
       "newSuperagent": "New Superagent"
     },
     "topbar": {
@@ -795,6 +792,28 @@
     "requestApprovedToast": "{{name}} is now part of the company",
     "requestRejectedToast": "Request rejected"
   },
+  "team": {
+    "title": "Team",
+    "viewProfile": "View profile",
+    "sendMessage": "Send message",
+    "back": "Back",
+    "manageUsers": "Manage users"
+  },
+  "planner": {
+    "title": "Personal planner",
+    "subtitle": "Your agenda, outside the boards",
+    "tabCalendar": "Calendar",
+    "tabList": "My tasks",
+    "addPlaceholder": "New personal task...",
+    "add": "Add",
+    "empty": "No personal tasks yet.",
+    "deleteConfirm": "Delete the task \"{{title}}\"?",
+    "groupOverdue": "Overdue",
+    "groupToday": "Today",
+    "groupTomorrow": "Tomorrow",
+    "groupUpcoming": "Upcoming",
+    "groupCompleted": "Completed"
+  },
   "plan": {
     "monthlyLabel": "Monthly price",
     "onRequest": "On request",
@@ -959,6 +978,8 @@
     "PASSWORD_TOO_SHORT": "The new password must be at least 6 characters",
     "CURRENT_PASSWORD_INCORRECT": "Current password is incorrect",
     "TITLE_REQUIRED": "Title is required",
+    "DUE_REQUIRED": "Choose a date",
+    "PERSONAL_TASK_NOT_FOUND": "Task not found",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Only the master user can delete shared boards",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds is required",
     "CARD_IDS_REQUIRED": "cardIds is required",

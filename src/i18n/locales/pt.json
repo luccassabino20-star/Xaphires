@@ -656,8 +656,6 @@
       },
       "shortcuts": {
         "inbox": "Caixa de entrada",
-        "replies": "Respostas",
-        "assignedComments": "Comentários atribuídos",
         "meetings": "Reuniões",
         "myTasks": "Minhas tarefas",
         "allTasks": "Todas as tarefas"
@@ -666,7 +664,6 @@
       "aiChatsPlaceholder": "Pergunte, construa...",
       "superagentsTitle": "Superagentes",
       "superagentSample1": "Meu assistente",
-      "superagentSample2": "Chefe de gabinete",
       "newSuperagent": "Novo Superagente"
     },
     "topbar": {
@@ -1128,6 +1125,28 @@
     "requestApprovedToast": "{{name}} agora faz parte da empresa",
     "requestRejectedToast": "Pedido recusado"
   },
+  "team": {
+    "title": "Equipe",
+    "viewProfile": "Ver perfil",
+    "sendMessage": "Enviar mensagem",
+    "back": "Voltar",
+    "manageUsers": "Administrar usuários"
+  },
+  "planner": {
+    "title": "Planejador pessoal",
+    "subtitle": "Sua agenda, fora dos quadros",
+    "tabCalendar": "Calendário",
+    "tabList": "Minhas tarefas",
+    "addPlaceholder": "Nova tarefa pessoal...",
+    "add": "Adicionar",
+    "empty": "Nenhuma tarefa pessoal ainda.",
+    "deleteConfirm": "Excluir a tarefa \"{{title}}\"?",
+    "groupOverdue": "Atrasadas",
+    "groupToday": "Hoje",
+    "groupTomorrow": "Amanhã",
+    "groupUpcoming": "Em breve",
+    "groupCompleted": "Concluídas"
+  },
   "plan": {
     "monthlyLabel": "Mensalidade",
     "onRequest": "Sob consulta",
@@ -1292,6 +1311,8 @@
     "PASSWORD_TOO_SHORT": "A nova senha deve ter ao menos 6 caracteres",
     "CURRENT_PASSWORD_INCORRECT": "Senha atual incorreta",
     "TITLE_REQUIRED": "Título obrigatório",
+    "DUE_REQUIRED": "Escolha uma data",
+    "PERSONAL_TASK_NOT_FOUND": "Tarefa não encontrada",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Apenas o usuário master pode excluir quadros compartilhados",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds obrigatório",
     "CARD_IDS_REQUIRED": "cardIds obrigatório",

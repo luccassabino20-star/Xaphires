@@ -29,8 +29,10 @@ function ChevronIcon({ dir }) {
 // por isso o componente não sabe abri-la sozinho. Quem chama passa
 // `onOpenRecurrence` quando faz sentido no contexto (cartão, que tem quadro);
 // sem o prop, o botão só explica onde o recurso vive (caso da subtarefa, que
-// não é candidata a virar molde).
-export default function DatePicker({ value, onChange, label, disabled, compact = false, onOpenRecurrence }) {
+// não é candidata a virar molde). `showRecurrence=false` tira o preset inteiro
+// - usado pelo Planejador pessoal, que não tem quadro nem cartão nenhum por
+// trás, então nem a explicação faz sentido ali.
+export default function DatePicker({ value, onChange, label, disabled, compact = false, onOpenRecurrence, showRecurrence = true }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const lang = normalizeLanguage(i18n.language);
@@ -155,21 +157,23 @@ export default function DatePicker({ value, onChange, label, disabled, compact =
                 <span className="datepicker-preset-date">{p.dateLabel}</span>
               </button>
             ))}
-            <button
-              type="button"
-              className="datepicker-preset datepicker-recurrence"
-              onClick={() => {
-                if (onOpenRecurrence) {
-                  onOpenRecurrence();
-                } else {
-                  showToast(t("datePicker.recurrenceHint"));
-                }
-                setOpen(false);
-              }}
-            >
-              <span>{t("datePicker.recurrence")}</span>
-              <span className="datepicker-preset-date">›</span>
-            </button>
+            {showRecurrence && (
+              <button
+                type="button"
+                className="datepicker-preset datepicker-recurrence"
+                onClick={() => {
+                  if (onOpenRecurrence) {
+                    onOpenRecurrence();
+                  } else {
+                    showToast(t("datePicker.recurrenceHint"));
+                  }
+                  setOpen(false);
+                }}
+              >
+                <span>{t("datePicker.recurrence")}</span>
+                <span className="datepicker-preset-date">›</span>
+              </button>
+            )}
             {selected && (
               <button type="button" className="datepicker-clear" onClick={() => commit(null)}>
                 {t("datePicker.clear")}

@@ -235,6 +235,12 @@ export const createRecurrence = (boardId, data) =>
 export const updateRecurrence = (id, patch) => request(`/recurrences/${id}`, { method: "PATCH", body: patch });
 export const deleteRecurrence = (id) => request(`/recurrences/${id}`, { method: "DELETE" });
 
+// ---------- Agenda pessoal (Planejador) ----------
+export const listPersonalTasks = () => request("/personal-tasks");
+export const createPersonalTask = (data) => request("/personal-tasks", { method: "POST", body: data });
+export const updatePersonalTask = (id, patch) => request(`/personal-tasks/${id}`, { method: "PATCH", body: patch });
+export const deletePersonalTask = (id) => request(`/personal-tasks/${id}`, { method: "DELETE" });
+
 // ---------- Relatórios ----------
 
 // Os filtros viram query string num só lugar, para o contador e o download nunca

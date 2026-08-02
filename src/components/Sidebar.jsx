@@ -8,6 +8,8 @@ import { useChat } from "../state/ChatContext.jsx";
 import { uid } from "../utils/id.js";
 import * as api from "../state/api.js";
 import UsersPanel from "./UsersPanel.jsx";
+import TeamPanel from "./TeamPanel.jsx";
+import PersonalPlanner from "./PersonalPlanner.jsx";
 import PlanModal from "./PlanModal.jsx";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
@@ -55,12 +57,6 @@ function IconUpgrade(p) {
 }
 function IconInbox(p) {
   return <Svg {...p} d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm0 2v6h4.5a3.5 3.5 0 0 0 7 0H20V6zm0 8v4h16v-4h-3.6a5.5 5.5 0 0 1-8.8 0z" />;
-}
-function IconReply(p) {
-  return <Svg {...p} d="M10 8V4l-8 7 8 7v-4.1c4 0 6.8 1.3 9 4.1-.8-4.4-3.4-8.7-9-9z" />;
-}
-function IconAt(p) {
-  return <Svg {...p} d="M12 2a10 10 0 1 0 6.3 17.8l-1.2-1.6A8 8 0 1 1 20 12v1c0 1.1-.5 2-1.5 2s-1.5-.9-1.5-2v-4h-1.8l-.1.7A3.5 3.5 0 1 0 15.5 15c.6.9 1.7 1.5 3 1.5 2.2 0 3.5-1.7 3.5-4v-1A10 10 0 0 0 12 2zm0 7.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-4.5z" />;
 }
 function IconVideo(p) {
   return <Svg {...p} d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z" />;
@@ -133,6 +129,8 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
   const [editingId, setEditingId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [usersPanelOpen, setUsersPanelOpen] = useState(false);
+  const [teamPanelOpen, setTeamPanelOpen] = useState(false);
+  const [plannerTab, setPlannerTab] = useState(null); // null = fechado; "calendar" | "list" = aberto nessa aba
   const [planOpen, setPlanOpen] = useState(false);
   const [plataformaOpen, setPlataformaOpen] = useState(false);
   // null = sem teto (ou ainda não carregou - getPlan() tem cache de 30s em
@@ -309,17 +307,14 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
 
         <div className="dsb-rail-nav">
           <RailItem icon={<IconHome />} label={t("app.sidebar.rail.home")} active />
-          {/* PLACEHOLDER: Planejador/IA/Painéis/Quadros/Mais não têm tela nem
-              dado por trás no Xaphires hoje - ver decisão registrada na
-              conversa ("visual completo, com placeholders"). Ficam sem
-              onClick de propósito. */}
-          <RailItem icon={<IconCalendar />} label={t("app.sidebar.rail.planner")} />
+          {/* PLACEHOLDER: IA/Painéis/Quadros/Mais não têm tela nem dado por
+              trás no Xaphires hoje - ver decisão registrada na conversa
+              ("visual completo, com placeholders"). Ficam sem onClick de
+              propósito. Planejador é real: agenda pessoal (ver
+              PersonalPlanner.jsx), fora de qualquer quadro. */}
+          <RailItem icon={<IconCalendar />} label={t("app.sidebar.rail.planner")} onClick={() => setPlannerTab("calendar")} />
           <RailItem icon={<IconSparkle />} label={t("app.sidebar.rail.ai")} />
-          <RailItem
-            icon={<IconUsers />}
-            label={t("app.sidebar.rail.team")}
-            onClick={user.role === "master" ? () => setUsersPanelOpen(true) : undefined}
-          />
+          <RailItem icon={<IconUsers />} label={t("app.sidebar.rail.team")} onClick={() => setTeamPanelOpen(true)} />
           <RailItem icon={<IconChart />} label={t("app.sidebar.rail.dashboards")} />
           <RailItem icon={<IconGrid />} label={t("app.sidebar.rail.boards")} />
           {/* Real: abre o flyout com idioma/tema (e, para quem administra a
@@ -369,10 +364,8 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
         </div>
 
         <div className="dsb-shortcuts">
-          {/* PLACEHOLDER: nenhum dos outros existe no Xaphires (sem caixa de
-              entrada, sem @menções, sem comentário atribuído, sem reunião,
-              sem "minhas tarefas" cruzando quadros, sem mais atalhos atrás
-              do "Mais") - ver decisão da conversa. */}
+          {/* PLACEHOLDER: caixa de entrada e reunião não existem no Xaphires,
+              nem mais atalhos atrás do "Mais" - ver decisão da conversa. */}
           <ShortcutRow icon={<IconInbox size={15} />} label={t("app.sidebar.shortcuts.inbox")} badge={1} />
           {/* Real: bate-papo da empresa, logo abaixo da Caixa de entrada -
               mesmo gatilho/estado de sempre (useChat), só mudou de casa de
@@ -384,10 +377,14 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
             badge={totalUnread > 0 ? (totalUnread > 9 ? "9+" : totalUnread) : null}
             onClick={openChat}
           />
-          <ShortcutRow icon={<IconReply size={15} />} label={t("app.sidebar.shortcuts.replies")} />
-          <ShortcutRow icon={<IconAt size={15} />} label={t("app.sidebar.shortcuts.assignedComments")} />
           <ShortcutRow icon={<IconVideo size={15} />} label={t("app.sidebar.shortcuts.meetings")} />
-          <ShortcutRow icon={<IconCheckCircle size={15} />} label={t("app.sidebar.shortcuts.myTasks")} />
+          {/* Real: lista da mesma agenda pessoal do Planejador (PersonalPlanner),
+              só que aberta direto na aba de lista em vez da de calendário. */}
+          <ShortcutRow
+            icon={<IconCheckCircle size={15} />}
+            label={t("app.sidebar.shortcuts.myTasks")}
+            onClick={() => setPlannerTab("list")}
+          />
           <ShortcutRow icon={<IconDots size={15} />} label={t("app.sidebar.rail.more")} />
         </div>
 
@@ -470,7 +467,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
             <span className="dsb-section-title">{t("app.sidebar.superagentsTitle")}</span>
           </div>
           <ShortcutRow icon={<IconBot size={14} />} label={t("app.sidebar.superagentSample1")} />
-          <ShortcutRow icon={<IconBot size={14} />} label={t("app.sidebar.superagentSample2")} />
           <button type="button" className="dsb-new-space-btn">
             <IconPlus size={13} />
             {t("app.sidebar.newSuperagent")}
@@ -509,6 +505,20 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
         )}
 
       {usersPanelOpen && <UsersPanel onClose={() => setUsersPanelOpen(false)} />}
+      {teamPanelOpen && (
+        <TeamPanel
+          onClose={() => setTeamPanelOpen(false)}
+          onManageUsers={
+            user.role === "master"
+              ? () => {
+                  setTeamPanelOpen(false);
+                  setUsersPanelOpen(true);
+                }
+              : undefined
+          }
+        />
+      )}
+      {plannerTab && <PersonalPlanner initialTab={plannerTab} onClose={() => setPlannerTab(null)} />}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
       {plataformaOpen && (
         <Suspense fallback={null}>
