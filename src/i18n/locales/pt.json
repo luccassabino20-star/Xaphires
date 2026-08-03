@@ -372,7 +372,7 @@
         },
         {
           "name": "Intermediário",
-          "price": "R$ 369,99",
+          "price": "R$ 370,00",
           "period": "/mês",
           "tagline": "Para equipes que cresceram além de sete pessoas",
           "cta": "Experimente grátis", "note": "7 dias grátis para testar",
@@ -386,7 +386,7 @@
         },
         {
           "name": "Profissional",
-          "price": "R$ 679,99",
+          "price": "R$ 730,00",
           "period": "/mês",
           "tagline": "Para equipes que querem controle total",
           "cta": "Experimente grátis", "note": "7 dias grátis para testar",
@@ -594,10 +594,7 @@
             "Para dúvidas sobre esta política ou sobre o tratamento dos seus dados, fale com o encarregado de proteção de dados:"
           ],
           "bullets": [
-            "E-mail: [PREENCHER: e-mail de contato]",
-            "Razão social: [PREENCHER: razão social]",
-            "CNPJ: [PREENCHER: CNPJ]",
-            "Endereço: [PREENCHER: endereço completo]"
+            "E-mail: xaphires@contato.com"
           ]
         }
       ]

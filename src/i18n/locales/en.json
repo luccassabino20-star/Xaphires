@@ -157,8 +157,8 @@
       "mostPopular": "Most popular",
       "plans": [
         { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Up to 4 boards, private and shared", "Kanban, Table and Calendar", "Manual card archiving", "Card attachments and links (up to 10 MB)", "Email support"] },
-        { "name": "Intermediate", "price": "R$ 369.99", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Basic, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Card attachments and links (up to 50 MB)"] },
-        { "name": "Professional", "price": "R$ 679.99", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Intermediate, plus:", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Routines that create cards on their own", "Priority support"] },
+        { "name": "Intermediate", "price": "R$ 370.00", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Basic, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Card attachments and links (up to 50 MB)"] },
+        { "name": "Professional", "price": "R$ 730.00", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Intermediate, plus:", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Routines that create cards on their own", "Priority support"] },
         { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
       ]
     },
@@ -248,10 +248,7 @@
           "title": "10. How to contact us",
           "paragraphs": ["For questions about this policy or about how your data is handled, contact the data protection officer:"],
           "bullets": [
-            "Email: [FILL IN: contact email]",
-            "Legal entity: [FILL IN: registered company name]",
-            "Tax ID: [FILL IN: tax identification number]",
-            "Address: [FILL IN: full address]"
+            "Email: xaphires@contato.com"
           ]
         }
       ]

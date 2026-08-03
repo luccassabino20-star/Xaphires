@@ -157,8 +157,8 @@
       "mostPopular": "Más popular",
       "plans": [
         { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
-        { "name": "Intermedio", "price": "R$ 369,99", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
-        { "name": "Profesional", "price": "R$ 679,99", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
+        { "name": "Intermedio", "price": "R$ 370,00", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
+        { "name": "Profesional", "price": "R$ 730,00", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
         { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo lo incluido en Profesional, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
       ]
     },
@@ -248,10 +248,7 @@
           "title": "10. Cómo contactarnos",
           "paragraphs": ["Para dudas sobre esta política o sobre el tratamiento de tus datos, contacta al responsable de protección de datos:"],
           "bullets": [
-            "Correo electrónico: [COMPLETAR: correo de contacto]",
-            "Razón social: [COMPLETAR: razón social]",
-            "Identificación fiscal: [COMPLETAR: identificación fiscal]",
-            "Dirección: [COMPLETAR: dirección completa]"
+            "Correo electrónico: xaphires@contato.com"
           ]
         }
       ]

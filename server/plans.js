@@ -26,8 +26,8 @@ export const ALL_VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "m
 // Profissional antes disso; agora os cinco sobem juntos no mesmo degrau.
 const DEFINICOES = {
   basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false },
-  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 36999, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false },
-  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 67999, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true }, // null = ilimitado
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 37000, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false },
+  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 73000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true }, // null = ilimitado
   enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
 };
 
