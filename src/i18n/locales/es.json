@@ -343,12 +343,7 @@
         "meetings": "Reuniones",
         "myTasks": "Mis tareas",
         "allTasks": "Todas las tareas"
-      },
-      "aiChatsTitle": "Chats con IA",
-      "aiChatsPlaceholder": "Pregunta, crea...",
-      "superagentsTitle": "Superagentes",
-      "superagentSample1": "Mi asistente",
-      "newSuperagent": "Nuevo Superagente"
+      }
     },
     "topbar": {
       "toggleSidebar": "Mostrar/ocultar barra lateral",

@@ -234,11 +234,14 @@ input, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  /* Ícone preto sobre gradiente branco: o par de maior contraste dos dois, e
+     branco é o que faz o botão se destacar na barra lateral quase preta
+     (#0d0d0d) - um fundo escuro aqui quase desapareceria nela. */
+  color: #000;
   cursor: pointer;
-  background: linear-gradient(135deg, #7c3aed, #d6249f);
+  background: linear-gradient(135deg, #ffffff, #e2e2e2);
 }
-.dsb-rail-upgrade:hover { filter: brightness(1.12); }
+.dsb-rail-upgrade:hover { filter: brightness(0.96); }
 
 /* ---- Painel secundário: branco, ~240px ---- */
 .dsb-panel {
@@ -488,10 +491,6 @@ input, textarea { font-family: inherit; }
 }
 .dsb-add-private-toggle { display: flex; align-items: center; gap: 6px; padding: 2px; font-size: 12px; color: #616161; cursor: pointer; }
 .dsb-add-private-toggle input { width: 14px; height: 14px; cursor: pointer; }
-
-/* PLACEHOLDER: Chats com IA e Superagentes não têm dado real por trás - ver
-   decisão registrada na conversa ("visual completo, com placeholders"). */
-.dsb-ai-section { display: flex; flex-direction: column; padding: 0 8px 10px; gap: 1px; }
 
 /* ---------- Main area / Topbar ---------- */
 .main-area {

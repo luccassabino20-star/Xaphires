@@ -343,12 +343,7 @@
         "meetings": "Meetings",
         "myTasks": "My tasks",
         "allTasks": "All tasks"
-      },
-      "aiChatsTitle": "AI Chats",
-      "aiChatsPlaceholder": "Ask, build...",
-      "superagentsTitle": "Superagents",
-      "superagentSample1": "My assistant",
-      "newSuperagent": "New Superagent"
+      }
     },
     "topbar": {
       "toggleSidebar": "Show/hide sidebar",

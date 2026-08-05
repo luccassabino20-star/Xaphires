@@ -662,12 +662,7 @@
         "meetings": "Reuniões",
         "myTasks": "Minhas tarefas",
         "allTasks": "Todas as tarefas"
-      },
-      "aiChatsTitle": "Chats com IA",
-      "aiChatsPlaceholder": "Pergunte, construa...",
-      "superagentsTitle": "Superagentes",
-      "superagentSample1": "Meu assistente",
-      "newSuperagent": "Novo Superagente"
+      }
     },
     "topbar": {
       "toggleSidebar": "Mostrar/ocultar barra lateral",

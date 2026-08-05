@@ -53,7 +53,7 @@ function IconInvite(p) {
   return <Svg {...p} d="M10 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4 0-8 2-8 5v2h11.5A6 6 0 0 1 20 13.3V13c-2-.7-4-1-6.5-1H10zM19 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3z" />;
 }
 function IconUpgrade(p) {
-  return <Svg {...p} d="M12 3l7 7h-4v9h-6v-9H5z" />;
+  return <Svg {...p} d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />;
 }
 function IconInbox(p) {
   return <Svg {...p} d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm0 2v6h4.5a3.5 3.5 0 0 0 7 0H20V6zm0 8v4h16v-4h-3.6a5.5 5.5 0 0 1-8.8 0z" />;
@@ -85,10 +85,6 @@ function IconLock(p) {
 function IconChatBubble(p) {
   return <Svg {...p} d="M4 4h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8l-4.4 3.3A.5.5 0 0 1 3 21V5a1 1 0 0 1 1-1z" />;
 }
-function IconBot(p) {
-  return <Svg {...p} d="M12 2a2 2 0 0 1 2 2c0 .4-.1.8-.4 1.1L13 6h3a4 4 0 0 1 4 4v1a2 2 0 0 1 0 4v1a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-1a2 2 0 0 1 0-4v-1a4 4 0 0 1 4-4h3l-.6-.9A1.9 1.9 0 0 1 10 4a2 2 0 0 1 2-2zM9 11a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />;
-}
-
 // Uma linha do rail primário. `active`/`onClick` reais quando a seção existe
 // de verdade no Xaphires; sem onClick é decoração da referência do ClickUp
 // (ver decisão registrada na conversa) - fica no visual, não faz nada.
@@ -129,6 +125,9 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
   const [editingId, setEditingId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [usersPanelOpen, setUsersPanelOpen] = useState(false);
+  // true só quando o painel de usuários abre pelo "Convidar" - decide se ele
+  // já nasce com o formulário de novo usuário aberto (ver UsersPanel.jsx).
+  const [usersPanelInvite, setUsersPanelInvite] = useState(false);
   const [teamPanelOpen, setTeamPanelOpen] = useState(false);
   const [plannerTab, setPlannerTab] = useState(null); // null = fechado; "calendar" | "list" = aberto nessa aba
   const [planOpen, setPlanOpen] = useState(false);
@@ -334,11 +333,25 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
         </div>
 
         <div className="dsb-rail-bottom">
-          {/* PLACEHOLDER: convite por e-mail não existe - quem administra
-              cria a conta direto no painel de Equipe (ver Equipes acima). */}
-          <RailItem icon={<IconInvite />} label={t("app.sidebar.rail.invite")} />
+          {/* Convite é direto, sem e-mail nem link: só master cria conta
+              (mesma regra de sempre, ver Equipes -> Administrar usuários),
+              então "convidar" aqui é abrir o painel de usuários com o
+              formulário de criação já pronto. Membro comum não tem o que
+              fazer aqui, então o botão nasce sem onClick (desabilitado). */}
+          <RailItem
+            icon={<IconInvite />}
+            label={t("app.sidebar.rail.invite")}
+            onClick={
+              user.role === "master"
+                ? () => {
+                    setUsersPanelInvite(true);
+                    setUsersPanelOpen(true);
+                  }
+                : undefined
+            }
+          />
           <button type="button" className="dsb-rail-upgrade" onClick={() => setPlanOpen(true)} title={t("plan.menuItem")}>
-            <IconUpgrade size={16} />
+            <IconUpgrade size={18} />
           </button>
         </div>
       </nav>
@@ -450,28 +463,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
           )}
         </div>
 
-        <div className="dsb-divider" />
-
-        {/* PLACEHOLDER: Chats com IA e Superagentes não existem no Xaphires -
-            ficam só para bater com a referência visual (ver decisão
-            registrada na conversa). */}
-        <div className="dsb-ai-section">
-          <div className="dsb-section-row">
-            <span className="dsb-section-title">{t("app.sidebar.aiChatsTitle")}</span>
-          </div>
-          <ShortcutRow icon={<IconPlus size={14} />} label={t("app.sidebar.aiChatsPlaceholder")} />
-        </div>
-
-        <div className="dsb-ai-section">
-          <div className="dsb-section-row">
-            <span className="dsb-section-title">{t("app.sidebar.superagentsTitle")}</span>
-          </div>
-          <ShortcutRow icon={<IconBot size={14} />} label={t("app.sidebar.superagentSample1")} />
-          <button type="button" className="dsb-new-space-btn">
-            <IconPlus size={13} />
-            {t("app.sidebar.newSuperagent")}
-          </button>
-        </div>
       </aside>
 
       {moreOpen &&
@@ -504,7 +495,15 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
           document.body
         )}
 
-      {usersPanelOpen && <UsersPanel onClose={() => setUsersPanelOpen(false)} />}
+      {usersPanelOpen && (
+        <UsersPanel
+          initialShowCreate={usersPanelInvite}
+          onClose={() => {
+            setUsersPanelOpen(false);
+            setUsersPanelInvite(false);
+          }}
+        />
+      )}
       {teamPanelOpen && (
         <TeamPanel
           onClose={() => setTeamPanelOpen(false)}
@@ -512,6 +511,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
             user.role === "master"
               ? () => {
                   setTeamPanelOpen(false);
+                  setUsersPanelInvite(false);
                   setUsersPanelOpen(true);
                 }
               : undefined

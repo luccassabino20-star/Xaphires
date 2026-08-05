@@ -8,13 +8,16 @@ import { normalizarDoc, formatarDoc } from "../utils/doc.js";
 import * as api from "../state/api.js";
 import Avatar from "./Avatar.jsx";
 
-export default function UsersPanel({ onClose }) {
+// initialShowCreate: quem chega aqui pelo "Convidar" da barra lateral já quer
+// adicionar alguém - abrir com o formulário pronto poupa o clique extra em
+// "+ Novo usuário" que quem só veio administrar (via Equipes) não precisa.
+export default function UsersPanel({ onClose, initialShowCreate = false }) {
   const { t } = useTranslation();
   const { users, createUser, deleteUser, resetPassword, setRole, refresh: refreshUsers } = useUsers();
   const { user: currentUser } = useAuth();
   const showToast = useToast();
 
-  const [showCreate, setShowCreate] = useState(false);
+  const [showCreate, setShowCreate] = useState(initialShowCreate);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
