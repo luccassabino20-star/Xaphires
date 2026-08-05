@@ -82,9 +82,6 @@ function IconList(p) {
 function IconLock(p) {
   return <Svg {...p} d="M12 2a4 4 0 0 1 4 4v3h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h1V6a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v3h4V6a2 2 0 0 0-2-2z" />;
 }
-function IconChatBubble(p) {
-  return <Svg {...p} d="M4 4h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8l-4.4 3.3A.5.5 0 0 1 3 21V5a1 1 0 0 1 1-1z" />;
-}
 // Uma linha do rail primário. `active`/`onClick` reais quando a seção existe
 // de verdade no Xaphires; sem onClick é decoração da referência do ClickUp
 // (ver decisão registrada na conversa) - fica no visual, não faz nada.
@@ -377,16 +374,12 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
         </div>
 
         <div className="dsb-shortcuts">
-          {/* PLACEHOLDER: caixa de entrada e reunião não existem no Xaphires,
-              nem mais atalhos atrás do "Mais" - ver decisão da conversa. */}
-          <ShortcutRow icon={<IconInbox size={15} />} label={t("app.sidebar.shortcuts.inbox")} badge={1} />
-          {/* Real: bate-papo da empresa, logo abaixo da Caixa de entrada -
-              mesmo gatilho/estado de sempre (useChat), só mudou de casa de
-              novo (antes: fileira de utilidades no cabeçalho / flyout do
-              "Mais"). O modal em si continua montado só pela TopBar. */}
+          {/* Caixa de entrada abre o mesmo chat da empresa (useChat) - reunião
+              e mais atalhos atrás do "Mais" continuam sem função, ver decisão
+              da conversa. O modal do chat continua montado só pela TopBar. */}
           <ShortcutRow
-            icon={<IconChatBubble size={15} />}
-            label={t("chat.title")}
+            icon={<IconInbox size={15} />}
+            label={t("app.sidebar.shortcuts.inbox")}
             badge={totalUnread > 0 ? (totalUnread > 9 ? "9+" : totalUnread) : null}
             onClick={openChat}
           />
