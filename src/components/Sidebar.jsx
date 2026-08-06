@@ -150,28 +150,14 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
   }, []);
 
   // Cartões arquivados/Monitor de gargalos/Rotinas automáticas moraram no menu
-  // "⋮" do topo do quadro (DataMenu.jsx) antes - agora ficam só aqui, atrás do
-  // "Mais" do painel branco (decisão da conversa). Mesmo quadro ativo que o
-  // resto do app usa, e não um novo pedido ao servidor.
+  // "⋮" do topo do quadro (DataMenu.jsx) antes - agora ficam atrás do "Mais" do
+  // rail escuro, junto de idioma/tema (ver moreOpen abaixo). Mesmo quadro ativo
+  // que o resto do app usa, e não um novo pedido ao servidor.
   const activeBoard = state.boards.find((b) => b.id === activeBoardId) || null;
   const activeBoardReadOnly = activeBoard?.myRole === "viewer";
-  const [toolsOpen, setToolsOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [gargalosOpen, setGargalosOpen] = useState(false);
   const [rotinasOpen, setRotinasOpen] = useState(false);
-  const toolsBtnRef = useRef(null);
-  const toolsMenuRef = useRef(null);
-
-  useEffect(() => {
-    if (!toolsOpen) return;
-    function onDocClick(e) {
-      if (toolsBtnRef.current?.contains(e.target)) return;
-      if (toolsMenuRef.current?.contains(e.target)) return;
-      setToolsOpen(false);
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [toolsOpen]);
 
   // Flyout do "Mais": bate-papo/idioma/tema moraram na fileira sempre visível
   // do painel branco antes; agora só aparecem aqui, sob demanda. Portal +
@@ -186,7 +172,11 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
     if (!moreOpen) return;
     const rect = moreBtnRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const ESTIMATED_HEIGHT = 170;
+    // 170 bastava só com idioma/tema (e o item de admin, para quem administra a
+    // plataforma). Com Monitor de gargalos/Rotinas automáticas/Cartões arquivados
+    // somados, o conteúdo real passa disso - a estimativa sobe para cobrir o pior
+    // caso (quadro ativo, não leitor, e admin da plataforma) sem medir de verdade.
+    const ESTIMATED_HEIGHT = 260;
     setMoreCoords({
       top: Math.min(rect.top, window.innerHeight - ESTIMATED_HEIGHT - 12),
       left: rect.right + 8,
@@ -401,11 +391,10 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
         </div>
 
         <div className="dsb-shortcuts">
-          {/* Caixa de entrada abre o mesmo chat da empresa (useChat) - "Reuniões"
-              continua sem função (ver decisão da conversa). "Mais", logo abaixo,
-              abre Monitor de gargalos/Rotinas automáticas/Cartões arquivados, que
-              moraram no menu "⋮" do topo do quadro antes (DataMenu.jsx). O modal
-              do chat continua montado só pela TopBar. */}
+          {/* Caixa de entrada abre o mesmo chat da empresa (useChat) - "Reuniões" e
+              "Mais" continuam sem função aqui (ver decisão da conversa): Monitor de
+              gargalos/Rotinas automáticas/Cartões arquivados foram para o "Mais" do
+              rail escuro, não este. O modal do chat continua montado só pela TopBar. */}
           <ShortcutRow
             icon={<IconInbox size={15} />}
             label={t("app.sidebar.shortcuts.inbox")}
@@ -420,61 +409,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
             label={t("app.sidebar.shortcuts.myTasks")}
             onClick={() => setPlannerTab("list")}
           />
-          <div style={{ position: "relative" }}>
-            {/* Botão bruto, não ShortcutRow: precisa da ref de verdade no
-                elemento para o clique-fora (useEffect acima) diferenciar
-                "clicou no próprio gatilho" de "clicou fora" - mesmo motivo do
-                botão "Mais" do rail, um pouco acima. */}
-            <button
-              type="button"
-              ref={toolsBtnRef}
-              className="dsb-shortcut-row"
-              onClick={() => setToolsOpen((o) => !o)}
-            >
-              <span className="dsb-shortcut-icon">
-                <IconDots size={15} />
-              </span>
-              <span className="dsb-shortcut-label">{t("app.sidebar.rail.more")}</span>
-            </button>
-            {toolsOpen && (
-              <div className="dropdown" ref={toolsMenuRef}>
-                <div
-                  className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
-                  onClick={() => {
-                    if (!activeBoard) return;
-                    setGargalosOpen(true);
-                    setToolsOpen(false);
-                  }}
-                >
-                  {t("app.dataMenu.bottlenecks")}
-                </div>
-                {!activeBoardReadOnly && (
-                  <>
-                    <div
-                      className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
-                      onClick={() => {
-                        if (!activeBoard) return;
-                        setRotinasOpen(true);
-                        setToolsOpen(false);
-                      }}
-                    >
-                      {t("app.dataMenu.recurrences")}
-                    </div>
-                    <div
-                      className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
-                      onClick={() => {
-                        if (!activeBoard) return;
-                        setArchiveOpen(true);
-                        setToolsOpen(false);
-                      }}
-                    >
-                      {t("app.dataMenu.archivedCards")}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+          <ShortcutRow icon={<IconDots size={15} />} label={t("app.sidebar.rail.more")} />
         </div>
 
         <div className="dsb-divider" />
@@ -553,6 +488,41 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
               <LanguageSwitcher className="dsb-utility-btn" />
               <ThemeToggle className="dsb-utility-btn" />
             </div>
+            <div className="dropdown-divider" />
+            <div
+              className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
+              onClick={() => {
+                if (!activeBoard) return;
+                setGargalosOpen(true);
+                setMoreOpen(false);
+              }}
+            >
+              {t("app.dataMenu.bottlenecks")}
+            </div>
+            {!activeBoardReadOnly && (
+              <>
+                <div
+                  className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
+                  onClick={() => {
+                    if (!activeBoard) return;
+                    setRotinasOpen(true);
+                    setMoreOpen(false);
+                  }}
+                >
+                  {t("app.dataMenu.recurrences")}
+                </div>
+                <div
+                  className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
+                  onClick={() => {
+                    if (!activeBoard) return;
+                    setArchiveOpen(true);
+                    setMoreOpen(false);
+                  }}
+                >
+                  {t("app.dataMenu.archivedCards")}
+                </div>
+              </>
+            )}
             {user.platformAdmin && (
               <>
                 <div className="dropdown-divider" />
