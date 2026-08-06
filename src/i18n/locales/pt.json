@@ -1155,6 +1155,8 @@
   },
   "plan": {
     "monthlyLabel": "Mensalidade",
+    "listPriceLabel": "Valor de tabela",
+    "discountLabel": "Desconto aplicado",
     "onRequest": "Sob consulta",
     "contractedAtLabel": "Contratado em",
     "perMonth": "/mês",

@@ -132,6 +132,18 @@ export default function PlanModal({ onClose }) {
                     <dt>{t("plan.monthlyLabel")}</dt>
                     <dd>{valor ?? t("plan.onRequest")}</dd>
                   </div>
+                  {plano.discountCents > 0 && (
+                    <>
+                      <div>
+                        <dt>{t("plan.listPriceLabel")}</dt>
+                        <dd>{formatarValor(plano.listPrice, i18n.language)}</dd>
+                      </div>
+                      <div>
+                        <dt>{t("plan.discountLabel")}</dt>
+                        <dd>{formatarValor(plano.discountCents / 100, i18n.language)}</dd>
+                      </div>
+                    </>
+                  )}
                   {dataInicio && (
                     <div>
                       <dt>{t("plan.contractedAtLabel")}</dt>

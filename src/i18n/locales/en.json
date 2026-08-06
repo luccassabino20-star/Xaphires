@@ -817,6 +817,8 @@
   },
   "plan": {
     "monthlyLabel": "Monthly price",
+    "listPriceLabel": "List price",
+    "discountLabel": "Discount applied",
     "onRequest": "On request",
     "contractedAtLabel": "Contracted on",
     "perMonth": "/month",
