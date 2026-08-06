@@ -993,7 +993,8 @@
       "today": "Hoje",
       "prevMonth": "Mês anterior",
       "nextMonth": "Próximo mês",
-      "more": "+{{count}} mais"
+      "more": "+{{count}} mais",
+      "routinePreview": "Prévia da rotina automática \"{{title}}\" - ainda não virou cartão"
     },
     "dashboard": {
       "totalCards": "Total de cartões",

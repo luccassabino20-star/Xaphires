@@ -674,7 +674,8 @@
       "today": "Today",
       "prevMonth": "Previous month",
       "nextMonth": "Next month",
-      "more": "+{{count}} more"
+      "more": "+{{count}} more",
+      "routinePreview": "Preview of the automatic routine \"{{title}}\" - not a card yet"
     },
     "dashboard": {
       "totalCards": "Total cards",

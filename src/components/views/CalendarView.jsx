@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
-import { weekdayNames, monthNames, toISODate, buildGrid } from "../../utils/calendarGrid.js";
+import { weekdayNames, monthNames, toISODate, buildGrid, occurrencesInRange } from "../../utils/calendarGrid.js";
+import * as api from "../../state/api.js";
 
 export default function CalendarView({ board, users, searchQuery, memberFilter, onOpenCard }) {
   const { t, i18n } = useTranslation();
@@ -12,6 +13,27 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+  const [recorrencias, setRecorrencias] = useState([]);
+
+  // Autocontido, como o RecurrencesModal - a view não recebe recorrência por
+  // prop porque nenhuma outra view precisa dela. GET não é bloqueado por
+  // plano (só criar é, ver exigePlano em routes/recurrences.js), então uma
+  // empresa que caiu de plano ainda vê a prévia das regras que já existiam.
+  useEffect(() => {
+    if (!board?.id) return;
+    let cancelado = false;
+    api
+      .listRecurrences(board.id)
+      .then((r) => {
+        if (!cancelado) setRecorrencias(r.recurrences);
+      })
+      .catch(() => {
+        if (!cancelado) setRecorrencias([]);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [board?.id]);
 
   const cards = useMemo(() => flattenCards(board), [board]);
   const filtered = cards.filter((c) => {
@@ -31,6 +53,31 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
 
   const grid = useMemo(() => buildGrid(monthDate), [monthDate]);
   const todayIso = toISODate(new Date());
+
+  // Prévia das próximas ocorrências das rotinas automáticas, para o mês visível.
+  // Só a partir de hoje: dia passado sem cartão real é ocorrência que a rotina já
+  // deu como perdida (ver runRecurrences em repo.js, que gera no máximo um
+  // cartão por regra) - mostrar fantasma ali pareceria tarefa esquecida, não
+  // prévia. E some sozinha na data em que vira cartão de verdade: mesmo
+  // título/coluna já é a mesma ocorrência, mostrar as duas duplicaria.
+  const rotinasByDate = useMemo(() => {
+    const map = {};
+    if (grid.length === 0) return map;
+    const inicio = new Date(Math.max(grid[0].date, new Date(todayIso)));
+    const fim = grid[grid.length - 1].date;
+    if (inicio > fim) return map;
+    for (const regra of recorrencias) {
+      if (!regra.active) continue;
+      for (const iso of occurrencesInRange(regra, inicio, fim)) {
+        const jaVirouCartaoDeVerdade = (cardsByDate[iso] || []).some(
+          (c) => c.title === regra.title && c.listId === regra.listId
+        );
+        if (jaVirouCartaoDeVerdade) continue;
+        (map[iso] ||= []).push(regra);
+      }
+    }
+    return map;
+  }, [recorrencias, grid, cardsByDate, todayIso]);
 
   function goToday() {
     const now = new Date();
@@ -71,6 +118,8 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
         {grid.map(({ date, inMonth }) => {
           const iso = toISODate(date);
           const dayCards = cardsByDate[iso] || [];
+          const dayRotinas = rotinasByDate[iso] || [];
+          const total = dayCards.length + dayRotinas.length;
           const isToday = iso === todayIso;
           return (
             <div key={iso} className={"calendar-cell" + (inMonth ? "" : " outside") + (isToday ? " today" : "")}>
@@ -90,7 +139,23 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
                     </button>
                   );
                 })}
-                {dayCards.length > 4 && <div className="calendar-more">{t("views.calendar.more", { count: dayCards.length - 4 })}</div>}
+                {dayRotinas.slice(0, Math.max(0, 4 - dayCards.length)).map((r) => (
+                  // Só prévia: sem cartão ainda, então sem onClick de abrir. Estilo
+                  // tracejado + opacidade reduzida (inline, não classe nova - CSS
+                  // deste projeto tem regra de especificidade e variável
+                  // inexistente derruba a declaração inteira em silêncio, e isto
+                  // não foi conferido no navegador) para diferenciar de cartão real
+                  // sem depender só de cor.
+                  <div
+                    key={"rotina-" + r.id + "-" + iso}
+                    className="calendar-card-chip"
+                    style={{ opacity: 0.6, borderStyle: "dashed", cursor: "default" }}
+                    title={t("views.calendar.routinePreview", { title: r.title })}
+                  >
+                    {r.title}
+                  </div>
+                ))}
+                {total > 4 && <div className="calendar-more">{t("views.calendar.more", { count: total - 4 })}</div>}
               </div>
             </div>
           );
