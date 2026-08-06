@@ -58,19 +58,27 @@ export function lastDueOccurrence(rule, now = new Date()) {
   }
 
   if (rule.freq === "monthly") {
-    const dia = Number.isInteger(rule.monthday) ? rule.monthday : 1;
-    // Mês corrente, com o dia limitado ao tamanho do mês: regra do dia 31 cai
-    // no dia 28 em fevereiro em vez de vazar para março.
-    const ano = now.getFullYear();
-    const mes = now.getMonth();
-    const diaEsteMes = Math.min(dia, lastDayOfMonth(ano, mes));
-    const candidato = atHour(new Date(ano, mes, diaEsteMes), hour);
-    if (candidato <= now) return candidato;
-    // Ainda não chegou neste mês: a última devida foi no mês anterior.
-    const anoAnt = mes === 0 ? ano - 1 : ano;
-    const mesAnt = mes === 0 ? 11 : mes - 1;
-    const diaAnt = Math.min(dia, lastDayOfMonth(anoAnt, mesAnt));
-    return atHour(new Date(anoAnt, mesAnt, diaAnt), hour);
+    // monthday2 é opcional - regra com um dia só (o caso comum) passa por aqui
+    // com uma lista de um elemento. Quando os dois estão preenchidos, a última
+    // ocorrência devida é a mais recente entre os dois, para a rotina poder
+    // nascer duas vezes no mesmo mês sem precisar de duas regras.
+    const dias = [rule.monthday, rule.monthday2].filter((d) => Number.isInteger(d) && d >= 1 && d <= 31);
+    if (dias.length === 0) dias.push(1);
+    const candidatos = dias.map((dia) => {
+      // Mês corrente, com o dia limitado ao tamanho do mês: regra do dia 31 cai
+      // no dia 28 em fevereiro em vez de vazar para março.
+      const ano = now.getFullYear();
+      const mes = now.getMonth();
+      const diaEsteMes = Math.min(dia, lastDayOfMonth(ano, mes));
+      const candidato = atHour(new Date(ano, mes, diaEsteMes), hour);
+      if (candidato <= now) return candidato;
+      // Ainda não chegou neste mês: a última devida foi no mês anterior.
+      const anoAnt = mes === 0 ? ano - 1 : ano;
+      const mesAnt = mes === 0 ? 11 : mes - 1;
+      const diaAnt = Math.min(dia, lastDayOfMonth(anoAnt, mesAnt));
+      return atHour(new Date(anoAnt, mesAnt, diaAnt), hour);
+    });
+    return candidatos.reduce((a, b) => (a > b ? a : b));
   }
 
   return null;

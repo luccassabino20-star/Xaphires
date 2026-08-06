@@ -32,6 +32,16 @@ function validar(body) {
   if (body.freq === "monthly" && !(Number.isInteger(body.monthday) && body.monthday >= 1 && body.monthday <= 31)) {
     return { error: "Escolha um dia do mês entre 1 e 31", code: "MONTHDAY_REQUIRED" };
   }
+  // monthday2 é opcional - só monthly usa, e só quando preenchido (null/undefined
+  // pula a checagem, é o caso comum de um dia só).
+  if (
+    body.freq === "monthly" &&
+    body.monthday2 !== undefined &&
+    body.monthday2 !== null &&
+    !(Number.isInteger(body.monthday2) && body.monthday2 >= 1 && body.monthday2 <= 31)
+  ) {
+    return { error: "Escolha um dia do mês entre 1 e 31", code: "MONTHDAY2_INVALID" };
+  }
   if (body.hour !== undefined && body.hour !== null && !(Number.isInteger(body.hour) && body.hour >= 0 && body.hour <= 23)) {
     return { error: "Hora deve ser entre 0 e 23", code: "INVALID_HOUR" };
   }

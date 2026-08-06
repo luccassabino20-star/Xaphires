@@ -882,6 +882,7 @@ function parseRecurrence(row) {
     freq: row.freq,
     weekday: row.weekday,
     monthday: row.monthday,
+    monthday2: row.monthday2,
     hour: row.hour,
     dueInDays: row.due_in_days,
     active: !!row.active,
@@ -911,8 +912,8 @@ export function createRecurrence(boardId, data) {
   getDb()
     .prepare(
       `INSERT INTO recurrences
-       (id, board_id, list_id, title, description, checklist, labels, member_ids, freq, weekday, monthday, hour, due_in_days, active, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
+       (id, board_id, list_id, title, description, checklist, labels, member_ids, freq, weekday, monthday, monthday2, hour, due_in_days, active, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
     )
     .run(
       id,
@@ -926,6 +927,7 @@ export function createRecurrence(boardId, data) {
       data.freq,
       data.weekday ?? null,
       data.monthday ?? null,
+      data.monthday2 ?? null,
       data.hour ?? 0,
       data.dueInDays ?? null,
       nowIso()
@@ -939,7 +941,7 @@ export function updateRecurrence(id, patch) {
   getDb()
     .prepare(
       `UPDATE recurrences SET list_id=?, title=?, description=?, checklist=?, labels=?, member_ids=?,
-       freq=?, weekday=?, monthday=?, hour=?, due_in_days=?, active=? WHERE id=?`
+       freq=?, weekday=?, monthday=?, monthday2=?, hour=?, due_in_days=?, active=? WHERE id=?`
     )
     .run(
       patch.listId ?? atual.listId,
@@ -951,6 +953,7 @@ export function updateRecurrence(id, patch) {
       patch.freq ?? atual.freq,
       patch.weekday === undefined ? atual.weekday : patch.weekday,
       patch.monthday === undefined ? atual.monthday : patch.monthday,
+      patch.monthday2 === undefined ? atual.monthday2 : patch.monthday2,
       patch.hour === undefined ? atual.hour : patch.hour,
       patch.dueInDays === undefined ? atual.dueInDays : patch.dueInDays,
       patch.active === undefined ? (atual.active ? 1 : 0) : patch.active ? 1 : 0,

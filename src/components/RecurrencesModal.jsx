@@ -15,6 +15,7 @@ function moldeVazio(listId) {
     freq: "monthly",
     weekday: 1,
     monthday: 25,
+    monthday2: "",
     hour: 8,
     dueInDays: "",
     checklistTexto: "",
@@ -63,6 +64,7 @@ export default function RecurrencesModal({ board, onClose }) {
         freq: form.freq,
         weekday: form.freq === "weekly" ? Number(form.weekday) : null,
         monthday: form.freq === "monthly" ? Number(form.monthday) : null,
+        monthday2: form.freq === "monthly" && form.monthday2 !== "" ? Number(form.monthday2) : null,
         hour: Number(form.hour),
         dueInDays: form.dueInDays === "" ? null : Number(form.dueInDays),
         // Uma linha por item, que é como se escreve uma rotina de cabeça.
@@ -107,6 +109,8 @@ export default function RecurrencesModal({ board, onClose }) {
     if (r.freq === "daily") return t("board.recurrences.everyDay", { hour: r.hour });
     if (r.freq === "weekly")
       return t("board.recurrences.everyWeek", { day: t(`board.recurrences.weekdays.${r.weekday}`), hour: r.hour });
+    if (r.monthday2)
+      return t("board.recurrences.everyMonthTwoDays", { day: r.monthday, day2: r.monthday2, hour: r.hour });
     return t("board.recurrences.everyMonth", { day: r.monthday, hour: r.hour });
   }
 
@@ -235,6 +239,19 @@ export default function RecurrencesModal({ board, onClose }) {
                     />
                   </label>
                 )}
+                {form.freq === "monthly" && (
+                  <label className="recurrence-field">
+                    <span>{t("board.recurrences.fieldMonthday2")}</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="31"
+                      placeholder={t("board.recurrences.noSecondDay")}
+                      value={form.monthday2}
+                      onChange={(e) => set("monthday2", e.target.value)}
+                    />
+                  </label>
+                )}
                 <label className="recurrence-field">
                   <span>{t("board.recurrences.fieldHour")}</span>
                   <input type="number" min="0" max="23" value={form.hour} onChange={(e) => set("hour", e.target.value)} />
@@ -262,7 +279,7 @@ export default function RecurrencesModal({ board, onClose }) {
                 />
               </label>
 
-              {form.freq === "monthly" && Number(form.monthday) > 28 && (
+              {form.freq === "monthly" && (Number(form.monthday) > 28 || Number(form.monthday2) > 28) && (
                 <p className="recurrence-warning">{t("board.recurrences.monthdayWarning")}</p>
               )}
 

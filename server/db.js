@@ -225,6 +225,11 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "lists", "stuck_hours", "stuck_hours INTEGER");
   // Dias até arquivar um concluído. NULL = regra desligada, que é o padrão.
   addColumnIfMissing(companyDb, "boards", "auto_archive_days", "auto_archive_days INTEGER");
+  // Segundo dia do mês opcional para rotina mensal, para a mesma rotina nascer
+  // duas vezes por mês (ex: fechar balancete no dia 5 e no dia 20) sem precisar
+  // de duas regras separadas. NULL = só o dia único de `monthday`, que continua
+  // sendo o caso comum. Mesmo raciocínio não se aplica a `weekday`: ninguém pediu.
+  addColumnIfMissing(companyDb, "recurrences", "monthday2", "monthday2 INTEGER");
   // chat_messages nasceu só com o chat geral; conversation_id chegou depois para
   // separar as conversas privadas sem duplicar a tabela. NULL preserva as mensagens
   // do geral já gravadas antes desta coluna existir.
