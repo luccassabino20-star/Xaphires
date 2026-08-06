@@ -22,6 +22,23 @@ function moldeVazio(listId) {
   };
 }
 
+// Inverso do que salvar() manda para a API: da regra já criada de volta para o
+// formato do formulário (checklist vira texto de novo, campos ausentes caem no
+// mesmo padrão do molde vazio).
+function paraForm(r) {
+  return {
+    title: r.title,
+    listId: r.listId,
+    freq: r.freq,
+    weekday: r.weekday ?? 1,
+    monthday: r.monthday ?? 25,
+    monthday2: r.monthday2 ?? "",
+    hour: r.hour,
+    dueInDays: r.dueInDays ?? "",
+    checklistTexto: r.checklist.map((c) => c.text).join("\n"),
+  };
+}
+
 export default function RecurrencesModal({ board, onClose }) {
   const { t } = useTranslation();
   const showToast = useToast();
@@ -32,6 +49,7 @@ export default function RecurrencesModal({ board, onClose }) {
   const [erro, setErro] = useState(null);
   const [form, setForm] = useState(moldeVazio(board.lists[0]?.id));
   const [criando, setCriando] = useState(false);
+  const [editando, setEditando] = useState(null); // regra sendo editada, ou null
   const [salvando, setSalvando] = useState(false);
 
   async function carregar() {
@@ -54,30 +72,47 @@ export default function RecurrencesModal({ board, onClose }) {
     setForm((f) => ({ ...f, [campo]: valor }));
   }
 
+  function cancelar() {
+    setCriando(false);
+    setEditando(null);
+    setForm(moldeVazio(board.lists[0]?.id));
+  }
+
+  function iniciarEdicao(regra) {
+    setEditando(regra);
+    setCriando(false);
+    setForm(paraForm(regra));
+  }
+
   async function salvar(e) {
     e.preventDefault();
     setSalvando(true);
+    const dados = {
+      title: form.title,
+      listId: form.listId,
+      freq: form.freq,
+      weekday: form.freq === "weekly" ? Number(form.weekday) : null,
+      monthday: form.freq === "monthly" ? Number(form.monthday) : null,
+      monthday2: form.freq === "monthly" && form.monthday2 !== "" ? Number(form.monthday2) : null,
+      hour: Number(form.hour),
+      dueInDays: form.dueInDays === "" ? null : Number(form.dueInDays),
+      // Uma linha por item, que é como se escreve uma rotina de cabeça.
+      checklist: form.checklistTexto
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean)
+        .map((text) => ({ text, done: false })),
+    };
     try {
-      await api.createRecurrence(board.id, {
-        title: form.title,
-        listId: form.listId,
-        freq: form.freq,
-        weekday: form.freq === "weekly" ? Number(form.weekday) : null,
-        monthday: form.freq === "monthly" ? Number(form.monthday) : null,
-        monthday2: form.freq === "monthly" && form.monthday2 !== "" ? Number(form.monthday2) : null,
-        hour: Number(form.hour),
-        dueInDays: form.dueInDays === "" ? null : Number(form.dueInDays),
-        // Uma linha por item, que é como se escreve uma rotina de cabeça.
-        checklist: form.checklistTexto
-          .split("\n")
-          .map((l) => l.trim())
-          .filter(Boolean)
-          .map((text) => ({ text, done: false })),
-      });
-      setForm(moldeVazio(board.lists[0]?.id));
-      setCriando(false);
+      if (editando) {
+        await api.updateRecurrence(editando.id, dados);
+        showToast(t("board.recurrences.updated"));
+      } else {
+        await api.createRecurrence(board.id, dados);
+        showToast(t("board.recurrences.created"));
+      }
+      cancelar();
       await carregar();
-      showToast(t("board.recurrences.created"));
     } catch (err) {
       showToast(translateError(err, t));
     } finally {
@@ -98,6 +133,7 @@ export default function RecurrencesModal({ board, onClose }) {
     if (!confirm(t("board.recurrences.deleteConfirm", { title: regra.title }))) return;
     try {
       await api.deleteRecurrence(regra.id);
+      if (editando?.id === regra.id) cancelar();
       await carregar();
       showToast(t("board.recurrences.deleted"));
     } catch (err) {
@@ -159,6 +195,13 @@ export default function RecurrencesModal({ board, onClose }) {
                     )}
                   </div>
                   <div className="recurrence-item-actions">
+                    <button
+                      className="btn-secondary btn-small"
+                      onClick={() => iniciarEdicao(r)}
+                      disabled={!podeUsar}
+                    >
+                      {t("board.recurrences.edit")}
+                    </button>
                     <button className="btn-secondary btn-small" onClick={() => alternar(r)} disabled={!podeUsar}>
                       {r.active ? t("board.recurrences.pause") : t("board.recurrences.resume")}
                     </button>
@@ -171,14 +214,15 @@ export default function RecurrencesModal({ board, onClose }) {
             </ul>
           )}
 
-          {podeUsar && !criando && (
+          {podeUsar && !criando && !editando && (
             <button className="btn-primary recurrence-new" onClick={() => setCriando(true)}>
               {t("board.recurrences.newRule")}
             </button>
           )}
 
-          {podeUsar && criando && (
+          {podeUsar && (criando || editando) && (
             <form className="recurrence-form" onSubmit={salvar}>
+              {editando && <p className="recurrence-hint">{t("board.recurrences.editingHint", { title: editando.title })}</p>}
               <label className="recurrence-field">
                 <span>{t("board.recurrences.fieldTitle")}</span>
                 <input
@@ -285,9 +329,9 @@ export default function RecurrencesModal({ board, onClose }) {
 
               <div className="recurrence-form-actions">
                 <button type="submit" className="btn-primary btn-small" disabled={salvando}>
-                  {t("board.recurrences.save")}
+                  {editando ? t("board.recurrences.saveEdit") : t("board.recurrences.save")}
                 </button>
-                <button type="button" className="btn-cancel" onClick={() => setCriando(false)}>
+                <button type="button" className="btn-cancel" onClick={cancelar}>
                   {t("common.cancel")}
                 </button>
               </div>
