@@ -27,7 +27,7 @@ function Detalhe({ id, onFechar, onMudou }) {
   const [limiteAnexoMb, setLimiteAnexoMb] = useState("");
   const [salvandoLimites, setSalvandoLimites] = useState(false);
   const [diasTeste, setDiasTeste] = useState("");
-  const [salvandoTeste, setSalvandoTeste] = useState(false);
+  const [salvandoTeste, setSalvandoTeste] = useState(null); // 1, -1 ou null
 
   const carregar = useCallback(async () => {
     try {
@@ -115,22 +115,25 @@ function Detalhe({ id, onFechar, onMudou }) {
     }
   }
 
-  async function prorrogarTeste() {
+  // sinal: 1 prorroga, -1 encurta. O campo sempre recebe um número positivo de
+  // dias - é o botão que decide a direção, para não depender de quem usa
+  // lembrar de digitar o sinal de menos.
+  async function ajustarTeste(sinal) {
     const dias = parseInt(diasTeste, 10);
     if (!Number.isInteger(dias) || dias <= 0) {
       setErro("Quantidade de dias inválida");
       return;
     }
-    setSalvandoTeste(true);
+    setSalvandoTeste(sinal);
     try {
-      await api.prorrogarTeste(id, dias);
+      await api.prorrogarTeste(id, dias * sinal);
       setDiasTeste("");
       await carregar();
       onMudou?.();
     } catch (e) {
       setErro(e.message);
     } finally {
-      setSalvandoTeste(false);
+      setSalvandoTeste(null);
     }
   }
 
@@ -270,7 +273,7 @@ function Detalhe({ id, onFechar, onMudou }) {
 
         <div className="adm-grade2" style={{ marginTop: 14 }}>
           <label className="adm-campo">
-            <span>Prorrogar teste (dias)</span>
+            <span>Dias de teste</span>
             <input
               type="text"
               inputMode="numeric"
@@ -281,12 +284,18 @@ function Detalhe({ id, onFechar, onMudou }) {
           </label>
         </div>
         <p className="adm-fraco">
-          Soma dias ao vencimento atual (ou começa a contar de hoje, se já tiver vencido) e garante que a empresa
-          volte a aparecer como "Em teste" em vez de assinatura paga sem cobrança.
+          Prorrogar soma dias ao vencimento atual (ou começa a contar de hoje, se já tiver vencido). Encurtar sempre
+          parte do vencimento atual, e pode até levá-lo para o passado, vencendo o teste na hora. Os dois garantem que
+          a empresa apareça como "Em teste" em vez de assinatura paga sem cobrança.
         </p>
-        <button className="adm-btn adm-btn-primario" onClick={prorrogarTeste} disabled={salvandoTeste}>
-          {salvandoTeste ? "Salvando..." : "Prorrogar teste"}
-        </button>
+        <div className="adm-botoes">
+          <button className="adm-btn adm-btn-primario" onClick={() => ajustarTeste(1)} disabled={salvandoTeste !== null}>
+            {salvandoTeste === 1 ? "Salvando..." : "Prorrogar teste"}
+          </button>
+          <button className="adm-btn adm-btn-perigo" onClick={() => ajustarTeste(-1)} disabled={salvandoTeste !== null}>
+            {salvandoTeste === -1 ? "Salvando..." : "Encurtar teste"}
+          </button>
+        </div>
 
         <p className="adm-fraco" style={{ marginTop: 14 }}>
           Desconto mensal fixo, negociado por fora, por plano - não segue a empresa se ela trocar de plano depois.

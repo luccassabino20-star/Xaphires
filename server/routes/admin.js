@@ -242,26 +242,43 @@ router.post(
   })
 );
 
-// Prorroga o teste gratuito. A base é o maior entre "agora" e o vencimento atual -
-// teste ainda em andamento soma dias ao que resta, teste já vencido recomeça a
-// contar de hoje, em vez de ganhar dias que já passaram. Sempre volta o status para
-// "trialing" (mesmo que a empresa já tivesse caído para "expired"), porque é isso
-// que faz effectiveStatus tratar o novo prazo como teste, não como assinatura paga
-// grátis - a tela do cliente e o catálogo de planos dependem dessa distinção.
+// Prorroga (days > 0) ou encurta (days < 0) o teste gratuito. As duas direções
+// escolhem a base de forma diferente, de propósito:
+// - Prorrogar soma ao maior entre "agora" e o vencimento atual, para teste
+//   ainda em andamento somar ao que resta, e teste já vencido recomeçar a
+//   contar de hoje em vez de ganhar de volta dias que já passaram.
+// - Encurtar sempre parte do vencimento atual, nunca de "agora": não existe
+//   "tempo já perdido" para descontar em cima, é o prazo combinado que fica
+//   menor. Por isso exige que a empresa já tenha um vencimento cadastrado -
+//   sem isso não há o que encurtar.
+// Sempre volta o status para "trialing" (mesmo que a empresa já tivesse caído
+// para "expired"), porque é isso que faz effectiveStatus tratar o novo prazo
+// como teste, não como assinatura paga grátis - a tela do cliente e o
+// catálogo de planos dependem dessa distinção, mesmo quando o resultado do
+// encurtamento cai no passado (a empresa só passa a ler o effectiveStatus
+// como "expired" pela data, não porque o status gravado mudou).
 router.post(
   "/companies/:id/extend-trial",
   ah(async (req, res) => {
     const e = store.acharEmpresa(req.params.id);
     if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
     const { days } = req.body || {};
-    if (!Number.isInteger(days) || days <= 0) {
+    if (!Number.isInteger(days) || days === 0) {
       return res.status(400).json({ error: "Quantidade de dias inválida", code: "INVALID_DAYS" });
     }
-    const agora = new Date();
-    const baseAtual = e.expires_at && new Date(e.expires_at) > agora ? new Date(e.expires_at) : agora;
-    const novoVencimento = new Date(baseAtual.getTime() + days * 86400000).toISOString();
+    let base;
+    if (days > 0) {
+      const agora = new Date();
+      base = e.expires_at && new Date(e.expires_at) > agora ? new Date(e.expires_at) : agora;
+    } else {
+      if (!e.expires_at) {
+        return res.status(400).json({ error: "Empresa sem prazo de teste para encurtar", code: "NO_TRIAL_TO_SHORTEN" });
+      }
+      base = new Date(e.expires_at);
+    }
+    const novoVencimento = new Date(base.getTime() + days * 86400000).toISOString();
     const atualizada = dir.setCompanyPlan(req.params.id, { status: "trialing", expiresAt: novoVencimento });
-    auditar(req, "prorrogar_teste", {
+    auditar(req, days > 0 ? "prorrogar_teste" : "encurtar_teste", {
       companyId: e.id,
       alvo: e.name,
       detalhe: { dias: days, de: e.expires_at, para: novoVencimento },
