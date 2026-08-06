@@ -113,7 +113,8 @@ function visaoEmpresa(e) {
     contactPhone: e.contact_phone,
     doc: e.doc,
     notes: e.notes,
-    discountCents: e.discount_cents || 0,
+    // planId -> centavos, só planos com desconto negociado aparecem como chave.
+    discounts: dir.getCompanyPlanDiscounts(e),
   };
 }
 
@@ -212,23 +213,30 @@ router.post(
   })
 );
 
-// Desconto fixo negociado por fora, aplicado em toda cobrança futura (ver
-// emitirCobranca em billing/lifecycle.js). Zerar manda discountCents: 0, não
-// omitir o campo - omitir seria "não mexer", zerar é "remover o desconto".
+// Desconto negociado por fora, por plano (ver emitirCobranca em
+// billing/lifecycle.js) - o mesmo desconto não acompanha a empresa se ela
+// trocar de plano depois. Zerar manda discountCents: 0, não omitir o campo -
+// omitir seria "não mexer", zerar é "remover o desconto deste plano". Só
+// aceita plano pago com preço de tabela: sem tabela (Empresarial, sob
+// consulta) não há o que descontar, e o Básico é sempre grátis.
 router.post(
   "/companies/:id/discount",
   ah(async (req, res) => {
     const e = store.acharEmpresa(req.params.id);
     if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
-    const { discountCents } = req.body || {};
+    const { plan, discountCents } = req.body || {};
+    const alvo = PLAN_IDS.includes(plan) ? getPlan(plan) : null;
+    if (!alvo || !alvo.paid || alvo.priceCents === null) {
+      return res.status(400).json({ error: "Plano inválido para desconto", code: "INVALID_PLAN" });
+    }
     if (!Number.isInteger(discountCents) || discountCents < 0) {
       return res.status(400).json({ error: "Desconto inválido", code: "INVALID_DISCOUNT" });
     }
-    const atualizada = dir.setCompanyDiscount(req.params.id, discountCents);
+    const atualizada = dir.setCompanyPlanDiscount(req.params.id, plan, discountCents);
     auditar(req, "definir_desconto", {
       companyId: e.id,
       alvo: e.name,
-      detalhe: { de: e.discount_cents || 0, para: discountCents },
+      detalhe: { plan, de: dir.getCompanyPlanDiscounts(e)[plan] || 0, para: discountCents },
     });
     res.json({ company: visaoEmpresa(atualizada) });
   })

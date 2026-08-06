@@ -3,6 +3,9 @@ import * as api from "./api.js";
 
 const PLANOS = ["basic", "intermediate", "professional", "enterprise"];
 const NOMES = { basic: "Básico", intermediate: "Intermediário", professional: "Profissional", enterprise: "Empresarial" };
+// Só planos pagos com preço de tabela levam desconto - Básico já é grátis, e
+// Empresarial é sob consulta, sem valor de tabela para descontar em cima.
+const PLANOS_COM_DESCONTO = ["intermediate", "professional"];
 const SITUACAO = { active: "Ativa", trialing: "Em teste", grace: "Pagamento em aberto", expired: "Vencida", blocked: "Bloqueada" };
 
 function data(iso) {
@@ -18,8 +21,8 @@ function Detalhe({ id, onFechar, onMudou }) {
   const [quadros, setQuadros] = useState(null);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState(null);
-  const [desconto, setDesconto] = useState("");
-  const [salvandoDesconto, setSalvandoDesconto] = useState(false);
+  const [descontos, setDescontos] = useState({});
+  const [salvandoDesconto, setSalvandoDesconto] = useState(null); // planId em salvamento, ou null
   const [limiteUsuarios, setLimiteUsuarios] = useState("");
   const [limiteAnexoMb, setLimiteAnexoMb] = useState("");
   const [salvandoLimites, setSalvandoLimites] = useState(false);
@@ -39,8 +42,13 @@ function Detalhe({ id, onFechar, onMudou }) {
         notes: d.company.notes || "",
       });
       // Centavos -> reais só para exibir; a conversão de volta é feita ao salvar,
-      // igual ao padrão de plans.js (nunca soma/subtrai o decimal).
-      setDesconto(d.company.discountCents ? String(d.company.discountCents / 100) : "");
+      // igual ao padrão de plans.js (nunca soma/subtrai o decimal). Um campo por
+      // plano com desconto negociado; plano sem chave em discounts fica vazio.
+      setDescontos(
+        Object.fromEntries(
+          PLANOS_COM_DESCONTO.map((p) => [p, d.company.discounts?.[p] ? String(d.company.discounts[p] / 100) : ""])
+        )
+      );
       setLimiteUsuarios(d.company.maxUsersOverride != null ? String(d.company.maxUsersOverride) : "");
       setLimiteAnexoMb(
         d.company.maxAttachmentBytesOverride != null ? String(Math.round(d.company.maxAttachmentBytesOverride / (1024 * 1024))) : ""
@@ -67,21 +75,21 @@ function Detalhe({ id, onFechar, onMudou }) {
     }
   }
 
-  async function salvarDesconto() {
-    const reais = parseFloat((desconto || "0").replace(",", "."));
+  async function salvarDesconto(plano) {
+    const reais = parseFloat((descontos[plano] || "0").replace(",", "."));
     if (Number.isNaN(reais) || reais < 0) {
       setErro("Desconto inválido");
       return;
     }
-    setSalvandoDesconto(true);
+    setSalvandoDesconto(plano);
     try {
-      await api.definirDesconto(id, Math.round(reais * 100));
+      await api.definirDesconto(id, plano, Math.round(reais * 100));
       await carregar();
       onMudou?.();
     } catch (e) {
       setErro(e.message);
     } finally {
-      setSalvandoDesconto(false);
+      setSalvandoDesconto(null);
     }
   }
 
@@ -280,25 +288,32 @@ function Detalhe({ id, onFechar, onMudou }) {
           {salvandoTeste ? "Salvando..." : "Prorrogar teste"}
         </button>
 
-        <div className="adm-grade2" style={{ marginTop: 14 }}>
-          <label className="adm-campo">
-            <span>Desconto fixo mensal (R$)</span>
-            <input
-              type="text"
-              inputMode="decimal"
-              placeholder="0,00"
-              value={desconto}
-              onChange={(e) => setDesconto(e.target.value)}
-            />
-          </label>
-        </div>
-        <p className="adm-fraco">
+        <p className="adm-fraco" style={{ marginTop: 14 }}>
+          Desconto mensal fixo, negociado por fora, por plano - não segue a empresa se ela trocar de plano depois.
           Aplicado como desconto do Asaas em cima do preço de tabela em toda cobrança futura (Pix e boleto). Zerar
-          remove o desconto.
+          remove o desconto daquele plano.
         </p>
-        <button className="adm-btn adm-btn-primario" onClick={salvarDesconto} disabled={salvandoDesconto}>
-          {salvandoDesconto ? "Salvando..." : "Salvar desconto"}
-        </button>
+        {PLANOS_COM_DESCONTO.map((p) => (
+          <div className="adm-grade2" key={p} style={{ marginTop: 8, alignItems: "end" }}>
+            <label className="adm-campo">
+              <span>Desconto no {NOMES[p]} (R$)</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                placeholder="0,00"
+                value={descontos[p] || ""}
+                onChange={(e) => setDescontos({ ...descontos, [p]: e.target.value })}
+              />
+            </label>
+            <button
+              className="adm-btn adm-btn-primario"
+              onClick={() => salvarDesconto(p)}
+              disabled={salvandoDesconto !== null}
+            >
+              {salvandoDesconto === p ? "Salvando..." : "Salvar"}
+            </button>
+          </div>
+        ))}
       </div>
 
       <div className="adm-secao">

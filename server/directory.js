@@ -55,6 +55,29 @@ addColumnIfMissing("companies", "cnpj", "cnpj TEXT");
 // Vai como discount na cobrança do Asaas (dueDateLimitDays: 0, ver providers/asaas.js),
 // então o boleto/Pix mostra o valor cheio com o desconto aplicado, não escondido.
 addColumnIfMissing("companies", "discount_cents", "discount_cents INTEGER NOT NULL DEFAULT 0");
+// Substitui discount_cents por um desconto independente por plano: o combinado
+// com o cliente costuma ser "paga X a menos no Profissional", não um valor que
+// deveria seguir valendo do mesmo jeito se a empresa mudasse para o
+// Intermediário. JSON em vez de uma tabela própria porque só existem dois
+// planos com preço de tabela para descontar (Intermediário e Profissional; o
+// Empresarial é sob consulta, sem preço para subtrair) - registro comprido
+// demais para uma tabela à parte. Guarda só planId -> centavos, sem chave
+// zerada (ver setCompanyPlanDiscount). discount_cents fica no schema sem uso
+// novo, só para não quebrar quem ainda tiver essa coluna preenchida.
+addColumnIfMissing("companies", "discount_by_plan", "discount_by_plan TEXT");
+// Backfill uma vez só: quem já tinha desconto fixo herda ele como desconto do
+// próprio plano atual, para a migração não zerar combinado de cliente
+// existente. Roda sempre, mas só pega linha ainda não migrada (discount_by_plan
+// IS NULL) - a segunda execução não reencontra nada porque a primeira já
+// preencheu, mesmo padrão do backfill de completed_at/list_entered_at.
+for (const c of directoryDb
+  .prepare("SELECT id, plan, discount_cents FROM companies WHERE discount_by_plan IS NULL AND discount_cents > 0")
+  .all()) {
+  directoryDb
+    .prepare("UPDATE companies SET discount_by_plan = ? WHERE id = ?")
+    .run(JSON.stringify({ [c.plan]: c.discount_cents }), c.id);
+}
+directoryDb.exec("UPDATE companies SET discount_by_plan = '{}' WHERE discount_by_plan IS NULL");
 // Exceções numéricas por empresa, por fora do que o plano dela dá direito (ver
 // maxUsersFor/attachmentLimitFor em plans.js). NULL = sem exceção, usa o teto do
 // plano normalmente. Não existe valor para "ilimitado por override" de propósito:
@@ -131,8 +154,28 @@ export function setCompanyCnpj(id, cnpj) {
   return getCompany(id);
 }
 
-export function setCompanyDiscount(id, discountCents) {
-  directoryDb.prepare("UPDATE companies SET discount_cents = ? WHERE id = ?").run(Math.max(0, discountCents || 0), id);
+// { planId: centavos }, sem chave para plano sem desconto. Aceita tanto a linha
+// crua da empresa (discount_by_plan ainda string) quanto undefined/null, para
+// quem só tem o id poder chamar sem reconsultar primeiro.
+export function getCompanyPlanDiscounts(company) {
+  if (!company?.discount_by_plan) return {};
+  try {
+    return JSON.parse(company.discount_by_plan);
+  } catch {
+    return {};
+  }
+}
+
+// Zerar (discountCents <= 0) remove a chave em vez de gravar 0 - "sem desconto
+// neste plano" e "chave ausente" precisam significar a mesma coisa, senão um
+// desconto zerado por engano fica living no JSON para sempre sem efeito
+// nenhum, só ruído.
+export function setCompanyPlanDiscount(id, planId, discountCents) {
+  const atual = getCompanyPlanDiscounts(getCompany(id));
+  const novo = { ...atual };
+  if (discountCents > 0) novo[planId] = discountCents;
+  else delete novo[planId];
+  directoryDb.prepare("UPDATE companies SET discount_by_plan = ? WHERE id = ?").run(JSON.stringify(novo), id);
   return getCompany(id);
 }
 

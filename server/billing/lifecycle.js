@@ -12,7 +12,7 @@
 //    vezes o mesmo ciclo nem emitir um Pix por acesso.
 
 import crypto from "node:crypto";
-import { getCompany, setCompanyPlan, setCompanyGrace } from "../directory.js";
+import { getCompany, setCompanyPlan, setCompanyGrace, getCompanyPlanDiscounts } from "../directory.js";
 import { getPlan, priceCentsOf, addOneMonth, effectiveStatus } from "../plans.js";
 import { gateway, metodoTemDebitoAutomatico, metodoRenovaSozinho } from "./gateway.js";
 import * as store from "./store.js";
@@ -131,13 +131,14 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
     err.code = "PLAN_NOT_CHARGEABLE";
     throw err;
   }
-  // Desconto fixo negociado por fora (companies.discount_cents, ver directory.js).
+  // Desconto negociado por fora, por plano (companies.discount_by_plan, ver
+  // directory.js) - o mesmo desconto não segue a empresa se ela mudar de plano.
   // Vai como discount na cobrança do Asaas em cima do preço de tabela, não
   // subtraído aqui - o boleto/Pix precisa mostrar os dois valores, não só o líquido.
   // O que esta função registra localmente em amountCents É o líquido, porque é o
   // que a empresa de fato paga; o preço de tabela sem desconto some deste ponto em
   // diante e só existe para o gateway montar o documento.
-  const descontoCentavos = Math.min(getCompany(companyId)?.discount_cents || 0, centavos);
+  const descontoCentavos = Math.min(getCompanyPlanDiscounts(getCompany(companyId))[plan] || 0, centavos);
   const centavosLiquidos = centavos - descontoCentavos;
 
   const inicio = periodStart || nowIso();

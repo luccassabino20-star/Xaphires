@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth, requireMaster } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
-import { getCompany, setCompanyPlan } from "../directory.js";
+import { getCompany, setCompanyPlan, getCompanyPlanDiscounts } from "../directory.js";
 import { countUsers, countBoards } from "../repo.js";
 import {
   PLANS,
@@ -28,11 +28,13 @@ router.use(requireAuth);
 // (priceCents null, hoje só o Empresarial) não desconta nada, porque não há
 // tabela para descontar em cima. Mesma trava de emitirCobranca em
 // billing/lifecycle.js, para o valor mostrado aqui nunca destoar do que a
-// cobrança de verdade vai cobrar.
-function precoComDesconto(planId, discountCents) {
+// cobrança de verdade vai cobrar. `discounts` é o mapa planId -> centavos
+// (getCompanyPlanDiscounts) - cada plano tem o próprio valor negociado, não
+// um desconto único que segue a empresa de plano em plano.
+function precoComDesconto(planId, discounts) {
   const centavos = PLANS[planId].priceCents;
   if (centavos === null) return null;
-  return (centavos - Math.min(discountCents, centavos)) / 100;
+  return (centavos - Math.min(discounts[planId] || 0, centavos)) / 100;
 }
 
 function resumo(companyId) {
@@ -42,7 +44,7 @@ function resumo(companyId) {
   const maxUsers = maxUsersFor(company);
   const quadros = countBoards();
   const maxBoards = maxBoardsFor(company);
-  const discountCents = company?.discount_cents || 0;
+  const discounts = getCompanyPlanDiscounts(company);
   return {
     plan: company?.plan || "basic",
     status: effectiveStatus(company),
@@ -51,9 +53,12 @@ function resumo(companyId) {
     daysLeft: daysLeft(company),
     // price já vem líquido de desconto - é o que a empresa paga de fato. listPrice
     // é o valor de tabela, sem desconto, só para a tela poder mostrar os dois.
-    price: precoComDesconto(company?.plan || "basic", discountCents),
+    // discountCents aqui é o desconto do plano ATUAL - se a empresa mudar de
+    // plano, o valor mostrado muda para o desconto negociado naquele outro
+    // plano (ou 0, se nenhum foi combinado nele).
+    price: precoComDesconto(company?.plan || "basic", discounts),
     listPrice: plano.price,
-    discountCents,
+    discountCents: discounts[company?.plan || "basic"] || 0,
     userCount: usuarios,
     maxUsers,
     canAddUser: maxUsers === null || usuarios < maxUsers,
@@ -72,7 +77,7 @@ function resumo(companyId) {
     // checkout mostrarem o valor que será cobrado de verdade.
     catalog: PLAN_IDS.map((id) => ({
       id,
-      price: precoComDesconto(id, discountCents),
+      price: precoComDesconto(id, discounts),
       listPrice: PLANS[id].price,
       maxUsers: PLANS[id].maxUsers,
       paid: PLANS[id].paid,
