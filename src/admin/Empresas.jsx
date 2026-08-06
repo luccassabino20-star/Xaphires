@@ -23,6 +23,8 @@ function Detalhe({ id, onFechar, onMudou }) {
   const [limiteUsuarios, setLimiteUsuarios] = useState("");
   const [limiteAnexoMb, setLimiteAnexoMb] = useState("");
   const [salvandoLimites, setSalvandoLimites] = useState(false);
+  const [diasTeste, setDiasTeste] = useState("");
+  const [salvandoTeste, setSalvandoTeste] = useState(false);
 
   const carregar = useCallback(async () => {
     try {
@@ -105,6 +107,25 @@ function Detalhe({ id, onFechar, onMudou }) {
     }
   }
 
+  async function prorrogarTeste() {
+    const dias = parseInt(diasTeste, 10);
+    if (!Number.isInteger(dias) || dias <= 0) {
+      setErro("Quantidade de dias inválida");
+      return;
+    }
+    setSalvandoTeste(true);
+    try {
+      await api.prorrogarTeste(id, dias);
+      setDiasTeste("");
+      await carregar();
+      onMudou?.();
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setSalvandoTeste(false);
+    }
+  }
+
   async function trocarPlano(plano) {
     if (!confirm(`Definir o plano ${NOMES[plano]} para esta empresa? Isso não passa por cobrança.`)) return;
     try {
@@ -146,6 +167,17 @@ function Detalhe({ id, onFechar, onMudou }) {
     if (!confirm(`Tornar ${usuario.name} ${novo === "master" ? "master" : "membro"} desta empresa?`)) return;
     try {
       await api.definirPapel(id, usuario.id, novo);
+      await carregar();
+    } catch (e) {
+      setErro(e.message);
+    }
+  }
+
+  async function corrigirEmail(usuario) {
+    const novo = prompt(`Novo e-mail de login para ${usuario.name}:`, usuario.email);
+    if (novo === null || !novo.trim() || novo.trim().toLowerCase() === usuario.email.toLowerCase()) return;
+    try {
+      await api.definirEmailUsuario(id, usuario.id, novo.trim());
       await carregar();
     } catch (e) {
       setErro(e.message);
@@ -230,6 +262,26 @@ function Detalhe({ id, onFechar, onMudou }) {
 
         <div className="adm-grade2" style={{ marginTop: 14 }}>
           <label className="adm-campo">
+            <span>Prorrogar teste (dias)</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="ex: 7"
+              value={diasTeste}
+              onChange={(e) => setDiasTeste(e.target.value)}
+            />
+          </label>
+        </div>
+        <p className="adm-fraco">
+          Soma dias ao vencimento atual (ou começa a contar de hoje, se já tiver vencido) e garante que a empresa
+          volte a aparecer como "Em teste" em vez de assinatura paga sem cobrança.
+        </p>
+        <button className="adm-btn adm-btn-primario" onClick={prorrogarTeste} disabled={salvandoTeste}>
+          {salvandoTeste ? "Salvando..." : "Prorrogar teste"}
+        </button>
+
+        <div className="adm-grade2" style={{ marginTop: 14 }}>
+          <label className="adm-campo">
             <span>Desconto fixo mensal (R$)</span>
             <input
               type="text"
@@ -295,6 +347,9 @@ function Detalhe({ id, onFechar, onMudou }) {
                   <span className={"adm-chip" + (u.role === "master" ? " adm-chip-master" : "")}>{u.role}</span>
                 </td>
                 <td className="adm-direita">
+                  <button className="adm-btn adm-btn-fantasma" onClick={() => corrigirEmail(u)}>
+                    Editar e-mail
+                  </button>
                   <button className="adm-btn adm-btn-fantasma" onClick={() => trocarPapel(u)}>
                     {u.role === "master" ? "Tornar membro" : "Tornar master"}
                   </button>

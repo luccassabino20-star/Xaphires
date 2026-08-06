@@ -78,10 +78,13 @@ export const bloquear = (id, blocked, reason) => req(`/companies/${id}/block`, {
 export const definirDesconto = (id, discountCents) => req(`/companies/${id}/discount`, { method: "POST", body: { discountCents } });
 export const definirLimites = (id, maxUsersOverride, maxAttachmentBytesOverride) =>
   req(`/companies/${id}/limits`, { method: "POST", body: { maxUsersOverride, maxAttachmentBytesOverride } });
+export const prorrogarTeste = (id, days) => req(`/companies/${id}/extend-trial`, { method: "POST", body: { days } });
 
 export const verQuadros = (id) => req(`/companies/${id}/boards`);
 export const alterarCartao = (id, cardId, patch) => req(`/companies/${id}/cards/${cardId}`, { method: "PATCH", body: patch });
 export const definirPapel = (id, userId, role) => req(`/companies/${id}/users/${userId}/role`, { method: "POST", body: { role } });
+export const definirEmailUsuario = (id, userId, email) =>
+  req(`/companies/${id}/users/${userId}/email`, { method: "POST", body: { email } });
 
 export const metricas = () => req("/metrics");
 export const auditoria = (params = {}) => {

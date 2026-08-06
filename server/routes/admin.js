@@ -234,6 +234,34 @@ router.post(
   })
 );
 
+// Prorroga o teste gratuito. A base é o maior entre "agora" e o vencimento atual -
+// teste ainda em andamento soma dias ao que resta, teste já vencido recomeça a
+// contar de hoje, em vez de ganhar dias que já passaram. Sempre volta o status para
+// "trialing" (mesmo que a empresa já tivesse caído para "expired"), porque é isso
+// que faz effectiveStatus tratar o novo prazo como teste, não como assinatura paga
+// grátis - a tela do cliente e o catálogo de planos dependem dessa distinção.
+router.post(
+  "/companies/:id/extend-trial",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    const { days } = req.body || {};
+    if (!Number.isInteger(days) || days <= 0) {
+      return res.status(400).json({ error: "Quantidade de dias inválida", code: "INVALID_DAYS" });
+    }
+    const agora = new Date();
+    const baseAtual = e.expires_at && new Date(e.expires_at) > agora ? new Date(e.expires_at) : agora;
+    const novoVencimento = new Date(baseAtual.getTime() + days * 86400000).toISOString();
+    const atualizada = dir.setCompanyPlan(req.params.id, { status: "trialing", expiresAt: novoVencimento });
+    auditar(req, "prorrogar_teste", {
+      companyId: e.id,
+      alvo: e.name,
+      detalhe: { dias: days, de: e.expires_at, para: novoVencimento },
+    });
+    res.json({ company: visaoEmpresa(atualizada) });
+  })
+);
+
 // Exceções numéricas por empresa (ver o comentário na coluna, em directory.js).
 // Campo vazio no corpo (null) limpa a exceção; número fixa um teto específico.
 // Sem suporte a "ilimitado por exceção" de propósito - quem precisa disso muda
@@ -340,6 +368,44 @@ router.post(
     );
     if (!atualizado) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
     res.json({ user: atualizado });
+  })
+);
+
+// Corrige o e-mail de login de um usuário a pedido do cliente (perdeu acesso ao
+// e-mail antigo, digitou errado no cadastro etc.). Mesma dupla escrita que a troca
+// de e-mail feita pelo próprio master em routes/users.js: banco da empresa e
+// diretório global precisam mudar juntos, senão o login para de achar a empresa
+// certa. A checagem de conflito e a busca do usuário moram dentro do mesmo acesso
+// à empresa, e não antes dele, porque só lá dentro dá para comparar com o e-mail
+// atual do alvo - devolve um marcador em vez de lançar erro porque o handler de
+// erro genérico do app não lê err.status/err.code, só devolve 500 para tudo.
+router.post(
+  "/companies/:id/users/:userId/email",
+  ah(async (req, res) => {
+    const novoEmail = req.body?.email?.trim().toLowerCase();
+    if (!novoEmail || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(novoEmail)) {
+      return res.status(400).json({ error: "E-mail inválido", code: "EMAIL_INVALID" });
+    }
+    const resultado = await comAcessoAEmpresa(
+      req,
+      req.params.id,
+      "corrigir_email_usuario",
+      async () => {
+        const alvo = await repo.getUserById(req.params.userId);
+        if (!alvo) return null;
+        const emailAntigo = alvo.email.toLowerCase();
+        if (novoEmail !== emailAntigo && dir.getCompanyIdForEmail(novoEmail)) {
+          return { conflito: true };
+        }
+        const atualizado = repo.publicUser(await repo.updateUser(req.params.userId, { email: novoEmail }));
+        if (novoEmail !== emailAntigo) dir.updateUserDirectoryEmail(alvo.email, novoEmail);
+        return atualizado;
+      },
+      { alvo: req.params.userId, detalhe: { para: novoEmail } }
+    );
+    if (!resultado) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
+    if (resultado.conflito) return res.status(409).json({ error: "E-mail já em uso", code: "EMAIL_IN_USE" });
+    res.json({ user: resultado });
   })
 );
 
