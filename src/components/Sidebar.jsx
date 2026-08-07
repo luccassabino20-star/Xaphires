@@ -102,9 +102,9 @@ function RailItem({ icon, label, active, onClick, title }) {
 
 // Uma linha de atalho no painel branco (Caixa de entrada, Respostas...) -
 // mesmo espírito do RailItem: sem onClick, é só a referência visual.
-function ShortcutRow({ icon, label, badge, onClick }) {
+function ShortcutRow({ icon, label, badge, onClick, title }) {
   return (
-    <button type="button" className="dsb-shortcut-row" onClick={onClick} disabled={!onClick}>
+    <button type="button" className="dsb-shortcut-row" onClick={onClick} disabled={!onClick} title={title}>
       <span className="dsb-shortcut-icon">{icon}</span>
       <span className="dsb-shortcut-label">{label}</span>
       {badge != null && <span className="dsb-badge-pink">{badge}</span>}
@@ -396,18 +396,23 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
 
         <div className="dsb-shortcuts">
           {/* Caixa de entrada abre o mesmo chat da empresa (useChat) - "Reuniões"
-              continua sem função (ver decisão da conversa). "Mais" saiu daqui: virou
-              redundante depois que Monitor de gargalos/Rotinas automáticas/Cartões
-              arquivados foram para o "Mais" do rail escuro, que já era funcional
-              (idioma/tema/painel da plataforma). O modal do chat continua montado
-              só pela TopBar. */}
+              continua sem função (ver decisão da conversa), com title="Em breve"
+              como os placeholders do rail. "Mais" saiu daqui: virou redundante
+              depois que Monitor de gargalos/Rotinas automáticas/Cartões arquivados
+              foram para o "Mais" do rail escuro, que já era funcional (idioma/
+              tema/painel da plataforma). O modal do chat continua montado só pela
+              TopBar. */}
           <ShortcutRow
             icon={<IconInbox size={15} />}
             label={t("app.sidebar.shortcuts.inbox")}
             badge={totalUnread > 0 ? (totalUnread > 9 ? "9+" : totalUnread) : null}
             onClick={openChat}
           />
-          <ShortcutRow icon={<IconVideo size={15} />} label={t("app.sidebar.shortcuts.meetings")} />
+          <ShortcutRow
+            icon={<IconVideo size={15} />}
+            label={t("app.sidebar.shortcuts.meetings")}
+            title={t("app.sidebar.comingSoon")}
+          />
           {/* Real: lista da mesma agenda pessoal do Planejador (PersonalPlanner),
               só que aberta direto na aba de lista em vez da de calendário. */}
           <ShortcutRow
