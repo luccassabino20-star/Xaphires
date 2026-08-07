@@ -67,9 +67,6 @@ function IconVideo(p) {
 function IconCheckCircle(p) {
   return <Svg {...p} d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.2 14.4-4.2-4.2 1.4-1.4 2.8 2.8 5.8-5.8 1.4 1.4z" />;
 }
-function IconDots(p) {
-  return <Svg {...p} d="M6 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />;
-}
 function IconChevronDown(p) {
   return <Svg {...p} d="M6.7 8.3 5.3 9.7l6.7 6.7 6.7-6.7-1.4-1.4L12 13.6z" />;
 }
@@ -398,10 +395,12 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
         </div>
 
         <div className="dsb-shortcuts">
-          {/* Caixa de entrada abre o mesmo chat da empresa (useChat) - "Reuniões" e
-              "Mais" continuam sem função aqui (ver decisão da conversa): Monitor de
-              gargalos/Rotinas automáticas/Cartões arquivados foram para o "Mais" do
-              rail escuro, não este. O modal do chat continua montado só pela TopBar. */}
+          {/* Caixa de entrada abre o mesmo chat da empresa (useChat) - "Reuniões"
+              continua sem função (ver decisão da conversa). "Mais" saiu daqui: virou
+              redundante depois que Monitor de gargalos/Rotinas automáticas/Cartões
+              arquivados foram para o "Mais" do rail escuro, que já era funcional
+              (idioma/tema/painel da plataforma). O modal do chat continua montado
+              só pela TopBar. */}
           <ShortcutRow
             icon={<IconInbox size={15} />}
             label={t("app.sidebar.shortcuts.inbox")}
@@ -416,7 +415,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
             label={t("app.sidebar.shortcuts.myTasks")}
             onClick={() => setPlannerTab("list")}
           />
-          <ShortcutRow icon={<IconDots size={15} />} label={t("app.sidebar.rail.more")} />
         </div>
 
         <div className="dsb-divider" />
