@@ -88,9 +88,15 @@ function IconLock(p) {
 // Uma linha do rail primário. `active`/`onClick` reais quando a seção existe
 // de verdade no Xaphires; sem onClick é decoração da referência do ClickUp
 // (ver decisão registrada na conversa) - fica no visual, não faz nada.
-function RailItem({ icon, label, active, onClick }) {
+function RailItem({ icon, label, active, onClick, title }) {
   return (
-    <button type="button" className={"dsb-rail-item" + (active ? " active" : "")} onClick={onClick} disabled={!onClick}>
+    <button
+      type="button"
+      className={"dsb-rail-item" + (active ? " active" : "")}
+      onClick={onClick}
+      disabled={!onClick}
+      title={title}
+    >
       <span className="dsb-rail-item-icon">{icon}</span>
       <span className="dsb-rail-item-label">{label}</span>
     </button>
@@ -323,13 +329,14 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
           {/* PLACEHOLDER: IA/Painéis/Quadros/Mais não têm tela nem dado por
               trás no Xaphires hoje - ver decisão registrada na conversa
               ("visual completo, com placeholders"). Ficam sem onClick de
-              propósito. Planejador é real: agenda pessoal (ver
+              propósito, com title="Em breve" pra quem passar o mouse não
+              achar que é bug. Planejador é real: agenda pessoal (ver
               PersonalPlanner.jsx), fora de qualquer quadro. */}
           <RailItem icon={<IconCalendar />} label={t("app.sidebar.rail.planner")} onClick={() => setPlannerTab("calendar")} />
-          <RailItem icon={<IconSparkle />} label={t("app.sidebar.rail.ai")} />
+          <RailItem icon={<IconSparkle />} label={t("app.sidebar.rail.ai")} title={t("app.sidebar.comingSoon")} />
           <RailItem icon={<IconUsers />} label={t("app.sidebar.rail.team")} onClick={() => setTeamPanelOpen(true)} />
-          <RailItem icon={<IconChart />} label={t("app.sidebar.rail.dashboards")} />
-          <RailItem icon={<IconGrid />} label={t("app.sidebar.rail.boards")} />
+          <RailItem icon={<IconChart />} label={t("app.sidebar.rail.dashboards")} title={t("app.sidebar.comingSoon")} />
+          <RailItem icon={<IconGrid />} label={t("app.sidebar.rail.boards")} title={t("app.sidebar.comingSoon")} />
           {/* Real: abre o flyout com idioma/tema (e, para quem administra a
               plataforma, o painel de administração) - ver moreOpen acima.
               Não é mais placeholder. */}

@@ -314,6 +314,7 @@
     "loadingBoards": "Cargando tableros...",
     "noBoards": "Sin tableros. Crea uno en la barra lateral.",
     "sidebar": {
+      "comingSoon": "Próximamente",
       "sharedBoards": "Tableros compartidos",
       "myPrivateBoards": "Mis tableros privados",
       "sharedWithMe": "Compartidos conmigo",

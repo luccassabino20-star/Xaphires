@@ -633,6 +633,7 @@
     "loadingBoards": "Carregando quadros...",
     "noBoards": "Nenhum quadro. Crie um na barra lateral.",
     "sidebar": {
+      "comingSoon": "Em breve",
       "sharedBoards": "Quadros compartilhados",
       "myPrivateBoards": "Meus quadros privados",
       "sharedWithMe": "Compartilhados comigo",

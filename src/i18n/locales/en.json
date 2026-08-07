@@ -314,6 +314,7 @@
     "loadingBoards": "Loading boards...",
     "noBoards": "No boards. Create one in the sidebar.",
     "sidebar": {
+      "comingSoon": "Coming soon",
       "sharedBoards": "Shared boards",
       "myPrivateBoards": "My private boards",
       "sharedWithMe": "Shared with me",
