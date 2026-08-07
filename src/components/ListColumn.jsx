@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
+import { useAuth } from "../state/AuthContext.jsx";
 import { uid } from "../utils/id.js";
 import { brightListColor } from "../utils/backgrounds.js";
 import CardItem from "./CardItem.jsx";
@@ -25,6 +26,7 @@ export default function ListColumn({
 }) {
   const { t } = useTranslation();
   const dispatch = useBoardDispatch();
+  const { user } = useAuth();
   const [title, setTitle] = useState(list.title);
   const [addingCard, setAddingCard] = useState(false);
   const [newCardText, setNewCardText] = useState("");
@@ -135,6 +137,10 @@ export default function ListColumn({
               onOpen={() => onOpenCard(card.id)}
               onOpenSubtask={() => onOpenCard(card.id, "subtask")}
               readOnly={readOnly}
+              // Mesma regra do CardModal: só quem criou (ou dono do quadro/master
+              // da empresa) vê o "Excluir" no menu rápido. Cartão sem creatorId
+              // (anterior à regra, ou de rotina automática) continua liberado.
+              canDeleteCard={!card.creatorId || card.creatorId === user.id || board.myRole === "owner" || user.role === "master"}
               onDragStart={() => onCardDragStart(card.id, list.id)}
               onDragEnd={onCardDragEnd}
             />

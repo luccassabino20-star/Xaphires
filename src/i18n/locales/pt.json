@@ -1304,6 +1304,7 @@
     "FORBIDDEN_BOARD_ACCESS": "Você não tem acesso a este quadro",
     "FORBIDDEN_BOARD_READ_ONLY": "Seu acesso a este quadro é somente leitura",
     "FORBIDDEN_BOARD_OWNER_ONLY": "Apenas o dono do quadro pode fazer isso",
+    "FORBIDDEN_NOT_CARD_CREATOR": "Só quem criou o cartão pode excluí-lo",
     "BOARD_NOT_PRIVATE": "Só quadros privados têm lista de acesso",
     "INVALID_BOARD_ROLE": "Papel inválido",
     "USER_ID_REQUIRED": "Selecione um usuário",

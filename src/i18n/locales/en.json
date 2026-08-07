@@ -966,6 +966,7 @@
     "FORBIDDEN_BOARD_ACCESS": "You don't have access to this board",
     "FORBIDDEN_BOARD_READ_ONLY": "Your access to this board is read-only",
     "FORBIDDEN_BOARD_OWNER_ONLY": "Only the board owner can do this",
+    "FORBIDDEN_NOT_CARD_CREATOR": "Only the person who created the card can delete it",
     "BOARD_NOT_PRIVATE": "Only private boards have an access list",
     "INVALID_BOARD_ROLE": "Invalid role",
     "USER_ID_REQUIRED": "Select a user",

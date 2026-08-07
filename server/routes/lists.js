@@ -76,7 +76,7 @@ router.post(
   ah(async (req, res) => {
     const { id, title } = req.body || {};
     if (!title?.trim()) return res.status(400).json({ error: "Título obrigatório", code: "TITLE_REQUIRED" });
-    const cardId = await repo.createCard(req.params.id, { id, title: title.trim() });
+    const cardId = await repo.createCard(req.params.id, { id, title: title.trim(), creatorId: req.user.id });
     res.status(201).json({ id: cardId });
   })
 );

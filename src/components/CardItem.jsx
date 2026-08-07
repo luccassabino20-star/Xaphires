@@ -100,7 +100,20 @@ function ChevronDownIcon() {
   );
 }
 
-export default function CardItem({ card, list, boardId, members, searchQuery, memberFilter, onOpen, onOpenSubtask, readOnly, onDragStart, onDragEnd }) {
+export default function CardItem({
+  card,
+  list,
+  boardId,
+  members,
+  searchQuery,
+  memberFilter,
+  onOpen,
+  onOpenSubtask,
+  readOnly,
+  canDeleteCard,
+  onDragStart,
+  onDragEnd,
+}) {
   const { t, i18n } = useTranslation();
   const dispatch = useBoardDispatch();
   const showToast = useToast();
@@ -238,9 +251,11 @@ export default function CardItem({ card, list, boardId, members, searchQuery, me
                 <button type="button" onClick={handleDuplicate}>
                   {t("board.cardItem.duplicate")}
                 </button>
-                <button type="button" className="quick-actions-dropdown-danger" onClick={handleDelete}>
-                  {t("board.cardModal.deleteCard")}
-                </button>
+                {canDeleteCard && (
+                  <button type="button" className="quick-actions-dropdown-danger" onClick={handleDelete}>
+                    {t("board.cardModal.deleteCard")}
+                  </button>
+                )}
               </div>,
               document.body
             )}

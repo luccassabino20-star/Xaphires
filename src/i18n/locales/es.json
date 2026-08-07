@@ -966,6 +966,7 @@
     "FORBIDDEN_BOARD_ACCESS": "No tienes acceso a este tablero",
     "FORBIDDEN_BOARD_READ_ONLY": "Tu acceso a este tablero es de solo lectura",
     "FORBIDDEN_BOARD_OWNER_ONLY": "Solo el dueño del tablero puede hacer esto",
+    "FORBIDDEN_NOT_CARD_CREATOR": "Solo quien creó la tarjeta puede eliminarla",
     "BOARD_NOT_PRIVATE": "Solo los tableros privados tienen lista de acceso",
     "INVALID_BOARD_ROLE": "Rol inválido",
     "USER_ID_REQUIRED": "Selecciona un usuario",

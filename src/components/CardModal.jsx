@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch, useBoardState } from "../state/BoardContext.jsx";
+import { useAuth } from "../state/AuthContext.jsx";
 import { useUsers } from "../state/UsersContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
@@ -108,6 +109,7 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
   const { t } = useTranslation();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
+  const { user } = useAuth();
   const { users } = useUsers();
   const showToast = useToast();
   const board = state.boards.find((b) => b.id === boardId);
@@ -115,6 +117,13 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
   // Quem foi convidado só para ler abre o cartão e vê tudo, sem nada para mexer.
   // O papel vem do servidor no workspace; aqui só se desenha a consequência.
   const readOnly = board?.myRole === "viewer";
+  // Só quem criou o cartão exclui, exceto dono do quadro (privado) ou master da
+  // empresa. Cartão sem creatorId (anterior à regra, ou gerado por rotina
+  // automática) continua excluível por qualquer um com acesso de escrita - quem
+  // decide de verdade é o servidor (DELETE /api/cards/:id), isto só evita mostrar
+  // um botão que ia falhar.
+  const canDeleteCard =
+    !card?.creatorId || card.creatorId === user.id || board?.myRole === "owner" || user.role === "master";
 
   const [title, setTitle] = useState(card?.title || "");
   const [description, setDescription] = useState(card?.description || "");
@@ -788,9 +797,11 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
             <button className="btn-secondary" onClick={archiveCard}>
               {t("board.cardModal.archiveCard")}
             </button>
-            <button className="btn-danger" onClick={deleteCard}>
-              {t("board.cardModal.deleteCard")}
-            </button>
+            {canDeleteCard && (
+              <button className="btn-danger" onClick={deleteCard}>
+                {t("board.cardModal.deleteCard")}
+              </button>
+            )}
           </div>
         )}
       </div>

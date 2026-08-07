@@ -332,7 +332,7 @@ export function listExists(id) {
   return !!getDb().prepare("SELECT 1 FROM lists WHERE id = ?").get(id);
 }
 
-export function createCard(listId, { id, title }) {
+export function createCard(listId, { id, title, creatorId }) {
   const cardId = id || uid();
   const pos = nextPosition("cards", "list_id", listId);
   // list_entered_at nasce preenchido: sem isso o cartão fica com NULL e o monitor
@@ -343,8 +343,8 @@ export function createCard(listId, { id, title }) {
   // criaria uma diferença de milissegundos para alguém estranhar depois no relatório.
   const agora = nowIso();
   getDb().prepare(
-    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, subtasks, member_ids, position, list_entered_at, created_at) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', '[]', ?, ?, ?)"
-  ).run(cardId, listId, title, pos, agora, agora);
+    "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, subtasks, member_ids, position, list_entered_at, created_at, creator_id) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', '[]', ?, ?, ?, ?)"
+  ).run(cardId, listId, title, pos, agora, agora, creatorId || null);
   return cardId;
 }
 export function deleteCard(id) {
@@ -765,6 +765,7 @@ export function getCardById(id) {
     urgent: !!c.urgent,
     important: !!c.important,
     archived: !!c.archived,
+    creatorId: c.creator_id || null,
   };
 }
 
@@ -835,6 +836,11 @@ function montarWorkspace(boards, userId) {
             // Coluna de origem, para o modal de arquivados mostrar de onde veio
             // e para o restaurar saber para onde devolver.
             archivedFrom: c.archived ? l.id : null,
+            // Só quem criou (ou dono do quadro/master da empresa) exclui - o
+            // cliente decide se mostra o botão de excluir com isto (ver
+            // CardModal.jsx/CardItem.jsx), mas quem decide de fato é o servidor,
+            // na rota de exclusão.
+            creatorId: c.creator_id || null,
           };
         });
     });

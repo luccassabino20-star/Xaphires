@@ -234,6 +234,12 @@ function applySchema(companyDb) {
   // separar as conversas privadas sem duplicar a tabela. NULL preserva as mensagens
   // do geral já gravadas antes desta coluna existir.
   addColumnIfMissing(companyDb, "chat_messages", "conversation_id", "conversation_id TEXT REFERENCES chat_conversations(id) ON DELETE CASCADE");
+  // Quem criou o cartão - só quem criou (ou dono do quadro/master da empresa)
+  // pode excluí-lo (ver DELETE /api/cards/:id em routes/cards.js). NULL para
+  // cartão criado antes desta coluna existir, e de propósito: sem usuário
+  // registrado para checar contra, a regra não tem como se aplicar, e o cartão
+  // continua excluível por quem já tinha acesso de escrita, como sempre foi.
+  addColumnIfMissing(companyDb, "cards", "creator_id", "creator_id TEXT");
 
   // Cartões já concluídos antes desta coluna existir não têm data. Preenche com o
   // instante da migração, para o relógio deles começar agora: quem ligar a regra

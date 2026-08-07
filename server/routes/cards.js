@@ -23,6 +23,18 @@ router.patch(
 router.delete(
   "/:id",
   ah(async (req, res) => {
+    // Só quem criou o cartão pode excluir, exceto dono do quadro (privado) ou
+    // master da empresa - sem essa exceção, cartão de quem saiu da empresa
+    // ficaria travado, sem ninguém que pudesse excluí-lo. Cartão sem criador
+    // registrado (criado antes desta regra existir, ou gerado por rotina
+    // automática) continua excluível por qualquer um com acesso de escrita,
+    // como sempre foi - não há dono para checar contra.
+    const card = await repo.getCardById(req.params.id);
+    const podeExcluir =
+      !card?.creatorId || card.creatorId === req.user.id || req.boardRole === "owner" || req.user.role === "master";
+    if (!podeExcluir) {
+      return res.status(403).json({ error: "Só quem criou o cartão pode excluí-lo", code: "FORBIDDEN_NOT_CARD_CREATOR" });
+    }
     await repo.deleteCard(req.params.id);
     res.json({ ok: true });
   })
