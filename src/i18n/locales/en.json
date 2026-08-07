@@ -359,6 +359,7 @@
       "searchPlaceholder": "Search cards...",
       "clearBoard": "Clear board",
       "clearBoardConfirm": "This will delete all lists and cards on this board. Continue?",
+      "clearBoardConfirmPartial": "This will delete the cards you created (and any lists left empty). Other people's cards stay on the board. Continue?",
       "clearBoardToast": "Board cleared"
     },
     "dataMenu": {

@@ -208,9 +208,49 @@ export function deleteBoard(id) {
   removeAttachmentFilesOf(cardIdsOfBoards([id]));
   getDb().prepare("DELETE FROM boards WHERE id = ?").run(id);
 }
-export function clearBoard(id) {
-  removeAttachmentFilesOf(cardIdsOfBoards([id]));
-  getDb().prepare("DELETE FROM lists WHERE board_id = ?").run(id);
+// IDs de cartão que `userId` pode excluir dentre as listas dadas - próprios e
+// sem creator_id (mesma regra do DELETE /api/cards/:id), ou todos se
+// `podeExcluirTudo` (dono do quadro/master da empresa). Compartilhado entre
+// clearBoard e clearListCards, para as duas ações de limpeza nunca discordarem
+// sobre o que "pode excluir" significa.
+function cardIdsExcluiveis(listIds, { userId, podeExcluirTudo, incluirArquivados = true }) {
+  if (!listIds || listIds.length === 0) return [];
+  const marcadores = listIds.map(() => "?").join(",");
+  const arquivadoSql = incluirArquivados ? "" : " AND archived = 0";
+  if (podeExcluirTudo) {
+    return getDb()
+      .prepare(`SELECT id FROM cards WHERE list_id IN (${marcadores})${arquivadoSql}`)
+      .all(...listIds)
+      .map((r) => r.id);
+  }
+  return getDb()
+    .prepare(`SELECT id FROM cards WHERE list_id IN (${marcadores})${arquivadoSql} AND (creator_id IS NULL OR creator_id = ?)`)
+    .all(...listIds, userId)
+    .map((r) => r.id);
+}
+
+// Limpar não é mais "apaga tudo incondicionalmente": só remove os cartões que
+// `userId` teria permissão de excluir um a um (mesma regra do DELETE
+// /api/cards/:id). Uma lista só é removida junto se ficou vazia depois - cartão
+// de outra pessoa que sobrou (sem permissão) segura a coluna inteira, senão ele
+// perderia a lista que referencia.
+export function clearBoard(id, { userId, podeExcluirTudo }) {
+  const listIds = getDb().prepare("SELECT id FROM lists WHERE board_id = ?").all(id).map((r) => r.id);
+  if (listIds.length === 0) return;
+  const cardIds = cardIdsExcluiveis(listIds, { userId, podeExcluirTudo });
+  removeAttachmentFilesOf(cardIds);
+  if (cardIds.length > 0) {
+    const marcadores = cardIds.map(() => "?").join(",");
+    getDb().prepare(`DELETE FROM cards WHERE id IN (${marcadores})`).run(...cardIds);
+  }
+  const listaVaziaIds = getDb()
+    .prepare("SELECT l.id FROM lists l WHERE l.board_id = ? AND NOT EXISTS (SELECT 1 FROM cards c WHERE c.list_id = l.id)")
+    .all(id)
+    .map((r) => r.id);
+  if (listaVaziaIds.length > 0) {
+    const marcadores = listaVaziaIds.map(() => "?").join(",");
+    getDb().prepare(`DELETE FROM lists WHERE id IN (${marcadores})`).run(...listaVaziaIds);
+  }
 }
 export function getBoardAccessInfo(boardId) {
   const row = getDb().prepare("SELECT owner_id, visibility FROM boards WHERE id = ?").get(boardId);
@@ -321,12 +361,18 @@ export function setListOrder(boardId, orderedListIds) {
   const stmt = getDb().prepare("UPDATE lists SET position = ? WHERE id = ?");
   orderedListIds.filter((id) => doQuadro.has(id)).forEach((id, idx) => stmt.run(idx, id));
 }
-export function clearListCards(listId) {
+export function clearListCards(listId, { userId, podeExcluirTudo }) {
   // Preserva os arquivados: o reducer do cliente só apaga o que está em cardIds,
   // e arquivado não está lá. Sem o filtro, limpar a coluna apagaria no servidor
   // um histórico que continuaria aparecendo na tela até o próximo carregamento.
-  removeAttachmentFilesOf(cardIdsOfList(listId, { incluirArquivados: false }));
-  getDb().prepare("DELETE FROM cards WHERE list_id = ? AND archived = 0").run(listId);
+  // E só remove o que `userId` teria permissão de excluir um a um - mesma regra
+  // de clearBoard, para as duas ações de limpeza nunca discordarem.
+  const cardIds = cardIdsExcluiveis([listId], { userId, podeExcluirTudo, incluirArquivados: false });
+  removeAttachmentFilesOf(cardIds);
+  if (cardIds.length > 0) {
+    const marcadores = cardIds.map(() => "?").join(",");
+    getDb().prepare(`DELETE FROM cards WHERE id IN (${marcadores})`).run(...cardIds);
+  }
 }
 export function listExists(id) {
   return !!getDb().prepare("SELECT 1 FROM lists WHERE id = ?").get(id);

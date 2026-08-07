@@ -45,7 +45,13 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
 
   function clearBoard() {
     if (!board) return;
-    if (confirm(t("app.topbar.clearBoardConfirm"))) {
+    // Mesma exceção do servidor (ver clearBoard em repo.js): dono do quadro
+    // privado ou master limpa tudo, o resto só os próprios cartões - o aviso
+    // muda junto, senão quem não é dono clicaria esperando o quadro vazio e
+    // encontraria cartão de colega sobrando, sem explicação.
+    const podeExcluirTudo = isOwner || user.role === "master";
+    const mensagem = podeExcluirTudo ? t("app.topbar.clearBoardConfirm") : t("app.topbar.clearBoardConfirmPartial");
+    if (confirm(mensagem)) {
       dispatch({ type: "CLEAR_BOARD", boardId: board.id });
       showToast(t("app.topbar.clearBoardToast"));
     }

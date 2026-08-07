@@ -678,6 +678,7 @@
       "searchPlaceholder": "Buscar cartões...",
       "clearBoard": "Limpar quadro",
       "clearBoardConfirm": "Isso vai apagar todas as listas e cartões deste quadro. Continuar?",
+      "clearBoardConfirmPartial": "Isso vai apagar os cartões que você criou (e as listas que ficarem vazias). Cartões de outras pessoas continuam no quadro. Continuar?",
       "clearBoardToast": "Quadro limpo"
     },
     "dataMenu": {

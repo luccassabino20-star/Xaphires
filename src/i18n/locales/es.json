@@ -359,6 +359,7 @@
       "searchPlaceholder": "Buscar tarjetas...",
       "clearBoard": "Vaciar tablero",
       "clearBoardConfirm": "Esto borrará todas las listas y tarjetas de este tablero. ¿Continuar?",
+      "clearBoardConfirmPartial": "Esto borrará las tarjetas que creaste (y las listas que queden vacías). Las tarjetas de otras personas siguen en el tablero. ¿Continuar?",
       "clearBoardToast": "Tablero vaciado"
     },
     "dataMenu": {

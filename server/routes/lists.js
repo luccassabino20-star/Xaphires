@@ -48,7 +48,10 @@ router.delete(
 router.post(
   "/:id/clear",
   ah(async (req, res) => {
-    await repo.clearListCards(req.params.id);
+    // Mesma exceção do DELETE /api/cards/:id: dono do quadro privado ou master
+    // da empresa limpa tudo, o resto só o que criou (ver clearListCards em repo.js).
+    const podeExcluirTudo = req.boardRole === "owner" || req.user.role === "master";
+    await repo.clearListCards(req.params.id, { userId: req.user.id, podeExcluirTudo });
     res.json({ ok: true });
   })
 );
