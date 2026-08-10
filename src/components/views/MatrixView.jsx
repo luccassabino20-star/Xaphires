@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../../state/BoardContext.jsx";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
-import { initials, colorForUser } from "../../utils/members.js";
+import Avatar from "../Avatar.jsx";
 
 function FlagIcon() {
   return (
@@ -64,7 +64,10 @@ export default function MatrixView({ board, users, searchQuery, memberFilter, on
   }
 
   function handleDrop(q) {
-    if (dragCardId) {
+    // Arrastar entre quadrantes reescreve urgente/importante do cartão. Convidado
+    // como leitor não muda nada aqui - a API recusaria, e a mudança ficaria na
+    // tela até o próximo carregamento.
+    if (dragCardId && board.myRole !== "viewer") {
       dispatch({
         type: "UPDATE_CARD",
         boardId: board.id,
@@ -125,14 +128,7 @@ export default function MatrixView({ board, users, searchQuery, memberFilter, on
                       {cardMembers.length > 0 && (
                         <div className="matrix-card-avatars">
                           {cardMembers.map((m) => (
-                            <span
-                              key={m.id}
-                              className="avatar avatar-small"
-                              style={{ background: colorForUser(m.id) }}
-                              title={m.name}
-                            >
-                              {initials(m.name)}
-                            </span>
+                            <Avatar key={m.id} id={m.id} name={m.name} avatarUrl={m.avatarUrl} className="avatar-small" title={m.name} />
                           ))}
                         </div>
                       )}

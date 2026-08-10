@@ -13,20 +13,36 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
   const [newListTitle, setNewListTitle] = useState("");
   const lastMoveKeyRef = useRef(null);
   const lastListOrderKeyRef = useRef(null);
+  // Colunas mexidas durante o arraste em curso. A gravação acontece uma vez, no
+  // fim, e não a cada posição por onde o cartão passa.
+  const touchedListsRef = useRef(new Set());
+
+  // Convidado como leitor. O arraste é bloqueado na origem, e não no fim: sem isso
+  // o cartão se moveria na tela, a gravação levaria 403 e o erro só apareceria no
+  // console — a mudança ficaria visível até o próximo carregamento.
+  const readOnly = board.myRole === "viewer";
 
   function handleCardDragStart(cardId, fromListId) {
     setDragCard({ cardId, fromListId });
     lastMoveKeyRef.current = null;
+    touchedListsRef.current = new Set([fromListId]);
   }
   function handleCardDragEnd() {
+    const listIds = [...touchedListsRef.current];
+    touchedListsRef.current = new Set();
     setDragCard(null);
     lastMoveKeyRef.current = null;
+    if (listIds.length > 0) {
+      dispatch({ type: "COMMIT_CARD_ORDER", boardId: board.id, listIds });
+    }
   }
   function handleCardHover(targetListId, targetIndex) {
-    if (!dragCard) return;
+    if (!dragCard || readOnly) return;
     const key = `${targetListId}:${targetIndex}`;
     if (lastMoveKeyRef.current === key) return;
     lastMoveKeyRef.current = key;
+    touchedListsRef.current.add(dragCard.fromListId);
+    touchedListsRef.current.add(targetListId);
     dispatch({
       type: "MOVE_CARD",
       boardId: board.id,
@@ -34,6 +50,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
       fromListId: dragCard.fromListId,
       toListId: targetListId,
       toIndex: targetIndex,
+      at: new Date().toISOString(),
     });
     if (targetListId !== dragCard.fromListId) {
       setDragCard({ cardId: dragCard.cardId, fromListId: targetListId });
@@ -49,7 +66,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
     lastListOrderKeyRef.current = null;
   }
   function handleListHover(targetListId) {
-    if (!dragListId || dragListId === targetListId) return;
+    if (!dragListId || dragListId === targetListId || readOnly) return;
     const ids = board.lists.map((l) => l.id);
     const from = ids.indexOf(dragListId);
     const to = ids.indexOf(targetListId);
@@ -86,6 +103,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
             searchQuery={searchQuery}
             memberFilter={memberFilter}
             onOpenCard={onOpenCard}
+            readOnly={readOnly}
             dragCard={dragCard}
             dragListId={dragListId}
             onCardDragStart={handleCardDragStart}
@@ -98,7 +116,7 @@ export default function BoardView({ board, members, searchQuery, memberFilter, o
         ))}
 
         <div className="list-composer-wrap">
-          {addingList ? (
+          {readOnly ? null : addingList ? (
             <div className="list-composer">
               <input
                 autoFocus

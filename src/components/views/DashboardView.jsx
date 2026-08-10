@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
-import { initials, colorForUser } from "../../utils/members.js";
+import { colorForUser } from "../../utils/members.js";
+import Avatar from "../Avatar.jsx";
 
 function isOverdue(iso) {
   if (!iso) return false;
@@ -110,11 +111,7 @@ export default function DashboardView({ board, users, searchQuery, memberFilter 
               count={m.count}
               max={maxMemberCount}
               color={colorForUser(m.id)}
-              avatar={
-                <span className="avatar avatar-small" style={{ background: colorForUser(m.id) }}>
-                  {initials(m.name)}
-                </span>
-              }
+              avatar={<Avatar id={m.id} name={m.name} avatarUrl={m.avatarUrl} className="avatar-small" />}
             />
           ))}
         </div>

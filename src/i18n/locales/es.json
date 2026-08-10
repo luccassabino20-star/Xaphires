@@ -24,64 +24,131 @@
   },
   "landing": {
     "nav": {
-      "brand": "Kanban IMG",
+      "brand": "Xaphires",
       "home": "Inicio",
       "features": "Funciones",
       "solutions": "Soluciones",
       "pricing": "Precios",
       "enter": "Ingresar"
     },
+    "promoPopup": {
+      "copy": "Copiar",
+      "copied": "¡Copiado!",
+      "defaultButton": "Aprovechar oferta"
+    },
     "home": {
       "heroTitle": "Tu equipo organizado, sin esfuerzo extra",
-      "heroText": "Kanban IMG reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos, prioridades y actas de reunión, sincronizados en tiempo real para todo el equipo.",
+      "heroText": "Xaphires reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos y prioridades, sincronizados en tiempo real para todo el equipo.",
       "ctaStart": "Empieza ahora",
       "ctaPlans": "Ver planes",
-      "heroNote": "Sin burocracia. Cancela cuando quieras.",
+      "heroNote": "7 días gratis con todos los recursos, sin tarjeta de crédito. Después, quédate en el plan gratuito para siempre si quieres.",
+      "boardPreview": { "columns": [
+        { "title": "Por hacer", "cards": [
+          { "title": "Visita técnica - Sector 4", "badge": "Hoy", "initials": "LS" },
+          { "title": "Presupuesto - Reforma Sala 4", "badge": "Mañana", "initials": "MA" }
+        ] },
+        { "title": "En curso", "cards": [
+          { "title": "Comprar materiales - Fase 2", "badge": "2/4", "initials": "TC" },
+          { "title": "Revisar contrato del proveedor", "badge": "3 días", "initials": "LS" }
+        ] },
+        { "title": "Completado", "cards": [
+          { "title": "Entrega - Lote 12", "badge": "Listo", "initials": "MA", "done": true }
+        ] }
+      ] },
       "stats": [
-        { "value": "8", "label": "Herramientas integradas en un solo lugar" },
+        { "value": "13", "label": "Herramientas integradas en un solo lugar" },
         { "value": "100%", "label": "Sincronización en tiempo real entre el equipo" },
         { "value": "0", "label": "Hojas de cálculo sueltas o grupos de WhatsApp" },
         { "value": "24/7", "label": "Acceso al tablero, desde cualquier lugar" }
       ],
       "benefits": [
         { "title": "Todo en un solo lugar", "text": "Reemplaza hojas de cálculo sueltas, grupos de WhatsApp y herramientas dispersas por un único sistema." },
-        { "title": "Tu equipo ya lo entiende", "text": "Interfaz simple, sin necesidad de capacitación — quien ya usó un tablero Kanban empieza a usarlo en minutos." },
+        { "title": "Tu equipo ya lo entiende", "text": "Interfaz simple, sin necesidad de capacitación. Quien ya usó un tablero Kanban empieza a usarlo en minutos." },
         { "title": "Crece contigo", "text": "De un equipo pequeño a varias áreas, con tableros privados y compartidos, control de accesos y roles." }
       ],
-      "exploreTitle": "Explora Kanban IMG",
+      "exploreTitle": "Explora Xaphires",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las 8 herramientas de Kanban IMG: tablero, tabla, calendario, mapa y más." },
-        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Kanban IMG en el día a día." },
+        { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las herramientas de Xaphires: tablero, tabla, calendario, mapa y más." },
+        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Xaphires en el día a día." },
         { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Básico, Profesional y Empresarial y elige el ideal para tu equipo." }
-      ]
+      ],
+      "faq": { "title": "Preguntas frecuentes", "items": [
+        { "q": "¿Necesito instalar algo?", "a": "No. Xaphires funciona directo en el navegador, en computadora o celular - sin aplicación para descargar ni servidor para configurar." },
+        { "q": "¿Tengo soporte si tengo algún problema?", "a": "Sí. Todo plan incluye soporte por correo; en los planes Profesional y Empresarial, el soporte es prioritario o dedicado, con atención más rápida." },
+        { "q": "¿Puedo cancelar cuando quiera?", "a": "Sí, sin multa. Al cancelar, mantienes acceso completo hasta el fin del período ya pagado; después, los datos siguen ahí - para volver a editar, solo elige el plan gratuito cuando quieras." },
+        { "q": "¿Mi equipo necesita capacitación para usarlo?", "a": "En la mayoría de los casos, no. Si alguien de tu equipo ya usó un tablero Kanban, aunque sea en papel con notas adhesivas, Xaphires sigue la misma lógica - se aprende en minutos." }
+      ] }
     },
     "features": {
+      "automationsTitle": "Lo que Xaphires hace solo",
+      "automationsText": "Automatizaciones que trabajan en segundo plano, para que no tengas que recordar ni reclamar a mano.",
+      "automations": [
+        { "badge": "A", "title": "Archivado de tarjetas", "text": "Saca lo terminado del tablero sin borrar nada. Lo archivado sale de todas las vistas y vuelve a su columna cuando quieras." },
+        { "badge": "R", "title": "Archivado automático", "text": "Define los días y las tarjetas completadas pasan al archivo solas. Disponible desde el plan Profesional." },
+        { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Profesional." },
+        { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Profesional." },
+        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció. Disponible desde el plan Profesional." },
+        { "badge": "P", "title": "Planificador personal", "text": "Una agenda fuera de los tableros, solo tuya: calendario y lista de tareas personales, con las completadas archivándose solas después de 2 días. Disponible desde el plan Profesional." },
+        { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." },
+        { "badge": "C", "title": "Finalización automática", "text": "Marcaste la tarjeta como completada y ella salta sola a la columna de completadas del tablero - sin arrastrar a mano." }
+      ],
       "headerTitle": "Todo lo que tu equipo necesita",
-      "headerText": "Ocho herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
+      "headerText": "Herramientas integradas, para no depender de hojas de cálculo sueltas ni de otra app por tarea.",
       "items": [
         { "badge": "T", "title": "Tablero Kanban", "text": "Se acabaron las tareas perdidas en capturas de chat. Arrastra y suelta entre listas y ve el avance real del equipo." },
-        { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro — sin necesitar otra herramienta." },
+        { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro, sin necesitar otra herramienta." },
         { "badge": "C", "title": "Calendario", "text": "Plazos y fechas de inicio en una vista mensual, para que nada pase desapercibido." },
-        { "badge": "L", "title": "Línea de tiempo", "text": "Todo el cronograma del proyecto de un vistazo, período a período." },
-        { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla." },
-        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo — ideal para equipos en terreno." },
-        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte." },
-        { "badge": "A", "title": "Actas de reunión", "text": "Agenda, decisiones y tareas registradas — y exigidas después." }
+        { "badge": "L", "title": "Línea de tiempo (Gantt)", "text": "Crea y abre tareas directo desde la línea de tiempo, con todo el cronograma del proyecto de un vistazo, período a período. Disponible desde el plan Intermedio." },
+        { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla. Disponible desde el plan Intermedio." },
+        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno. Disponible desde el plan Intermedio." },
+        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte. Disponible desde el plan Intermedio." }
       ],
+      "ganttPreview": { "title": "El Gantt en acción", "text": "Cada tarea se convierte en una barra en la línea de tiempo, con la línea de hoy siempre visible - crea y edita justo aquí, sin otra herramienta.", "rows": [
+        { "title": "Planificación", "status": "done" },
+        { "title": "Desarrollo", "status": "inProgress" },
+        { "title": "Pruebas", "status": "agency" },
+        { "title": "Revisión final", "child": true }
+      ] },
       "secondary": [
         { "title": "Tableros privados y compartidos", "text": "Separa lo que es del equipo de lo que es solo tuyo, con control total de visibilidad." },
-        { "title": "Control de usuarios y roles", "text": "Define quién es administrador (master) y quién es miembro del equipo." }
+        { "title": "Control de usuarios y roles", "text": "Define quién es administrador (master) y quién es miembro del equipo." },
+        { "title": "Chat de la empresa", "text": "Un canal general para todos y conversaciones privadas entre compañeros, sin salir del sistema hacia WhatsApp." },
+        { "title": "Subtareas con responsable, plazo y prioridad", "text": "Divide la tarjeta en pasos más pequeños, cada uno con responsable, fecha y prioridad propios - no es solo una lista de casillas." }
       ]
     },
     "solutions": {
       "headerTitle": "Soluciones para cada tipo de equipo",
-      "headerText": "El mismo Kanban IMG, organizado como cada equipo necesita trabajar.",
+      "headerText": "El mismo Xaphires, organizado como cada equipo necesita trabajar.",
       "items": [
         { "title": "Agencias y equipos de proyecto", "text": "Un tablero por cliente o proyecto, con línea de tiempo para plazos y panel de métricas listo para mostrar el progreso en reuniones.", "tags": ["Tablero Kanban", "Línea de tiempo", "Panel"] },
-        { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa — ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
+        { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa. Ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
         { "title": "Gestión y liderazgo", "text": "Prioriza con la Matriz de Eisenhower, sigue los indicadores en el Panel y mantén la planificación sensible en tableros privados.", "tags": ["Matriz de Eisenhower", "Panel", "Tableros privados"] },
         { "title": "Operaciones y rutina", "text": "El dúo Tablero Kanban + Tabla cubre el trabajo diario, con Calendario para plazos recurrentes y nada pasa desapercibido.", "tags": ["Tablero Kanban", "Tabla", "Calendario"] },
-        { "title": "Reuniones y alineación", "text": "Actas de reunión con agenda, decisiones y tareas — registradas al momento y exigidas después, sin depender de la memoria.", "tags": ["Actas de reunión"] }
+        { "title": "Equipos de Producto", "text": "Del roadmap al lanzamiento: organiza iniciativas en la Línea de tiempo, prioriza pedidos de funciones y mantén todo en un solo lugar.", "tags": ["Línea de tiempo", "Matriz de Eisenhower", "Adjuntos"], "page": "productTeams" }
+      ],
+      "learnMore": "Saber más"
+    },
+    "productTeams": {
+      "backLink": "← Volver a Soluciones",
+      "badge": "Para equipos de producto",
+      "heroTitle": "Roadmap, sprints y lanzamientos, sin depender de una hoja de cálculo",
+      "heroText": "Organiza las iniciativas del producto, sigue el ciclo de cada sprint y prioriza pedidos de funciones con visibilidad en tiempo real para todo el equipo.",
+      "ctaStart": "Empezar ahora",
+      "ctaPlans": "Ver planes",
+      "templatesTitle": "Un tablero para cada etapa del producto",
+      "templates": [
+        { "badge": "R", "title": "Roadmap de Producto", "text": "Organiza iniciativas por trimestre y sigue todo en la Línea de tiempo, desde la planificación hasta el lanzamiento." },
+        { "badge": "S", "title": "Sprint Ágil", "text": "Listas de Backlog, En progreso y Completado, con lista de tareas y fecha límite en cada tarjeta." },
+        { "badge": "F", "title": "Pedidos de Funciones", "text": "Etiquetas por prioridad y adjuntos con capturas o enlaces de referencia en cada pedido." }
+      ],
+      "timelineBadge": "Línea de tiempo",
+      "timelineTitle": "Lanzamientos más previsibles",
+      "timelineText": "Ve todo el cronograma del roadmap de un vistazo, período a período, y detecta retrasos antes de que se conviertan en un problema de lanzamiento.",
+      "extraTitle": "Prioridad y visibilidad, sin esfuerzo extra",
+      "extra": [
+        { "title": "Matriz de Eisenhower", "text": "Separa lo urgente de lo importante y deja de reaccionar solo a lo que más grita en el backlog." },
+        { "title": "Panel", "text": "Métricas listas para mostrar el progreso del producto en cualquier reunión, sin armar una diapositiva." },
+        { "title": "Tableros privados", "text": "Mantén los roadmaps sensibles visibles solo para quien los necesita, antes del anuncio oficial." }
       ]
     },
     "pricing": {
@@ -89,23 +156,140 @@
       "headerText": "Elige el plan ideal para tu equipo y cámbialo cuando crezca.",
       "mostPopular": "Más popular",
       "plans": [
-        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 3 usuarios", "Tableros ilimitados", "Tablero Kanban, Tabla y Calendario", "Soporte por correo"] },
-        { "name": "Profesional", "price": "R$ 799", "period": "/usuario/mes", "tagline": "Para equipos que quieren control total", "cta": "Suscribirse a Profesional", "highlight": true, "features": ["Usuarios ilimitados", "Todas las vistas (Panel, Mapa, Línea de tiempo, Matriz de Eisenhower)", "Actas de reunión", "Tableros privados y compartidos", "Soporte prioritario"] },
-        { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo de Profesional", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)"] }
+        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
+        { "name": "Intermedio", "price": "R$ 370,00", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
+        { "name": "Profesional", "price": "R$ 730,00", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
+        { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo lo incluido en Profesional, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)", "Desarrollo de cualquier funcionalidad a medida", "Creamos cualquier solución personalizada que tu negocio necesite", "Alcance abierto para proyectos y personalizaciones exclusivas"] }
+      ]
+    },
+    "privacy": {
+      "backLink": "← Volver",
+      "headerTitle": "Política de Privacidad",
+      "headerText": "Cómo Xaphires recopila, usa, almacena y protege los datos de tu equipo.",
+      "updatedLabel": "Última actualización",
+      "updatedDate": "25 de julio de 2026",
+      "sections": [
+        {
+          "title": "1. Información que recopilamos",
+          "paragraphs": ["Recopilamos solo lo necesario para operar la plataforma. Los datos provienen de lo que informas al crear la cuenta y del contenido que produces durante el uso."],
+          "bullets": [
+            "Datos de registro: nombre, correo electrónico, contraseña y el nombre de la empresa indicado en el registro.",
+            "Contenido que creas: tableros, listas, tarjetas, descripciones, plazos, listas de verificación, etiquetas, responsables y archivos adjuntos.",
+            "Direcciones: solo cuando agregas una dirección a una tarjeta para mostrarla en el Mapa.",
+            "Datos de sesión: la información necesaria para mantenerte conectado de forma segura."
+          ]
+        },
+        {
+          "title": "2. Cómo usamos la información",
+          "paragraphs": ["Usamos los datos exclusivamente para brindar y mantener el servicio. No vendemos tus datos, no los usamos para publicidad y no los cedemos a terceros con fines de marketing."],
+          "bullets": [
+            "Autenticar tu acceso y mantener tu sesión activa.",
+            "Mostrar y sincronizar el contenido de los tableros entre los miembros de tu empresa.",
+            "Convertir direcciones en coordenadas para mostrarlas en el Mapa.",
+            "Comunicar avisos operativos importantes sobre el servicio.",
+            "Investigar y prevenir el uso indebido, el fraude y los incidentes de seguridad."
+          ]
+        },
+        {
+          "title": "3. Divulgación de información",
+          "paragraphs": ["No vendemos ni alquilamos datos personales. La divulgación ocurre solo en las situaciones siguientes."],
+          "bullets": [
+            "Con otros usuarios de tu empresa: el contenido de los tableros compartidos es visible para los demás miembros. Los tableros privados solo son visibles para quien los creó.",
+            "Con el servicio de geocodificación OpenStreetMap (Nominatim): cuando buscas una dirección, solo se envía el texto de la dirección para obtener las coordenadas. No se transmite ningún dato de tu cuenta.",
+            "Por obligación legal: cuando lo exija la ley, una orden judicial o una autoridad competente."
+          ]
+        },
+        {
+          "title": "4. Cómo almacenamos y protegemos",
+          "paragraphs": ["Los datos de cada empresa se guardan en una base de datos aislada, separada de las demás empresas de la plataforma."],
+          "bullets": [
+            "Las contraseñas nunca se almacenan en texto plano: guardamos solo un hash criptográfico.",
+            "Todas las rutas de la API exigen autenticación, y cada solicitud se valida contra la empresa y los permisos del usuario.",
+            "La sesión usa una cookie httpOnly, inaccesible para los scripts de la página.",
+            "En producción, todo el tráfico usa conexión cifrada (HTTPS).",
+            "Las solicitudes de escritura tienen el origen verificado, lo que impide acciones falsificadas por sitios de terceros."
+          ]
+        },
+        {
+          "title": "5. Cuánto tiempo conservamos los datos",
+          "paragraphs": [
+            "Conservamos los datos mientras la cuenta esté activa y durante el período necesario para cumplir obligaciones legales.",
+            "Cuando un administrador elimina a un usuario, se borra el registro, se eliminan sus tableros privados y se desvinculan las referencias a esa persona en las tarjetas."
+          ]
+        },
+        {
+          "title": "6. Cookies y almacenamiento local",
+          "paragraphs": ["No usamos cookies de publicidad ni de rastreo entre sitios."],
+          "bullets": [
+            "Cookie de sesión: guarda el token que te mantiene conectado, con validez de 7 días.",
+            "Almacenamiento local del navegador: guarda solo tus preferencias de tema e idioma."
+          ]
+        },
+        {
+          "title": "7. Tus derechos",
+          "paragraphs": ["Según la legislación de protección de datos aplicable, en cualquier momento puedes:"],
+          "bullets": [
+            "Confirmar la existencia del tratamiento y acceder a tus datos.",
+            "Corregir datos incompletos, inexactos o desactualizados, directamente en tu perfil.",
+            "Solicitar la eliminación de la cuenta y de los datos asociados.",
+            "Exportar el contenido de tus tableros en formato JSON, desde la propia plataforma.",
+            "Revocar el consentimiento y oponerte a tratamientos que consideres indebidos."
+          ]
+        },
+        {
+          "title": "8. Niños y adolescentes",
+          "paragraphs": ["Xaphires es una herramienta corporativa, destinada al uso profesional. No dirigimos el servicio a menores de 18 años y no recopilamos intencionalmente datos de niños. Los registros identificados en esas condiciones serán eliminados."]
+        },
+        {
+          "title": "9. Cambios en esta política",
+          "paragraphs": ["Podemos actualizar esta política para reflejar cambios en el servicio o en la legislación. La fecha de última actualización en la parte superior de esta página siempre indica la versión vigente. Los cambios relevantes se comunicarán por los canales de contacto registrados."]
+        },
+        {
+          "title": "10. Cómo contactarnos",
+          "paragraphs": ["Para dudas sobre esta política o sobre el tratamiento de tus datos, contacta al responsable de protección de datos:"],
+          "bullets": [
+            "Correo electrónico: xaphires@contato.com"
+          ]
+        }
+      ]
+    },
+    "switcher": {
+      "title": "Una herramienta que sigue el ritmo de la obra",
+      "text": "Todo lo que el equipo registra aparece al instante para todos, con el nivel de acceso adecuado para cada persona.",
+      "items": [
+        { "key": "realtime", "mark": "S", "title": "Sincronización en tiempo real", "text": "Cambias una tarjeta y todo el equipo lo ve en el mismo instante.", "statusLabel": "Sincronización", "statusValue": "Activa" },
+        { "key": "access", "mark": "A", "title": "Acceso por rol", "text": "Cada persona ve y edita solo lo que corresponde a su función.", "statusLabel": "Control de acceso", "statusValue": "Por rol" },
+        { "key": "insights", "mark": "P", "title": "Indicadores listos", "text": "El panel muestra el avance sin que nadie arme un informe.", "statusLabel": "Panel", "statusValue": "Actualizado" }
+      ]
+    },
+    "logos": {
+      "label": "Todo esto en un solo lugar",
+      "items": ["Tablero Kanban", "Tabla", "Calendario", "Línea de tiempo", "Panel", "Mapa", "Matriz Eisenhower", "Archivado automático", "Monitor de atascos", "Rutinas automáticas", "Letrero de tareas", "Adjuntos y enlaces"]
+    },
+    "testimonials": {
+      "title": "Lo que dicen los equipos",
+      "items": [
+        { "quote": "Reemplazamos tres planillas y grupos de WhatsApp por un solo tablero. El equipo dejó de perder tareas.", "name": "Alex Rivera", "role": "Líder de equipo" },
+        { "quote": "La línea de tiempo se volvió la reunión del lunes. Todos ven el mismo cronograma y se acabó la discusión de versiones. Y además puedo ver todo desde el celular.", "name": "Ana Braga", "role": "Planificación" },
+        { "quote": "Mejoré mi gestión del tiempo con este kanban.", "name": "Lucas Sabino", "role": "Finanzas" }
       ]
     },
     "footer": {
       "title": "¿Listo para organizar tu equipo?",
-      "cta": "Empieza ahora"
+      "cta": "Empieza ahora",
+      "privacy": "Política de Privacidad",
+      "copyright": "Derechos de autor © 2026 Xaphires"
     }
   },
   "auth": {
-    "brandTitle": "Kanban IMG",
+    "brandTitle": "Xaphires",
     "brandText": "Organiza tus proyectos en tableros Kanban simples, rápidos y colaborativos.",
     "back": "← Volver",
     "tabLogin": "Ingresar",
     "tabSignup": "Crear empresa",
+    "tabJoin": "Pedir acceso",
     "companyName": "Nombre de la empresa",
+    "companyDocLabel": "CNPJ o CPF de la empresa",
     "yourName": "Tu nombre",
     "email": "Correo electrónico",
     "password": "Contraseña",
@@ -113,39 +297,79 @@
     "passwordsMismatch": "Las contraseñas no coinciden",
     "submitWait": "Espera...",
     "submitLogin": "Ingresar",
-    "submitSignup": "Crear empresa"
+    "submitSignup": "Crear empresa",
+    "joinIntro": "¿Tu empresa ya usa Xaphires? Ingresa su CNPJ o CPF para pedir acceso.",
+    "cnpjLabel": "CNPJ o CPF de la empresa",
+    "cnpjSearch": "Buscar",
+    "cnpjSearching": "Buscando...",
+    "companyFound": "Empresa encontrada: {{name}}",
+    "notThisCompany": "¿No es esta empresa? Cambiar CNPJ/CPF",
+    "joinSubmit": "Enviar pedido",
+    "joinSubmitWait": "Enviando...",
+    "joinSuccessTitle": "¡Pedido enviado!",
+    "joinSuccessText": "En cuanto alguien de tu empresa lo apruebe, podrás ingresar con el correo y la contraseña que acabas de elegir.",
+    "joinSuccessBackToLogin": "Ir a ingresar"
   },
   "app": {
     "loadingBoards": "Cargando tableros...",
     "noBoards": "Sin tableros. Crea uno en la barra lateral.",
     "sidebar": {
-      "minutesNav": "Actas de Reunión",
+      "comingSoon": "Próximamente",
       "sharedBoards": "Tableros compartidos",
       "myPrivateBoards": "Mis tableros privados",
+      "sharedWithMe": "Compartidos conmigo",
+      "sharedWithCount": "Compartido con {{count}} persona(s)",
       "newBoard": "+ Nuevo tablero",
       "boardNamePlaceholder": "Nombre del tablero",
       "privateToggle": "Privado (solo tú lo ves)",
       "create": "Crear",
       "deleteBoardTitle": "Eliminar tablero",
       "deleteBoardConfirm": "¿Eliminar el tablero \"{{title}}\" y todo su contenido?",
-      "boardDeletedToast": "Tablero eliminado"
+      "boardDeletedToast": "Tablero eliminado",
+      "workspaceLabel": "Workspace de {{name}}",
+      "spacesTitle": "Espacios",
+      "boardsFolder": "Proyectos",
+      "rail": {
+        "home": "Inicio",
+        "planner": "Planificador",
+        "ai": "IA",
+        "team": "Equipos",
+        "dashboards": "Paneles",
+        "boards": "Tableros",
+        "more": "Más",
+        "invite": "Invitar"
+      },
+      "shortcuts": {
+        "inbox": "Bandeja de entrada",
+        "meetings": "Reuniones",
+        "myTasks": "Mis tareas",
+        "allTasks": "Todas las tareas"
+      }
     },
     "topbar": {
       "toggleSidebar": "Mostrar/ocultar barra lateral",
       "menu": "Menú",
       "defaultBoardName": "Tablero sin nombre",
-      "privateBoardTitle": "Tablero privado — visible solo para ti",
+      "privateBoardTitle": "Tablero privado, visible solo para ti",
+      "sharedWithYouTitle": "Tablero privado compartido contigo",
+      "shareBtn": "Compartir",
+      "readOnlyBadge": "Solo lectura",
       "filterBy": "Filtrar por {{name}}",
       "usersBtn": "Usuarios",
       "searchPlaceholder": "Buscar tarjetas...",
       "clearBoard": "Vaciar tablero",
       "clearBoardConfirm": "Esto borrará todas las listas y tarjetas de este tablero. ¿Continuar?",
+      "clearBoardConfirmPartial": "Esto borrará las tarjetas que creaste (y las listas que queden vacías). Las tarjetas de otras personas siguen en el tablero. ¿Continuar?",
       "clearBoardToast": "Tablero vaciado"
     },
     "dataMenu": {
+      "recurrences": "Rutinas automáticas",
+      "bottlenecks": "Monitor de cuellos de botella",
+      "archivedCards": "Tarjetas archivadas",
       "moreOptions": "Más opciones",
       "personalize": "Personalizar",
       "dataSection": "Datos",
+      "exportReport": "Exportar informe",
       "exportCurrent": "Exportar tablero actual",
       "exportAll": "Exportar todo (respaldo)",
       "importJson": "Importar JSON",
@@ -165,19 +389,164 @@
     },
     "accountMenu": {
       "changePassword": "Cambiar contraseña",
+      "platformPanel": "Panel de la plataforma",
       "logout": "Cerrar sesión",
       "currentPassword": "Contraseña actual",
       "newPassword": "Nueva contraseña",
       "save": "Guardar",
       "passwordChangedToast": "Contraseña cambiada",
-      "master": "Master"
+      "master": "Master",
+      "myProfile": "Mi perfil",
+      "profileSavedToast": "Perfil actualizado",
+      "profileName": "Nombre",
+      "profileBio": "Descripción",
+      "profileBioPlaceholder": "Cuéntanos un poco sobre ti...",
+      "uploadPhoto": "Cambiar foto",
+      "removePhoto": "Quitar foto"
     },
     "taskTicker": {
       "pending": "Pendientes ({{count}})"
     }
   },
   "board": {
+    "recurrences": {
+      "title": "Rutinas automáticas",
+      "empty": "Todavía no hay rutinas. Una rutina crea la tarjeta sola en la fecha correcta, con el checklist listo.",
+      "planRequired": "Las rutinas automáticas están disponibles desde el plan Profesional. Puedes ver y eliminar las existentes.",
+      "newRule": "Nueva rutina",
+      "fieldTitle": "Título de la tarjeta",
+      "titlePlaceholder": "Ej: Cerrar el balance contable",
+      "fieldList": "Crear en la columna",
+      "fieldFreq": "Repetir",
+      "fieldWeekday": "Día de la semana",
+      "fieldMonthday": "Día del mes",
+      "fieldMonthday2": "Segundo día del mes (opcional)",
+      "noSecondDay": "solo un día",
+      "fieldHour": "Hora",
+      "fieldDueInDays": "Vence en (días)",
+      "noDue": "sin fecha",
+      "fieldChecklist": "Checklist de la rutina",
+      "checklistPlaceholder": "Un ítem por línea:\nConciliar cuentas\nRevisar facturas\nEnviar al contador",
+      "save": "Crear rutina",
+      "saveEdit": "Guardar cambios",
+      "created": "Rutina creada",
+      "updated": "Rutina actualizada",
+      "editingHint": "Editando \"{{title}}\". Las tarjetas ya creadas no cambian.",
+      "deleted": "Rutina eliminada",
+      "deleteConfirm": "¿Eliminar la rutina \"{{title}}\"? Las tarjetas ya creadas siguen en el tablero.",
+      "edit": "Editar",
+      "pause": "Pausar",
+      "resume": "Reanudar",
+      "delete": "Eliminar",
+      "everyDay": "Todos los días a las {{hour}}h",
+      "everyWeek": "Cada {{day}} a las {{hour}}h",
+      "everyMonth": "Cada día {{day}} a las {{hour}}h",
+      "everyMonthTwoDays": "Cada día {{day}} y {{day2}} a las {{hour}}h",
+      "intoList": "en {{list}}",
+      "listGone": "columna eliminada",
+      "checklistCount": "{{count}} ítem en el checklist",
+      "checklistCount_other": "{{count}} ítems en el checklist",
+      "lastRun": "Última vez: {{date}}",
+      "monthdayWarning": "En meses más cortos, la rutina cae el último día del mes.",
+      "hint": "Las rutinas se revisan al cargar el tablero. Si pasan varias fechas sin que nadie abra la app, solo la más reciente se convierte en tarjeta.",
+      "freq": {
+        "daily": "Todos los días",
+        "weekly": "Cada semana",
+        "monthly": "Cada mes"
+      },
+      "weekdays": {
+        "0": "domingo",
+        "1": "lunes",
+        "2": "martes",
+        "3": "miércoles",
+        "4": "jueves",
+        "5": "viernes",
+        "6": "sábado"
+      }
+    },
+    "exportReport": {
+      "title": "Exportar informe del Kanban",
+      "boardLabel": "Tablero",
+      "allBoards": "Todos los tableros",
+      "privateTag": "privado",
+      "allBoardsHint": "Incluye todos los tableros a los que tienes acceso, incluidos los privados.",
+      "noBoardsHint": "Selecciona al menos un tablero para exportar el informe.",
+      "userLabel": "Usuario",
+      "allUsers": "Todos los usuarios",
+      "statusLabel": "Estado de la tarjeta",
+      "statusAll": "Todos",
+      "statusOpen": "Solo abiertas",
+      "statusDone": "Solo completadas",
+      "count": "{{count}} tarjeta encontrada",
+      "count_other": "{{count}} tarjetas encontradas",
+      "counting": "Contando tarjetas...",
+      "countFailed": "No se pudieron contar las tarjetas",
+      "emptyHint": "Ninguna tarjeta coincide con los filtros elegidos. El archivo saldrá solo con el encabezado.",
+      "downloadCsv": "Descargar informe (CSV)",
+      "downloadPdf": "Descargar informe (PDF)",
+      "downloadExcel": "Descargar informe (Excel)",
+      "generating": "Generando...",
+      "downloadStarted": "Informe generado"
+    },
+    "bottlenecks": {
+      "bareHours": "{{count}} hora",
+      "bareHours_other": "{{count}} horas",
+      "bareDays": "{{count}} día",
+      "bareDays_other": "{{count}} días",
+      "msgGreetingNoName": "¡Hola!",
+      "title": "Monitor de cuellos de botella",
+      "noneMonitored": "Ninguna columna está siendo monitoreada. Abre el menú de una columna y define cuánto tiempo puede quedarse una tarjeta antes de generar alerta.",
+      "allClear": "Sin atascos. {{count}} columna monitoreada y todo al día.",
+      "allClear_other": "Sin atascos. {{count}} columnas monitoreadas y todo al día.",
+      "summary": "{{count}} tarjeta detenida más allá del límite de su columna.",
+      "summary_other": "{{count}} tarjetas detenidas más allá del límite de su columna.",
+      "inList": "En {{list}} · límite de {{hours}}h",
+      "hours": "{{count}}h detenida",
+      "hours_other": "{{count}}h detenida",
+      "days": "{{count}} día detenida",
+      "days_other": "{{count}} días detenida",
+      "cardTooltip": "Detenida hace {{duration}} en esta columna",
+      "copyFollowUp": "Copiar seguimiento",
+      "copied": "Mensaje copiado",
+      "msgGreeting": "¡Hola, {{name}}!",
+      "msgBody": "Te escribo para saber cómo va \"{{title}}\". La tarjeta está en {{list}} desde hace {{duration}}.",
+      "msgDue": "La fecha acordada es {{date}}.",
+      "msgClosing": "¿Me puedes contar cómo está avanzando? ¡Gracias!"
+    },
+    "archive": {
+      "autoPlanRequired": "El archivado automático está disponible desde el plan Profesional. El archivado manual sigue disponible.",
+      "autoLabel": "Archivar completadas automáticamente",
+      "autoDaysSuffix": "días",
+      "autoOnHint": "Las tarjetas completadas hace más de {{days}} días pasan al archivo cuando se carga el tablero. Desmarcar una tarjeta reinicia el conteo.",
+      "autoOffHint": "Con la regla apagada, las completadas quedan en el tablero hasta que las archives a mano.",
+      "autoInvalid": "Indica un número de días entre 1 y 365",
+      "title": "Tarjetas archivadas",
+      "searchPlaceholder": "Buscar en archivadas",
+      "empty": "Todavía no hay tarjetas archivadas. Archivar saca la tarjeta del tablero sin borrar nada.",
+      "noResults": "Ninguna archivada coincide con la búsqueda",
+      "fromList": "De {{list}}",
+      "fromDeletedList": "Columna de origen eliminada",
+      "restore": "Restaurar",
+      "delete": "Eliminar",
+      "restoredToast": "{{title}} restaurada",
+      "deleteConfirm": "¿Eliminar \"{{title}}\" definitivamente? Esta acción no se puede deshacer.",
+      "deletedToast": "Tarjeta eliminada"
+    },
     "listMenu": {
+      "stuckPlanRequired": "El monitor de cuellos de botella está disponible desde el plan Profesional.",
+      "stuckConfigure": "Monitorear atascos en esta columna",
+      "stuckConfigured": "Atasco: alerta a las {{hours}}h",
+      "stuckHint": "Avisa cuando una tarjeta pase este tiempo detenida en esta columna.",
+      "stuckHoursSuffix": "horas",
+      "stuckSave": "Guardar",
+      "stuckDisable": "Dejar de monitorear",
+      "stuckOn": "Columna monitoreada: alerta a las {{hours}}h",
+      "stuckOff": "Monitoreo desactivado en esta columna",
+      "stuckInvalid": "Indica un número de horas entre 1 y 8760",
+      "archiveCompleted": "Archivar completadas",
+      "cardsArchivedToast": "{{count}} tarjeta archivada",
+      "cardsArchivedToast_other": "{{count}} tarjetas archivadas",
+      "noCompletedToArchive": "No hay tarjetas completadas en esta columna",
       "listColor": "Color de la lista",
       "defaultColor": "Predeterminado",
       "sortAZ": "Ordenar por título (A-Z)",
@@ -187,6 +556,20 @@
       "deleteList": "Eliminar lista",
       "deleteListConfirm": "¿Eliminar la lista \"{{title}}\" y todas sus tarjetas?",
       "listDeletedToast": "Lista eliminada"
+    },
+    "share": {
+      "title": "Acceso a \"{{title}}\"",
+      "hint": "Tablero privado. Además de ti, solo quienes estén en esta lista pueden abrirlo.",
+      "roleOwner": "Dueño",
+      "roleEditor": "Puede editar",
+      "roleViewer": "Solo lectura",
+      "add": "Añadir",
+      "remove": "Quitar",
+      "searchPlaceholder": "Buscar por nombre o correo...",
+      "noCandidates": "No hay nadie más para añadir.",
+      "addedToast": "{{name}} ahora tiene acceso",
+      "removedToast": "{{name}} ya no tiene acceso",
+      "removeConfirm": "¿Quitar el acceso de {{name}} a este tablero?"
     },
     "listColumn": {
       "cardTitlePlaceholder": "Escribe un título para esta tarjeta...",
@@ -203,12 +586,33 @@
       "markComplete": "Marcar como completada",
       "markIncomplete": "Marcar como no completada",
       "urgent": "Urgente",
-      "important": "Importante"
+      "important": "Importante",
+      "edit": "Editar",
+      "moreActions": "Más acciones",
+      "duplicate": "Duplicar",
+      "duplicateSuffix": " (copia)",
+      "cardDuplicatedToast": "Tarjeta duplicada",
+      "subtasksCount": "{{count}} subtarea",
+      "subtasksCount_other": "{{count}} subtareas"
     },
     "cardModal": {
+      "readOnlyNote": "Tienes acceso de solo lectura a este tablero.",
+      "noLocation": "Sin ubicación definida",
+      "archiveCard": "Archivar",
+      "cardArchivedToast": "Tarjeta archivada",
       "untitled": "Sin título",
+      "typeBadge": "Tarea",
       "complete": "Completada",
       "markComplete": "Marcar como completada",
+      "status": "Estado",
+      "statusOpen": "Abierta",
+      "empty": "Vacío",
+      "datesLabel": "Fechas",
+      "descriptionShortcut": "Añade una descripción",
+      "collapseEmpty": "Ocultar campos vacíos",
+      "showEmpty": "Mostrar campos vacíos",
+      "moveToList": "Mover a lista",
+      "movedToList": "Tarjeta movida a \"{{list}}\"",
       "members": "Miembros",
       "noUsersYet": "Aún no hay usuarios registrados.",
       "labels": "Etiquetas",
@@ -221,10 +625,14 @@
       "addressPlaceholder": "Dirección, ciudad...",
       "locating": "Buscando...",
       "locate": "Ubicar",
-      "locationFound": "Ubicación encontrada — visible en el Mapa",
+      "locationFound": "Ubicación encontrada, visible en el Mapa",
       "locationPending": "Dirección guardada, pero no ubicada en el mapa",
       "description": "Descripción",
       "descriptionPlaceholder": "Agrega una descripción más detallada...",
+      "subtasks": "Subtareas",
+      "addSubtask": "Agregar subtarea",
+      "addSubtaskPlaceholder": "Nombre de la subtarea...",
+      "unassign": "Quitar responsable",
       "checklist": "Lista de tareas",
       "addItemPlaceholder": "Agregar un ítem",
       "attachments": "Adjuntos",
@@ -234,7 +642,7 @@
       "linkNamePlaceholder": "Nombre del enlace (opcional)",
       "attachmentAdded": "Adjunto agregado",
       "attachmentRemoved": "Adjunto eliminado",
-      "attachmentTooLarge": "El archivo debe tener hasta 8MB",
+      "attachmentTooLarge": "El archivo debe tener hasta {{mb}} MB",
       "uploading": "Subiendo...",
       "deleteCard": "Eliminar tarjeta",
       "deleteCardConfirm": "¿Eliminar esta tarjeta de forma permanente?",
@@ -246,7 +654,7 @@
       "board": "Tablero",
       "table": "Tabla",
       "calendar": "Calendario",
-      "timeline": "Línea de tiempo",
+      "gantt": "Gantt",
       "dashboard": "Panel",
       "map": "Mapa",
       "matrix": "Matriz de Eisenhower"
@@ -268,12 +676,8 @@
       "today": "Hoy",
       "prevMonth": "Mes anterior",
       "nextMonth": "Mes siguiente",
-      "more": "+{{count}} más"
-    },
-    "timeline": {
-      "empty": "No hay tarjetas con fecha de inicio o entrega para mostrar en la línea de tiempo.",
-      "undated_one": "{{count}} tarjeta sin fecha de inicio/entrega no mostrada.",
-      "undated_other": "{{count}} tarjetas sin fecha de inicio/entrega no mostradas."
+      "more": "+{{count}} más",
+      "routinePreview": "Vista previa de la rutina automática \"{{title}}\" - todavía no es una tarjeta"
     },
     "dashboard": {
       "totalCards": "Total de tarjetas",
@@ -303,35 +707,63 @@
       "dropHere": "Arrastra tarjetas aquí"
     }
   },
-  "minutes": {
-    "screen": {
-      "title": "Actas de Reunión",
-      "newMinute": "+ Nueva acta",
-      "loading": "Cargando actas...",
-      "empty": "Aún no hay actas registradas."
-    },
-    "modal": {
-      "titlePlaceholder": "Título de la reunión",
-      "date": "Fecha",
-      "author": "Autor",
-      "participants": "Participantes",
-      "noUsersYet": "Aún no hay usuarios registrados.",
-      "agenda": "Agenda",
-      "agendaPlaceholder": "Qué se va a discutir...",
-      "decisions": "Decisiones",
-      "decisionsPlaceholder": "Qué se decidió...",
-      "actionItems": "Tareas",
-      "assignee": "Responsable",
-      "addActionPlaceholder": "Agregar una tarea",
-      "deleteMinute": "Eliminar acta",
-      "deleteConfirm": "¿Eliminar esta acta de forma permanente?",
-      "minuteDeletedToast": "Acta eliminada",
-      "minuteCreatedToast": "Acta creada",
-      "minuteUpdatedToast": "Acta actualizada",
-      "saving": "Guardando...",
-      "createMinute": "Crear acta",
-      "saveChanges": "Guardar cambios"
+  "datePicker": {
+    "today": "Hoy",
+    "clear": "Quitar fecha",
+    "recurrence": "Configurar recurrencia",
+    "recurrenceHint": "Las tarjetas recurrentes se configuran desde el menú de datos del tablero, no desde aquí",
+    "presets": {
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "weekend": "Próximo fin de semana",
+      "nextWeek": "Próxima semana",
+      "twoWeeks": "2 semanas",
+      "fourWeeks": "4 semanas",
+      "eightWeeks": "8 semanas"
     }
+  },
+  "gantt": {
+    "columns": { "activity": "Actividad", "status": "Estado", "group": "Grupo", "start": "Inicio", "due": "Plazo" },
+    "toolbar": {
+      "new": "Nuevo",
+      "open": "Abrir",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "undo": "Deshacer",
+      "print": "Imprimir",
+      "export": "Exportar",
+      "search": "Filtrar / buscar",
+      "searchPlaceholder": "Buscar por título...",
+      "zoom": "Zoom",
+      "resetZoom": "Restablecer zoom"
+    },
+    "saveError": "No se pudo guardar: {{erro}}",
+    "newTaskDefaultTitle": "Nueva tarea",
+    "noSearchResults": "No se encontró ninguna tarea para esa búsqueda.",
+    "status": {
+      "done": "Hecho",
+      "todo": "Por hacer",
+      "inProgress": "En curso",
+      "late": "Atrasado",
+      "agency": "Agencia de publicidad",
+      "lateFlag": "¡atrasado!"
+    },
+    "legend": {
+      "icons": { "meeting": "reunión", "call": "llamada", "mail": "correo", "check": "revisar progreso" }
+    },
+    "meta": { "event": "evento:", "venue": "lugar:", "date": "fecha:" },
+    "emptyState": "Nada para mostrar en el Gantt todavía."
+  },
+  "chat": {
+    "title": "Chat de la empresa",
+    "you": "Tú",
+    "unknownAuthor": "Usuario eliminado",
+    "empty": "Todavía no hay mensajes. Empieza la conversación.",
+    "placeholder": "Escribe un mensaje...",
+    "send": "Enviar",
+    "generalTitle": "General",
+    "newConversation": "+ Nueva conversación",
+    "noCandidates": "Nadie más para agregar"
   },
   "users": {
     "title": "Panel de usuarios",
@@ -358,22 +790,219 @@
     "userCreatedToast": "Usuario creado",
     "userDeletedToast": "Usuario eliminado",
     "passwordResetToast": "Contraseña restablecida",
-    "passwordMinLength": "La nueva contraseña debe tener al menos 6 caracteres"
+    "passwordMinLength": "La nueva contraseña debe tener al menos 6 caracteres",
+    "companyCnpjLabel": "CNPJ o CPF de la empresa",
+    "companyCnpjHint": "Quien quiera pedir acceso a tu empresa deberá ingresar este número.",
+    "companyCnpjSave": "Guardar",
+    "companyCnpjSaved": "CNPJ guardado",
+    "joinRequestsTitle": "Solicitudes de acceso",
+    "joinRequestsEmpty": "Ninguna solicitud pendiente.",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "requestApprovedToast": "{{name}} ahora es parte de la empresa",
+    "requestRejectedToast": "Solicitud rechazada"
+  },
+  "team": {
+    "title": "Equipo",
+    "viewProfile": "Ver perfil",
+    "sendMessage": "Enviar mensaje",
+    "back": "Volver",
+    "manageUsers": "Administrar usuarios"
+  },
+  "planner": {
+    "title": "Planificador personal",
+    "subtitle": "Tu agenda, fuera de los tableros",
+    "tabCalendar": "Calendario",
+    "tabList": "Mis tareas",
+    "addPlaceholder": "Nueva tarea personal...",
+    "add": "Agregar",
+    "empty": "Todavía no hay tareas personales.",
+    "deleteConfirm": "¿Eliminar la tarea \"{{title}}\"?",
+    "groupOverdue": "Atrasadas",
+    "groupToday": "Hoy",
+    "groupTomorrow": "Mañana",
+    "groupUpcoming": "Próximas",
+    "groupCompleted": "Completadas",
+    "planRequired": "El planificador personal está disponible desde el plan Profesional. Puedes ver y borrar lo que ya existe."
+  },
+  "plan": {
+    "monthlyLabel": "Mensualidad",
+    "listPriceLabel": "Precio de tabla",
+    "discountLabel": "Descuento aplicado",
+    "onRequest": "Bajo consulta",
+    "contractedAtLabel": "Contratado el",
+    "perMonth": "/mes",
+    "upgradeTitle": "Subir de plan",
+    "upgradeConfirm": "¿Contratar el plan {{plan}} por {{price}}/mes? El ciclo empieza a contar hoy.",
+    "downgradeHint": "Para bajar de plan o cancelar, contacta al soporte. Aquí solo se puede subir.",
+    "menuItem": "Mi plan",
+    "title": "Plan de la empresa",
+    "unlimited": "ilimitado",
+    "usersLabel": "Usuarios",
+    "renewsOnLabel": "Válido hasta",
+    "expiredOnLabel": "Expiró el",
+    "daysLeftLabel": "Tiempo restante",
+    "daysLeftValue": "{{count}} día",
+    "daysLeftValue_other": "{{count}} días",
+    "userLimitReached": "Alcanzaste el límite de usuarios de este plan. Cambia de plan para agregar más personas.",
+    "masterOnly": "Solo el usuario master puede cambiar el plan de la empresa.",
+    "changed": "Plan cambiado a {{plan}}",
+    "names": {
+      "basic": "Básico",
+      "intermediate": "Intermedio",
+      "professional": "Profesional",
+      "enterprise": "Empresarial"
+    },
+    "status": {
+      "active": "Activo",
+      "trialing": "En prueba",
+      "expired": "Expirado",
+      "grace": "Pago pendiente"
+    },
+    "trialEnding": "Tu prueba termina en {{count}} día",
+    "trialEnding_other": "Tu prueba termina en {{count}} días",
+    "expiredMessage": "Tu plan expiró. Todavía ves todo, pero no puedes crear ni editar.",
+    "continueOnBasic": "Continuar en el plan Básico gratis",
+    "movedToBasic": "Plan cambiado a Básico",
+    "selectTitle": "Elegir plan",
+    "freeChoiceHint": "Aún no tienes un plan de pago vigente, así que puedes elegir cualquier plan de abajo, incluido el Básico gratuito, que no caduca.",
+    "selectFreeConfirm": "¿Pasar al plan {{plan}}? Es gratuito y no tiene fecha de vencimiento."
+  },
+  "billing": {
+    "checkoutTitle": "Contratar {{plan}}",
+    "chooseMethod": "Cómo quieres pagar",
+    "methods": {
+      "pix": "Pix",
+      "card": "Tarjeta de crédito",
+      "boleto": "Boleto"
+    },
+    "methodNotes": {
+      "pix": "Se acredita en segundos",
+      "card": "Se renueva solo cada mes",
+      "boleto": "Se acredita hasta en 3 días hábiles"
+    },
+        "docLabel": "CPF o CNPJ del pagador",
+    "docHint": "Exigido por el banco para emitir el cobro.",
+    "docInvalid": "CPF o CNPJ inválido. Revisa los números.",
+        "cardRedirectNote": "Serás llevado a una página segura para ingresar la tarjeta, y volverás aquí en cuanto termines. El número de la tarjeta no pasa por nuestros servidores.",
+    "continueToCheckout": "Continuar al pago",
+    "payNow": "Pagar ahora",
+    "processing": "Procesando...",
+    "fineprint": "El plan se libera cuando se confirma el pago. Puedes cancelar la renovación cuando quieras.",
+    "cardNumber": "Número de la tarjeta",
+    "cardName": "Nombre en la tarjeta",
+    "cardExpiry": "Vencimiento",
+    "cardCvv": "CVV",
+    "testMode": "Modo de prueba: no se hace ningún cobro real.",
+    "testCards": "Tarjetas de prueba: terminación 1111 aprueba, 0002 rechaza, 0003 sin saldo, 0004 vencida.",
+    "awaitingPayment": "Esperando el pago",
+    "pixCopyPaste": "Pix copiar y pegar",
+    "boletoLine": "Línea digitable",
+    "copyCode": "Copiar código",
+    "copied": "Copiado",
+    "copyFailed": "No se pudo copiar. Selecciona el código y cópialo a mano.",
+    "payUntil": "Paga hasta {{date}}",
+    "willUpdateAlone": "Esta pantalla se actualiza sola cuando se confirme el pago.",
+    "simulateConfirm": "Simular confirmación del pago",
+    "paid": "Pagado",
+    "paidToast": "Pago confirmado",
+    "releasedUntil": "Acceso liberado hasta {{date}}",
+    "failed": "No aprobado",
+    "failureGeneric": "El pago no fue aprobado. Prueba otra forma de pago.",
+    "failureReasons": {
+      "CARD_DECLINED": "La tarjeta fue rechazada por el banco emisor.",
+      "INSUFFICIENT_FUNDS": "No había saldo o límite suficiente.",
+      "EXPIRED_CARD": "La tarjeta está vencida.",
+      "EXPIRED": "El cobro venció antes de ser pagado."
+    },
+    "tryAgain": "Intentar de nuevo",
+    "finishPayment": "Terminar el pago",
+    "subscriptionTitle": "Suscripción",
+    "methodLabel": "Forma de pago",
+    "nextChargeLabel": "Próximo cobro",
+    "subStatusLabel": "Situación",
+    "subStatus": {
+      "active": "Activa",
+      "past_due": "Pago atrasado",
+      "canceled": "Cancelada"
+    },
+    "cancelSubscription": "Cancelar renovación",
+    "cancelConfirm": "¿Cancelar la renovación automática? Mantienes el acceso hasta el fin del período ya pagado.",
+    "canceled": "Renovación cancelada",
+    "canceledHint": "La renovación está cancelada. El acceso vale hasta el fin del período ya pagado.",
+    "historyTitle": "Historial de pagos",
+    "payStatus": {
+      "paid": "Pagado",
+      "pending": "Pendiente",
+      "failed": "No aprobado",
+      "canceled": "Cancelado",
+      "refunded": "Devuelto"
+    }
   },
   "errors": {
+    "NETWORK_UNREACHABLE": "El servidor no respondió. Comprueba que esté en ejecución e inténtalo de nuevo.",
+    "REPORT_FORMAT_INVALID": "Formato de informe no admitido",
+    "REPORT_STATUS_INVALID": "Filtro de estado inválido",
+    "BOARD_LIMIT_REACHED": "Límite de tableros del plan alcanzado. Elimina un tablero o mejora tu plan para crear otro.",
+    "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Profesional.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "El planificador personal está disponible desde el plan Profesional.",
+    "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Profesional.",
+    "INVALID_FREQUENCY": "Frecuencia inválida",
+    "WEEKDAY_REQUIRED": "Elige el día de la semana",
+    "MONTHDAY_REQUIRED": "Elige un día del mes entre 1 y 31",
+    "INVALID_HOUR": "La hora debe estar entre 0 y 23",
+    "LIST_REQUIRED": "Elige la columna de destino",
+    "LIST_NOT_FOUND": "Columna no encontrada",
+    "RECURRENCE_NOT_FOUND": "Rutina no encontrada",
+    "INVALID_STUCK_HOURS": "Indica un número de horas entre 1 y 8760",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Profesional.",
+    "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Aquí solo se puede subir de plan. Para bajar o cancelar, contacta al soporte.",
+    "PLAN_EXPIRED": "Tu plan expiró. Renueva para volver a editar.",
+    "PLAN_USER_LIMIT": "Tu plan alcanzó el límite de usuarios. Cambia de plan para agregar más.",
+    "PLAN_USER_LIMIT_EXCEEDED": "La empresa tiene más usuarios de los que permite el plan elegido.",
+    "INVALID_PLAN": "Plan inválido",
     "NOT_AUTHENTICATED": "No autenticado",
     "FORBIDDEN_MASTER_ONLY": "Acceso restringido al usuario master",
     "BOARD_NOT_FOUND": "Tablero no encontrado",
     "FORBIDDEN_BOARD_ACCESS": "No tienes acceso a este tablero",
+    "FORBIDDEN_BOARD_READ_ONLY": "Tu acceso a este tablero es de solo lectura",
+    "FORBIDDEN_BOARD_OWNER_ONLY": "Solo el dueño del tablero puede hacer esto",
+    "FORBIDDEN_NOT_CARD_CREATOR": "Solo quien creó la tarjeta puede eliminarla",
+    "BOARD_NOT_PRIVATE": "Solo los tableros privados tienen lista de acceso",
+    "INVALID_BOARD_ROLE": "Rol inválido",
+    "USER_ID_REQUIRED": "Selecciona un usuario",
+    "CANNOT_CHANGE_BOARD_OWNER": "El dueño ya tiene acceso al tablero",
     "NOT_FOUND": "No encontrado",
     "VALIDATION_MISSING_FIELDS": "Completa nombre, correo electrónico y una contraseña con al menos 6 caracteres",
     "COMPANY_NAME_REQUIRED": "Indica el nombre de la empresa",
     "EMAIL_ALREADY_REGISTERED": "Correo electrónico ya registrado",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Correo electrónico ya registrado (puede pertenecer a otra empresa)",
     "INVALID_CREDENTIALS": "Correo electrónico o contraseña inválidos",
+    "CNPJ_INVALID": "CNPJ o CPF inválido",
+    "COMPANY_NOT_FOUND": "Ninguna empresa encontrada con ese CNPJ o CPF",
+    "CNPJ_IN_USE": "Ese CNPJ o CPF ya está en uso por otra empresa",
+    "JOIN_REQUEST_PENDING": "Ya existe una solicitud pendiente para este correo electrónico",
+    "JOIN_REQUEST_NOT_FOUND": "Solicitud no encontrada",
+    "CHAT_MESSAGE_REQUIRED": "Escribe un mensaje antes de enviar",
+    "CHAT_MESSAGE_TOO_LONG": "Mensaje demasiado largo",
+    "CHAT_USER_REQUIRED": "Selecciona otro usuario",
+    "CHAT_USER_NOT_FOUND": "Usuario no encontrado",
+    "FORBIDDEN_CHAT_CONVERSATION": "No participas de esta conversación",
+    "TOO_MANY_CNPJ_LOOKUPS": "Demasiadas búsquedas por CNPJ desde esta dirección. Inténtalo de nuevo más tarde.",
+    "TOO_MANY_JOIN_REQUESTS": "Demasiadas solicitudes desde esta dirección. Inténtalo de nuevo más tarde.",
     "PASSWORD_TOO_SHORT": "La nueva contraseña debe tener al menos 6 caracteres",
     "CURRENT_PASSWORD_INCORRECT": "La contraseña actual es incorrecta",
     "TITLE_REQUIRED": "El título es obligatorio",
+    "DUE_REQUIRED": "Elige una fecha",
+    "PERSONAL_TASK_NOT_FOUND": "Tarea no encontrada",
+    "NAME_REQUIRED": "El nombre es obligatorio",
+    "BIO_TOO_LONG": "La descripción es demasiado larga",
+    "INVALID_IMAGE_TYPE": "Sube una imagen PNG, JPEG, WEBP o GIF",
+    "AVATAR_TOO_LARGE": "La foto debe tener hasta 3 MB",
+    "AVATAR_NOT_FOUND": "Foto no encontrada",
+    "AVATAR_SAVE_FAILED": "Error al guardar la foto",
+    "UPLOAD_FAILED": "Error al recibir el archivo",
+    "INVALID_UPLOAD": "Envío inválido",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Solo el usuario master puede eliminar tableros compartidos",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds es obligatorio",
     "CARD_IDS_REQUIRED": "cardIds es obligatorio",
@@ -381,9 +1010,6 @@
     "EMAIL_IN_USE": "Correo electrónico ya en uso",
     "INVALID_ROLE": "Rol inválido",
     "CANNOT_DELETE_MASTER": "No se puede eliminar al usuario master",
-    "MINUTE_NOT_FOUND": "Acta no encontrada",
-    "FORBIDDEN_MINUTE_EDIT": "Solo el autor o el usuario master puede editar esta acta",
-    "FORBIDDEN_MINUTE_DELETE": "Solo el autor o el usuario master puede eliminar esta acta",
     "ADDRESS_REQUIRED": "Indica una dirección para buscar",
     "ADDRESS_NOT_FOUND": "Dirección no encontrada",
     "GEOCODE_UNAVAILABLE": "No se pudo buscar la dirección ahora. Intenta de nuevo.",
@@ -395,7 +1021,22 @@
     "URL_REQUIRED": "Ingresa una URL",
     "INVALID_URL": "URL inválida",
     "FILE_REQUIRED": "Selecciona un archivo",
-    "FILE_TOO_LARGE": "El archivo debe tener hasta 8MB",
-    "ATTACHMENT_NOT_FOUND": "Adjunto no encontrado"
+    "FILE_TOO_LARGE": "El archivo supera el límite de tu plan.",
+    "ATTACHMENT_NOT_FOUND": "Adjunto no encontrado",
+    "LIST_NOT_IN_BOARD": "Esa columna no pertenece a este tablero.",
+    "TOO_MANY_GEOCODE_REQUESTS": "Demasiadas búsquedas de dirección en poco tiempo. Espera un momento e intenta de nuevo.",
+    "INVALID_TITLE": "Título no válido.",
+    "PAYER_DOCUMENT_REQUIRED": "Informa el CPF o CNPJ del pagador.",
+    "PAYER_DOCUMENT_INVALID": "CPF o CNPJ invalido. Revisa los numeros.",
+    "PAYER_EMAIL_REQUIRED": "Falta el correo del pagador.",
+    "CARD_TOKEN_REQUIRED": "No se pudo validar la tarjeta. Intenta de nuevo.",
+    "PLAN_REQUIRES_PAYMENT": "Contratar un plan de pago pasa por el pago.",
+    "PLAN_NOT_CHARGEABLE": "Ese plan no se cobra automáticamente.",
+    "INVALID_PAYMENT_METHOD": "Elige una forma de pago.",
+    "PAYMENT_ALREADY_PENDING": "Ya existe un cobro abierto. Págalo o espera a que venza.",
+    "CARD_DECLINED": "La tarjeta fue rechazada. Revisa los datos o prueba otra.",
+    "PAYMENT_NOT_FOUND": "Cobro no encontrado.",
+    "NO_SUBSCRIPTION": "No hay suscripción activa.",
+    "BILLING_PROVIDER_NOT_CONFIGURED": "El medio de pago aún no está configurado. Contacta al soporte."
   }
 }

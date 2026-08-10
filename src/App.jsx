@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "./state/AuthContext.jsx";
 import { BoardProvider } from "./state/BoardContext.jsx";
 import { UsersProvider } from "./state/UsersContext.jsx";
-import { MinutesProvider } from "./state/MinutesContext.jsx";
+import { ChatProvider } from "./state/ChatContext.jsx";
 import AuthScreen from "./screens/AuthScreen.jsx";
 import LandingScreen from "./screens/LandingScreen.jsx";
 import AuthenticatedApp from "./AuthenticatedApp.jsx";
@@ -24,9 +24,9 @@ export default function App() {
   return (
     <BoardProvider>
       <UsersProvider>
-        <MinutesProvider>
+        <ChatProvider>
           <AuthenticatedApp />
-        </MinutesProvider>
+        </ChatProvider>
       </UsersProvider>
     </BoardProvider>
   );

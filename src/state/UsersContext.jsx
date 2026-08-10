@@ -16,7 +16,11 @@ export function UsersProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    refresh().finally(() => setLoading(false));
+    // O catch é necessário: sem ele uma falha aqui virava unhandled rejection no
+    // console, sem nada indicando que a lista de usuários não carregou.
+    refresh()
+      .catch((err) => console.error("Falha ao carregar os usuários:", err))
+      .finally(() => setLoading(false));
   }, [refresh]);
 
   async function createUser(data) {

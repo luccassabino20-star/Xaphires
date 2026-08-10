@@ -1,8 +1,14 @@
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
+import { useToast } from "../state/ToastContext.jsx";
 import { LABEL_COLORS } from "../utils/labels.js";
-import { initials, colorForUser } from "../utils/members.js";
+import { isStuck, hoursStuck, formatDuration } from "../utils/bottlenecks.js";
 import { localeTag } from "../i18n/locale.js";
+import { uid } from "../utils/id.js";
+import SubtaskCard from "./SubtaskCard.jsx";
+import Avatar from "./Avatar.jsx";
 
 function formatDate(iso, lng) {
   if (!iso) return "";
@@ -44,13 +50,6 @@ function AttachmentIcon() {
     </svg>
   );
 }
-function CheckmarkIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="12" height="12">
-      <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
-    </svg>
-  );
-}
 function UrgentIcon() {
   return (
     <svg viewBox="0 0 24 24" width="13" height="13">
@@ -65,10 +64,59 @@ function ImportantIcon() {
     </svg>
   );
 }
+function QuickCheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
+    </svg>
+  );
+}
+function QuickPlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" />
+    </svg>
+  );
+}
+function QuickEditIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zm17.71-10.04a1 1 0 0 0 0-1.41l-2.51-2.51a1 1 0 0 0-1.41 0l-1.96 1.96 3.75 3.75z" />
+    </svg>
+  );
+}
+function QuickMoreIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+    </svg>
+  );
+}
+function ChevronDownIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
 
-export default function CardItem({ card, boardId, members, searchQuery, memberFilter, onOpen, onDragStart, onDragEnd }) {
+export default function CardItem({
+  card,
+  list,
+  boardId,
+  members,
+  searchQuery,
+  memberFilter,
+  onOpen,
+  onOpenSubtask,
+  readOnly,
+  canDeleteCard,
+  onDragStart,
+  onDragEnd,
+}) {
   const { t, i18n } = useTranslation();
   const dispatch = useBoardDispatch();
+  const showToast = useToast();
   const matchesSearch = !searchQuery || card.title.toLowerCase().includes(searchQuery.toLowerCase());
   const matchesMemberFilter = !memberFilter || (card.memberIds || []).includes(memberFilter);
   const dimmed = !matchesSearch || !matchesMemberFilter;
@@ -78,20 +126,152 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
   const hasDesc = !!(card.description && card.description.trim());
   const hasAttachments = card.attachments && card.attachments.length > 0;
   const cardMembers = (card.memberIds || []).map((id) => members.find((m) => m.id === id)).filter(Boolean);
+  const subtasks = card.subtasks || [];
+  const hasSubtasks = subtasks.length > 0;
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuCoords, setMenuCoords] = useState(null);
+  const [subtasksOpen, setSubtasksOpen] = useState(false);
+  const moreBtnRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   function toggleCompleted(e) {
     e.stopPropagation();
     dispatch({ type: "TOGGLE_CARD_COMPLETED", boardId, cardId: card.id });
   }
+  function handleOpenSubtask(e) {
+    e.stopPropagation();
+    onOpenSubtask();
+  }
+  function handleEdit(e) {
+    e.stopPropagation();
+    onOpen();
+  }
+  function toggleMenu(e) {
+    e.stopPropagation();
+    setMenuOpen((o) => !o);
+  }
+  function handleArchive(e) {
+    e.stopPropagation();
+    dispatch({ type: "ARCHIVE_CARD", boardId, cardId: card.id, at: new Date().toISOString() });
+    showToast(t("board.cardModal.cardArchivedToast"));
+    setMenuOpen(false);
+  }
+  function handleDuplicate(e) {
+    e.stopPropagation();
+    dispatch({
+      type: "DUPLICATE_CARD",
+      boardId,
+      cardId: card.id,
+      newId: uid(),
+      title: `${card.title}${t("board.cardItem.duplicateSuffix")}`,
+    });
+    showToast(t("board.cardItem.cardDuplicatedToast"));
+    setMenuOpen(false);
+  }
+  function handleDelete(e) {
+    e.stopPropagation();
+    setMenuOpen(false);
+    if (!confirm(t("board.cardModal.deleteCardConfirm"))) return;
+    dispatch({ type: "DELETE_CARD", boardId, cardId: card.id });
+    showToast(t("board.cardModal.cardDeletedToast"));
+  }
+  function toggleSubtasksOpen(e) {
+    e.stopPropagation();
+    setSubtasksOpen((o) => !o);
+  }
+  function toggleSubtaskDone(subtaskId) {
+    dispatch({ type: "TOGGLE_SUBTASK", boardId, cardId: card.id, subtaskId });
+  }
+  function handleRemoveSubtask(subtaskId) {
+    dispatch({ type: "REMOVE_SUBTASK", boardId, cardId: card.id, subtaskId });
+  }
+  function handleUpdateSubtask(subtaskId, patch) {
+    dispatch({ type: "UPDATE_SUBTASK", boardId, cardId: card.id, subtaskId, patch });
+  }
+
+  // Dropdown por portal em document.body, mesma razão do popover do DatePicker
+  // (ver DatePicker.jsx): a coluna do quadro rola com overflow-y:auto, e um
+  // menu posicionado relativo ao card ficaria cortado perto do fim da coluna.
+  const DROPDOWN_WIDTH = 160;
+  useLayoutEffect(() => {
+    if (!menuOpen) return;
+    const rect = moreBtnRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const left = Math.min(rect.right - DROPDOWN_WIDTH, window.innerWidth - DROPDOWN_WIDTH - 8);
+    setMenuCoords({ top: rect.bottom + 4, left: Math.max(left, 8) });
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onDocClick(e) {
+      if (moreBtnRef.current?.contains(e.target)) return;
+      if (dropdownRef.current?.contains(e.target)) return;
+      setMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [menuOpen]);
 
   return (
+    <div className="kanban-card-wrapper">
     <div
       className={"card" + (dimmed ? " dimmed" : "") + (card.completed ? " completed" : "")}
-      draggable
+      draggable={!readOnly}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onClick={onOpen}
     >
+      {!readOnly && (
+        <div className="quick-actions-bar" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className="quick-action-btn"
+            title={card.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
+            onClick={toggleCompleted}
+          >
+            <QuickCheckIcon />
+          </button>
+          <button type="button" className="quick-action-btn" title={t("board.cardModal.addSubtask")} onClick={handleOpenSubtask}>
+            <QuickPlusIcon />
+          </button>
+          <button type="button" className="quick-action-btn" title={t("board.cardItem.edit")} onClick={handleEdit}>
+            <QuickEditIcon />
+          </button>
+          <button type="button" className="quick-action-btn" ref={moreBtnRef} title={t("board.cardItem.moreActions")} onClick={toggleMenu}>
+            <QuickMoreIcon />
+          </button>
+          {menuOpen &&
+            menuCoords &&
+            createPortal(
+              <div className="quick-actions-dropdown" ref={dropdownRef} style={{ top: menuCoords.top, left: menuCoords.left }}>
+                <button type="button" onClick={handleArchive}>
+                  {t("board.cardModal.archiveCard")}
+                </button>
+                <button type="button" onClick={handleDuplicate}>
+                  {t("board.cardItem.duplicate")}
+                </button>
+                {canDeleteCard && (
+                  <button type="button" className="quick-actions-dropdown-danger" onClick={handleDelete}>
+                    {t("board.cardModal.deleteCard")}
+                  </button>
+                )}
+              </div>,
+              document.body
+            )}
+        </div>
+      )}
+
+      {isStuck(card, list) && (
+        <div
+          className="card-stuck"
+          title={t("board.bottlenecks.cardTooltip", { duration: formatDuration(hoursStuck(card), t) })}
+        >
+          <span className="card-stuck-dot" />
+          {formatDuration(hoursStuck(card), t)}
+        </div>
+      )}
+
       {card.labels?.length > 0 && (
         <div className="card-labels">
           {card.labels.map((labelId) => {
@@ -103,14 +283,6 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
       )}
 
       <div className="card-title-row">
-        <button
-          type="button"
-          className={"card-complete-check" + (card.completed ? " checked" : "")}
-          onClick={toggleCompleted}
-          title={card.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
-        >
-          {card.completed && <CheckmarkIcon />}
-        </button>
         <div className="card-title-text">{card.title}</div>
       </div>
 
@@ -128,7 +300,12 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
               </span>
             )}
             {hasDue && (
-              <span className={"card-meta-item" + (isOverdue(card.due, card.checklist) ? " due-overdue" : "")}>
+              <span
+                className={
+                  "card-meta-item" +
+                  (isOverdue(card.due, card.checklist) ? " due-overdue" : card.completed ? " due-done" : "")
+                }
+              >
                 <ClockIcon /> {formatDate(card.due, i18n.language)}
               </span>
             )}
@@ -151,14 +328,47 @@ export default function CardItem({ card, boardId, members, searchQuery, memberFi
           {cardMembers.length > 0 && (
             <div className="card-avatars">
               {cardMembers.map((m) => (
-                <span key={m.id} className="avatar avatar-small" style={{ background: colorForUser(m.id) }} title={m.name}>
-                  {initials(m.name)}
-                </span>
+                <Avatar key={m.id} id={m.id} name={m.name} avatarUrl={m.avatarUrl} className="avatar-small" title={m.name} />
               ))}
             </div>
           )}
         </div>
       )}
+
+      {hasSubtasks && (
+        <button
+          type="button"
+          className={"subtasks-toggle-btn" + (subtasksOpen ? " expanded" : "")}
+          onClick={toggleSubtasksOpen}
+          aria-expanded={subtasksOpen}
+        >
+          <ChevronDownIcon />
+          <span>{t("board.cardItem.subtasksCount", { count: subtasks.length })}</span>
+        </button>
+      )}
+    </div>
+
+    {hasSubtasks && (
+      // Mesmo componente "card" que o pai (SubtaskCard reaproveita
+      // card-title-row/card-footer-row/quick-actions-bar), com prioridade
+      // (urgente + importante, o mesmo par do card principal), prazo e
+      // responsável editáveis ali mesmo - não só uma prévia, um card de
+      // verdade ligado à tarefa principal.
+      <div className={"subtasks-container" + (subtasksOpen ? " open" : "")}>
+        {subtasks.map((st) => (
+          <SubtaskCard
+            key={st.id}
+            subtask={st}
+            members={members}
+            readOnly={readOnly}
+            onOpen={onOpen}
+            onToggleDone={() => toggleSubtaskDone(st.id)}
+            onRemove={() => handleRemoveSubtask(st.id)}
+            onUpdate={(patch) => handleUpdateSubtask(st.id, patch)}
+          />
+        ))}
+      </div>
+    )}
     </div>
   );
 }

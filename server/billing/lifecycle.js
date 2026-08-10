@@ -1,0 +1,397 @@
+// O ciclo de vida da assinatura: emitir cobrança, confirmar pagamento, renovar,
+// insistir quando o cartão falha, e desistir na hora certa.
+//
+// Duas regras que valem para tudo aqui:
+//
+// 1. CONFIRMAR PAGAMENTO É O ÚNICO CAMINHO QUE LIBERA ACESSO. Nenhuma outra função
+//    escreve companies.plan/expires_at. Quem quiser dar acesso passa por
+//    confirmarPagamento(), que só é chamada com um pagamento em estado paid.
+//
+// 2. TUDO É IDEMPOTENTE. varrerCobranca() roda na leitura do quadro, ou seja, dezenas
+//    de vezes por sessão e em requisições concorrentes. Nada aqui pode cobrar duas
+//    vezes o mesmo ciclo nem emitir um Pix por acesso.
+
+import crypto from "node:crypto";
+import { getCompany, setCompanyPlan, setCompanyGrace, getCompanyPlanDiscounts } from "../directory.js";
+import { getPlan, priceCentsOf, addOneMonth, effectiveStatus } from "../plans.js";
+import { gateway, metodoTemDebitoAutomatico, metodoRenovaSozinho } from "./gateway.js";
+import * as store from "./store.js";
+
+// Dias de escrita liberada depois do vencimento, enquanto a cobrança tenta. Boleto
+// compensa em até 3 dias úteis; menos que isso puniria quem pagou em dia.
+export const GRACE_DAYS = 5;
+
+// Tentativas de cartão por ciclo, e o espaçamento entre elas em dias a partir do
+// vencimento. Três tentativas em uma semana é o costume: recusa por saldo costuma
+// resolver sozinha no dia do salário, recusa por cartão expirado não resolve nunca.
+export const MAX_TENTATIVAS_CARTAO = 3;
+export const ESPACAMENTO_DIAS = [0, 3, 7];
+
+function nowIso() {
+  return new Date().toISOString();
+}
+function uid() {
+  return crypto.randomUUID();
+}
+function maisDias(iso, dias) {
+  return new Date(new Date(iso).getTime() + dias * 86400000).toISOString();
+}
+
+// ---------- Confirmação: o único caminho que concede acesso ----------
+
+// Aplica um pagamento aprovado: marca como pago, empurra o vencimento e agenda o
+// próximo ciclo. Idempotente — chamada duas vezes para o mesmo pagamento (webhook
+// duplicado, que é rotina) não estende o acesso duas vezes.
+export function confirmarPagamento(paymentId, { paidAt } = {}) {
+  const pagamento = store.getPayment(paymentId);
+  if (!pagamento) return null;
+  if (pagamento.status === "paid") return pagamento; // já aplicado
+
+  const pago = store.setPaymentStatus(paymentId, "paid", { paidAt });
+  if (pago?.status !== "paid") return pago;
+
+  const empresa = getCompany(pagamento.company_id);
+  // Paga adiantado não perde os dias que restavam: o ciclo novo começa no fim do
+  // atual, não em hoje. Já vencido, conta de hoje.
+  const base =
+    empresa?.expires_at && new Date(empresa.expires_at) > new Date() ? empresa.expires_at : nowIso();
+  const novoVencimento = addOneMonth(base);
+
+  // O período do pagamento passa a ser o que ele realmente comprou. Sem isto, quem
+  // paga adiantado via no comprovante um intervalo contado de hoje, enquanto o acesso
+  // ia até um mês depois do vencimento antigo — dois números diferentes na mesma tela.
+  store.setPaymentPeriod(paymentId, base, novoVencimento);
+
+  setCompanyPlan(pagamento.company_id, {
+    plan: pagamento.plan,
+    status: "active",
+    expiresAt: novoVencimento,
+    // contracted_at marca o início do vínculo, então só é reescrito quando o plano
+    // muda de fato — renovar não reinicia a data de contratação.
+    contractedAt: empresa?.plan === pagamento.plan ? empresa.contracted_at : nowIso(),
+  });
+  // Pagou: não há mais o que perdoar.
+  setCompanyGrace(pagamento.company_id, null);
+
+  if (pagamento.subscription_id) {
+    store.updateSubscription(pagamento.subscription_id, {
+      plan: pagamento.plan,
+      status: "active",
+      // Só pula o agendamento quando o PROVEDOR ATIVO renova esse método sozinho
+      // (Asaas, cartão) - agendar aqui faria a varredura emitir uma SEGUNDA
+      // cobrança por cima da que o próprio gateway já vai gerar. O simulado não
+      // tem esse motor (nem tinha o Mercado Pago, antes), então cartão nele
+      // continua sendo agendado como Pix e boleto sempre foram - é o que deixa
+      // renovação exercitável em desenvolvimento.
+      nextChargeAt: metodoRenovaSozinho(pagamento.method) ? null : novoVencimento,
+    });
+  }
+  return store.getPayment(paymentId);
+}
+
+// Falha de uma tentativa. Não tranca ninguém: só registra e decide se ainda vale
+// insistir. Quem tranca é o vencimento passar da carência.
+export function registrarFalha(paymentId, motivo) {
+  const pagamento = store.getPayment(paymentId);
+  if (!pagamento) return null;
+  store.setPaymentStatus(paymentId, "failed", { failureReason: motivo || "UNKNOWN" });
+
+  if (!pagamento.subscription_id) return store.getPayment(paymentId);
+
+  const tentativas = store.countAttempts(pagamento.subscription_id, pagamento.period_start);
+  const assinatura = store.getSubscription(pagamento.subscription_id);
+  const vencimento = pagamento.period_start || nowIso();
+
+  // Cartão que o próprio provedor renova sozinho (Asaas): quem decide se tenta de
+  // novo é ele (tem a política de retentativa própria), não nós - reagendar um
+  // next_charge_at aqui faria a varredura emitir um checkout novo por cima da
+  // renovação que o gateway já está tentando sozinho. Fica só marcado como
+  // inadimplente; se o gateway desistir de vez, o acesso cai quando a carência
+  // (companies.grace_until) esgotar, sem precisar de um agendamento nosso. No
+  // simulado, sem esse motor, cartão continua reagendando como sempre.
+  if (tentativas >= MAX_TENTATIVAS_CARTAO || metodoRenovaSozinho(pagamento.method)) {
+    store.updateSubscription(pagamento.subscription_id, { status: "past_due", nextChargeAt: null });
+  } else {
+    // Reagenda para a próxima janela, contada do vencimento e não de agora, para
+    // três falhas seguidas não empurrarem o ciclo indefinidamente.
+    const proximo = maisDias(vencimento, ESPACAMENTO_DIAS[tentativas] ?? 3);
+    store.updateSubscription(pagamento.subscription_id, { status: "past_due", nextChargeAt: proximo });
+  }
+  return store.getPayment(paymentId);
+}
+
+// ---------- Emissão ----------
+
+// Emite a cobrança de um ciclo. Devolve o pagamento criado, já com o estado que o
+// gateway respondeu — pago (cartão aprovado), pendente (Pix/boleto) ou falho.
+export async function emitirCobranca({ companyId, plan, method, subscriptionId, card, payer, periodStart, attempt }) {
+  const centavos = priceCentsOf(plan);
+  if (centavos === null) {
+    const err = new Error("Plano sob consulta não passa por cobrança automática");
+    err.code = "PLAN_NOT_CHARGEABLE";
+    throw err;
+  }
+  // Desconto negociado por fora, por plano (companies.discount_by_plan, ver
+  // directory.js) - o mesmo desconto não segue a empresa se ela mudar de plano.
+  // Vai como discount na cobrança do Asaas em cima do preço de tabela, não
+  // subtraído aqui - o boleto/Pix precisa mostrar os dois valores, não só o líquido.
+  // O que esta função registra localmente em amountCents É o líquido, porque é o
+  // que a empresa de fato paga; o preço de tabela sem desconto some deste ponto em
+  // diante e só existe para o gateway montar o documento.
+  const descontoCentavos = Math.min(getCompanyPlanDiscounts(getCompany(companyId))[plan] || 0, centavos);
+  const centavosLiquidos = centavos - descontoCentavos;
+
+  const inicio = periodStart || nowIso();
+  const tentativa = attempt || 1;
+  // Gerado ANTES da chamada ao gateway, e não depois: um checkout hospedado (ver
+  // providers/asaas.js) não devolve um id de cobrança de verdade na hora - o
+  // pagamento local nasce com um pseudo-id ("checkout:<id-do-checkout>"), e o
+  // webhook que chega bem depois é quem casa de volta com esta linha (pelo
+  // checkoutSession do aviso, não por este paymentId - ver routes/billingWebhook.js).
+  // paymentId ainda vai como externalReference do checkout, só para reconciliação
+  // manual no painel do Asaas: testado, esse campo não propaga para o pagamento
+  // gerado, então o sistema não depende dele para nada.
+  const paymentId = uid();
+  const resposta = await gateway.criarCobranca({
+    amountCents: centavos,
+    discountCents: descontoCentavos,
+    method,
+    plan,
+    companyId,
+    card,
+    payer,
+    paymentId,
+    // Estável para a mesma tentativa do mesmo ciclo, diferente entre tentativas.
+    // É o que impede a varredura, ao rodar duas vezes por retry de rede, de virar
+    // duas cobranças no cartão do cliente.
+    idempotencyKey: `${subscriptionId || companyId}:${inicio}:${tentativa}`,
+  });
+
+  const pagamento = store.createPayment({
+    id: paymentId,
+    companyId,
+    subscriptionId,
+    plan,
+    amountCents: centavosLiquidos,
+    method,
+    provider: gateway.nome,
+    providerChargeId: resposta.providerChargeId,
+    checkoutUrl: resposta.checkoutUrl,
+    pixCode: resposta.pixCode,
+    boletoLine: resposta.boletoLine,
+    periodStart: inicio,
+    periodEnd: addOneMonth(inicio),
+    attempt: tentativa,
+    dueAt: resposta.dueAt,
+    // Nasce sempre pendente e só então transiciona, para o histórico registrar a
+    // emissão mesmo que a confirmação falhe no meio.
+    status: "pending",
+  });
+
+  if (resposta.status === "paid") return confirmarPagamento(pagamento.id);
+  if (resposta.status === "failed") return registrarFalha(pagamento.id, resposta.failureReason);
+  return pagamento;
+}
+
+// ---------- Contratação ----------
+
+// Inicia a assinatura de um plano pago. É o que POST /api/billing/subscribe chama.
+//
+// Não concede plano nenhum por conta própria: quem concede é a confirmação do
+// pagamento. Com cartão aprovado isso acontece na mesma chamada; com Pix e boleto o
+// plano só muda quando o pagamento for confirmado, e até lá a empresa continua
+// exatamente no acesso que já tinha.
+export async function assinar({ companyId, plan, method, card, payer }) {
+  const jaPendente = store.pendingPayment(companyId);
+  if (jaPendente) {
+    const err = new Error("Já existe uma cobrança em aberto. Pague ou aguarde o vencimento dela.");
+    err.code = "PAYMENT_ALREADY_PENDING";
+    err.payment = jaPendente;
+    throw err;
+  }
+
+  const anterior = store.getActiveSubscription(companyId);
+  if (anterior) {
+    // Trocar de plano ou de meio encerra a assinatura antiga: uma empresa não pode
+    // ter duas recorrências ativas cobrando ao mesmo tempo.
+    if (anterior.provider_subscription_id) {
+      try {
+        await gateway.cancelarAssinatura(anterior.provider_subscription_id);
+      } catch (err) {
+        console.error("[billing] falha ao cancelar assinatura anterior no gateway:", err.message);
+      }
+    }
+    store.updateSubscription(anterior.id, { status: "canceled", canceledAt: nowIso(), nextChargeAt: null });
+  }
+
+  let providerSubscriptionId = null;
+  if (metodoTemDebitoAutomatico(method)) {
+    const r = await gateway.criarAssinatura({ plan, method, card, payer, amountCents: priceCentsOf(plan) });
+    if (r.status === "failed") {
+      const err = new Error("O cartão foi recusado.");
+      err.code = "CARD_DECLINED";
+      err.failureReason = r.failureReason;
+      throw err;
+    }
+    providerSubscriptionId = r.providerSubscriptionId;
+  }
+
+  const assinatura = store.createSubscription({
+    id: uid(),
+    companyId,
+    plan,
+    method,
+    provider: gateway.nome,
+    providerSubscriptionId,
+    // Fica sem próxima cobrança até o primeiro pagamento entrar: quem define o
+    // ciclo é a data em que o acesso passa a valer.
+    nextChargeAt: null,
+    payerEmail: payer?.email,
+    payerDoc: payer?.doc,
+  });
+
+  const pagamento = await emitirCobranca({
+    companyId,
+    plan,
+    method,
+    subscriptionId: assinatura.id,
+    card,
+    payer,
+  });
+
+  return { subscription: store.getSubscription(assinatura.id), payment: pagamento };
+}
+
+// Troca o meio de pagamento sem cobrar. Vale do próximo ciclo em diante: o ciclo
+// atual já está pago, e cobrar de novo agora seria cobrar duas vezes o mesmo mês.
+export async function trocarMetodo(subscriptionId, method, card) {
+  const assinatura = store.getSubscription(subscriptionId);
+  if (!assinatura) return null;
+
+  // Sair do cartão encerra o débito automático no gateway; entrar no cartão cria um.
+  if (assinatura.provider_subscription_id && !metodoTemDebitoAutomatico(method)) {
+    try {
+      await gateway.cancelarAssinatura(assinatura.provider_subscription_id);
+    } catch (err) {
+      console.error("[billing] falha ao encerrar débito automático:", err.message);
+    }
+    return store.updateSubscription(subscriptionId, { method, providerSubscriptionId: null });
+  }
+
+  if (metodoTemDebitoAutomatico(method)) {
+    const r = await gateway.criarAssinatura({ plan: assinatura.plan, method, card });
+    if (r.status === "failed") {
+      const err = new Error("O cartão foi recusado.");
+      err.code = "CARD_DECLINED";
+      err.failureReason = r.failureReason;
+      throw err;
+    }
+    // O cartão novo passou: se a assinatura estava inadimplente por recusa, volta a
+    // valer e a próxima cobrança é retomada no vencimento que já existia.
+    return store.updateSubscription(subscriptionId, {
+      method,
+      providerSubscriptionId: r.providerSubscriptionId,
+      status: assinatura.status === "canceled" ? "canceled" : "active",
+    });
+  }
+
+  return store.updateSubscription(subscriptionId, { method });
+}
+
+export async function cancelarAssinatura(companyId) {
+  const assinatura = store.getActiveSubscription(companyId);
+  if (!assinatura) return null;
+  if (assinatura.provider_subscription_id) {
+    try {
+      await gateway.cancelarAssinatura(assinatura.provider_subscription_id);
+    } catch (err) {
+      console.error("[billing] falha ao cancelar no gateway:", err.message);
+    }
+  }
+  // Cancelar não tira o acesso já pago: o vencimento continua valendo até o fim do
+  // ciclo que a pessoa pagou. O que para é a renovação.
+  return store.updateSubscription(assinatura.id, {
+    status: "canceled",
+    canceledAt: nowIso(),
+    nextChargeAt: null,
+  });
+}
+
+// ---------- Varredura ----------
+
+// Roda na leitura autenticada, como o arquivamento automático e as rotinas. Sem
+// agendador, e por isso obrigada a ser idempotente e barata quando não há nada a
+// fazer — o caminho comum é sair no primeiro if.
+export async function varrerCobranca(now = new Date()) {
+  const agora = now.toISOString();
+  const feito = { expirados: 0, emitidos: 0, carencias: 0 };
+
+  // 1. Cobrança pendente que passou do prazo vira cancelada, liberando espaço para
+  //    uma nova. Pix expira em 24h: sem isso a empresa ficaria travada para sempre
+  //    atrás de um código que já não pode ser pago.
+  for (const p of store.pendingExpired(agora)) {
+    store.setPaymentStatus(p.id, "canceled", { failureReason: "EXPIRED" });
+    feito.expirados++;
+  }
+
+  // 2. Assinaturas que já deviam ter cobrado.
+  for (const assinatura of store.subscriptionsDue(agora)) {
+    // Cobrança em aberto do mesmo ciclo: não emite outra.
+    if (store.pendingPayment(assinatura.company_id)) continue;
+
+    const tentativas = store.countAttempts(assinatura.id, assinatura.next_charge_at);
+    if (metodoTemDebitoAutomatico(assinatura.method) && tentativas >= MAX_TENTATIVAS_CARTAO) {
+      store.updateSubscription(assinatura.id, { status: "past_due", nextChargeAt: null });
+      continue;
+    }
+
+    try {
+      await emitirCobranca({
+        companyId: assinatura.company_id,
+        plan: assinatura.plan,
+        method: assinatura.method,
+        subscriptionId: assinatura.id,
+        // O pagador vem da assinatura porque a varredura roda fora do contexto da
+        // empresa e não teria como abrir o banco de cada uma para achar o e-mail.
+        payer: { email: assinatura.payer_email, doc: assinatura.payer_doc },
+        periodStart: assinatura.next_charge_at,
+        attempt: tentativas + 1,
+      });
+      feito.emitidos++;
+    } catch (err) {
+      // Gateway fora do ar não pode derrubar a leitura do quadro de ninguém.
+      console.error(`[billing] falha ao emitir cobrança da empresa ${assinatura.company_id}:`, err.message);
+    }
+  }
+
+  // 3. Carência para quem venceu com cobrança em andamento. Só aqui, e nunca para
+  //    teste terminado: quem nunca teve assinatura não recebe prolongamento.
+  for (const assinatura of store.subscriptionsNeedingGrace(agora)) {
+    const empresa = getCompany(assinatura.company_id);
+    if (!empresa?.expires_at) continue;
+    if (effectiveStatus(empresa, now) !== "expired") continue;
+    const limite = maisDias(empresa.expires_at, GRACE_DAYS);
+    if (new Date(limite) <= now) continue; // carência já esgotada
+    if (empresa.grace_until === limite) continue; // já concedida
+    setCompanyGrace(assinatura.company_id, limite);
+    feito.carencias++;
+  }
+
+  return feito;
+}
+
+// Confere no gateway o estado de uma cobrança pendente, sem depender do webhook.
+// Usado quando o cliente abre a tela de pagamento: aviso perdido é comum, e ficar
+// esperando um webhook que não chegou é o que gera "paguei e não liberou".
+export async function conferirPagamento(paymentId) {
+  const pagamento = store.getPayment(paymentId);
+  if (!pagamento || pagamento.status !== "pending") return pagamento;
+  try {
+    const r = await gateway.consultarCobranca(pagamento.provider_charge_id);
+    if (r?.status === "paid") return confirmarPagamento(paymentId);
+    if (r?.status === "failed") return registrarFalha(paymentId, r.failureReason);
+  } catch (err) {
+    console.error("[billing] falha ao consultar cobrança:", err.message);
+  }
+  return pagamento;
+}

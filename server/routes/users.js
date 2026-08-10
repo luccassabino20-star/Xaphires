@@ -3,6 +3,8 @@ import { requireAuth, requireMaster } from "../middleware.js";
 import { hashPassword } from "../auth.js";
 import { ah } from "../asyncHandler.js";
 import * as directory from "../directory.js";
+import { normalizarDoc, docValido } from "../doc.js";
+import { listJoinRequestsForCompany, getJoinRequest, deleteJoinRequest } from "../joinRequestStore.js";
 import {
   listUsers,
   publicUser,
@@ -14,10 +16,109 @@ import {
   setUserRole,
   scrubUserFromCards,
   deletePrivateBoardsByOwner,
+  countUsers,
 } from "../repo.js";
+import { canAddUser, maxUsersFor } from "../plans.js";
 
 const router = Router();
 router.use(requireAuth);
+
+// Registradas antes de "/:id" de propósito: "/:id" casa com qualquer segmento
+// único, incluindo literalmente "company" ou "join-requests" - se essas rotas
+// entrassem depois, uma request para /company nunca chegaria aqui, cairia no
+// :id tratando "company" como um id de usuário.
+router.get(
+  "/company",
+  requireMaster,
+  ah(async (req, res) => {
+    const company = directory.getCompany(req.companyId);
+    res.json({ name: company?.name || "", cnpj: company?.cnpj || null });
+  })
+);
+
+router.patch(
+  "/company",
+  requireMaster,
+  ah(async (req, res) => {
+    const cnpj = normalizarDoc(req.body?.cnpj);
+    if (!docValido(cnpj)) return res.status(400).json({ error: "CNPJ ou CPF inválido", code: "CNPJ_INVALID" });
+    const donoAtual = directory.getCompanyIdForCnpj(cnpj);
+    if (donoAtual && donoAtual !== req.companyId)
+      return res.status(409).json({ error: "Esse CNPJ ou CPF já está em uso por outra empresa", code: "CNPJ_IN_USE" });
+    const company = directory.setCompanyCnpj(req.companyId, cnpj);
+    res.json({ name: company.name, cnpj: company.cnpj });
+  })
+);
+
+router.get(
+  "/join-requests",
+  requireMaster,
+  ah(async (req, res) => {
+    res.json(listJoinRequestsForCompany(req.companyId));
+  })
+);
+
+router.post(
+  "/join-requests/:id/approve",
+  requireMaster,
+  ah(async (req, res) => {
+    const pedido = getJoinRequest(req.params.id);
+    // company_id !== req.companyId não pode virar 403/404 diferentes: um master
+    // não tem como saber se o id existe numa empresa alheia, e diferenciar os dois
+    // casos daria essa informação de graça.
+    if (!pedido || pedido.company_id !== req.companyId)
+      return res.status(404).json({ error: "Solicitação não encontrada", code: "JOIN_REQUEST_NOT_FOUND" });
+
+    const company = directory.getCompany(req.companyId);
+    if (!canAddUser(company, countUsers())) {
+      const limite = maxUsersFor(company);
+      return res.status(403).json({
+        error: `Seu plano permite até ${limite} usuários. Mude de plano para adicionar mais.`,
+        code: "PLAN_USER_LIMIT",
+        maxUsers: limite,
+      });
+    }
+    // Corrida: o e-mail pode ter sido cadastrado em outro lugar entre o pedido e
+    // agora (outra empresa aprovou primeiro, ou a pessoa se cadastrou direto).
+    if (directory.getCompanyIdForEmail(pedido.email)) {
+      deleteJoinRequest(pedido.id);
+      return res.status(409).json({ error: "Este e-mail já está em uso", code: "EMAIL_ALREADY_REGISTERED" });
+    }
+
+    try {
+      directory.addUserToDirectory(pedido.email, req.companyId);
+    } catch {
+      deleteJoinRequest(pedido.id);
+      return res.status(409).json({ error: "Este e-mail já está em uso", code: "EMAIL_ALREADY_REGISTERED" });
+    }
+    let user;
+    try {
+      user = await insertUser({
+        name: pedido.name,
+        email: pedido.email,
+        passwordHash: pedido.password_hash,
+        role: "member",
+      });
+    } catch (err) {
+      directory.removeUserFromDirectory(pedido.email);
+      throw err;
+    }
+    deleteJoinRequest(pedido.id);
+    res.status(201).json(publicUser(user));
+  })
+);
+
+router.post(
+  "/join-requests/:id/reject",
+  requireMaster,
+  ah(async (req, res) => {
+    const pedido = getJoinRequest(req.params.id);
+    if (!pedido || pedido.company_id !== req.companyId)
+      return res.status(404).json({ error: "Solicitação não encontrada", code: "JOIN_REQUEST_NOT_FOUND" });
+    deleteJoinRequest(pedido.id);
+    res.json({ ok: true });
+  })
+);
 
 router.get(
   "/",
@@ -40,6 +141,17 @@ router.post(
       return res
         .status(409)
         .json({ error: "E-mail já cadastrado (pode já pertencer a outra empresa)", code: "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY" });
+    }
+    // Limite do plano, checado antes de qualquer escrita — se passasse daqui, o
+    // e-mail já teria entrado no diretório e sobraria lixo a limpar.
+    const company = directory.getCompany(req.companyId);
+    if (!canAddUser(company, countUsers())) {
+      const limite = maxUsersFor(company);
+      return res.status(403).json({
+        error: `Seu plano permite até ${limite} usuários. Mude de plano para adicionar mais.`,
+        code: "PLAN_USER_LIMIT",
+        maxUsers: limite,
+      });
     }
     try {
       directory.addUserToDirectory(email, req.companyId);

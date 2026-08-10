@@ -24,64 +24,131 @@
   },
   "landing": {
     "nav": {
-      "brand": "Kanban IMG",
+      "brand": "Xaphires",
       "home": "Home",
       "features": "Features",
       "solutions": "Solutions",
       "pricing": "Pricing",
       "enter": "Sign in"
     },
+    "promoPopup": {
+      "copy": "Copy",
+      "copied": "Copied!",
+      "defaultButton": "Claim offer"
+    },
     "home": {
       "heroTitle": "Your team organized, with no extra effort",
-      "heroText": "Kanban IMG replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines, priorities and meeting minutes, synced in real time for the whole team.",
+      "heroText": "Xaphires replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines and priorities, synced in real time for the whole team.",
       "ctaStart": "Get started",
       "ctaPlans": "See plans",
-      "heroNote": "No red tape. Cancel anytime.",
+      "heroNote": "7 days free with every feature, no credit card. After that, stay on the free plan forever if you want.",
+      "boardPreview": { "columns": [
+        { "title": "To do", "cards": [
+          { "title": "Site visit - Sector 4", "badge": "Today", "initials": "LS" },
+          { "title": "Quote - Room 4 renovation", "badge": "Tomorrow", "initials": "MA" }
+        ] },
+        { "title": "In progress", "cards": [
+          { "title": "Buy materials - Phase 2", "badge": "2/4", "initials": "TC" },
+          { "title": "Review supplier contract", "badge": "3 days", "initials": "LS" }
+        ] },
+        { "title": "Done", "cards": [
+          { "title": "Delivery - Lot 12", "badge": "Done", "initials": "MA", "done": true }
+        ] }
+      ] },
       "stats": [
-        { "value": "8", "label": "Integrated tools in one place" },
+        { "value": "13", "label": "Integrated tools in one place" },
         { "value": "100%", "label": "Real-time sync across the team" },
         { "value": "0", "label": "Loose spreadsheets or WhatsApp groups" },
         { "value": "24/7", "label": "Board access, from anywhere" }
       ],
       "benefits": [
         { "title": "Everything in one place", "text": "Replace loose spreadsheets, WhatsApp groups and scattered tools with a single system." },
-        { "title": "Your team already gets it", "text": "Simple interface, no training needed — anyone who's used a Kanban board starts using it in minutes." },
+        { "title": "Your team already gets it", "text": "Simple interface, no training needed. Anyone who's used a Kanban board starts using it in minutes." },
         { "title": "Grows with you", "text": "From a small team to multiple departments, with private and shared boards, access control and roles." }
       ],
-      "exploreTitle": "Explore Kanban IMG",
+      "exploreTitle": "Explore Xaphires",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Kanban IMG's 8 tools: board, table, calendar, map and more." },
-        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Kanban IMG day to day." },
+        { "page": "features", "badge": "F", "title": "Features", "text": "Discover Xaphires's tools: board, table, calendar, map and more." },
+        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Xaphires day to day." },
         { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Basic, Professional and Enterprise plans and pick the right one for your team." }
-      ]
+      ],
+      "faq": { "title": "Frequently asked questions", "items": [
+        { "q": "Do I need to install anything?", "a": "No. Xaphires runs straight in the browser, on desktop or mobile - no app to download and no server to set up." },
+        { "q": "Do I get support if something goes wrong?", "a": "Yes. Every plan includes email support; on the Professional and Enterprise plans, support is priority or dedicated, with faster response times." },
+        { "q": "Can I cancel anytime?", "a": "Yes, no penalty. When you cancel, you keep full access until the end of the period you already paid for; after that, your data stays put - just pick the free plan whenever you want to keep editing." },
+        { "q": "Does my team need training to use it?", "a": "In most cases, no. If anyone on your team has used a Kanban board before, even a whiteboard with sticky notes, Xaphires follows the same logic - it takes minutes to learn." }
+      ] }
     },
     "features": {
+      "automationsTitle": "What Xaphires does on its own",
+      "automationsText": "Automations running in the background, so you don't have to remember or chase things by hand.",
+      "automations": [
+        { "badge": "A", "title": "Card archiving", "text": "Take finished work off the board without deleting it. Archived cards leave every view and return to their original column whenever you want." },
+        { "badge": "R", "title": "Auto-archiving", "text": "Set the number of days and completed cards move to the archive on their own. Available from the Professional plan up." },
+        { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Professional up." },
+        { "badge": "T", "title": "Automatic routines", "text": "Fixed tasks become cards on their own at the right date, with the checklist already filled in. From the Professional plan up." },
+        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue. Available from the Professional plan up." },
+        { "badge": "P", "title": "Personal planner", "text": "A personal agenda outside the boards: your own calendar and task list, with completed ones archiving on their own after 2 days. Available from the Professional plan up." },
+        { "badge": "X", "title": "Attachments and links", "text": "Contracts, plans and photos straight on the card, plus links to whatever lives outside the system." },
+        { "badge": "D", "title": "Automatic completion", "text": "Mark a card as done and it jumps on its own to the board's completed column - no dragging by hand." }
+      ],
       "headerTitle": "Everything your team needs",
-      "headerText": "Eight integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
+      "headerText": "Integrated tools, so you don't need loose spreadsheets or a separate app for every task.",
       "items": [
         { "badge": "B", "title": "Kanban board", "text": "No more tasks lost in chat screenshots. Drag and drop between lists and see the team's real progress." },
-        { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member — no need for another tool." },
+        { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member. No need for another tool." },
         { "badge": "C", "title": "Calendar", "text": "Deadlines and start dates in a monthly view, so nothing slips by unnoticed." },
-        { "badge": "L", "title": "Timeline", "text": "The whole project schedule at a glance, period by period." },
-        { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet." },
-        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map — great for field teams." },
-        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest." },
-        { "badge": "N", "title": "Meeting minutes", "text": "Agenda, decisions and action items recorded — and followed up on later." }
+        { "badge": "L", "title": "Timeline (Gantt)", "text": "Create and open tasks straight from the timeline, with the whole project schedule at a glance, period by period. Available from the Intermediate plan up." },
+        { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet. Available from the Intermediate plan up." },
+        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams. Available from the Intermediate plan up." },
+        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest. Available from the Intermediate plan up." }
       ],
+      "ganttPreview": { "title": "The Gantt in action", "text": "Every task becomes a bar on the timeline, with today's line always visible - create and edit right here, no other tool needed.", "rows": [
+        { "title": "Planning", "status": "done" },
+        { "title": "Development", "status": "inProgress" },
+        { "title": "Testing", "status": "agency" },
+        { "title": "Final review", "child": true }
+      ] },
       "secondary": [
         { "title": "Private and shared boards", "text": "Separate what's the team's from what's just yours, with full visibility control." },
-        { "title": "User and role management", "text": "Define who's an admin (master) and who's a team member." }
+        { "title": "User and role management", "text": "Define who's an admin (master) and who's a team member." },
+        { "title": "Company chat", "text": "A general channel for everyone and private conversations between teammates, without leaving the system for WhatsApp." },
+        { "title": "Subtasks with owner, due date and priority", "text": "Break a card into smaller steps, each with its own assignee, date and priority - not just a checklist." }
       ]
     },
     "solutions": {
       "headerTitle": "Solutions for every kind of team",
-      "headerText": "The same Kanban IMG, organized the way each team needs to work.",
+      "headerText": "The same Xaphires, organized the way each team needs to work.",
       "items": [
         { "title": "Agencies and project teams", "text": "One board per client or project, with a timeline for deadlines and a dashboard ready to show progress in meetings.", "tags": ["Kanban board", "Timeline", "Dashboard"] },
-        { "title": "Field teams", "text": "Tasks with addresses plotted on the map — ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
+        { "title": "Field teams", "text": "Tasks with addresses plotted on the map. Ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
         { "title": "Management and leadership", "text": "Prioritize with the Eisenhower Matrix, track indicators on the Dashboard, and keep sensitive planning in private boards.", "tags": ["Eisenhower Matrix", "Dashboard", "Private boards"] },
         { "title": "Operations and routine", "text": "The Kanban board + Table pair covers day-to-day work, with a Calendar for recurring deadlines so nothing slips by.", "tags": ["Kanban board", "Table", "Calendar"] },
-        { "title": "Meetings and alignment", "text": "Meeting minutes with agenda, decisions and action items — recorded on the spot and followed up on later, without relying on memory.", "tags": ["Meeting minutes"] }
+        { "title": "Product Teams", "text": "From roadmap to launch: organize initiatives on the Timeline, prioritize feature requests, and keep everything in one place.", "tags": ["Timeline", "Eisenhower Matrix", "Attachments"], "page": "productTeams" }
+      ],
+      "learnMore": "Learn more"
+    },
+    "productTeams": {
+      "backLink": "← Back to Solutions",
+      "badge": "For product teams",
+      "heroTitle": "Roadmaps, sprints and launches, without relying on spreadsheets",
+      "heroText": "Organize product initiatives, track each sprint's progress, and prioritize feature requests with real-time visibility for the whole team.",
+      "ctaStart": "Get started",
+      "ctaPlans": "See plans",
+      "templatesTitle": "A board for every stage of the product",
+      "templates": [
+        { "badge": "R", "title": "Product Roadmap", "text": "Organize initiatives by quarter and track everything on the Timeline, from planning to launch." },
+        { "badge": "S", "title": "Agile Sprint", "text": "Backlog, In progress and Done lists, with a checklist and due date on every card." },
+        { "badge": "F", "title": "Feature Requests", "text": "Priority labels and attachments for screenshots or reference links on every request." }
+      ],
+      "timelineBadge": "Timeline",
+      "timelineTitle": "More predictable launches",
+      "timelineText": "See the whole roadmap timeline at a glance, period by period, and spot delays before they become a launch problem.",
+      "extraTitle": "Priority and visibility, with no extra effort",
+      "extra": [
+        { "title": "Eisenhower Matrix", "text": "Separate what's urgent from what's important and stop reacting only to the loudest item in the backlog." },
+        { "title": "Dashboard", "text": "Ready-made metrics to show product progress in any meeting, without building a slide." },
+        { "title": "Private boards", "text": "Keep sensitive roadmaps visible only to who needs them, before the official announcement." }
       ]
     },
     "pricing": {
@@ -89,23 +156,140 @@
       "headerText": "Pick the right plan for your team and change it as it grows.",
       "mostPopular": "Most popular",
       "plans": [
-        { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 3 users", "Unlimited boards", "Kanban board, Table and Calendar", "Email support"] },
-        { "name": "Professional", "price": "R$ 799", "period": "/user/month", "tagline": "For teams that want full control", "cta": "Subscribe to Professional", "highlight": true, "features": ["Unlimited users", "All views (Dashboard, Map, Timeline, Eisenhower Matrix)", "Meeting minutes", "Private and shared boards", "Priority support"] },
-        { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)"] }
+        { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Up to 4 boards, private and shared", "Kanban, Table and Calendar", "Manual card archiving", "Card attachments and links (up to 10 MB)", "Email support"] },
+        { "name": "Intermediate", "price": "R$ 370.00", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Basic, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Card attachments and links (up to 50 MB)"] },
+        { "name": "Professional", "price": "R$ 730.00", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Intermediate, plus:", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Routines that create cards on their own", "Priority support"] },
+        { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)", "Development of any custom feature you need", "We build any tailored solution your business requires", "Open scope for exclusive projects and customizations"] }
+      ]
+    },
+    "privacy": {
+      "backLink": "← Back",
+      "headerTitle": "Privacy Policy",
+      "headerText": "How Xaphires collects, uses, stores and protects your team's data.",
+      "updatedLabel": "Last updated",
+      "updatedDate": "July 25, 2026",
+      "sections": [
+        {
+          "title": "1. Information we collect",
+          "paragraphs": ["We collect only what is needed to operate the platform. The data comes from what you provide when creating an account and from the content you produce while using it."],
+          "bullets": [
+            "Account data: name, email, password and the company name given at registration.",
+            "Content you create: boards, lists, cards, descriptions, due dates, checklists, labels, assignees and attached files.",
+            "Addresses: only when you add an address to a card to show it on the Map.",
+            "Session data: the information needed to keep you securely signed in."
+          ]
+        },
+        {
+          "title": "2. How we use information",
+          "paragraphs": ["We use the data solely to provide and maintain the service. We do not sell your data, do not use it for advertising and do not pass it to third parties for marketing."],
+          "bullets": [
+            "Authenticate your access and keep your session active.",
+            "Display and sync board content among the members of your company.",
+            "Convert addresses into coordinates for display on the Map.",
+            "Send important operational notices about the service.",
+            "Investigate and prevent misuse, fraud and security incidents."
+          ]
+        },
+        {
+          "title": "3. How we disclose information",
+          "paragraphs": ["We do not sell or rent personal data. Disclosure happens only in the situations below."],
+          "bullets": [
+            "With other users in your company: content on shared boards is visible to the other members. Private boards are visible only to the person who created them.",
+            "With the OpenStreetMap (Nominatim) geocoding service: when you search for an address, only the address text is sent to obtain the coordinates. No account data is transmitted.",
+            "For legal reasons: when required by law, court order or a competent authority."
+          ]
+        },
+        {
+          "title": "4. How we store and secure information",
+          "paragraphs": ["Each company's data is kept in an isolated database, separate from the other companies on the platform."],
+          "bullets": [
+            "Passwords are never stored in plain text: we keep only a cryptographic hash.",
+            "Every API route requires authentication, and each request is validated against the company and the user's permissions.",
+            "The session uses an httpOnly cookie, inaccessible to page scripts.",
+            "In production, all traffic uses an encrypted connection (HTTPS).",
+            "Write requests have their origin verified, which blocks actions forged by third-party sites."
+          ]
+        },
+        {
+          "title": "5. How long we keep information",
+          "paragraphs": [
+            "We keep data while the account is active and for the period needed to meet legal obligations.",
+            "When an administrator deletes a user, the account is removed, their private boards are deleted and references to them on cards are unlinked."
+          ]
+        },
+        {
+          "title": "6. Cookies and local storage",
+          "paragraphs": ["We do not use advertising cookies or cross-site tracking."],
+          "bullets": [
+            "Session cookie: holds the token that keeps you signed in, valid for 7 days.",
+            "Browser local storage: holds only your theme and language preferences."
+          ]
+        },
+        {
+          "title": "7. Your rights",
+          "paragraphs": ["Under applicable data protection law, you may at any time:"],
+          "bullets": [
+            "Confirm that processing exists and access your data.",
+            "Correct incomplete, inaccurate or outdated data, directly in your profile.",
+            "Request deletion of the account and associated data.",
+            "Export your board content in JSON format, from within the platform.",
+            "Withdraw consent and object to processing you consider improper."
+          ]
+        },
+        {
+          "title": "8. Our policy towards children",
+          "paragraphs": ["Xaphires is a corporate tool intended for professional use. We do not direct the service to anyone under 18 and do not knowingly collect children's data. Accounts identified in those conditions will be removed."]
+        },
+        {
+          "title": "9. Changes to this policy",
+          "paragraphs": ["We may update this policy to reflect changes in the service or in the law. The last-updated date at the top of this page always indicates the current version. Material changes will be communicated through the registered contact channels."]
+        },
+        {
+          "title": "10. How to contact us",
+          "paragraphs": ["For questions about this policy or about how your data is handled, contact the data protection officer:"],
+          "bullets": [
+            "Email: xaphires@contato.com"
+          ]
+        }
+      ]
+    },
+    "switcher": {
+      "title": "A tool that keeps up with the work",
+      "text": "Everything the team logs shows up instantly for everyone, with the right level of access for each person.",
+      "items": [
+        { "key": "realtime", "mark": "S", "title": "Real-time sync", "text": "Change a card and the whole team sees it in the same instant.", "statusLabel": "Sync", "statusValue": "Active" },
+        { "key": "access", "mark": "A", "title": "Role-based access", "text": "Each person sees and edits only what their role covers.", "statusLabel": "Access control", "statusValue": "By role" },
+        { "key": "insights", "mark": "D", "title": "Dashboards out of the box", "text": "Progress is visible without anyone building a report.", "statusLabel": "Dashboard", "statusValue": "Up to date" }
+      ]
+    },
+    "logos": {
+      "label": "All of it in one place",
+      "items": ["Kanban board", "Table", "Calendar", "Timeline", "Dashboard", "Map", "Eisenhower matrix", "Auto-archiving", "Bottleneck monitor", "Automatic routines", "Task ticker", "Attachments and links"]
+    },
+    "testimonials": {
+      "title": "What teams are saying",
+      "items": [
+        { "quote": "We replaced three spreadsheets and WhatsApp groups with a single board. The team stopped losing tasks.", "name": "Alex Rivera", "role": "Team Lead" },
+        { "quote": "The timeline became our Monday meeting. Everyone sees the same schedule and the version arguments are over. And I can check it all from my phone.", "name": "Ana Braga", "role": "Planning" },
+        { "quote": "I improved my time management with this kanban.", "name": "Lucas Sabino", "role": "Finance" }
       ]
     },
     "footer": {
       "title": "Ready to organize your team?",
-      "cta": "Get started"
+      "cta": "Get started",
+      "privacy": "Privacy Policy",
+      "copyright": "Copyright © 2026 Xaphires"
     }
   },
   "auth": {
-    "brandTitle": "Kanban IMG",
+    "brandTitle": "Xaphires",
     "brandText": "Organize your projects in simple, fast and collaborative Kanban boards.",
     "back": "← Back",
     "tabLogin": "Sign in",
     "tabSignup": "Create company",
+    "tabJoin": "Request access",
     "companyName": "Company name",
+    "companyDocLabel": "Company CNPJ or CPF",
     "yourName": "Your name",
     "email": "Email",
     "password": "Password",
@@ -113,39 +297,79 @@
     "passwordsMismatch": "Passwords don't match",
     "submitWait": "Please wait...",
     "submitLogin": "Sign in",
-    "submitSignup": "Create company"
+    "submitSignup": "Create company",
+    "joinIntro": "Does your company already use Xaphires? Enter its CNPJ or CPF to request access.",
+    "cnpjLabel": "Company CNPJ or CPF",
+    "cnpjSearch": "Search",
+    "cnpjSearching": "Searching...",
+    "companyFound": "Company found: {{name}}",
+    "notThisCompany": "Not the right company? Change CNPJ/CPF",
+    "joinSubmit": "Send request",
+    "joinSubmitWait": "Sending...",
+    "joinSuccessTitle": "Request sent!",
+    "joinSuccessText": "As soon as someone from your company approves it, you can sign in with the email and password you just chose.",
+    "joinSuccessBackToLogin": "Go to sign in"
   },
   "app": {
     "loadingBoards": "Loading boards...",
     "noBoards": "No boards. Create one in the sidebar.",
     "sidebar": {
-      "minutesNav": "Meeting Minutes",
+      "comingSoon": "Coming soon",
       "sharedBoards": "Shared boards",
       "myPrivateBoards": "My private boards",
+      "sharedWithMe": "Shared with me",
+      "sharedWithCount": "Shared with {{count}} person(s)",
       "newBoard": "+ New board",
       "boardNamePlaceholder": "Board name",
       "privateToggle": "Private (only you see it)",
       "create": "Create",
       "deleteBoardTitle": "Delete board",
       "deleteBoardConfirm": "Delete board \"{{title}}\" and all its content?",
-      "boardDeletedToast": "Board deleted"
+      "boardDeletedToast": "Board deleted",
+      "workspaceLabel": "{{name}}'s Workspace",
+      "spacesTitle": "Spaces",
+      "boardsFolder": "Projects",
+      "rail": {
+        "home": "Home",
+        "planner": "Planner",
+        "ai": "AI",
+        "team": "Teams",
+        "dashboards": "Dashboards",
+        "boards": "Boards",
+        "more": "More",
+        "invite": "Invite"
+      },
+      "shortcuts": {
+        "inbox": "Inbox",
+        "meetings": "Meetings",
+        "myTasks": "My tasks",
+        "allTasks": "All tasks"
+      }
     },
     "topbar": {
       "toggleSidebar": "Show/hide sidebar",
       "menu": "Menu",
       "defaultBoardName": "Untitled board",
-      "privateBoardTitle": "Private board — only visible to you",
+      "privateBoardTitle": "Private board, only visible to you",
+      "sharedWithYouTitle": "Private board shared with you",
+      "shareBtn": "Share",
+      "readOnlyBadge": "Read only",
       "filterBy": "Filter by {{name}}",
       "usersBtn": "Users",
       "searchPlaceholder": "Search cards...",
       "clearBoard": "Clear board",
       "clearBoardConfirm": "This will delete all lists and cards on this board. Continue?",
+      "clearBoardConfirmPartial": "This will delete the cards you created (and any lists left empty). Other people's cards stay on the board. Continue?",
       "clearBoardToast": "Board cleared"
     },
     "dataMenu": {
+      "recurrences": "Recurring routines",
+      "bottlenecks": "Bottleneck monitor",
+      "archivedCards": "Archived cards",
       "moreOptions": "More options",
       "personalize": "Customize",
       "dataSection": "Data",
+      "exportReport": "Export report",
       "exportCurrent": "Export current board",
       "exportAll": "Export everything (backup)",
       "importJson": "Import JSON",
@@ -165,19 +389,164 @@
     },
     "accountMenu": {
       "changePassword": "Change password",
+      "platformPanel": "Platform panel",
       "logout": "Sign out",
       "currentPassword": "Current password",
       "newPassword": "New password",
       "save": "Save",
       "passwordChangedToast": "Password changed",
-      "master": "Master"
+      "master": "Master",
+      "myProfile": "My profile",
+      "profileSavedToast": "Profile updated",
+      "profileName": "Name",
+      "profileBio": "Bio",
+      "profileBioPlaceholder": "Tell us a bit about yourself...",
+      "uploadPhoto": "Change photo",
+      "removePhoto": "Remove photo"
     },
     "taskTicker": {
       "pending": "Pending ({{count}})"
     }
   },
   "board": {
+    "recurrences": {
+      "title": "Recurring routines",
+      "empty": "No routines yet. A routine creates the card on its own at the right date, with the checklist ready.",
+      "planRequired": "Recurring routines are available from the Professional plan up. You can still view and delete existing ones.",
+      "newRule": "New routine",
+      "fieldTitle": "Card title",
+      "titlePlaceholder": "e.g. Close the monthly books",
+      "fieldList": "Create in column",
+      "fieldFreq": "Repeat",
+      "fieldWeekday": "Day of week",
+      "fieldMonthday": "Day of month",
+      "fieldMonthday2": "Second day of month (optional)",
+      "noSecondDay": "one day only",
+      "fieldHour": "Hour",
+      "fieldDueInDays": "Due in (days)",
+      "noDue": "no due date",
+      "fieldChecklist": "Routine checklist",
+      "checklistPlaceholder": "One item per line:\nReconcile accounts\nCheck invoices\nSend to accountant",
+      "save": "Create routine",
+      "saveEdit": "Save changes",
+      "created": "Routine created",
+      "updated": "Routine updated",
+      "editingHint": "Editing \"{{title}}\". Cards it already created stay the same.",
+      "deleted": "Routine removed",
+      "deleteConfirm": "Remove the \"{{title}}\" routine? Cards it already created stay on the board.",
+      "edit": "Edit",
+      "pause": "Pause",
+      "resume": "Resume",
+      "delete": "Remove",
+      "everyDay": "Every day at {{hour}}:00",
+      "everyWeek": "Every {{day}} at {{hour}}:00",
+      "everyMonth": "Every {{day}} of the month at {{hour}}:00",
+      "everyMonthTwoDays": "Every {{day}} and {{day2}} of the month at {{hour}}:00",
+      "intoList": "into {{list}}",
+      "listGone": "column removed",
+      "checklistCount": "{{count}} checklist item",
+      "checklistCount_other": "{{count}} checklist items",
+      "lastRun": "Last run: {{date}}",
+      "monthdayWarning": "In shorter months, the routine falls on the last day of the month.",
+      "hint": "Routines are checked when the board loads. If several dates pass without anyone opening the app, only the most recent becomes a card.",
+      "freq": {
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month"
+      },
+      "weekdays": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
+    },
+    "exportReport": {
+      "title": "Export Kanban report",
+      "boardLabel": "Board",
+      "allBoards": "All boards",
+      "privateTag": "private",
+      "allBoardsHint": "Includes every board you have access to, private ones included.",
+      "noBoardsHint": "Select at least one board to export the report.",
+      "userLabel": "User",
+      "allUsers": "All users",
+      "statusLabel": "Card status",
+      "statusAll": "All",
+      "statusOpen": "Open only",
+      "statusDone": "Completed only",
+      "count": "{{count}} card found",
+      "count_other": "{{count}} cards found",
+      "counting": "Counting cards...",
+      "countFailed": "The cards could not be counted",
+      "emptyHint": "No card matches the selected filters. The file will contain only the header row.",
+      "downloadCsv": "Download report (CSV)",
+      "downloadPdf": "Download report (PDF)",
+      "downloadExcel": "Download report (Excel)",
+      "generating": "Generating...",
+      "downloadStarted": "Report generated"
+    },
+    "bottlenecks": {
+      "bareHours": "{{count}} hour",
+      "bareHours_other": "{{count}} hours",
+      "bareDays": "{{count}} day",
+      "bareDays_other": "{{count}} days",
+      "msgGreetingNoName": "Hi!",
+      "title": "Bottleneck monitor",
+      "noneMonitored": "No column is being monitored. Open a column's menu and set how long a card can sit there before it becomes an alert.",
+      "allClear": "No bottlenecks. {{count}} monitored column, all on track.",
+      "allClear_other": "No bottlenecks. {{count}} monitored columns, all on track.",
+      "summary": "{{count}} card past its column's limit.",
+      "summary_other": "{{count}} cards past their column's limit.",
+      "inList": "In {{list}} · {{hours}}h limit",
+      "hours": "{{count}}h stuck",
+      "hours_other": "{{count}}h stuck",
+      "days": "{{count}} day stuck",
+      "days_other": "{{count}} days stuck",
+      "cardTooltip": "Stuck for {{duration}} in this column",
+      "copyFollowUp": "Copy follow-up",
+      "copied": "Message copied",
+      "msgGreeting": "Hi, {{name}}!",
+      "msgBody": "Just checking in on \"{{title}}\". The card has been in {{list}} for {{duration}}.",
+      "msgDue": "The agreed due date is {{date}}.",
+      "msgClosing": "Could you let me know where it stands? Thanks!"
+    },
+    "archive": {
+      "autoPlanRequired": "Auto-archiving is available from the Professional plan up. Manual archiving stays available.",
+      "autoLabel": "Auto-archive completed cards",
+      "autoDaysSuffix": "days",
+      "autoOnHint": "Cards completed more than {{days}} days ago move to the archive when the board loads. Unchecking a card restarts the count.",
+      "autoOffHint": "With the rule off, completed cards stay on the board until you archive them yourself.",
+      "autoInvalid": "Enter a number of days between 1 and 365",
+      "title": "Archived cards",
+      "searchPlaceholder": "Search archived",
+      "empty": "No archived cards yet. Archiving takes a card off the board without deleting anything.",
+      "noResults": "No archived card matches your search",
+      "fromList": "From {{list}}",
+      "fromDeletedList": "Original column removed",
+      "restore": "Restore",
+      "delete": "Delete",
+      "restoredToast": "{{title}} restored",
+      "deleteConfirm": "Delete \"{{title}}\" permanently? This cannot be undone.",
+      "deletedToast": "Card deleted"
+    },
     "listMenu": {
+      "stuckPlanRequired": "The bottleneck monitor is available from the Professional plan up.",
+      "stuckConfigure": "Monitor bottlenecks in this column",
+      "stuckConfigured": "Bottleneck: alert at {{hours}}h",
+      "stuckHint": "Warns when a card sits in this column longer than this.",
+      "stuckHoursSuffix": "hours",
+      "stuckSave": "Save",
+      "stuckDisable": "Stop monitoring",
+      "stuckOn": "Column monitored: alert at {{hours}}h",
+      "stuckOff": "Monitoring turned off for this column",
+      "stuckInvalid": "Enter a number of hours between 1 and 8760",
+      "archiveCompleted": "Archive completed",
+      "cardsArchivedToast": "{{count}} card archived",
+      "cardsArchivedToast_other": "{{count}} cards archived",
+      "noCompletedToArchive": "No completed cards in this column",
       "listColor": "List color",
       "defaultColor": "Default",
       "sortAZ": "Sort by title (A-Z)",
@@ -187,6 +556,20 @@
       "deleteList": "Delete list",
       "deleteListConfirm": "Delete list \"{{title}}\" and all its cards?",
       "listDeletedToast": "List deleted"
+    },
+    "share": {
+      "title": "Access to \"{{title}}\"",
+      "hint": "Private board. Besides you, only the people listed here can open it.",
+      "roleOwner": "Owner",
+      "roleEditor": "Can edit",
+      "roleViewer": "Read only",
+      "add": "Add",
+      "remove": "Remove",
+      "searchPlaceholder": "Search by name or email...",
+      "noCandidates": "No one else to add.",
+      "addedToast": "{{name}} now has access",
+      "removedToast": "{{name}} no longer has access",
+      "removeConfirm": "Remove {{name}}'s access to this board?"
     },
     "listColumn": {
       "cardTitlePlaceholder": "Enter a title for this card...",
@@ -203,12 +586,33 @@
       "markComplete": "Mark as complete",
       "markIncomplete": "Mark as incomplete",
       "urgent": "Urgent",
-      "important": "Important"
+      "important": "Important",
+      "edit": "Edit",
+      "moreActions": "More actions",
+      "duplicate": "Duplicate",
+      "duplicateSuffix": " (copy)",
+      "cardDuplicatedToast": "Card duplicated",
+      "subtasksCount": "{{count}} subtask",
+      "subtasksCount_other": "{{count}} subtasks"
     },
     "cardModal": {
+      "readOnlyNote": "You have read-only access to this board.",
+      "noLocation": "No location set",
+      "archiveCard": "Archive",
+      "cardArchivedToast": "Card archived",
       "untitled": "Untitled",
+      "typeBadge": "Task",
       "complete": "Complete",
       "markComplete": "Mark as complete",
+      "status": "Status",
+      "statusOpen": "Open",
+      "empty": "Empty",
+      "datesLabel": "Dates",
+      "descriptionShortcut": "Add a description",
+      "collapseEmpty": "Collapse empty fields",
+      "showEmpty": "Show empty fields",
+      "moveToList": "Move to list",
+      "movedToList": "Card moved to \"{{list}}\"",
       "members": "Members",
       "noUsersYet": "No users registered yet.",
       "labels": "Labels",
@@ -221,10 +625,14 @@
       "addressPlaceholder": "Address, city...",
       "locating": "Searching...",
       "locate": "Locate",
-      "locationFound": "Location found — visible on the Map",
+      "locationFound": "Location found, visible on the Map",
       "locationPending": "Address saved, but not located on the map",
       "description": "Description",
       "descriptionPlaceholder": "Add a more detailed description...",
+      "subtasks": "Subtasks",
+      "addSubtask": "Add subtask",
+      "addSubtaskPlaceholder": "Subtask name...",
+      "unassign": "Remove assignee",
       "checklist": "Checklist",
       "addItemPlaceholder": "Add an item",
       "attachments": "Attachments",
@@ -234,7 +642,7 @@
       "linkNamePlaceholder": "Link name (optional)",
       "attachmentAdded": "Attachment added",
       "attachmentRemoved": "Attachment removed",
-      "attachmentTooLarge": "File must be up to 8MB",
+      "attachmentTooLarge": "File must be up to {{mb}} MB",
       "uploading": "Uploading...",
       "deleteCard": "Delete card",
       "deleteCardConfirm": "Delete this card permanently?",
@@ -246,7 +654,7 @@
       "board": "Board",
       "table": "Table",
       "calendar": "Calendar",
-      "timeline": "Timeline",
+      "gantt": "Gantt",
       "dashboard": "Dashboard",
       "map": "Map",
       "matrix": "Eisenhower Matrix"
@@ -268,12 +676,8 @@
       "today": "Today",
       "prevMonth": "Previous month",
       "nextMonth": "Next month",
-      "more": "+{{count}} more"
-    },
-    "timeline": {
-      "empty": "No cards with a start or due date to show on the timeline.",
-      "undated_one": "{{count}} card with no start/due date not shown.",
-      "undated_other": "{{count}} cards with no start/due date not shown."
+      "more": "+{{count}} more",
+      "routinePreview": "Preview of the automatic routine \"{{title}}\" - not a card yet"
     },
     "dashboard": {
       "totalCards": "Total cards",
@@ -303,35 +707,63 @@
       "dropHere": "Drag cards here"
     }
   },
-  "minutes": {
-    "screen": {
-      "title": "Meeting Minutes",
-      "newMinute": "+ New minute",
-      "loading": "Loading minutes...",
-      "empty": "No minutes recorded yet."
-    },
-    "modal": {
-      "titlePlaceholder": "Meeting title",
-      "date": "Date",
-      "author": "Author",
-      "participants": "Participants",
-      "noUsersYet": "No users registered yet.",
-      "agenda": "Agenda",
-      "agendaPlaceholder": "What will be discussed...",
-      "decisions": "Decisions",
-      "decisionsPlaceholder": "What was decided...",
-      "actionItems": "Action items",
-      "assignee": "Assignee",
-      "addActionPlaceholder": "Add an action item",
-      "deleteMinute": "Delete minute",
-      "deleteConfirm": "Delete this minute permanently?",
-      "minuteDeletedToast": "Minute deleted",
-      "minuteCreatedToast": "Minute created",
-      "minuteUpdatedToast": "Minute updated",
-      "saving": "Saving...",
-      "createMinute": "Create minute",
-      "saveChanges": "Save changes"
+  "datePicker": {
+    "today": "Today",
+    "clear": "Remove date",
+    "recurrence": "Set up recurrence",
+    "recurrenceHint": "Recurring cards are set up from the board's data menu, not from here",
+    "presets": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "weekend": "Next weekend",
+      "nextWeek": "Next week",
+      "twoWeeks": "2 weeks",
+      "fourWeeks": "4 weeks",
+      "eightWeeks": "8 weeks"
     }
+  },
+  "gantt": {
+    "columns": { "activity": "Activity", "status": "Status", "group": "Group", "start": "Start", "due": "Due" },
+    "toolbar": {
+      "new": "New",
+      "open": "Open",
+      "save": "Save",
+      "saving": "Saving...",
+      "undo": "Undo",
+      "print": "Print",
+      "export": "Export",
+      "search": "Filter / search",
+      "searchPlaceholder": "Search by title...",
+      "zoom": "Zoom",
+      "resetZoom": "Reset zoom"
+    },
+    "saveError": "Could not save: {{erro}}",
+    "newTaskDefaultTitle": "New task",
+    "noSearchResults": "No task found for that search.",
+    "status": {
+      "done": "Done",
+      "todo": "To do",
+      "inProgress": "In progress",
+      "late": "Late",
+      "agency": "Advertising agency",
+      "lateFlag": "late!"
+    },
+    "legend": {
+      "icons": { "meeting": "meeting", "call": "conference call", "mail": "mailing", "check": "check progress" }
+    },
+    "meta": { "event": "event:", "venue": "venue:", "date": "date:" },
+    "emptyState": "Nothing to show in the Gantt yet."
+  },
+  "chat": {
+    "title": "Company chat",
+    "you": "You",
+    "unknownAuthor": "Removed user",
+    "empty": "No messages yet. Start the conversation.",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "generalTitle": "General",
+    "newConversation": "+ New conversation",
+    "noCandidates": "No one else to add"
   },
   "users": {
     "title": "Users panel",
@@ -358,22 +790,219 @@
     "userCreatedToast": "User created",
     "userDeletedToast": "User deleted",
     "passwordResetToast": "Password reset",
-    "passwordMinLength": "The new password must be at least 6 characters"
+    "passwordMinLength": "The new password must be at least 6 characters",
+    "companyCnpjLabel": "Company CNPJ or CPF",
+    "companyCnpjHint": "Anyone requesting access to your company will need to enter this number.",
+    "companyCnpjSave": "Save",
+    "companyCnpjSaved": "CNPJ saved",
+    "joinRequestsTitle": "Access requests",
+    "joinRequestsEmpty": "No pending requests.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "requestApprovedToast": "{{name}} is now part of the company",
+    "requestRejectedToast": "Request rejected"
+  },
+  "team": {
+    "title": "Team",
+    "viewProfile": "View profile",
+    "sendMessage": "Send message",
+    "back": "Back",
+    "manageUsers": "Manage users"
+  },
+  "planner": {
+    "title": "Personal planner",
+    "subtitle": "Your agenda, outside the boards",
+    "tabCalendar": "Calendar",
+    "tabList": "My tasks",
+    "addPlaceholder": "New personal task...",
+    "add": "Add",
+    "empty": "No personal tasks yet.",
+    "deleteConfirm": "Delete the task \"{{title}}\"?",
+    "groupOverdue": "Overdue",
+    "groupToday": "Today",
+    "groupTomorrow": "Tomorrow",
+    "groupUpcoming": "Upcoming",
+    "groupCompleted": "Completed",
+    "planRequired": "The personal planner is available from the Professional plan up. You can still view and delete what already exists."
+  },
+  "plan": {
+    "monthlyLabel": "Monthly price",
+    "listPriceLabel": "List price",
+    "discountLabel": "Discount applied",
+    "onRequest": "On request",
+    "contractedAtLabel": "Contracted on",
+    "perMonth": "/month",
+    "upgradeTitle": "Move up a plan",
+    "upgradeConfirm": "Subscribe to the {{plan}} plan for {{price}}/month? The cycle restarts today.",
+    "downgradeHint": "To move down a plan or cancel, contact support. Only upgrades are available here.",
+    "menuItem": "My plan",
+    "title": "Company plan",
+    "unlimited": "unlimited",
+    "usersLabel": "Users",
+    "renewsOnLabel": "Valid until",
+    "expiredOnLabel": "Expired on",
+    "daysLeftLabel": "Time left",
+    "daysLeftValue": "{{count}} day",
+    "daysLeftValue_other": "{{count}} days",
+    "userLimitReached": "You reached this plan's user limit. Change plans to add more people.",
+    "masterOnly": "Only the master user can change the company plan.",
+    "changed": "Plan changed to {{plan}}",
+    "names": {
+      "basic": "Basic",
+      "intermediate": "Intermediate",
+      "professional": "Professional",
+      "enterprise": "Enterprise"
+    },
+    "status": {
+      "active": "Active",
+      "trialing": "Trial",
+      "expired": "Expired",
+      "grace": "Payment outstanding"
+    },
+    "trialEnding": "Your trial ends in {{count}} day",
+    "trialEnding_other": "Your trial ends in {{count}} days",
+    "expiredMessage": "Your plan expired. You can still see everything, but not create or edit.",
+    "continueOnBasic": "Continue on the free Basic plan",
+    "movedToBasic": "Plan changed to Basic",
+    "selectTitle": "Choose a plan",
+    "freeChoiceHint": "You do not have a paid plan in effect, so you can pick any plan below - including the free Basic, which never expires.",
+    "selectFreeConfirm": "Switch to the {{plan}} plan? It is free and never expires."
+  },
+  "billing": {
+    "checkoutTitle": "Subscribe to {{plan}}",
+    "chooseMethod": "How would you like to pay",
+    "methods": {
+      "pix": "Pix",
+      "card": "Credit card",
+      "boleto": "Bank slip"
+    },
+    "methodNotes": {
+      "pix": "Clears in seconds",
+      "card": "Renews automatically",
+      "boleto": "Clears in up to 3 business days"
+    },
+        "docLabel": "Payer tax ID (CPF or CNPJ)",
+    "docHint": "Required by the bank to issue the charge.",
+    "docInvalid": "Invalid CPF or CNPJ. Check the digits.",
+        "cardRedirectNote": "You'll be taken to a secure page to enter your card, and brought back here once you're done. Your card number never passes through our servers.",
+    "continueToCheckout": "Continue to payment",
+    "payNow": "Pay now",
+    "processing": "Processing...",
+    "fineprint": "The plan is released once payment clears. You can cancel renewal at any time.",
+    "cardNumber": "Card number",
+    "cardName": "Name on card",
+    "cardExpiry": "Expiry",
+    "cardCvv": "CVV",
+    "testMode": "Test mode: no real charge is made.",
+    "testCards": "Test cards: ending 1111 approves, 0002 declines, 0003 insufficient funds, 0004 expired.",
+    "awaitingPayment": "Awaiting payment",
+    "pixCopyPaste": "Pix copy and paste",
+    "boletoLine": "Barcode line",
+    "copyCode": "Copy code",
+    "copied": "Copied",
+    "copyFailed": "Could not copy. Select the code and copy it manually.",
+    "payUntil": "Pay by {{date}}",
+    "willUpdateAlone": "This screen updates itself once the payment clears.",
+    "simulateConfirm": "Simulate payment confirmation",
+    "paid": "Paid",
+    "paidToast": "Payment confirmed",
+    "releasedUntil": "Access released until {{date}}",
+    "failed": "Not approved",
+    "failureGeneric": "The payment was not approved. Try another payment method.",
+    "failureReasons": {
+      "CARD_DECLINED": "The card was declined by the issuing bank.",
+      "INSUFFICIENT_FUNDS": "There was not enough balance or limit.",
+      "EXPIRED_CARD": "The card has expired.",
+      "EXPIRED": "The charge expired before it was paid."
+    },
+    "tryAgain": "Try again",
+    "finishPayment": "Finish payment",
+    "subscriptionTitle": "Subscription",
+    "methodLabel": "Payment method",
+    "nextChargeLabel": "Next charge",
+    "subStatusLabel": "Status",
+    "subStatus": {
+      "active": "Active",
+      "past_due": "Payment overdue",
+      "canceled": "Canceled"
+    },
+    "cancelSubscription": "Cancel renewal",
+    "cancelConfirm": "Cancel automatic renewal? You keep access until the end of the period already paid.",
+    "canceled": "Renewal canceled",
+    "canceledHint": "Renewal is canceled. Access lasts until the end of the period already paid.",
+    "historyTitle": "Payment history",
+    "payStatus": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "failed": "Not approved",
+      "canceled": "Canceled",
+      "refunded": "Refunded"
+    }
   },
   "errors": {
+    "NETWORK_UNREACHABLE": "The server did not respond. Check that it is running and try again.",
+    "REPORT_FORMAT_INVALID": "Unsupported report format",
+    "REPORT_STATUS_INVALID": "Invalid status filter",
+    "BOARD_LIMIT_REACHED": "Plan board limit reached. Delete a board or upgrade to create another one.",
+    "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Professional plan up.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "The personal planner is available from the Professional plan up.",
+    "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Professional plan up.",
+    "INVALID_FREQUENCY": "Invalid frequency",
+    "WEEKDAY_REQUIRED": "Choose the day of the week",
+    "MONTHDAY_REQUIRED": "Choose a day of the month between 1 and 31",
+    "INVALID_HOUR": "Hour must be between 0 and 23",
+    "LIST_REQUIRED": "Choose the target column",
+    "LIST_NOT_FOUND": "Column not found",
+    "RECURRENCE_NOT_FOUND": "Routine not found",
+    "INVALID_STUCK_HOURS": "Enter a number of hours between 1 and 8760",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Professional plan up.",
+    "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Only upgrades are available here. To move down or cancel, contact support.",
+    "PLAN_EXPIRED": "Your plan expired. Renew to edit again.",
+    "PLAN_USER_LIMIT": "Your plan reached its user limit. Change plans to add more.",
+    "PLAN_USER_LIMIT_EXCEEDED": "The company has more users than the chosen plan allows.",
+    "INVALID_PLAN": "Invalid plan",
     "NOT_AUTHENTICATED": "Not authenticated",
     "FORBIDDEN_MASTER_ONLY": "Restricted to the master user",
     "BOARD_NOT_FOUND": "Board not found",
     "FORBIDDEN_BOARD_ACCESS": "You don't have access to this board",
+    "FORBIDDEN_BOARD_READ_ONLY": "Your access to this board is read-only",
+    "FORBIDDEN_BOARD_OWNER_ONLY": "Only the board owner can do this",
+    "FORBIDDEN_NOT_CARD_CREATOR": "Only the person who created the card can delete it",
+    "BOARD_NOT_PRIVATE": "Only private boards have an access list",
+    "INVALID_BOARD_ROLE": "Invalid role",
+    "USER_ID_REQUIRED": "Select a user",
+    "CANNOT_CHANGE_BOARD_OWNER": "The owner already has access to the board",
     "NOT_FOUND": "Not found",
     "VALIDATION_MISSING_FIELDS": "Fill in name, email and a password with at least 6 characters",
     "COMPANY_NAME_REQUIRED": "Enter the company name",
     "EMAIL_ALREADY_REGISTERED": "Email already registered",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Email already registered (it may already belong to another company)",
     "INVALID_CREDENTIALS": "Invalid email or password",
+    "CNPJ_INVALID": "Invalid CNPJ or CPF",
+    "COMPANY_NOT_FOUND": "No company found with that CNPJ or CPF",
+    "CNPJ_IN_USE": "That CNPJ or CPF is already used by another company",
+    "JOIN_REQUEST_PENDING": "There's already a pending request for this email",
+    "JOIN_REQUEST_NOT_FOUND": "Request not found",
+    "CHAT_MESSAGE_REQUIRED": "Write a message before sending",
+    "CHAT_MESSAGE_TOO_LONG": "Message is too long",
+    "CHAT_USER_REQUIRED": "Select another user",
+    "CHAT_USER_NOT_FOUND": "User not found",
+    "FORBIDDEN_CHAT_CONVERSATION": "You're not part of this conversation",
+    "TOO_MANY_CNPJ_LOOKUPS": "Too many CNPJ lookups from this address. Try again later.",
+    "TOO_MANY_JOIN_REQUESTS": "Too many requests from this address. Try again later.",
     "PASSWORD_TOO_SHORT": "The new password must be at least 6 characters",
     "CURRENT_PASSWORD_INCORRECT": "Current password is incorrect",
     "TITLE_REQUIRED": "Title is required",
+    "DUE_REQUIRED": "Choose a date",
+    "PERSONAL_TASK_NOT_FOUND": "Task not found",
+    "NAME_REQUIRED": "Name is required",
+    "BIO_TOO_LONG": "The bio is too long",
+    "INVALID_IMAGE_TYPE": "Upload a PNG, JPEG, WEBP or GIF image",
+    "AVATAR_TOO_LARGE": "The photo must be up to 3 MB",
+    "AVATAR_NOT_FOUND": "Photo not found",
+    "AVATAR_SAVE_FAILED": "Failed to save the photo",
+    "UPLOAD_FAILED": "Failed to receive the file",
+    "INVALID_UPLOAD": "Invalid upload",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Only the master user can delete shared boards",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds is required",
     "CARD_IDS_REQUIRED": "cardIds is required",
@@ -381,9 +1010,6 @@
     "EMAIL_IN_USE": "Email already in use",
     "INVALID_ROLE": "Invalid role",
     "CANNOT_DELETE_MASTER": "The master user cannot be deleted",
-    "MINUTE_NOT_FOUND": "Minute not found",
-    "FORBIDDEN_MINUTE_EDIT": "Only the author or the master user can edit this minute",
-    "FORBIDDEN_MINUTE_DELETE": "Only the author or the master user can delete this minute",
     "ADDRESS_REQUIRED": "Enter an address to search",
     "ADDRESS_NOT_FOUND": "Address not found",
     "GEOCODE_UNAVAILABLE": "Couldn't look up the address right now. Try again.",
@@ -395,7 +1021,22 @@
     "URL_REQUIRED": "Enter a URL",
     "INVALID_URL": "Invalid URL",
     "FILE_REQUIRED": "Select a file",
-    "FILE_TOO_LARGE": "File must be up to 8MB",
-    "ATTACHMENT_NOT_FOUND": "Attachment not found"
+    "FILE_TOO_LARGE": "The file is larger than your plan allows.",
+    "ATTACHMENT_NOT_FOUND": "Attachment not found",
+    "LIST_NOT_IN_BOARD": "That column does not belong to this board.",
+    "TOO_MANY_GEOCODE_REQUESTS": "Too many address lookups in a short time. Wait a moment and try again.",
+    "INVALID_TITLE": "Invalid title.",
+    "PAYER_DOCUMENT_REQUIRED": "Enter the payer tax ID.",
+    "PAYER_DOCUMENT_INVALID": "Invalid CPF or CNPJ. Check the digits.",
+    "PAYER_EMAIL_REQUIRED": "Payer email is missing.",
+    "CARD_TOKEN_REQUIRED": "Could not validate the card. Try again.",
+    "PLAN_REQUIRES_PAYMENT": "Subscribing to a paid plan goes through payment.",
+    "PLAN_NOT_CHARGEABLE": "That plan is not charged automatically.",
+    "INVALID_PAYMENT_METHOD": "Choose a payment method.",
+    "PAYMENT_ALREADY_PENDING": "There is already an open charge. Pay it or wait for it to expire.",
+    "CARD_DECLINED": "The card was declined. Check the details or try another one.",
+    "PAYMENT_NOT_FOUND": "Charge not found.",
+    "NO_SUBSCRIPTION": "There is no active subscription.",
+    "BILLING_PROVIDER_NOT_CONFIGURED": "The payment method is not configured yet. Contact support."
   }
 }

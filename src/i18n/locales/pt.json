@@ -24,64 +24,330 @@
   },
   "landing": {
     "nav": {
-      "brand": "Kanban IMG",
+      "brand": "Xaphires",
       "home": "Início",
       "features": "Recursos",
       "solutions": "Soluções",
       "pricing": "Preços",
       "enter": "Entrar"
     },
+    "promoPopup": {
+      "copy": "Copiar",
+      "copied": "Copiado!",
+      "defaultButton": "Aproveitar oferta"
+    },
     "home": {
       "heroTitle": "Sua equipe organizada, sem esforço extra",
-      "heroText": "O Kanban IMG substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos, prioridades e atas de reunião, sincronizados em tempo real para toda a equipe.",
+      "heroText": "O Xaphires substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos e prioridades, sincronizados em tempo real para toda a equipe.",
       "ctaStart": "Comece agora",
       "ctaPlans": "Ver planos",
-      "heroNote": "Sem burocracia. Cancele quando quiser.",
+      "heroNote": "7 dias grátis com todos os recursos, sem cartão de crédito. Depois, fique no plano gratuito para sempre, se quiser.",
+      "boardPreview": {
+        "columns": [
+          {
+            "title": "A Fazer",
+            "cards": [
+              { "title": "Visita técnica - Setor 4", "badge": "Hoje", "initials": "LS" },
+              { "title": "Orçamento - Reforma Sala 4", "badge": "Amanhã", "initials": "MA" }
+            ]
+          },
+          {
+            "title": "Em andamento",
+            "cards": [
+              { "title": "Comprar material - Fase 2", "badge": "2/4", "initials": "TC" },
+              { "title": "Revisar contrato do fornecedor", "badge": "3 dias", "initials": "LS" }
+            ]
+          },
+          {
+            "title": "Concluído",
+            "cards": [
+              { "title": "Entrega - Lote 12", "badge": "Feito", "initials": "MA", "done": true }
+            ]
+          }
+        ]
+      },
       "stats": [
-        { "value": "8", "label": "Ferramentas integradas num só lugar" },
-        { "value": "100%", "label": "Sincronização em tempo real entre a equipe" },
-        { "value": "0", "label": "Planilhas soltas ou grupos de WhatsApp" },
-        { "value": "24/7", "label": "Acesso ao quadro, de qualquer lugar" }
+        {
+          "value": "13",
+          "label": "Ferramentas integradas num só lugar"
+        },
+        {
+          "value": "100%",
+          "label": "Sincronização em tempo real entre a equipe"
+        },
+        {
+          "value": "0",
+          "label": "Planilhas soltas ou grupos de WhatsApp"
+        },
+        {
+          "value": "24/7",
+          "label": "Acesso ao quadro, de qualquer lugar"
+        }
       ],
       "benefits": [
-        { "title": "Tudo num só lugar", "text": "Substitua planilhas soltas, grupos de WhatsApp e ferramentas espalhadas por um único sistema." },
-        { "title": "Sua equipe já entende", "text": "Interface simples, sem curso ou treinamento — quem já usou um quadro Kanban começa a usar em minutos." },
-        { "title": "Cresce com você", "text": "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis." }
+        {
+          "title": "Tudo num só lugar",
+          "text": "Substitua planilhas soltas, grupos de WhatsApp e ferramentas espalhadas por um único sistema."
+        },
+        {
+          "title": "Sua equipe já entende",
+          "text": "Interface simples, sem curso ou treinamento. Quem já usou um quadro Kanban começa a usar em minutos."
+        },
+        {
+          "title": "Cresce com você",
+          "text": "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis."
+        }
       ],
-      "exploreTitle": "Explore o Kanban IMG",
+      "exploreTitle": "Explore o Xaphires",
       "exploreLinks": [
-        { "page": "features", "badge": "R", "title": "Recursos", "text": "Conheça as 8 ferramentas do Kanban IMG: quadro, tabela, calendário, mapa e mais." },
-        { "page": "solutions", "badge": "S", "title": "Soluções", "text": "Veja como times de projeto, campo, gestão e operações usam o Kanban IMG no dia a dia." },
-        { "page": "pricing", "badge": "P", "title": "Preços", "text": "Compare os planos Básico, Profissional e Empresarial e escolha o ideal pra sua equipe." }
-      ]
+        {
+          "page": "features",
+          "badge": "R",
+          "title": "Recursos",
+          "text": "Conheça as ferramentas do Xaphires: quadro, tabela, calendário, mapa e mais."
+        },
+        {
+          "page": "solutions",
+          "badge": "S",
+          "title": "Soluções",
+          "text": "Veja como times de projeto, campo, gestão e operações usam o Xaphires no dia a dia."
+        },
+        {
+          "page": "pricing",
+          "badge": "P",
+          "title": "Preços",
+          "text": "Compare os planos Básico, Profissional e Empresarial e escolha o ideal pra sua equipe."
+        }
+      ],
+      "faq": {
+        "title": "Perguntas frequentes",
+        "items": [
+          {
+            "q": "Preciso instalar alguma coisa?",
+            "a": "Não. O Xaphires roda direto no navegador, no computador ou no celular - sem aplicativo para baixar nem servidor para configurar."
+          },
+          {
+            "q": "Tenho suporte se eu tiver algum problema?",
+            "a": "Sim. Todo plano inclui suporte por e-mail; nos planos Profissional e Empresarial, o suporte é prioritário ou dedicado, com atendimento mais rápido."
+          },
+          {
+            "q": "Posso cancelar quando quiser?",
+            "a": "Sim, sem multa. Ao cancelar, você mantém acesso completo até o fim do período já pago; depois, os dados continuam lá - para voltar a editar, é só escolher o plano gratuito quando quiser."
+          },
+          {
+            "q": "Preciso treinar minha equipe para usar?",
+            "a": "Na maioria dos casos, não. Se alguém do seu time já usou um quadro Kanban, mesmo em papel com post-it, o Xaphires segue a mesma lógica - o aprendizado é de minutos."
+          }
+        ]
+      }
     },
     "features": {
-      "headerTitle": "Tudo o que a sua equipe precisa",
-      "headerText": "Oito ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
-      "items": [
-        { "badge": "Q", "title": "Quadro Kanban", "text": "Chega de tarefa perdida em print de conversa. Arraste e solte entre listas e veja o andamento real da equipe." },
-        { "badge": "T", "title": "Tabela", "text": "Todos os cartões em formato de planilha, com busca e filtro por membro — sem precisar de outra ferramenta." },
-        { "badge": "C", "title": "Calendário", "text": "Prazos e datas de início numa visão mensal, para nada passar despercebido." },
-        { "badge": "L", "title": "Linha do tempo", "text": "O cronograma inteiro do projeto num só olhar, período a período." },
-        { "badge": "P", "title": "Painel", "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma." },
-        { "badge": "M", "title": "Mapa", "text": "Tarefas com endereço plotadas num mapa interativo — ótimo para equipes em campo." },
-        { "badge": "E", "title": "Matriz Eisenhower", "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto." },
-        { "badge": "A", "title": "Atas de reunião", "text": "Pauta, decisões e itens de ação registrados — e cobrados depois." }
+      "automationsTitle": "O que o Xaphires faz sozinho",
+      "automationsText": "Automações que trabalham em segundo plano, para você não precisar lembrar nem cobrar na mão.",
+      "automations": [
+        {
+          "badge": "R",
+          "title": "Arquivamento de cartões",
+          "text": "Tire o concluído do quadro sem apagar nada. Arquivado sai de todas as visões e volta para a coluna de origem quando você quiser."
+        },
+        {
+          "badge": "A",
+          "title": "Arquivamento automático",
+          "text": "Defina os dias e os cartões concluídos vão para o arquivo sozinhos. Disponível do plano Profissional para cima."
+        },
+        {
+          "badge": "G",
+          "title": "Monitor de gargalos",
+          "text": "Marque o tempo aceitável de cada coluna e veja quais cartões passaram do prazo, com mensagem de cobrança pronta. Do Profissional para cima."
+        },
+        {
+          "badge": "T",
+          "title": "Rotinas automáticas",
+          "text": "Tarefas fixas viram cartão sozinhas na data certa, com o checklist já preenchido. Do plano Profissional para cima."
+        },
+        {
+          "badge": "L",
+          "title": "Letreiro de tarefas",
+          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Profissional para cima."
+        },
+        {
+          "badge": "P",
+          "title": "Planejador pessoal",
+          "text": "Uma agenda fora dos quadros, só sua: calendário e lista de tarefas pessoais, com as concluídas arquivando sozinhas depois de 2 dias. Disponível do plano Profissional para cima."
+        },
+        {
+          "badge": "X",
+          "title": "Anexos e links",
+          "text": "Contratos, plantas e fotos direto no cartão, além de links para o que mora fora do sistema."
+        },
+        {
+          "badge": "C",
+          "title": "Conclusão automática",
+          "text": "Marcou o cartão como concluído, ele já pula sozinho para a coluna de concluído do quadro - sem arrastar na mão."
+        }
       ],
+      "headerTitle": "Tudo o que a sua equipe precisa",
+      "headerText": "Ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
+      "items": [
+        {
+          "badge": "Q",
+          "title": "Quadro Kanban",
+          "text": "Chega de tarefa perdida em print de conversa. Arraste e solte entre listas e veja o andamento real da equipe."
+        },
+        {
+          "badge": "T",
+          "title": "Tabela",
+          "text": "Todos os cartões em formato de planilha, com busca e filtro por membro, sem precisar de outra ferramenta."
+        },
+        {
+          "badge": "C",
+          "title": "Calendário",
+          "text": "Prazos e datas de início numa visão mensal, para nada passar despercebido."
+        },
+        {
+          "badge": "L",
+          "title": "Linha do tempo (Gantt)",
+          "text": "Crie e abra tarefas direto na linha do tempo, com o cronograma inteiro do projeto num só olhar, período a período. Disponível do plano Intermediário para cima."
+        },
+        {
+          "badge": "P",
+          "title": "Painel",
+          "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma. Disponível do plano Intermediário para cima."
+        },
+        {
+          "badge": "M",
+          "title": "Mapa",
+          "text": "Tarefas com endereço plotadas num mapa interativo. Ótimo para equipes em campo. Disponível do plano Intermediário para cima."
+        },
+        {
+          "badge": "E",
+          "title": "Matriz Eisenhower",
+          "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto. Disponível do plano Intermediário para cima."
+        }
+      ],
+      "ganttPreview": {
+        "title": "O Gantt em ação",
+        "text": "Cada tarefa vira uma barra no tempo, com a linha do dia de hoje sempre visível - crie e edite direto por aqui, sem precisar de outra ferramenta.",
+        "rows": [
+          { "title": "Planejamento", "status": "done" },
+          { "title": "Desenvolvimento", "status": "inProgress" },
+          { "title": "Testes", "status": "agency" },
+          { "title": "Revisão final", "child": true }
+        ]
+      },
       "secondary": [
-        { "title": "Quadros privados e compartilhados", "text": "Separe o que é da equipe do que é só seu, com controle total de visibilidade." },
-        { "title": "Controle de usuários e papéis", "text": "Defina quem é administrador (master) e quem é membro da equipe." }
+        {
+          "title": "Quadros privados e compartilhados",
+          "text": "Separe o que é da equipe do que é só seu, com controle total de visibilidade."
+        },
+        {
+          "title": "Controle de usuários e papéis",
+          "text": "Defina quem é administrador (master) e quem é membro da equipe."
+        },
+        {
+          "title": "Bate-papo da empresa",
+          "text": "Um canal geral para todo mundo e conversas privadas entre colegas, sem sair do sistema para o WhatsApp."
+        },
+        {
+          "title": "Subtarefas com dono, prazo e prioridade",
+          "text": "Divida o cartão em etapas menores, cada uma com responsável, data e prioridade próprios - não é só uma lista de caixinhas."
+        }
       ]
     },
     "solutions": {
       "headerTitle": "Soluções para cada tipo de equipe",
-      "headerText": "O mesmo Kanban IMG, organizado do jeito que cada time precisa trabalhar.",
+      "headerText": "O mesmo Xaphires, organizado do jeito que cada time precisa trabalhar.",
       "items": [
-        { "title": "Agências e times de projeto", "text": "Um quadro por cliente ou projeto, com linha do tempo para prazos e painel de métricas prontos para mostrar o progresso em reunião.", "tags": ["Quadro Kanban", "Linha do tempo", "Painel"] },
-        { "title": "Equipes em campo", "text": "Tarefas com endereço plotadas no mapa — ideal para manutenção, entregas, vistorias e qualquer equipe que trabalha fora do escritório.", "tags": ["Mapa", "Quadro Kanban"] },
-        { "title": "Gestão e liderança", "text": "Priorize com a Matriz Eisenhower, acompanhe indicadores no Painel e mantenha planejamentos sensíveis em quadros privados.", "tags": ["Matriz Eisenhower", "Painel", "Quadros privados"] },
-        { "title": "Operações e rotina", "text": "O par Quadro Kanban + Tabela cobre o trabalho do dia a dia, com Calendário para prazos recorrentes e nada passa despercebido.", "tags": ["Quadro Kanban", "Tabela", "Calendário"] },
-        { "title": "Reuniões e alinhamento", "text": "Atas de reunião com pauta, decisões e itens de ação — registrados na hora e cobrados depois, sem depender de memória.", "tags": ["Atas de reunião"] }
+        {
+          "title": "Agências e times de projeto",
+          "text": "Um quadro por cliente ou projeto, com linha do tempo para prazos e painel de métricas prontos para mostrar o progresso em reunião.",
+          "tags": [
+            "Quadro Kanban",
+            "Linha do tempo",
+            "Painel"
+          ]
+        },
+        {
+          "title": "Equipes em campo",
+          "text": "Tarefas com endereço plotadas no mapa. Ideal para manutenção, entregas, vistorias e qualquer equipe que trabalha fora do escritório.",
+          "tags": [
+            "Mapa",
+            "Quadro Kanban"
+          ]
+        },
+        {
+          "title": "Gestão e liderança",
+          "text": "Priorize com a Matriz Eisenhower, acompanhe indicadores no Painel e mantenha planejamentos sensíveis em quadros privados.",
+          "tags": [
+            "Matriz Eisenhower",
+            "Painel",
+            "Quadros privados"
+          ]
+        },
+        {
+          "title": "Operações e rotina",
+          "text": "O par Quadro Kanban + Tabela cobre o trabalho do dia a dia, com Calendário para prazos recorrentes e nada passa despercebido.",
+          "tags": [
+            "Quadro Kanban",
+            "Tabela",
+            "Calendário"
+          ]
+        },
+        {
+          "title": "Times de Produto",
+          "text": "Do roadmap ao lançamento: organize iniciativas na Linha do tempo, priorize pedidos de feature e mantenha tudo num só lugar.",
+          "tags": [
+            "Linha do tempo",
+            "Matriz Eisenhower",
+            "Anexos"
+          ],
+          "page": "productTeams"
+        }
+      ],
+      "learnMore": "Saiba mais"
+    },
+    "productTeams": {
+      "backLink": "← Voltar para Soluções",
+      "badge": "Para times de produto",
+      "heroTitle": "Roadmap, sprints e lançamentos, sem depender de planilha",
+      "heroText": "Organize as iniciativas do produto, acompanhe o ciclo de cada sprint e priorize pedidos de feature com visibilidade em tempo real para toda a equipe.",
+      "ctaStart": "Comece agora",
+      "ctaPlans": "Ver planos",
+      "templatesTitle": "Um quadro para cada etapa do produto",
+      "templates": [
+        {
+          "badge": "R",
+          "title": "Roadmap de Produto",
+          "text": "Organize iniciativas por trimestre e acompanhe tudo na Linha do tempo, do planejamento ao lançamento."
+        },
+        {
+          "badge": "S",
+          "title": "Sprint Ágil",
+          "text": "Listas de Backlog, Em andamento e Concluído, com checklist e prazo em cada cartão."
+        },
+        {
+          "badge": "F",
+          "title": "Pedidos de Feature",
+          "text": "Etiquetas por prioridade e anexos com prints ou links de referência em cada pedido."
+        }
+      ],
+      "timelineBadge": "Linha do tempo",
+      "timelineTitle": "Lançamentos mais previsíveis",
+      "timelineText": "Veja o cronograma inteiro do roadmap num só olhar, período a período, e identifique atrasos antes que virem problema no lançamento.",
+      "extraTitle": "Prioridade e visibilidade, sem esforço extra",
+      "extra": [
+        {
+          "title": "Matriz Eisenhower",
+          "text": "Separe o que é urgente do que é importante e pare de reagir só ao que grita mais alto no backlog."
+        },
+        {
+          "title": "Painel",
+          "text": "Métricas prontas para mostrar o progresso do produto em qualquer reunião, sem montar slide."
+        },
+        {
+          "title": "Quadros privados",
+          "text": "Mantenha roadmaps sensíveis visíveis só para quem precisa, antes do anúncio oficial."
+        }
       ]
     },
     "pricing": {
@@ -89,22 +355,261 @@
       "headerText": "Escolha o plano ideal para sua equipe e mude quando ela crescer.",
       "mostPopular": "Mais popular",
       "plans": [
-        { "name": "Básico", "price": "Grátis", "period": "", "tagline": "Para equipes pequenas começarem com o essencial", "cta": "Começar grátis", "features": ["Até 3 usuários", "Quadros ilimitados", "Quadro Kanban, Tabela e Calendário", "Suporte por e-mail"] },
-        { "name": "Profissional", "price": "R$ 799", "period": "/usuário/mês", "tagline": "Para equipes que querem controle total", "cta": "Assinar Profissional", "highlight": true, "features": ["Usuários ilimitados", "Todas as visões (Painel, Mapa, Linha do tempo, Matriz Eisenhower)", "Atas de reunião", "Quadros privados e compartilhados", "Suporte prioritário"] },
-        { "name": "Empresarial", "price": "Sob consulta", "period": "", "tagline": "Para organizações com necessidades específicas", "cta": "Falar com vendas", "features": ["Tudo do Profissional", "Onboarding dedicado", "Suporte dedicado", "Acordo de nível de serviço (SLA)"] }
+        {
+          "name": "Básico",
+          "price": "Grátis",
+          "period": "",
+          "tagline": "Para equipes pequenas começarem com o essencial",
+          "cta": "Começar grátis",
+          "features": [
+            "Até 7 usuários",
+            "Até 4 quadros, privados e compartilhados",
+            "Kanban, Tabela e Calendário",
+            "Arquivamento manual de cartões",
+            "Anexos e links nos cartões (até 10 MB)",
+            "Suporte por e-mail"
+          ]
+        },
+        {
+          "name": "Intermediário",
+          "price": "R$ 370,00",
+          "period": "/mês",
+          "tagline": "Para equipes que cresceram além de sete pessoas",
+          "cta": "Experimente grátis", "note": "7 dias grátis para testar",
+          "features": [
+            "Até 15 usuários",
+            "Tudo do Básico, mais:",
+            "Quadros ilimitados",
+            "Todas as 7 visões (+ Gantt, Painel, Mapa, Matriz Eisenhower)",
+            "Anexos e links nos cartões (até 50 MB)"
+          ]
+        },
+        {
+          "name": "Profissional",
+          "price": "R$ 730,00",
+          "period": "/mês",
+          "tagline": "Para equipes que querem controle total",
+          "cta": "Experimente grátis", "note": "7 dias grátis para testar",
+          "highlight": true,
+          "features": [
+            "Usuários ilimitados",
+            "Tudo do Intermediário, mais:",
+            "Letreiro de tarefas pendentes",
+            "Arquivamento automático de concluídos",
+            "Monitor de gargalos",
+            "Planejador pessoal",
+            "Rotinas que criam cartões sozinhas",
+            "Suporte prioritário"
+          ]
+        },
+        {
+          "name": "Empresarial",
+          "price": "Sob consulta",
+          "period": "",
+          "tagline": "Para organizações com necessidades específicas",
+          "cta": "Falar com vendas",
+          "features": [
+            "Tudo incluído no profissional, mais:",
+            "Onboarding dedicado",
+            "Suporte dedicado",
+            "Acordo de nível de serviço (SLA)",
+            "Desenvolvimento de qualquer funcionalidade sob medida",
+            "Criamos qualquer solução personalizada que o seu negócio precisar",
+            "Escopo aberto para projetos e customizações exclusivas"
+          ]
+        }
+      ]
+    },
+    "switcher": {
+      "title": "Uma ferramenta que acompanha o ritmo da obra",
+      "text": "Tudo que a equipe registra aparece na hora para todo mundo, com o nível de acesso certo para cada pessoa.",
+      "items": [
+        {
+          "key": "realtime",
+          "mark": "S",
+          "title": "Sincronização em tempo real",
+          "text": "Mudou o cartão, mudou para a equipe inteira, no mesmo instante.",
+          "statusLabel": "Sincronização",
+          "statusValue": "Ativa"
+        },
+        {
+          "key": "access",
+          "mark": "A",
+          "title": "Acesso por papel",
+          "text": "Cada pessoa vê e edita apenas o que cabe à sua função.",
+          "statusLabel": "Controle de acesso",
+          "statusValue": "Por papel"
+        },
+        {
+          "key": "insights",
+          "mark": "P",
+          "title": "Indicadores prontos",
+          "text": "O painel mostra o andamento sem ninguém precisar montar relatório.",
+          "statusLabel": "Painel",
+          "statusValue": "Atualizado"
+        }
+      ]
+    },
+    "logos": {
+      "label": "Tudo isso num só lugar",
+      "items": [
+        "Quadro Kanban",
+        "Tabela",
+        "Calendário",
+        "Linha do tempo",
+        "Painel",
+        "Mapa",
+        "Matriz Eisenhower",
+        "Arquivamento automático",
+        "Monitor de gargalos",
+        "Rotinas automáticas",
+        "Letreiro de tarefas",
+        "Anexos e links"
+      ]
+    },
+    "testimonials": {
+      "title": "O que dizem as equipes",
+      "items": [
+        {
+          "quote": "Substituímos três planilhas e grupos de WhatsApp por um quadro só. A equipe parou de perder tarefa.",
+          "name": "Alex Rivera",
+          "role": "Líder de equipe"
+        },
+        {
+          "quote": "A linha do tempo virou a reunião de segunda. Todo mundo vê o mesmo cronograma e acabou a discussão de versão. E ainda consigo ver tudo do meu celular.",
+          "name": "Ana Braga",
+          "role": "Planejamento"
+        },
+        {
+          "quote": "Melhorei a minha gestão de tempo com esse kanban.",
+          "name": "Lucas Sabino",
+          "role": "Financeiro"
+        }
       ]
     },
     "footer": {
       "title": "Pronto para organizar sua equipe?",
-      "cta": "Comece agora"
+      "cta": "Comece agora",
+      "privacy": "Política de Privacidade",
+      "copyright": "Direitos autorais © 2026 Xaphires"
+    },
+    "privacy": {
+      "backLink": "← Voltar",
+      "headerTitle": "Política de Privacidade",
+      "headerText": "Como o Xaphires coleta, usa, armazena e protege os dados da sua equipe.",
+      "updatedLabel": "Última atualização",
+      "updatedDate": "25 de julho de 2026",
+      "sections": [
+        {
+          "title": "1. Informações que coletamos",
+          "paragraphs": [
+            "Coletamos apenas o necessário para operar a plataforma. Os dados vêm do que você informa ao criar a conta e do conteúdo que produz durante o uso."
+          ],
+          "bullets": [
+            "Dados de cadastro: nome, e-mail, senha e o nome da empresa informado no registro.",
+            "Conteúdo que você cria: quadros, listas, cartões, descrições, prazos, checklists, etiquetas, responsáveis e arquivos anexados.",
+            "Endereços: apenas quando você adiciona um endereço a um cartão para exibi-lo no Mapa.",
+            "Dados de sessão: as informações necessárias para manter você conectado com segurança."
+          ]
+        },
+        {
+          "title": "2. Como usamos as informações",
+          "paragraphs": [
+            "Usamos os dados exclusivamente para fornecer e manter o serviço. Não vendemos seus dados, não os usamos para publicidade e não os repassamos a terceiros para fins de marketing."
+          ],
+          "bullets": [
+            "Autenticar seu acesso e manter sua sessão ativa.",
+            "Exibir e sincronizar o conteúdo dos quadros entre os membros da sua empresa.",
+            "Converter endereços em coordenadas para exibição no Mapa.",
+            "Comunicar avisos operacionais importantes sobre o serviço.",
+            "Investigar e prevenir uso indevido, fraude e incidentes de segurança."
+          ]
+        },
+        {
+          "title": "3. Compartilhamento de informações",
+          "paragraphs": [
+            "Não vendemos nem alugamos dados pessoais. O compartilhamento acontece apenas nas situações abaixo."
+          ],
+          "bullets": [
+            "Com outros usuários da sua empresa: o conteúdo dos quadros compartilhados fica visível para os demais membros. Quadros privados são visíveis apenas para quem os criou.",
+            "Com o serviço de geocodificação OpenStreetMap (Nominatim): quando você busca um endereço, apenas o texto do endereço é enviado para obter as coordenadas. Nenhum dado da sua conta é transmitido.",
+            "Por obrigação legal: quando exigido por lei, ordem judicial ou autoridade competente."
+          ]
+        },
+        {
+          "title": "4. Como armazenamos e protegemos",
+          "paragraphs": [
+            "Os dados de cada empresa ficam em um banco de dados isolado, separado das demais empresas da plataforma."
+          ],
+          "bullets": [
+            "Senhas nunca são armazenadas em texto puro: guardamos apenas um hash criptográfico.",
+            "Todas as rotas da API exigem autenticação, e cada requisição é validada contra a empresa e as permissões do usuário.",
+            "A sessão usa cookie httpOnly, inacessível aos scripts da página.",
+            "Em produção, todo o tráfego usa conexão criptografada (HTTPS).",
+            "Requisições de escrita têm a origem verificada, o que impede ações forjadas por sites de terceiros."
+          ]
+        },
+        {
+          "title": "5. Por quanto tempo mantemos os dados",
+          "paragraphs": [
+            "Mantemos os dados enquanto a conta estiver ativa e pelo período necessário para cumprir obrigações legais.",
+            "Quando um usuário é excluído por um administrador, o cadastro é removido, os quadros privados dele são apagados e as referências a ele nos cartões são desvinculadas."
+          ]
+        },
+        {
+          "title": "6. Cookies e armazenamento local",
+          "paragraphs": [
+            "Não usamos cookies de publicidade nem de rastreamento entre sites."
+          ],
+          "bullets": [
+            "Cookie de sessão: guarda o token que mantém você conectado, com validade de 7 dias.",
+            "Armazenamento local do navegador: guarda apenas suas preferências de tema e idioma."
+          ]
+        },
+        {
+          "title": "7. Seus direitos",
+          "paragraphs": [
+            "Conforme a Lei Geral de Proteção de Dados (LGPD), você pode a qualquer momento:"
+          ],
+          "bullets": [
+            "Confirmar a existência de tratamento e acessar seus dados.",
+            "Corrigir dados incompletos, inexatos ou desatualizados, diretamente no seu perfil.",
+            "Solicitar a exclusão da conta e dos dados associados.",
+            "Exportar o conteúdo dos seus quadros em formato JSON, pela própria plataforma.",
+            "Revogar consentimento e se opor a tratamentos que considere indevidos."
+          ]
+        },
+        {
+          "title": "8. Crianças e adolescentes",
+          "paragraphs": [
+            "O Xaphires é uma ferramenta corporativa, destinada ao uso profissional. Não direcionamos o serviço a menores de 18 anos e não coletamos intencionalmente dados de crianças. Cadastros identificados nessas condições serão removidos."
+          ]
+        },
+        {
+          "title": "9. Alterações nesta política",
+          "paragraphs": [
+            "Podemos atualizar esta política para refletir mudanças no serviço ou na legislação. A data de última atualização no topo desta página sempre indica a versão vigente. Mudanças relevantes serão comunicadas pelos canais de contato cadastrados."
+          ]
+        },
+        {
+          "title": "10. Como entrar em contato",
+          "paragraphs": [
+            "Para dúvidas sobre esta política ou sobre o tratamento dos seus dados, fale com o encarregado de proteção de dados:"
+          ],
+          "bullets": [
+            "E-mail: xaphires@contato.com"
+          ]
+        }
+      ]
     }
   },
   "auth": {
-    "brandTitle": "Kanban IMG",
+    "brandTitle": "Xaphires",
     "brandText": "Organize seus projetos em quadros Kanban simples, rápidos e colaborativos.",
     "back": "← Voltar",
     "tabLogin": "Entrar",
     "tabSignup": "Criar empresa",
+    "tabJoin": "Pedir acesso",
     "companyName": "Nome da empresa",
     "yourName": "Seu nome",
     "email": "E-mail",
@@ -113,39 +618,80 @@
     "passwordsMismatch": "As senhas não coincidem",
     "submitWait": "Aguarde...",
     "submitLogin": "Entrar",
-    "submitSignup": "Criar empresa"
+    "submitSignup": "Criar empresa",
+    "companyDocLabel": "CNPJ ou CPF da empresa",
+    "joinIntro": "Sua empresa já usa o Xaphires? Informe o CNPJ ou CPF dela para pedir acesso.",
+    "cnpjLabel": "CNPJ ou CPF da empresa",
+    "cnpjSearch": "Buscar",
+    "cnpjSearching": "Buscando...",
+    "companyFound": "Empresa encontrada: {{name}}",
+    "notThisCompany": "Não é essa empresa? Trocar CNPJ/CPF",
+    "joinSubmit": "Enviar pedido",
+    "joinSubmitWait": "Enviando...",
+    "joinSuccessTitle": "Pedido enviado!",
+    "joinSuccessText": "Assim que alguém da sua empresa aprovar, você já pode entrar com o e-mail e a senha que escolheu agora.",
+    "joinSuccessBackToLogin": "Ir para o login"
   },
   "app": {
     "loadingBoards": "Carregando quadros...",
     "noBoards": "Nenhum quadro. Crie um na barra lateral.",
     "sidebar": {
-      "minutesNav": "Atas de Reunião",
+      "comingSoon": "Em breve",
       "sharedBoards": "Quadros compartilhados",
       "myPrivateBoards": "Meus quadros privados",
+      "sharedWithMe": "Compartilhados comigo",
+      "sharedWithCount": "Compartilhado com {{count}} pessoa(s)",
       "newBoard": "+ Novo quadro",
       "boardNamePlaceholder": "Nome do quadro",
       "privateToggle": "Privado (só você vê)",
       "create": "Criar",
       "deleteBoardTitle": "Excluir quadro",
       "deleteBoardConfirm": "Excluir o quadro \"{{title}}\" e todo o seu conteúdo?",
-      "boardDeletedToast": "Quadro excluído"
+      "boardDeletedToast": "Quadro excluído",
+      "workspaceLabel": "Workspace de {{name}}",
+      "spacesTitle": "Espaços",
+      "boardsFolder": "Projetos",
+      "rail": {
+        "home": "Início",
+        "planner": "Planejador",
+        "ai": "IA",
+        "team": "Equipes",
+        "dashboards": "Painéis",
+        "boards": "Quadros",
+        "more": "Mais",
+        "invite": "Convidar"
+      },
+      "shortcuts": {
+        "inbox": "Caixa de entrada",
+        "meetings": "Reuniões",
+        "myTasks": "Minhas tarefas",
+        "allTasks": "Todas as tarefas"
+      }
     },
     "topbar": {
       "toggleSidebar": "Mostrar/ocultar barra lateral",
       "menu": "Menu",
       "defaultBoardName": "Quadro sem nome",
-      "privateBoardTitle": "Quadro privado — visível só para você",
+      "privateBoardTitle": "Quadro privado, visível só para você",
+      "sharedWithYouTitle": "Quadro privado compartilhado com você",
+      "shareBtn": "Compartilhar",
+      "readOnlyBadge": "Somente leitura",
       "filterBy": "Filtrar por {{name}}",
       "usersBtn": "Usuários",
       "searchPlaceholder": "Buscar cartões...",
       "clearBoard": "Limpar quadro",
       "clearBoardConfirm": "Isso vai apagar todas as listas e cartões deste quadro. Continuar?",
+      "clearBoardConfirmPartial": "Isso vai apagar os cartões que você criou (e as listas que ficarem vazias). Cartões de outras pessoas continuam no quadro. Continuar?",
       "clearBoardToast": "Quadro limpo"
     },
     "dataMenu": {
+      "recurrences": "Rotinas automáticas",
+      "bottlenecks": "Monitor de gargalos",
+      "archivedCards": "Cartões arquivados",
       "moreOptions": "Mais opções",
       "personalize": "Personalizar",
       "dataSection": "Dados",
+      "exportReport": "Exportar relatório",
       "exportCurrent": "Exportar quadro atual",
       "exportAll": "Exportar tudo (backup)",
       "importJson": "Importar JSON",
@@ -165,19 +711,164 @@
     },
     "accountMenu": {
       "changePassword": "Alterar senha",
+      "platformPanel": "Painel da plataforma",
       "logout": "Sair",
       "currentPassword": "Senha atual",
       "newPassword": "Nova senha",
       "save": "Salvar",
       "passwordChangedToast": "Senha alterada",
-      "master": "Master"
+      "master": "Master",
+      "myProfile": "Meu perfil",
+      "profileSavedToast": "Perfil atualizado",
+      "profileName": "Nome",
+      "profileBio": "Descrição",
+      "profileBioPlaceholder": "Fale um pouco sobre você...",
+      "uploadPhoto": "Alterar foto",
+      "removePhoto": "Remover foto"
     },
     "taskTicker": {
       "pending": "Pendentes ({{count}})"
     }
   },
   "board": {
+    "recurrences": {
+      "title": "Rotinas automáticas",
+      "empty": "Nenhuma rotina criada. Uma rotina cria o cartão sozinha na data certa, com o checklist já preenchido.",
+      "planRequired": "As rotinas automáticas estão disponíveis a partir do plano Profissional. Você pode ver e apagar as que já existem.",
+      "newRule": "Nova rotina",
+      "fieldTitle": "Título do cartão",
+      "titlePlaceholder": "Ex: Fechar balancete da contabilidade",
+      "fieldList": "Criar na coluna",
+      "fieldFreq": "Repetir",
+      "fieldWeekday": "Dia da semana",
+      "fieldMonthday": "Dia do mês",
+      "fieldMonthday2": "Segundo dia do mês (opcional)",
+      "noSecondDay": "só um dia",
+      "fieldHour": "Hora",
+      "fieldDueInDays": "Prazo (dias)",
+      "noDue": "sem prazo",
+      "fieldChecklist": "Checklist da rotina",
+      "checklistPlaceholder": "Um item por linha:\nConciliar contas\nConferir notas\nEnviar ao contador",
+      "save": "Criar rotina",
+      "saveEdit": "Salvar alterações",
+      "created": "Rotina criada",
+      "updated": "Rotina atualizada",
+      "editingHint": "Editando \"{{title}}\". Cartões já criados por ela não mudam.",
+      "deleted": "Rotina removida",
+      "deleteConfirm": "Remover a rotina \"{{title}}\"? Os cartões já criados por ela continuam no quadro.",
+      "edit": "Editar",
+      "pause": "Pausar",
+      "resume": "Retomar",
+      "delete": "Remover",
+      "everyDay": "Todo dia às {{hour}}h",
+      "everyWeek": "Toda {{day}} às {{hour}}h",
+      "everyMonth": "Todo dia {{day}} às {{hour}}h",
+      "everyMonthTwoDays": "Todo dia {{day}} e {{day2}} às {{hour}}h",
+      "intoList": "em {{list}}",
+      "listGone": "coluna removida",
+      "checklistCount": "{{count}} item no checklist",
+      "checklistCount_other": "{{count}} itens no checklist",
+      "lastRun": "Última vez: {{date}}",
+      "monthdayWarning": "Em meses mais curtos, a rotina cai no último dia do mês.",
+      "hint": "As rotinas são conferidas quando o quadro é carregado. Se várias datas passarem sem ninguém abrir o app, apenas a mais recente vira cartão.",
+      "freq": {
+        "daily": "Todo dia",
+        "weekly": "Toda semana",
+        "monthly": "Todo mês"
+      },
+      "weekdays": {
+        "0": "domingo",
+        "1": "segunda",
+        "2": "terça",
+        "3": "quarta",
+        "4": "quinta",
+        "5": "sexta",
+        "6": "sábado"
+      }
+    },
+    "exportReport": {
+      "title": "Exportar relatório do Kanban",
+      "boardLabel": "Quadro",
+      "allBoards": "Todos os quadros",
+      "privateTag": "privado",
+      "allBoardsHint": "Inclui todos os quadros a que você tem acesso, inclusive os privados.",
+      "noBoardsHint": "Selecione ao menos um quadro para exportar o relatório.",
+      "userLabel": "Usuário",
+      "allUsers": "Todos os usuários",
+      "statusLabel": "Status do cartão",
+      "statusAll": "Todos",
+      "statusOpen": "Apenas abertos",
+      "statusDone": "Apenas concluídos",
+      "count": "{{count}} cartão encontrado",
+      "count_other": "{{count}} cartões encontrados",
+      "counting": "Contando cartões...",
+      "countFailed": "Não foi possível contar os cartões",
+      "emptyHint": "Nenhum cartão corresponde aos filtros escolhidos. O arquivo sai só com o cabeçalho.",
+      "downloadCsv": "Baixar relatório (CSV)",
+      "downloadPdf": "Baixar relatório (PDF)",
+      "downloadExcel": "Baixar relatório (Excel)",
+      "generating": "Gerando...",
+      "downloadStarted": "Relatório gerado"
+    },
+    "bottlenecks": {
+      "bareHours": "{{count}} hora",
+      "bareHours_other": "{{count}} horas",
+      "bareDays": "{{count}} dia",
+      "bareDays_other": "{{count}} dias",
+      "msgGreetingNoName": "Oi!",
+      "title": "Monitor de gargalos",
+      "noneMonitored": "Nenhuma coluna está sendo monitorada. Abra o menu de uma coluna e defina o tempo a partir do qual um cartão parado vira alerta.",
+      "allClear": "Nenhum gargalo. {{count}} coluna monitorada e tudo em dia.",
+      "allClear_other": "Nenhum gargalo. {{count}} colunas monitoradas e tudo em dia.",
+      "summary": "{{count}} cartão parado além do prazo da coluna.",
+      "summary_other": "{{count}} cartões parados além do prazo da coluna.",
+      "inList": "Em {{list}} · limite de {{hours}}h",
+      "hours": "{{count}}h parado",
+      "hours_other": "{{count}}h parado",
+      "days": "{{count}} dia parado",
+      "days_other": "{{count}} dias parado",
+      "cardTooltip": "Parado há {{duration}} nesta coluna",
+      "copyFollowUp": "Copiar cobrança",
+      "copied": "Mensagem copiada",
+      "msgGreeting": "Oi, {{name}}!",
+      "msgBody": "Estou passando para saber como está \"{{title}}\". O cartão está em {{list}} há {{duration}}.",
+      "msgDue": "O prazo combinado é {{date}}.",
+      "msgClosing": "Consegue me dar um retorno sobre o andamento? Obrigado!"
+    },
+    "archive": {
+      "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Profissional. O arquivamento manual continua liberado.",
+      "autoLabel": "Arquivar concluídos automaticamente",
+      "autoDaysSuffix": "dias",
+      "autoOnHint": "Cartões concluídos há mais de {{days}} dias vão para o arquivo quando o quadro é carregado. Desmarcar um cartão reinicia a contagem.",
+      "autoOffHint": "Com a regra desligada, os concluídos ficam no quadro até você arquivar à mão.",
+      "autoInvalid": "Informe um número de dias entre 1 e 365",
+      "title": "Cartões arquivados",
+      "searchPlaceholder": "Buscar nos arquivados",
+      "empty": "Nenhum cartão arquivado ainda. Arquivar tira o cartão do quadro sem apagar nada.",
+      "noResults": "Nenhum arquivado corresponde à busca",
+      "fromList": "De {{list}}",
+      "fromDeletedList": "Coluna de origem removida",
+      "restore": "Restaurar",
+      "delete": "Excluir",
+      "restoredToast": "{{title}} restaurado",
+      "deleteConfirm": "Excluir \"{{title}}\" definitivamente? Esta ação não pode ser desfeita.",
+      "deletedToast": "Cartão excluído"
+    },
     "listMenu": {
+      "stuckPlanRequired": "O monitor de gargalos está disponível a partir do plano Profissional.",
+      "stuckConfigure": "Monitorar gargalo nesta coluna",
+      "stuckConfigured": "Gargalo: alerta em {{hours}}h",
+      "stuckHint": "Avisa quando um cartão passar deste tempo parado nesta coluna.",
+      "stuckHoursSuffix": "horas",
+      "stuckSave": "Salvar",
+      "stuckDisable": "Parar de monitorar",
+      "stuckOn": "Coluna monitorada: alerta em {{hours}}h",
+      "stuckOff": "Monitoramento desligado nesta coluna",
+      "stuckInvalid": "Informe um número de horas entre 1 e 8760",
+      "archiveCompleted": "Arquivar concluídos",
+      "cardsArchivedToast": "{{count}} cartão arquivado",
+      "cardsArchivedToast_other": "{{count}} cartões arquivados",
+      "noCompletedToArchive": "Nenhum cartão concluído nesta coluna",
       "listColor": "Cor da lista",
       "defaultColor": "Padrão",
       "sortAZ": "Ordenar por título (A-Z)",
@@ -187,6 +878,20 @@
       "deleteList": "Excluir lista",
       "deleteListConfirm": "Excluir a lista \"{{title}}\" e todos os seus cartões?",
       "listDeletedToast": "Lista excluída"
+    },
+    "share": {
+      "title": "Acesso ao quadro \"{{title}}\"",
+      "hint": "Quadro privado. Além de você, só quem estiver nesta lista consegue abri-lo.",
+      "roleOwner": "Dono",
+      "roleEditor": "Pode editar",
+      "roleViewer": "Somente leitura",
+      "add": "Adicionar",
+      "remove": "Remover",
+      "searchPlaceholder": "Buscar pessoa por nome ou e-mail...",
+      "noCandidates": "Ninguém mais para adicionar.",
+      "addedToast": "{{name}} agora tem acesso",
+      "removedToast": "{{name}} perdeu o acesso",
+      "removeConfirm": "Remover o acesso de {{name}} a este quadro?"
     },
     "listColumn": {
       "cardTitlePlaceholder": "Insira um título para este cartão...",
@@ -203,12 +908,33 @@
       "markComplete": "Marcar como concluído",
       "markIncomplete": "Marcar como não concluído",
       "urgent": "Urgente",
-      "important": "Importante"
+      "important": "Importante",
+      "edit": "Editar",
+      "moreActions": "Mais ações",
+      "duplicate": "Duplicar",
+      "duplicateSuffix": " (cópia)",
+      "cardDuplicatedToast": "Cartão duplicado",
+      "subtasksCount": "{{count}} subtarefa",
+      "subtasksCount_other": "{{count}} subtarefas"
     },
     "cardModal": {
+      "readOnlyNote": "Você tem acesso somente leitura a este quadro.",
+      "noLocation": "Sem local definido",
+      "archiveCard": "Arquivar",
+      "cardArchivedToast": "Cartão arquivado",
       "untitled": "Sem título",
+      "typeBadge": "Tarefa",
       "complete": "Concluído",
       "markComplete": "Marcar como concluído",
+      "status": "Status",
+      "statusOpen": "Em aberto",
+      "empty": "Vazio",
+      "datesLabel": "Datas",
+      "descriptionShortcut": "Adicione uma descrição",
+      "collapseEmpty": "Recolher campos vazios",
+      "showEmpty": "Mostrar campos vazios",
+      "moveToList": "Mover para lista",
+      "movedToList": "Cartão movido para \"{{list}}\"",
       "members": "Membros",
       "noUsersYet": "Nenhum usuário cadastrado ainda.",
       "labels": "Etiquetas",
@@ -221,10 +947,14 @@
       "addressPlaceholder": "Endereço, cidade...",
       "locating": "Buscando...",
       "locate": "Localizar",
-      "locationFound": "Localização encontrada — visível no Mapa",
+      "locationFound": "Localização encontrada, visível no Mapa",
       "locationPending": "Endereço salvo, mas não localizado no mapa",
       "description": "Descrição",
       "descriptionPlaceholder": "Adicione uma descrição mais detalhada...",
+      "subtasks": "Subtarefas",
+      "addSubtask": "Adicionar subtarefa",
+      "addSubtaskPlaceholder": "Nome da subtarefa...",
+      "unassign": "Remover responsável",
       "checklist": "Checklist",
       "addItemPlaceholder": "Adicionar um item",
       "attachments": "Anexos",
@@ -234,7 +964,7 @@
       "linkNamePlaceholder": "Nome do link (opcional)",
       "attachmentAdded": "Anexo adicionado",
       "attachmentRemoved": "Anexo removido",
-      "attachmentTooLarge": "O arquivo deve ter até 8MB",
+      "attachmentTooLarge": "O arquivo deve ter até {{mb}} MB",
       "uploading": "Enviando...",
       "deleteCard": "Excluir cartão",
       "deleteCardConfirm": "Excluir este cartão permanentemente?",
@@ -246,7 +976,7 @@
       "board": "Quadro",
       "table": "Tabela",
       "calendar": "Calendário",
-      "timeline": "Linha do tempo",
+      "gantt": "Gantt",
       "dashboard": "Painel",
       "map": "Mapa",
       "matrix": "Matriz Eisenhower"
@@ -268,12 +998,8 @@
       "today": "Hoje",
       "prevMonth": "Mês anterior",
       "nextMonth": "Próximo mês",
-      "more": "+{{count}} mais"
-    },
-    "timeline": {
-      "empty": "Nenhum cartão com data de início ou entrega para mostrar na linha do tempo.",
-      "undated_one": "{{count}} cartão sem data de início/entrega não exibido.",
-      "undated_other": "{{count}} cartões sem data de início/entrega não exibidos."
+      "more": "+{{count}} mais",
+      "routinePreview": "Prévia da rotina automática \"{{title}}\" - ainda não virou cartão"
     },
     "dashboard": {
       "totalCards": "Total de cartões",
@@ -287,7 +1013,14 @@
       "noLists": "Sem listas.",
       "noAssigned": "Nenhum cartão atribuído a alguém ainda.",
       "noLabels": "Nenhuma etiqueta em uso.",
-      "labelNames": { "gray": "Cinza", "blue": "Azul", "green": "Verde", "amber": "Âmbar", "red": "Vermelho", "purple": "Roxo" }
+      "labelNames": {
+        "gray": "Cinza",
+        "blue": "Azul",
+        "green": "Verde",
+        "amber": "Âmbar",
+        "red": "Vermelho",
+        "purple": "Roxo"
+      }
     },
     "map": {
       "emptyLine1": "Nenhum cartão com localização definida.",
@@ -296,42 +1029,82 @@
       "unlocated_other": "{{count}} endereços salvos mas não localizados no mapa."
     },
     "matrix": {
-      "doNow": { "title": "Fazer agora", "subtitle": "Urgente e importante" },
-      "schedule": { "title": "Planejar", "subtitle": "Importante, não urgente" },
-      "delegate": { "title": "Delegar", "subtitle": "Urgente, não importante" },
-      "eliminate": { "title": "Eliminar", "subtitle": "Nem urgente, nem importante" },
+      "doNow": {
+        "title": "Fazer agora",
+        "subtitle": "Urgente e importante"
+      },
+      "schedule": {
+        "title": "Planejar",
+        "subtitle": "Importante, não urgente"
+      },
+      "delegate": {
+        "title": "Delegar",
+        "subtitle": "Urgente, não importante"
+      },
+      "eliminate": {
+        "title": "Eliminar",
+        "subtitle": "Nem urgente, nem importante"
+      },
       "dropHere": "Arraste cartões para cá"
     }
   },
-  "minutes": {
-    "screen": {
-      "title": "Atas de Reunião",
-      "newMinute": "+ Nova ata",
-      "loading": "Carregando atas...",
-      "empty": "Nenhuma ata registrada ainda."
-    },
-    "modal": {
-      "titlePlaceholder": "Título da reunião",
-      "date": "Data",
-      "author": "Autor",
-      "participants": "Participantes",
-      "noUsersYet": "Nenhum usuário cadastrado ainda.",
-      "agenda": "Pauta",
-      "agendaPlaceholder": "O que será discutido...",
-      "decisions": "Decisões",
-      "decisionsPlaceholder": "O que foi decidido...",
-      "actionItems": "Itens de ação",
-      "assignee": "Responsável",
-      "addActionPlaceholder": "Adicionar um item de ação",
-      "deleteMinute": "Excluir ata",
-      "deleteConfirm": "Excluir esta ata permanentemente?",
-      "minuteDeletedToast": "Ata excluída",
-      "minuteCreatedToast": "Ata criada",
-      "minuteUpdatedToast": "Ata atualizada",
-      "saving": "Salvando...",
-      "createMinute": "Criar ata",
-      "saveChanges": "Salvar alterações"
+  "datePicker": {
+    "today": "Hoje",
+    "clear": "Remover data",
+    "recurrence": "Configurar recorrência",
+    "recurrenceHint": "Cartões recorrentes se configuram pelo menu de dados do quadro, não por aqui",
+    "presets": {
+      "today": "Hoje",
+      "tomorrow": "Amanhã",
+      "weekend": "Próximo final de semana",
+      "nextWeek": "Semana que vem",
+      "twoWeeks": "2 semanas",
+      "fourWeeks": "4 semanas",
+      "eightWeeks": "8 semanas"
     }
+  },
+  "gantt": {
+    "columns": { "activity": "Atividade", "status": "Situação", "group": "Grupo", "start": "Início", "due": "Prazo" },
+    "toolbar": {
+      "new": "Novo",
+      "open": "Abrir",
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "undo": "Desfazer",
+      "print": "Imprimir",
+      "export": "Exportar",
+      "search": "Filtrar / buscar",
+      "searchPlaceholder": "Buscar por título...",
+      "zoom": "Zoom",
+      "resetZoom": "Redefinir zoom"
+    },
+    "saveError": "Não foi possível salvar: {{erro}}",
+    "newTaskDefaultTitle": "Nova tarefa",
+    "noSearchResults": "Nenhuma tarefa encontrada para essa busca.",
+    "status": {
+      "done": "Concluído",
+      "todo": "A fazer",
+      "inProgress": "Em andamento",
+      "late": "Atrasado",
+      "agency": "Agência de publicidade",
+      "lateFlag": "atrasado!"
+    },
+    "legend": {
+      "icons": { "meeting": "reunião", "call": "chamada", "mail": "e-mail", "check": "checar progresso" }
+    },
+    "meta": { "event": "evento:", "venue": "local:", "date": "data:" },
+    "emptyState": "Nada para mostrar no Gantt ainda."
+  },
+  "chat": {
+    "title": "Bate-papo da empresa",
+    "you": "Você",
+    "unknownAuthor": "Usuário removido",
+    "empty": "Nenhuma mensagem ainda. Comece a conversa.",
+    "placeholder": "Escreva uma mensagem...",
+    "send": "Enviar",
+    "generalTitle": "Geral",
+    "newConversation": "+ Nova conversa",
+    "noCandidates": "Ninguém mais para chamar"
   },
   "users": {
     "title": "Painel de usuários",
@@ -358,22 +1131,219 @@
     "userCreatedToast": "Usuário criado",
     "userDeletedToast": "Usuário excluído",
     "passwordResetToast": "Senha redefinida",
-    "passwordMinLength": "A nova senha deve ter ao menos 6 caracteres"
+    "passwordMinLength": "A nova senha deve ter ao menos 6 caracteres",
+    "companyCnpjLabel": "CNPJ ou CPF da empresa",
+    "companyCnpjHint": "Quem quiser pedir acesso à sua empresa vai precisar digitar esse número.",
+    "companyCnpjSave": "Salvar",
+    "companyCnpjSaved": "CNPJ salvo",
+    "joinRequestsTitle": "Pedidos de acesso",
+    "joinRequestsEmpty": "Nenhum pedido pendente.",
+    "approve": "Aprovar",
+    "reject": "Recusar",
+    "requestApprovedToast": "{{name}} agora faz parte da empresa",
+    "requestRejectedToast": "Pedido recusado"
+  },
+  "team": {
+    "title": "Equipe",
+    "viewProfile": "Ver perfil",
+    "sendMessage": "Enviar mensagem",
+    "back": "Voltar",
+    "manageUsers": "Administrar usuários"
+  },
+  "planner": {
+    "title": "Planejador pessoal",
+    "subtitle": "Sua agenda, fora dos quadros",
+    "tabCalendar": "Calendário",
+    "tabList": "Minhas tarefas",
+    "addPlaceholder": "Nova tarefa pessoal...",
+    "add": "Adicionar",
+    "empty": "Nenhuma tarefa pessoal ainda.",
+    "deleteConfirm": "Excluir a tarefa \"{{title}}\"?",
+    "groupOverdue": "Atrasadas",
+    "groupToday": "Hoje",
+    "groupTomorrow": "Amanhã",
+    "groupUpcoming": "Em breve",
+    "groupCompleted": "Concluídas",
+    "planRequired": "O planejador pessoal está disponível a partir do plano Profissional. Você pode ver e apagar o que já existe."
+  },
+  "plan": {
+    "monthlyLabel": "Mensalidade",
+    "listPriceLabel": "Valor de tabela",
+    "discountLabel": "Desconto aplicado",
+    "onRequest": "Sob consulta",
+    "contractedAtLabel": "Contratado em",
+    "perMonth": "/mês",
+    "upgradeTitle": "Subir de plano",
+    "upgradeConfirm": "Contratar o plano {{plan}} por {{price}}/mês? O ciclo passa a contar de hoje.",
+    "downgradeHint": "Para descer de plano ou cancelar, fale com o suporte. Por aqui só é possível subir.",
+    "menuItem": "Meu plano",
+    "title": "Plano da empresa",
+    "unlimited": "ilimitado",
+    "usersLabel": "Usuários",
+    "renewsOnLabel": "Válido até",
+    "expiredOnLabel": "Expirou em",
+    "daysLeftLabel": "Tempo restante",
+    "daysLeftValue": "{{count}} dia",
+    "daysLeftValue_other": "{{count}} dias",
+    "userLimitReached": "Você atingiu o limite de usuários deste plano. Mude de plano para adicionar mais pessoas.",
+    "masterOnly": "Só o usuário master pode mudar o plano da empresa.",
+    "changed": "Plano alterado para {{plan}}",
+    "names": {
+      "basic": "Básico",
+      "intermediate": "Intermediário",
+      "professional": "Profissional",
+      "enterprise": "Empresarial"
+    },
+    "status": {
+      "active": "Ativo",
+      "trialing": "Em teste",
+      "expired": "Expirado",
+      "grace": "Pagamento em aberto"
+    },
+    "trialEnding": "Seu teste termina em {{count}} dia",
+    "trialEnding_other": "Seu teste termina em {{count}} dias",
+    "expiredMessage": "Seu plano expirou. Você ainda vê tudo, mas não pode criar nem editar.",
+    "continueOnBasic": "Continuar no Básico grátis",
+    "movedToBasic": "Plano alterado para Básico",
+    "selectTitle": "Escolher plano",
+    "freeChoiceHint": "Você ainda não tem um plano pago em vigor, então pode escolher qualquer plano abaixo - inclusive o Básico gratuito, que não expira.",
+    "selectFreeConfirm": "Passar para o plano {{plan}}? Ele é gratuito e não tem prazo de validade."
+  },
+  "billing": {
+    "checkoutTitle": "Contratar {{plan}}",
+    "chooseMethod": "Como você quer pagar",
+    "methods": {
+      "pix": "Pix",
+      "card": "Cartão de crédito",
+      "boleto": "Boleto"
+    },
+    "methodNotes": {
+      "pix": "Libera em segundos",
+      "card": "Renova sozinho todo mês",
+      "boleto": "Compensa em até 3 dias úteis"
+    },
+        "docLabel": "CPF ou CNPJ do pagador",
+    "docHint": "Exigido pelo banco para emitir a cobrança.",
+    "docInvalid": "CPF ou CNPJ inválido. Confira os números.",
+        "cardRedirectNote": "Você será levado para uma página segura para digitar o cartão, e volta para cá assim que terminar. O número do cartão não passa pelos nossos servidores.",
+    "continueToCheckout": "Continuar para pagamento",
+    "payNow": "Pagar agora",
+    "processing": "Processando...",
+    "fineprint": "O plano é liberado quando o pagamento é confirmado. Você pode cancelar a renovação quando quiser.",
+    "cardNumber": "Número do cartão",
+    "cardName": "Nome impresso no cartão",
+    "cardExpiry": "Validade",
+    "cardCvv": "CVV",
+    "testMode": "Modo de teste: nenhuma cobrança real acontece.",
+    "testCards": "Cartões de teste: terminação 1111 aprova, 0002 recusa, 0003 sem saldo, 0004 expirado.",
+    "awaitingPayment": "Aguardando pagamento",
+    "pixCopyPaste": "Pix copia e cola",
+    "boletoLine": "Linha digitável",
+    "copyCode": "Copiar código",
+    "copied": "Copiado",
+    "copyFailed": "Não foi possível copiar. Selecione o código e copie à mão.",
+    "payUntil": "Pague até {{date}}",
+    "willUpdateAlone": "Esta tela se atualiza sozinha quando o pagamento for confirmado.",
+    "simulateConfirm": "Simular confirmação do pagamento",
+    "paid": "Pago",
+    "paidToast": "Pagamento confirmado",
+    "releasedUntil": "Acesso liberado até {{date}}",
+    "failed": "Não aprovado",
+    "failureGeneric": "O pagamento não foi aprovado. Tente outra forma de pagamento.",
+    "failureReasons": {
+      "CARD_DECLINED": "O cartão foi recusado pelo banco emissor.",
+      "INSUFFICIENT_FUNDS": "Não havia saldo ou limite suficiente.",
+      "EXPIRED_CARD": "O cartão está expirado.",
+      "EXPIRED": "A cobrança venceu antes de ser paga."
+    },
+    "tryAgain": "Tentar de novo",
+    "finishPayment": "Terminar o pagamento",
+    "subscriptionTitle": "Assinatura",
+    "methodLabel": "Forma de pagamento",
+    "nextChargeLabel": "Próxima cobrança",
+    "subStatusLabel": "Situação",
+    "subStatus": {
+      "active": "Ativa",
+      "past_due": "Pagamento atrasado",
+      "canceled": "Cancelada"
+    },
+    "cancelSubscription": "Cancelar renovação",
+    "cancelConfirm": "Cancelar a renovação automática? Você continua com acesso até o fim do período já pago.",
+    "canceled": "Renovação cancelada",
+    "canceledHint": "A renovação está cancelada. O acesso vale até o fim do período já pago.",
+    "historyTitle": "Histórico de pagamentos",
+    "payStatus": {
+      "paid": "Pago",
+      "pending": "Pendente",
+      "failed": "Não aprovado",
+      "canceled": "Cancelado",
+      "refunded": "Devolvido"
+    }
   },
   "errors": {
+    "NETWORK_UNREACHABLE": "O servidor não respondeu. Verifique se ele está em execução e tente de novo.",
+    "REPORT_FORMAT_INVALID": "Formato de relatório não suportado",
+    "REPORT_STATUS_INVALID": "Filtro de situação inválido",
+    "BOARD_LIMIT_REACHED": "Limite de quadros do plano atingido. Exclua um quadro ou faça upgrade para criar outro.",
+    "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Profissional.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "O planejador pessoal está disponível a partir do plano Profissional.",
+    "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
+    "INVALID_FREQUENCY": "Frequência inválida",
+    "WEEKDAY_REQUIRED": "Escolha o dia da semana",
+    "MONTHDAY_REQUIRED": "Escolha um dia do mês entre 1 e 31",
+    "INVALID_HOUR": "Hora deve ser entre 0 e 23",
+    "LIST_REQUIRED": "Escolha a coluna de destino",
+    "LIST_NOT_FOUND": "Coluna não encontrada",
+    "RECURRENCE_NOT_FOUND": "Rotina não encontrada",
+    "INVALID_STUCK_HOURS": "Informe um número de horas entre 1 e 8760",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Profissional.",
+    "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",
+    "PLAN_EXPIRED": "Seu plano expirou. Renove para voltar a editar.",
+    "PLAN_USER_LIMIT": "Seu plano atingiu o limite de usuários. Mude de plano para adicionar mais.",
+    "PLAN_USER_LIMIT_EXCEEDED": "A empresa tem mais usuários do que o plano escolhido permite.",
+    "INVALID_PLAN": "Plano inválido",
     "NOT_AUTHENTICATED": "Não autenticado",
     "FORBIDDEN_MASTER_ONLY": "Acesso restrito ao usuário master",
     "BOARD_NOT_FOUND": "Quadro não encontrado",
     "FORBIDDEN_BOARD_ACCESS": "Você não tem acesso a este quadro",
+    "FORBIDDEN_BOARD_READ_ONLY": "Seu acesso a este quadro é somente leitura",
+    "FORBIDDEN_BOARD_OWNER_ONLY": "Apenas o dono do quadro pode fazer isso",
+    "FORBIDDEN_NOT_CARD_CREATOR": "Só quem criou o cartão pode excluí-lo",
+    "BOARD_NOT_PRIVATE": "Só quadros privados têm lista de acesso",
+    "INVALID_BOARD_ROLE": "Papel inválido",
+    "USER_ID_REQUIRED": "Selecione um usuário",
+    "CANNOT_CHANGE_BOARD_OWNER": "O dono já tem acesso ao quadro",
     "NOT_FOUND": "Não encontrado",
     "VALIDATION_MISSING_FIELDS": "Preencha nome, e-mail e uma senha com pelo menos 6 caracteres",
     "COMPANY_NAME_REQUIRED": "Informe o nome da empresa",
     "EMAIL_ALREADY_REGISTERED": "E-mail já cadastrado",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "E-mail já cadastrado (pode já pertencer a outra empresa)",
     "INVALID_CREDENTIALS": "E-mail ou senha inválidos",
+    "CNPJ_INVALID": "CNPJ ou CPF inválido",
+    "COMPANY_NOT_FOUND": "Nenhuma empresa encontrada com esse CNPJ ou CPF",
+    "CNPJ_IN_USE": "Esse CNPJ ou CPF já está em uso por outra empresa",
+    "JOIN_REQUEST_PENDING": "Já existe uma solicitação pendente para este e-mail",
+    "JOIN_REQUEST_NOT_FOUND": "Solicitação não encontrada",
+    "CHAT_MESSAGE_REQUIRED": "Escreva uma mensagem antes de enviar",
+    "CHAT_MESSAGE_TOO_LONG": "Mensagem muito longa",
+    "CHAT_USER_REQUIRED": "Selecione outro usuário",
+    "CHAT_USER_NOT_FOUND": "Usuário não encontrado",
+    "FORBIDDEN_CHAT_CONVERSATION": "Você não participa desta conversa",
+    "TOO_MANY_CNPJ_LOOKUPS": "Muitas buscas por CNPJ a partir deste endereço. Tente novamente mais tarde.",
+    "TOO_MANY_JOIN_REQUESTS": "Muitas solicitações a partir deste endereço. Tente novamente mais tarde.",
     "PASSWORD_TOO_SHORT": "A nova senha deve ter ao menos 6 caracteres",
     "CURRENT_PASSWORD_INCORRECT": "Senha atual incorreta",
     "TITLE_REQUIRED": "Título obrigatório",
+    "DUE_REQUIRED": "Escolha uma data",
+    "PERSONAL_TASK_NOT_FOUND": "Tarefa não encontrada",
+    "NAME_REQUIRED": "Nome obrigatório",
+    "BIO_TOO_LONG": "A descrição é muito longa",
+    "INVALID_IMAGE_TYPE": "Envie uma imagem PNG, JPEG, WEBP ou GIF",
+    "AVATAR_TOO_LARGE": "A foto deve ter até 3 MB",
+    "AVATAR_NOT_FOUND": "Foto não encontrada",
+    "AVATAR_SAVE_FAILED": "Erro ao salvar a foto",
+    "UPLOAD_FAILED": "Falha ao receber o arquivo",
+    "INVALID_UPLOAD": "Envio inválido",
     "FORBIDDEN_DELETE_SHARED_BOARD": "Apenas o usuário master pode excluir quadros compartilhados",
     "ORDERED_LIST_IDS_REQUIRED": "orderedListIds obrigatório",
     "CARD_IDS_REQUIRED": "cardIds obrigatório",
@@ -381,9 +1351,6 @@
     "EMAIL_IN_USE": "E-mail já em uso",
     "INVALID_ROLE": "Papel inválido",
     "CANNOT_DELETE_MASTER": "Não é possível excluir o usuário master",
-    "MINUTE_NOT_FOUND": "Ata não encontrada",
-    "FORBIDDEN_MINUTE_EDIT": "Apenas o autor ou o usuário master pode editar esta ata",
-    "FORBIDDEN_MINUTE_DELETE": "Apenas o autor ou o usuário master pode excluir esta ata",
     "ADDRESS_REQUIRED": "Informe um endereço para buscar",
     "ADDRESS_NOT_FOUND": "Endereço não encontrado",
     "GEOCODE_UNAVAILABLE": "Não foi possível buscar o endereço agora. Tente novamente.",
@@ -395,7 +1362,22 @@
     "URL_REQUIRED": "Informe uma URL",
     "INVALID_URL": "URL inválida",
     "FILE_REQUIRED": "Selecione um arquivo",
-    "FILE_TOO_LARGE": "O arquivo deve ter até 8MB",
-    "ATTACHMENT_NOT_FOUND": "Anexo não encontrado"
+    "FILE_TOO_LARGE": "O arquivo é maior que o limite do seu plano.",
+    "ATTACHMENT_NOT_FOUND": "Anexo não encontrado",
+    "LIST_NOT_IN_BOARD": "Essa coluna não pertence a este quadro.",
+    "TOO_MANY_GEOCODE_REQUESTS": "Muitas buscas de endereço em pouco tempo. Aguarde um instante e tente de novo.",
+    "INVALID_TITLE": "Título inválido.",
+    "PAYER_DOCUMENT_REQUIRED": "Informe o CPF ou CNPJ do pagador.",
+    "PAYER_DOCUMENT_INVALID": "CPF ou CNPJ invalido. Confira os numeros.",
+    "PAYER_EMAIL_REQUIRED": "E-mail do pagador ausente.",
+    "CARD_TOKEN_REQUIRED": "Nao foi possivel validar o cartao. Tente de novo.",
+    "PLAN_REQUIRES_PAYMENT": "Contratar um plano pago passa pelo pagamento.",
+    "PLAN_NOT_CHARGEABLE": "Esse plano não é cobrado automaticamente.",
+    "INVALID_PAYMENT_METHOD": "Escolha uma forma de pagamento.",
+    "PAYMENT_ALREADY_PENDING": "Já existe uma cobrança em aberto. Pague ou aguarde o vencimento dela.",
+    "CARD_DECLINED": "O cartão foi recusado. Confira os dados ou tente outro.",
+    "PAYMENT_NOT_FOUND": "Cobrança não encontrada.",
+    "NO_SUBSCRIPTION": "Não há assinatura ativa.",
+    "BILLING_PROVIDER_NOT_CONFIGURED": "O meio de pagamento ainda não está configurado. Fale com o suporte."
   }
 }

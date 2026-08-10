@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../state/BoardContext.jsx";
+import { useAuth } from "../state/AuthContext.jsx";
 import { uid } from "../utils/id.js";
+import { brightListColor } from "../utils/backgrounds.js";
 import CardItem from "./CardItem.jsx";
 import ListMenu from "./ListMenu.jsx";
 
@@ -12,6 +14,7 @@ export default function ListColumn({
   searchQuery,
   memberFilter,
   onOpenCard,
+  readOnly,
   dragCard,
   dragListId,
   onCardDragStart,
@@ -23,6 +26,7 @@ export default function ListColumn({
 }) {
   const { t } = useTranslation();
   const dispatch = useBoardDispatch();
+  const { user } = useAuth();
   const [title, setTitle] = useState(list.title);
   const [addingCard, setAddingCard] = useState(false);
   const [newCardText, setNewCardText] = useState("");
@@ -35,6 +39,9 @@ export default function ListColumn({
   }, [list.title]);
 
   function commitTitle() {
+    // Mesmo motivo do título do quadro: o blur dispara sem edição nenhuma, e o
+    // leitor sairia daqui mandando um PATCH que a API recusa.
+    if (readOnly) return;
     const val = title.trim() || t("board.listColumn.defaultListName");
     dispatch({ type: "RENAME_LIST", boardId: board.id, listId: list.id, title: val });
     setTitle(val);
@@ -65,8 +72,18 @@ export default function ListColumn({
     onCardHover(list.id, index);
   }
 
-  const listStyle = list.color
-    ? { background: `color-mix(in srgb, ${list.color} 16%, var(--bg-column))`, borderTop: `3px solid ${list.color}` }
+  // Converte o tom antigo gravado no dado para a versão viva, sem migrar o banco.
+  const listColor = brightListColor(list.color);
+  // --list-accent/--list-accent-bg alimentam a pill do título e o botão de
+  // adicionar tarefa (ver index.css) - sem cor própria, os dois caem no par
+  // neutro --status-pill-bg/--status-pill-text definido em :root.
+  const listStyle = listColor
+    ? {
+        background: `color-mix(in srgb, ${listColor} 16%, var(--bg-column))`,
+        borderTop: `3px solid ${listColor}`,
+        "--list-accent": listColor,
+        "--list-accent-bg": `color-mix(in srgb, ${listColor} 20%, var(--bg-card))`,
+      }
     : undefined;
 
   return (
@@ -75,11 +92,17 @@ export default function ListColumn({
       style={listStyle}
       onDragOver={(e) => { if (dragListId && dragListId !== list.id) { e.preventDefault(); onListHover(list.id); } }}
     >
-      <div className="list-header" draggable onDragStart={() => onListDragStart(list.id)} onDragEnd={onListDragEnd}>
+      <div
+        className="list-header"
+        draggable={!readOnly}
+        onDragStart={() => onListDragStart(list.id)}
+        onDragEnd={onListDragEnd}
+      >
         <input
           className="list-title"
           value={title}
           spellCheck={false}
+          readOnly={readOnly}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={commitTitle}
           onKeyDown={(e) => {
@@ -87,11 +110,14 @@ export default function ListColumn({
           }}
         />
         <span className="list-count">{list.cardIds.length}</span>
-        <button ref={menuBtnRef} className="list-menu-btn" onClick={() => setMenuOpen((o) => !o)}>
-          <svg viewBox="0 0 24 24" width="16" height="16">
-            <path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-          </svg>
-        </button>
+        {/* O menu da coluna é só ação de escrita (cor, prazo de gargalo, limpar, excluir). */}
+        {!readOnly && (
+          <button ref={menuBtnRef} className="list-menu-btn" onClick={() => setMenuOpen((o) => !o)}>
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+            </svg>
+          </button>
+        )}
         {menuOpen && <ListMenu board={board} list={list} onClose={() => setMenuOpen(false)} anchorRef={menuBtnRef} />}
       </div>
 
@@ -103,11 +129,18 @@ export default function ListColumn({
             <CardItem
               key={card.id}
               card={card}
+              list={list}
               boardId={board.id}
               members={members}
               searchQuery={searchQuery}
               memberFilter={memberFilter}
               onOpen={() => onOpenCard(card.id)}
+              onOpenSubtask={() => onOpenCard(card.id, "subtask")}
+              readOnly={readOnly}
+              // Mesma regra do CardModal: só quem criou (ou dono do quadro/master
+              // da empresa) vê o "Excluir" no menu rápido. Cartão sem creatorId
+              // (anterior à regra, ou de rotina automática) continua liberado.
+              canDeleteCard={!card.creatorId || card.creatorId === user.id || board.myRole === "owner" || user.role === "master"}
               onDragStart={() => onCardDragStart(card.id, list.id)}
               onDragEnd={onCardDragEnd}
             />
@@ -116,7 +149,7 @@ export default function ListColumn({
       </div>
 
       <div className="add-card-wrap">
-        {addingCard ? (
+        {readOnly ? null : addingCard ? (
           <div className="card-composer">
             <textarea
               autoFocus
