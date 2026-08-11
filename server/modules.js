@@ -30,11 +30,14 @@ const DEFINICOES = [
   {
     id: "financeiro",
     // A espinha dorsal do ERP: contas a pagar/receber, fluxo de caixa, DRE. É
-    // core (plano base) porque todo módulo posterior desemboca aqui, mas ainda
-    // não está construído.
+    // core (plano base) porque todo módulo posterior desemboca aqui.
     core: true,
-    available: false,
+    available: true,
     icon: "financeiro",
+    // Dado financeiro é sensível: além do plano da empresa, exige autorização do
+    // usuário. O master sempre acessa; os demais só com a concessão
+    // (users.finance_access). Ver usuarioAutorizado abaixo e o toggle no UsersPanel.
+    restricted: true,
   },
   {
     id: "compras-estoque",
@@ -65,30 +68,45 @@ export function getModule(id) {
   return DEFINICOES.find((m) => m.id === id) || null;
 }
 
-// Um módulo está liberado para a empresa quando faz parte do plano base (core) e
-// já está no ar (available). Add-on fica sempre bloqueado por ora — não há como
-// contratá-lo ainda, então nem o core resolveria o acesso sozinho. Quando a
-// cobrança por módulo entrar, é aqui que a lista de add-ons contratados da
-// empresa passa a contar (mesmo lugar, mesma função), sem o cliente precisar
-// saber como a conta foi feita.
-//
-// Recebe a empresa inteira (não só o plano) porque a decisão vai depender, na
-// fase da cobrança, de campos da própria empresa (add-ons ligados) — deixar a
-// assinatura pronta agora evita um refactor depois.
-export function isModuleEnabled(company, moduleId) {
+// Autorização do USUÁRIO num módulo restrito. Módulo comum não restringe por
+// pessoa (todo mundo da empresa entra, como no quadro compartilhado). O
+// Financeiro restringe: master sempre; membro só com a concessão. Aceita tanto a
+// linha crua do banco (finance_access 0/1) quanto o publicUser (financeAccess
+// boolean), porque os dois formatos circulam.
+export function usuarioAutorizado(user, moduleId) {
   const mod = getModule(moduleId);
-  if (!mod) return false;
-  return mod.core === true && mod.available === true;
+  if (!mod || !mod.restricted) return true;
+  if (!user) return false;
+  if (user.role === "master") return true;
+  if (moduleId === "financeiro") return user.finance_access === 1 || user.financeAccess === true;
+  return false;
 }
 
-// Catálogo já resolvido para a empresa: cada módulo com enabled/available/core
-// calculados. É o que a rota devolve e o que o launcher desenha.
-export function moduleCatalogFor(company) {
+// Um módulo está liberado quando faz parte do plano base (core), já está no ar
+// (available) E o usuário tem autorização nele. Add-on fica sempre bloqueado por
+// ora — não há como contratá-lo ainda. Quando a cobrança por módulo entrar, é
+// aqui que a lista de add-ons contratados da empresa passa a contar, sem o
+// cliente precisar saber como a conta foi feita.
+//
+// Recebe empresa E usuário: a empresa decide o entitlement (plano/add-on), o
+// usuário decide a autorização (módulo restrito). Deixar as duas na assinatura
+// mantém a decisão de acesso num lugar só.
+export function isModuleEnabled(company, user, moduleId) {
+  const mod = getModule(moduleId);
+  if (!mod) return false;
+  if (!(mod.core === true && mod.available === true)) return false;
+  return usuarioAutorizado(user, mod.id);
+}
+
+// Catálogo já resolvido para a empresa e o usuário: cada módulo com
+// enabled/available/core calculados. É o que a rota devolve e o que o launcher
+// desenha — módulo sem enabled some da vista de quem não tem acesso.
+export function moduleCatalogFor(company, user) {
   return DEFINICOES.map((m) => ({
     id: m.id,
     icon: m.icon,
     core: m.core,
     available: m.available,
-    enabled: isModuleEnabled(company, m.id),
+    enabled: isModuleEnabled(company, user, m.id),
   }));
 }

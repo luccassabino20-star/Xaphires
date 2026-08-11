@@ -6088,3 +6088,154 @@ img.avatar { object-fit: cover; padding: 0; }
   .launcher-title { font-size: 28px; }
   .launcher-grid { grid-template-columns: 1fr; }
 }
+
+/* ---------- Módulo Financeiro ---------- */
+/* Par de cores das séries do fluxo (entradas azul / saídas laranja), validado
+   para daltonismo pela skill dataviz. Definido nos quatro blocos de tema como o
+   resto: base claro, dark do sistema, e as duas escolhas explícitas. */
+:root { --fin-entrada: #2a78d6; --fin-saida: #eb6834; }
+@media (prefers-color-scheme: dark) {
+  :root { --fin-entrada: #3987e5; --fin-saida: #d95926; }
+}
+:root[data-theme="dark"] { --fin-entrada: #3987e5; --fin-saida: #d95926; }
+:root[data-theme="light"] { --fin-entrada: #2a78d6; --fin-saida: #eb6834; }
+
+.fin {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-column);
+  color: var(--text-primary);
+}
+.fin-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-topbar);
+}
+.fin-top-left { display: flex; align-items: center; gap: 12px; }
+.fin-title { font-size: 18px; font-weight: 680; margin: 0; }
+.fin-top-actions { display: flex; align-items: center; gap: 12px; }
+.fin-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-topbar);
+}
+.fin-tab {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 550;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.fin-tab:hover { color: var(--text-primary); }
+.fin-tab.active { color: var(--text-primary); border-bottom-color: var(--fin-entrada); }
+.fin-body {
+  flex: 1;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+.fin-loading, .fin-error, .fin-empty { color: var(--text-secondary); padding: 20px 4px; }
+.fin-error { color: var(--danger); }
+
+/* KPIs */
+.fin-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.fin-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+.fin-kpi-label { font-size: 12.5px; color: var(--text-muted); }
+.fin-kpi-value { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.fin-kpi-receber .fin-kpi-value { color: var(--fin-entrada); }
+.fin-kpi-pagar .fin-kpi-value { color: var(--fin-saida); }
+
+/* Formulário e filtros */
+.fin-form, .fin-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.fin-form input, .fin-form select, .fin-filtros select, .fin-periodo input {
+  padding: 8px 10px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+.fin-form input:focus, .fin-form select:focus { outline: none; border-color: var(--border-strong); }
+.fin-form input[type="text"] { flex: 1; min-width: 140px; }
+
+/* Tabela */
+.fin-table-wrap { overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: 12px; }
+.fin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.fin-table th, .fin-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+.fin-table th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg-list); }
+.fin-table tr:last-child td { border-bottom: none; }
+.fin-table .fin-num { text-align: right; font-variant-numeric: tabular-nums; }
+.fin-receber { color: var(--fin-entrada); }
+.fin-pagar { color: var(--fin-saida); }
+.fin-row-pago { opacity: 0.62; }
+.fin-row-actions { text-align: right; white-space: nowrap; }
+.fin-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+.fin-badge-pendente { color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); }
+.fin-badge-pago { color: #fff; background: var(--success); }
+.fin-empty { text-align: center; color: var(--text-muted); padding: 24px; }
+
+/* Gráfico do fluxo */
+.fin-fluxo-head { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.fin-year { display: inline-flex; align-items: center; gap: 8px; }
+.fin-year-value { font-size: 16px; font-weight: 650; min-width: 52px; text-align: center; }
+.fin-chart { margin: 8px 0 24px; }
+.fin-legend { display: flex; gap: 18px; margin-bottom: 8px; }
+.fin-legend-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-secondary); }
+.fin-legend-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.fin-chart-svg { width: 100%; height: auto; }
+.fin-chart-empty { text-align: center; padding: 48px; }
+.fin-grid { stroke: var(--border-subtle); stroke-width: 1; }
+.fin-axis-label { fill: var(--text-muted); font-size: 10px; }
+.fin-tip-bg { fill: var(--bg-card); stroke: var(--border-strong); stroke-width: 1; }
+.fin-tip-text { fill: var(--text-primary); font-size: 11px; font-weight: 600; }
+
+/* DRE */
+.fin-periodo { display: flex; gap: 16px; margin-bottom: 20px; }
+.fin-periodo label { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+.fin-dre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.fin-dre-bloco { border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px 18px; background: var(--bg-card); }
+.fin-dre-titulo { font-size: 14px; font-weight: 650; margin: 0 0 12px; }
+.fin-dre-lista { list-style: none; margin: 0; padding: 0; }
+.fin-dre-lista li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; font-size: 13.5px; border-bottom: 1px dashed var(--border-subtle); }
+.fin-dre-lista li:last-child { border-bottom: none; }
+.fin-dre-subtotal { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-strong); font-weight: 650; font-size: 14px; }
+.fin-dre-resultado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 720;
+}
+.fin-dre-resultado.positivo { background: color-mix(in srgb, var(--fin-entrada) 14%, var(--bg-card)); color: var(--fin-entrada); }
+.fin-dre-resultado.negativo { background: color-mix(in srgb, var(--fin-saida) 14%, var(--bg-card)); color: var(--fin-saida); }
+.fin-num { font-variant-numeric: tabular-nums; }
+
+/* Toggle de acesso ao Financeiro no painel de usuários */
+.finance-access-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; }
+.finance-access-always { font-size: 12px; color: var(--text-muted); }
+
+@media (max-width: 720px) {
+  .fin-dre-grid { grid-template-columns: 1fr; }
+  .fin-body { padding: 20px 14px 48px; }
+}

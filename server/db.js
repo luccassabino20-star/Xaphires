@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
 import { getCurrentCompanyId } from "./context.js";
+import { applyFinanceiroSchema } from "./modules/financeiro/schema.js";
 
 const dataDir = process.env.KANBAN_DATA_DIR || path.join(process.cwd(), "server", "data");
 fs.mkdirSync(dataDir, { recursive: true });
@@ -282,6 +283,18 @@ function applySchema(companyDb) {
   // crachá, não casavam no Calendário e saíam com posição NaN na Linha do tempo.
   // Corta o que veio errado; o horário não tinha uso nenhum.
   companyDb.exec("UPDATE cards SET due = substr(due, 1, 10) WHERE due LIKE '____-__-__T%'");
+
+  // Concessão de acesso ao módulo Financeiro (plataforma modular). O master
+  // sempre acessa, com ou sem a flag; membro só com ela ligada. Default 0: numa
+  // empresa existente ninguém enxerga o Financeiro até o master liberar, que é a
+  // postura segura para dado financeiro. Ver server/modules.js (isModuleEnabled)
+  // e o toggle no UsersPanel.
+  addColumnIfMissing(companyDb, "users", "finance_access", "finance_access INTEGER NOT NULL DEFAULT 0");
+
+  // Schema do módulo Financeiro. Fica junto do módulo (server/modules/financeiro),
+  // mas roda aqui, no mesmo ponto preguiçoso do resto - a tabela nasce na primeira
+  // requisição autenticada da empresa, não no arranque do servidor.
+  applyFinanceiroSchema(companyDb);
 }
 
 const cache = new Map();

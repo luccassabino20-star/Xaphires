@@ -15,7 +15,7 @@ router.get(
   "/",
   ah(async (req, res) => {
     const company = getCompany(req.companyId);
-    res.json({ modules: moduleCatalogFor(company) });
+    res.json({ modules: moduleCatalogFor(company, req.user) });
   })
 );
 

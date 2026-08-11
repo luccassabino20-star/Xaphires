@@ -18,6 +18,7 @@ import { router as geocodeRouter } from "./routes/geocode.js";
 import { router as chatRouter } from "./routes/chat.js";
 import { router as planRouter } from "./routes/plan.js";
 import { router as modulesRouter } from "./routes/modules.js";
+import { router as financeiroRouter } from "./modules/financeiro/routes.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as personalTasksRouter } from "./routes/personalTasks.js";
 import { router as billingRouter } from "./routes/billing.js";
@@ -109,6 +110,10 @@ app.use("/api/geocode", geocodeRouter);
 app.use("/api/chat", requireAuth, requireWritablePlan, chatRouter);
 app.use("/api/recurrences", requireAuth, requireWritablePlan, recurrencesRouter);
 app.use("/api/personal-tasks", requireAuth, requireWritablePlan, personalTasksRouter);
+// Módulo Financeiro. O router já aplica requireAuth/requireWritablePlan/
+// requireModule("financeiro") internamente, então monta direto - o requireModule
+// é que barra empresa sem o módulo ou usuário sem autorização.
+app.use("/api/financeiro", financeiroRouter);
 // Relatório é leitura, e requireWritablePlan já libera GET - fica no mesmo grupo por
 // coerência, e empresa vencida continua conseguindo exportar os próprios dados.
 app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);

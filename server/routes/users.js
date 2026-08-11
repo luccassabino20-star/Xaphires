@@ -14,6 +14,7 @@ import {
   deleteUser,
   setPassword,
   setUserRole,
+  setFinanceAccess,
   scrubUserFromCards,
   deletePrivateBoardsByOwner,
   countUsers,
@@ -205,6 +206,24 @@ router.post(
     }
     const updated = await setUserRole(target.id, role);
     res.json(publicUser(updated));
+  })
+);
+
+// Concede/revoga o acesso ao módulo Financeiro. Só o master mexe. No próprio
+// master não faz efeito (ele acessa sempre) e é recusado para deixar claro que a
+// flag não se aplica a ele - não é um "tirar acesso do master".
+router.post(
+  "/:id/finance-access",
+  requireMaster,
+  ah(async (req, res) => {
+    const target = await getUserById(req.params.id);
+    if (!target) return res.status(404).json({ error: "Usuário não encontrado", code: "USER_NOT_FOUND" });
+    if (target.role === "master")
+      return res.status(400).json({ error: "O master já tem acesso ao Financeiro", code: "FIN_MASTER_ALWAYS" });
+    const { allowed } = req.body || {};
+    if (typeof allowed !== "boolean")
+      return res.status(400).json({ error: "Valor inválido", code: "VALIDATION_MISSING_FIELDS" });
+    res.json(publicUser(await setFinanceAccess(target.id, allowed)));
   })
 );
 

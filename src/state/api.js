@@ -72,6 +72,10 @@ export const renameUser = (id, data) => request(`/users/${id}`, { method: "PATCH
 export const resetUserPassword = (id, newPassword) =>
   request(`/users/${id}/reset-password`, { method: "POST", body: { newPassword } });
 export const setUserRole = (id, role) => request(`/users/${id}/role`, { method: "POST", body: { role } });
+// Concede/revoga o acesso ao módulo Financeiro (só o master chama). O master é
+// recusado pelo servidor - ele acessa sempre.
+export const setFinanceAccess = (id, allowed) =>
+  request(`/users/${id}/finance-access`, { method: "POST", body: { allowed } });
 export const deleteUser = (id) => request(`/users/${id}`, { method: "DELETE" });
 export const getMyCompany = () => request("/users/company");
 export const setCompanyCnpj = (cnpj) => request("/users/company", { method: "PATCH", body: { cnpj } });
@@ -210,6 +214,26 @@ export const markChatRead = (conversationId, lastMessageId) =>
 // resolvidos pelo servidor. A casca (PlatformShell) consulta uma vez ao entrar
 // para saber quais módulos abrir e quais mostrar como "Em breve".
 export const getModules = () => request("/modules");
+
+// ---------- Módulo Financeiro ----------
+// Passa o locale para o servidor semear as categorias padrão na 1ª leitura (a
+// empresa não guarda idioma, mesmo caso do quadro inicial).
+export const finListCategorias = (locale) => request(`/financeiro/categorias?locale=${encodeURIComponent(locale || "pt")}`);
+export const finCreateCategoria = (data) => request("/financeiro/categorias", { method: "POST", body: data });
+export const finListLancamentos = (filtros = {}) => {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(filtros)) if (v) qs.set(k, v);
+  const s = qs.toString();
+  return request("/financeiro/lancamentos" + (s ? `?${s}` : ""));
+};
+export const finCreateLancamento = (data) => request("/financeiro/lancamentos", { method: "POST", body: data });
+export const finUpdateLancamento = (id, data) => request(`/financeiro/lancamentos/${id}`, { method: "PATCH", body: data });
+export const finBaixarLancamento = (id, paidAt) =>
+  request(`/financeiro/lancamentos/${id}/baixar`, { method: "POST", body: paidAt ? { paidAt } : {} });
+export const finEstornarLancamento = (id) => request(`/financeiro/lancamentos/${id}/estornar`, { method: "POST" });
+export const finDeleteLancamento = (id) => request(`/financeiro/lancamentos/${id}`, { method: "DELETE" });
+export const finGetFluxo = (ano) => request(`/financeiro/fluxo?ano=${ano}`);
+export const finGetDRE = (de, ate) => request(`/financeiro/dre?de=${de}&ate=${ate}`);
 
 // ---------- Plano ----------
 // Cache curto do resumo do plano. CardModal, ArchiveModal e ListMenu consultam

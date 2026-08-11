@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getModules } from "./state/api.js";
 import ModuleLauncher from "./modules/ModuleLauncher.jsx";
 import AuthenticatedApp from "./AuthenticatedApp.jsx";
+import FinanceiroModule from "./modules/financeiro/FinanceiroModule.jsx";
 
 // A casca da plataforma: decide entre o launcher (grid de pilares) e o módulo
 // aberto. Fica ABAIXO dos providers do app (Board/Users/Chat, montados em
@@ -18,6 +19,7 @@ const PERSIST_KEY = "xaphires-module";
 // hoje; os demais entram aqui quando forem construídos, um por fase.
 const COMPONENTES = {
   "vendas-crm": ({ onExit }) => <AuthenticatedApp onExitModule={onExit} />,
+  financeiro: ({ onExit }) => <FinanceiroModule onExit={onExit} />,
 };
 
 export default function PlatformShell() {
