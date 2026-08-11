@@ -17,6 +17,7 @@ import { router as cardsRouter } from "./routes/cards.js";
 import { router as geocodeRouter } from "./routes/geocode.js";
 import { router as chatRouter } from "./routes/chat.js";
 import { router as planRouter } from "./routes/plan.js";
+import { router as modulesRouter } from "./routes/modules.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as personalTasksRouter } from "./routes/personalTasks.js";
 import { router as billingRouter } from "./routes/billing.js";
@@ -89,6 +90,9 @@ app.use("/api/admin", adminRouter);
 
 app.use("/api/auth", authRouter);
 app.use("/api/plan", planRouter);
+// Catálogo de módulos da plataforma. Fora do requireWritablePlan, como /api/plan:
+// empresa vencida precisa ver os módulos para navegar e voltar a pagar.
+app.use("/api/modules", modulesRouter);
 // Pop-up promocional da landing: público de propósito, ninguém logou ainda nesse
 // ponto da visita. Só GET, então não precisa de verifyOrigin nem de rate limit.
 app.use("/api/popup", popupRouter);

@@ -205,6 +205,12 @@ export const sendChatMessage = (body, conversationId) =>
 export const markChatRead = (conversationId, lastMessageId) =>
   request("/chat/read", { method: "POST", body: { conversationId, lastMessageId } });
 
+// ---------- Módulos da plataforma ----------
+// Catálogo dos pilares (Vendas & CRM, Financeiro...) já com enabled/available
+// resolvidos pelo servidor. A casca (PlatformShell) consulta uma vez ao entrar
+// para saber quais módulos abrir e quais mostrar como "Em breve".
+export const getModules = () => request("/modules");
+
 // ---------- Plano ----------
 // Cache curto do resumo do plano. CardModal, ArchiveModal e ListMenu consultam
 // isto de forma independente ao abrir, e sem cache eram três requisições iguais

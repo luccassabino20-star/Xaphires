@@ -6,7 +6,38 @@
     "add": "Add",
     "remove": "Remove",
     "close": "Close",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "retry": "Try again"
+  },
+  "modules": {
+    "launcher": {
+      "eyebrow": "Xaphires Platform",
+      "title": "Hello, {{name}}",
+      "subtitle": "Choose where to start. Each module handles one pillar of your business."
+    },
+    "comingSoon": "Coming soon",
+    "backToLauncher": "Modules",
+    "loadError": "Couldn't load the modules.",
+    "vendas-crm": {
+      "name": "Sales & CRM",
+      "desc": "Leads, Kanban pipeline, proposals, quotes and orders."
+    },
+    "financeiro": {
+      "name": "Finance",
+      "desc": "Cash flow, accounts payable and receivable, reconciliation and P&L."
+    },
+    "compras-estoque": {
+      "name": "Purchasing & Inventory",
+      "desc": "Stock, suppliers, product margins and reorder points."
+    },
+    "faturamento": {
+      "name": "Invoicing",
+      "desc": "Tax invoice issuing, bank slips and payment links."
+    },
+    "relatorios-bi": {
+      "name": "Reports & BI",
+      "desc": "Consolidated operational and financial dashboards."
+    }
   },
   "theme": {
     "light": "Light",

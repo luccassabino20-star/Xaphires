@@ -6,7 +6,38 @@
     "add": "Agregar",
     "remove": "Eliminar",
     "close": "Cerrar",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "retry": "Intentar de nuevo"
+  },
+  "modules": {
+    "launcher": {
+      "eyebrow": "Plataforma Xaphires",
+      "title": "Hola, {{name}}",
+      "subtitle": "Elige por dónde empezar. Cada módulo cuida un pilar de tu empresa."
+    },
+    "comingSoon": "Próximamente",
+    "backToLauncher": "Módulos",
+    "loadError": "No se pudieron cargar los módulos.",
+    "vendas-crm": {
+      "name": "Ventas & CRM",
+      "desc": "Leads, embudo en Kanban, propuestas, presupuestos y pedidos."
+    },
+    "financeiro": {
+      "name": "Finanzas",
+      "desc": "Flujo de caja, cuentas por pagar y por cobrar, conciliación y ERE."
+    },
+    "compras-estoque": {
+      "name": "Compras & Inventario",
+      "desc": "Inventario, proveedores, margen de productos y punto de reorden."
+    },
+    "faturamento": {
+      "name": "Facturación",
+      "desc": "Emisión de facturas, boletos y enlaces de pago."
+    },
+    "relatorios-bi": {
+      "name": "Informes & BI",
+      "desc": "Paneles operativos y financieros consolidados."
+    }
   },
   "theme": {
     "light": "Claro",

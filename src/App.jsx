@@ -6,7 +6,7 @@ import { UsersProvider } from "./state/UsersContext.jsx";
 import { ChatProvider } from "./state/ChatContext.jsx";
 import AuthScreen from "./screens/AuthScreen.jsx";
 import LandingScreen from "./screens/LandingScreen.jsx";
-import AuthenticatedApp from "./AuthenticatedApp.jsx";
+import PlatformShell from "./PlatformShell.jsx";
 
 export default function App() {
   const { t } = useTranslation();
@@ -25,7 +25,7 @@ export default function App() {
     <BoardProvider>
       <UsersProvider>
         <ChatProvider>
-          <AuthenticatedApp />
+          <PlatformShell />
         </ChatProvider>
       </UsersProvider>
     </BoardProvider>

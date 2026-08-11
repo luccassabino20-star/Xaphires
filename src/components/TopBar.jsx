@@ -11,7 +11,7 @@ import ShareBoardModal from "./ShareBoardModal.jsx";
 import ChatModal from "./ChatModal.jsx";
 import DataMenu from "./DataMenu.jsx";
 
-export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchChange, memberFilter, onFilterChange, onSelectBoard }) {
+export default function TopBar({ board, onExitModule, onToggleSidebar, searchQuery, onSearchChange, memberFilter, onFilterChange, onSelectBoard }) {
   const { t } = useTranslation();
   const dispatch = useBoardDispatch();
   const { users } = useUsers();
@@ -60,6 +60,15 @@ export default function TopBar({ board, onToggleSidebar, searchQuery, onSearchCh
   return (
     <header className="topbar">
       <div className="topbar-left">
+        {/* Volta para o launcher da plataforma. Só aparece quando a casca passou
+            o callback (onExitModule) - fora dela o Kanban não sabe de módulos. */}
+        {onExitModule && (
+          <button className="icon-btn" onClick={onExitModule} title={t("modules.backToLauncher")} aria-label={t("modules.backToLauncher")}>
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path fill="currentColor" d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z" />
+            </svg>
+          </button>
+        )}
         <button className="icon-btn" onClick={onToggleSidebar} title={t("app.topbar.toggleSidebar")} aria-label={t("app.topbar.menu")}>
           <svg viewBox="0 0 24 24" width="18" height="18">
             <path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" />
