@@ -5,11 +5,13 @@ import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import LancamentosView from "./LancamentosView.jsx";
 import FluxoView from "./FluxoView.jsx";
 import DREView from "./DREView.jsx";
+import ContasView from "./ContasView.jsx";
+import CadastrosView from "./CadastrosView.jsx";
 
 // Casca do módulo Financeiro: cabeçalho próprio (voltar ao launcher + conta) e as
-// três abas. Diferente do Kanban, não há reducer otimista - cada view busca e
-// re-busca por conta própria, que é o padrão mais seguro para dado financeiro.
-const ABAS = ["lancamentos", "fluxo", "dre"];
+// abas. Diferente do Kanban, não há reducer otimista - cada view busca e re-busca
+// por conta própria, que é o padrão mais seguro para dado financeiro.
+const ABAS = ["lancamentos", "contas", "fluxo", "dre", "cadastros"];
 
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
@@ -42,8 +44,10 @@ export default function FinanceiroModule({ onExit }) {
 
       <div className="fin-body">
         {aba === "lancamentos" && <LancamentosView />}
+        {aba === "contas" && <ContasView />}
         {aba === "fluxo" && <FluxoView />}
         {aba === "dre" && <DREView />}
+        {aba === "cadastros" && <CadastrosView />}
       </div>
     </div>
   );

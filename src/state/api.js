@@ -228,12 +228,23 @@ export const finListLancamentos = (filtros = {}) => {
 };
 export const finCreateLancamento = (data) => request("/financeiro/lancamentos", { method: "POST", body: data });
 export const finUpdateLancamento = (id, data) => request(`/financeiro/lancamentos/${id}`, { method: "PATCH", body: data });
-export const finBaixarLancamento = (id, paidAt) =>
-  request(`/financeiro/lancamentos/${id}/baixar`, { method: "POST", body: paidAt ? { paidAt } : {} });
+export const finBaixarLancamento = (id, { paidAt, contaId } = {}) =>
+  request(`/financeiro/lancamentos/${id}/baixar`, { method: "POST", body: { ...(paidAt ? { paidAt } : {}), ...(contaId ? { contaId } : {}) } });
 export const finEstornarLancamento = (id) => request(`/financeiro/lancamentos/${id}/estornar`, { method: "POST" });
 export const finDeleteLancamento = (id) => request(`/financeiro/lancamentos/${id}`, { method: "DELETE" });
 export const finGetFluxo = (ano) => request(`/financeiro/fluxo?ano=${ano}`);
 export const finGetDRE = (de, ate) => request(`/financeiro/dre?de=${de}&ate=${ate}`);
+// Fundação: cadastros de apoio e saldos por conta.
+export const finListContas = () => request("/financeiro/contas");
+export const finCreateConta = (data) => request("/financeiro/contas", { method: "POST", body: data });
+export const finUpdateConta = (id, data) => request(`/financeiro/contas/${id}`, { method: "PATCH", body: data });
+export const finListCentrosCusto = () => request("/financeiro/centros-custo");
+export const finCreateCentroCusto = (data) => request("/financeiro/centros-custo", { method: "POST", body: data });
+export const finUpdateCentroCusto = (id, data) => request(`/financeiro/centros-custo/${id}`, { method: "PATCH", body: data });
+export const finListContatos = () => request("/financeiro/contatos");
+export const finCreateContato = (data) => request("/financeiro/contatos", { method: "POST", body: data });
+export const finUpdateContato = (id, data) => request(`/financeiro/contatos/${id}`, { method: "PATCH", body: data });
+export const finGetSaldos = () => request("/financeiro/saldos");
 
 // ---------- Plano ----------
 // Cache curto do resumo do plano. CardModal, ArchiveModal e ListMenu consultam

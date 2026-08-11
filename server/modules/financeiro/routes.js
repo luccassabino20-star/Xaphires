@@ -5,6 +5,18 @@ import {
   listCategorias,
   insertCategoria,
   getCategoria,
+  listContas,
+  getConta,
+  insertConta,
+  updateConta,
+  listCentrosCusto,
+  getCentroCusto,
+  insertCentroCusto,
+  updateCentroCusto,
+  listContatos,
+  getContato,
+  insertContato,
+  updateContato,
   listLancamentos,
   getLancamento,
   insertLancamento,
@@ -12,9 +24,10 @@ import {
   baixarLancamento,
   estornarLancamento,
   deleteLancamento,
+  sincronizarTituloImposto,
 } from "./repo.js";
 import { seedCategoriasSeVazio } from "./seed.js";
-import { montarFluxo, montarDRE } from "./calculos.js";
+import { montarFluxo, montarDRE, montarSaldos } from "./calculos.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -45,13 +58,73 @@ router.get(
 router.post(
   "/categorias",
   ah(async (req, res) => {
-    const { nome, tipo } = req.body || {};
-    if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome da categoria", code: "FIN_CATEGORY_NAME_REQUIRED" });
+    const { nome, tipo, codigo } = req.body || {};
+    if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome da classe", code: "FIN_CATEGORY_NAME_REQUIRED" });
     if (tipo !== "receita" && tipo !== "despesa")
-      return res.status(400).json({ error: "Tipo de categoria inválido", code: "FIN_CATEGORY_TIPO_INVALID" });
-    res.status(201).json(insertCategoria({ nome: nome.trim(), tipo }));
+      return res.status(400).json({ error: "Tipo de classe inválido", code: "FIN_CATEGORY_TIPO_INVALID" });
+    res.status(201).json(insertCategoria({ nome: nome.trim(), tipo, codigo: (codigo || "").trim() }));
   })
 );
+
+// ---------- Contas correntes ----------
+router.get("/contas", ah(async (req, res) => res.json(listContas())));
+router.post(
+  "/contas",
+  ah(async (req, res) => {
+    const { nome, banco, agencia, numero, saldoInicialCents } = req.body || {};
+    if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome da conta", code: "FIN_CONTA_NAME_REQUIRED" });
+    if (saldoInicialCents !== undefined && !Number.isInteger(saldoInicialCents))
+      return res.status(400).json({ error: "Saldo inicial inválido", code: "FIN_VALUE_INVALID" });
+    res.status(201).json(insertConta({ nome: nome.trim(), banco, agencia, numero, saldoInicialCents }));
+  })
+);
+router.patch(
+  "/contas/:id",
+  ah(async (req, res) => {
+    if (!getConta(req.params.id)) return res.status(404).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
+    res.json(updateConta(req.params.id, req.body || {}));
+  })
+);
+
+// ---------- Centros de custo ----------
+router.get("/centros-custo", ah(async (req, res) => res.json(listCentrosCusto())));
+router.post(
+  "/centros-custo",
+  ah(async (req, res) => {
+    const { nome, codigo } = req.body || {};
+    if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome do centro de custo", code: "FIN_CC_NAME_REQUIRED" });
+    res.status(201).json(insertCentroCusto({ nome: nome.trim(), codigo: (codigo || "").trim() }));
+  })
+);
+router.patch(
+  "/centros-custo/:id",
+  ah(async (req, res) => {
+    if (!getCentroCusto(req.params.id)) return res.status(404).json({ error: "Centro de custo não encontrado", code: "FIN_CC_NOT_FOUND" });
+    res.json(updateCentroCusto(req.params.id, req.body || {}));
+  })
+);
+
+// ---------- Contatos (clientes/fornecedores) ----------
+router.get("/contatos", ah(async (req, res) => res.json(listContatos())));
+router.post(
+  "/contatos",
+  ah(async (req, res) => {
+    const { nome, tipo, doc, email, telefone } = req.body || {};
+    if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome", code: "FIN_CONTATO_NAME_REQUIRED" });
+    const t = ["cliente", "fornecedor", "ambos"].includes(tipo) ? tipo : "fornecedor";
+    res.status(201).json(insertContato({ nome: nome.trim(), tipo: t, doc, email, telefone }));
+  })
+);
+router.patch(
+  "/contatos/:id",
+  ah(async (req, res) => {
+    if (!getContato(req.params.id)) return res.status(404).json({ error: "Contato não encontrado", code: "FIN_CONTATO_NOT_FOUND" });
+    res.json(updateContato(req.params.id, req.body || {}));
+  })
+);
+
+// ---------- Saldos por conta corrente ----------
+router.get("/saldos", ah(async (req, res) => res.json(montarSaldos())));
 
 // ---------- Lançamentos ----------
 router.get(
@@ -70,8 +143,10 @@ router.get(
 );
 
 // Valida o corpo de um lançamento novo/editado. Devolve { error, code } ou null.
+// Referências opcionais (categoria, centro de custo, contato, conta) são
+// checadas se vierem - um id fantasma quebraria os relatórios e os saldos.
 function validarLancamento(body, { parcial } = {}) {
-  const { tipo, valorCents, due, categoryId } = body || {};
+  const { tipo, valorCents, due, emissao, categoryId, centroCustoId, contatoId, contaId } = body || {};
   if (!parcial || tipo !== undefined) {
     if (tipo !== "receber" && tipo !== "pagar") return { error: "Tipo inválido", code: "FIN_TIPO_INVALID" };
   }
@@ -81,11 +156,19 @@ function validarLancamento(body, { parcial } = {}) {
   if (!parcial || due !== undefined) {
     if (!DATA_CIVIL.test(due || "")) return { error: "Data de vencimento inválida", code: "FIN_DATE_INVALID" };
   }
-  // Categoria é opcional, mas se veio um id ele precisa existir - senão o DRE
-  // agruparia por uma categoria fantasma.
-  if (categoryId) {
-    if (!getCategoria(categoryId)) return { error: "Categoria não encontrada", code: "FIN_CATEGORY_NOT_FOUND" };
+  // Emissão é opcional; se vier, precisa ser data civil.
+  if (emissao !== undefined && emissao !== null && emissao !== "" && !DATA_CIVIL.test(emissao))
+    return { error: "Data de emissão inválida", code: "FIN_DATE_INVALID" };
+  // Impostos/desconto/retenção/multa/juros: se vierem, inteiros >= 0 (0 é válido).
+  for (const campo of ["impostoRetidoCents", "impostoAcrescidoCents", "descontoCents", "retencaoCents", "multaCents", "jurosCents"]) {
+    const v = (body || {})[campo];
+    if (v !== undefined && v !== null && (!Number.isInteger(v) || v < 0))
+      return { error: "Valor inválido", code: "FIN_VALUE_INVALID" };
   }
+  if (categoryId && !getCategoria(categoryId)) return { error: "Classe não encontrada", code: "FIN_CATEGORY_NOT_FOUND" };
+  if (centroCustoId && !getCentroCusto(centroCustoId)) return { error: "Centro de custo não encontrado", code: "FIN_CC_NOT_FOUND" };
+  if (contatoId && !getContato(contatoId)) return { error: "Contato não encontrado", code: "FIN_CONTATO_NOT_FOUND" };
+  if (contaId && !getConta(contaId)) return { error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" };
   return null;
 }
 
@@ -94,16 +177,15 @@ router.post(
   ah(async (req, res) => {
     const erro = validarLancamento(req.body, { parcial: false });
     if (erro) return res.status(400).json(erro);
-    const { tipo, descricao, valorCents, due, categoryId, contraparte } = req.body;
+    const { tipo, descricao, valorCents, due, emissao, formaPagto, observacao, impostoRetidoCents, impostoAcrescidoCents, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte } = req.body;
     const criado = insertLancamento({
-      tipo,
-      descricao,
-      valorCents,
-      due,
-      categoryId,
-      contraparte,
+      tipo, descricao, valorCents, due, emissao, formaPagto, observacao,
+      impostoRetidoCents, impostoAcrescidoCents, descontoCents, retencaoCents, multaCents, jurosCents,
+      categoryId, centroCustoId, contatoId, contaId, doc, contraparte,
       createdBy: req.user.id,
     });
+    // Gera o título de imposto vinculado, se for a pagar com imposto retido.
+    sincronizarTituloImposto(criado.id, req.user.id);
     res.status(201).json(criado);
   })
 );
@@ -115,7 +197,10 @@ router.patch(
       return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
     const erro = validarLancamento(req.body, { parcial: true });
     if (erro) return res.status(400).json(erro);
-    res.json(updateLancamento(req.params.id, req.body));
+    const atualizado = updateLancamento(req.params.id, req.body);
+    // Reflete a mudança de imposto retido no título de imposto vinculado.
+    sincronizarTituloImposto(req.params.id, req.user.id);
+    res.json(atualizado);
   })
 );
 
@@ -125,7 +210,9 @@ router.post(
     if (!getLancamento(req.params.id))
       return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
     const paidAt = DATA_CIVIL.test(req.body?.paidAt || "") ? req.body.paidAt : undefined;
-    res.json(baixarLancamento(req.params.id, paidAt));
+    const contaId = req.body?.contaId;
+    if (contaId && !getConta(contaId)) return res.status(400).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
+    res.json(baixarLancamento(req.params.id, { paidAt, contaId }));
   })
 );
 

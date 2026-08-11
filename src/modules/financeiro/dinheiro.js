@@ -21,3 +21,12 @@ export function reaisParaCents(entrada) {
   if (!Number.isFinite(reais) || reais <= 0) return null;
   return Math.round(reais * 100);
 }
+
+// Como reaisParaCents, mas 0/vazio é um valor VÁLIDO (retorna 0). Para os campos
+// de imposto/desconto/retenção, onde "nenhum" é legítimo, diferente do valor do
+// título que precisa ser > 0.
+export function centsOuZero(entrada) {
+  if (entrada === null || entrada === undefined || String(entrada).trim() === "") return 0;
+  const cents = reaisParaCents(entrada);
+  return cents == null ? 0 : cents;
+}

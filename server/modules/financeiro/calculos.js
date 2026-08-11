@@ -6,7 +6,7 @@
 // Regime de CAIXA nesta fase: realizado é o que foi pago (status 'pago'), datado
 // pela baixa (paid_at). O regime de competência (pelo vencimento) fica anotado
 // como evolução - hoje fluxo e DRE contam a mesma história para não confundir.
-import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria } from "./repo.js";
+import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents } from "./repo.js";
 
 // Mês civil (1..12) de uma data 'YYYY-MM-DD'. Sem new Date() de propósito: a
 // string já é a data civil, e parsear como Date reintroduziria fuso.
@@ -29,14 +29,15 @@ export function montarFluxo(ano) {
 
   for (const l of lancamentosDoAno(ano)) {
     const ehReceber = l.tipo === "receber";
+    const liq = liquidoCents(l); // caixa move o líquido, não o valor bruto do título
     if (l.status === "pago" && l.paid_at && l.paid_at.startsWith(String(ano))) {
       const idx = mesDe(l.paid_at) - 1;
-      if (ehReceber) linhas[idx].entradasRealizadas += l.valor_cents;
-      else linhas[idx].saidasRealizadas += l.valor_cents;
+      if (ehReceber) linhas[idx].entradasRealizadas += liq;
+      else linhas[idx].saidasRealizadas += liq;
     } else if (l.status === "pendente" && l.due && l.due.startsWith(String(ano))) {
       const idx = mesDe(l.due) - 1;
-      if (ehReceber) linhas[idx].entradasPrevistas += l.valor_cents;
-      else linhas[idx].saidasPrevistas += l.valor_cents;
+      if (ehReceber) linhas[idx].entradasPrevistas += liq;
+      else linhas[idx].saidasPrevistas += liq;
     }
   }
 
@@ -62,6 +63,23 @@ export function montarFluxo(ano) {
   return { ano, linhas, totais };
 }
 
+// Saldos por conta corrente: saldo_inicial + movimento realizado (receber −
+// pagar do que está pago naquela conta). Derivado, nunca gravado, para um estorno
+// nunca deixar o saldo mentindo. Devolve também o saldo total somado.
+export function montarSaldos() {
+  const mov = Object.fromEntries(movimentoPorConta().map((r) => [r.conta_id, r.mov]));
+  const contas = listContas().map((c) => ({
+    id: c.id,
+    nome: c.nome,
+    banco: c.banco,
+    ativo: c.ativo === 1,
+    saldoInicial: c.saldo_inicial_cents,
+    movimento: mov[c.id] || 0,
+    saldo: c.saldo_inicial_cents + (mov[c.id] || 0),
+  }));
+  return { contas, saldoTotal: contas.reduce((s, c) => s + c.saldo, 0) };
+}
+
 // DRE gerencial do período (regime de caixa): agrupa os lançamentos PAGOS por
 // categoria. Receita é o que a categoria diz ser receita, e não o tipo do
 // lançamento - assim um estorno lançado como 'pagar' numa categoria de receita
@@ -79,7 +97,7 @@ export function montarDRE(de, ate) {
     const chave = cat ? cat.id : "__sem__";
     const nome = cat ? cat.nome : SEM.nome;
     const linha = alvo.get(chave) || { id: cat ? cat.id : null, nome, total: 0 };
-    linha.total += l.valor_cents;
+    linha.total += liquidoCents(l); // DRE também pelo líquido, coerente com o caixa
     alvo.set(chave, linha);
   }
 

@@ -19,6 +19,7 @@ import {
 import * as repo from "../repo.js";
 import * as billing from "../billing/store.js";
 import { PLAN_IDS, getPlan, effectiveStatus, daysLeft, addOneMonth, maxUsersFor, attachmentLimitFor } from "../plans.js";
+import { MODULE_IDS, moduleEntitlementsFor } from "../modules.js";
 
 const router = Router();
 
@@ -239,6 +240,38 @@ router.post(
       detalhe: { plan, de: dir.getCompanyPlanDiscounts(e)[plan] || 0, para: discountCents },
     });
     res.json({ company: visaoEmpresa(atualizada) });
+  })
+);
+
+// Entitlement de módulos da empresa (o que ela pode usar de cada módulo da
+// plataforma). É o autoatendimento invertido: quem controla é a plataforma, não
+// a empresa. GET devolve o catálogo com o direito atual resolvido; PUT grava a
+// lista explícita. Isto é dado do diretório (não entra no banco da empresa),
+// então não passa por comAcessoAEmpresa - mas é auditado como qualquer mudança
+// contratual.
+router.get(
+  "/companies/:id/modules",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    res.json({ modules: moduleEntitlementsFor(e) });
+  })
+);
+
+router.put(
+  "/companies/:id/modules",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    const { modules } = req.body || {};
+    if (!Array.isArray(modules) || !modules.every((m) => MODULE_IDS.includes(m))) {
+      return res.status(400).json({ error: "Lista de módulos inválida", code: "INVALID_MODULES" });
+    }
+    // Normaliza para ids únicos e conhecidos, na ordem canônica do catálogo.
+    const alvo = MODULE_IDS.filter((id) => modules.includes(id));
+    const atualizada = dir.setCompanyModules(req.params.id, alvo);
+    auditar(req, "definir_modulos", { companyId: e.id, alvo: e.name, detalhe: { modules: alvo } });
+    res.json({ company: visaoEmpresa(atualizada), modules: moduleEntitlementsFor(atualizada) });
   })
 );
 

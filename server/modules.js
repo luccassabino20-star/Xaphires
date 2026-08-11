@@ -82,20 +82,50 @@ export function usuarioAutorizado(user, moduleId) {
   return false;
 }
 
-// Um módulo está liberado quando faz parte do plano base (core), já está no ar
-// (available) E o usuário tem autorização nele. Add-on fica sempre bloqueado por
-// ora — não há como contratá-lo ainda. Quando a cobrança por módulo entrar, é
-// aqui que a lista de add-ons contratados da empresa passa a contar, sem o
-// cliente precisar saber como a conta foi feita.
-//
-// Recebe empresa E usuário: a empresa decide o entitlement (plano/add-on), o
-// usuário decide a autorização (módulo restrito). Deixar as duas na assinatura
-// mantém a decisão de acesso num lugar só.
-export function isModuleEnabled(company, user, moduleId) {
+// A lista de módulos que a EMPRESA pode usar, controlada pelo painel de
+// plataforma (companies.enabled_modules). NULL = a plataforma ainda não definiu:
+// o padrão então são os módulos core, para nenhuma empresa existente ficar sem o
+// que já tinha. Definida a lista, ela manda — inclusive para liberar add-on ou
+// tirar um core de uma empresa específica.
+function parseEnabledModules(company) {
+  if (!company?.enabled_modules) return null;
+  try {
+    const arr = JSON.parse(company.enabled_modules);
+    return Array.isArray(arr) ? arr : null;
+  } catch {
+    return null;
+  }
+}
+
+// A empresa tem direito ao módulo? available é pré-requisito sempre (não se libera
+// o que ainda não existe). Com lista definida, vale a lista; sem lista, o padrão
+// é core.
+export function companyEntitled(company, moduleId) {
   const mod = getModule(moduleId);
-  if (!mod) return false;
-  if (!(mod.core === true && mod.available === true)) return false;
-  return usuarioAutorizado(user, mod.id);
+  if (!mod || !mod.available) return false;
+  const lista = parseEnabledModules(company);
+  if (lista === null) return mod.core === true;
+  return lista.includes(moduleId);
+}
+
+// Um módulo está liberado quando a EMPRESA tem direito a ele (entitlement do
+// painel) E o USUÁRIO tem autorização nele (módulo restrito). Duas camadas
+// independentes: a plataforma decide o que a empresa contratou; o master decide
+// quem, dentro dela, acessa.
+export function isModuleEnabled(company, user, moduleId) {
+  if (!companyEntitled(company, moduleId)) return false;
+  return usuarioAutorizado(user, moduleId);
+}
+
+// Módulos que a plataforma pode gerir para uma empresa: todos, com core/available
+// e o direito atual resolvido. É o que o painel de administração desenha.
+export function moduleEntitlementsFor(company) {
+  return DEFINICOES.map((m) => ({
+    id: m.id,
+    core: m.core,
+    available: m.available,
+    entitled: companyEntitled(company, m.id),
+  }));
 }
 
 // Catálogo já resolvido para a empresa e o usuário: cada módulo com

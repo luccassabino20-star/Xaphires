@@ -5402,6 +5402,11 @@ img.avatar { object-fit: cover; padding: 0; }
 .adm-chip-blocked { background: color-mix(in srgb, var(--adm-perigo) 15%, transparent); color: var(--adm-perigo); border-color: transparent; }
 .adm-chip-master { background: var(--adm-texto); color: #fff; border-color: transparent; }
 .adm-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.adm-chip-fraco { opacity: 0.7; }
+.adm-modulos { display: flex; flex-direction: column; gap: 8px; }
+.adm-modulo { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.adm-modulo input { cursor: pointer; }
+.adm-modulo-nome { margin-right: 4px; }
 
 .adm-bloqueio {
   padding: 10px 12px; border-radius: 8px; font-size: 13px;
@@ -6140,9 +6145,9 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-body {
   flex: 1;
   width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 28px 24px 56px;
+  /* Sem max-width: o Financeiro ocupa a tela toda, para o grid de título (muitas
+     colunas) caber sem a barra de rolagem lateral. */
+  padding: 28px 32px 56px;
 }
 .fin-loading, .fin-error, .fin-empty { color: var(--text-secondary); padding: 20px 4px; }
 .fin-error { color: var(--danger); }
@@ -6230,6 +6235,70 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-dre-resultado.positivo { background: color-mix(in srgb, var(--fin-entrada) 14%, var(--bg-card)); color: var(--fin-entrada); }
 .fin-dre-resultado.negativo { background: color-mix(in srgb, var(--fin-saida) 14%, var(--bg-card)); color: var(--fin-saida); }
 .fin-num { font-variant-numeric: tabular-nums; }
+
+/* Barra de busca + filtros dos lançamentos */
+.fin-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.fin-toolbar select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-search { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 220px; padding: 7px 11px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-muted); }
+.fin-search input { flex: 1; border: none; background: none; outline: none; color: var(--text-primary); font-size: 13.5px; }
+.fin-filtro-data { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+.fin-filtro-data input { padding: 7px 9px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+
+/* Número do título como link */
+.fin-titulo-link { font-weight: 650; color: var(--fin-entrada); background: none; border: none; padding: 0; cursor: pointer; font-variant-numeric: tabular-nums; }
+.fin-titulo-link:hover { text-decoration: underline; }
+
+/* Linha de total no rodapé da tabela */
+.fin-total-row td { border-top: 2px solid var(--border-strong); font-weight: 600; color: var(--text-secondary); background: var(--bg-list); }
+
+/* Modal do título */
+.fin-modal-body { display: flex; flex-direction: column; gap: 14px; }
+.fin-modal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.fin-field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+.fin-field-wide { grid-column: 1 / -1; }
+.fin-field input, .fin-field select, .fin-field textarea { padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; font-family: inherit; }
+.fin-field input:disabled, .fin-field select:disabled { opacity: 0.55; }
+.fin-field strong { font-size: 14px; color: var(--text-primary); }
+.fin-modal-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.fin-modal-excluir { margin-left: auto; }
+
+/* Cabeçalho do título (nº | correntista + doc | situação) */
+.fin-tit-cab { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: start; padding: 20px 44px 16px 20px; border-bottom: 1px solid var(--border-subtle); }
+.fin-tit-num { display: flex; flex-direction: column; gap: 4px; }
+.fin-tit-num-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.fin-tit-num-value { font-size: 24px; font-weight: 720; font-variant-numeric: tabular-nums; color: var(--fin-entrada); }
+.fin-tit-correntista { gap: 4px; }
+.fin-tit-doc-correntista { font-size: 12px; color: var(--text-muted); min-height: 15px; font-variant-numeric: tabular-nums; }
+.fin-tit-situacao { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; font-size: 12px; color: var(--text-secondary); }
+
+/* Blocos (fieldsets) no estilo do SIGIM */
+.fin-bloco { border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px 14px; margin: 0; }
+.fin-bloco > legend { font-size: 11.5px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 0 6px; }
+.fin-bloco-pagto { background: color-mix(in srgb, var(--fin-entrada) 6%, var(--bg-card)); }
+.fin-tit-liquido strong { font-size: 17px; font-weight: 720; color: var(--fin-entrada); }
+
+/* Vínculo de título de imposto (pai/filho) */
+.fin-vinculo { font-size: 12.5px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); }
+.fin-vinculo-filho { background: color-mix(in srgb, var(--fin-saida) 10%, var(--bg-card)); color: var(--fin-saida); }
+.fin-vinculo-pai { background: color-mix(in srgb, var(--fin-entrada) 8%, var(--bg-card)); color: var(--text-secondary); }
+.fin-tag-imposto { margin-left: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; padding: 1px 6px; border-radius: 999px; color: var(--fin-saida); background: color-mix(in srgb, var(--fin-saida) 14%, transparent); vertical-align: middle; }
+
+@media (max-width: 720px) {
+  .fin-modal-grid { grid-template-columns: repeat(2, 1fr); }
+  .fin-tit-cab { grid-template-columns: 1fr; }
+}
+
+/* Subabas dos cadastros e baixa inline */
+.fin-subtabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.fin-subtab {
+  padding: 7px 14px; font-size: 13px; font-weight: 550; border-radius: 999px;
+  color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); cursor: pointer;
+}
+.fin-subtab:hover { color: var(--text-primary); }
+.fin-subtab.active { color: #fff; background: var(--fin-entrada); border-color: transparent; }
+.fin-cad-secao { display: flex; flex-direction: column; gap: 14px; }
+.fin-baixa-inline { display: inline-flex; align-items: center; gap: 6px; }
+.fin-baixa-inline select { padding: 5px 8px; font-size: 12.5px; background: var(--bg-list); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 6px; }
 
 /* Toggle de acesso ao Financeiro no painel de usuários */
 .finance-access-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; }
