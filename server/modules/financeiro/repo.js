@@ -685,10 +685,18 @@ export function importarExtrato({ contaId, transacoes, createdBy }) {
 
 export function deleteLancamento(id) {
   const db = getDb();
-  // Títulos gerados a partir deste (recolhimento de imposto, parcelas). Somem
-  // junto, para não deixar filho órfão apontando para um pai que não existe mais.
-  const gerados = db.prepare("SELECT id FROM financeiro_lancamentos WHERE titulo_origem_id = ?").all(id).map((r) => r.id);
-  const ids = [id, ...gerados];
+  // Toda a DESCENDÊNCIA some junto, não só os filhos diretos: uma parcela (filha
+  // de um desdobramento) pode ter gerado um recolhimento de imposto, que é NETO do
+  // título original. Apagar só os filhos deixaria o neto órfão apontando para um
+  // pai inexistente, e ele seguiria contando como obrigação viva em fluxo/DRE/saldo.
+  const ids = [id];
+  const fila = [id];
+  const filhosDe = db.prepare("SELECT id FROM financeiro_lancamentos WHERE titulo_origem_id = ?");
+  while (fila.length) {
+    for (const r of filhosDe.all(fila.shift())) {
+      if (!ids.includes(r.id)) { ids.push(r.id); fila.push(r.id); }
+    }
+  }
   const marcas = ids.map(() => "?").join(",");
   // ANTES dos títulos: apagar os impostos aplicados que os referenciam. A FK
   // financeiro_lancamento_impostos.lancamento_id é NOT NULL e as FKs estão ON, então
@@ -696,8 +704,7 @@ export function deleteLancamento(id) {
   db.prepare(`DELETE FROM financeiro_lancamento_impostos WHERE lancamento_id IN (${marcas})`).run(...ids);
   // Apropriações também referenciam o título (FK NOT NULL) - somem junto.
   db.prepare(`DELETE FROM financeiro_apropriacoes WHERE lancamento_id IN (${marcas})`).run(...ids);
-  db.prepare("DELETE FROM financeiro_lancamentos WHERE titulo_origem_id = ?").run(id);
-  db.prepare("DELETE FROM financeiro_lancamentos WHERE id = ?").run(id);
+  db.prepare(`DELETE FROM financeiro_lancamentos WHERE id IN (${marcas})`).run(...ids);
 }
 
 // ---------- Apropriação (rateio) por centro de custo ----------
@@ -706,6 +713,14 @@ export function deleteLancamento(id) {
 // título rateado tem centro_custo_id único NULL (o rateio manda).
 export function listApropriacoes(lancamentoId) {
   return getDb().prepare("SELECT * FROM financeiro_apropriacoes WHERE lancamento_id = ? ORDER BY created_at").all(lancamentoId);
+}
+
+// Apropriações de vários títulos numa consulta só - o DRE precisa das de todos os
+// títulos pagos do período e não pode fazer um SELECT por título (N+1).
+export function apropriacoesDeVarios(ids) {
+  if (!ids.length) return [];
+  const marcas = ids.map(() => "?").join(",");
+  return getDb().prepare(`SELECT * FROM financeiro_apropriacoes WHERE lancamento_id IN (${marcas})`).all(...ids);
 }
 
 // Erro de regra do rateio - a rota traduz o code. Fora da classe RegraError dos

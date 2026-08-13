@@ -61,9 +61,17 @@ function codigoDoPai(codigo) {
   return partes.length <= 1 ? null : partes.slice(0, -1).join(".");
 }
 
-// Ordena numericamente por nível - texto puro poria "1.10" antes de "1.2".
+// Ordena numericamente por nível - texto puro poria "1.10" antes de "1.2". Código
+// não numérico (legado livre importado por importarLegado, ex.: "OBRA-PRAINHA")
+// não vira NaN silencioso: cai para comparação de texto, e códigos numéricos vêm
+// antes dos livres.
 function ordenarPorCodigo(rows) {
+  const numerico = (c) => String(c || "").split(".").every((p) => p !== "" && Number.isFinite(Number(p)));
   return rows.sort((a, b) => {
+    const na = numerico(a.codigo), nb = numerico(b.codigo);
+    if (!na && !nb) return String(a.codigo).localeCompare(String(b.codigo));
+    if (!na) return 1;
+    if (!nb) return -1;
     const pa = a.codigo.split(".").map(Number);
     const pb = b.codigo.split(".").map(Number);
     for (let i = 0; i < Math.max(pa.length, pb.length); i++) {

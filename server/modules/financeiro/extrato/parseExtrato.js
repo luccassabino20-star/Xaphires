@@ -61,7 +61,10 @@ function parseSicredi(texto) {
 // Conta/Rende+" e cabeçalhos/rodapés são ruído.
 const RE_MES = /^([A-Z]{3})\/(\d{2})\s*(.*)$/;
 const RE_DIA = /^(\d{1,2})(?:\s+(.*))?$/;
-const RE_VALOR_FIM = /^(.*?)\s+(-\s+)?(\d{1,3}(?:\.\d{3})*,\d{2})$/;
+// Valor no fim da linha. Aceita com OU sem separador de milhar: se o pdf-parse
+// renderizar "1234,56" em vez de "1.234,56", a transação >= 1000 ainda casa (a
+// exigência estrita de milhar descartava essas linhas em silêncio).
+const RE_VALOR_FIM = /^(.*?)\s+(-\s+)?(\d[\d.]*,\d{2})$/;
 
 function ehRuidoBanestes(l) {
   return (

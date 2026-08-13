@@ -148,7 +148,13 @@ router.post("/categorias/importar", (req, res) => {
     if (!linhas.length) return res.status(400).json({ error: "A planilha não tem linhas para importar", code: "FIN_CAT_XLSX_VAZIO" });
     // O 'close' do busboy é assíncrono e escapa do ALS montado pelo requireAuth;
     // reentramos no contexto da empresa na mão (mesmo padrão do import de centros).
-    res.status(201).json(runWithCompany(req.companyId, () => importarCategorias(linhas)));
+    // try/catch: o close do busboy é assíncrono e sem ah(); um erro inesperado
+    // (ex.: banco) escaparia como rejection não tratada e a requisição penduraria.
+    try {
+      res.status(201).json(runWithCompany(req.companyId, () => importarCategorias(linhas)));
+    } catch {
+      res.status(500).json({ error: "Falha ao importar a planilha", code: "FIN_IMPORT_ERRO" });
+    }
   });
   bb.on("error", () => res.status(400).json({ error: "Falha ao ler o envio", code: "FIN_CAT_XLSX_ILEGIVEL" }));
   req.pipe(bb);
@@ -268,7 +274,11 @@ router.post("/centros-custo/importar", (req, res) => {
     if (!linhas.length) return res.status(400).json({ error: "A planilha não tem linhas para importar", code: "FIN_CC_XLSX_VAZIO" });
     // O 'close' do busboy é assíncrono e escapa do ALS montado pelo requireAuth;
     // reentramos no contexto da empresa na mão (mesmo padrão do upload de anexo).
-    res.status(201).json(runWithCompany(req.companyId, () => importarCentros(linhas)));
+    try {
+      res.status(201).json(runWithCompany(req.companyId, () => importarCentros(linhas)));
+    } catch {
+      res.status(500).json({ error: "Falha ao importar a planilha", code: "FIN_IMPORT_ERRO" });
+    }
   });
   bb.on("error", () => res.status(400).json({ error: "Falha ao ler o envio", code: "FIN_CC_XLSX_ILEGIVEL" }));
   req.pipe(bb);

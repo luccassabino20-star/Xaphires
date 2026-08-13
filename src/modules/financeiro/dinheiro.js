@@ -22,6 +22,17 @@ export function reaisParaCents(entrada) {
   return Math.round(reais * 100);
 }
 
+// Como centsOuZero, mas aceita NEGATIVO. Para o saldo inicial de conta, que pode
+// ser negativo (cheque especial) - reaisParaCents/centsOuZero devolvem 0 para <= 0
+// e engoliriam um saldo negativo em silêncio.
+export function centsAssinado(entrada) {
+  if (entrada === null || entrada === undefined || String(entrada).trim() === "") return 0;
+  const s = String(entrada).trim();
+  const normalizado = s.includes(",") ? s.replace(/\./g, "").replace(",", ".") : s;
+  const reais = Number(normalizado);
+  return Number.isFinite(reais) ? Math.round(reais * 100) : 0;
+}
+
 // Como reaisParaCents, mas 0/vazio é um valor VÁLIDO (retorna 0). Para os campos
 // de imposto/desconto/retenção, onde "nenhum" é legítimo, diferente do valor do
 // título que precisa ser > 0.

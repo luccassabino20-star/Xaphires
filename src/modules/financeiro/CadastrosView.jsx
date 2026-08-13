@@ -4,7 +4,7 @@ import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
-import { formatCents, reaisParaCents, centsOuZero, formatPercent } from "./dinheiro.js";
+import { formatCents, reaisParaCents, centsOuZero, centsAssinado, formatPercent } from "./dinheiro.js";
 import { BANCOS, rotuloBanco } from "./bancos.js";
 import { normalizarDoc, cnpjValido } from "../../utils/doc.js";
 
@@ -162,7 +162,7 @@ function SecaoContas({ contas, lang, onCriar, onEditar }) {
           e.preventDefault();
           if (!f.nome.trim()) return;
           const banco = usandoOutro ? bancoOutro.trim() : f.banco;
-          const dados = { nome: f.nome.trim(), banco, agencia: f.agencia, numero: f.numero, saldoInicialCents: reaisParaCents(f.saldo) || 0 };
+          const dados = { nome: f.nome.trim(), banco, agencia: f.agencia, numero: f.numero, saldoInicialCents: centsAssinado(f.saldo) };
           if (editandoId) onEditar(api.finUpdateConta, editandoId, dados, cancelar);
           else onCriar(api.finCreateConta, dados, () => { setF(vazio); setBancoOutro(""); });
         }}
@@ -397,7 +397,7 @@ function SecaoCentros({ centros, onCriar, onEditar, onChanged }) {
           {resultado.erros > 0 && (
             <ul className="fin-cc-import-erros">
               {resultado.resultados.filter((r) => r.status === "erro").map((r) => (
-                <li key={r.row}>{t("financeiro.cad.importLinha", { row: r.row, codigo: r.codigo })} — {translateError({ code: r.code, message: r.motivo }, t)}</li>
+                <li key={r.row}>{t("financeiro.cad.importLinha", { row: r.row, codigo: r.codigo })} - {translateError({ code: r.code, message: r.motivo }, t)}</li>
               ))}
             </ul>
           )}
@@ -485,7 +485,7 @@ function SecaoClasses({ classes, onCriar, onEditar, onChanged }) {
           {resultado.erros > 0 && (
             <ul className="fin-cc-import-erros">
               {resultado.resultados.filter((r) => r.status === "erro").map((r) => (
-                <li key={r.row}>{t("financeiro.cad.importLinha", { row: r.row, codigo: r.codigo })} — {translateError({ code: r.code, message: r.motivo }, t)}</li>
+                <li key={r.row}>{t("financeiro.cad.importLinha", { row: r.row, codigo: r.codigo })} - {translateError({ code: r.code, message: r.motivo }, t)}</li>
               ))}
             </ul>
           )}

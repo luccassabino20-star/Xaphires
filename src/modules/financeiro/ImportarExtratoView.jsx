@@ -136,7 +136,9 @@ export default function ImportarExtratoView() {
                           {tx.tipo === "C" ? "+" : "-"} {formatCents(tx.valorCents, lang)}
                         </td>
                         <td>{tx.historico}</td>
-                        <td className="fin-num">{tx.saldoCents == null ? "-" : formatCents(Math.abs(tx.saldoCents), lang)}</td>
+                        <td className={"fin-num " + (tx.saldoCents != null && tx.saldoCents < 0 ? "fin-pagar" : "")}>
+                          {tx.saldoCents == null ? "-" : formatCents(tx.saldoCents, lang)}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

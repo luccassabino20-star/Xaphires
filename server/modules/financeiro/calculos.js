@@ -7,7 +7,7 @@
 // 'finalizado'), datado pela baixa (paid_at). O regime de competência (pelo
 // vencimento) fica anotado como evolução - hoje fluxo e DRE contam a mesma
 // história para não confundir.
-import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents, getConta, finalizadosDaConta, estornadosDaConta, listApropriacoes } from "./repo.js";
+import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents, getConta, finalizadosDaConta, estornadosDaConta, apropriacoesDeVarios } from "./repo.js";
 
 // Estados de "aberto" - o título ainda deve entrar/sair, então conta no previsto
 // do fluxo. 'finalizado' já é realizado; 'anulado' não conta em lugar nenhum.
@@ -167,9 +167,18 @@ export function montarDRE(de, ate) {
     alvo.set(chave, linha);
   }
 
-  for (const l of lancamentosPagosNoPeriodo(de, ate)) {
+  // Apropriações de todos os títulos do período numa consulta só (evita N+1).
+  const titulos = lancamentosPagosNoPeriodo(de, ate);
+  const aprPorTitulo = new Map();
+  for (const a of apropriacoesDeVarios(titulos.map((t) => t.id))) {
+    if (!a.category_id) continue; // só as com classe própria dividem o DRE
+    if (!aprPorTitulo.has(a.lancamento_id)) aprPorTitulo.set(a.lancamento_id, []);
+    aprPorTitulo.get(a.lancamento_id).push(a);
+  }
+
+  for (const l of titulos) {
     const liq = liquidoCents(l); // DRE também pelo líquido, coerente com o caixa
-    const comClasse = listApropriacoes(l.id).filter((a) => a.category_id);
+    const comClasse = aprPorTitulo.get(l.id) || [];
     if (comClasse.length && l.valor_cents > 0) {
       // Cada apropriação com classe leva a sua fatia do valor bruto; o que sobrar
       // (rateio parcial) volta para a classe do título. O líquido é dividido na

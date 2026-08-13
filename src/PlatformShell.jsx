@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { getModules } from "./state/api.js";
 import ModuleLauncher from "./modules/ModuleLauncher.jsx";
 import AuthenticatedApp from "./AuthenticatedApp.jsx";
-import FinanceiroModule from "./modules/financeiro/FinanceiroModule.jsx";
+// Lazy: o Financeiro (com exceljs/pdf-parse na cauda) não deve pesar no pacote que
+// todo cliente baixa - só é buscado quando alguém abre o módulo.
+const FinanceiroModule = lazy(() => import("./modules/financeiro/FinanceiroModule.jsx"));
 
 // A casca da plataforma: decide entre o launcher (grid de pilares) e o módulo
 // aberto. Fica ABAIXO dos providers do app (Board/Users/Chat, montados em
@@ -77,7 +79,12 @@ export default function PlatformShell() {
   const ativo = modules.find((m) => m.id === activeModule && m.enabled);
   const Componente = ativo ? COMPONENTES[ativo.id] : null;
   if (ativo && Componente) {
-    return <Componente onExit={voltar} />;
+    // Suspense cobre o carregamento do chunk lazy do módulo (Financeiro).
+    return (
+      <Suspense fallback={<div className="app-loading">{t("common.loading")}</div>}>
+        <Componente onExit={voltar} />
+      </Suspense>
+    );
   }
 
   return <ModuleLauncher modules={modules} onOpen={abrir} />;

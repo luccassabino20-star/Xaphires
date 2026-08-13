@@ -74,6 +74,10 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
   // seção; quando desligada, o centro único volta a valer.
   const [rateioAtivo, setRateioAtivo] = useState(false);
   const [rateio, setRateio] = useState([]);
+  // Só sabemos o estado real do rateio se a carga do servidor deu certo. Sem essa
+  // marca, uma falha transitória no GET (catch silencioso abaixo) deixaria
+  // rateioAtivo=false e o salvar apagaria o rateio salvo (finDefinirApropriacoes []).
+  const [rateioCarregado, setRateioCarregado] = useState(false);
 
   useEffect(() => {
     api.finListImpostosAplicados(l.id).then(setAplicados).catch(() => {});
@@ -87,7 +91,8 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
         })));
         setRateioAtivo(true);
       }
-    }).catch(() => {});
+      setRateioCarregado(true);
+    }).catch(() => { /* falhou: rateioCarregado fica false, o salvar não mexe no rateio */ });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [l.id]);
 
@@ -187,8 +192,11 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
       });
       // Grava (ou limpa) o rateio depois do título - a validação de soma no
       // servidor é contra o valor já salvo.
+      // Com rateio ligado, grava o que o usuário montou. Desligado, só LIMPA se a
+      // carga tinha dado certo (senão não sabemos se havia rateio - não apaga às
+      // cegas).
       if (rateioAtivo) await api.finDefinirApropriacoes(l.id, itensRateio);
-      else await api.finDefinirApropriacoes(l.id, []);
+      else if (rateioCarregado) await api.finDefinirApropriacoes(l.id, []);
       showToast(t("financeiro.toast.salvo"));
       onChanged();
     } catch (e) {
@@ -386,7 +394,12 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
                   </div>
                   {rateio.map((r, idx) => {
                     const usados = centroUsado(idx);
-                    const opts = centrosSelecionaveis.filter((c) => !usados.has(c.id) || c.id === r.centroCustoId);
+                    const base = centrosSelecionaveis.filter((c) => !usados.has(c.id) || c.id === r.centroCustoId);
+                    // Preserva o centro já gravado nesta linha mesmo que hoje seja
+                    // inativo/sintético (não está em centrosSelecionaveis), senão o
+                    // select apareceria em branco e re-salvar zeraria a apropriação.
+                    const atual = r.centroCustoId && !base.some((c) => c.id === r.centroCustoId) ? centros.find((c) => c.id === r.centroCustoId) : null;
+                    const opts = atual ? [atual, ...base] : base;
                     return (
                       <div className="fin-rateio-linha" key={idx}>
                         <select value={r.centroCustoId} disabled={travado} onChange={(e) => setLinha(idx, { centroCustoId: e.target.value })}>

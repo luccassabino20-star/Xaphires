@@ -9,7 +9,13 @@ import { comCodigo } from "./rotulo.js";
 import LancamentoModal, { FORMAS } from "./LancamentoModal.jsx";
 import SearchSelect from "./SearchSelect.jsx";
 
-const hoje = () => new Date().toISOString().slice(0, 10);
+// Data civil de HOJE no horário LOCAL, não UTC: toISOString() daria o dia de UTC
+// e, perto da meia-noite no Brasil (UTC-3), pré-preencheria vencimento/emissão um
+// dia à frente. Mesma escolha do resto do módulo (hojeCivil).
+const hoje = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 function formVazio() {
   return {
