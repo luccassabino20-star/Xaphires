@@ -295,6 +295,43 @@ export async function finBaixarModeloCentros() {
   a.remove();
   URL.revokeObjectURL(url);
 }
+export async function finImportarCategorias(file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/categorias/importar`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try { data = await res.json(); } catch { /* sem corpo */ }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+export async function finBaixarModeloCategorias() {
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/categorias/modelo`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) throw new Error(`Erro ${res.status}`);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "modelo-classes.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 export const finListContatos = () => request("/financeiro/contatos");
 export const finCreateContato = (data) => request("/financeiro/contatos", { method: "POST", body: data });
 export const finUpdateContato = (id, data) => request(`/financeiro/contatos/${id}`, { method: "PATCH", body: data });

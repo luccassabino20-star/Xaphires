@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
@@ -125,7 +125,7 @@ export default function CadastrosView() {
         {erro && <div className="fin-error">{erro}</div>}
         {selecionado === "contas" && <SecaoContas contas={contas} lang={lang} onCriar={criar} onEditar={editar} />}
         {selecionado === "centros" && <SecaoCentros centros={centros} onCriar={criar} onEditar={editar} onChanged={carregar} />}
-        {selecionado === "classes" && <SecaoClasses classes={classes} onCriar={criar} onEditar={editar} />}
+        {selecionado === "classes" && <SecaoClasses classes={classes} onCriar={criar} onEditar={editar} onChanged={carregar} />}
         {selecionado === "contatos" && <SecaoContatos contatos={contatos} onCriar={criar} onEditar={editar} />}
         {selecionado === "impostos" && <SecaoImpostos impostos={impostos} lang={lang} onCriar={criar} onEditar={editar} />}
         {selecionado === "sped" && <SecaoCodigosServico codigos={codigosServico} onCriar={criar} onEditar={editar} />}
@@ -191,6 +191,129 @@ function SecaoContas({ contas, lang, onCriar, onEditar }) {
   );
 }
 
+// Ordena uma lista plana pela árvore do código pontilhado (1.10 vem depois de
+// 1.2, por isso a comparação é numérica nível a nível). Código vazio ou não
+// numérico cai para o fim, ordenado por nome - assim classe sem código de plano
+// de contas ainda aparece, só não entra na hierarquia. Centro de custo já chega
+// ordenado do servidor; classe não, então precisa disto para a árvore ficar
+// contígua (pai seguido dos filhos), sem o que o recolher escondia linhas soltas.
+function ordenarPorCodigo(linhas) {
+  const partes = (c) => String(c || "").split(".").map((n) => Number(n));
+  const numerico = (c) => c && partes(c).every((n) => Number.isFinite(n));
+  return [...linhas].sort((a, b) => {
+    const na = numerico(a.codigo), nb = numerico(b.codigo);
+    if (!na && !nb) return String(a.nome || "").localeCompare(String(b.nome || ""));
+    if (!na) return 1;
+    if (!nb) return -1;
+    const pa = partes(a.codigo), pb = partes(b.codigo);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const da = pa[i] ?? -1, db = pb[i] ?? -1;
+      if (da !== db) return da - db;
+    }
+    return 0;
+  });
+}
+
+// Recolher/expandir uma árvore por código pontilhado, compartilhado por Centros
+// de custo e Classes - os dois usam o mesmo esquema "pai.filho" (1.02 é pai de
+// 1.02.01). Devolve só as linhas visíveis (escondendo descendentes de um nó
+// recolhido), quem tem filho (ganha o +/-), o estado e o toggle. A lista já
+// precisa vir ordenada pela árvore (ver ordenarPorCodigo).
+function useArvoreColapsavel(linhas) {
+  const [recolhidos, setRecolhidos] = useState(() => new Set());
+  // Todos os códigos que EXISTEM como linha. Um pai só conta se estiver aqui: a
+  // classe semeada usa "3.01"/"4.02" sem uma linha "3"/"4" (esses são só os
+  // grupos lógicos receita/despesa), e tratar "3" como pai recolhível sumia com
+  // a lista inteira. Centro de custo sempre tem a cadeia completa (o servidor
+  // exige o pai antes do filho), então nada muda para ele.
+  const codigos = useMemo(() => new Set(linhas.map((x) => String(x.codigo || ""))), [linhas]);
+  // Ancestrais que existem como linha, do mais raso ao mais fundo.
+  const ancestrais = (cod) => {
+    const p = String(cod || "").split(".");
+    const out = [];
+    for (let i = 1; i < p.length; i++) {
+      const a = p.slice(0, i).join(".");
+      if (codigos.has(a)) out.push(a);
+    }
+    return out;
+  };
+  // Nós que têm filho (sintético), considerando só o pai que existe como linha.
+  const comFilho = useMemo(() => {
+    const set = new Set();
+    for (const x of linhas) {
+      const cod = String(x.codigo || "");
+      const pai = cod.split(".").slice(0, -1).join(".");
+      if (pai && codigos.has(pai)) set.add(pai);
+    }
+    return set;
+  }, [linhas, codigos]);
+  // Nós que têm ao menos um filho ANALÍTICO (folha). Folha = código que não é pai
+  // de ninguém. São exatamente os nós que, recolhidos por padrão, escondem as
+  // folhas e deixam só o esqueleto sintético à mostra - o resto dos sintéticos
+  // (cujos filhos são sintéticos) nasce aberto, mostrando a estrutura.
+  const comFilhoAnalitico = useMemo(() => {
+    const set = new Set();
+    for (const x of linhas) {
+      const cod = String(x.codigo || "");
+      if (comFilho.has(cod)) continue; // este é sintético, não é folha
+      const pai = cod.split(".").slice(0, -1).join(".");
+      if (pai && codigos.has(pai)) set.add(pai);
+    }
+    return set;
+  }, [linhas, comFilho, codigos]);
+  // A árvore NASCE mostrando só os sintéticos: na primeira carga (a lista começa
+  // vazia e só popula depois do fetch) recolho os nós com filho analítico, então
+  // as folhas ficam escondidas atrás do + do pai. Só uma vez - depois disso o
+  // estado é do usuário, então recarregar ou incluir um centro não reabre o que
+  // ele fechou nem fecha o que ele abriu.
+  const inicializado = useRef(false);
+  useEffect(() => {
+    if (inicializado.current || comFilho.size === 0) return;
+    inicializado.current = true;
+    setRecolhidos(new Set(comFilhoAnalitico));
+  }, [comFilho, comFilhoAnalitico]);
+  const visiveis = linhas.filter((x) => !ancestrais(x.codigo).some((a) => recolhidos.has(a)));
+  const toggle = (cod) => setRecolhidos((prev) => {
+    const next = new Set(prev);
+    next.has(cod) ? next.delete(cod) : next.add(cod);
+    return next;
+  });
+  return {
+    visiveis,
+    temFilho: (cod) => comFilho.has(String(cod || "")),
+    recolhido: (cod) => recolhidos.has(String(cod || "")),
+    // Indentação pela profundidade REAL na árvore (ancestrais que existem), não
+    // pela contagem de pontos - senão "3.01" sem um "3" apareceria indentado
+    // como se pendurado num pai invisível.
+    nivel: (cod) => ancestrais(cod).length,
+    toggle,
+  };
+}
+
+// Célula de código com o botão +/- de recolher (só em nó com filho; folha ganha
+// um espaçador do mesmo tamanho para o texto alinhar) e a indentação por nível.
+function CelulaCodigo({ arvore, x }) {
+  const { t } = useTranslation();
+  const cod = String(x.codigo || "");
+  const nivel = x.nivel ?? arvore.nivel(cod);
+  return (
+    <span className="fin-cc-codigo" style={{ paddingLeft: nivel * 16 }}>
+      {arvore.temFilho(cod) ? (
+        <button
+          type="button" className="fin-tree-toggle" onClick={() => arvore.toggle(cod)}
+          aria-label={arvore.recolhido(cod) ? t("financeiro.cad.expandir") : t("financeiro.cad.recolher")}
+          title={arvore.recolhido(cod) ? t("financeiro.cad.expandir") : t("financeiro.cad.recolher")}
+        >
+          {arvore.recolhido(cod) ? "+" : "−"}
+        </button>
+      ) : (
+        <span className="fin-tree-spacer" aria-hidden="true" />
+      )}
+      {x.codigo || "-"}
+    </span>
+  );
+}
+
 // Centro de custo HIERÁRQUICO, editável pela própria empresa. O código define a
 // árvore (ex.: 1.02.01) e o pai é derivado dele - o pai precisa existir antes, e
 // ao ganhar um filho vira sintético (deixa de receber lançamento). O código não é
@@ -198,6 +321,8 @@ function SecaoContas({ contas, lang, onCriar, onEditar }) {
 // o painel da plataforma, mas cada empresa só enxerga/edita os seus.
 function SecaoCentros({ centros, onCriar, onEditar, onChanged }) {
   const { t } = useTranslation();
+  // Centro já chega ordenado pela árvore do servidor; o hook cuida do recolher.
+  const arvore = useArvoreColapsavel(centros);
   const vazio = { codigo: "", nome: "" };
   const [f, setF] = useState(vazio);
   const [editandoId, setEditandoId] = useState(null);
@@ -296,8 +421,8 @@ function SecaoCentros({ centros, onCriar, onEditar, onChanged }) {
         <button type="submit" className="btn-primary btn-small">{editandoId ? t("common.save") : t("financeiro.form.adicionar")}</button>
         {editandoId && <button type="button" className="btn-ghost btn-small" onClick={cancelar}>{t("common.cancel")}</button>}
       </form>
-      <Tabela vazio={t("financeiro.vazio")} linhas={centros} colunas={[
-        { h: t("financeiro.cad.codigo"), c: (x) => <span className="fin-cc-codigo" style={{ paddingLeft: (x.nivel || 0) * 16 }}>{x.codigo || "-"}</span> },
+      <Tabela vazio={t("financeiro.vazio")} linhas={arvore.visiveis} colunas={[
+        { h: t("financeiro.cad.codigo"), c: (x) => <CelulaCodigo arvore={arvore} x={x} /> },
         { h: t("financeiro.cad.nome"), c: (x) => x.nome },
         { h: t("financeiro.cad.tipo"), c: (x) => t("financeiro.cad." + (x.tipo === "sintetico" ? "sintetico" : "analitico")) },
         { h: "", c: (x) => confirmar === x.id ? (
@@ -310,15 +435,61 @@ function SecaoCentros({ centros, onCriar, onEditar, onChanged }) {
   );
 }
 
-function SecaoClasses({ classes, onCriar, onEditar }) {
+function SecaoClasses({ classes, onCriar, onEditar, onChanged }) {
   const { t } = useTranslation();
+  // O servidor devolve a classe por tipo/nome; para recolher a árvore do plano de
+  // contas (4, 4.08, 4.08.01) reordeno por código aqui, no cliente.
+  const ordenadas = useMemo(() => ordenarPorCodigo(classes), [classes]);
+  const arvore = useArvoreColapsavel(ordenadas);
   const vazio = { nome: "", tipo: "despesa", codigo: "" };
   const [f, setF] = useState(vazio);
   const [editandoId, setEditandoId] = useState(null);
+  const [importando, setImportando] = useState(false);
+  const [resultado, setResultado] = useState(null);
+  const [importErro, setImportErro] = useState("");
   function editar(x) { setEditandoId(x.id); setF({ nome: x.nome, tipo: x.tipo, codigo: x.codigo || "" }); }
   function cancelar() { setEditandoId(null); setF(vazio); }
+  async function escolherExcel(e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImportErro(""); setResultado(null); setImportando(true);
+    try {
+      const r = await api.finImportarCategorias(file);
+      setResultado(r);
+      onChanged?.();
+    } catch (err) {
+      setImportErro(translateError(err, t));
+    } finally {
+      setImportando(false);
+    }
+  }
+  async function baixarModelo() {
+    setImportErro("");
+    try { await api.finBaixarModeloCategorias(); } catch (err) { setImportErro(translateError(err, t)); }
+  }
   return (
     <div className="fin-cad-secao">
+      <div className="fin-cc-import">
+        <label className={"btn-secondary btn-small fin-importar-file" + (importando ? " is-disabled" : "")}>
+          {importando ? t("financeiro.importar.lendo") : t("financeiro.cad.importarExcel")}
+          <input type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={escolherExcel} disabled={importando} hidden />
+        </label>
+        <button type="button" className="btn-ghost btn-small" onClick={baixarModelo}>{t("financeiro.cad.baixarModelo")}</button>
+      </div>
+      {importErro && <div className="fin-error">{importErro}</div>}
+      {resultado && (
+        <div className="fin-cc-import-res">
+          <div>{t("financeiro.cad.importResultado", { criados: resultado.criados, ignorados: resultado.ignorados, erros: resultado.erros })}</div>
+          {resultado.erros > 0 && (
+            <ul className="fin-cc-import-erros">
+              {resultado.resultados.filter((r) => r.status === "erro").map((r) => (
+                <li key={r.row}>{t("financeiro.cad.importLinha", { row: r.row, codigo: r.codigo })} — {translateError({ code: r.code, message: r.motivo }, t)}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       <form
         className="fin-form"
         onSubmit={(e) => {
@@ -338,8 +509,8 @@ function SecaoClasses({ classes, onCriar, onEditar }) {
         <button type="submit" className="btn-primary btn-small">{editandoId ? t("common.save") : t("financeiro.form.adicionar")}</button>
         {editandoId && <button type="button" className="btn-ghost btn-small" onClick={cancelar}>{t("common.cancel")}</button>}
       </form>
-      <Tabela vazio={t("financeiro.vazio")} linhas={classes} colunas={[
-        { h: t("financeiro.cad.codigo"), c: (x) => x.codigo || "-" },
+      <Tabela vazio={t("financeiro.vazio")} linhas={arvore.visiveis} colunas={[
+        { h: t("financeiro.cad.codigo"), c: (x) => <CelulaCodigo arvore={arvore} x={x} /> },
         { h: t("financeiro.cad.nome"), c: (x) => x.nome },
         { h: t("financeiro.cad.tipo"), c: (x) => (x.tipo === "receita" ? t("financeiro.dre.receitas") : t("financeiro.dre.despesas")) },
         { h: "", c: (x) => <AcoesCadastro x={x} onEditar={() => editar(x)} onToggle={() => onEditar(api.finUpdateCategoria, x.id, { ativo: !x.ativo }, () => {})} /> },

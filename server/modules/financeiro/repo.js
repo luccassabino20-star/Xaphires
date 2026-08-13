@@ -6,6 +6,7 @@ import { getDb } from "../../db.js";
 import { uid } from "../../repo.js";
 import { getCurrentCompanyId } from "../../context.js";
 import * as centrosGlobais from "../../admin/centrosCustoStore.js";
+import { normalizarTipoCategoria } from "./importCategorias.js";
 
 // "Hoje" em data civil YYYY-MM-DD no horário LOCAL do servidor, não UTC - mesma
 // escolha da aritmética de recorrência (a data é a do relógio de quem age).
@@ -213,6 +214,50 @@ export function importarCentros(linhas) {
         throw e;
       }
     }
+  }
+  return { criados, ignorados, erros, resultados };
+}
+
+// Import em lote de classes (planilha). Diferente do centro, classe não tem
+// hierarquia obrigatória (o pai não precisa existir), então não reordena por
+// profundidade. É tolerante linha a linha: código repetido - já existente no
+// banco OU repetido dentro da própria planilha - conta como "ignorado" (permite
+// reimportar sem duplicar), tipo em branco/desconhecido e descrição vazia viram
+// "erro" com o motivo, sem abortar o resto. Devolve o resumo + o desfecho de
+// cada linha, no mesmo formato do import de centros.
+export function importarCategorias(linhas) {
+  const db = getDb();
+  // Códigos já existentes (não-vazios), para o dedup. Código vazio nunca dedupa:
+  // classe sem código de plano de contas é válida e pode repetir.
+  const existentes = new Set(
+    db.prepare("SELECT codigo FROM financeiro_categorias WHERE codigo <> ''").all().map((r) => r.codigo)
+  );
+  const vistos = new Set(); // códigos já processados nesta planilha
+  let criados = 0, ignorados = 0, erros = 0;
+  const resultados = [];
+  for (const l of linhas) {
+    const codigo = String(l.codigo || "").trim();
+    const nome = String(l.nome || "").trim();
+    const tipo = normalizarTipoCategoria(l.tipo);
+    if (codigo && (existentes.has(codigo) || vistos.has(codigo))) {
+      ignorados++;
+      resultados.push({ row: l.row, codigo, status: "ignorado", code: "FIN_CAT_DUPLICADO" });
+      continue;
+    }
+    if (!nome) {
+      erros++;
+      resultados.push({ row: l.row, codigo, status: "erro", code: "FIN_CAT_NOME_REQUIRED", motivo: "Informe a descrição da classe" });
+      continue;
+    }
+    if (!tipo) {
+      erros++;
+      resultados.push({ row: l.row, codigo, status: "erro", code: "FIN_CAT_TIPO_INVALID", motivo: "Tipo inválido (use receita ou despesa)" });
+      continue;
+    }
+    insertCategoria({ nome, tipo, codigo });
+    if (codigo) vistos.add(codigo);
+    criados++;
+    resultados.push({ row: l.row, codigo, status: "criado" });
   }
   return { criados, ignorados, erros, resultados };
 }

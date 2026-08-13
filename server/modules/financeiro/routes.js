@@ -18,6 +18,7 @@ import {
   excluirCentroCusto,
   excluirTodosCentrosCusto,
   importarCentros,
+  importarCategorias,
   listContatos,
   getContato,
   insertContato,
@@ -97,6 +98,42 @@ router.post(
     res.status(201).json(insertCategoria({ nome: nome.trim(), tipo, codigo: (codigo || "").trim() }));
   })
 );
+
+// Modelo .xlsx das classes (Código, Descrição, Tipo). Antes do /:id para o
+// Express não casar "modelo" como um id.
+router.get("/categorias/modelo", ah(async (req, res) => {
+  const buffer = await modeloCategoriasXlsx();
+  res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  res.setHeader("Content-Disposition", 'attachment; filename="modelo-classes.xlsx"');
+  res.send(buffer);
+}));
+
+// Import em lote por planilha: sobe o .xlsx, lê as linhas (código + descrição +
+// tipo) e cria as classes da empresa do contexto. Tolerante linha a linha (ver
+// repo.importarCategorias).
+router.post("/categorias/importar", (req, res) => {
+  const bb = Busboy({ headers: req.headers, limits: { fileSize: 5 * 1024 * 1024, files: 1 } });
+  const partes = [];
+  let grande = false, recebeu = false;
+  bb.on("file", (_n, arquivo) => {
+    recebeu = true;
+    arquivo.on("data", (d) => partes.push(d));
+    arquivo.on("limit", () => { grande = true; arquivo.resume(); });
+  });
+  bb.on("close", async () => {
+    if (grande) return res.status(400).json({ error: "Arquivo muito grande", code: "FIN_CAT_XLSX_GRANDE" });
+    if (!recebeu || !partes.length) return res.status(400).json({ error: "Envie uma planilha .xlsx", code: "FIN_CAT_XLSX_SEM_ARQUIVO" });
+    const { linhas, erro } = await parseCategoriasXlsx(Buffer.concat(partes));
+    if (erro) return res.status(400).json({ error: "Não foi possível ler esta planilha", code: "FIN_CAT_XLSX_ILEGIVEL" });
+    if (!linhas.length) return res.status(400).json({ error: "A planilha não tem linhas para importar", code: "FIN_CAT_XLSX_VAZIO" });
+    // O 'close' do busboy é assíncrono e escapa do ALS montado pelo requireAuth;
+    // reentramos no contexto da empresa na mão (mesmo padrão do import de centros).
+    res.status(201).json(runWithCompany(req.companyId, () => importarCategorias(linhas)));
+  });
+  bb.on("error", () => res.status(400).json({ error: "Falha ao ler o envio", code: "FIN_CAT_XLSX_ILEGIVEL" }));
+  req.pipe(bb);
+});
+
 router.patch(
   "/categorias/:id",
   ah(async (req, res) => {
