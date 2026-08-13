@@ -100,14 +100,14 @@ function garantirMigracaoCentros(companyId) {
     return;
   }
   if (!antigos.length) return;
-  // Importa para o global só se ainda não tem (preservando os ids). E ESVAZIA o
-  // legado logo em seguida: manter as linhas ali fazia um "Excluir tudo" (que zera
-  // o global) ser DESFEITO na leitura seguinte, porque esta migração re-importava
-  // tudo de volta. Os centros já vivem no global e os lançamentos apontam para lá,
-  // então limpar o legado é seguro - e é o que faz a exclusão finalmente "pegar".
-  if (!centrosGlobais.empresaTemCentros(companyId)) {
-    centrosGlobais.importarLegado(companyId, antigos);
-  }
+  // SEMPRE importa o legado antes de esvaziá-lo (importarLegado é idempotente:
+  // INSERT OR IGNORE preserva os ids). O guard antigo "só importa se o global está
+  // vazio" tinha um furo: uma empresa com um centro global criado antes (ex.: pelo
+  // painel) pulava a importação, mas o DELETE abaixo apagava os legados que os
+  // lançamentos referenciam pelo id - deixando-os órfãos. Esvaziar o legado depois
+  // de importar é o que faz um "Excluir tudo" finalmente "pegar" (a leitura
+  // seguinte acha o legado vazio e não re-importa nada).
+  centrosGlobais.importarLegado(companyId, antigos);
   getDb().prepare("DELETE FROM financeiro_centros_custo").run();
 }
 
@@ -157,6 +157,7 @@ export function definirCentroAtivo(id, ativo) {
 // perde a apropriação de centro (nunca apagamos lançamento por causa de cadastro).
 export function excluirCentroCusto(id) {
   const companyId = getCurrentCompanyId();
+  garantirMigracaoCentros(companyId); // migra o legado antes de excluir (ver excluirTodosCentrosCusto)
   const ids = centrosGlobais.excluirCentro(companyId, id);
   if (!ids) return null; // inexistente ou de outra empresa
   if (ids.length) {
@@ -175,6 +176,11 @@ export function excluirCentroCusto(id) {
 // (todos apontam para centros que estão sumindo).
 export function excluirTodosCentrosCusto() {
   const companyId = getCurrentCompanyId();
+  // Migra o legado ANTES de excluir: numa empresa não migrada, o global está vazio,
+  // então excluir não removeria nada, mas o UPDATE abaixo já anularia os lançamentos
+  // - e a leitura seguinte re-importaria os centros legados, ressuscitando-os com os
+  // vínculos já perdidos. Migrando antes, a exclusão remove de verdade e o anular fica coerente.
+  garantirMigracaoCentros(companyId);
   const ids = centrosGlobais.excluirTodosCentros(companyId);
   try {
     getDb().prepare("UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE centro_custo_id IS NOT NULL").run();
