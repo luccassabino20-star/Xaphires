@@ -61,7 +61,8 @@ export default function MovimentacaoView() {
 
   const contatoById = useMemo(() => Object.fromEntries(contatos.map((c) => [c.id, c])), [contatos]);
   const contasAtivas = useMemo(() => contas.filter((c) => c.ativo === 1), [contas]);
-  const contaOpts = useMemo(() => contasAtivas.map((c) => ({ id: c.id, label: c.nome })), [contasAtivas]);
+  const contaOpts = useMemo(() => contasAtivas.map((c) => ({ id: c.id, label: rotuloConta(c) })), [contasAtivas]);
+  const contaSel = useMemo(() => contasAtivas.find((c) => c.id === contaId) || null, [contasAtivas, contaId]);
   useEffect(() => { if (!contaId && contasAtivas.length) setContaId(contasAtivas[0].id); }, [contasAtivas, contaId]);
 
   const nomeContraparte = (l) => contatoById[l.contato_id]?.nome || l.contraparte || "-";
@@ -119,6 +120,11 @@ export default function MovimentacaoView() {
             <span className="fin-cad-hint">{t("financeiro.importar.semContas")}</span>
           ) : (
             <SearchSelect value={contaId} onChange={setContaId} options={contaOpts} allLabel={t("financeiro.baixa.semConta")} />
+          )}
+          {contaSel && (detalheConta(contaSel) || contaSel.banco) && (
+            <span className="fin-conta-detalhe">
+              {[contaSel.banco, detalheConta(contaSel)].filter(Boolean).join(" · ")}
+            </span>
           )}
         </label>
         <label className="fin-field">
