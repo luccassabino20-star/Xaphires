@@ -6,37 +6,55 @@ import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents, liquidoDoLancamento } from "./dinheiro.js";
 import SearchSelect from "./SearchSelect.jsx";
 
-// Movimentação = o EXTRATO de uma conta: escolhe a conta bancária e vê o que já
-// foi quitado nela (finalizado), com o saldo e a opção de estornar. Quitar título
-// (a baixa) mudou para a aba Títulos, onde se seleciona vários e dá quitado - aqui
-// é só olhar o dinheiro que se moveu na conta e, se preciso, desfazer.
+// "Hoje" e "primeiro dia do mês" em data civil YYYY-MM-DD no horário local - os
+// mesmos formatos que o <input type="date"> produz e que o backend espera.
+function hojeCivil() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function inicioDoMes() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+}
+
+// Movimentação = o EXTRATO de uma conta, agora com FILTRO MANUAL por período: a
+// tela não busca nada ao entrar nem ao trocar a conta. O usuário escolhe conta e
+// intervalo e clica em Filtrar; só então vêm a lista e os cinco saldos, todos
+// calculados no servidor (calculos.montarMovimentacao) - o cliente só desenha.
 export default function MovimentacaoView() {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
 
-  const [lancamentos, setLancamentos] = useState([]);
   const [contatos, setContatos] = useState([]);
   const [contas, setContas] = useState([]);
-  const [saldos, setSaldos] = useState({ contas: [] });
-  const [contaId, setContaId] = useState("");
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setCarregando] = useState(true); // carga inicial (só cadastros)
   const [erro, setErro] = useState("");
 
-  async function carregar() {
+  // Filtros do formulário (o que o usuário está montando).
+  const [contaId, setContaId] = useState("");
+  const [de, setDe] = useState(inicioDoMes());
+  const [ate, setAte] = useState(hojeCivil());
+  const [incluirEstornados, setIncluirEstornados] = useState(false);
+
+  // Resultado da última busca e os filtros que a geraram (o "aplicado"). Guardo os
+  // filtros aplicados à parte para que conferir/estornar rebusquem com eles, e não
+  // com o formulário que o usuário talvez já tenha começado a mudar.
+  const [resultado, setResultado] = useState(null);
+  const [aplicado, setAplicado] = useState(null);
+  const [buscando, setBuscando] = useState(false);
+
+  async function carregarCadastros() {
     setCarregando(true);
     try {
-      const [lancs, cts, cos, sal] = await Promise.all([
-        api.finListLancamentos(), api.finListContatos(), api.finListContas(), api.finGetSaldos(),
-      ]);
-      setLancamentos(lancs); setContatos(cts); setContas(cos); setSaldos(sal);
-      setErro("");
+      const [cts, cos] = await Promise.all([api.finListContatos(), api.finListContas()]);
+      setContatos(cts); setContas(cos); setErro("");
     } catch (err) {
       setErro(translateError(err, t));
     } finally {
       setCarregando(false);
     }
   }
-  useEffect(() => { carregar(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { carregarCadastros(); /* eslint-disable-next-line */ }, []);
 
   const contatoById = useMemo(() => Object.fromEntries(contatos.map((c) => [c.id, c])), [contatos]);
   const contasAtivas = useMemo(() => contas.filter((c) => c.ativo === 1), [contas]);
@@ -45,25 +63,53 @@ export default function MovimentacaoView() {
 
   const nomeContraparte = (l) => contatoById[l.contato_id]?.nome || l.contraparte || "-";
 
-  // O que se moveu nesta conta: os títulos finalizados apontando para ela, do mais
-  // recente para o mais antigo (pela data da baixa).
-  const movimentos = useMemo(
-    () => lancamentos.filter((l) => l.status === "finalizado" && l.conta_id === contaId).sort((a, b) => (b.paid_at || "").localeCompare(a.paid_at || "")),
-    [lancamentos, contaId]
-  );
-  const saldoConta = saldos.contas.find((c) => c.id === contaId)?.saldo ?? null;
+  // Busca sob demanda: valida e chama a API. Usada pelo botão Filtrar (com o
+  // formulário atual) e pelas ações da tabela (com os filtros já aplicados).
+  async function buscar(filtros) {
+    if (!filtros.contaId) { setErro(t("financeiro.mov.selecioneConta")); return; }
+    if (!filtros.de || !filtros.ate) { setErro(t("financeiro.mov.informePeriodo")); return; }
+    if (filtros.de > filtros.ate) { setErro(t("financeiro.mov.periodoInvalido")); return; }
+    setBuscando(true);
+    try {
+      const r = await api.finMovimentacao(filtros);
+      setResultado(r);
+      setAplicado(filtros);
+      setErro("");
+    } catch (err) {
+      setErro(translateError(err, t));
+    } finally {
+      setBuscando(false);
+    }
+  }
+  function filtrar(e) {
+    e?.preventDefault();
+    buscar({ contaId, de, ate, estornados: incluirEstornados });
+  }
+  async function refiltrar() { if (aplicado) await buscar(aplicado); }
 
   async function estornar(l) {
     setErro("");
-    try { await api.finEstornarLancamento(l.id); await carregar(); } catch (e) { setErro(translateError(e, t)); }
+    try { await api.finEstornarLancamento(l.id); await refiltrar(); } catch (e) { setErro(translateError(e, t)); }
+  }
+  async function alternarConferido(l) {
+    setErro("");
+    try { await api.finDefinirConferido(l.id, l.conferido !== 1); await refiltrar(); } catch (e) { setErro(translateError(e, t)); }
   }
 
   if (carregando) return <div className="fin-loading">{t("common.loading")}</div>;
-  if (erro) return <div className="fin-error">{erro}</div>;
+
+  const cards = resultado ? [
+    { k: "saldoAnterior", v: resultado.saldoAnterior, cls: "" },
+    { k: "creditos", v: resultado.creditos, cls: "fin-receber" },
+    { k: "debitos", v: resultado.debitos, cls: "fin-pagar" },
+    { k: "saldoAtual", v: resultado.saldoAtual, cls: resultado.saldoAtual < 0 ? "fin-pagar" : "fin-receber" },
+    { k: "saldoConferido", v: resultado.saldoConferido, cls: resultado.saldoConferido < 0 ? "fin-pagar" : "fin-receber" },
+  ] : [];
 
   return (
     <div className="fin-movimentacao">
-      <div className="fin-mov-topo">
+      {/* Barra de filtros: conta, período, estornados e o botão de busca. */}
+      <form className="fin-mov-filtros" onSubmit={filtrar}>
         <label className="fin-field fin-mov-conta">
           <span>{t("financeiro.contas.nome")}</span>
           {contasAtivas.length === 0 ? (
@@ -72,49 +118,93 @@ export default function MovimentacaoView() {
             <SearchSelect value={contaId} onChange={setContaId} options={contaOpts} allLabel={t("financeiro.baixa.semConta")} />
           )}
         </label>
-        {contaId && saldoConta != null && (
-          <div className="fin-mov-saldo">
-            <span>{t("financeiro.contas.saldo")}</span>
-            <strong className={saldoConta < 0 ? "fin-pagar" : "fin-receber"}>{formatCents(saldoConta, lang)}</strong>
-          </div>
-        )}
-      </div>
+        <label className="fin-field">
+          <span>{t("financeiro.mov.dataInicio")}</span>
+          <input type="date" value={de} max={ate || undefined} onChange={(e) => setDe(e.target.value)} />
+        </label>
+        <label className="fin-field">
+          <span>{t("financeiro.mov.dataFim")}</span>
+          <input type="date" value={ate} min={de || undefined} onChange={(e) => setAte(e.target.value)} />
+        </label>
+        <label className="fin-mov-check">
+          <input type="checkbox" checked={incluirEstornados} onChange={(e) => setIncluirEstornados(e.target.checked)} />
+          <span>{t("financeiro.mov.incluirEstornados")}</span>
+        </label>
+        <button type="submit" className="btn-primary fin-mov-filtrar" disabled={buscando || contasAtivas.length === 0}>
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+            <path fill="none" stroke="currentColor" strokeWidth="2" d="M10 4a6 6 0 104.9 9.5l4.8 4.8m-4.9-4.8A6 6 0 0010 4z" />
+          </svg>
+          {buscando ? t("common.loading") : t("financeiro.mov.filtrar")}
+        </button>
+      </form>
 
-      {contaId && (
-        <div className="fin-table-wrap">
-          <table className="fin-table">
-            <thead>
-              <tr>
-                <th>{t("financeiro.col.titulo")}</th>
-                <th>{t("financeiro.tit.dataBaixa")}</th>
-                <th>{t("financeiro.col.contraparte")}</th>
-                <th>{t("financeiro.col.descricao")}</th>
-                <th className="fin-num">{t("financeiro.col.valor")}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {movimentos.length === 0 ? (
-                <tr><td colSpan={6} className="fin-empty">{t("financeiro.mov.extratoVazio")}</td></tr>
-              ) : (
-                movimentos.map((l) => (
-                  <tr key={l.id}>
-                    <td>{l.numero}</td>
-                    <td>{l.paid_at}</td>
-                    <td>{nomeContraparte(l)}</td>
-                    <td>{l.descricao || "-"}</td>
-                    <td className={"fin-num " + (l.tipo === "receber" ? "fin-receber" : "fin-pagar")}>
-                      {l.tipo === "receber" ? "+" : "-"} {formatCents(liquidoDoLancamento(l), lang)}
-                    </td>
-                    <td className="fin-row-actions">
-                      <button className="btn-ghost btn-small" onClick={() => estornar(l)}>{t("financeiro.acao.estornar")}</button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+      {erro && <div className="fin-error">{erro}</div>}
+
+      {/* Antes da primeira busca, só um convite - nada carrega sozinho. */}
+      {!resultado && !erro && (
+        <div className="fin-empty fin-mov-prompt">{t("financeiro.mov.filtrePrompt")}</div>
+      )}
+
+      {resultado && (
+        <>
+          <div className="fin-mov-cards">
+            {cards.map((c) => (
+              <div key={c.k} className="fin-mov-card">
+                <span className="fin-mov-card-lbl">{t("financeiro.mov." + c.k)}</span>
+                <strong className={"fin-mov-card-val " + c.cls}>{formatCents(c.v, lang)}</strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="fin-table-wrap">
+            <table className="fin-table">
+              <thead>
+                <tr>
+                  <th className="fin-mov-conf-col">{t("financeiro.mov.conf")}</th>
+                  <th>{t("financeiro.col.titulo")}</th>
+                  <th>{t("financeiro.mov.data")}</th>
+                  <th>{t("financeiro.col.contraparte")}</th>
+                  <th>{t("financeiro.col.descricao")}</th>
+                  <th className="fin-num">{t("financeiro.col.valor")}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {resultado.movimentos.length === 0 ? (
+                  <tr><td colSpan={7} className="fin-empty">{t("financeiro.mov.extratoVazio")}</td></tr>
+                ) : (
+                  resultado.movimentos.map((l) => (
+                    <tr key={l.id} className={l.estornado ? "fin-mov-estornado" : ""}>
+                      <td className="fin-mov-conf-col">
+                        {l.estornado ? (
+                          <span className="fin-mov-tag">{t("financeiro.mov.estornado")}</span>
+                        ) : (
+                          <input
+                            type="checkbox" checked={l.conferido === 1}
+                            onChange={() => alternarConferido(l)}
+                            title={t("financeiro.mov.conferir")} aria-label={t("financeiro.mov.conferir")}
+                          />
+                        )}
+                      </td>
+                      <td>{l.numero}</td>
+                      <td>{l.data}</td>
+                      <td>{nomeContraparte(l)}</td>
+                      <td>{l.descricao || "-"}</td>
+                      <td className={"fin-num " + (l.tipo === "receber" ? "fin-receber" : "fin-pagar")}>
+                        {l.tipo === "receber" ? "+" : "-"} {formatCents(liquidoDoLancamento(l), lang)}
+                      </td>
+                      <td className="fin-row-actions">
+                        {!l.estornado && (
+                          <button className="btn-ghost btn-small" onClick={() => estornar(l)}>{t("financeiro.acao.estornar")}</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

@@ -6333,6 +6333,25 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-mov-saldo span { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
 .fin-mov-saldo strong { font-size: 20px; font-weight: 700; }
 
+/* Barra de filtros da Movimentação: conta, período, estornados e o botão de
+   busca. A tela só carrega ao clicar aqui. */
+.fin-mov-filtros { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.fin-mov-filtros .fin-field { gap: 4px; }
+.fin-mov-filtros input[type="date"] { padding: 7px 9px; border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-list); color: var(--text-primary); font-size: 13.5px; }
+.fin-mov-check { display: flex; align-items: center; gap: 6px; padding-bottom: 8px; font-size: 13.5px; color: var(--text-secondary); cursor: pointer; }
+.fin-mov-filtrar { display: inline-flex; align-items: center; gap: 7px; }
+.fin-mov-prompt { margin-top: 6px; }
+/* Cards de totalizadores do período. */
+.fin-mov-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.fin-mov-card { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card); }
+.fin-mov-card-lbl { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.fin-mov-card-val { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Coluna de conferência e a linha estornada (mostrada só com o filtro ligado). */
+.fin-mov-conf-col { width: 54px; text-align: center; }
+.fin-mov-estornado { opacity: 0.62; }
+.fin-mov-estornado td:not(.fin-mov-conf-col) { text-decoration: line-through; }
+.fin-mov-tag { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--danger); border: 1px solid var(--danger); }
+
 /* Número do título como link */
 .fin-titulo-link { font-weight: 650; color: var(--fin-entrada); background: none; border: none; padding: 0; cursor: pointer; font-variant-numeric: tabular-nums; }
 .fin-titulo-link:hover { text-decoration: underline; }

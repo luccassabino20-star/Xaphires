@@ -536,19 +536,55 @@ export function baixarLancamento(id, { paidAt, contaId } = {}) {
   // Já finalizado: idempotente, não reescreve. Anulado não se baixa - fica de
   // fora, e a rota já barra antes com mensagem própria.
   if (atual.status === "finalizado" || atual.status === "anulado") return atual;
+  // Baixa é movimento novo: zera o rastro de estorno e o "conferido" antigo -
+  // uma linha rebaixada precisa ser conferida de novo, e não é mais um estorno.
   getDb()
-    .prepare("UPDATE financeiro_lancamentos SET status = 'finalizado', paid_at = ?, conta_id = COALESCE(?, conta_id) WHERE id = ?")
+    .prepare("UPDATE financeiro_lancamentos SET status = 'finalizado', paid_at = ?, conta_id = COALESCE(?, conta_id), estornado_em = NULL, conferido = 0 WHERE id = ?")
     .run(paidAt || hojeCivil(), contaId || null, id);
   return getLancamento(id);
 }
 
 // Estorna a baixa (volta a pendente). Simétrico do baixar, também idempotente.
+// Agora deixa RASTRO: grava estornado_em (a data do estorno) para o filtro
+// "Estornados" da Movimentação reexibir o que foi desfeito, e zera conferido -
+// movimento desfeito não conta no saldo conferido. Mantém conta_id de propósito:
+// é como a tela sabe de que conta o estorno saiu.
 export function estornarLancamento(id) {
   const atual = getLancamento(id);
   if (!atual) return null;
   if (atual.status !== "finalizado") return atual;
-  getDb().prepare("UPDATE financeiro_lancamentos SET status = 'pendente', paid_at = NULL WHERE id = ?").run(id);
+  getDb()
+    .prepare("UPDATE financeiro_lancamentos SET status = 'pendente', paid_at = NULL, estornado_em = ?, conferido = 0 WHERE id = ?")
+    .run(hojeCivil(), id);
   return getLancamento(id);
+}
+
+// Marca/desmarca a conferência bancária de um título. Só finalizado se confere -
+// um título em aberto não é movimento de conta. Idempotente. Devolve a linha ou
+// null quando não existe / não é finalizado (a rota traduz para o erro certo).
+export function definirConferido(id, conferido) {
+  const atual = getLancamento(id);
+  if (!atual) return null;
+  if (atual.status !== "finalizado") return null;
+  getDb().prepare("UPDATE financeiro_lancamentos SET conferido = ? WHERE id = ?").run(conferido ? 1 : 0, id);
+  return getLancamento(id);
+}
+
+// Movimentação de uma conta: os títulos FINALIZADOS apontando para ela (a fonte
+// dos saldos do período). Ordenados pela data da baixa. calculos.montarMovimentacao
+// filtra por período em JS, coerente com o resto do módulo.
+export function finalizadosDaConta(contaId) {
+  return getDb()
+    .prepare("SELECT * FROM financeiro_lancamentos WHERE conta_id = ? AND status = 'finalizado' ORDER BY paid_at ASC, numero ASC")
+    .all(contaId);
+}
+
+// Títulos que foram estornados nesta conta (têm rastro de estorno). Servem só ao
+// filtro "Estornados" - não entram em nenhum saldo, porque não são realizados.
+export function estornadosDaConta(contaId) {
+  return getDb()
+    .prepare("SELECT * FROM financeiro_lancamentos WHERE conta_id = ? AND estornado_em IS NOT NULL ORDER BY estornado_em ASC, numero ASC")
+    .all(contaId);
 }
 
 // Muda a situação do título entre os estados de "aberto" (provisionado, pendente,

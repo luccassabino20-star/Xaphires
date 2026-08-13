@@ -7,7 +7,7 @@
 // 'finalizado'), datado pela baixa (paid_at). O regime de competência (pelo
 // vencimento) fica anotado como evolução - hoje fluxo e DRE contam a mesma
 // história para não confundir.
-import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents } from "./repo.js";
+import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents, getConta, finalizadosDaConta, estornadosDaConta } from "./repo.js";
 
 // Estados de "aberto" - o título ainda deve entrar/sair, então conta no previsto
 // do fluxo. 'finalizado' já é realizado; 'anulado' não conta em lugar nenhum.
@@ -83,6 +83,60 @@ export function montarSaldos() {
     saldo: c.saldo_inicial_cents + (mov[c.id] || 0),
   }));
   return { contas, saldoTotal: contas.reduce((s, c) => s + c.saldo, 0) };
+}
+
+// Movimentação (extrato) de UMA conta num período [de, ate], em regime de caixa.
+// É a fonte única dos números da aba Movimentação - o cliente desenha o que sai
+// daqui e não reconta. Todas as datas são civis 'YYYY-MM-DD', então comparo como
+// string (a ordem lexicográfica coincide com a cronológica nesse formato), sem
+// new Date() para não reintroduzir fuso.
+//
+// Os cinco saldos, todos ancorados no saldo inicial da conta e no sinal do
+// lançamento (receber entra +, pagar sai -):
+//   - saldoAnterior  = inicial + movimento realizado ANTES de `de`
+//   - creditos       = entradas (receber) realizadas no período
+//   - debitos        = saídas (pagar) realizadas no período
+//   - saldoAtual     = fechamento do período = saldoAnterior + creditos - debitos
+//                      (por construção idêntico a inicial + movimento até `ate`)
+//   - saldoConferido = inicial + movimento até `ate` SÓ dos conferidos
+//
+// Estorno não entra em saldo nenhum: ao ser estornado o título deixa de ser
+// finalizado, então some naturalmente do realizado. Ele só reaparece na LISTA
+// quando `incluirEstornados`, para consulta, marcado e datado pela data do estorno.
+export function montarMovimentacao(contaId, de, ate, { incluirEstornados = false } = {}) {
+  const conta = getConta(contaId);
+  if (!conta) return null;
+  const inicial = conta.saldo_inicial_cents;
+  const sinal = (l) => (l.tipo === "receber" ? liquidoCents(l) : -liquidoCents(l));
+
+  let anteriorMov = 0, creditos = 0, debitos = 0, conferidoMov = 0;
+  const noPeriodo = [];
+  for (const l of finalizadosDaConta(contaId)) {
+    const d = l.paid_at || "";
+    if (d < de) anteriorMov += sinal(l);
+    if (d <= ate && l.conferido === 1) conferidoMov += sinal(l);
+    if (d >= de && d <= ate) {
+      if (l.tipo === "receber") creditos += liquidoCents(l);
+      else debitos += liquidoCents(l);
+      noPeriodo.push({ ...l, estornado: false, data: d });
+    }
+  }
+
+  const saldoAnterior = inicial + anteriorMov;
+  const saldoAtual = saldoAnterior + creditos - debitos;
+  const saldoConferido = inicial + conferidoMov;
+
+  let movimentos = noPeriodo;
+  if (incluirEstornados) {
+    const estornados = estornadosDaConta(contaId)
+      .filter((l) => l.estornado_em >= de && l.estornado_em <= ate)
+      .map((l) => ({ ...l, estornado: true, data: l.estornado_em }));
+    movimentos = [...noPeriodo, ...estornados];
+  }
+  // Mais recente primeiro, pela data efetiva da linha (baixa ou estorno).
+  movimentos.sort((a, b) => (b.data || "").localeCompare(a.data || ""));
+
+  return { contaId, de, ate, saldoAnterior, creditos, debitos, saldoAtual, saldoConferido, movimentos };
 }
 
 // DRE gerencial do período (regime de caixa): agrupa os lançamentos FINALIZADOS por

@@ -224,6 +224,18 @@ export function applyFinanceiroSchema(companyDb) {
     for (const r of semNumero) upd.run(++base, r.id);
   }
   companyDb.exec("CREATE INDEX IF NOT EXISTS idx_fin_lanc_numero ON financeiro_lancamentos(numero)");
+
+  // Conferência bancária (aba Movimentação): marca de que a linha do extrato foi
+  // conferida contra o banco. O "Saldo Conferido" da tela soma só os conferidos.
+  // Nasce 0 (não conferido); a baixa reinicia para 0 e o estorno também zera -
+  // movimento novo/desfeito não pode herdar "conferido" antigo.
+  addColumn(companyDb, "financeiro_lancamentos", "conferido", "conferido INTEGER NOT NULL DEFAULT 0");
+  // Rastro do estorno: quando um título finalizado é estornado, guarda a data
+  // civil do estorno (antes o estorno não deixava rastro nenhum - voltava a
+  // pendente e sumia do extrato). É o que o filtro "Estornados" da Movimentação
+  // usa para reexibir o que foi desfeito. Limpo na baixa (a linha volta a ser um
+  // movimento normal).
+  addColumn(companyDb, "financeiro_lancamentos", "estornado_em", "estornado_em TEXT");
 }
 
 function addColumn(companyDb, table, name, ddl) {

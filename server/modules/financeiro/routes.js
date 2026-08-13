@@ -37,6 +37,7 @@ import {
   updateLancamento,
   baixarLancamento,
   estornarLancamento,
+  definirConferido,
   mudarStatusLancamento,
   deleteLancamento,
   desdobrarLancamento,
@@ -276,6 +277,22 @@ router.patch(
 // ---------- Saldos por conta corrente ----------
 router.get("/saldos", ah(async (req, res) => res.json(montarSaldos())));
 
+// ---------- Movimentação (extrato de uma conta num período) ----------
+// A tela busca sob demanda: exige conta e o intervalo [de, ate]. Devolve os cinco
+// saldos e a lista de movimentos do período (finalizados; estornados quando
+// pedido). Toda a aritmética é do calculos.montarMovimentacao.
+router.get("/movimentacao", ah(async (req, res) => {
+  const { contaId, de, ate } = req.query;
+  if (!contaId || !getConta(contaId))
+    return res.status(400).json({ error: "Selecione uma conta", code: "FIN_CONTA_NOT_FOUND" });
+  if (!DATA_CIVIL.test(de || "") || !DATA_CIVIL.test(ate || ""))
+    return res.status(400).json({ error: "Informe o período (data início e data fim)", code: "FIN_DATE_INVALID" });
+  if (de > ate)
+    return res.status(400).json({ error: "A data de início não pode ser maior que a data de fim", code: "FIN_PERIODO_INVALIDO" });
+  const incluirEstornados = req.query.estornados === "1" || req.query.estornados === "true";
+  res.json(montarMovimentacao(contaId, de, ate, { incluirEstornados }));
+}));
+
 // ---------- Impostos (alíquotas) ----------
 router.get("/impostos", ah(async (req, res) => res.json(listImpostos())));
 router.post(
@@ -501,6 +518,19 @@ router.post(
     if (!getLancamento(req.params.id))
       return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
     res.json(estornarLancamento(req.params.id));
+  })
+);
+
+// Conferência bancária: marca/desmarca a linha como conferida contra o extrato.
+// Só título finalizado se confere - em aberto não é movimento de conta.
+router.patch(
+  "/lancamentos/:id/conferido",
+  ah(async (req, res) => {
+    const l = getLancamento(req.params.id);
+    if (!l) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (l.status !== "finalizado")
+      return res.status(400).json({ error: "Só título baixado pode ser conferido", code: "FIN_CONFERIR_NAO_FINALIZADO" });
+    res.json(definirConferido(req.params.id, !!req.body?.conferido));
   })
 );
 
