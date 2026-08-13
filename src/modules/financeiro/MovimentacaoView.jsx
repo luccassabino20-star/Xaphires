@@ -4,7 +4,9 @@ import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents, liquidoDoLancamento } from "./dinheiro.js";
+import { rotuloConta, detalheConta } from "./rotulo.js";
 import SearchSelect from "./SearchSelect.jsx";
+import LancamentoManualModal from "./LancamentoManualModal.jsx";
 
 // "Hoje" e "primeiro dia do mês" em data civil YYYY-MM-DD no horário local - os
 // mesmos formatos que o <input type="date"> produz e que o backend espera.
@@ -42,6 +44,7 @@ export default function MovimentacaoView() {
   const [resultado, setResultado] = useState(null);
   const [aplicado, setAplicado] = useState(null);
   const [buscando, setBuscando] = useState(false);
+  const [manualAberto, setManualAberto] = useState(false);
 
   async function carregarCadastros() {
     setCarregando(true);
@@ -136,9 +139,19 @@ export default function MovimentacaoView() {
           </svg>
           {buscando ? t("common.loading") : t("financeiro.mov.filtrar")}
         </button>
+        <button type="button" className="btn-secondary fin-mov-manual" onClick={() => setManualAberto(true)}>
+          + {t("financeiro.manual.titulo")}
+        </button>
       </form>
 
       {erro && <div className="fin-error">{erro}</div>}
+
+      {manualAberto && (
+        <LancamentoManualModal
+          onClose={() => setManualAberto(false)}
+          onCriado={() => { if (aplicado) refiltrar(); }}
+        />
+      )}
 
       {/* Antes da primeira busca, só um convite - nada carrega sozinho. */}
       {!resultado && !erro && (

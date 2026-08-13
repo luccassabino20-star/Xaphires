@@ -42,6 +42,7 @@
   "financeiro": {
     "tabs": { "lancamentos": "Entries", "titulos": "Titles", "movimentacao": "Movements", "contas": "Accounts", "fluxo": "Cash flow", "dre": "P&L", "importar": "Import statement", "cadastros": "Registers" },
     "importar": { "titulo": "Import bank statement", "ajuda": "Upload the statement PDF (Sicredi or Banestes). Each transaction becomes a settled entry on the chosen account.", "conta": "Target account", "escolher": "Choose statement PDF", "lendo": "Reading the PDF...", "banco": "Bank", "creditos": "Credits", "debitos": "Debits", "data": "Date", "historico": "Description", "saldo": "Balance", "nenhuma": "No transactions recognized in this PDF.", "importar": "Import {{n}} transactions", "baixarExcel": "Download Excel", "selecioneConta": "Select the target account before importing.", "resultado": "{{imp}} imported, {{ign}} already existed (skipped).", "semContas": "Register a bank account first, in the Accounts tab." },
+    "manual": { "titulo": "Manual Entry", "dados": "Entry details", "movimento": "Movement", "data": "Date", "referencia": "Reference", "referenciaPlaceholder": "History / description", "documento": "Document", "credito": "credit", "debito": "debit", "dicaCredito": "This movement is a credit (inflow) to the account.", "dicaDebito": "This movement is a debit (outflow) from the account.", "rateioTitulo": "Allocation / Split", "tipoRateio": "Split type", "porPercentual": "Percent (%)", "porValor": "Amount (R$)", "valorApropriacao": "Allocation amount", "semRateio": "No split added.", "criado": "Manual entry created.", "salvar": "Post", "informeData": "Enter the date.", "escolhaClasse": "Choose the class.", "mov": { "tarifa_bancaria": "Bank Fee", "juros_pagos": "Interest Paid", "juros_recebidos": "Interest Received", "rendimento_aplicacao": "Investment Yield", "aplicacao_financeira": "Financial Investment", "resgate_aplicacao": "Investment Redemption", "outras_entradas": "Other Inflows", "outras_saidas": "Other Outflows" } },
     "rateio": { "ativar": "Split across cost centers", "desativar": "Remove split", "titulo": "Cost-center split", "adicionar": "Add center", "restante": "Remaining", "escolhaCentro": "Choose the center on each split line.", "valorInvalido": "Enter a valid amount on each split line.", "duplicado": "Center repeated in the split.", "naoFecha": "The split must add up to the title value.", "rateadoLabel": "Split", "travadoPorRateio": "Title is split - single center does not apply." },
     "mov": { "pendentes": "Open", "baixados": "Recently settled", "vazioPendentes": "No open titles.", "vazioBaixados": "No recent settlements.", "extratoVazio": "No movements in the period.",
         "dataInicio": "Start Date",
@@ -1137,6 +1138,7 @@
     "FIN_APROP_DUPLICADO": "Center repeated in the split.",
     "FIN_APROP_VALOR": "Invalid split amount.",
     "FIN_APROP_SOMA": "The split must add up to the title value.",
+    "FIN_MOV_INVALIDO": "Invalid movement.",
     "FIN_CATEGORY_NOT_FOUND": "Category not found.",
     "FIN_CATEGORY_NAME_REQUIRED": "Enter the category name.",
     "FIN_CATEGORY_TIPO_INVALID": "Invalid category type.",

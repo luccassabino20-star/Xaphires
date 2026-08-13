@@ -714,6 +714,10 @@ export function definirApropriacoes(lancamentoId, itens) {
     vistos.add(cc.id);
     if (!Number.isInteger(it.valorCents) || it.valorCents <= 0)
       throw new ApropriacaoError("FIN_APROP_VALOR", "Valor de rateio inválido");
+    // Classe por linha é opcional (o rateio do detalhe do título não usa); se vier,
+    // precisa existir. O Lançamento Manual manda classe + centro em cada linha.
+    if (it.categoryId && !getCategoria(it.categoryId))
+      throw new ApropriacaoError("FIN_CATEGORY_NOT_FOUND", "Classe não encontrada");
     soma += it.valorCents;
   }
   if (lista.length && soma !== titulo.valor_cents)
@@ -724,9 +728,9 @@ export function definirApropriacoes(lancamentoId, itens) {
   db.exec("BEGIN");
   try {
     db.prepare("DELETE FROM financeiro_apropriacoes WHERE lancamento_id = ?").run(lancamentoId);
-    const ins = db.prepare("INSERT INTO financeiro_apropriacoes (id, lancamento_id, centro_custo_id, valor_cents, created_at) VALUES (?, ?, ?, ?, ?)");
+    const ins = db.prepare("INSERT INTO financeiro_apropriacoes (id, lancamento_id, centro_custo_id, category_id, valor_cents, created_at) VALUES (?, ?, ?, ?, ?, ?)");
     const agora = new Date().toISOString();
-    for (const it of lista) ins.run(uid(), lancamentoId, it.centroCustoId, it.valorCents, agora);
+    for (const it of lista) ins.run(uid(), lancamentoId, it.centroCustoId, it.categoryId || null, it.valorCents, agora);
     // Título rateado não tem centro único; sem rateio, não mexo no centro atual.
     if (lista.length) db.prepare("UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE id = ?").run(lancamentoId);
     db.exec("COMMIT");

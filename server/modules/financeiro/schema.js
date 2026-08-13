@@ -251,6 +251,12 @@ export function applyFinanceiroSchema(companyDb) {
   // usa para reexibir o que foi desfeito. Limpo na baixa (a linha volta a ser um
   // movimento normal).
   addColumn(companyDb, "financeiro_lancamentos", "estornado_em", "estornado_em TEXT");
+
+  // Classe (categoria) por linha do rateio, além do centro. A apropriação nasceu
+  // só com centro (rateio do detalhe do título); o Lançamento Manual dos Movimentos
+  // rateia por Classe E Centro, então cada linha guarda também a classe. Nulo nas
+  // apropriações antigas (rateio só por centro).
+  addColumn(companyDb, "financeiro_apropriacoes", "category_id", "category_id TEXT");
 }
 
 function addColumn(companyDb, table, name, ddl) {

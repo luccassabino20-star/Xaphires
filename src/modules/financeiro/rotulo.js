@@ -6,3 +6,20 @@ export function comCodigo(item) {
   const cod = (item.codigo || "").trim();
   return cod ? `${cod} - ${item.nome}` : item.nome;
 }
+
+// Agência e conta bancária de uma conta corrente, em "Ag 1234 · Cc 56789-0". Só
+// mostra as partes preenchidas; conta sem esses dados devolve string vazia.
+export function detalheConta(c) {
+  if (!c) return "";
+  const partes = [];
+  if ((c.agencia || "").trim()) partes.push(`Ag ${c.agencia.trim()}`);
+  if ((c.numero || "").trim()) partes.push(`Cc ${c.numero.trim()}`);
+  return partes.join(" · ");
+}
+
+// Rótulo da conta para selects: nome + agência/conta quando houver.
+export function rotuloConta(c) {
+  if (!c) return "";
+  const det = detalheConta(c);
+  return det ? `${c.nome} (${det})` : c.nome;
+}

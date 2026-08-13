@@ -74,6 +74,21 @@ const LOCALES = ["pt", "en", "es"];
 // baixa/imposto/desdobramento; MANUAIS são os que a rota /status aceita definir à
 // mão (finalizar é a baixa; sair de finalizado é o estorno - nunca por /status).
 const STATUS_VALIDOS = ["provisionado", "pendente", "disponivel", "finalizado", "anulado"];
+
+// Tipos de Movimento do Lançamento Manual e a DIREÇÃO fixa de cada um (a regra de
+// débito/crédito é do servidor, não do cliente). Débito = saída = 'pagar';
+// crédito = entrada = 'receber'. Chave estável gravada em nada - só decide o tipo
+// do título criado; o rótulo é traduzido no cliente (financeiro.manual.mov.*).
+const MOVIMENTOS = {
+  tarifa_bancaria: "pagar",
+  juros_pagos: "pagar",
+  juros_recebidos: "receber",
+  rendimento_aplicacao: "receber",
+  aplicacao_financeira: "pagar",
+  resgate_aplicacao: "receber",
+  outras_entradas: "receber",
+  outras_saidas: "pagar",
+};
 const STATUS_ABERTOS = ["provisionado", "pendente", "disponivel"];
 const STATUS_MANUAIS = ["provisionado", "pendente", "disponivel", "anulado"];
 
@@ -295,6 +310,39 @@ router.get("/movimentacao", ah(async (req, res) => {
     return res.status(400).json({ error: "A data de início não pode ser maior que a data de fim", code: "FIN_PERIODO_INVALIDO" });
   const incluirEstornados = req.query.estornados === "1" || req.query.estornados === "true";
   res.json(montarMovimentacao(contaId, de, ate, { incluirEstornados }));
+}));
+
+// Lançamento Manual dos Movimentos: cria UM título já classificado por Movimento
+// (tarifa, juros, aplicação...), que decide a direção débito/crédito. Nasce EM
+// ABERTO (pendente) na conta escolhida - a baixa fica para Títulos/Movimentação.
+// O rateio (opcional) apropria o valor por Classe + Centro; se vier, tem que
+// fechar o valor (definirApropriacoes valida). O título fica com a classe da
+// única linha do rateio, ou sem classe quando há várias.
+router.post("/movimentacao/manual", ah(async (req, res) => {
+  const { contaId, movimento, data, valorCents, referencia, documento, rateio } = req.body || {};
+  const tipo = MOVIMENTOS[movimento];
+  if (!tipo) return res.status(400).json({ error: "Movimento inválido", code: "FIN_MOV_INVALIDO" });
+  if (!contaId || !getConta(contaId)) return res.status(400).json({ error: "Selecione uma conta", code: "FIN_CONTA_NOT_FOUND" });
+  if (!DATA_CIVIL.test(data || "")) return res.status(400).json({ error: "Data inválida", code: "FIN_DATE_INVALID" });
+  if (!Number.isInteger(valorCents) || valorCents <= 0) return res.status(400).json({ error: "Valor inválido", code: "FIN_VALUE_INVALID" });
+
+  const lista = Array.isArray(rateio) ? rateio : [];
+  const classeTitulo = lista.length === 1 ? (lista[0].categoryId || null) : null;
+  const criado = insertLancamento({
+    tipo, descricao: (referencia || "").trim(), doc: (documento || "").trim(),
+    valorCents, due: data, categoryId: classeTitulo, contaId, createdBy: req.user.id,
+  });
+  if (lista.length) {
+    try {
+      definirApropriacoes(criado.id, lista.map((r) => ({ centroCustoId: r.centroCustoId, categoryId: r.categoryId, valorCents: r.valorCents })));
+    } catch (e) {
+      // Rateio inválido: desfaz o título recém-criado para não deixar órfão.
+      deleteLancamento(criado.id);
+      if (e instanceof ApropriacaoError) return res.status(400).json({ error: e.message, code: e.code });
+      throw e;
+    }
+  }
+  res.status(201).json(getLancamento(criado.id));
 }));
 
 // ---------- Impostos (alíquotas) ----------
