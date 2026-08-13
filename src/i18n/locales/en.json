@@ -1188,6 +1188,7 @@
     "FIN_PARCELA_INVALIDO": "A generated title cannot be split.",
     "FIN_PARCELA_JA": "Title is already split.",
     "FIN_PARCELA_IMPOSTOS": "Clear taxes/discount/charges before splitting.",
+    "FIN_PARCELA_RATEIO": "Remove the split before installments.",
     "FIN_STATUS_INVALID": "Invalid status.",
     "FIN_STATUS_FINALIZADO": "Reverse the settlement before changing the status.",
     "FIN_STATUS_ANULADO": "A voided title cannot be settled.",

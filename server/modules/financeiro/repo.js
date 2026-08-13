@@ -607,7 +607,15 @@ export function estornadosDaConta(contaId) {
 export function mudarStatusLancamento(id, status) {
   const atual = getLancamento(id);
   if (!atual) return null;
-  getDb().prepare("UPDATE financeiro_lancamentos SET status = ? WHERE id = ?").run(status, id);
+  // Anular tira o título de tudo: se ele estava estornado, limpa o rastro para não
+  // continuar aparecendo no filtro "Estornados" da Movimentação como se fosse um
+  // estorno vivo. Nos demais estados o rastro é mantido (ainda é um título aberto
+  // que foi estornado).
+  if (status === "anulado") {
+    getDb().prepare("UPDATE financeiro_lancamentos SET status = ?, estornado_em = NULL WHERE id = ?").run(status, id);
+  } else {
+    getDb().prepare("UPDATE financeiro_lancamentos SET status = ? WHERE id = ?").run(status, id);
+  }
   return getLancamento(id);
 }
 

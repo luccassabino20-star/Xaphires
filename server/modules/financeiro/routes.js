@@ -579,6 +579,11 @@ router.post(
     if (l.parcela_total) return res.status(400).json({ error: "Título já está parcelado", code: "FIN_PARCELA_JA" });
     const temEncargo = (l.imposto_retido_cents || l.imposto_acrescido_cents || l.desconto_cents || l.retencao_cents || l.multa_cents || l.juros_cents);
     if (temEncargo) return res.status(400).json({ error: "Zere impostos/desconto/encargos antes de desdobrar", code: "FIN_PARCELA_IMPOSTOS" });
+    // Rateio soma o valor do título; desdobrar encolhe esse valor por SQL cru (fora
+    // do updateLancamento, que é quem limparia as apropriações), então o rateio
+    // deixaria de fechar. Barra aqui, como os encargos - o rateio por parcela fica
+    // para depois.
+    if (listApropriacoes(l.id).length) return res.status(400).json({ error: "Remova o rateio antes de desdobrar", code: "FIN_PARCELA_RATEIO" });
 
     const parcelas = Number(req.body?.parcelas);
     if (!Number.isInteger(parcelas) || parcelas < 2 || parcelas > 120)
