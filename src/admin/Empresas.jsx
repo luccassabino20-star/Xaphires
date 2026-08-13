@@ -110,7 +110,10 @@ function Detalhe({ id, onFechar, onMudou }) {
   // partir do estado atual e envia inteira - o servidor guarda a lista explícita.
   async function alternarModulo(mid) {
     if (!modulos) return;
-    const liberados = modulos.filter((m) => m.entitled).map((m) => m.id);
+    // Monta a partir do que está GRAVADO (stored), não do entitled resolvido:
+    // entitled é false para módulo ainda indisponível ("Em breve"), então usá-lo
+    // aqui apagaria a pré-autorização desses módulos a cada alternância.
+    const liberados = modulos.filter((m) => m.stored).map((m) => m.id);
     const alvo = liberados.includes(mid) ? liberados.filter((x) => x !== mid) : [...liberados, mid];
     setSalvandoModulo(mid);
     try {
@@ -405,7 +408,7 @@ function Detalhe({ id, onFechar, onMudou }) {
               <label key={m.id} className="adm-modulo">
                 <input
                   type="checkbox"
-                  checked={m.entitled}
+                  checked={m.stored}
                   disabled={salvandoModulo === m.id}
                   onChange={() => alternarModulo(m.id)}
                 />

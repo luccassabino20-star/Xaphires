@@ -120,11 +120,18 @@ export function isModuleEnabled(company, user, moduleId) {
 // Módulos que a plataforma pode gerir para uma empresa: todos, com core/available
 // e o direito atual resolvido. É o que o painel de administração desenha.
 export function moduleEntitlementsFor(company) {
+  const lista = parseEnabledModules(company);
   return DEFINICOES.map((m) => ({
     id: m.id,
     core: m.core,
     available: m.available,
     entitled: companyEntitled(company, m.id),
+    // O que está de fato GRAVADO para a empresa, independente de o módulo já
+    // existir (available). É o que o painel precisa para desenhar a marca e para
+    // remontar a lista ao alternar: usar `entitled` descartava a pré-autorização
+    // de um módulo "Em breve" - a marca voltava desmarcada e, pior, o próximo
+    // toque em qualquer outro módulo apagava a pré-autorização gravada.
+    stored: lista === null ? m.core === true : lista.includes(m.id),
   }));
 }
 

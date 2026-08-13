@@ -78,6 +78,10 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
   // marca, uma falha transitória no GET (catch silencioso abaixo) deixaria
   // rateioAtivo=false e o salvar apagaria o rateio salvo (finDefinirApropriacoes []).
   const [rateioCarregado, setRateioCarregado] = useState(false);
+  // O título TINHA rateio gravado quando abriu? É o que autoriza a limpeza no
+  // salvar - não dá para olhar `rateio.length`, porque "Remover rateio" esvazia o
+  // estado local e aí a limpeza no servidor nunca aconteceria.
+  const [tinhaRateio, setTinhaRateio] = useState(false);
 
   useEffect(() => {
     api.finListImpostosAplicados(l.id).then(setAplicados).catch(() => {});
@@ -86,10 +90,15 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
         const base = l.valor_cents || 0;
         setRateio(rows.map((r) => ({
           centroCustoId: r.centro_custo_id,
+          // A classe por linha vem do Lançamento Manual (rateio por Classe + Centro).
+          // Precisa viajar no estado e voltar no salvar, senão regravar o título
+          // zeraria category_id e o DRE deixaria de dividir por classe.
+          categoryId: r.category_id || "",
           valor: String(r.valor_cents / 100),
           pct: base ? String(Math.round((r.valor_cents / base) * 10000) / 100) : "",
         })));
         setRateioAtivo(true);
+        setTinhaRateio(true);
       }
       setRateioCarregado(true);
     }).catch(() => { /* falhou: rateioCarregado fica false, o salvar não mexe no rateio */ });
@@ -173,7 +182,7 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
     // imediato; o servidor revalida de qualquer forma.
     let itensRateio = null;
     if (rateioAtivo) {
-      const itens = rateio.map((r) => ({ centroCustoId: r.centroCustoId, valorCents: reaisParaCents(r.valor) || 0 }));
+      const itens = rateio.map((r) => ({ centroCustoId: r.centroCustoId, categoryId: r.categoryId || null, valorCents: reaisParaCents(r.valor) || 0 }));
       if (itens.some((it) => !it.centroCustoId)) return setErro(t("financeiro.rateio.escolhaCentro"));
       if (itens.some((it) => !it.valorCents || it.valorCents <= 0)) return setErro(t("financeiro.rateio.valorInvalido"));
       if (new Set(itens.map((it) => it.centroCustoId)).size !== itens.length) return setErro(t("financeiro.rateio.duplicado"));
@@ -191,12 +200,15 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
         categoryId: f.categoryId || null, centroCustoId: rateioAtivo ? null : (f.centroCustoId || null), contatoId: f.contatoId || null,
       });
       // Grava (ou limpa) o rateio depois do título - a validação de soma no
-      // servidor é contra o valor já salvo.
-      // Com rateio ligado, grava o que o usuário montou. Desligado, só LIMPA se a
-      // carga tinha dado certo (senão não sabemos se havia rateio - não apaga às
-      // cegas).
-      if (rateioAtivo) await api.finDefinirApropriacoes(l.id, itensRateio);
-      else if (rateioCarregado) await api.finDefinirApropriacoes(l.id, []);
+      // servidor é contra o valor já salvo. Título TRAVADO (finalizado/anulado) não
+      // aceita rateio: nem gravar nem limpar (o servidor recusa com
+      // FIN_APROP_TRAVADO, e salvar a observação de um título baixado é legítimo).
+      // Desligado, só LIMPA se havia rateio carregado - sem isso, um título que
+      // nunca teve rateio faria uma escrita inútil a cada salvar.
+      if (!travado) {
+        if (rateioAtivo) await api.finDefinirApropriacoes(l.id, itensRateio);
+        else if (rateioCarregado && tinhaRateio) await api.finDefinirApropriacoes(l.id, []);
+      }
       showToast(t("financeiro.toast.salvo"));
       onChanged();
     } catch (e) {

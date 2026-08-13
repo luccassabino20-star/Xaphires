@@ -487,13 +487,30 @@ router.patch(
     if (!atual) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
     const erro = validarLancamento(req.body, { parcial: true });
     if (erro) return res.status(400).json(erro);
+    // Título FECHADO (finalizado/anulado) não muda de dinheiro nem de data: alterar
+    // valor/tipo/vencimento de um período já encerrado moveria saldo, movimentação e
+    // DRE retroativamente. O cliente já desabilita esses campos; aqui é a barreira de
+    // verdade (chamada direta não passa). Descrição, documento, observação e a
+    // apropriação seguem editáveis, que é o que a tela permite num título baixado.
+    const FINANCEIROS = ["valorCents", "tipo", "due", "emissao", "descontoCents", "retencaoCents", "multaCents", "jurosCents"];
+    const MAPA = {
+      valorCents: "valor_cents", tipo: "tipo", due: "due", emissao: "emissao",
+      descontoCents: "desconto_cents", retencaoCents: "retencao_cents", multaCents: "multa_cents", jurosCents: "juros_cents",
+    };
+    if (!STATUS_ABERTOS.includes(atual.status)) {
+      const mudou = FINANCEIROS.some((c) => req.body?.[c] !== undefined && req.body[c] !== atual[MAPA[c]]);
+      if (mudou) {
+        return res.status(400).json({ error: "Título baixado ou anulado não aceita mudança de valor ou data", code: "FIN_EDIT_TRAVADO" });
+      }
+    }
     // Título com imposto aplicado não pode ter o valor mudado por baixo dos
     // impostos: eles foram calculados em cima do valor antigo, e mudar aqui sem
     // recalcular deixaria o total mentindo. Remova os impostos aplicados, edite
-    // o valor, e reaplique.
+    // o valor, e reaplique. A checagem é pela EXISTÊNCIA de imposto aplicado, não
+    // pelos totais: um imposto de alíquota 0% deixa os dois totais em 0 e passaria.
     if (
       req.body?.valorCents !== undefined && req.body.valorCents !== atual.valor_cents &&
-      ((atual.imposto_retido_cents || 0) > 0 || (atual.imposto_acrescido_cents || 0) > 0)
+      listImpostosAplicados(atual.id).length > 0
     ) {
       return res.status(400).json({ error: "Remova os impostos aplicados antes de mudar o valor do título", code: "FIN_VALOR_COM_IMPOSTOS" });
     }

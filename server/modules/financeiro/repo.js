@@ -155,6 +155,22 @@ export function definirCentroAtivo(id, ativo) {
 // Exclui um centro (e sua subárvore) da empresa do contexto. Antes de sumir com
 // eles, ANULA a referência nos lançamentos que os usavam - o lançamento fica, só
 // perde a apropriação de centro (nunca apagamos lançamento por causa de cadastro).
+// Centro excluído também sai do RATEIO. Como um rateio parcial não fecharia mais o
+// valor do título (e o deixaria insalvável, com FIN_CC_NOT_FOUND na revalidação),
+// apagamos o rateio INTEIRO dos títulos afetados: o título fica sem apropriação,
+// no mesmo espírito de anular o centro único (nunca apagamos o lançamento).
+function limparRateiosComCentros(centroIds) {
+  const db = getDb();
+  const marcas = centroIds.map(() => "?").join(",");
+  const titulos = db
+    .prepare(`SELECT DISTINCT lancamento_id FROM financeiro_apropriacoes WHERE centro_custo_id IN (${marcas})`)
+    .all(...centroIds)
+    .map((r) => r.lancamento_id);
+  if (!titulos.length) return;
+  const m2 = titulos.map(() => "?").join(",");
+  db.prepare(`DELETE FROM financeiro_apropriacoes WHERE lancamento_id IN (${m2})`).run(...titulos);
+}
+
 export function excluirCentroCusto(id) {
   const companyId = getCurrentCompanyId();
   garantirMigracaoCentros(companyId); // migra o legado antes de excluir (ver excluirTodosCentrosCusto)
@@ -164,6 +180,7 @@ export function excluirCentroCusto(id) {
     const marcas = ids.map(() => "?").join(",");
     try {
       getDb().prepare(`UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE centro_custo_id IN (${marcas})`).run(...ids);
+      limparRateiosComCentros(ids);
     } catch {
       // A empresa pode nunca ter aberto o Financeiro (sem tabela de lançamentos):
       // não há referência a anular, segue.
@@ -184,6 +201,8 @@ export function excluirTodosCentrosCusto() {
   const ids = centrosGlobais.excluirTodosCentros(companyId);
   try {
     getDb().prepare("UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE centro_custo_id IS NOT NULL").run();
+    // Sem nenhum centro sobrando, nenhum rateio pode continuar de pé.
+    getDb().prepare("DELETE FROM financeiro_apropriacoes").run();
   } catch {
     // Empresa sem Financeiro aberto: sem tabela de lançamentos, nada a anular.
   }
@@ -479,6 +498,11 @@ export function desdobrarLancamento(id, { parcelas, intervaloMeses = 1, primeira
       centroCustoId: parent.centro_custo_id,
       contatoId: parent.contato_id,
       doc: parent.doc,
+      // contraparte (cliente/fornecedor em texto livre, sem contato_id) e observação
+      // acompanham a parcela: sem isso as parcelas 2..N apareciam sem correntista na
+      // lista e perdiam a observação do título.
+      contraparte: parent.contraparte,
+      observacao: parent.observacao,
       tituloOrigemId: id,
       origem: "parcela",
       parcelaNum: i,
@@ -629,7 +653,17 @@ export function mudarStatusLancamento(id, status) {
       "UPDATE financeiro_lancamentos SET status = 'anulado' WHERE titulo_origem_id = ? AND origem = 'imposto_aplicado' AND status NOT IN ('finalizado', 'anulado')"
     ).run(id);
   } else {
-    getDb().prepare("UPDATE financeiro_lancamentos SET status = ? WHERE id = ?").run(status, id);
+    const db = getDb();
+    db.prepare("UPDATE financeiro_lancamentos SET status = ? WHERE id = ?").run(status, id);
+    // Simétrico do anular: REATIVAR um título anulado traz de volta os recolhimentos
+    // de imposto que foram anulados junto com ele - senão a obrigação de imposto
+    // sumia do fluxo/DRE enquanto o pai voltava a valer. Volta como 'pendente'
+    // (estado de aberto), e só para quem está anulado.
+    if (atual.status === "anulado") {
+      db.prepare(
+        "UPDATE financeiro_lancamentos SET status = 'pendente' WHERE titulo_origem_id = ? AND origem = 'imposto_aplicado' AND status = 'anulado'"
+      ).run(id);
+    }
   }
   return getLancamento(id);
 }

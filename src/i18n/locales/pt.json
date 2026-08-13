@@ -1532,6 +1532,7 @@
     "FIN_PARCELA_RATEIO": "Remova o rateio antes de desdobrar.",
     "FIN_IMPORT_ERRO": "Falha ao importar a planilha.",
     "FIN_DELETE_GERADO": "Remova o imposto no título de origem, não apague o recolhimento direto.",
+    "FIN_EDIT_TRAVADO": "Título baixado ou anulado não aceita mudança de valor ou data.",
     "FIN_STATUS_INVALID": "Situação inválida.",
     "FIN_STATUS_FINALIZADO": "Estorne a baixa antes de mudar a situação.",
     "FIN_STATUS_ANULADO": "Título anulado não pode ser baixado.",
