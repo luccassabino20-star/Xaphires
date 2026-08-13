@@ -661,8 +661,15 @@ router.patch(
 router.delete(
   "/lancamentos/:id",
   ah(async (req, res) => {
-    if (!getLancamento(req.params.id))
+    const l = getLancamento(req.params.id);
+    if (!l)
       return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    // Um recolhimento de imposto é gerado por outro título e referenciado na linha
+    // de imposto do pai (titulo_gerado_id). Apagá-lo direto deixaria essa referência
+    // pendurada e o imposto do pai inflado. O caminho certo é remover o imposto do
+    // título de origem (DELETE .../impostos/:aplicadoId), que apaga o recolhimento junto.
+    if (l.origem === "imposto_aplicado")
+      return res.status(400).json({ error: "Remova o imposto no título de origem, não apague o recolhimento direto", code: "FIN_DELETE_GERADO" });
     deleteLancamento(req.params.id);
     res.json({ ok: true });
   })

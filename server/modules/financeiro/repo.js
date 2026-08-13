@@ -618,7 +618,16 @@ export function mudarStatusLancamento(id, status) {
   // estorno vivo. Nos demais estados o rastro é mantido (ainda é um título aberto
   // que foi estornado).
   if (status === "anulado") {
-    getDb().prepare("UPDATE financeiro_lancamentos SET status = ?, estornado_em = NULL WHERE id = ?").run(status, id);
+    const db = getDb();
+    db.prepare("UPDATE financeiro_lancamentos SET status = 'anulado', estornado_em = NULL WHERE id = ?").run(id);
+    // Anular o título anula junto os recolhimentos de imposto que ELE gerou e que
+    // ainda estão EM ABERTO - eram obrigações derivadas dele; sem isto ficavam como
+    // imposto a pagar fantasma no fluxo/DRE. Recolhimento já PAGO (finalizado) não se
+    // desfaz por aqui. Parcelas (origem='parcela') NÃO são tocadas: são prestações
+    // independentes, anular uma não anula as outras.
+    db.prepare(
+      "UPDATE financeiro_lancamentos SET status = 'anulado' WHERE titulo_origem_id = ? AND origem = 'imposto_aplicado' AND status NOT IN ('finalizado', 'anulado')"
+    ).run(id);
   } else {
     getDb().prepare("UPDATE financeiro_lancamentos SET status = ? WHERE id = ?").run(status, id);
   }

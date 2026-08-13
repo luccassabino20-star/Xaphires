@@ -1190,6 +1190,7 @@
     "FIN_PARCELA_IMPOSTOS": "Clear taxes/discount/charges before splitting.",
     "FIN_PARCELA_RATEIO": "Remove the split before installments.",
     "FIN_IMPORT_ERRO": "Failed to import the spreadsheet.",
+    "FIN_DELETE_GERADO": "Remove the tax on the source title; don't delete the generated tax entry directly.",
     "FIN_STATUS_INVALID": "Invalid status.",
     "FIN_STATUS_FINALIZADO": "Reverse the settlement before changing the status.",
     "FIN_STATUS_ANULADO": "A voided title cannot be settled.",

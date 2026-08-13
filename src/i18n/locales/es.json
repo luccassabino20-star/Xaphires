@@ -1190,6 +1190,7 @@
     "FIN_PARCELA_IMPOSTOS": "Pon en cero impuestos/descuento/cargos antes de desdoblar.",
     "FIN_PARCELA_RATEIO": "Quita el prorrateo antes de desdoblar.",
     "FIN_IMPORT_ERRO": "Error al importar la planilla.",
+    "FIN_DELETE_GERADO": "Quite el impuesto en el título de origen; no borre el recolhimiento directamente.",
     "FIN_STATUS_INVALID": "Situación inválida.",
     "FIN_STATUS_FINALIZADO": "Revierte el saldo antes de cambiar la situación.",
     "FIN_STATUS_ANULADO": "Un título anulado no puede saldarse.",
