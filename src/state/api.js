@@ -193,6 +193,9 @@ export const attachmentDownloadUrl = (cardId, attachmentId) => `${BASE}/cards/${
 
 // ---------- Geocoding ----------
 export const geocodeAddress = (q) => request(`/geocode?q=${encodeURIComponent(q)}`);
+// Endereço por CEP (ViaCEP, via proxy do servidor). Devolve { cep, logradouro,
+// complemento, bairro, cidade, uf }.
+export const buscarCep = (cep) => request(`/cep/${encodeURIComponent(String(cep).replace(/\D/g, ""))}`);
 
 // ---------- Chat ----------
 export const listChatConversations = () => request("/chat/conversations");
@@ -220,6 +223,7 @@ export const getModules = () => request("/modules");
 // empresa não guarda idioma, mesmo caso do quadro inicial).
 export const finListCategorias = (locale) => request(`/financeiro/categorias?locale=${encodeURIComponent(locale || "pt")}`);
 export const finCreateCategoria = (data) => request("/financeiro/categorias", { method: "POST", body: data });
+export const finUpdateCategoria = (id, data) => request(`/financeiro/categorias/${id}`, { method: "PATCH", body: data });
 export const finListLancamentos = (filtros = {}) => {
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(filtros)) if (v) qs.set(k, v);
@@ -231,6 +235,11 @@ export const finUpdateLancamento = (id, data) => request(`/financeiro/lancamento
 export const finBaixarLancamento = (id, { paidAt, contaId } = {}) =>
   request(`/financeiro/lancamentos/${id}/baixar`, { method: "POST", body: { ...(paidAt ? { paidAt } : {}), ...(contaId ? { contaId } : {}) } });
 export const finEstornarLancamento = (id) => request(`/financeiro/lancamentos/${id}/estornar`, { method: "POST" });
+export const finMudarStatus = (id, status) => request(`/financeiro/lancamentos/${id}/status`, { method: "PATCH", body: { status } });
+export const finDesdobrarLancamento = (id, dados) => request(`/financeiro/lancamentos/${id}/desdobrar`, { method: "POST", body: dados });
+export const finListImpostosAplicados = (id) => request(`/financeiro/lancamentos/${id}/impostos`);
+export const finAplicarImposto = (id, impostoId) => request(`/financeiro/lancamentos/${id}/impostos`, { method: "POST", body: { impostoId } });
+export const finRemoverImpostoAplicado = (id, aplicadoId) => request(`/financeiro/lancamentos/${id}/impostos/${aplicadoId}`, { method: "DELETE" });
 export const finDeleteLancamento = (id) => request(`/financeiro/lancamentos/${id}`, { method: "DELETE" });
 export const finGetFluxo = (ano) => request(`/financeiro/fluxo?ano=${ano}`);
 export const finGetDRE = (de, ate) => request(`/financeiro/dre?de=${de}&ate=${ate}`);
@@ -238,13 +247,119 @@ export const finGetDRE = (de, ate) => request(`/financeiro/dre?de=${de}&ate=${at
 export const finListContas = () => request("/financeiro/contas");
 export const finCreateConta = (data) => request("/financeiro/contas", { method: "POST", body: data });
 export const finUpdateConta = (id, data) => request(`/financeiro/contas/${id}`, { method: "PATCH", body: data });
+// Centro de custo hierárquico: cada empresa gerencia os SEUS (o painel da
+// plataforma mantém a visão cross-empresa). Criar recebe { codigo, nome }; o
+// código define a hierarquia (o pai é derivado dele). Editar muda só a descrição;
+// mandar { ativo } ativa/desativa (cascata no servidor).
 export const finListCentrosCusto = () => request("/financeiro/centros-custo");
 export const finCreateCentroCusto = (data) => request("/financeiro/centros-custo", { method: "POST", body: data });
 export const finUpdateCentroCusto = (id, data) => request(`/financeiro/centros-custo/${id}`, { method: "PATCH", body: data });
+export const finDeleteCentroCusto = (id) => request(`/financeiro/centros-custo/${id}`, { method: "DELETE" });
+export const finExcluirTodosCentros = () => request("/financeiro/centros-custo", { method: "DELETE" });
+// Import em lote por planilha (FormData, fora do request() pelo boundary do
+// multipart). Devolve { criados, ignorados, erros, resultados }.
+export async function finImportarCentros(file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/centros-custo/importar`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try { data = await res.json(); } catch { /* sem corpo */ }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+export async function finBaixarModeloCentros() {
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/centros-custo/modelo`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) throw new Error(`Erro ${res.status}`);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "modelo-centros-custo.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 export const finListContatos = () => request("/financeiro/contatos");
 export const finCreateContato = (data) => request("/financeiro/contatos", { method: "POST", body: data });
 export const finUpdateContato = (id, data) => request(`/financeiro/contatos/${id}`, { method: "PATCH", body: data });
 export const finGetSaldos = () => request("/financeiro/saldos");
+export const finListImpostos = () => request("/financeiro/impostos");
+export const finCreateImposto = (data) => request("/financeiro/impostos", { method: "POST", body: data });
+export const finUpdateImposto = (id, data) => request(`/financeiro/impostos/${id}`, { method: "PATCH", body: data });
+export const finListCodigosServico = () => request("/financeiro/codigos-servico");
+export const finCreateCodigoServico = (data) => request("/financeiro/codigos-servico", { method: "POST", body: data });
+export const finUpdateCodigoServico = (id, data) => request(`/financeiro/codigos-servico/${id}`, { method: "PATCH", body: data });
+
+// ---------- Extrato bancário (PDF -> preview -> importar/Excel) ----------
+// Preview: sobe o PDF (FormData, como o anexo de cartão - fora do request() para o
+// boundary do multipart sair certo) e recebe as transações já parseadas, sem
+// importar nada ainda.
+export async function finExtratoPreview(file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/extrato/preview`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try { data = await res.json(); } catch { /* sem corpo */ }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+export const finImportarExtrato = (contaId, transacoes) =>
+  request("/financeiro/extrato/importar", { method: "POST", body: { contaId, transacoes } });
+export async function finExtratoExcel(transacoes) {
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/extrato/excel`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ transacoes }),
+    });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    let data = null;
+    try { data = await res.json(); } catch { /* sem corpo */ }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    throw err;
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "extrato.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 // ---------- Plano ----------
 // Cache curto do resumo do plano. CardModal, ArchiveModal e ListMenu consultam

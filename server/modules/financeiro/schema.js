@@ -89,12 +89,61 @@ export function applyFinanceiroSchema(companyDb) {
       ativo INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL
     );
+
+    -- ---------- Fiscal & tributário ----------
+
+    -- Tipos de imposto e a alíquota de cada um (ex.: ISS 5%, IRRF 1,5%). Alíquota
+    -- em CENTÉSIMOS DE PONTO PERCENTUAL - mesmo raciocínio dos centavos de
+    -- dinheiro: 150 = 1,50%, inteiro, sem erro de binário. tipo diz se essa
+    -- alíquota, ao ser aplicada, é retida (some do que se paga) ou acrescida
+    -- (soma no que se paga) - o mesmo par que já existe no título
+    -- (imposto_retido_cents/imposto_acrescido_cents).
+    CREATE TABLE IF NOT EXISTS financeiro_impostos (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      codigo TEXT NOT NULL DEFAULT '',
+      aliquota_centesimos INTEGER NOT NULL DEFAULT 0,
+      tipo TEXT NOT NULL DEFAULT 'retido',
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+
+    -- Código de serviço para SPED/NFSe: código + descrição. Sem uso funcional
+    -- ainda (a emissão fiscal é do bloco Faturamento) - é o cadastro de apoio
+    -- para quando a nota entrar.
+    CREATE TABLE IF NOT EXISTS financeiro_codigos_servico (
+      id TEXT PRIMARY KEY,
+      codigo TEXT NOT NULL,
+      descricao TEXT NOT NULL,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+
+    -- Impostos aplicados a um título específico: um por imposto do cadastro
+    -- (financeiro_impostos), com o valor já calculado (título × alíquota) e, se
+    -- for retido num título a pagar, o id do título de recolhimento que ele
+    -- gerou. nome/tipo/alíquota são copiados no momento da aplicação (snapshot) -
+    -- editar o imposto no cadastro depois não reescreve o histórico de quem já
+    -- usou aquela alíquota.
+    CREATE TABLE IF NOT EXISTS financeiro_lancamento_impostos (
+      id TEXT PRIMARY KEY,
+      lancamento_id TEXT NOT NULL REFERENCES financeiro_lancamentos(id),
+      imposto_id TEXT REFERENCES financeiro_impostos(id),
+      imposto_nome TEXT NOT NULL,
+      tipo TEXT NOT NULL,
+      aliquota_centesimos INTEGER NOT NULL,
+      valor_cents INTEGER NOT NULL,
+      titulo_gerado_id TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_fin_lanc_impostos_titulo ON financeiro_lancamento_impostos(lancamento_id);
   `);
 
   // Colunas acrescentadas depois do MVP - mesmo padrão addColumnIfMissing de
   // db.js, aqui local porque o helper de lá não é exportado. Default cobre as
   // linhas existentes no próprio ALTER.
   addColumn(companyDb, "financeiro_categorias", "codigo", "codigo TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_categorias", "ativo", "ativo INTEGER NOT NULL DEFAULT 1");
   addColumn(companyDb, "financeiro_lancamentos", "centro_custo_id", "centro_custo_id TEXT");
   addColumn(companyDb, "financeiro_lancamentos", "contato_id", "contato_id TEXT");
   // Conta corrente da baixa: gravada quando o lançamento é pago, para os saldos
@@ -131,6 +180,36 @@ export function applyFinanceiroSchema(companyDb) {
   addColumn(companyDb, "financeiro_lancamentos", "titulo_origem_id", "titulo_origem_id TEXT");
   addColumn(companyDb, "financeiro_lancamentos", "origem", "origem TEXT");
   companyDb.exec("CREATE INDEX IF NOT EXISTS idx_fin_lanc_origem ON financeiro_lancamentos(titulo_origem_id)");
+  // Desdobramento em parcelas: parcela_num/parcela_total marcam "X de N". NULL em
+  // título não parcelado. A parcela 1 é o próprio título original (que tem o
+  // vínculo NULL); as parcelas 2..N são títulos com origem='parcela' apontando
+  // para ele. A soma das parcelas fecha com o valor original.
+  addColumn(companyDb, "financeiro_lancamentos", "parcela_num", "parcela_num INTEGER");
+  addColumn(companyDb, "financeiro_lancamentos", "parcela_total", "parcela_total INTEGER");
+  // Ciclo de situação do título: de 'pendente'/'pago' binário para cinco estados
+  // (provisionado -> pendente -> disponivel -> finalizado, e anulado como
+  // cancelamento). O antigo 'pago' vira 'finalizado' - único estado que conta
+  // como realizado no caixa/DRE. Idempotente: depois da primeira passada não
+  // sobra nenhum 'pago'. O default do insert segue 'pendente' (onde o título
+  // nasce, aguardando baixa).
+  companyDb.exec("UPDATE financeiro_lancamentos SET status = 'finalizado' WHERE status = 'pago'");
+  // Import de extrato bancário: hash estável da linha (conta+data+valor+tipo+doc+
+  // histórico) para não importar a mesma movimentação duas vezes ao reprocessar o
+  // mesmo PDF. NULL nos lançamentos que não vieram de extrato.
+  addColumn(companyDb, "financeiro_lancamentos", "extrato_hash", "extrato_hash TEXT");
+  companyDb.exec("CREATE INDEX IF NOT EXISTS idx_fin_extrato_hash ON financeiro_lancamentos(extrato_hash)");
+  // Endereço do contato (cliente/fornecedor), preenchido pelo CEP (ViaCEP) na
+  // tela. Tudo TEXT DEFAULT '' - endereço é opcional e os contatos antigos ficam
+  // com string vazia, sem virar NULL.
+  addColumn(companyDb, "financeiro_contatos", "cep", "cep TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_contatos", "logradouro", "logradouro TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_contatos", "numero", "numero TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_contatos", "complemento", "complemento TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_contatos", "bairro", "bairro TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_contatos", "cidade", "cidade TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_contatos", "uf", "uf TEXT NOT NULL DEFAULT ''");
+  addColumn(companyDb, "financeiro_contatos", "pais", "pais TEXT NOT NULL DEFAULT 'Brasil'");
+  addColumn(companyDb, "financeiro_contatos", "ponto_referencia", "ponto_referencia TEXT NOT NULL DEFAULT ''");
   // Número do TÍTULO: um sequencial legível por empresa (o "64194" do SIGIM), que
   // dá um identificador estável e pesquisável a cada lançamento em vez do uuid.
   // Atribuído no insert (repo.insertLancamento); o backfill abaixo numera os

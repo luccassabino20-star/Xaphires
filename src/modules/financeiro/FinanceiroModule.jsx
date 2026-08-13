@@ -3,15 +3,22 @@ import { useTranslation } from "react-i18next";
 import AccountMenu from "../../components/AccountMenu.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import LancamentosView from "./LancamentosView.jsx";
+import TitulosView from "./TitulosView.jsx";
+import MovimentacaoView from "./MovimentacaoView.jsx";
 import FluxoView from "./FluxoView.jsx";
 import DREView from "./DREView.jsx";
 import ContasView from "./ContasView.jsx";
+import ImportarExtratoView from "./ImportarExtratoView.jsx";
 import CadastrosView from "./CadastrosView.jsx";
 
 // Casca do módulo Financeiro: cabeçalho próprio (voltar ao launcher + conta) e as
 // abas. Diferente do Kanban, não há reducer otimista - cada view busca e re-busca
 // por conta própria, que é o padrão mais seguro para dado financeiro.
-const ABAS = ["lancamentos", "contas", "fluxo", "dre", "cadastros"];
+// Lançamentos (só o formulário de lançar), Títulos (a lista e a busca do que já
+// existe) e Movimentação (baixa/estorna) são abas separadas de propósito -
+// lançar, consultar e mover o dinheiro são passos diferentes, cada um com sua
+// tela.
+const ABAS = ["lancamentos", "titulos", "movimentacao", "contas", "importar", "fluxo", "dre", "cadastros"];
 
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
@@ -44,7 +51,10 @@ export default function FinanceiroModule({ onExit }) {
 
       <div className="fin-body">
         {aba === "lancamentos" && <LancamentosView />}
+        {aba === "titulos" && <TitulosView />}
+        {aba === "movimentacao" && <MovimentacaoView />}
         {aba === "contas" && <ContasView />}
+        {aba === "importar" && <ImportarExtratoView />}
         {aba === "fluxo" && <FluxoView />}
         {aba === "dre" && <DREView />}
         {aba === "cadastros" && <CadastrosView />}

@@ -3,10 +3,15 @@
 // Mesma lição do reports/dados.js: uma segunda definição de "o que conta" faz as
 // telas discordarem entre si sobre os mesmos lançamentos.
 //
-// Regime de CAIXA nesta fase: realizado é o que foi pago (status 'pago'), datado
-// pela baixa (paid_at). O regime de competência (pelo vencimento) fica anotado
-// como evolução - hoje fluxo e DRE contam a mesma história para não confundir.
+// Regime de CAIXA nesta fase: realizado é o que foi baixado (status
+// 'finalizado'), datado pela baixa (paid_at). O regime de competência (pelo
+// vencimento) fica anotado como evolução - hoje fluxo e DRE contam a mesma
+// história para não confundir.
 import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents } from "./repo.js";
+
+// Estados de "aberto" - o título ainda deve entrar/sair, então conta no previsto
+// do fluxo. 'finalizado' já é realizado; 'anulado' não conta em lugar nenhum.
+const ABERTOS = ["provisionado", "pendente", "disponivel"];
 
 // Mês civil (1..12) de uma data 'YYYY-MM-DD'. Sem new Date() de propósito: a
 // string já é a data civil, e parsear como Date reintroduziria fuso.
@@ -15,8 +20,8 @@ function mesDe(civil) {
 }
 
 // Fluxo de caixa mês a mês do ano. Para cada mês:
-//   - realizado: entradas/saídas PAGAS, agrupadas por paid_at
-//   - previsto:  entradas/saídas PENDENTES, agrupadas por due (vencimento)
+//   - realizado: entradas/saídas FINALIZADAS, agrupadas por paid_at
+//   - previsto:  entradas/saídas EM ABERTO, agrupadas por due (vencimento)
 // saldoAcumulado é o realizado somado mês a mês - a "linha do saldo".
 export function montarFluxo(ano) {
   const linhas = Array.from({ length: 12 }, (_, i) => ({
@@ -30,11 +35,11 @@ export function montarFluxo(ano) {
   for (const l of lancamentosDoAno(ano)) {
     const ehReceber = l.tipo === "receber";
     const liq = liquidoCents(l); // caixa move o líquido, não o valor bruto do título
-    if (l.status === "pago" && l.paid_at && l.paid_at.startsWith(String(ano))) {
+    if (l.status === "finalizado" && l.paid_at && l.paid_at.startsWith(String(ano))) {
       const idx = mesDe(l.paid_at) - 1;
       if (ehReceber) linhas[idx].entradasRealizadas += liq;
       else linhas[idx].saidasRealizadas += liq;
-    } else if (l.status === "pendente" && l.due && l.due.startsWith(String(ano))) {
+    } else if (ABERTOS.includes(l.status) && l.due && l.due.startsWith(String(ano))) {
       const idx = mesDe(l.due) - 1;
       if (ehReceber) linhas[idx].entradasPrevistas += liq;
       else linhas[idx].saidasPrevistas += liq;
@@ -80,7 +85,7 @@ export function montarSaldos() {
   return { contas, saldoTotal: contas.reduce((s, c) => s + c.saldo, 0) };
 }
 
-// DRE gerencial do período (regime de caixa): agrupa os lançamentos PAGOS por
+// DRE gerencial do período (regime de caixa): agrupa os lançamentos FINALIZADOS por
 // categoria. Receita é o que a categoria diz ser receita, e não o tipo do
 // lançamento - assim um estorno lançado como 'pagar' numa categoria de receita
 // cai no lugar certo. Sem categoria, entra num balde "Sem categoria" para não

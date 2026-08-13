@@ -4,17 +4,27 @@ import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
-import { formatCents, reaisParaCents } from "./dinheiro.js";
+import { formatCents, reaisParaCents, centsOuZero } from "./dinheiro.js";
 import { comCodigo } from "./rotulo.js";
-import LancamentoModal from "./LancamentoModal.jsx";
+import LancamentoModal, { FORMAS } from "./LancamentoModal.jsx";
+import SearchSelect from "./SearchSelect.jsx";
+
+const hoje = () => new Date().toISOString().slice(0, 10);
 
 function formVazio() {
   return {
-    tipo: "receber", descricao: "", valor: "", due: new Date().toISOString().slice(0, 10),
-    categoryId: "", centroCustoId: "", contatoId: "", contaId: "", doc: "",
+    tipo: "receber", descricao: "", doc: "", emissao: hoje(), due: hoje(), formaPagto: "",
+    categoryId: "", centroCustoId: "", contatoId: "",
+    valor: "", desconto: "", retencao: "", multa: "", juros: "", observacao: "",
   };
 }
 
+// Aba Lançamentos: o ato de lançar um título novo, com TODOS os campos que o
+// detalhe do título tem (identificação, apropriação, valores com juros/multa/
+// desconto/retenção e o líquido ao vivo). Impostos e parcelas não cabem aqui: os
+// dois geram títulos vinculados e precisam do título já salvo (id/número), então
+// são adicionados logo depois - por isso, ao criar, o título recém-nascido abre
+// no detalhe, onde se aplica imposto e se desdobra.
 export default function LancamentosView() {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
@@ -24,6 +34,7 @@ export default function LancamentosView() {
   const [centros, setCentros] = useState([]);
   const [contatos, setContatos] = useState([]);
   const [contas, setContas] = useState([]);
+  const [impostosCadastro, setImpostosCadastro] = useState([]);
   const [lancamentos, setLancamentos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -32,22 +43,13 @@ export default function LancamentosView() {
   const [formErro, setFormErro] = useState("");
   const [detalheId, setDetalheId] = useState(null);
 
-  // Busca e filtros
-  const [busca, setBusca] = useState("");
-  const [fTipo, setFTipo] = useState("");
-  const [fStatus, setFStatus] = useState("");
-  const [fCentro, setFCentro] = useState("");
-  const [fConta, setFConta] = useState("");
-  const [fDe, setFDe] = useState("");
-  const [fAte, setFAte] = useState("");
-
   async function carregar() {
-    setCarregando(true);
     try {
-      const [cats, ccs, cts, cos, lancs] = await Promise.all([
-        api.finListCategorias(lang), api.finListCentrosCusto(), api.finListContatos(), api.finListContas(), api.finListLancamentos(),
+      const [cats, ccs, cts, cos, imps, lancs] = await Promise.all([
+        api.finListCategorias(lang), api.finListCentrosCusto(), api.finListContatos(),
+        api.finListContas(), api.finListImpostos(), api.finListLancamentos(),
       ]);
-      setCategorias(cats); setCentros(ccs); setContatos(cts); setContas(cos); setLancamentos(lancs);
+      setCategorias(cats); setCentros(ccs); setContatos(cts); setContas(cos); setImpostosCadastro(imps); setLancamentos(lancs);
       setErro("");
     } catch (err) {
       setErro(translateError(err, t));
@@ -57,46 +59,13 @@ export default function LancamentosView() {
   }
   useEffect(() => { carregar(); /* eslint-disable-next-line */ }, []);
 
-  const catById = useMemo(() => Object.fromEntries(categorias.map((c) => [c.id, c])), [categorias]);
-  const centroById = useMemo(() => Object.fromEntries(centros.map((c) => [c.id, c])), [centros]);
-  const contatoById = useMemo(() => Object.fromEntries(contatos.map((c) => [c.id, c])), [contatos]);
-  const contaById = useMemo(() => Object.fromEntries(contas.map((c) => [c.id, c])), [contas]);
-
-  function nomeContraparte(l) {
-    return contatoById[l.contato_id]?.nome || l.contraparte || "";
-  }
-
-  // Filtro + busca, tudo em memória (volume baixo). A busca varre número, doc,
-  // descrição e correntista de uma vez - é o "melhor" pedido: um campo só acha
-  // qualquer coisa do título.
-  const visiveis = useMemo(() => {
-    const q = busca.trim().toLowerCase();
-    return lancamentos.filter((l) => {
-      if (fTipo && l.tipo !== fTipo) return false;
-      if (fStatus && l.status !== fStatus) return false;
-      if (fCentro && l.centro_custo_id !== fCentro) return false;
-      if (fConta && l.conta_id !== fConta) return false;
-      if (fDe && l.due < fDe) return false;
-      if (fAte && l.due > fAte) return false;
-      if (q) {
-        const alvo = `${l.numero} ${l.doc} ${l.descricao} ${nomeContraparte(l)}`.toLowerCase();
-        if (!alvo.includes(q)) return false;
-      }
-      return true;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lancamentos, busca, fTipo, fStatus, fCentro, fConta, fDe, fAte, contatoById]);
-
-  const totais = useMemo(() => {
-    let receber = 0, pagar = 0;
-    for (const l of visiveis) (l.tipo === "receber" ? (receber += l.valor_cents) : (pagar += l.valor_cents));
-    return { receber, pagar, count: visiveis.length };
-  }, [visiveis]);
-
-  function limparFiltros() {
-    setBusca(""); setFTipo(""); setFStatus(""); setFCentro(""); setFConta(""); setFDe(""); setFAte("");
-  }
-  const temFiltro = busca || fTipo || fStatus || fCentro || fConta || fDe || fAte;
+  // Líquido ao vivo, igual ao do detalhe (só que sem impostos, que ainda não
+  // existem num título que não nasceu): valor - desconto - retenção + multa + juros.
+  const liquido = useMemo(() => {
+    const bruto = reaisParaCents(form.valor) || 0;
+    const liq = bruto - centsOuZero(form.desconto) - centsOuZero(form.retencao) + centsOuZero(form.multa) + centsOuZero(form.juros);
+    return Math.max(0, liq);
+  }, [form.valor, form.desconto, form.retencao, form.multa, form.juros]);
 
   async function submitNovo(e) {
     e.preventDefault();
@@ -106,16 +75,19 @@ export default function LancamentosView() {
     if (!form.due) return setFormErro(t("financeiro.form.dataObrigatoria"));
     setEnviando(true);
     try {
-      await api.finCreateLancamento({
-        tipo: form.tipo, descricao: form.descricao.trim(), valorCents, due: form.due,
-        // Emissão do documento nasce como hoje; editável depois no detalhe do título.
-        emissao: new Date().toISOString().slice(0, 10),
+      const criado = await api.finCreateLancamento({
+        tipo: form.tipo, descricao: form.descricao.trim(), doc: form.doc.trim(), valorCents, due: form.due,
+        emissao: form.emissao || null, formaPagto: form.formaPagto, observacao: form.observacao,
+        descontoCents: centsOuZero(form.desconto), retencaoCents: centsOuZero(form.retencao),
+        multaCents: centsOuZero(form.multa), jurosCents: centsOuZero(form.juros),
         categoryId: form.categoryId || undefined, centroCustoId: form.centroCustoId || undefined,
-        contatoId: form.contatoId || undefined, contaId: form.contaId || undefined, doc: form.doc.trim(),
+        contatoId: form.contatoId || undefined,
       });
       setForm(formVazio());
       showToast(t("financeiro.toast.criado"));
+      // Recarrega e abre o título criado, para aplicar imposto/desdobrar já.
       await carregar();
+      setDetalheId(criado.id);
     } catch (err) {
       setFormErro(translateError(err, t));
     } finally {
@@ -123,119 +95,142 @@ export default function LancamentosView() {
     }
   }
 
+  // Opções {id,label} dos selects pesquisáveis. Classe/centro levam o código
+  // junto (comCodigo); contato é só o nome.
+  const contatoOpts = useMemo(() => contatos.map((c) => ({ id: c.id, label: c.nome })), [contatos]);
+  const categoriaOpts = useMemo(() => categorias.map((c) => ({ id: c.id, label: comCodigo(c) })), [categorias]);
+  // Só analítico ativo recebe lançamento (sintético é nó de agrupamento na árvore).
+  const centroOpts = useMemo(
+    () => centros.filter((c) => c.tipo !== "sintetico" && c.ativo === 1).map((c) => ({ id: c.id, label: comCodigo(c) })),
+    [centros]
+  );
+
   const detalhe = detalheId ? lancamentos.find((l) => l.id === detalheId) : null;
 
   if (carregando) return <div className="fin-loading">{t("common.loading")}</div>;
   if (erro) return <div className="fin-error">{erro}</div>;
 
   return (
-    <div className="fin-lancamentos">
-      <form className="fin-form" onSubmit={submitNovo}>
-        <select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
-          <option value="receber">{t("financeiro.tipo.receber")}</option>
-          <option value="pagar">{t("financeiro.tipo.pagar")}</option>
-        </select>
-        <input type="text" placeholder={t("financeiro.form.descricao")} value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
-        <input type="text" placeholder={t("financeiro.col.doc")} value={form.doc} onChange={(e) => setForm({ ...form, doc: e.target.value })} />
-        <input type="number" step="0.01" min="0" placeholder={t("financeiro.form.valor")} value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
-        <input type="date" value={form.due} onChange={(e) => setForm({ ...form, due: e.target.value })} />
-        <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}>
-          <option value="">{t("financeiro.form.semClasse")}</option>
-          {categorias.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
-        </select>
-        <select value={form.centroCustoId} onChange={(e) => setForm({ ...form, centroCustoId: e.target.value })}>
-          <option value="">{t("financeiro.form.semCentro")}</option>
-          {centros.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
-        </select>
-        <select value={form.contatoId} onChange={(e) => setForm({ ...form, contatoId: e.target.value })}>
-          <option value="">{t("financeiro.form.semContato")}</option>
-          {contatos.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-        </select>
-        <button type="submit" className="btn-primary btn-small" disabled={enviando}>{t("financeiro.form.adicionar")}</button>
-      </form>
-      {formErro && <div className="fin-error">{formErro}</div>}
-
-      <div className="fin-toolbar">
-        <div className="fin-search">
-          <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14" /></svg>
-          <input type="text" placeholder={t("financeiro.busca")} value={busca} onChange={(e) => setBusca(e.target.value)} />
+    <div className="fin-novo-titulo">
+      <form onSubmit={submitNovo}>
+        <div className="fin-novo-head">
+          <h3>{t("financeiro.form.novoTitulo")}</h3>
+          <select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
+            <option value="receber">{t("financeiro.tipo.receber")}</option>
+            <option value="pagar">{t("financeiro.tipo.pagar")}</option>
+          </select>
         </div>
-        <select value={fTipo} onChange={(e) => setFTipo(e.target.value)}>
-          <option value="">{t("financeiro.filtro.todosTipos")}</option>
-          <option value="receber">{t("financeiro.tipo.receber")}</option>
-          <option value="pagar">{t("financeiro.tipo.pagar")}</option>
-        </select>
-        <select value={fStatus} onChange={(e) => setFStatus(e.target.value)}>
-          <option value="">{t("financeiro.filtro.todosStatus")}</option>
-          <option value="pendente">{t("financeiro.status.pendente")}</option>
-          <option value="pago">{t("financeiro.status.pago")}</option>
-        </select>
-        <select value={fCentro} onChange={(e) => setFCentro(e.target.value)}>
-          <option value="">{t("financeiro.filtro.todosCentros")}</option>
-          {centros.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
-        </select>
-        <select value={fConta} onChange={(e) => setFConta(e.target.value)}>
-          <option value="">{t("financeiro.filtro.todasContas")}</option>
-          {contas.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-        </select>
-        <label className="fin-filtro-data">{t("financeiro.periodo.de")}<input type="date" value={fDe} onChange={(e) => setFDe(e.target.value)} /></label>
-        <label className="fin-filtro-data">{t("financeiro.periodo.ate")}<input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} /></label>
-        {temFiltro && <button className="btn-ghost btn-small" onClick={limparFiltros}>{t("financeiro.filtro.limpar")}</button>}
-      </div>
 
-      <div className="fin-table-wrap">
-        <table className="fin-table">
-          <thead>
-            <tr>
-              <th>{t("financeiro.col.titulo")}</th>
-              <th>{t("financeiro.col.doc")}</th>
-              <th>{t("financeiro.col.descricao")}</th>
-              <th>{t("financeiro.col.contraparte")}</th>
-              <th>{t("financeiro.col.categoria")}</th>
-              <th>{t("financeiro.col.centro")}</th>
-              <th>{t("financeiro.col.vencimento")}</th>
-              <th className="fin-num">{t("financeiro.col.valor")}</th>
-              <th>{t("financeiro.col.status")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visiveis.length === 0 ? (
-              <tr><td colSpan={9} className="fin-empty">{t("financeiro.vazio")}</td></tr>
-            ) : (
-              visiveis.map((l) => (
-                <tr key={l.id} className={l.status === "pago" ? "fin-row-pago" : ""}>
-                  <td>
-                    <button className="fin-titulo-link" onClick={() => setDetalheId(l.id)}>{l.numero}</button>
-                    {l.origem === "imposto_retido" && <span className="fin-tag-imposto" title={t("financeiro.tit.badgeImposto")}>{t("financeiro.tit.badgeImposto")}</span>}
-                  </td>
-                  <td>{l.doc || "-"}</td>
-                  <td>{l.descricao || "-"}</td>
-                  <td>{nomeContraparte(l) || "-"}</td>
-                  <td>{comCodigo(catById[l.category_id]) || "-"}</td>
-                  <td>{comCodigo(centroById[l.centro_custo_id]) || "-"}</td>
-                  <td>{l.due}</td>
-                  <td className={"fin-num " + (l.tipo === "receber" ? "fin-receber" : "fin-pagar")}>
-                    {l.tipo === "receber" ? "+" : "-"} {formatCents(l.valor_cents, lang)}
-                  </td>
-                  <td><span className={"fin-badge fin-badge-" + l.status}>{t("financeiro.status." + l.status)}</span></td>
-                </tr>
-              ))
-            )}
-          </tbody>
-          {visiveis.length > 0 && (
-            <tfoot>
-              <tr className="fin-total-row">
-                <td colSpan={7}>{t("financeiro.total.titulos", { n: totais.count })}</td>
-                <td className="fin-num">
-                  <span className="fin-receber">+{formatCents(totais.receber, lang)}</span>{" "}
-                  <span className="fin-pagar">-{formatCents(totais.pagar, lang)}</span>
-                </td>
-                <td></td>
-              </tr>
-            </tfoot>
-          )}
-        </table>
-      </div>
+        {/* Cliente/Fornecedor no topo, acima da identificação - é a primeira
+            coisa que se define ao lançar, como no cabeçalho do detalhe. */}
+        <label className="fin-field fin-novo-correntista">
+          <span>{t("financeiro.col.contraparte")}</span>
+          <SearchSelect
+            value={form.contatoId}
+            onChange={(id) => setForm({ ...form, contatoId: id })}
+            options={contatoOpts}
+            allLabel={t("financeiro.form.semContato")}
+          />
+        </label>
+
+        {/* Identificação / Documento */}
+        <fieldset className="fin-bloco">
+          <legend>{t("financeiro.tit.identificacao")}</legend>
+          <div className="fin-modal-grid">
+            <label className="fin-field fin-field-wide">
+              <span>{t("financeiro.col.descricao")}</span>
+              <input type="text" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.tit.docNumero")}</span>
+              <input type="text" value={form.doc} onChange={(e) => setForm({ ...form, doc: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.tit.emissao")}</span>
+              <input type="date" value={form.emissao} onChange={(e) => setForm({ ...form, emissao: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.col.vencimento")}</span>
+              <input type="date" value={form.due} onChange={(e) => setForm({ ...form, due: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.tit.formaPagto")}</span>
+              <select value={form.formaPagto} onChange={(e) => setForm({ ...form, formaPagto: e.target.value })}>
+                <option value="">{t("financeiro.tit.semForma")}</option>
+                {FORMAS.map((k) => <option key={k} value={k}>{t("financeiro.forma." + k)}</option>)}
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        {/* Apropriação: classe, centro de custo e contraparte */}
+        <fieldset className="fin-bloco">
+          <legend>{t("financeiro.tit.apropriacao")}</legend>
+          <div className="fin-modal-grid">
+            <label className="fin-field">
+              <span>{t("financeiro.cad.classes")}</span>
+              <SearchSelect
+                value={form.categoryId}
+                onChange={(id) => setForm({ ...form, categoryId: id })}
+                options={categoriaOpts}
+                allLabel={t("financeiro.form.semClasse")}
+              />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.cad.centros")}</span>
+              <SearchSelect
+                value={form.centroCustoId}
+                onChange={(id) => setForm({ ...form, centroCustoId: id })}
+                options={centroOpts}
+                allLabel={t("financeiro.form.semCentro")}
+              />
+            </label>
+          </div>
+        </fieldset>
+
+        {/* Valores */}
+        <fieldset className="fin-bloco">
+          <legend>{t("financeiro.tit.valores")}</legend>
+          <div className="fin-modal-grid">
+            <label className="fin-field">
+              <span>{t("financeiro.tit.valorTitulo")}</span>
+              <input type="number" step="0.01" min="0" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.tit.desconto")}</span>
+              <input type="number" step="0.01" min="0" value={form.desconto} placeholder="0,00" onChange={(e) => setForm({ ...form, desconto: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.tit.retencao")}</span>
+              <input type="number" step="0.01" min="0" value={form.retencao} placeholder="0,00" onChange={(e) => setForm({ ...form, retencao: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.tit.multa")}</span>
+              <input type="number" step="0.01" min="0" value={form.multa} placeholder="0,00" onChange={(e) => setForm({ ...form, multa: e.target.value })} />
+            </label>
+            <label className="fin-field">
+              <span>{t("financeiro.tit.juros")}</span>
+              <input type="number" step="0.01" min="0" value={form.juros} placeholder="0,00" onChange={(e) => setForm({ ...form, juros: e.target.value })} />
+            </label>
+            <div className="fin-field fin-tit-liquido">
+              <span>{t("financeiro.tit.valorLiquido")}</span>
+              <strong>{formatCents(liquido, lang)}</strong>
+            </div>
+          </div>
+        </fieldset>
+
+        <label className="fin-field">
+          <span>{t("financeiro.tit.observacao")}</span>
+          <textarea rows={2} value={form.observacao} onChange={(e) => setForm({ ...form, observacao: e.target.value })} />
+        </label>
+
+        {formErro && <div className="fin-error">{formErro}</div>}
+
+        <div className="fin-novo-acoes">
+          <button type="submit" className="btn-primary btn-small" disabled={enviando}>{t("financeiro.form.adicionar")}</button>
+          <span className="fin-cad-hint">{t("financeiro.form.impostoAposCriar")}</span>
+        </div>
+      </form>
 
       {detalhe && (
         <LancamentoModal
@@ -244,9 +239,11 @@ export default function LancamentosView() {
           centros={centros}
           contatos={contatos}
           contas={contas}
+          impostosCadastro={impostosCadastro}
           todos={lancamentos}
           onClose={() => setDetalheId(null)}
           onChanged={() => { setDetalheId(null); carregar(); }}
+          onRefreshList={carregar}
         />
       )}
     </div>

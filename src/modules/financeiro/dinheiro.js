@@ -30,3 +30,22 @@ export function centsOuZero(entrada) {
   const cents = reaisParaCents(entrada);
   return cents == null ? 0 : cents;
 }
+
+// Centésimos de ponto percentual (150 = 1,50%) -> texto "1,50%". Mesma escala de
+// reaisParaCents/centsOuZero (dividir por 100 dá o valor com 2 casas), só o
+// rótulo muda de moeda para percentual - por isso o formulário de imposto
+// reaproveita centsOuZero para converter o que a pessoa digita.
+export function formatPercent(centesimos, lang = "pt") {
+  const valor = (centesimos || 0) / 100;
+  return new Intl.NumberFormat(lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(valor) + "%";
+}
+
+// Espelha liquidoCents do servidor (repo.js), para telas que já têm a lista de
+// lançamentos em mãos mostrarem o líquido sem outra chamada de API.
+export function liquidoDoLancamento(l) {
+  if (!l) return 0;
+  const liq =
+    (l.valor_cents || 0) - (l.desconto_cents || 0) - (l.imposto_retido_cents || 0) - (l.retencao_cents || 0) +
+    (l.imposto_acrescido_cents || 0) + (l.multa_cents || 0) + (l.juros_cents || 0);
+  return Math.max(0, liq);
+}

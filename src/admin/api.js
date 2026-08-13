@@ -101,6 +101,14 @@ export const listarAdmins = () => req("/admins");
 export const criarAdmin = (dados) => req("/admins", { method: "POST", body: dados });
 export const definirAdminAtivo = (id, active) => req(`/admins/${id}/active`, { method: "POST", body: { active } });
 
+export const listarCentrosCusto = (companyId) =>
+  req(`/centros-custo${companyId ? `?companyId=${encodeURIComponent(companyId)}` : ""}`);
+export const criarCentroCusto = (dados) => req("/centros-custo", { method: "POST", body: dados });
+export const editarCentroCusto = (id, dados) => req(`/centros-custo/${id}`, { method: "PATCH", body: dados });
+export const definirCentroAtivo = (id, ativo) => req(`/centros-custo/${id}/ativo`, { method: "POST", body: { ativo } });
+export const excluirCentroCusto = (id) => req(`/centros-custo/${id}`, { method: "DELETE" });
+export const excluirTodosCentros = (companyId) => req(`/centros-custo?companyId=${encodeURIComponent(companyId)}`, { method: "DELETE" });
+
 export const listarPopups = () => req("/popups");
 export const criarPopup = (dados) => req("/popups", { method: "POST", body: dados });
 export const editarPopup = (id, dados) => req(`/popups/${id}`, { method: "PATCH", body: dados });

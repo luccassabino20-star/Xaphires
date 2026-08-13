@@ -1,8 +1,11 @@
 // Acesso ao banco do módulo Financeiro. Como o repo.js principal, tudo passa por
 // getDb() (resolvido pelo AsyncLocalStorage do companyId) - logo, só funciona
 // dentro de um runWithCompany, que o requireAuth já garante nas rotas.
+import crypto from "node:crypto";
 import { getDb } from "../../db.js";
 import { uid } from "../../repo.js";
+import { getCurrentCompanyId } from "../../context.js";
+import * as centrosGlobais from "../../admin/centrosCustoStore.js";
 
 // "Hoje" em data civil YYYY-MM-DD no horário LOCAL do servidor, não UTC - mesma
 // escolha da aritmética de recorrência (a data é a do relógio de quem age).
@@ -18,7 +21,7 @@ export function hojeCivil() {
 
 // ---------- Categorias ----------
 export function listCategorias() {
-  return getDb().prepare("SELECT * FROM financeiro_categorias ORDER BY tipo, nome").all();
+  return getDb().prepare("SELECT * FROM financeiro_categorias ORDER BY ativo DESC, tipo, nome").all();
 }
 export function countCategorias() {
   return getDb().prepare("SELECT COUNT(*) AS c FROM financeiro_categorias").get().c;
@@ -31,6 +34,14 @@ export function insertCategoria({ nome, tipo, codigo }) {
   getDb()
     .prepare("INSERT INTO financeiro_categorias (id, nome, tipo, codigo, created_at) VALUES (?, ?, ?, ?, ?)")
     .run(id, nome, tipo, codigo || "", new Date().toISOString());
+  return getCategoria(id);
+}
+export function updateCategoria(id, c) {
+  const a = getCategoria(id);
+  if (!a) return null;
+  getDb()
+    .prepare("UPDATE financeiro_categorias SET nome = ?, tipo = ?, codigo = ?, ativo = ? WHERE id = ?")
+    .run(c.nome ?? a.nome, c.tipo ?? a.tipo, c.codigo ?? a.codigo, c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo, id);
   return getCategoria(id);
 }
 
@@ -68,26 +79,142 @@ export function updateConta(id, c) {
 }
 
 // ---------- Centros de custo ----------
+// A FONTE ÚNICA agora é a tabela GLOBAL `centros_custo` (banco do diretório),
+// gerida no painel da plataforma - ver server/admin/centrosCustoStore.js. O
+// Financeiro só LÊ daqui os centros da própria empresa; criar/editar é no painel.
+// Formato mantido como as outras entidades do módulo (ativo 0/1), com tipo e nível
+// junto, para o cliente indentar e filtrar analíticos.
+
+// Migração preguiçosa: na primeira leitura de uma empresa que ainda não tem
+// centros no global, importa os antigos por-empresa preservando os ids (os
+// lançamentos continuam apontando certo). Roda aqui porque só o repo do módulo
+// tem o getDb() da empresa para ler a tabela legada.
+function garantirMigracaoCentros(companyId) {
+  if (!companyId) return;
+  let antigos = [];
+  try {
+    antigos = getDb().prepare("SELECT * FROM financeiro_centros_custo").all();
+  } catch {
+    // Tabela legada pode nem existir numa empresa nova - nada a migrar.
+    return;
+  }
+  if (!antigos.length) return;
+  // Importa para o global só se ainda não tem (preservando os ids). E ESVAZIA o
+  // legado logo em seguida: manter as linhas ali fazia um "Excluir tudo" (que zera
+  // o global) ser DESFEITO na leitura seguinte, porque esta migração re-importava
+  // tudo de volta. Os centros já vivem no global e os lançamentos apontam para lá,
+  // então limpar o legado é seguro - e é o que faz a exclusão finalmente "pegar".
+  if (!centrosGlobais.empresaTemCentros(companyId)) {
+    centrosGlobais.importarLegado(companyId, antigos);
+  }
+  getDb().prepare("DELETE FROM financeiro_centros_custo").run();
+}
+
+function centroTenant(c) {
+  if (!c) return null;
+  return { id: c.id, nome: c.nome, codigo: c.codigo, tipo: c.tipo, nivel: c.nivel, ativo: c.ativo ? 1 : 0 };
+}
+
 export function listCentrosCusto() {
-  return getDb().prepare("SELECT * FROM financeiro_centros_custo ORDER BY ativo DESC, nome").all();
+  const companyId = getCurrentCompanyId();
+  garantirMigracaoCentros(companyId);
+  return centrosGlobais.listarCentros(companyId).map(centroTenant);
 }
 export function getCentroCusto(id) {
-  return getDb().prepare("SELECT * FROM financeiro_centros_custo WHERE id = ?").get(id) || null;
+  const companyId = getCurrentCompanyId();
+  const row = centrosGlobais.acharCentro(id);
+  // Isolamento: um centro de OUTRA empresa não existe para esta.
+  if (!row || row.company_id !== companyId) return null;
+  return centroTenant(centrosGlobais.publicCentro(row));
 }
-export function insertCentroCusto({ nome, codigo }) {
-  const id = uid();
-  getDb()
-    .prepare("INSERT INTO financeiro_centros_custo (id, nome, codigo, ativo, created_at) VALUES (?, ?, ?, 1, ?)")
-    .run(id, nome, codigo || "", new Date().toISOString());
-  return getCentroCusto(id);
+
+// CRUD do próprio cliente, sempre ESCOPADO à empresa do contexto (companyId do
+// ALS): a empresa gerencia os SEUS centros: nunca os de outra. A visão
+// cross-empresa continua sendo exclusiva do painel da plataforma. As regras
+// (máscara, pai derivado, sintético/analítico, cascata) são as mesmas do store
+// global - aqui só amarramos a empresa e devolvemos o formato do módulo.
+export function criarCentroCusto({ codigo, nome }) {
+  const companyId = getCurrentCompanyId();
+  garantirMigracaoCentros(companyId); // pai pode ser um centro legado ainda não migrado
+  return centroTenant(centrosGlobais.criarCentro({ companyId, codigo, nome }));
 }
-export function updateCentroCusto(id, c) {
-  const a = getCentroCusto(id);
-  if (!a) return null;
-  getDb()
-    .prepare("UPDATE financeiro_centros_custo SET nome = ?, codigo = ?, ativo = ? WHERE id = ?")
-    .run(c.nome ?? a.nome, c.codigo ?? a.codigo, c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo, id);
-  return getCentroCusto(id);
+export function updateCentroCusto(id, { nome }) {
+  const companyId = getCurrentCompanyId();
+  const row = centrosGlobais.acharCentro(id);
+  if (!row || row.company_id !== companyId) return null;
+  return centroTenant(centrosGlobais.editarCentro(id, { nome }));
+}
+export function definirCentroAtivo(id, ativo) {
+  const companyId = getCurrentCompanyId();
+  const row = centrosGlobais.acharCentro(id);
+  if (!row || row.company_id !== companyId) return null;
+  return centroTenant(centrosGlobais.definirAtivo(id, ativo));
+}
+
+// Exclui um centro (e sua subárvore) da empresa do contexto. Antes de sumir com
+// eles, ANULA a referência nos lançamentos que os usavam - o lançamento fica, só
+// perde a apropriação de centro (nunca apagamos lançamento por causa de cadastro).
+export function excluirCentroCusto(id) {
+  const companyId = getCurrentCompanyId();
+  const ids = centrosGlobais.excluirCentro(companyId, id);
+  if (!ids) return null; // inexistente ou de outra empresa
+  if (ids.length) {
+    const marcas = ids.map(() => "?").join(",");
+    try {
+      getDb().prepare(`UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE centro_custo_id IN (${marcas})`).run(...ids);
+    } catch {
+      // A empresa pode nunca ter aberto o Financeiro (sem tabela de lançamentos):
+      // não há referência a anular, segue.
+    }
+  }
+  return { removidos: ids.length };
+}
+
+// Exclui TODOS os centros da empresa e anula o centro em todos os lançamentos dela
+// (todos apontam para centros que estão sumindo).
+export function excluirTodosCentrosCusto() {
+  const companyId = getCurrentCompanyId();
+  const ids = centrosGlobais.excluirTodosCentros(companyId);
+  try {
+    getDb().prepare("UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE centro_custo_id IS NOT NULL").run();
+  } catch {
+    // Empresa sem Financeiro aberto: sem tabela de lançamentos, nada a anular.
+  }
+  return { removidos: ids.length };
+}
+
+// Import em lote (planilha). Ordena por PROFUNDIDADE do código para o pai nascer
+// antes do filho, e é tolerante linha a linha: código duplicado conta como
+// "ignorado" (permite reimportar sem quebrar), outros erros de regra viram "erro"
+// com o motivo, sem abortar o resto. Devolve o resumo + o desfecho de cada linha.
+export function importarCentros(linhas) {
+  const companyId = getCurrentCompanyId();
+  garantirMigracaoCentros(companyId);
+  const ordenadas = [...linhas].sort(
+    (a, b) =>
+      String(a.codigo).split(".").length - String(b.codigo).split(".").length ||
+      String(a.codigo).localeCompare(String(b.codigo), undefined, { numeric: true })
+  );
+  let criados = 0, ignorados = 0, erros = 0;
+  const resultados = [];
+  for (const l of ordenadas) {
+    try {
+      centrosGlobais.criarCentro({ companyId, codigo: l.codigo, nome: l.nome });
+      criados++;
+      resultados.push({ row: l.row, codigo: l.codigo, status: "criado" });
+    } catch (e) {
+      if (e instanceof centrosGlobais.RegraError && e.code === "CC_CODIGO_DUPLICADO") {
+        ignorados++;
+        resultados.push({ row: l.row, codigo: l.codigo, status: "ignorado", code: e.code });
+      } else if (e instanceof centrosGlobais.RegraError) {
+        erros++;
+        resultados.push({ row: l.row, codigo: l.codigo, status: "erro", code: e.code, motivo: e.message });
+      } else {
+        throw e;
+      }
+    }
+  }
+  return { criados, ignorados, erros, resultados };
 }
 
 // ---------- Contatos (clientes/fornecedores) ----------
@@ -97,30 +224,100 @@ export function listContatos() {
 export function getContato(id) {
   return getDb().prepare("SELECT * FROM financeiro_contatos WHERE id = ?").get(id) || null;
 }
-export function insertContato({ nome, tipo, doc, email, telefone }) {
+export function insertContato({ nome, tipo, doc, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, pais, pontoReferencia }) {
   const id = uid();
   getDb()
     .prepare(
-      "INSERT INTO financeiro_contatos (id, nome, tipo, doc, email, telefone, ativo, created_at) VALUES (?, ?, ?, ?, ?, ?, 1, ?)"
+      `INSERT INTO financeiro_contatos
+         (id, nome, tipo, doc, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, pais, ponto_referencia, ativo, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
     )
-    .run(id, nome, tipo || "fornecedor", doc || "", email || "", telefone || "", new Date().toISOString());
+    .run(
+      id, nome, tipo || "fornecedor", doc || "", email || "", telefone || "",
+      cep || "", logradouro || "", numero || "", complemento || "", bairro || "", cidade || "", uf || "",
+      pais || "Brasil", pontoReferencia || "",
+      new Date().toISOString()
+    );
   return getContato(id);
 }
 export function updateContato(id, c) {
   const a = getContato(id);
   if (!a) return null;
   getDb()
-    .prepare("UPDATE financeiro_contatos SET nome = ?, tipo = ?, doc = ?, email = ?, telefone = ?, ativo = ? WHERE id = ?")
+    .prepare(
+      `UPDATE financeiro_contatos SET nome = ?, tipo = ?, doc = ?, email = ?, telefone = ?,
+         cep = ?, logradouro = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, uf = ?,
+         pais = ?, ponto_referencia = ?, ativo = ?
+       WHERE id = ?`
+    )
     .run(
       c.nome ?? a.nome,
       c.tipo ?? a.tipo,
       c.doc ?? a.doc,
       c.email ?? a.email,
       c.telefone ?? a.telefone,
+      c.cep ?? a.cep,
+      c.logradouro ?? a.logradouro,
+      c.numero ?? a.numero,
+      c.complemento ?? a.complemento,
+      c.bairro ?? a.bairro,
+      c.cidade ?? a.cidade,
+      c.uf ?? a.uf,
+      c.pais ?? a.pais,
+      c.pontoReferencia ?? a.ponto_referencia,
       c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo,
       id
     );
   return getContato(id);
+}
+
+// ---------- Impostos (alíquotas) ----------
+export function listImpostos() {
+  return getDb().prepare("SELECT * FROM financeiro_impostos ORDER BY ativo DESC, nome").all();
+}
+export function getImposto(id) {
+  return getDb().prepare("SELECT * FROM financeiro_impostos WHERE id = ?").get(id) || null;
+}
+export function insertImposto({ nome, codigo, aliquotaCentesimos, tipo }) {
+  const id = uid();
+  getDb()
+    .prepare("INSERT INTO financeiro_impostos (id, nome, codigo, aliquota_centesimos, tipo, ativo, created_at) VALUES (?, ?, ?, ?, ?, 1, ?)")
+    .run(id, nome, codigo || "", aliquotaCentesimos || 0, tipo, new Date().toISOString());
+  return getImposto(id);
+}
+export function updateImposto(id, c) {
+  const a = getImposto(id);
+  if (!a) return null;
+  getDb()
+    .prepare("UPDATE financeiro_impostos SET nome = ?, codigo = ?, aliquota_centesimos = ?, tipo = ?, ativo = ? WHERE id = ?")
+    .run(
+      c.nome ?? a.nome, c.codigo ?? a.codigo, c.aliquotaCentesimos ?? a.aliquota_centesimos, c.tipo ?? a.tipo,
+      c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo, id
+    );
+  return getImposto(id);
+}
+
+// ---------- Código de serviço (SPED) ----------
+export function listCodigosServico() {
+  return getDb().prepare("SELECT * FROM financeiro_codigos_servico ORDER BY ativo DESC, codigo").all();
+}
+export function getCodigoServico(id) {
+  return getDb().prepare("SELECT * FROM financeiro_codigos_servico WHERE id = ?").get(id) || null;
+}
+export function insertCodigoServico({ codigo, descricao }) {
+  const id = uid();
+  getDb()
+    .prepare("INSERT INTO financeiro_codigos_servico (id, codigo, descricao, ativo, created_at) VALUES (?, ?, ?, 1, ?)")
+    .run(id, codigo, descricao, new Date().toISOString());
+  return getCodigoServico(id);
+}
+export function updateCodigoServico(id, c) {
+  const a = getCodigoServico(id);
+  if (!a) return null;
+  getDb()
+    .prepare("UPDATE financeiro_codigos_servico SET codigo = ?, descricao = ?, ativo = ? WHERE id = ?")
+    .run(c.codigo ?? a.codigo, c.descricao ?? a.descricao, c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo, id);
+  return getCodigoServico(id);
 }
 
 // ---------- Lançamentos ----------
@@ -162,7 +359,7 @@ export function listLancamentos({ tipo, status, de, ate } = {}) {
     .all(...args);
 }
 
-export function insertLancamento({ tipo, descricao, valorCents, due, emissao, formaPagto, observacao, impostoRetidoCents, impostoAcrescidoCents, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte, tituloOrigemId, origem, createdBy }) {
+export function insertLancamento({ tipo, descricao, valorCents, due, emissao, formaPagto, observacao, impostoRetidoCents, impostoAcrescidoCents, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte, tituloOrigemId, origem, parcelaNum, parcelaTotal, createdBy }) {
   const id = uid();
   // Próximo número de título da empresa. node:sqlite é síncrono e single-thread
   // no processo, então o MAX+1 não corre risco de corrida entre requisições.
@@ -172,16 +369,70 @@ export function insertLancamento({ tipo, descricao, valorCents, due, emissao, fo
       `INSERT INTO financeiro_lancamentos
         (id, numero, tipo, descricao, valor_cents, due, emissao, forma_pagto, observacao,
          imposto_retido_cents, imposto_acrescido_cents, desconto_cents, retencao_cents, multa_cents, juros_cents,
-         status, paid_at, category_id, centro_custo_id, contato_id, conta_id, doc, contraparte, titulo_origem_id, origem, created_at, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente', NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         status, paid_at, category_id, centro_custo_id, contato_id, conta_id, doc, contraparte, titulo_origem_id, origem, parcela_num, parcela_total, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente', NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       id, numero, tipo, descricao || "", valorCents, due, emissao || null, formaPagto || "", observacao || "",
       impostoRetidoCents || 0, impostoAcrescidoCents || 0, descontoCents || 0, retencaoCents || 0, multaCents || 0, jurosCents || 0,
       categoryId || null, centroCustoId || null, contatoId || null, contaId || null, doc || "",
-      contraparte || "", tituloOrigemId || null, origem || null, new Date().toISOString(), createdBy || null
+      contraparte || "", tituloOrigemId || null, origem || null, parcelaNum || null, parcelaTotal || null, new Date().toISOString(), createdBy || null
     );
   return getLancamento(id);
+}
+
+// Adiciona n meses a uma data civil YYYY-MM-DD, preservando o dia (grampeando ao
+// último dia do mês quando o alvo é mais curto). Em horário local, coerente com o
+// resto do módulo - nunca UTC.
+export function addMesesCivil(civil, n) {
+  const [y, m, d] = civil.split("-").map(Number);
+  const alvo = new Date(y, m - 1 + n, 1);
+  const ultimoDia = new Date(alvo.getFullYear(), alvo.getMonth() + 1, 0).getDate();
+  const dia = Math.min(d, ultimoDia);
+  return `${alvo.getFullYear()}-${String(alvo.getMonth() + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+}
+
+// Desdobra um título pendente em `parcelas` parcelas. O próprio título vira a
+// parcela 1 (recebe o resto da divisão, para a soma fechar com o original); as
+// 2..N nascem como títulos vinculados (origem='parcela'), com vencimento espaçado
+// por `intervaloMeses`. A validação de elegibilidade fica na rota.
+export function desdobrarLancamento(id, { parcelas, intervaloMeses = 1, primeiraData, createdBy }) {
+  const parent = getLancamento(id);
+  if (!parent) return null;
+  const total = parent.valor_cents;
+  const base = Math.floor(total / parcelas);
+  const resto = total - base * parcelas;
+  const primeiroVenc = primeiraData || parent.due;
+
+  // Parcela 1 = o próprio título original.
+  getDb()
+    .prepare("UPDATE financeiro_lancamentos SET valor_cents = ?, due = ?, parcela_num = 1, parcela_total = ? WHERE id = ?")
+    .run(base + resto, primeiroVenc, parcelas, id);
+
+  // Parcelas 2..N.
+  for (let i = 2; i <= parcelas; i++) {
+    insertLancamento({
+      tipo: parent.tipo,
+      descricao: parent.descricao,
+      valorCents: base,
+      due: addMesesCivil(primeiroVenc, (i - 1) * intervaloMeses),
+      emissao: parent.emissao,
+      formaPagto: parent.forma_pagto,
+      categoryId: parent.category_id,
+      centroCustoId: parent.centro_custo_id,
+      contatoId: parent.contato_id,
+      doc: parent.doc,
+      tituloOrigemId: id,
+      origem: "parcela",
+      parcelaNum: i,
+      parcelaTotal: parcelas,
+      createdBy,
+    });
+  }
+  // Devolve todas as parcelas em ordem (a 1 é o próprio original).
+  return getDb()
+    .prepare("SELECT * FROM financeiro_lancamentos WHERE id = ? OR (titulo_origem_id = ? AND origem = 'parcela') ORDER BY parcela_num")
+    .all(id, id);
 }
 
 // Edição parcial: só sobrescreve o que veio. Não mexe em status/paid_at - baixar
@@ -198,8 +449,11 @@ export function updateLancamento(id, campos) {
     emissao: pick(campos.emissao, atual.emissao),
     forma_pagto: campos.formaPagto ?? atual.forma_pagto,
     observacao: campos.observacao ?? atual.observacao,
-    imposto_retido_cents: campos.impostoRetidoCents ?? atual.imposto_retido_cents,
-    imposto_acrescido_cents: campos.impostoAcrescidoCents ?? atual.imposto_acrescido_cents,
+    // Não vêm do body: são SEMPRE derivados dos impostos de fato aplicados
+    // (recalcularImpostosDoTitulo), nunca digitados - senão o total divergiria
+    // da lista de impostos que o título realmente tem.
+    imposto_retido_cents: atual.imposto_retido_cents,
+    imposto_acrescido_cents: atual.imposto_acrescido_cents,
     desconto_cents: campos.descontoCents ?? atual.desconto_cents,
     retencao_cents: campos.retencaoCents ?? atual.retencao_cents,
     multa_cents: campos.multaCents ?? atual.multa_cents,
@@ -234,9 +488,11 @@ export function updateLancamento(id, campos) {
 export function baixarLancamento(id, { paidAt, contaId } = {}) {
   const atual = getLancamento(id);
   if (!atual) return null;
-  if (atual.status === "pago") return atual;
+  // Já finalizado: idempotente, não reescreve. Anulado não se baixa - fica de
+  // fora, e a rota já barra antes com mensagem própria.
+  if (atual.status === "finalizado" || atual.status === "anulado") return atual;
   getDb()
-    .prepare("UPDATE financeiro_lancamentos SET status = 'pago', paid_at = ?, conta_id = COALESCE(?, conta_id) WHERE id = ?")
+    .prepare("UPDATE financeiro_lancamentos SET status = 'finalizado', paid_at = ?, conta_id = COALESCE(?, conta_id) WHERE id = ?")
     .run(paidAt || hojeCivil(), contaId || null, id);
   return getLancamento(id);
 }
@@ -245,24 +501,96 @@ export function baixarLancamento(id, { paidAt, contaId } = {}) {
 export function estornarLancamento(id) {
   const atual = getLancamento(id);
   if (!atual) return null;
-  if (atual.status !== "pago") return atual;
+  if (atual.status !== "finalizado") return atual;
   getDb().prepare("UPDATE financeiro_lancamentos SET status = 'pendente', paid_at = NULL WHERE id = ?").run(id);
   return getLancamento(id);
 }
 
-export function deleteLancamento(id) {
-  // Some com os títulos de imposto gerados a partir deste, para não deixar
-  // recolhimento órfão apontando para um título que não existe mais.
-  getDb().prepare("DELETE FROM financeiro_lancamentos WHERE titulo_origem_id = ?").run(id);
-  getDb().prepare("DELETE FROM financeiro_lancamentos WHERE id = ?").run(id);
+// Muda a situação do título entre os estados de "aberto" (provisionado, pendente,
+// disponivel) e o cancelamento (anulado). Finalizar NÃO passa por aqui - é a
+// baixa (baixarLancamento), que move o dinheiro contra uma conta; voltar de
+// finalizado é o estorno. A validação de quais transições valem fica na rota.
+export function mudarStatusLancamento(id, status) {
+  const atual = getLancamento(id);
+  if (!atual) return null;
+  getDb().prepare("UPDATE financeiro_lancamentos SET status = ? WHERE id = ?").run(status, id);
+  return getLancamento(id);
 }
 
-// ---------- Título de imposto vinculado ----------
-// O filho de imposto (recolhimento) gerado a partir de um título principal.
-export function getTituloImpostoDe(parentId) {
-  return getDb()
-    .prepare("SELECT * FROM financeiro_lancamentos WHERE titulo_origem_id = ? AND origem = 'imposto_retido'")
-    .get(parentId) || null;
+// Hash estável de uma linha de extrato, para dedup: mesma conta + mesma data +
+// mesmo valor/tipo + mesmo documento/histórico = mesma movimentação. Reprocessar
+// o mesmo PDF não duplica.
+function hashExtrato(contaId, tx) {
+  return crypto
+    .createHash("sha1")
+    .update([contaId, tx.dataMovimento, tx.valorCents, tx.tipo, tx.documento || "", tx.historico || ""].join("|"))
+    .digest("hex");
+}
+
+// Importa linhas de extrato bancário como lançamentos JÁ FINALIZADOS na conta
+// escolhida: crédito (C) vira 'receber', débito (D) vira 'pagar', datado pela
+// movimentação (due=emissao=paid_at=dataMovimento). Assim a importação alimenta
+// direto o caixa realizado e o saldo da conta (montarSaldos/lancamentosPagos).
+// Idempotente: linha já importada (mesmo hash) é ignorada, não duplicada.
+export function importarExtrato({ contaId, transacoes, createdBy }) {
+  const db = getDb();
+  const jaExiste = db.prepare("SELECT 1 FROM financeiro_lancamentos WHERE extrato_hash = ? LIMIT 1");
+  const insere = db.prepare(
+    `INSERT INTO financeiro_lancamentos
+       (id, numero, tipo, descricao, valor_cents, due, emissao, forma_pagto, observacao,
+        imposto_retido_cents, imposto_acrescido_cents, desconto_cents, retencao_cents, multa_cents, juros_cents,
+        status, paid_at, category_id, centro_custo_id, contato_id, conta_id, doc, contraparte,
+        titulo_origem_id, origem, parcela_num, parcela_total, created_at, created_by, extrato_hash)
+     VALUES (?, ?, ?, ?, ?, ?, ?, '', '',
+        0, 0, 0, 0, 0, 0,
+        'finalizado', ?, NULL, NULL, NULL, ?, ?, '',
+        NULL, 'extrato', NULL, NULL, ?, ?, ?)`
+  );
+  let importados = 0;
+  let ignorados = 0;
+  const criados = [];
+  for (const tx of transacoes) {
+    const hash = hashExtrato(contaId, tx);
+    if (jaExiste.get(hash)) { ignorados++; continue; }
+    const numero = db.prepare("SELECT COALESCE(MAX(numero), 0) + 1 AS n FROM financeiro_lancamentos").get().n;
+    const id = uid();
+    const tipo = tx.tipo === "C" ? "receber" : "pagar";
+    const agora = new Date().toISOString();
+    insere.run(
+      id, numero, tipo, tx.historico || "", tx.valorCents, tx.dataMovimento, tx.dataMovimento,
+      tx.dataMovimento, contaId, tx.documento || "", agora, createdBy || null, hash
+    );
+    criados.push(id);
+    importados++;
+  }
+  return { importados, ignorados, criados };
+}
+
+export function deleteLancamento(id) {
+  const db = getDb();
+  // Títulos gerados a partir deste (recolhimento de imposto, parcelas). Somem
+  // junto, para não deixar filho órfão apontando para um pai que não existe mais.
+  const gerados = db.prepare("SELECT id FROM financeiro_lancamentos WHERE titulo_origem_id = ?").all(id).map((r) => r.id);
+  const ids = [id, ...gerados];
+  const marcas = ids.map(() => "?").join(",");
+  // ANTES dos títulos: apagar os impostos aplicados que os referenciam. A FK
+  // financeiro_lancamento_impostos.lancamento_id é NOT NULL e as FKs estão ON, então
+  // deletar o título com imposto aplicado sem limpar isto dá "constraint failed".
+  db.prepare(`DELETE FROM financeiro_lancamento_impostos WHERE lancamento_id IN (${marcas})`).run(...ids);
+  db.prepare("DELETE FROM financeiro_lancamentos WHERE titulo_origem_id = ?").run(id);
+  db.prepare("DELETE FROM financeiro_lancamentos WHERE id = ?").run(id);
+}
+
+// ---------- Impostos aplicados ao título ----------
+// Cada linha é um imposto do cadastro (financeiro_impostos) aplicado a um
+// título, com o valor já calculado pela alíquota. Substitui o mecanismo antigo
+// de um único "imposto retido" digitado à mão: agora dá para aplicar vários
+// impostos diferentes, cada um com o título de recolhimento próprio.
+export function listImpostosAplicados(lancamentoId) {
+  return getDb().prepare("SELECT * FROM financeiro_lancamento_impostos WHERE lancamento_id = ? ORDER BY created_at").all(lancamentoId);
+}
+export function getImpostoAplicado(id) {
+  return getDb().prepare("SELECT * FROM financeiro_lancamento_impostos WHERE id = ?").get(id) || null;
 }
 export function listVinculados(parentId) {
   return getDb().prepare("SELECT * FROM financeiro_lancamentos WHERE titulo_origem_id = ?").all(parentId);
@@ -273,39 +601,69 @@ function classeImpostoId() {
   return c?.id || null;
 }
 
-// Garante que um título A PAGAR com imposto retido tenha um título de imposto
-// vinculado (recolhimento) de mesmo valor. Regras:
-//  - só gera para tipo 'pagar' com imposto_retido > 0 (no 'receber', o retido é
-//    crédito, não obrigação - não gera nada);
-//  - título já gerado (origem preenchida) nunca gera outro (sem recursão);
-//  - o filho pago não é mais mexido (não corrompe um recolhimento já quitado).
-// Devolve o título de imposto (novo, atualizado ou removido -> null).
-export function sincronizarTituloImposto(parentId, createdBy) {
-  const parent = getLancamento(parentId);
-  if (!parent || parent.origem) return null;
-  const gerar = parent.tipo === "pagar" && (parent.imposto_retido_cents || 0) > 0;
-  const filho = getTituloImpostoDe(parentId);
+// Recalcula os totais do título a partir dos impostos de fato aplicados (nunca
+// somados na mão) - é o que mantém imposto_retido_cents/imposto_acrescido_cents
+// (usados por liquidoCents e pelos agregados em SQL) coerentes com a lista.
+function recalcularImpostosDoTitulo(lancamentoId) {
+  const linhas = listImpostosAplicados(lancamentoId);
+  const retido = linhas.filter((l) => l.tipo === "retido").reduce((s, l) => s + l.valor_cents, 0);
+  const acrescido = linhas.filter((l) => l.tipo === "acrescido").reduce((s, l) => s + l.valor_cents, 0);
+  getDb()
+    .prepare("UPDATE financeiro_lancamentos SET imposto_retido_cents = ?, imposto_acrescido_cents = ? WHERE id = ?")
+    .run(retido, acrescido, lancamentoId);
+}
 
-  if (filho && filho.status === "pago") return filho; // não mexe em recolhimento pago
+// Aplica um imposto do cadastro a um título: calcula o valor (título × alíquota),
+// grava a linha e, se for retido num título A PAGAR, gera o título de
+// recolhimento vinculado (no 'receber' o retido é crédito, não obrigação - não
+// gera nada, mesma regra de antes). A elegibilidade (pendente, não é ele mesmo
+// um imposto gerado, imposto não repetido) é validada na rota.
+export function aplicarImposto(lancamentoId, impostoId, createdBy) {
+  const parent = getLancamento(lancamentoId);
+  const imposto = getImposto(impostoId);
+  if (!parent || !imposto) return null;
 
-  if (gerar) {
-    const descricao = `Imposto retido - título ${parent.numero}`;
-    if (filho) {
-      updateLancamento(filho.id, {
-        valorCents: parent.imposto_retido_cents, due: parent.due, descricao,
-        contatoId: parent.contato_id, centroCustoId: parent.centro_custo_id,
-      });
-      return getLancamento(filho.id);
-    }
-    return insertLancamento({
-      tipo: "pagar", descricao, valorCents: parent.imposto_retido_cents, due: parent.due, emissao: parent.emissao,
-      categoryId: classeImpostoId(), centroCustoId: parent.centro_custo_id, contatoId: parent.contato_id,
-      tituloOrigemId: parentId, origem: "imposto_retido", createdBy,
+  const valorCents = Math.round((parent.valor_cents * imposto.aliquota_centesimos) / 10000);
+  const id = uid();
+  getDb()
+    .prepare(
+      `INSERT INTO financeiro_lancamento_impostos
+        (id, lancamento_id, imposto_id, imposto_nome, tipo, aliquota_centesimos, valor_cents, titulo_gerado_id, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)`
+    )
+    .run(id, lancamentoId, impostoId, imposto.nome, imposto.tipo, imposto.aliquota_centesimos, valorCents, new Date().toISOString());
+
+  if (imposto.tipo === "retido" && parent.tipo === "pagar") {
+    const gerado = insertLancamento({
+      tipo: "pagar",
+      descricao: `Recolhimento ${imposto.nome} - título ${parent.numero}`,
+      valorCents,
+      due: parent.due,
+      emissao: parent.emissao,
+      categoryId: classeImpostoId(),
+      centroCustoId: parent.centro_custo_id,
+      contatoId: parent.contato_id,
+      tituloOrigemId: lancamentoId,
+      origem: "imposto_aplicado",
+      createdBy,
     });
+    getDb().prepare("UPDATE financeiro_lancamento_impostos SET titulo_gerado_id = ? WHERE id = ?").run(gerado.id, id);
   }
 
-  if (filho) deleteLancamento(filho.id); // retido zerou/virou receber: remove o pendente
-  return null;
+  recalcularImpostosDoTitulo(lancamentoId);
+  return { titulo: getLancamento(lancamentoId), aplicados: listImpostosAplicados(lancamentoId) };
+}
+
+// Remove um imposto aplicado e o título de recolhimento que ele gerou. A
+// elegibilidade (recolhimento já pago não se desfaz) é validada na rota, que
+// tem o título gerado em mãos antes de chamar isto.
+export function removerImpostoAplicado(id) {
+  const aplicado = getImpostoAplicado(id);
+  if (!aplicado) return null;
+  if (aplicado.titulo_gerado_id) deleteLancamento(aplicado.titulo_gerado_id);
+  getDb().prepare("DELETE FROM financeiro_lancamento_impostos WHERE id = ?").run(id);
+  recalcularImpostosDoTitulo(aplicado.lancamento_id);
+  return { titulo: getLancamento(aplicado.lancamento_id), aplicados: listImpostosAplicados(aplicado.lancamento_id) };
 }
 
 // ---------- Leituras para os cálculos (fluxo e DRE) ----------
@@ -319,15 +677,15 @@ export function lancamentosDoAno(ano) {
     .all(like, like);
 }
 
-// Pagos com baixa dentro do período - a base do DRE em regime de caixa. Fora do
-// período, ou ainda pendente, não entra no resultado realizado.
+// Finalizados com baixa dentro do período - a base do DRE em regime de caixa.
+// Fora do período, ou ainda em aberto, não entra no resultado realizado.
 export function lancamentosPagosNoPeriodo(de, ate) {
   return getDb()
-    .prepare("SELECT * FROM financeiro_lancamentos WHERE status = 'pago' AND paid_at >= ? AND paid_at <= ?")
+    .prepare("SELECT * FROM financeiro_lancamentos WHERE status = 'finalizado' AND paid_at >= ? AND paid_at <= ?")
     .all(de, ate);
 }
 
-// Movimento líquido por conta (só do que está pago e tem conta): receber soma,
+// Movimento líquido por conta (só do que está finalizado e tem conta): receber soma,
 // pagar subtrai. É a parte variável do saldo; o saldo_inicial da conta entra em
 // cima disso no cálculo dos saldos (calculos.montarSaldos).
 export function movimentoPorConta() {
@@ -336,7 +694,7 @@ export function movimentoPorConta() {
       `SELECT conta_id,
               SUM(CASE WHEN tipo = 'receber' THEN ${LIQUIDO_SQL} ELSE -(${LIQUIDO_SQL}) END) AS mov
          FROM financeiro_lancamentos
-        WHERE status = 'pago' AND conta_id IS NOT NULL
+        WHERE status = 'finalizado' AND conta_id IS NOT NULL
         GROUP BY conta_id`
     )
     .all();

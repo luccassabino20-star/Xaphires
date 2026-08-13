@@ -1,26 +1,39 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
-import { formatCents, reaisParaCents, centsOuZero } from "./dinheiro.js";
+import { formatCents, formatPercent, reaisParaCents, centsOuZero } from "./dinheiro.js";
 import { comCodigo } from "./rotulo.js";
 
 // Formas de pagamento (conjunto fixo por ora; o SIGIM tem cadastro próprio). A
-// chave é gravada; o rótulo é traduzido em financeiro.forma.*.
-const FORMAS = ["operacao_bancaria", "pix", "boleto", "transferencia", "dinheiro", "cheque", "cartao"];
+// chave é gravada; o rótulo é traduzido em financeiro.forma.*. Exportado para o
+// formulário de novo título (LancamentosView) usar a mesma lista.
+export const FORMAS = ["operacao_bancaria", "pix", "boleto", "transferencia", "dinheiro", "cheque", "cartao"];
 
-// Detalhe do título, no espírito da tela do SIGIM: cabeçalho (nº, correntista +
-// documento, situação), identificação/documento, valores (com líquido) e, quando
-// baixado, os detalhes do pagamento. Os campos de imposto/desconto/retenção
-// aparecem como placeholder - entram de fato no bloco de impostos (fase seguinte).
-export default function LancamentoModal({ lancamento, categorias, centros, contatos, contas, todos = [], onClose, onChanged }) {
+// Detalhe do título: cabeçalho (nº, correntista + documento, situação),
+// identificação/documento, apropriação, valores (com líquido e os impostos
+// aplicados do cadastro), observação e, quando baixado, os detalhes do
+// pagamento (só leitura). A BAIXA EM SI não acontece aqui - fica na aba
+// Movimentação, de propósito: lançar/editar o título é uma tela diferente de
+// onde o dinheiro de fato se move, no mesmo espírito do SIGIM.
+//
+// impostosCadastro é a lista de impostos.js (financeiro_impostos, com
+// alíquota); onRefreshList atualiza a lista do título na tela de trás SEM
+// fechar o modal - aplicar/remover imposto precisa disso, porque fechar a cada
+// clique tornaria impossível aplicar mais de um imposto seguido.
+export default function LancamentoModal({ lancamento, categorias, centros, contatos, contas, impostosCadastro = [], todos = [], onClose, onChanged, onRefreshList }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
   const l = lancamento;
-  const pago = l.status === "pago";
+  // Ciclo de situação: "aberto" (provisionado/pendente/disponivel) é editável e
+  // apto a baixa/imposto/desdobramento; finalizado e anulado travam os campos.
+  const finalizado = l.status === "finalizado";
+  const anulado = l.status === "anulado";
+  const aberto = l.status === "provisionado" || l.status === "pendente" || l.status === "disponivel";
+  const travado = !aberto; // finalizado ou anulado: sem edição de valores/encargos
 
   const [f, setF] = useState({
     tipo: l.tipo,
@@ -31,8 +44,6 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
     emissao: l.emissao || "",
     formaPagto: l.forma_pagto || "",
     observacao: l.observacao || "",
-    impostoRetido: l.imposto_retido_cents ? String(l.imposto_retido_cents / 100) : "",
-    impostoAcrescido: l.imposto_acrescido_cents ? String(l.imposto_acrescido_cents / 100) : "",
     desconto: l.desconto_cents ? String(l.desconto_cents / 100) : "",
     retencao: l.retencao_cents ? String(l.retencao_cents / 100) : "",
     multa: l.multa_cents ? String(l.multa_cents / 100) : "",
@@ -41,24 +52,64 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
     centroCustoId: l.centro_custo_id || "",
     contatoId: l.contato_id || "",
   });
-  const [contaBaixa, setContaBaixa] = useState(l.conta_id || contas.find((c) => c.ativo === 1)?.id || "");
   const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [confirmandoExcluir, setConfirmandoExcluir] = useState(false);
+  // Desdobramento
+  const [abrirParcelas, setAbrirParcelas] = useState(false);
+  const [nParcelas, setNParcelas] = useState(2);
+  const [intervalo, setIntervalo] = useState(1);
+  // Impostos aplicados: totais em estado próprio (não em `f`) porque são
+  // derivados do servidor, não digitados - atualizam a cada aplicar/remover
+  // sem depender de um recarregar da tela inteira.
+  const [aplicados, setAplicados] = useState([]);
+  const [totalRetido, setTotalRetido] = useState(l.imposto_retido_cents || 0);
+  const [totalAcrescido, setTotalAcrescido] = useState(l.imposto_acrescido_cents || 0);
+  const [impostoEscolhido, setImpostoEscolhido] = useState("");
+  const [aplicando, setAplicando] = useState(false);
+
+  useEffect(() => {
+    api.finListImpostosAplicados(l.id).then(setAplicados).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [l.id]);
 
   const correntista = useMemo(() => contatos.find((c) => c.id === f.contatoId) || null, [contatos, f.contatoId]);
   const contaPagto = useMemo(() => contas.find((c) => c.id === l.conta_id) || null, [contas, l.conta_id]);
-  // Líquido = título - desconto - imposto retido - retenção + acrescido (nunca < 0).
-  // Calculado ao vivo, no mesmo espírito do servidor (liquidoCents).
+  // Centros selecionáveis: só analítico ativo recebe lançamento. Mantém o centro
+  // já gravado neste título na lista mesmo que hoje seja sintético/inativo, para o
+  // valor não sumir do select ao reabrir um título antigo.
+  const centrosSelecionaveis = useMemo(() => {
+    const base = centros.filter((c) => c.tipo !== "sintetico" && c.ativo === 1);
+    if (f.centroCustoId && !base.some((c) => c.id === f.centroCustoId)) {
+      const atual = centros.find((c) => c.id === f.centroCustoId);
+      if (atual) return [atual, ...base];
+    }
+    return base;
+  }, [centros, f.centroCustoId]);
+  // Impostos do cadastro que ainda não foram aplicados neste título - não faz
+  // sentido oferecer o mesmo imposto duas vezes (o servidor também recusa).
+  const impostosDisponiveis = useMemo(
+    () => impostosCadastro.filter((i) => i.ativo === 1 && !aplicados.some((a) => a.imposto_id === i.id)),
+    [impostosCadastro, aplicados]
+  );
+
+  // Líquido = título - desconto - impostos retidos - retenção + impostos
+  // acrescidos + multa + juros (nunca < 0). Mesma fórmula do servidor
+  // (liquidoCents), só que ao vivo, na tela.
   const valorLiquido = useMemo(() => {
     const bruto = reaisParaCents(f.valor) || 0;
-    const liq = bruto - centsOuZero(f.desconto) - centsOuZero(f.impostoRetido) - centsOuZero(f.retencao)
-      + centsOuZero(f.impostoAcrescido) + centsOuZero(f.multa) + centsOuZero(f.juros);
+    const liq = bruto - centsOuZero(f.desconto) - totalRetido - centsOuZero(f.retencao)
+      + totalAcrescido + centsOuZero(f.multa) + centsOuZero(f.juros);
     return Math.max(0, liq);
-  }, [f.valor, f.desconto, f.impostoRetido, f.retencao, f.impostoAcrescido, f.multa, f.juros]);
+  }, [f.valor, f.desconto, f.retencao, f.multa, f.juros, totalRetido, totalAcrescido]);
 
-  // Vínculos: título-pai (se este foi gerado) e títulos de imposto que este gerou.
+  // Vínculos: título-pai (se este foi gerado) e filhos (imposto ou parcelas).
   const pai = useMemo(() => (l.titulo_origem_id ? todos.find((x) => x.id === l.titulo_origem_id) : null), [l.titulo_origem_id, todos]);
   const filhos = useMemo(() => todos.filter((x) => x.titulo_origem_id === l.id), [todos, l.id]);
+  const impostoFilhos = filhos.filter((x) => x.origem === "imposto_aplicado");
+  const parcelaFilhos = filhos.filter((x) => x.origem === "parcela");
+
+  const temImposto = totalRetido > 0 || totalAcrescido > 0;
 
   async function salvar() {
     setErro("");
@@ -69,7 +120,6 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
       await api.finUpdateLancamento(l.id, {
         tipo: f.tipo, descricao: f.descricao.trim(), doc: f.doc.trim(), valorCents, due: f.due,
         emissao: f.emissao || null, formaPagto: f.formaPagto, observacao: f.observacao,
-        impostoRetidoCents: centsOuZero(f.impostoRetido), impostoAcrescidoCents: centsOuZero(f.impostoAcrescido),
         descontoCents: centsOuZero(f.desconto), retencaoCents: centsOuZero(f.retencao),
         multaCents: centsOuZero(f.multa), jurosCents: centsOuZero(f.juros),
         categoryId: f.categoryId || null, centroCustoId: f.centroCustoId || null, contatoId: f.contatoId || null,
@@ -82,16 +132,73 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
       setSalvando(false);
     }
   }
-  async function baixar() {
-    try { await api.finBaixarLancamento(l.id, { contaId: contaBaixa || undefined }); showToast(t("financeiro.toast.baixado")); onChanged(); } catch (e) { setErro(translateError(e, t)); }
-  }
-  async function estornar() {
-    try { await api.finEstornarLancamento(l.id); onChanged(); } catch (e) { setErro(translateError(e, t)); }
-  }
+  // Sem window.confirm: o navegador pode suprimir diálogos repetidos e cancelá-los
+  // em silêncio (o botão parecia não fazer nada). A confirmação é inline, abaixo.
   async function excluir() {
-    if (!confirm(t("financeiro.confirm.excluir"))) return;
+    setConfirmandoExcluir(false);
     try { await api.finDeleteLancamento(l.id); showToast(t("financeiro.toast.excluido")); onChanged(); } catch (e) { setErro(translateError(e, t)); }
   }
+  // Muda a situação entre os estados de aberto e o cancelamento. Finalizar é a
+  // baixa (aba Movimentação) e sair de finalizado é o estorno - não passam por
+  // aqui. onChanged fecha e recarrega a lista de trás.
+  async function mudarStatus(novo) {
+    setErro("");
+    try {
+      await api.finMudarStatus(l.id, novo);
+      showToast(t("financeiro.toast.situacaoAlterada"));
+      onChanged();
+    } catch (e) { setErro(translateError(e, t)); }
+  }
+  async function anular() {
+    if (!confirm(t("financeiro.confirm.anular"))) return;
+    mudarStatus("anulado");
+  }
+  async function desdobrar() {
+    setErro("");
+    try {
+      await api.finDesdobrarLancamento(l.id, { parcelas: Number(nParcelas), intervaloMeses: Number(intervalo) });
+      showToast(t("financeiro.parcela.desdobrado", { n: nParcelas }));
+      onChanged();
+    } catch (e) {
+      setErro(translateError(e, t));
+    }
+  }
+  async function aplicarImposto() {
+    if (!impostoEscolhido) return;
+    setErro("");
+    setAplicando(true);
+    try {
+      const r = await api.finAplicarImposto(l.id, impostoEscolhido);
+      setAplicados(r.aplicados);
+      setTotalRetido(r.titulo.imposto_retido_cents || 0);
+      setTotalAcrescido(r.titulo.imposto_acrescido_cents || 0);
+      setImpostoEscolhido("");
+      showToast(t("financeiro.tit.impostoAplicado"));
+      onRefreshList?.();
+    } catch (e) {
+      setErro(translateError(e, t));
+    } finally {
+      setAplicando(false);
+    }
+  }
+  async function removerImposto(aplicadoId) {
+    setErro("");
+    try {
+      const r = await api.finRemoverImpostoAplicado(l.id, aplicadoId);
+      setAplicados(r.aplicados);
+      setTotalRetido(r.titulo.imposto_retido_cents || 0);
+      setTotalAcrescido(r.titulo.imposto_acrescido_cents || 0);
+      onRefreshList?.();
+    } catch (e) {
+      setErro(translateError(e, t));
+    }
+  }
+
+  // Elegível a desdobrar: pendente, não é parcela/imposto gerado, não parcelado
+  // e sem encargos lançados (espelho da regra do servidor, só para
+  // mostrar/esconder).
+  const temEncargo = temImposto || centsOuZero(f.desconto) || centsOuZero(f.retencao) || centsOuZero(f.multa) || centsOuZero(f.juros);
+  const podeDesdobrar = aberto && !l.origem && !l.parcela_total && !temEncargo;
 
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -110,25 +217,39 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
               <option value="">{t("financeiro.form.semContato")}</option>
               {contatos.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
-            <span className="fin-tit-doc-correntista">{correntista?.doc || " "}</span>
+            <span className="fin-tit-doc-correntista">{correntista?.doc || " "}</span>
           </label>
           <div className="fin-tit-situacao">
             <span>{t("financeiro.col.status")}</span>
             <span className={"fin-badge fin-badge-" + l.status}>{t("financeiro.status." + l.status)}</span>
+            {l.parcela_total && <span className="fin-parcela-badge">{t("financeiro.parcela.xdeN", { x: l.parcela_num, n: l.parcela_total })}</span>}
+            {/* Troca manual entre os estados de aberto; finalizar/estornar é na
+                aba Movimentação. Anular tira o título do caixa e do DRE. */}
+            {aberto && (
+              <select className="fin-status-select" value={l.status} onChange={(e) => mudarStatus(e.target.value)}>
+                <option value="provisionado">{t("financeiro.status.provisionado")}</option>
+                <option value="pendente">{t("financeiro.status.pendente")}</option>
+                <option value="disponivel">{t("financeiro.status.disponivel")}</option>
+              </select>
+            )}
+            {aberto && <button type="button" className="btn-ghost btn-small" onClick={anular}>{t("financeiro.acao.anular")}</button>}
+            {anulado && <button type="button" className="btn-ghost btn-small" onClick={() => mudarStatus("pendente")}>{t("financeiro.acao.reativar")}</button>}
           </div>
         </div>
 
         <div className="modal-body fin-modal-body">
-          {/* Vínculos de imposto */}
-          {pai && (
-            <div className="fin-vinculo fin-vinculo-filho">
-              {t("financeiro.tit.geradoDe", { n: pai.numero })}
-            </div>
+          {/* Vínculos */}
+          {pai && l.origem === "imposto_aplicado" && (
+            <div className="fin-vinculo fin-vinculo-filho">{t("financeiro.tit.geradoDe", { n: pai.numero })}</div>
           )}
-          {filhos.length > 0 && (
-            <div className="fin-vinculo fin-vinculo-pai">
-              {t("financeiro.tit.gerou", { n: filhos.map((x) => x.numero).join(", ") })}
-            </div>
+          {pai && l.origem === "parcela" && (
+            <div className="fin-vinculo fin-vinculo-pai">{t("financeiro.parcela.deTitulo", { x: l.parcela_num, n: l.parcela_total, t: pai.numero })}</div>
+          )}
+          {impostoFilhos.length > 0 && (
+            <div className="fin-vinculo fin-vinculo-pai">{t("financeiro.tit.gerou", { n: impostoFilhos.map((x) => x.numero).join(", ") })}</div>
+          )}
+          {l.parcela_total && parcelaFilhos.length > 0 && (
+            <div className="fin-vinculo fin-vinculo-pai">{t("financeiro.parcela.parcelado", { n: l.parcela_total, nums: parcelaFilhos.map((x) => x.numero).join(", ") })}</div>
           )}
 
           {/* Identificação / Documento */}
@@ -176,43 +297,47 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
                 <span>{t("financeiro.cad.centros")}</span>
                 <select value={f.centroCustoId} onChange={(e) => setF({ ...f, centroCustoId: e.target.value })}>
                   <option value="">{t("financeiro.form.semCentro")}</option>
-                  {centros.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
+                  {centrosSelecionaveis.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
                 </select>
               </label>
             </div>
           </fieldset>
 
-          {/* Valores. Impostos/desconto/retenção ainda não calculam - placeholder. */}
+          {/* Valores */}
           <fieldset className="fin-bloco">
             <legend>{t("financeiro.tit.valores")}</legend>
             <div className="fin-modal-grid">
               <label className="fin-field">
                 <span>{t("financeiro.tit.valorTitulo")}</span>
-                <input type="number" step="0.01" min="0" value={f.valor} disabled={pago} onChange={(e) => setF({ ...f, valor: e.target.value })} />
+                <input
+                  type="number" step="0.01" min="0" value={f.valor} disabled={travado || temImposto}
+                  title={temImposto ? t("financeiro.tit.valorTravadoImposto") : undefined}
+                  onChange={(e) => setF({ ...f, valor: e.target.value })}
+                />
               </label>
-              <label className="fin-field">
+              <div className="fin-field">
                 <span>{t("financeiro.tit.impostosRetidos")}</span>
-                <input type="number" step="0.01" min="0" value={f.impostoRetido} disabled={pago} placeholder="0,00" onChange={(e) => setF({ ...f, impostoRetido: e.target.value })} />
-              </label>
-              <label className="fin-field">
+                <strong>{formatCents(totalRetido, lang)}</strong>
+              </div>
+              <div className="fin-field">
                 <span>{t("financeiro.tit.impostosAcrescidos")}</span>
-                <input type="number" step="0.01" min="0" value={f.impostoAcrescido} disabled={pago} placeholder="0,00" onChange={(e) => setF({ ...f, impostoAcrescido: e.target.value })} />
-              </label>
+                <strong>{formatCents(totalAcrescido, lang)}</strong>
+              </div>
               <label className="fin-field">
                 <span>{t("financeiro.tit.desconto")}</span>
-                <input type="number" step="0.01" min="0" value={f.desconto} disabled={pago} placeholder="0,00" onChange={(e) => setF({ ...f, desconto: e.target.value })} />
+                <input type="number" step="0.01" min="0" value={f.desconto} disabled={travado} placeholder="0,00" onChange={(e) => setF({ ...f, desconto: e.target.value })} />
               </label>
               <label className="fin-field">
                 <span>{t("financeiro.tit.retencao")}</span>
-                <input type="number" step="0.01" min="0" value={f.retencao} disabled={pago} placeholder="0,00" onChange={(e) => setF({ ...f, retencao: e.target.value })} />
+                <input type="number" step="0.01" min="0" value={f.retencao} disabled={travado} placeholder="0,00" onChange={(e) => setF({ ...f, retencao: e.target.value })} />
               </label>
               <label className="fin-field">
                 <span>{t("financeiro.tit.multa")}</span>
-                <input type="number" step="0.01" min="0" value={f.multa} disabled={pago} placeholder="0,00" onChange={(e) => setF({ ...f, multa: e.target.value })} />
+                <input type="number" step="0.01" min="0" value={f.multa} disabled={travado} placeholder="0,00" onChange={(e) => setF({ ...f, multa: e.target.value })} />
               </label>
               <label className="fin-field">
                 <span>{t("financeiro.tit.juros")}</span>
-                <input type="number" step="0.01" min="0" value={f.juros} disabled={pago} placeholder="0,00" onChange={(e) => setF({ ...f, juros: e.target.value })} />
+                <input type="number" step="0.01" min="0" value={f.juros} disabled={travado} placeholder="0,00" onChange={(e) => setF({ ...f, juros: e.target.value })} />
               </label>
               <div className="fin-field fin-tit-liquido">
                 <span>{t("financeiro.tit.valorLiquido")}</span>
@@ -221,13 +346,53 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
             </div>
           </fieldset>
 
+          {/* Impostos aplicados: do cadastro, com alíquota calculada e o título de recolhimento gerado */}
+          <fieldset className="fin-bloco">
+            <legend>{t("financeiro.tit.impostosAplicados")}</legend>
+            {aplicados.length === 0 ? (
+              <p className="fin-cad-hint">{t("financeiro.tit.semImpostoAplicado")}</p>
+            ) : (
+              <ul className="fin-imposto-lista">
+                {aplicados.map((a) => (
+                  <li key={a.id} className="fin-imposto-linha">
+                    <span className="fin-imposto-nome">
+                      {a.imposto_nome}
+                      <span className={"fin-badge-tipo-" + a.tipo}>{t(`financeiro.cad.imposto_tipo_${a.tipo}`)}</span>
+                    </span>
+                    <span className="fin-num">{formatPercent(a.aliquota_centesimos, lang)}</span>
+                    <span className="fin-num">{formatCents(a.valor_cents, lang)}</span>
+                    {a.titulo_gerado_id && (
+                      <span className="fin-imposto-gerado">{t("financeiro.tit.recolhimento")}</span>
+                    )}
+                    {aberto && (
+                      <button type="button" className="btn-ghost btn-small" onClick={() => removerImposto(a.id)}>&times;</button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {aberto && l.origem !== "imposto_aplicado" && (
+              <div className="fin-imposto-adicionar">
+                <select value={impostoEscolhido} onChange={(e) => setImpostoEscolhido(e.target.value)}>
+                  <option value="">{t("financeiro.tit.escolherImposto")}</option>
+                  {impostosDisponiveis.map((i) => (
+                    <option key={i.id} value={i.id}>{i.nome} ({formatPercent(i.aliquota_centesimos, lang)})</option>
+                  ))}
+                </select>
+                <button type="button" className="btn-secondary btn-small" onClick={aplicarImposto} disabled={!impostoEscolhido || aplicando}>
+                  {t("financeiro.tit.aplicarImposto")}
+                </button>
+              </div>
+            )}
+          </fieldset>
+
           <label className="fin-field">
             <span>{t("financeiro.tit.observacao")}</span>
             <textarea rows={2} value={f.observacao} onChange={(e) => setF({ ...f, observacao: e.target.value })} />
           </label>
 
-          {/* Detalhes do pagamento - só quando baixado */}
-          {pago && (
+          {/* Detalhes do pagamento - só quando baixado (finalizado) */}
+          {finalizado && (
             <fieldset className="fin-bloco fin-bloco-pagto">
               <legend>{t("financeiro.tit.detalhesPagto")}</legend>
               <div className="fin-modal-grid">
@@ -242,19 +407,37 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
 
           <div className="fin-modal-acoes">
             <button className="btn-primary btn-small" onClick={salvar} disabled={salvando}>{t("common.save")}</button>
-            {!pago ? (
-              <span className="fin-baixa-inline">
-                <select value={contaBaixa} onChange={(e) => setContaBaixa(e.target.value)}>
-                  <option value="">{t("financeiro.baixa.semConta")}</option>
-                  {contas.filter((c) => c.ativo === 1).map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-                </select>
-                <button className="btn-secondary btn-small" onClick={baixar}>{t("financeiro.acao.baixar")}</button>
+            {finalizado && <span className="fin-modal-info">{t("financeiro.tit.baixaEmMovimentacao")}</span>}
+            {confirmandoExcluir ? (
+              <span className="fin-cc-confirm fin-modal-excluir">
+                <span className="fin-cc-confirm-txt">{t("financeiro.cad.confirmar")}</span>
+                <button type="button" className="btn-danger btn-small" onClick={excluir}>{t("financeiro.cad.sim")}</button>
+                <button type="button" className="btn-ghost btn-small" onClick={() => setConfirmandoExcluir(false)}>{t("financeiro.cad.nao")}</button>
               </span>
             ) : (
-              <button className="btn-secondary btn-small" onClick={estornar}>{t("financeiro.acao.estornar")}</button>
+              <button type="button" className="btn-danger btn-small fin-modal-excluir" onClick={() => setConfirmandoExcluir(true)}>{t("financeiro.acao.excluir")}</button>
             )}
-            <button className="btn-danger btn-small fin-modal-excluir" onClick={excluir}>{t("financeiro.acao.excluir")}</button>
           </div>
+
+          {/* Desdobramento em parcelas */}
+          {podeDesdobrar && (
+            <div className="fin-desdobrar">
+              {!abrirParcelas ? (
+                <button className="btn-ghost btn-small" onClick={() => setAbrirParcelas(true)}>{t("financeiro.parcela.botao")}</button>
+              ) : (
+                <div className="fin-desdobrar-form">
+                  <label>{t("financeiro.parcela.qtd")}
+                    <input type="number" min="2" max="120" value={nParcelas} onChange={(e) => setNParcelas(e.target.value)} />
+                  </label>
+                  <label>{t("financeiro.parcela.intervalo")}
+                    <input type="number" min="1" max="12" value={intervalo} onChange={(e) => setIntervalo(e.target.value)} />
+                  </label>
+                  <button className="btn-primary btn-small" onClick={desdobrar}>{t("financeiro.parcela.confirmar")}</button>
+                  <button className="btn-ghost btn-small" onClick={() => setAbrirParcelas(false)}>&times;</button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

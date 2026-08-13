@@ -4,6 +4,8 @@ import { rateLimit } from "../rateLimit.js";
 import * as dir from "../directory.js";
 import * as store from "../admin/store.js";
 import * as popupStore from "../admin/popupStore.js";
+import * as centrosStore from "../admin/centrosCustoStore.js";
+import { excluirCentroCusto as finExcluirCentro, excluirTodosCentrosCusto as finExcluirTodosCentros } from "../modules/financeiro/repo.js";
 import { novoDestinoDeImagem, extensaoValida, apagarImagem } from "../admin/popupUploads.js";
 import Busboy from "busboy";
 import fs from "node:fs";
@@ -727,6 +729,92 @@ router.delete(
     apagarImagem(atual.imageUrl);
     auditar(req, "remover_imagem_popup", { alvo: atual.title });
     res.json({ popup: atualizado });
+  })
+);
+
+// ---------- Centros de custo (hierárquicos, multiempresa) ----------
+// Vivem no diretório global, geridos aqui no painel. Cross-empresa é exclusividade
+// do painel - por isso não passam por comAcessoAEmpresa (que abre o banco de UMA
+// empresa); a leitura é do diretório, e cada escrita é auditada com a empresa alvo.
+
+// Converte um RegraError do store em 400 com o código estável; outros erros sobem.
+function tratarRegra(res, fn) {
+  try {
+    return { ok: true, valor: fn() };
+  } catch (e) {
+    if (e instanceof centrosStore.RegraError) {
+      res.status(400).json({ error: e.message, code: e.code });
+      return { ok: false };
+    }
+    throw e;
+  }
+}
+
+router.get(
+  "/centros-custo",
+  ah(async (req, res) => {
+    const companyId = req.query.companyId || undefined;
+    res.json({ centros: centrosStore.listarCentros(companyId) });
+  })
+);
+
+router.post(
+  "/centros-custo",
+  ah(async (req, res) => {
+    const { companyId, codigo, nome } = req.body || {};
+    const r = tratarRegra(res, () => centrosStore.criarCentro({ companyId, codigo, nome }));
+    if (!r.ok) return;
+    auditar(req, "centro_custo_criar", { companyId, alvo: r.valor.codigo, detalhe: { nome: r.valor.nome } });
+    res.status(201).json({ centro: r.valor });
+  })
+);
+
+router.patch(
+  "/centros-custo/:id",
+  ah(async (req, res) => {
+    const atual = centrosStore.acharCentro(req.params.id);
+    if (!atual) return res.status(404).json({ error: "Centro de custo não encontrado", code: "CC_NOT_FOUND" });
+    const r = tratarRegra(res, () => centrosStore.editarCentro(req.params.id, { nome: req.body?.nome }));
+    if (!r.ok) return;
+    auditar(req, "centro_custo_editar", { companyId: atual.company_id, alvo: atual.codigo, detalhe: { nome: r.valor.nome } });
+    res.json({ centro: r.valor });
+  })
+);
+
+router.post(
+  "/centros-custo/:id/ativo",
+  ah(async (req, res) => {
+    const atual = centrosStore.acharCentro(req.params.id);
+    if (!atual) return res.status(404).json({ error: "Centro de custo não encontrado", code: "CC_NOT_FOUND" });
+    const ativo = req.body?.ativo === true;
+    const r = tratarRegra(res, () => centrosStore.definirAtivo(req.params.id, ativo));
+    if (!r.ok) return;
+    auditar(req, ativo ? "centro_custo_reativar" : "centro_custo_desativar", { companyId: atual.company_id, alvo: atual.codigo });
+    res.json({ centro: r.valor });
+  })
+);
+
+// Excluir TODOS os centros de uma empresa. Coleção sem :id - antes das rotas com
+// parâmetro. Passa por comAcessoAEmpresa (contexto da empresa + auditoria) e
+// reaproveita a MESMA lógica do módulo, que também anula o centro nos lançamentos.
+router.delete(
+  "/centros-custo",
+  ah(async (req, res) => {
+    const companyId = req.query.companyId;
+    if (!companyId || !store.acharEmpresa(companyId))
+      return res.status(400).json({ error: "Empresa não encontrada", code: "CC_EMPRESA_NOT_FOUND" });
+    const r = await comAcessoAEmpresa(req, companyId, "centro_custo_excluir_todos", async () => finExcluirTodosCentros());
+    res.json(r);
+  })
+);
+
+router.delete(
+  "/centros-custo/:id",
+  ah(async (req, res) => {
+    const atual = centrosStore.acharCentro(req.params.id);
+    if (!atual) return res.status(404).json({ error: "Centro de custo não encontrado", code: "CC_NOT_FOUND" });
+    const r = await comAcessoAEmpresa(req, atual.company_id, "centro_custo_excluir", async () => finExcluirCentro(req.params.id));
+    res.json(r ?? { removidos: 0 });
   })
 );
 

@@ -5401,6 +5401,16 @@ img.avatar { object-fit: cover; padding: 0; }
 .adm-chip-grace, .adm-chip-expired { background: color-mix(in srgb, var(--adm-alerta) 18%, transparent); color: var(--adm-alerta); border-color: transparent; }
 .adm-chip-blocked { background: color-mix(in srgb, var(--adm-perigo) 15%, transparent); color: var(--adm-perigo); border-color: transparent; }
 .adm-chip-master { background: var(--adm-texto); color: #fff; border-color: transparent; }
+/* Centros de custo (árvore): código monoespaçado e indentado pelo nível, linha
+   inativa esmaecida, edição inline da descrição, e um select de empresa na barra. */
+.adm-cc-codigo { display: inline-block; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+.adm-cc-inativa { opacity: 0.55; }
+.adm-cc-vazio { text-align: center; }
+.adm-cc-edit { display: inline-flex; align-items: center; gap: 6px; }
+.adm-cc-edit input { flex: 1; min-width: 160px; }
+.adm-btn-mini { padding: 4px 9px; font-size: 12px; }
+.adm-campo-inline { flex-direction: row; align-items: center; gap: 8px; }
+.adm-campo-inline > span { white-space: nowrap; }
 .adm-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .adm-chip-fraco { opacity: 0.7; }
 .adm-modulos { display: flex; flex-direction: column; gap: 8px; }
@@ -6106,7 +6116,11 @@ img.avatar { object-fit: cover; padding: 0; }
 :root[data-theme="light"] { --fin-entrada: #2a78d6; --fin-saida: #eb6834; }
 
 .fin {
-  min-height: 100vh;
+  /* Altura fixa da viewport, não min-height: o app é body:overflow-hidden (cada
+     tela rola dentro de si), então quem rola é o .fin-body abaixo. Com min-height
+     o formulário de novo título, mais alto que a tela, ficava cortado sem barra. */
+  height: 100vh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--bg-column);
@@ -6129,7 +6143,11 @@ img.avatar { object-fit: cover; padding: 0; }
   padding: 0 20px;
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-topbar);
+  /* Sete abas: se a largura apertar, rola na horizontal em vez de sumir com as
+     últimas (Cadastros). flex-shrink:0 nas abas mantém o rótulo legível. */
+  overflow-x: auto;
 }
+.fin-tab { flex-shrink: 0; }
 .fin-tab {
   padding: 12px 16px;
   font-size: 14px;
@@ -6144,7 +6162,11 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-tab.active { color: var(--text-primary); border-bottom-color: var(--fin-entrada); }
 .fin-body {
   flex: 1;
+  min-height: 0;
   width: 100%;
+  /* Rola dentro de si (cabeçalho e abas ficam fixos em cima); sem isso as telas
+     mais altas que a viewport eram cortadas, porque o body é overflow:hidden. */
+  overflow-y: auto;
   /* Sem max-width: o Financeiro ocupa a tela toda, para o grid de título (muitas
      colunas) caber sem a barra de rolagem lateral. */
   padding: 28px 32px 56px;
@@ -6193,8 +6215,48 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-row-pago { opacity: 0.62; }
 .fin-row-actions { text-align: right; white-space: nowrap; }
 .fin-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+/* Cinco situações do ciclo do título. Provisionado é previsão (contorno
+   tracejado); pendente aguarda; disponivel está liberado (destaque de acento);
+   finalizado é realizado (verde); anulado sai de tudo (riscado, apagado). */
+.fin-badge-provisionado { color: var(--text-secondary); background: var(--bg-list); border: 1px dashed var(--border-strong); }
 .fin-badge-pendente { color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); }
-.fin-badge-pago { color: #fff; background: var(--success); }
+.fin-badge-disponivel { color: #fff; background: var(--accent); }
+.fin-badge-finalizado { color: #fff; background: var(--success); }
+.fin-badge-anulado { color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle); text-decoration: line-through; }
+.fin-status-select { padding: 4px 8px; font-size: 12px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-cc-codigo { display: inline-block; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+/* Import de centros por Excel: barra de ações + resumo do resultado. */
+.fin-cc-import { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 12px; }
+.fin-cc-import .fin-importar-file.is-disabled { opacity: 0.6; pointer-events: none; }
+.fin-cc-import-res { margin: 0 0 12px; font-size: 13px; color: var(--text-secondary); }
+.fin-cc-import-erros { margin: 6px 0 0; padding-left: 18px; color: var(--danger); font-size: 12.5px; }
+.fin-cad-excluir { color: var(--danger); }
+.fin-cc-excluir-tudo { margin-left: auto; }
+/* Campos de endereço no cadastro de cliente/fornecedor: larguras próprias para o
+   CEP, número e UF não esticarem como os campos de texto padrão do fin-form. */
+.fin-form input.fin-cep { flex: 0 0 auto; width: 120px; min-width: 0; }
+.fin-form input.fin-end-numero { flex: 0 0 auto; width: 90px; min-width: 0; }
+.fin-form input.fin-end-uf { flex: 0 0 auto; width: 64px; min-width: 0; text-transform: uppercase; }
+.fin-form input.fin-end-logradouro { min-width: 200px; }
+.fin-form input.fin-end-uf { text-transform: uppercase; }
+/* Painel de detalhes do cliente/fornecedor (clicar no nome). Tamanhos maiores
+   para leitura confortável do endereço e dos dados de contato. */
+.fin-contato-detalhe { min-width: min(560px, 80vw); }
+.fin-contato-detalhe h3 { margin: 0 0 10px; font-size: 24px; color: var(--text-primary); }
+.fin-contato-detalhe h4 { margin: 22px 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.fin-contato-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fin-contato-chips .fin-badge { font-size: 13px; padding: 3px 11px; }
+.fin-detalhe-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 28px; margin: 0; }
+.fin-detalhe-grid dt { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
+.fin-detalhe-grid dd { margin: 3px 0 0; font-size: 17px; color: var(--text-primary); word-break: break-word; }
+.fin-cc-confirm { display: inline-flex; align-items: center; gap: 6px; }
+.fin-cc-confirm-txt { font-size: 12.5px; color: var(--danger); white-space: nowrap; }
+/* Importar extrato: barra com conta + botão de arquivo, resumo do preview e ações. */
+.fin-importar-conta { flex: 1; min-width: 240px; max-width: 360px; }
+.fin-importar-file { cursor: pointer; display: inline-flex; align-items: center; }
+.fin-importar-resumo { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin: 14px 0 10px; font-size: 13.5px; }
+.fin-importar-resumo strong { text-transform: capitalize; }
+.fin-importar-acoes { display: flex; gap: 10px; margin-bottom: 12px; }
 .fin-empty { text-align: center; color: var(--text-muted); padding: 24px; }
 
 /* Gráfico do fluxo */
@@ -6243,6 +6305,27 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-search input { flex: 1; border: none; background: none; outline: none; color: var(--text-primary); font-size: 13.5px; }
 .fin-filtro-data { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
 .fin-filtro-data input { padding: 7px 9px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+/* Campos de texto/numero soltos na toolbar de Títulos (nº do título, faixa de
+   valor): mesmo traje dos selects, largura contida para não empurrar o resto. */
+.fin-toolbar input.fin-filtro-numero,
+.fin-toolbar input.fin-filtro-valor { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-toolbar input.fin-filtro-numero { width: 110px; }
+.fin-toolbar input.fin-filtro-valor { width: 108px; }
+/* Barra de quitação (aba Títulos): selecionados + conta + botão "Dar quitado". */
+.fin-quitar-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 12px; margin-bottom: 12px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 10px; }
+.fin-quitar-count { font-size: 13px; color: var(--text-secondary); }
+.fin-quitar-conta { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+.fin-quitar-conta select { padding: 7px 9px; font-size: 13px; color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-quitar-bar .btn-primary { margin-left: auto; }
+.fin-check-col { width: 34px; text-align: center; }
+.fin-check-col input { cursor: pointer; }
+.fin-row-sel { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+/* Movimentação: topo com o seletor de conta + saldo, e o extrato abaixo. */
+.fin-mov-topo { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 16px; }
+.fin-mov-conta { max-width: 360px; min-width: 240px; }
+.fin-mov-saldo { display: flex; flex-direction: column; gap: 2px; }
+.fin-mov-saldo span { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.fin-mov-saldo strong { font-size: 20px; font-weight: 700; }
 
 /* Número do título como link */
 .fin-titulo-link { font-weight: 650; color: var(--fin-entrada); background: none; border: none; padding: 0; cursor: pointer; font-variant-numeric: tabular-nums; }
@@ -6276,27 +6359,104 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-bloco > legend { font-size: 11.5px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 0 6px; }
 .fin-bloco-pagto { background: color-mix(in srgb, var(--fin-entrada) 6%, var(--bg-card)); }
 .fin-tit-liquido strong { font-size: 17px; font-weight: 720; color: var(--fin-entrada); }
+/* Formulário de novo título (aba Lançamentos): reaproveita os blocos do detalhe
+   (fin-bloco/fin-modal-grid/fin-field), só empilhados com respiro entre eles. */
+.fin-novo-titulo { max-width: 920px; }
+.fin-novo-titulo form { display: flex; flex-direction: column; gap: 14px; }
+.fin-novo-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fin-novo-head h3 { font-size: 15px; font-weight: 650; color: var(--text-primary); }
+.fin-novo-head select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-novo-acoes { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fin-novo-correntista { max-width: 360px; }
+/* Select pesquisável (SearchSelect): controle com lupa + popup com busca. Veste
+   igual aos outros campos do formulário e abre um dropdown filtrável. */
+.fin-ss { position: relative; }
+.fin-ss-control { display: flex; align-items: center; gap: 7px; width: 100%; padding: 8px 10px; font-size: 13px; text-align: left; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; cursor: pointer; }
+.fin-ss-control > svg { color: var(--text-muted); flex-shrink: 0; }
+.fin-ss-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-ss-placeholder { color: var(--text-muted); }
+.fin-ss-chevron { margin-left: auto; }
+.fin-ss.open .fin-ss-control { border-color: var(--border-strong); }
+.fin-ss-pop { position: absolute; z-index: 40; top: calc(100% + 4px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); overflow: hidden; }
+.fin-ss-search { display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); }
+.fin-ss-search input { flex: 1; min-width: 0; border: none; background: none; outline: none; color: var(--text-primary); font-size: 13px; }
+.fin-ss-list { list-style: none; margin: 0; padding: 4px; max-height: 220px; overflow-y: auto; }
+.fin-ss-opt { display: block; width: 100%; text-align: left; padding: 7px 9px; font-size: 13px; color: var(--text-primary); background: none; border: none; border-radius: 6px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-ss-opt:hover { background: var(--bg-list); }
+.fin-ss-opt.sel { background: var(--bg-list); font-weight: 600; }
+.fin-ss-empty { padding: 10px; font-size: 12.5px; color: var(--text-muted); text-align: center; }
+
+/* Impostos aplicados ao título (bloco do detalhe) */
+.fin-imposto-lista { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.fin-imposto-linha {
+  display: grid; grid-template-columns: 1fr auto auto auto auto; align-items: center; gap: 10px;
+  padding: 7px 10px; font-size: 13px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px;
+}
+.fin-imposto-nome { display: flex; align-items: center; gap: 8px; }
+.fin-badge-tipo-retido, .fin-badge-tipo-acrescido {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
+  padding: 1px 7px; border-radius: 999px;
+}
+.fin-badge-tipo-retido { color: var(--fin-saida); background: color-mix(in srgb, var(--fin-saida) 14%, transparent); }
+.fin-badge-tipo-acrescido { color: var(--fin-entrada); background: color-mix(in srgb, var(--fin-entrada) 14%, transparent); }
+.fin-imposto-gerado { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.fin-imposto-adicionar { display: flex; gap: 8px; align-items: center; }
+.fin-imposto-adicionar select { flex: 1; padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
 
 /* Vínculo de título de imposto (pai/filho) */
 .fin-vinculo { font-size: 12.5px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); }
 .fin-vinculo-filho { background: color-mix(in srgb, var(--fin-saida) 10%, var(--bg-card)); color: var(--fin-saida); }
 .fin-vinculo-pai { background: color-mix(in srgb, var(--fin-entrada) 8%, var(--bg-card)); color: var(--text-secondary); }
 .fin-tag-imposto { margin-left: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; padding: 1px 6px; border-radius: 999px; color: var(--fin-saida); background: color-mix(in srgb, var(--fin-saida) 14%, transparent); vertical-align: middle; }
+.fin-tag-parcela { margin-left: 6px; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 999px; color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); vertical-align: middle; font-variant-numeric: tabular-nums; }
+.fin-parcela-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); font-variant-numeric: tabular-nums; }
+.fin-desdobrar { margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--border-subtle); }
+.fin-desdobrar-form { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.fin-desdobrar-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+.fin-desdobrar-form input { width: 90px; padding: 7px 9px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
 
 @media (max-width: 720px) {
   .fin-modal-grid { grid-template-columns: repeat(2, 1fr); }
   .fin-tit-cab { grid-template-columns: 1fr; }
 }
 
-/* Subabas dos cadastros e baixa inline */
-.fin-subtabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
-.fin-subtab {
-  padding: 7px 14px; font-size: 13px; font-weight: 550; border-radius: 999px;
-  color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); cursor: pointer;
+.fin-mov-titulo { font-size: 14px; font-weight: 650; margin: 22px 0 10px; color: var(--text-secondary); }
+.fin-mov-titulo:first-of-type { margin-top: 4px; }
+
+/* Cadastros: sidebar agrupada por categoria + conteúdo do item selecionado */
+.fin-cad-layout { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: start; }
+.fin-cad-nav {
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 14px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px;
+  position: sticky; top: 16px;
 }
-.fin-subtab:hover { color: var(--text-primary); }
-.fin-subtab.active { color: #fff; background: var(--fin-entrada); border-color: transparent; }
+.fin-cad-grupo { display: flex; flex-direction: column; gap: 2px; }
+.fin-cad-grupo-titulo {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-muted); padding: 6px 10px 4px;
+}
+.fin-cad-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 10px; font-size: 13.5px; text-align: left;
+  color: var(--text-primary); background: none; border: none; border-radius: 8px; cursor: pointer;
+}
+.fin-cad-item:hover:not(.disabled) { background: var(--bg-list); }
+.fin-cad-item.active { background: color-mix(in srgb, var(--fin-entrada) 14%, transparent); color: var(--fin-entrada); font-weight: 600; }
+.fin-cad-item.disabled { color: var(--text-muted); cursor: default; opacity: 0.7; }
+.fin-cad-em-breve {
+  font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+  padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+.fin-cad-content { min-width: 0; }
+.fin-cad-hint { font-size: 12.5px; color: var(--text-muted); margin: -6px 0 4px; }
+.fin-cad-acoes { display: inline-flex; gap: 4px; white-space: nowrap; }
 .fin-cad-secao { display: flex; flex-direction: column; gap: 14px; }
+@media (max-width: 900px) {
+  .fin-cad-layout { grid-template-columns: 1fr; }
+  .fin-cad-nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .fin-cad-grupo { flex: 1 1 220px; }
+}
 .fin-baixa-inline { display: inline-flex; align-items: center; gap: 6px; }
 .fin-baixa-inline select { padding: 5px 8px; font-size: 12.5px; background: var(--bg-list); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 6px; }
 
