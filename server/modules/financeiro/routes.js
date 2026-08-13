@@ -187,6 +187,10 @@ router.patch(
   "/contas/:id",
   ah(async (req, res) => {
     if (!getConta(req.params.id)) return res.status(404).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
+    // Mesma validação do POST: saldo inicial não inteiro envenena montarSaldos (NaN).
+    const { saldoInicialCents } = req.body || {};
+    if (saldoInicialCents !== undefined && !Number.isInteger(saldoInicialCents))
+      return res.status(400).json({ error: "Saldo inicial inválido", code: "FIN_VALUE_INVALID" });
     res.json(updateConta(req.params.id, req.body || {}));
   })
 );
@@ -373,6 +377,14 @@ router.patch(
   "/impostos/:id",
   ah(async (req, res) => {
     if (!getImposto(req.params.id)) return res.status(404).json({ error: "Imposto não encontrado", code: "FIN_IMPOSTO_NOT_FOUND" });
+    // Mesma validação do POST, mas parcial (undefined mantém): tipo ou alíquota
+    // inválidos gravados aqui fariam aplicarImposto/recalcularImpostosDoTitulo
+    // calcularem errado e o líquido/DRE divergirem.
+    const { tipo, aliquotaCentesimos } = req.body || {};
+    if (tipo !== undefined && tipo !== "retido" && tipo !== "acrescido")
+      return res.status(400).json({ error: "Tipo de imposto inválido", code: "FIN_IMPOSTO_TIPO_INVALID" });
+    if (aliquotaCentesimos !== undefined && (!Number.isInteger(aliquotaCentesimos) || aliquotaCentesimos < 0 || aliquotaCentesimos > 10000))
+      return res.status(400).json({ error: "Alíquota inválida", code: "FIN_IMPOSTO_ALIQUOTA_INVALID" });
     res.json(updateImposto(req.params.id, req.body || {}));
   })
 );
