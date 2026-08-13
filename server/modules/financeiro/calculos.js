@@ -7,7 +7,7 @@
 // 'finalizado'), datado pela baixa (paid_at). O regime de competência (pelo
 // vencimento) fica anotado como evolução - hoje fluxo e DRE contam a mesma
 // história para não confundir.
-import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents, getConta, finalizadosDaConta, estornadosDaConta } from "./repo.js";
+import { lancamentosDoAno, lancamentosPagosNoPeriodo, getCategoria, listContas, movimentoPorConta, liquidoCents, getConta, finalizadosDaConta, estornadosDaConta, listApropriacoes } from "./repo.js";
 
 // Estados de "aberto" - o título ainda deve entrar/sair, então conta no previsto
 // do fluxo. 'finalizado' já é realizado; 'anulado' não conta em lugar nenhum.
@@ -144,20 +144,49 @@ export function montarMovimentacao(contaId, de, ate, { incluirEstornados = false
 // lançamento - assim um estorno lançado como 'pagar' numa categoria de receita
 // cai no lugar certo. Sem categoria, entra num balde "Sem categoria" para não
 // sumir do resultado.
+//
+// Um título RATEADO por classe (Lançamento Manual com várias classes) tem o valor
+// dividido entre as classes das apropriações; aqui o líquido é distribuído na
+// mesma proporção, então cada parte cai na sua classe (e no lado certo do DRE
+// pelo tipo dela). Rateio só por centro (sem classe) não muda nada: vale a classe
+// do título.
 export function montarDRE(de, ate) {
   const receitas = new Map(); // categoryId -> { nome, total }
   const despesas = new Map();
   const SEM = { id: null, nome: null }; // rótulo resolvido no cliente (i18n)
 
-  for (const l of lancamentosPagosNoPeriodo(de, ate)) {
-    const cat = l.category_id ? getCategoria(l.category_id) : null;
-    const ehReceita = cat ? cat.tipo === "receita" : l.tipo === "receber";
+  // Soma `valor` na classe `catId`, no lado certo (receita/despesa). O tipo do
+  // lançamento é o desempate quando não há classe.
+  function acumular(catId, tipoLanc, valor) {
+    const cat = catId ? getCategoria(catId) : null;
+    const ehReceita = cat ? cat.tipo === "receita" : tipoLanc === "receber";
     const alvo = ehReceita ? receitas : despesas;
     const chave = cat ? cat.id : "__sem__";
-    const nome = cat ? cat.nome : SEM.nome;
-    const linha = alvo.get(chave) || { id: cat ? cat.id : null, nome, total: 0 };
-    linha.total += liquidoCents(l); // DRE também pelo líquido, coerente com o caixa
+    const linha = alvo.get(chave) || { id: cat ? cat.id : null, nome: cat ? cat.nome : SEM.nome, total: 0 };
+    linha.total += valor;
     alvo.set(chave, linha);
+  }
+
+  for (const l of lancamentosPagosNoPeriodo(de, ate)) {
+    const liq = liquidoCents(l); // DRE também pelo líquido, coerente com o caixa
+    const comClasse = listApropriacoes(l.id).filter((a) => a.category_id);
+    if (comClasse.length && l.valor_cents > 0) {
+      // Cada apropriação com classe leva a sua fatia do valor bruto; o que sobrar
+      // (rateio parcial) volta para a classe do título. O líquido é dividido na
+      // mesma proporção, com o resto no último balde para fechar exato.
+      const somaClasse = comClasse.reduce((s, a) => s + a.valor_cents, 0);
+      const partes = comClasse.map((a) => ({ catId: a.category_id, bruto: a.valor_cents }));
+      const resto = l.valor_cents - somaClasse;
+      if (resto > 0) partes.push({ catId: l.category_id, bruto: resto });
+      let distribuido = 0;
+      partes.forEach((p, i) => {
+        const fatia = i === partes.length - 1 ? liq - distribuido : Math.round((liq * p.bruto) / l.valor_cents);
+        distribuido += fatia;
+        acumular(p.catId, l.tipo, fatia);
+      });
+    } else {
+      acumular(l.category_id, l.tipo, liq);
+    }
   }
 
   const listaReceitas = [...receitas.values()].sort((a, b) => b.total - a.total);

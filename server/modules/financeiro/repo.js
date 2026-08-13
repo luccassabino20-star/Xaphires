@@ -619,14 +619,21 @@ export function mudarStatusLancamento(id, status) {
   return getLancamento(id);
 }
 
-// Hash estável de uma linha de extrato, para dedup: mesma conta + mesma data +
-// mesmo valor/tipo + mesmo documento/histórico = mesma movimentação. Reprocessar
-// o mesmo PDF não duplica.
-function hashExtrato(contaId, tx) {
-  return crypto
-    .createHash("sha1")
-    .update([contaId, tx.dataMovimento, tx.valorCents, tx.tipo, tx.documento || "", tx.historico || ""].join("|"))
-    .digest("hex");
+// Chave-base de uma linha de extrato: mesma conta + data + valor/tipo + documento/
+// histórico = mesma movimentação. Reprocessar o mesmo PDF não duplica.
+function chaveBaseExtrato(contaId, tx) {
+  return [contaId, tx.dataMovimento, tx.valorCents, tx.tipo, tx.documento || "", tx.historico || ""].join("|");
+}
+// Hash de dedup. `ocorrencia` distingue linhas LEGÍTIMAS idênticas no mesmo
+// extrato (duas tarifas de R$ 2,00 no mesmo dia, dois Pix iguais): sem isso a
+// segunda colidia com a primeira e era descartada em silêncio. A ocorrência 0 NÃO
+// leva sufixo de propósito - assim o hash de linha única fica idêntico ao formato
+// antigo, e extratos já importados seguem sendo deduplicados na reimportação (e a
+// 2ª linha antes perdida é recuperada, não duplicada, porque o hash #1 é novo).
+function hashExtrato(contaId, tx, ocorrencia = 0) {
+  const base = chaveBaseExtrato(contaId, tx);
+  const chave = ocorrencia > 0 ? `${base}|#${ocorrencia}` : base;
+  return crypto.createHash("sha1").update(chave).digest("hex");
 }
 
 // Importa linhas de extrato bancário como lançamentos JÁ FINALIZADOS na conta
@@ -651,8 +658,16 @@ export function importarExtrato({ contaId, transacoes, createdBy }) {
   let importados = 0;
   let ignorados = 0;
   const criados = [];
+  // Conta quantas linhas idênticas já vieram ANTES nesta importação, para dar a
+  // ocorrência (0, 1, 2...) a cada uma - linhas legítimas repetidas no mesmo
+  // extrato deixam de colidir. Reimportar o mesmo extrato repete as ocorrências,
+  // então tudo continua sendo deduplicado.
+  const contagem = new Map();
   for (const tx of transacoes) {
-    const hash = hashExtrato(contaId, tx);
+    const chave = chaveBaseExtrato(contaId, tx);
+    const ocorrencia = contagem.get(chave) || 0;
+    contagem.set(chave, ocorrencia + 1);
+    const hash = hashExtrato(contaId, tx, ocorrencia);
     if (jaExiste.get(hash)) { ignorados++; continue; }
     const numero = db.prepare("SELECT COALESCE(MAX(numero), 0) + 1 AS n FROM financeiro_lancamentos").get().n;
     const id = uid();
