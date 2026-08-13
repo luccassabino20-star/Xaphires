@@ -4,7 +4,7 @@ import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
-import { formatCents, reaisParaCents } from "./dinheiro.js";
+import { formatCents, reaisParaCents, liquidoDoLancamento } from "./dinheiro.js";
 import { comCodigo } from "./rotulo.js";
 import LancamentoModal from "./LancamentoModal.jsx";
 
@@ -12,10 +12,22 @@ import LancamentoModal from "./LancamentoModal.jsx";
 // se acha, filtra e abre o detalhe do que já existe. A busca é a razão desta
 // tela: um campo de texto que varre tudo, mais filtros por tipo, situação,
 // classe, centro, conta, cliente/fornecedor, número exato, período e faixa de
-// valor. Tudo em memória (volume baixo, uma empresa não passa de alguns milhares
-// de títulos), então filtrar é instantâneo e não bate no servidor a cada tecla.
+// valor.
+//
+// A tela abre VAZIA e só traz os títulos quando o usuário clica em Pesquisar
+// (mesmo padrão da Movimentação) - não despeja a base inteira ao entrar. Os
+// cadastros de apoio (para os dropdowns e o modal) carregam ao montar; os títulos
+// só na busca. Uma vez carregados, os filtros refinam em memória (volume baixo,
+// alguns milhares de títulos no máximo), então mudar um dropdown é instantâneo e
+// não rebate no servidor.
 const ABERTOS = ["provisionado", "pendente", "disponivel"];
 const ehAberto = (l) => ABERTOS.includes(l.status);
+
+// "Hoje" em data civil YYYY-MM-DD no horário local - o padrão da data de baixa.
+function hojeCivil() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 export default function TitulosView() {
   const { t, i18n } = useTranslation();
@@ -34,13 +46,17 @@ export default function TitulosView() {
   // Quitação em lote: títulos marcados, conta de destino da baixa e trava enquanto processa.
   const [selecionados, setSelecionados] = useState(() => new Set());
   const [contaBaixa, setContaBaixa] = useState("");
+  const [dataBaixa, setDataBaixa] = useState(hojeCivil);
   const [quitando, setQuitando] = useState(false);
 
   // Busca e filtros. `busca` é o termo APLICADO (o que filtra); `buscaInput` é o
   // que está sendo digitado - a busca só vale ao clicar em Pesquisar (ou Enter),
-  // não a cada tecla.
+  // não a cada tecla. `buscou` guarda se já houve uma busca: antes dela a tela
+  // fica vazia, sem tabela nem totais.
   const [busca, setBusca] = useState("");
   const [buscaInput, setBuscaInput] = useState("");
+  const [buscou, setBuscou] = useState(false);
+  const [buscando, setBuscando] = useState(false);
   const [fTipo, setFTipo] = useState("");
   const [fStatus, setFStatus] = useState("");
   const [fCategoria, setFCategoria] = useState("");
@@ -53,14 +69,15 @@ export default function TitulosView() {
   const [fValMin, setFValMin] = useState("");
   const [fValMax, setFValMax] = useState("");
 
-  async function carregar() {
+  // Cadastros de apoio: dropdowns dos filtros + o modal de detalhe. Carregam uma
+  // vez ao entrar. Os títulos NÃO vêm aqui - só na busca.
+  async function carregarCadastros() {
     setCarregando(true);
     try {
-      const [cats, ccs, cts, cos, imps, lancs] = await Promise.all([
-        api.finListCategorias(lang), api.finListCentrosCusto(), api.finListContatos(), api.finListContas(),
-        api.finListImpostos(), api.finListLancamentos(),
+      const [cats, ccs, cts, cos, imps] = await Promise.all([
+        api.finListCategorias(lang), api.finListCentrosCusto(), api.finListContatos(), api.finListContas(), api.finListImpostos(),
       ]);
-      setCategorias(cats); setCentros(ccs); setContatos(cts); setContas(cos); setImpostosCadastro(imps); setLancamentos(lancs);
+      setCategorias(cats); setCentros(ccs); setContatos(cts); setContas(cos); setImpostosCadastro(imps);
       setErro("");
     } catch (err) {
       setErro(translateError(err, t));
@@ -68,7 +85,17 @@ export default function TitulosView() {
       setCarregando(false);
     }
   }
-  useEffect(() => { carregar(); /* eslint-disable-next-line */ }, []);
+  // Rebusca só os títulos: na Pesquisa e depois de quitar/editar (que mudam o que
+  // está no banco). Mantém a tela no estado "já buscou".
+  async function recarregarLancamentos() {
+    try {
+      setLancamentos(await api.finListLancamentos());
+      setErro("");
+    } catch (err) {
+      setErro(translateError(err, t));
+    }
+  }
+  useEffect(() => { carregarCadastros(); /* eslint-disable-next-line */ }, []);
 
   const catById = useMemo(() => Object.fromEntries(categorias.map((c) => [c.id, c])), [categorias]);
   const centroById = useMemo(() => Object.fromEntries(centros.map((c) => [c.id, c])), [centros]);
@@ -121,9 +148,12 @@ export default function TitulosView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lancamentos, busca, fTipo, fStatus, fCategoria, fCentro, fConta, fContato, fNumero, fDe, fAte, valMin, valMax, contatoById]);
 
+  // Totais pelo LÍQUIDO (com desconto/retenções/multa/juros), igual à coluna Valor:
+  // assim incluir juros/multa num título e salvar já reflete no valor exibido e na
+  // soma, sem tocar no valor_cents (que segue sendo o principal do título).
   const totais = useMemo(() => {
     let receber = 0, pagar = 0;
-    for (const l of visiveis) (l.tipo === "receber" ? (receber += l.valor_cents) : (pagar += l.valor_cents));
+    for (const l of visiveis) (l.tipo === "receber" ? (receber += liquidoDoLancamento(l)) : (pagar += liquidoDoLancamento(l)));
     return { receber, pagar, count: visiveis.length };
   }, [visiveis]);
 
@@ -150,13 +180,14 @@ export default function TitulosView() {
   }
   async function darQuitado() {
     const ids = selVisiveis.map((l) => l.id);
-    if (!ids.length || !contaBaixa) return;
+    if (!ids.length || !contaBaixa || !dataBaixa) return;
     setErro(""); setQuitando(true);
     try {
-      for (const id of ids) await api.finBaixarLancamento(id, { contaId: contaBaixa });
+      // Baixa todos na data escolhida (paidAt) - é o dia em que o dinheiro se moveu.
+      for (const id of ids) await api.finBaixarLancamento(id, { contaId: contaBaixa, paidAt: dataBaixa });
       showToast(t("financeiro.tit.quitados", { n: ids.length }));
       setSelecionados(new Set());
-      await carregar();
+      await recarregarLancamentos();
     } catch (e) {
       setErro(translateError(e, t));
     } finally {
@@ -164,17 +195,25 @@ export default function TitulosView() {
     }
   }
 
-  function aplicarBusca() { setBusca(buscaInput.trim()); }
+  // Pesquisar: aplica o termo, marca que houve busca e (re)traz os títulos do
+  // servidor. É o único caminho que preenche a tabela.
+  async function pesquisar() {
+    setBusca(buscaInput.trim());
+    setBuscou(true);
+    setBuscando(true);
+    try { await recarregarLancamentos(); } finally { setBuscando(false); }
+  }
+  // Limpar volta a tela ao estado inicial: sem filtros e sem lista (nova busca do zero).
   function limparFiltros() {
     setBusca(""); setBuscaInput(""); setFTipo(""); setFStatus(""); setFCategoria(""); setFCentro(""); setFConta("");
     setFContato(""); setFNumero(""); setFDe(""); setFAte(""); setFValMin(""); setFValMax("");
+    setBuscou(false); setLancamentos([]); setSelecionados(new Set());
   }
   const temFiltro = busca || fTipo || fStatus || fCategoria || fCentro || fConta || fContato || fNumero || fDe || fAte || fValMin || fValMax;
 
   const detalhe = detalheId ? lancamentos.find((l) => l.id === detalheId) : null;
 
   if (carregando) return <div className="fin-loading">{t("common.loading")}</div>;
-  if (erro) return <div className="fin-error">{erro}</div>;
 
   return (
     <div className="fin-titulos">
@@ -184,10 +223,10 @@ export default function TitulosView() {
           <input
             type="text" placeholder={t("financeiro.busca")} value={buscaInput}
             onChange={(e) => setBuscaInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") aplicarBusca(); }}
+            onKeyDown={(e) => { if (e.key === "Enter") pesquisar(); }}
           />
         </div>
-        <button className="btn-primary btn-small" onClick={aplicarBusca}>{t("financeiro.pesquisar")}</button>
+        <button className="btn-primary btn-small" onClick={pesquisar} disabled={buscando}>{t("financeiro.pesquisar")}</button>
         <input className="fin-filtro-numero" type="text" inputMode="numeric" placeholder={t("financeiro.filtro.numero")} value={fNumero} onChange={(e) => setFNumero(e.target.value)} />
         <select value={fTipo} onChange={(e) => setFTipo(e.target.value)}>
           <option value="">{t("financeiro.filtro.todosTipos")}</option>
@@ -226,6 +265,14 @@ export default function TitulosView() {
         {temFiltro && <button className="btn-ghost btn-small" onClick={limparFiltros}>{t("financeiro.filtro.limpar")}</button>}
       </div>
 
+      {erro && <div className="fin-error">{erro}</div>}
+
+      {!buscou && !erro && (
+        <div className="fin-empty fin-mov-prompt">{t("financeiro.tit.pesquisePrompt")}</div>
+      )}
+
+      {buscou && (
+      <>
       {abertosVisiveis.length > 0 && (
         <div className="fin-quitar-bar">
           <span className="fin-quitar-count">{t("financeiro.tit.selecionados", { n: nSel })}</span>
@@ -236,7 +283,11 @@ export default function TitulosView() {
               {contasAtivas.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
           </label>
-          <button className="btn-primary btn-small" disabled={nSel === 0 || !contaBaixa || quitando} onClick={darQuitado}>
+          <label className="fin-quitar-conta">
+            {t("financeiro.tit.dataBaixa")}
+            <input type="date" value={dataBaixa} onChange={(e) => setDataBaixa(e.target.value)} />
+          </label>
+          <button className="btn-primary btn-small" disabled={nSel === 0 || !contaBaixa || !dataBaixa || quitando} onClick={darQuitado}>
             {t("financeiro.tit.darQuitado", { n: nSel })}
           </button>
         </div>
@@ -303,6 +354,8 @@ export default function TitulosView() {
           )}
         </table>
       </div>
+      </>
+      )}
 
       {detalhe && (
         <LancamentoModal
@@ -314,8 +367,8 @@ export default function TitulosView() {
           impostosCadastro={impostosCadastro}
           todos={lancamentos}
           onClose={() => setDetalheId(null)}
-          onChanged={() => { setDetalheId(null); carregar(); }}
-          onRefreshList={carregar}
+          onChanged={() => { setDetalheId(null); recarregarLancamentos(); }}
+          onRefreshList={recarregarLancamentos}
         />
       )}
     </div>
