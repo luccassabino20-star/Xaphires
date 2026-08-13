@@ -45,14 +45,18 @@ import {
   removerImpostoAplicado,
   listImpostosAplicados,
   getImpostoAplicado,
+  listApropriacoes,
+  definirApropriacoes,
+  ApropriacaoError,
   importarExtrato,
 } from "./repo.js";
 import { seedCategoriasSeVazio } from "./seed.js";
-import { montarFluxo, montarDRE, montarSaldos } from "./calculos.js";
+import { montarFluxo, montarDRE, montarSaldos, montarMovimentacao } from "./calculos.js";
 import { gerarExcelExtrato } from "./extrato/excelExtrato.js";
 import { parseExtrato } from "./extrato/parseExtrato.js";
 import { RegraError } from "../../admin/centrosCustoStore.js";
 import { parseCentrosXlsx, modeloCentrosXlsx } from "./importCentros.js";
+import { parseCategoriasXlsx, modeloCategoriasXlsx } from "./importCategorias.js";
 import { runWithCompany } from "../../context.js";
 import Busboy from "busboy";
 import { PDFParse } from "pdf-parse";
@@ -469,6 +473,33 @@ router.delete(
         return res.status(400).json({ error: "O recolhimento deste imposto já foi pago - não pode ser desfeito", code: "FIN_IMPOSTO_APLICADO_PAGO" });
     }
     res.json(removerImpostoAplicado(req.params.aplicadoId));
+  })
+);
+
+// ---------- Apropriação (rateio) por centro de custo ----------
+router.get(
+  "/lancamentos/:id/apropriacoes",
+  ah(async (req, res) => {
+    if (!getLancamento(req.params.id))
+      return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    res.json(listApropriacoes(req.params.id));
+  })
+);
+
+// Substitui todo o rateio do título. itens = [{ centroCustoId, valorCents }];
+// vazio limpa o rateio. A validação (soma fecha o valor, analítico ativo, sem
+// repetido) fica no repo, que lança ApropriacaoError com o code.
+router.put(
+  "/lancamentos/:id/apropriacoes",
+  ah(async (req, res) => {
+    if (!getLancamento(req.params.id))
+      return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    try {
+      res.json(definirApropriacoes(req.params.id, req.body?.itens));
+    } catch (e) {
+      if (e instanceof ApropriacaoError) return res.status(400).json({ error: e.message, code: e.code });
+      throw e;
+    }
   })
 );
 

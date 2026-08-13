@@ -67,9 +67,26 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
   const [totalAcrescido, setTotalAcrescido] = useState(l.imposto_acrescido_cents || 0);
   const [impostoEscolhido, setImpostoEscolhido] = useState("");
   const [aplicando, setAplicando] = useState(false);
+  // Rateio por centro de custo. Linhas editáveis {centroCustoId, valor, pct} - valor
+  // e pct andam juntos (digitar um recalcula o outro contra o valor do título). O
+  // servidor guarda só o valor em centavos; o pct é derivado. rateioAtivo liga a
+  // seção; quando desligada, o centro único volta a valer.
+  const [rateioAtivo, setRateioAtivo] = useState(false);
+  const [rateio, setRateio] = useState([]);
 
   useEffect(() => {
     api.finListImpostosAplicados(l.id).then(setAplicados).catch(() => {});
+    api.finListApropriacoes(l.id).then((rows) => {
+      if (rows.length) {
+        const base = l.valor_cents || 0;
+        setRateio(rows.map((r) => ({
+          centroCustoId: r.centro_custo_id,
+          valor: String(r.valor_cents / 100),
+          pct: base ? String(Math.round((r.valor_cents / base) * 10000) / 100) : "",
+        })));
+        setRateioAtivo(true);
+      }
+    }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [l.id]);
 
@@ -103,6 +120,36 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
     return Math.max(0, liq);
   }, [f.valor, f.desconto, f.retencao, f.multa, f.juros, totalRetido, totalAcrescido]);
 
+  // Base do rateio = valor do título (bruto). As linhas se apoiam nela para
+  // converter % em valor e vice-versa, e o "restante" mostra o que falta fechar.
+  const baseRateioCents = reaisParaCents(f.valor) || 0;
+  const rateioSomaCents = useMemo(() => rateio.reduce((s, r) => s + (reaisParaCents(r.valor) || 0), 0), [rateio]);
+  const rateioRestanteCents = baseRateioCents - rateioSomaCents;
+  // Centros já escolhidos noutras linhas: não oferecer o mesmo duas vezes.
+  const centroUsado = (idx) => new Set(rateio.filter((_, i) => i !== idx).map((r) => r.centroCustoId).filter(Boolean));
+
+  function addLinha() { setRateio((rs) => [...rs, { centroCustoId: "", valor: "", pct: "" }]); }
+  function removeLinha(idx) { setRateio((rs) => rs.filter((_, i) => i !== idx)); }
+  function setLinha(idx, patch) { setRateio((rs) => rs.map((r, i) => (i === idx ? { ...r, ...patch } : r))); }
+  // Digitar o VALOR recalcula o %, e digitar o % recalcula o valor - sempre contra
+  // a base. Guardo as duas strings para o campo não "pular" ao digitar.
+  function onValor(idx, valorStr) {
+    const cents = reaisParaCents(valorStr) || 0;
+    const pct = baseRateioCents ? String(Math.round((cents / baseRateioCents) * 10000) / 100) : "";
+    setLinha(idx, { valor: valorStr, pct });
+  }
+  function onPct(idx, pctStr) {
+    const pct = Number(String(pctStr).replace(",", ".")) || 0;
+    const cents = Math.round((baseRateioCents * pct) / 100);
+    setLinha(idx, { pct: pctStr, valor: cents ? String(cents / 100) : "" });
+  }
+  function ligarRateio() {
+    setRateioAtivo(true);
+    // Ao ligar, semeia com uma linha já apontando para o centro único (se houver).
+    if (rateio.length === 0) setRateio([{ centroCustoId: f.centroCustoId || "", valor: "", pct: "" }]);
+  }
+  function desligarRateio() { setRateioAtivo(false); setRateio([]); }
+
   // Vínculos: título-pai (se este foi gerado) e filhos (imposto ou parcelas).
   const pai = useMemo(() => (l.titulo_origem_id ? todos.find((x) => x.id === l.titulo_origem_id) : null), [l.titulo_origem_id, todos]);
   const filhos = useMemo(() => todos.filter((x) => x.titulo_origem_id === l.id), [todos, l.id]);
@@ -115,6 +162,17 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
     setErro("");
     const valorCents = reaisParaCents(f.valor);
     if (!valorCents) return setErro(t("financeiro.form.valorInvalido"));
+    // Monta e valida o rateio (quando ligado) ANTES de tocar no servidor - feedback
+    // imediato; o servidor revalida de qualquer forma.
+    let itensRateio = null;
+    if (rateioAtivo) {
+      const itens = rateio.map((r) => ({ centroCustoId: r.centroCustoId, valorCents: reaisParaCents(r.valor) || 0 }));
+      if (itens.some((it) => !it.centroCustoId)) return setErro(t("financeiro.rateio.escolhaCentro"));
+      if (itens.some((it) => !it.valorCents || it.valorCents <= 0)) return setErro(t("financeiro.rateio.valorInvalido"));
+      if (new Set(itens.map((it) => it.centroCustoId)).size !== itens.length) return setErro(t("financeiro.rateio.duplicado"));
+      if (itens.reduce((s, it) => s + it.valorCents, 0) !== valorCents) return setErro(t("financeiro.rateio.naoFecha"));
+      itensRateio = itens;
+    }
     setSalvando(true);
     try {
       await api.finUpdateLancamento(l.id, {
@@ -122,8 +180,13 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
         emissao: f.emissao || null, formaPagto: f.formaPagto, observacao: f.observacao,
         descontoCents: centsOuZero(f.desconto), retencaoCents: centsOuZero(f.retencao),
         multaCents: centsOuZero(f.multa), jurosCents: centsOuZero(f.juros),
-        categoryId: f.categoryId || null, centroCustoId: f.centroCustoId || null, contatoId: f.contatoId || null,
+        // Rateado não tem centro único - o rateio manda. Sem rateio, vale o select.
+        categoryId: f.categoryId || null, centroCustoId: rateioAtivo ? null : (f.centroCustoId || null), contatoId: f.contatoId || null,
       });
+      // Grava (ou limpa) o rateio depois do título - a validação de soma no
+      // servidor é contra o valor já salvo.
+      if (rateioAtivo) await api.finDefinirApropriacoes(l.id, itensRateio);
+      else await api.finDefinirApropriacoes(l.id, []);
       showToast(t("financeiro.toast.salvo"));
       onChanged();
     } catch (e) {
@@ -295,11 +358,55 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
               </label>
               <label className="fin-field">
                 <span>{t("financeiro.cad.centros")}</span>
-                <select value={f.centroCustoId} onChange={(e) => setF({ ...f, centroCustoId: e.target.value })}>
-                  <option value="">{t("financeiro.form.semCentro")}</option>
-                  {centrosSelecionaveis.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
+                <select
+                  value={f.centroCustoId} disabled={travado || rateioAtivo}
+                  title={rateioAtivo ? t("financeiro.rateio.travadoPorRateio") : undefined}
+                  onChange={(e) => setF({ ...f, centroCustoId: e.target.value })}
+                >
+                  <option value="">{rateioAtivo ? t("financeiro.rateio.rateadoLabel") : t("financeiro.form.semCentro")}</option>
+                  {!rateioAtivo && centrosSelecionaveis.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
                 </select>
               </label>
+            </div>
+
+            {/* Rateio: divide o valor do título entre vários centros (% ou R$). */}
+            <div className="fin-rateio">
+              {!rateioAtivo ? (
+                !travado && <button type="button" className="btn-ghost btn-small" onClick={ligarRateio}>{t("financeiro.rateio.ativar")}</button>
+              ) : (
+                <>
+                  <div className="fin-rateio-head">
+                    <span className="fin-rateio-titulo">{t("financeiro.rateio.titulo")}</span>
+                    {!travado && <button type="button" className="btn-ghost btn-small" onClick={desligarRateio}>{t("financeiro.rateio.desativar")}</button>}
+                  </div>
+                  <div className="fin-rateio-cols">
+                    <span>{t("financeiro.cad.centros")}</span>
+                    <span>%</span>
+                    <span>{t("financeiro.col.valor")}</span>
+                    <span></span>
+                  </div>
+                  {rateio.map((r, idx) => {
+                    const usados = centroUsado(idx);
+                    const opts = centrosSelecionaveis.filter((c) => !usados.has(c.id) || c.id === r.centroCustoId);
+                    return (
+                      <div className="fin-rateio-linha" key={idx}>
+                        <select value={r.centroCustoId} disabled={travado} onChange={(e) => setLinha(idx, { centroCustoId: e.target.value })}>
+                          <option value="">{t("financeiro.form.semCentro")}</option>
+                          {opts.map((c) => <option key={c.id} value={c.id}>{comCodigo(c)}</option>)}
+                        </select>
+                        <input type="number" step="0.01" min="0" placeholder="0" value={r.pct} disabled={travado} onChange={(e) => onPct(idx, e.target.value)} />
+                        <input type="number" step="0.01" min="0" placeholder="0,00" value={r.valor} disabled={travado} onChange={(e) => onValor(idx, e.target.value)} />
+                        {!travado && <button type="button" className="btn-ghost btn-small fin-rateio-x" onClick={() => removeLinha(idx)} aria-label={t("common.remove")}>×</button>}
+                      </div>
+                    );
+                  })}
+                  {!travado && <button type="button" className="btn-secondary btn-small" onClick={addLinha}>{t("financeiro.rateio.adicionar")}</button>}
+                  <div className={"fin-rateio-restante " + (rateioRestanteCents === 0 ? "ok" : "pend")}>
+                    {t("financeiro.rateio.restante")}: <strong>{formatCents(rateioRestanteCents, lang)}</strong>
+                    <span className="fin-rateio-base"> / {formatCents(baseRateioCents, lang)}</span>
+                  </div>
+                </>
+              )}
             </div>
           </fieldset>
 

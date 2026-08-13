@@ -235,9 +235,18 @@ export const finUpdateLancamento = (id, data) => request(`/financeiro/lancamento
 export const finBaixarLancamento = (id, { paidAt, contaId } = {}) =>
   request(`/financeiro/lancamentos/${id}/baixar`, { method: "POST", body: { ...(paidAt ? { paidAt } : {}), ...(contaId ? { contaId } : {}) } });
 export const finEstornarLancamento = (id) => request(`/financeiro/lancamentos/${id}/estornar`, { method: "POST" });
+export const finDefinirConferido = (id, conferido) => request(`/financeiro/lancamentos/${id}/conferido`, { method: "PATCH", body: { conferido } });
+// Movimentação de uma conta num período - busca sob demanda (só ao clicar Filtrar).
+export const finMovimentacao = ({ contaId, de, ate, estornados } = {}) => {
+  const qs = new URLSearchParams({ contaId, de, ate });
+  if (estornados) qs.set("estornados", "1");
+  return request(`/financeiro/movimentacao?${qs.toString()}`);
+};
 export const finMudarStatus = (id, status) => request(`/financeiro/lancamentos/${id}/status`, { method: "PATCH", body: { status } });
 export const finDesdobrarLancamento = (id, dados) => request(`/financeiro/lancamentos/${id}/desdobrar`, { method: "POST", body: dados });
 export const finListImpostosAplicados = (id) => request(`/financeiro/lancamentos/${id}/impostos`);
+export const finListApropriacoes = (id) => request(`/financeiro/lancamentos/${id}/apropriacoes`);
+export const finDefinirApropriacoes = (id, itens) => request(`/financeiro/lancamentos/${id}/apropriacoes`, { method: "PUT", body: { itens } });
 export const finAplicarImposto = (id, impostoId) => request(`/financeiro/lancamentos/${id}/impostos`, { method: "POST", body: { impostoId } });
 export const finRemoverImpostoAplicado = (id, aplicadoId) => request(`/financeiro/lancamentos/${id}/impostos/${aplicadoId}`, { method: "DELETE" });
 export const finDeleteLancamento = (id) => request(`/financeiro/lancamentos/${id}`, { method: "DELETE" });

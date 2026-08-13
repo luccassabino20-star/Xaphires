@@ -326,10 +326,10 @@ export default function TitulosView() {
                   <td>{l.descricao || "-"}</td>
                   <td>{nomeContraparte(l) || "-"}</td>
                   <td>{comCodigo(catById[l.category_id]) || "-"}</td>
-                  <td>{comCodigo(centroById[l.centro_custo_id]) || "-"}</td>
+                  <td>{l.apropriacao_count > 0 ? <span className="fin-tag-rateado">{t("financeiro.tit.rateadoN", { n: l.apropriacao_count })}</span> : (comCodigo(centroById[l.centro_custo_id]) || "-")}</td>
                   <td>{l.due}</td>
                   <td className={"fin-num " + (l.tipo === "receber" ? "fin-receber" : "fin-pagar")}>
-                    {l.tipo === "receber" ? "+" : "-"} {formatCents(l.valor_cents, lang)}
+                    {l.tipo === "receber" ? "+" : "-"} {formatCents(liquidoDoLancamento(l), lang)}
                   </td>
                   <td><span className={"fin-badge fin-badge-" + l.status}>{t("financeiro.status." + l.status)}</span></td>
                   <td className="fin-row-actions">

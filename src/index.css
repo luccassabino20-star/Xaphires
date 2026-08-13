@@ -6384,6 +6384,20 @@ img.avatar { object-fit: cover; padding: 0; }
 .fin-bloco > legend { font-size: 11.5px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 0 6px; }
 .fin-bloco-pagto { background: color-mix(in srgb, var(--fin-entrada) 6%, var(--bg-card)); }
 .fin-tit-liquido strong { font-size: 17px; font-weight: 720; color: var(--fin-entrada); }
+/* Rateio (apropriação) por vários centros de custo no detalhe do título. */
+.fin-rateio { margin-top: 12px; }
+.fin-rateio-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.fin-rateio-titulo { font-size: 13px; font-weight: 650; color: var(--text-secondary); }
+.fin-rateio-cols, .fin-rateio-linha { display: grid; grid-template-columns: 1fr 88px 120px 32px; gap: 8px; align-items: center; }
+.fin-rateio-cols { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.fin-rateio-linha { margin-bottom: 6px; }
+.fin-rateio-linha select, .fin-rateio-linha input { width: 100%; }
+.fin-rateio-x { justify-self: center; }
+.fin-rateio-restante { margin-top: 8px; font-size: 13px; color: var(--text-secondary); }
+.fin-rateio-restante.ok strong { color: var(--success); }
+.fin-rateio-restante.pend strong { color: var(--danger); }
+.fin-rateio-base { color: var(--text-muted); }
+.fin-tag-rateado { font-size: 10.5px; font-weight: 650; padding: 1px 7px; border-radius: 999px; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
 /* Formulário de novo título (aba Lançamentos): reaproveita os blocos do detalhe
    (fin-bloco/fin-modal-grid/fin-field), só empilhados com respiro entre eles. */
 .fin-novo-titulo { max-width: 920px; }

@@ -137,6 +137,21 @@ export function applyFinanceiroSchema(companyDb) {
       created_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_fin_lanc_impostos_titulo ON financeiro_lancamento_impostos(lancamento_id);
+
+    -- Apropriação (rateio) do valor de um título entre vários centros de custo.
+    -- Cada linha é uma parte do valor do título alocada a um centro. Quando um
+    -- título tem apropriações, ele é "rateado" e o centro_custo_id único fica NULL
+    -- (o rateio é a fonte da verdade). A soma dos valor_cents fecha o valor do
+    -- título (validado no repo). Mesmo espírito de financeiro_lancamento_impostos:
+    -- sub-registros de um lançamento.
+    CREATE TABLE IF NOT EXISTS financeiro_apropriacoes (
+      id TEXT PRIMARY KEY,
+      lancamento_id TEXT NOT NULL REFERENCES financeiro_lancamentos(id),
+      centro_custo_id TEXT NOT NULL,
+      valor_cents INTEGER NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_fin_apropriacoes_titulo ON financeiro_apropriacoes(lancamento_id);
   `);
 
   // Colunas acrescentadas depois do MVP - mesmo padrão addColumnIfMissing de

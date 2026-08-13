@@ -399,8 +399,14 @@ export function listLancamentos({ tipo, status, de, ate } = {}) {
   if (de) { cond.push("due >= ?"); args.push(de); }
   if (ate) { cond.push("due <= ?"); args.push(ate); }
   const where = cond.length ? `WHERE ${cond.join(" AND ")}` : "";
+  // apropriacao_count acompanha para a lista mostrar "Rateado (N)" sem uma segunda
+  // consulta por linha - o título rateado não tem centro único, então é assim que
+  // a coluna Centro sabe distinguir "sem centro" de "rateado". As colunas do WHERE
+  // (tipo/status/due) só existem na tabela externa, então não precisam de alias.
   return getDb()
-    .prepare(`SELECT * FROM financeiro_lancamentos ${where} ORDER BY due ASC, created_at ASC`)
+    .prepare(`SELECT financeiro_lancamentos.*,
+                (SELECT COUNT(*) FROM financeiro_apropriacoes a WHERE a.lancamento_id = financeiro_lancamentos.id) AS apropriacao_count
+              FROM financeiro_lancamentos ${where} ORDER BY due ASC, created_at ASC`)
     .all(...args);
 }
 
@@ -523,6 +529,13 @@ export function updateLancamento(id, campos) {
       novo.imposto_retido_cents, novo.imposto_acrescido_cents, novo.desconto_cents, novo.retencao_cents, novo.multa_cents, novo.juros_cents,
       novo.category_id, novo.centro_custo_id, novo.contato_id, novo.conta_id, novo.doc, novo.contraparte, id
     );
+  // Mudou o valor do título? Um rateio antigo não fecha mais a soma - limpa as
+  // apropriações para não deixar rateio inconsistente. O cliente regrava o rateio
+  // logo em seguida (salva o título e então manda as apropriações contra o novo
+  // valor), então isto só descarta o que ficou órfão.
+  if (novo.valor_cents !== atual.valor_cents) {
+    getDb().prepare("DELETE FROM financeiro_apropriacoes WHERE lancamento_id = ?").run(id);
+  }
   return getLancamento(id);
 }
 
@@ -658,8 +671,70 @@ export function deleteLancamento(id) {
   // financeiro_lancamento_impostos.lancamento_id é NOT NULL e as FKs estão ON, então
   // deletar o título com imposto aplicado sem limpar isto dá "constraint failed".
   db.prepare(`DELETE FROM financeiro_lancamento_impostos WHERE lancamento_id IN (${marcas})`).run(...ids);
+  // Apropriações também referenciam o título (FK NOT NULL) - somem junto.
+  db.prepare(`DELETE FROM financeiro_apropriacoes WHERE lancamento_id IN (${marcas})`).run(...ids);
   db.prepare("DELETE FROM financeiro_lancamentos WHERE titulo_origem_id = ?").run(id);
   db.prepare("DELETE FROM financeiro_lancamentos WHERE id = ?").run(id);
+}
+
+// ---------- Apropriação (rateio) por centro de custo ----------
+// Divide o valor de um título entre vários centros. Sub-registros do lançamento,
+// mesmo padrão dos impostos aplicados. A soma tem que FECHAR o valor do título; um
+// título rateado tem centro_custo_id único NULL (o rateio manda).
+export function listApropriacoes(lancamentoId) {
+  return getDb().prepare("SELECT * FROM financeiro_apropriacoes WHERE lancamento_id = ? ORDER BY created_at").all(lancamentoId);
+}
+
+// Erro de regra do rateio - a rota traduz o code. Fora da classe RegraError dos
+// centros (aquela é do store global); aqui é validação do módulo.
+export class ApropriacaoError extends Error {
+  constructor(code, message) { super(message); this.code = code; }
+}
+
+// Substitui TODAS as apropriações do título pelas `itens` ({centroCustoId,
+// valorCents}). itens vazio limpa o rateio (o título volta a poder ter centro
+// único). Valida: só título aberto; cada centro analítico ativo da empresa; sem
+// centro repetido; cada valor inteiro > 0; e a soma igual ao valor do título.
+export function definirApropriacoes(lancamentoId, itens) {
+  const db = getDb();
+  const titulo = getLancamento(lancamentoId);
+  if (!titulo) return null;
+  if (titulo.status !== "provisionado" && titulo.status !== "pendente" && titulo.status !== "disponivel")
+    throw new ApropriacaoError("FIN_APROP_TRAVADO", "Título baixado ou anulado não aceita rateio");
+
+  const lista = Array.isArray(itens) ? itens : [];
+  const vistos = new Set();
+  let soma = 0;
+  for (const it of lista) {
+    const cc = it.centroCustoId ? getCentroCusto(it.centroCustoId) : null;
+    if (!cc) throw new ApropriacaoError("FIN_CC_NOT_FOUND", "Centro de custo não encontrado");
+    if (cc.tipo !== "analitico") throw new ApropriacaoError("FIN_CC_SINTETICO", "Centro sintético não recebe rateio; escolha um analítico");
+    if (cc.ativo !== 1) throw new ApropriacaoError("FIN_CC_INATIVO", "Centro de custo inativo");
+    if (vistos.has(cc.id)) throw new ApropriacaoError("FIN_APROP_DUPLICADO", "Centro repetido no rateio");
+    vistos.add(cc.id);
+    if (!Number.isInteger(it.valorCents) || it.valorCents <= 0)
+      throw new ApropriacaoError("FIN_APROP_VALOR", "Valor de rateio inválido");
+    soma += it.valorCents;
+  }
+  if (lista.length && soma !== titulo.valor_cents)
+    throw new ApropriacaoError("FIN_APROP_SOMA", "A soma do rateio precisa fechar o valor do título");
+
+  // Troca atômica: limpa as antigas e grava as novas. node:sqlite não tem
+  // db.transaction() do better-sqlite3 - uso BEGIN/COMMIT na mão.
+  db.exec("BEGIN");
+  try {
+    db.prepare("DELETE FROM financeiro_apropriacoes WHERE lancamento_id = ?").run(lancamentoId);
+    const ins = db.prepare("INSERT INTO financeiro_apropriacoes (id, lancamento_id, centro_custo_id, valor_cents, created_at) VALUES (?, ?, ?, ?, ?)");
+    const agora = new Date().toISOString();
+    for (const it of lista) ins.run(uid(), lancamentoId, it.centroCustoId, it.valorCents, agora);
+    // Título rateado não tem centro único; sem rateio, não mexo no centro atual.
+    if (lista.length) db.prepare("UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE id = ?").run(lancamentoId);
+    db.exec("COMMIT");
+  } catch (e) {
+    db.exec("ROLLBACK");
+    throw e;
+  }
+  return { titulo: getLancamento(lancamentoId), apropriacoes: listApropriacoes(lancamentoId) };
 }
 
 // ---------- Impostos aplicados ao título ----------
