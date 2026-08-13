@@ -196,6 +196,7 @@ export const geocodeAddress = (q) => request(`/geocode?q=${encodeURIComponent(q)
 // Endereço por CEP (ViaCEP, via proxy do servidor). Devolve { cep, logradouro,
 // complemento, bairro, cidade, uf }.
 export const buscarCep = (cep) => request(`/cep/${encodeURIComponent(String(cep).replace(/\D/g, ""))}`);
+export const buscarCnpj = (cnpj) => request(`/cnpj/${encodeURIComponent(String(cnpj).replace(/\D/g, ""))}`);
 
 // ---------- Chat ----------
 export const listChatConversations = () => request("/chat/conversations");

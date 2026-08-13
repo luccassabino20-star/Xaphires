@@ -6,6 +6,7 @@ import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents, reaisParaCents, centsOuZero, formatPercent } from "./dinheiro.js";
 import { BANCOS, rotuloBanco } from "./bancos.js";
+import { normalizarDoc, cnpjValido } from "../../utils/doc.js";
 
 // Cadastros de apoio do Financeiro, organizados em sidebar por categoria (o
 // mesmo agrupamento do menu "Cadastros Básicos" do SIGIM). Só 6 itens são reais
@@ -527,6 +528,8 @@ function SecaoContatos({ contatos, onCriar, onEditar }) {
   const [editandoId, setEditandoId] = useState(null);
   const [buscandoCep, setBuscandoCep] = useState(false);
   const [cepErro, setCepErro] = useState("");
+  const [buscandoCnpj, setBuscandoCnpj] = useState(false);
+  const [cnpjErro, setCnpjErro] = useState("");
   const [detalhe, setDetalhe] = useState(null); // contato aberto para ver os dados
   const rotuloTipo = (tp) => t(`financeiro.cad.tipo_${tp}`);
   function editar(x) {
@@ -538,7 +541,39 @@ function SecaoContatos({ contatos, onCriar, onEditar }) {
       bairro: x.bairro || "", cidade: x.cidade || "", uf: x.uf || "", pais: x.pais || "Brasil", pontoReferencia: x.ponto_referencia || "",
     });
   }
-  function cancelar() { setEditandoId(null); setF(CONTATO_VAZIO); setCepErro(""); }
+  function cancelar() { setEditandoId(null); setF(CONTATO_VAZIO); setCepErro(""); setCnpjErro(""); }
+
+  // Pesquisar empresa: busca os dados na BrasilAPI (via servidor) pelo CNPJ e
+  // preenche razão social, endereço, telefone e e-mail. Só CNPJ (14 dígitos) - CPF
+  // não tem cadastro de empresa. Não sobrescreve o que o usuário já tenha digitado
+  // de propósito? Não: é uma busca explícita, então preenche com o que veio (mantém
+  // só o número/complemento se a base não trouxer).
+  async function preencherPorCnpj() {
+    const doc = normalizarDoc(f.doc);
+    setCnpjErro("");
+    if (!cnpjValido(doc)) { setCnpjErro(t("financeiro.cad.cnpjInvalido")); return; }
+    setBuscandoCnpj(true);
+    try {
+      const e = await api.buscarCnpj(doc);
+      setF((cur) => ({
+        ...cur,
+        nome: e.nome || cur.nome,
+        cep: e.cep || cur.cep,
+        logradouro: e.logradouro || cur.logradouro,
+        numero: e.numero || cur.numero,
+        complemento: e.complemento || cur.complemento,
+        bairro: e.bairro || cur.bairro,
+        cidade: e.cidade || cur.cidade,
+        uf: e.uf || cur.uf,
+        telefone: e.telefone || cur.telefone,
+        email: e.email || cur.email,
+      }));
+    } catch (err) {
+      setCnpjErro(translateError(err, t));
+    } finally {
+      setBuscandoCnpj(false);
+    }
+  }
 
   // Busca o endereço no ViaCEP (via servidor) e preenche logradouro/bairro/cidade/
   // UF. Dispara ao completar 8 dígitos e também no blur, para não depender de sair
@@ -584,6 +619,9 @@ function SecaoContatos({ contatos, onCriar, onEditar }) {
           <option value="ambos">{rotuloTipo("ambos")}</option>
         </select>
         <input type="text" placeholder={t("financeiro.cad.doc")} value={f.doc} onChange={(e) => setF({ ...f, doc: e.target.value })} />
+        <button type="button" className="btn-secondary btn-small" onClick={preencherPorCnpj} disabled={buscandoCnpj}>
+          {buscandoCnpj ? t("financeiro.cad.buscandoEmpresa") : t("financeiro.cad.pesquisarEmpresa")}
+        </button>
         <input type="text" placeholder={t("financeiro.cad.email")} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
         <input type="text" placeholder={t("financeiro.cad.telefone")} value={f.telefone} onChange={(e) => setF({ ...f, telefone: e.target.value })} />
         <input
@@ -604,6 +642,8 @@ function SecaoContatos({ contatos, onCriar, onEditar }) {
       </form>
       {buscandoCep && <div className="fin-cad-hint">{t("financeiro.cad.buscandoCep")}</div>}
       {cepErro && <div className="fin-error">{cepErro}</div>}
+      {buscandoCnpj && <div className="fin-cad-hint">{t("financeiro.cad.buscandoEmpresa")}</div>}
+      {cnpjErro && <div className="fin-error">{cnpjErro}</div>}
       <Tabela vazio={t("financeiro.vazio")} linhas={contatos} colunas={[
         { h: t("financeiro.cad.nome"), c: (x) => <button type="button" className="fin-titulo-link" onClick={() => setDetalhe(x)}>{x.nome}</button> },
         { h: t("financeiro.cad.tipo"), c: (x) => rotuloTipo(x.tipo) },
