@@ -6335,11 +6335,20 @@ img.avatar { object-fit: cover; padding: 0; }
 
 /* Barra de filtros da Movimentação: conta, período, estornados e o botão de
    busca. A tela só carrega ao clicar aqui. */
-.fin-mov-filtros { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+/* Todos os itens são .fin-field (label em cima + controle); o checkbox e os botões
+   ganham um label vazio, então os controles ficam todos na MESMA linha. Alinhados
+   por baixo, e com altura de controle uniforme (36px) para os topos também baterem. */
+.fin-mov-filtros { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
 .fin-mov-filtros .fin-field { gap: 4px; }
-.fin-mov-filtros input[type="date"] { padding: 7px 9px; border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-list); color: var(--text-primary); font-size: 13.5px; }
-.fin-mov-check { display: flex; align-items: center; gap: 6px; padding-bottom: 8px; font-size: 13.5px; color: var(--text-secondary); cursor: pointer; }
+.fin-mov-filtros input[type="date"] { padding: 0 10px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-list); color: var(--text-primary); font-size: 13.5px; }
+.fin-mov-filtros input, .fin-mov-filtros .fin-ss-control,
+.fin-mov-filtros .btn-primary, .fin-mov-filtros .btn-secondary, .fin-mov-check { height: 36px; box-sizing: border-box; }
+.fin-mov-check { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+/* O checkbox não deve herdar o box de .fin-field input (borda/fundo/padding). */
+.fin-mov-check input[type="checkbox"] { height: auto; width: auto; padding: 0; margin: 0; border: none; background: none; border-radius: 0; }
+.fin-mov-acao { justify-content: flex-end; }
 .fin-mov-filtrar { display: inline-flex; align-items: center; gap: 7px; }
+.fin-mov-conta-info { margin-top: -6px; margin-bottom: 14px; }
 .fin-mov-prompt { margin-top: 6px; }
 /* Cards de totalizadores do período. */
 .fin-mov-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }

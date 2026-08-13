@@ -121,11 +121,6 @@ export default function MovimentacaoView() {
           ) : (
             <SearchSelect value={contaId} onChange={setContaId} options={contaOpts} allLabel={t("financeiro.baixa.semConta")} />
           )}
-          {contaSel && (detalheConta(contaSel) || contaSel.banco) && (
-            <span className="fin-conta-detalhe">
-              {[contaSel.banco, detalheConta(contaSel)].filter(Boolean).join(" · ")}
-            </span>
-          )}
         </label>
         <label className="fin-field">
           <span>{t("financeiro.mov.dataInicio")}</span>
@@ -135,20 +130,37 @@ export default function MovimentacaoView() {
           <span>{t("financeiro.mov.dataFim")}</span>
           <input type="date" value={ate} min={de || undefined} onChange={(e) => setAte(e.target.value)} />
         </label>
-        <label className="fin-mov-check">
-          <input type="checkbox" checked={incluirEstornados} onChange={(e) => setIncluirEstornados(e.target.checked)} />
-          <span>{t("financeiro.mov.incluirEstornados")}</span>
+        {/* Checkbox e botões não têm label em cima: um span vazio reserva a mesma
+            altura de label dos campos, para o controle alinhar na mesma linha. */}
+        <label className="fin-field fin-mov-check-field">
+          <span aria-hidden="true">&nbsp;</span>
+          <span className="fin-mov-check">
+            <input type="checkbox" checked={incluirEstornados} onChange={(e) => setIncluirEstornados(e.target.checked)} />
+            {t("financeiro.mov.incluirEstornados")}
+          </span>
         </label>
-        <button type="submit" className="btn-primary fin-mov-filtrar" disabled={buscando || contasAtivas.length === 0}>
-          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-            <path fill="none" stroke="currentColor" strokeWidth="2" d="M10 4a6 6 0 104.9 9.5l4.8 4.8m-4.9-4.8A6 6 0 0010 4z" />
-          </svg>
-          {buscando ? t("common.loading") : t("financeiro.mov.filtrar")}
-        </button>
-        <button type="button" className="btn-secondary fin-mov-manual" onClick={() => setManualAberto(true)}>
-          + {t("financeiro.manual.titulo")}
-        </button>
+        <div className="fin-field fin-mov-acao">
+          <span aria-hidden="true">&nbsp;</span>
+          <button type="submit" className="btn-primary fin-mov-filtrar" disabled={buscando || contasAtivas.length === 0}>
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+              <path fill="none" stroke="currentColor" strokeWidth="2" d="M10 4a6 6 0 104.9 9.5l4.8 4.8m-4.9-4.8A6 6 0 0010 4z" />
+            </svg>
+            {buscando ? t("common.loading") : t("financeiro.mov.filtrar")}
+          </button>
+        </div>
+        <div className="fin-field fin-mov-acao">
+          <span aria-hidden="true">&nbsp;</span>
+          <button type="button" className="btn-secondary fin-mov-manual" onClick={() => setManualAberto(true)}>
+            + {t("financeiro.manual.titulo")}
+          </button>
+        </div>
       </form>
+
+      {contaSel && (detalheConta(contaSel) || contaSel.banco) && (
+        <div className="fin-conta-detalhe fin-mov-conta-info">
+          {[contaSel.banco, detalheConta(contaSel)].filter(Boolean).join(" · ")}
+        </div>
+      )}
 
       {erro && <div className="fin-error">{erro}</div>}
 
