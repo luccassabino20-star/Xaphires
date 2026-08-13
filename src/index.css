@@ -6307,6 +6307,9 @@ img.avatar { object-fit: cover; padding: 0; }
 /* Barra de busca + filtros dos lançamentos */
 .fin-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
 .fin-toolbar select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+/* SearchSelect pesquisável no lugar do <select> de cliente/fornecedor da toolbar. */
+.fin-toolbar-ss { width: 210px; }
+.fin-toolbar-ss > .fin-ss { width: 100%; }
 .fin-search { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 220px; padding: 7px 11px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-muted); }
 .fin-search input { flex: 1; border: none; background: none; outline: none; color: var(--text-primary); font-size: 13.5px; }
 .fin-filtro-data { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }

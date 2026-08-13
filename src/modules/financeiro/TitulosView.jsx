@@ -6,6 +6,7 @@ import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents, reaisParaCents, liquidoDoLancamento } from "./dinheiro.js";
 import { comCodigo } from "./rotulo.js";
+import SearchSelect from "./SearchSelect.jsx";
 import LancamentoModal from "./LancamentoModal.jsx";
 
 // Aba Títulos: só a consulta. Lançar um título novo é na aba Lançamentos - aqui
@@ -100,6 +101,7 @@ export default function TitulosView() {
   const catById = useMemo(() => Object.fromEntries(categorias.map((c) => [c.id, c])), [categorias]);
   const centroById = useMemo(() => Object.fromEntries(centros.map((c) => [c.id, c])), [centros]);
   const contatoById = useMemo(() => Object.fromEntries(contatos.map((c) => [c.id, c])), [contatos]);
+  const contatoOpts = useMemo(() => contatos.map((c) => ({ id: c.id, label: c.nome })), [contatos]);
 
   function nomeContraparte(l) {
     return contatoById[l.contato_id]?.nome || l.contraparte || "";
@@ -254,10 +256,9 @@ export default function TitulosView() {
           <option value="">{t("financeiro.filtro.todasContas")}</option>
           {contas.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
         </select>
-        <select value={fContato} onChange={(e) => setFContato(e.target.value)}>
-          <option value="">{t("financeiro.filtro.todosContatos")}</option>
-          {contatos.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-        </select>
+        <div className="fin-toolbar-ss">
+          <SearchSelect value={fContato} onChange={setFContato} options={contatoOpts} allLabel={t("financeiro.filtro.todosContatos")} />
+        </div>
         <label className="fin-filtro-data">{t("financeiro.periodo.de")}<input type="date" value={fDe} onChange={(e) => setFDe(e.target.value)} /></label>
         <label className="fin-filtro-data">{t("financeiro.periodo.ate")}<input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} /></label>
         <input className="fin-filtro-valor" type="number" step="0.01" min="0" placeholder={t("financeiro.filtro.valorMin")} value={fValMin} onChange={(e) => setFValMin(e.target.value)} />

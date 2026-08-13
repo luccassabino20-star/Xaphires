@@ -6,6 +6,7 @@ import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents, formatPercent, reaisParaCents, centsOuZero } from "./dinheiro.js";
 import { comCodigo } from "./rotulo.js";
+import SearchSelect from "./SearchSelect.jsx";
 
 // Formas de pagamento (conjunto fixo por ora; o SIGIM tem cadastro próprio). A
 // chave é gravada; o rótulo é traduzido em financeiro.forma.*. Exportado para o
@@ -91,6 +92,7 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
   }, [l.id]);
 
   const correntista = useMemo(() => contatos.find((c) => c.id === f.contatoId) || null, [contatos, f.contatoId]);
+  const contatoOpts = useMemo(() => contatos.map((c) => ({ id: c.id, label: c.nome })), [contatos]);
   const contaPagto = useMemo(() => contas.find((c) => c.id === l.conta_id) || null, [contas, l.conta_id]);
   // Centros selecionáveis: só analítico ativo recebe lançamento. Mantém o centro
   // já gravado neste título na lista mesmo que hoje seja sintético/inativo, para o
@@ -276,10 +278,7 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
           </div>
           <label className="fin-field fin-tit-correntista">
             <span>{t("financeiro.col.contraparte")}</span>
-            <select value={f.contatoId} onChange={(e) => setF({ ...f, contatoId: e.target.value })}>
-              <option value="">{t("financeiro.form.semContato")}</option>
-              {contatos.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-            </select>
+            <SearchSelect value={f.contatoId} onChange={(id) => setF({ ...f, contatoId: id })} options={contatoOpts} allLabel={t("financeiro.form.semContato")} />
             <span className="fin-tit-doc-correntista">{correntista?.doc || " "}</span>
           </label>
           <div className="fin-tit-situacao">
