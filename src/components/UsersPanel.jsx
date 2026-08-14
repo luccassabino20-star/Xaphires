@@ -113,6 +113,18 @@ export default function UsersPanel({ onClose, initialShowCreate = false }) {
     }
   }
 
+  // Liga/desliga o acesso ao módulo Financeiro para um membro. O master não
+  // aparece com o toggle (acessa sempre) - a regra do master implícito mora no
+  // servidor (publicUser.financeAccess), aqui só se reflete.
+  async function handleToggleFinance(u) {
+    try {
+      await api.setFinanceAccess(u.id, !u.financeAccess);
+      await refreshUsers();
+    } catch (err) {
+      alert(translateError(err, t));
+    }
+  }
+
   async function handleDelete(u) {
     if (!confirm(t("users.deleteUserConfirm", { name: u.name }))) return;
     try {
@@ -216,6 +228,7 @@ export default function UsersPanel({ onClose, initialShowCreate = false }) {
                   <th>{t("users.colName")}</th>
                   <th>{t("users.colEmail")}</th>
                   <th>{t("users.colRole")}</th>
+                  <th>{t("users.colFinance")}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -234,6 +247,16 @@ export default function UsersPanel({ onClose, initialShowCreate = false }) {
                       <span className={"role-badge" + (u.role === "master" ? " master" : "")}>
                         {u.role === "master" ? t("users.roleMaster") : t("users.roleMember")}
                       </span>
+                    </td>
+                    <td>
+                      {u.role === "master" ? (
+                        <span className="finance-access-always">{t("users.financeAlways")}</span>
+                      ) : (
+                        <label className="finance-access-toggle" title={t("users.financeAccessHint")}>
+                          <input type="checkbox" checked={!!u.financeAccess} onChange={() => handleToggleFinance(u)} />
+                          <span>{t("users.financeAccessLabel")}</span>
+                        </label>
+                      )}
                     </td>
                     <td className="users-table-actions">
                       {u.role !== "master" && (

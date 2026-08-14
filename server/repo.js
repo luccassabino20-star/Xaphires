@@ -50,6 +50,13 @@ export function setUserRole(id, role) {
   getDb().prepare("UPDATE users SET role = ? WHERE id = ?").run(role, id);
   return getUserById(id);
 }
+// Concede ou revoga o acesso ao módulo Financeiro para um membro. Não toca no
+// master (ele acessa sempre; a rota nem chama isto para ele). 1/0 porque a coluna
+// é INTEGER - SQLite não tem booleano próprio.
+export function setFinanceAccess(id, allowed) {
+  getDb().prepare("UPDATE users SET finance_access = ? WHERE id = ?").run(allowed ? 1 : 0, id);
+  return getUserById(id);
+}
 export function deleteUser(id) {
   // Sem isto a foto de perfil de quem foi excluído ficava órfã em
   // companies/<id>/uploads/avatars para sempre - a linha do usuário some
@@ -80,6 +87,10 @@ export function publicUser(u) {
     email: u.email,
     role: u.role,
     bio: u.bio || "",
+    // Acesso ao módulo Financeiro: o master sempre pode, os demais só com a
+    // concessão. Vai calculado aqui para o cliente (launcher, UsersPanel) não
+    // reimplementar a regra do master implícito. Ver server/modules.js.
+    financeAccess: u.role === "master" || u.finance_access === 1,
     // ?v=avatar_path muda a cada troca de foto (o path é um uuid novo), então
     // o navegador busca de novo sozinho - sem isso a mesma URL por usuário
     // ficaria presa no cache com a foto antiga depois de trocar.

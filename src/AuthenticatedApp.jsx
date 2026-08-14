@@ -16,7 +16,7 @@ import { useBoardState } from "./state/BoardContext.jsx";
 import { useUsers } from "./state/UsersContext.jsx";
 import PlanBanner from "./components/PlanBanner.jsx";
 
-export default function AuthenticatedApp() {
+export default function AuthenticatedApp({ onExitModule }) {
   const { t } = useTranslation();
   const state = useBoardState();
   const { users } = useUsers();
@@ -70,6 +70,7 @@ export default function AuthenticatedApp() {
         <PlanBanner />
         <TopBar
           board={board}
+          onExitModule={onExitModule}
           onToggleSidebar={() => setSidebarOpen((o) => !o)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}

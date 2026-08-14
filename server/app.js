@@ -15,8 +15,12 @@ import { router as reportsRouter } from "./routes/reports.js";
 import { router as listsRouter } from "./routes/lists.js";
 import { router as cardsRouter } from "./routes/cards.js";
 import { router as geocodeRouter } from "./routes/geocode.js";
+import { router as cepRouter } from "./routes/cep.js";
+import { router as cnpjRouter } from "./routes/cnpj.js";
 import { router as chatRouter } from "./routes/chat.js";
 import { router as planRouter } from "./routes/plan.js";
+import { router as modulesRouter } from "./routes/modules.js";
+import { router as financeiroRouter } from "./modules/financeiro/routes.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as personalTasksRouter } from "./routes/personalTasks.js";
 import { router as billingRouter } from "./routes/billing.js";
@@ -89,6 +93,9 @@ app.use("/api/admin", adminRouter);
 
 app.use("/api/auth", authRouter);
 app.use("/api/plan", planRouter);
+// Catálogo de módulos da plataforma. Fora do requireWritablePlan, como /api/plan:
+// empresa vencida precisa ver os módulos para navegar e voltar a pagar.
+app.use("/api/modules", modulesRouter);
 // Pop-up promocional da landing: público de propósito, ninguém logou ainda nesse
 // ponto da visita. Só GET, então não precisa de verifyOrigin nem de rate limit.
 app.use("/api/popup", popupRouter);
@@ -102,9 +109,15 @@ app.use("/api/boards", requireAuth, requireWritablePlan, boardsRouter);
 app.use("/api/lists", requireAuth, requireWritablePlan, listsRouter);
 app.use("/api/cards", requireAuth, requireWritablePlan, cardsRouter);
 app.use("/api/geocode", geocodeRouter);
+app.use("/api/cep", cepRouter);
+app.use("/api/cnpj", cnpjRouter);
 app.use("/api/chat", requireAuth, requireWritablePlan, chatRouter);
 app.use("/api/recurrences", requireAuth, requireWritablePlan, recurrencesRouter);
 app.use("/api/personal-tasks", requireAuth, requireWritablePlan, personalTasksRouter);
+// Módulo Financeiro. O router já aplica requireAuth/requireWritablePlan/
+// requireModule("financeiro") internamente, então monta direto - o requireModule
+// é que barra empresa sem o módulo ou usuário sem autorização.
+app.use("/api/financeiro", financeiroRouter);
 // Relatório é leitura, e requireWritablePlan já libera GET - fica no mesmo grupo por
 // coerência, e empresa vencida continua conseguindo exportar os próprios dados.
 app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);

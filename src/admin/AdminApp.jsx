@@ -5,6 +5,7 @@ import Metricas from "./Metricas.jsx";
 import Auditoria from "./Auditoria.jsx";
 import Admins from "./Admins.jsx";
 import Popups from "./Popups.jsx";
+import CentrosCusto from "./CentrosCusto.jsx";
 
 // O painel é interno e tem um público só: quem opera a plataforma. Por isso os
 // textos ficam em português direto no componente, sem passar pelo i18n do produto —
@@ -12,6 +13,7 @@ import Popups from "./Popups.jsx";
 
 const ABAS = [
   { id: "empresas", nome: "Empresas" },
+  { id: "centros", nome: "Centros de custo" },
   { id: "metricas", nome: "Métricas" },
   { id: "popups", nome: "Pop-ups" },
   { id: "auditoria", nome: "Auditoria" },
@@ -118,6 +120,7 @@ export default function AdminApp() {
 
       <main className="adm-conteudo">
         {aba === "empresas" && <Empresas />}
+        {aba === "centros" && <CentrosCusto />}
         {aba === "metricas" && <Metricas />}
         {aba === "popups" && <Popups />}
         {aba === "auditoria" && <Auditoria />}

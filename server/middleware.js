@@ -4,6 +4,7 @@ import { ah } from "./asyncHandler.js";
 import { runWithCompany } from "./context.js";
 import { getCompany } from "./directory.js";
 import { isWritable } from "./plans.js";
+import { isModuleEnabled } from "./modules.js";
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
@@ -91,6 +92,19 @@ export function requireWritablePlan(req, res, next) {
 export function requireMaster(req, res, next) {
   if (req.user?.role !== "master") return res.status(403).json({ error: "Acesso restrito ao usuário master", code: "FORBIDDEN_MASTER_ONLY" });
   next();
+}
+
+// Barra quem não pode acessar um módulo da plataforma: confere o entitlement da
+// empresa E a autorização do usuário, na autoridade única (modules.js). Aplicado
+// por router, uma vez - rota nova do módulo nasce protegida, como requireWritablePlan.
+// A recusa é genérica de propósito (não diz se faltou plano ou permissão), para
+// não revelar a estrutura de acesso a quem sonda.
+export function requireModule(moduleId) {
+  return (req, res, next) => {
+    const company = getCompany(req.companyId);
+    if (isModuleEnabled(company, req.user, moduleId)) return next();
+    return res.status(403).json({ error: "Módulo indisponível", code: "MODULE_FORBIDDEN" });
+  };
 }
 
 // Papel de um usuário num quadro, ou null quando ele não tem acesso nenhum.

@@ -87,6 +87,14 @@ directoryDb.exec("UPDATE companies SET discount_by_plan = '{}' WHERE discount_by
 addColumnIfMissing("companies", "max_users_override", "max_users_override INTEGER");
 addColumnIfMissing("companies", "max_attachment_bytes_override", "max_attachment_bytes_override INTEGER");
 
+// Entitlement de módulos da plataforma, controlado pelo painel de administração
+// (não é autoatendimento). JSON com a lista de ids de módulos que a empresa pode
+// usar. NULL significa "ainda não definido pela plataforma": o padrão então são
+// os módulos core (ver companyEntitled em modules.js), para nenhuma empresa
+// existente perder o que já tinha ao ligar este recurso. Definir a lista pelo
+// painel passa a valer explicitamente por cima do padrão.
+addColumnIfMissing("companies", "enabled_modules", "enabled_modules TEXT");
+
 // A cobrança guarda os dados dela no mesmo banco global, porque pagamento é da
 // empresa e não de dentro de um quadro. Fica em server/billing/store.js, que cria
 // as próprias tabelas — este arquivo continua sendo só o cadastro de empresas.
@@ -135,6 +143,18 @@ export function setCompanyPlan(id, { plan, status, expiresAt, contractedAt }) {
 
 // Estende (ou remove, com null) a carência. Separado do setCompanyPlan porque a
 // carência muda no ritmo da cobrança, não no da contratação.
+// Grava a lista de módulos que a empresa pode usar (ids). Guarda como JSON;
+// array vazio é um estado válido e diferente de NULL - "a plataforma definiu que
+// nenhum módulo está liberado", em vez de "ainda não definiu". Ver companyEntitled.
+export function setCompanyModules(id, moduleIds) {
+  const atual = getCompany(id);
+  if (!atual) return null;
+  directoryDb
+    .prepare("UPDATE companies SET enabled_modules = ? WHERE id = ?")
+    .run(moduleIds ? JSON.stringify(moduleIds) : null, id);
+  return getCompany(id);
+}
+
 export function setCompanyGrace(id, graceUntil) {
   directoryDb.prepare("UPDATE companies SET grace_until = ? WHERE id = ?").run(graceUntil || null, id);
   return getCompany(id);

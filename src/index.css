@@ -5401,7 +5401,22 @@ img.avatar { object-fit: cover; padding: 0; }
 .adm-chip-grace, .adm-chip-expired { background: color-mix(in srgb, var(--adm-alerta) 18%, transparent); color: var(--adm-alerta); border-color: transparent; }
 .adm-chip-blocked { background: color-mix(in srgb, var(--adm-perigo) 15%, transparent); color: var(--adm-perigo); border-color: transparent; }
 .adm-chip-master { background: var(--adm-texto); color: #fff; border-color: transparent; }
+/* Centros de custo (árvore): código monoespaçado e indentado pelo nível, linha
+   inativa esmaecida, edição inline da descrição, e um select de empresa na barra. */
+.adm-cc-codigo { display: inline-block; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+.adm-cc-inativa { opacity: 0.55; }
+.adm-cc-vazio { text-align: center; }
+.adm-cc-edit { display: inline-flex; align-items: center; gap: 6px; }
+.adm-cc-edit input { flex: 1; min-width: 160px; }
+.adm-btn-mini { padding: 4px 9px; font-size: 12px; }
+.adm-campo-inline { flex-direction: row; align-items: center; gap: 8px; }
+.adm-campo-inline > span { white-space: nowrap; }
 .adm-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.adm-chip-fraco { opacity: 0.7; }
+.adm-modulos { display: flex; flex-direction: column; gap: 8px; }
+.adm-modulo { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.adm-modulo input { cursor: pointer; }
+.adm-modulo-nome { margin-right: 4px; }
 
 .adm-bloqueio {
   padding: 10px 12px; border-radius: 8px; font-size: 13px;
@@ -5856,3 +5871,661 @@ img.avatar { object-fit: cover; padding: 0; }
   border-radius: 8px;
 }
 .chat-input:focus { outline: none; border-color: var(--border-strong); }
+
+/* ---------- Launcher de módulos ---------- */
+/* A home da plataforma: um card por pilar. Segue o tema do app (dark/branco) pelas
+   mesmas variáveis do resto, com um tratamento mais premium - fundo com halos,
+   cabeçalho em vidro e cards com gradiente e brilho de destaque no hover. */
+.launcher {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-column);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+/* Dois halos radiais suaves nas cores da marca. Ficam atrás de tudo (z-index 0)
+   e o conteúdo sobe com position:relative. No branco eles quase somem, o
+   suficiente para dar profundidade sem sujar o fundo claro. */
+.launcher-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(680px 420px at 12% -8%, rgba(99, 102, 241, 0.20), transparent 70%),
+    radial-gradient(620px 420px at 100% 0%, rgba(16, 185, 129, 0.14), transparent 68%);
+}
+:root[data-theme="light"] .launcher-glow {
+  background:
+    radial-gradient(680px 420px at 12% -8%, rgba(99, 102, 241, 0.10), transparent 70%),
+    radial-gradient(620px 420px at 100% 0%, rgba(16, 185, 129, 0.08), transparent 68%);
+}
+.launcher-top,
+.launcher-body {
+  position: relative;
+  z-index: 1;
+}
+/* Cabeçalho em vidro: fica colado no topo e desfoca o que passa por trás. */
+.launcher-top {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--bg-column) 72%, transparent);
+  backdrop-filter: saturate(1.3) blur(12px);
+  -webkit-backdrop-filter: saturate(1.3) blur(12px);
+}
+.launcher-brand {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: linear-gradient(120deg, var(--text-primary), color-mix(in srgb, var(--text-primary) 55%, #6366f1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.launcher-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.launcher-body {
+  flex: 1;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 72px 30px 80px;
+}
+/* Sobrescreve o eyebrow em maiúsculas espaçadas - dá o ar de produto. */
+.launcher-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #818cf8;
+  margin-bottom: 14px;
+}
+.launcher-title {
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+  margin: 0 0 10px;
+}
+.launcher-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0 0 48px;
+  max-width: 560px;
+}
+.launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  gap: 20px;
+}
+.module-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px 22px;
+  min-height: 176px;
+  text-align: left;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--module-accent) 6%, var(--bg-card)), var(--bg-card));
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+/* Linha de destaque no topo do card, na cor do módulo. */
+.module-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--module-accent), transparent);
+  opacity: 0.85;
+}
+/* Halo interno que acende no hover. */
+.module-card-glow {
+  position: absolute;
+  z-index: -1;
+  top: -40%;
+  right: -30%;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--module-accent), transparent 68%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.module-card:not(.module-card-locked):hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--module-accent) 60%, var(--border-strong));
+  box-shadow:
+    0 18px 40px -12px color-mix(in srgb, var(--module-accent) 45%, transparent),
+    0 6px 18px rgba(0, 0, 0, 0.16);
+}
+.module-card:not(.module-card-locked):hover .module-card-glow {
+  opacity: 0.18;
+}
+.module-card:not(.module-card-locked):active {
+  transform: translateY(-1px);
+}
+.module-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--module-accent) 82%, #fff), var(--module-accent));
+  box-shadow:
+    0 8px 20px -6px color-mix(in srgb, var(--module-accent) 65%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+.module-card-name {
+  font-size: 17.5px;
+  font-weight: 680;
+  letter-spacing: -0.2px;
+}
+.module-card-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+/* Seta de "entrar", canto inferior direito. Desliza e acende no hover. */
+.module-card-arrow {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  display: inline-flex;
+  color: var(--module-accent);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.module-card:hover .module-card-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* Módulo ainda não liberado: apagado, sem clique, com o selo "Em breve". */
+.module-card-locked {
+  cursor: default;
+  opacity: 0.6;
+}
+.module-card-locked::before {
+  opacity: 0.35;
+}
+.module-card-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--bg-list) 80%, transparent);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(4px);
+}
+.launcher-error {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: var(--bg-column);
+  color: var(--text-primary);
+  padding: 24px;
+  text-align: center;
+}
+@media (max-width: 720px) {
+  .launcher-body { padding: 48px 18px 60px; }
+  .launcher-title { font-size: 28px; }
+  .launcher-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- Módulo Financeiro ---------- */
+/* Par de cores das séries do fluxo (entradas azul / saídas laranja), validado
+   para daltonismo pela skill dataviz. Definido nos quatro blocos de tema como o
+   resto: base claro, dark do sistema, e as duas escolhas explícitas. */
+:root { --fin-entrada: #2a78d6; --fin-saida: #eb6834; }
+@media (prefers-color-scheme: dark) {
+  :root { --fin-entrada: #3987e5; --fin-saida: #d95926; }
+}
+:root[data-theme="dark"] { --fin-entrada: #3987e5; --fin-saida: #d95926; }
+:root[data-theme="light"] { --fin-entrada: #2a78d6; --fin-saida: #eb6834; }
+
+.fin {
+  /* Altura fixa da viewport, não min-height: o app é body:overflow-hidden (cada
+     tela rola dentro de si), então quem rola é o .fin-body abaixo. Com min-height
+     o formulário de novo título, mais alto que a tela, ficava cortado sem barra. */
+  height: 100vh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-column);
+  color: var(--text-primary);
+}
+.fin-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-topbar);
+}
+.fin-top-left { display: flex; align-items: center; gap: 12px; }
+.fin-title { font-size: 18px; font-weight: 680; margin: 0; }
+.fin-top-actions { display: flex; align-items: center; gap: 12px; }
+.fin-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-topbar);
+  /* Sete abas: se a largura apertar, rola na horizontal em vez de sumir com as
+     últimas (Cadastros). flex-shrink:0 nas abas mantém o rótulo legível. */
+  overflow-x: auto;
+}
+.fin-tab { flex-shrink: 0; }
+.fin-tab {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 550;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.fin-tab:hover { color: var(--text-primary); }
+.fin-tab.active { color: var(--text-primary); border-bottom-color: var(--fin-entrada); }
+.fin-body {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  /* Rola dentro de si (cabeçalho e abas ficam fixos em cima); sem isso as telas
+     mais altas que a viewport eram cortadas, porque o body é overflow:hidden. */
+  overflow-y: auto;
+  /* Sem max-width: o Financeiro ocupa a tela toda, para o grid de título (muitas
+     colunas) caber sem a barra de rolagem lateral. */
+  padding: 28px 32px 56px;
+}
+.fin-loading, .fin-error, .fin-empty { color: var(--text-secondary); padding: 20px 4px; }
+.fin-error { color: var(--danger); }
+
+/* KPIs */
+.fin-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.fin-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+.fin-kpi-label { font-size: 12.5px; color: var(--text-muted); }
+.fin-kpi-value { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.fin-kpi-receber .fin-kpi-value { color: var(--fin-entrada); }
+.fin-kpi-pagar .fin-kpi-value { color: var(--fin-saida); }
+
+/* Formulário e filtros */
+.fin-form, .fin-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.fin-form input, .fin-form select, .fin-filtros select, .fin-periodo input {
+  padding: 8px 10px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+.fin-form input:focus, .fin-form select:focus { outline: none; border-color: var(--border-strong); }
+.fin-form input[type="text"] { flex: 1; min-width: 140px; }
+
+/* Tabela */
+.fin-table-wrap { overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: 12px; }
+.fin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.fin-table th, .fin-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+.fin-table th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg-list); }
+.fin-table tr:last-child td { border-bottom: none; }
+.fin-table .fin-num { text-align: right; font-variant-numeric: tabular-nums; }
+.fin-receber { color: var(--fin-entrada); }
+.fin-pagar { color: var(--fin-saida); }
+.fin-row-pago { opacity: 0.62; }
+.fin-row-actions { text-align: right; white-space: nowrap; }
+.fin-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+/* Cinco situações do ciclo do título. Provisionado é previsão (contorno
+   tracejado); pendente aguarda; disponivel está liberado (destaque de acento);
+   finalizado é realizado (verde); anulado sai de tudo (riscado, apagado). */
+.fin-badge-provisionado { color: var(--text-secondary); background: var(--bg-list); border: 1px dashed var(--border-strong); }
+.fin-badge-pendente { color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); }
+.fin-badge-disponivel { color: #fff; background: var(--accent); }
+.fin-badge-finalizado { color: #fff; background: var(--success); }
+.fin-badge-anulado { color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle); text-decoration: line-through; }
+.fin-status-select { padding: 4px 8px; font-size: 12px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-cc-codigo { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+/* Botão de recolher/expandir a árvore (+/-) em Centros de custo e Classes. O
+   espaçador ocupa a mesma largura na folha, para o código alinhar com os nós
+   que têm o botão. */
+.fin-tree-toggle { flex: none; width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; padding: 0; line-height: 1; font-size: 13px; font-weight: 700; color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; }
+.fin-tree-toggle:hover { color: var(--text-primary); border-color: var(--border-strong); }
+.fin-tree-spacer { flex: none; width: 16px; height: 16px; display: inline-block; }
+/* Import de centros por Excel: barra de ações + resumo do resultado. */
+.fin-cc-import { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 12px; }
+.fin-cc-import .fin-importar-file.is-disabled { opacity: 0.6; pointer-events: none; }
+.fin-cc-import-res { margin: 0 0 12px; font-size: 13px; color: var(--text-secondary); }
+.fin-cc-import-erros { margin: 6px 0 0; padding-left: 18px; color: var(--danger); font-size: 12.5px; }
+.fin-cad-excluir { color: var(--danger); }
+.fin-cc-excluir-tudo { margin-left: auto; }
+/* Campos de endereço no cadastro de cliente/fornecedor: larguras próprias para o
+   CEP, número e UF não esticarem como os campos de texto padrão do fin-form. */
+.fin-form input.fin-cep { flex: 0 0 auto; width: 120px; min-width: 0; }
+.fin-form input.fin-end-numero { flex: 0 0 auto; width: 90px; min-width: 0; }
+.fin-form input.fin-end-uf { flex: 0 0 auto; width: 64px; min-width: 0; text-transform: uppercase; }
+.fin-form input.fin-end-logradouro { min-width: 200px; }
+.fin-form input.fin-end-uf { text-transform: uppercase; }
+/* Painel de detalhes do cliente/fornecedor (clicar no nome). Tamanhos maiores
+   para leitura confortável do endereço e dos dados de contato. */
+.fin-contato-detalhe { min-width: min(560px, 80vw); }
+.fin-contato-detalhe h3 { margin: 0 0 10px; font-size: 24px; color: var(--text-primary); }
+.fin-contato-detalhe h4 { margin: 22px 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.fin-contato-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fin-contato-chips .fin-badge { font-size: 13px; padding: 3px 11px; }
+.fin-detalhe-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 28px; margin: 0; }
+.fin-detalhe-grid dt { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
+.fin-detalhe-grid dd { margin: 3px 0 0; font-size: 17px; color: var(--text-primary); word-break: break-word; }
+.fin-cc-confirm { display: inline-flex; align-items: center; gap: 6px; }
+.fin-cc-confirm-txt { font-size: 12.5px; color: var(--danger); white-space: nowrap; }
+/* Importar extrato: barra com conta + botão de arquivo, resumo do preview e ações. */
+.fin-importar-conta { flex: 1; min-width: 240px; max-width: 360px; }
+.fin-importar-file { cursor: pointer; display: inline-flex; align-items: center; }
+.fin-importar-resumo { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin: 14px 0 10px; font-size: 13.5px; }
+.fin-importar-resumo strong { text-transform: capitalize; }
+.fin-importar-acoes { display: flex; gap: 10px; margin-bottom: 12px; }
+.fin-empty { text-align: center; color: var(--text-muted); padding: 24px; }
+
+/* Gráfico do fluxo */
+.fin-fluxo-head { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.fin-year { display: inline-flex; align-items: center; gap: 8px; }
+.fin-year-value { font-size: 16px; font-weight: 650; min-width: 52px; text-align: center; }
+.fin-chart { margin: 8px 0 24px; }
+.fin-legend { display: flex; gap: 18px; margin-bottom: 8px; }
+.fin-legend-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-secondary); }
+.fin-legend-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.fin-chart-svg { width: 100%; height: auto; }
+.fin-chart-empty { text-align: center; padding: 48px; }
+.fin-grid { stroke: var(--border-subtle); stroke-width: 1; }
+.fin-axis-label { fill: var(--text-muted); font-size: 10px; }
+.fin-tip-bg { fill: var(--bg-card); stroke: var(--border-strong); stroke-width: 1; }
+.fin-tip-text { fill: var(--text-primary); font-size: 11px; font-weight: 600; }
+
+/* DRE */
+.fin-periodo { display: flex; gap: 16px; margin-bottom: 20px; }
+.fin-periodo label { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+.fin-dre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.fin-dre-bloco { border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px 18px; background: var(--bg-card); }
+.fin-dre-titulo { font-size: 14px; font-weight: 650; margin: 0 0 12px; }
+.fin-dre-lista { list-style: none; margin: 0; padding: 0; }
+.fin-dre-lista li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; font-size: 13.5px; border-bottom: 1px dashed var(--border-subtle); }
+.fin-dre-lista li:last-child { border-bottom: none; }
+.fin-dre-subtotal { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-strong); font-weight: 650; font-size: 14px; }
+.fin-dre-resultado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 720;
+}
+.fin-dre-resultado.positivo { background: color-mix(in srgb, var(--fin-entrada) 14%, var(--bg-card)); color: var(--fin-entrada); }
+.fin-dre-resultado.negativo { background: color-mix(in srgb, var(--fin-saida) 14%, var(--bg-card)); color: var(--fin-saida); }
+.fin-num { font-variant-numeric: tabular-nums; }
+
+/* Barra de busca + filtros dos lançamentos */
+.fin-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.fin-toolbar select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+/* SearchSelect pesquisável no lugar do <select> de cliente/fornecedor da toolbar. */
+.fin-toolbar-ss { width: 210px; }
+.fin-toolbar-ss > .fin-ss { width: 100%; }
+.fin-search { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 220px; padding: 7px 11px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-muted); }
+.fin-search input { flex: 1; border: none; background: none; outline: none; color: var(--text-primary); font-size: 13.5px; }
+.fin-filtro-data { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+.fin-filtro-data input { padding: 7px 9px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+/* Campos de texto/numero soltos na toolbar de Títulos (nº do título, faixa de
+   valor): mesmo traje dos selects, largura contida para não empurrar o resto. */
+.fin-toolbar input.fin-filtro-numero,
+.fin-toolbar input.fin-filtro-valor { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-toolbar input.fin-filtro-numero { width: 110px; }
+.fin-toolbar input.fin-filtro-valor { width: 108px; }
+/* Barra de quitação (aba Títulos): selecionados + conta + botão "Dar quitado". */
+.fin-quitar-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 12px; margin-bottom: 12px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 10px; }
+.fin-quitar-count { font-size: 13px; color: var(--text-secondary); }
+.fin-quitar-conta { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+.fin-quitar-conta select { padding: 7px 9px; font-size: 13px; color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-quitar-bar .btn-primary { margin-left: auto; }
+.fin-check-col { width: 34px; text-align: center; }
+.fin-check-col input { cursor: pointer; }
+.fin-row-sel { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+/* Movimentação: topo com o seletor de conta + saldo, e o extrato abaixo. */
+.fin-mov-topo { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 16px; }
+.fin-mov-conta { max-width: 360px; min-width: 240px; }
+.fin-mov-saldo { display: flex; flex-direction: column; gap: 2px; }
+.fin-mov-saldo span { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.fin-mov-saldo strong { font-size: 20px; font-weight: 700; }
+
+/* Barra de filtros da Movimentação: conta, período, estornados e o botão de
+   busca. A tela só carrega ao clicar aqui. */
+/* Todos os itens são .fin-field (label em cima + controle); o checkbox e os botões
+   ganham um label vazio, então os controles ficam todos na MESMA linha. Alinhados
+   por baixo, e com altura de controle uniforme (36px) para os topos também baterem. */
+.fin-mov-filtros { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.fin-mov-filtros .fin-field { gap: 4px; }
+.fin-mov-filtros input[type="date"] { padding: 0 10px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-list); color: var(--text-primary); font-size: 13.5px; }
+.fin-mov-filtros input, .fin-mov-filtros .fin-ss-control,
+.fin-mov-filtros .btn-primary, .fin-mov-filtros .btn-secondary, .fin-mov-check { height: 36px; box-sizing: border-box; }
+.fin-mov-check { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+/* O checkbox não deve herdar o box de .fin-field input (borda/fundo/padding). */
+.fin-mov-check input[type="checkbox"] { height: auto; width: auto; padding: 0; margin: 0; border: none; background: none; border-radius: 0; }
+.fin-mov-acao { justify-content: flex-end; }
+.fin-mov-filtrar { display: inline-flex; align-items: center; gap: 7px; }
+.fin-mov-conta-info { margin-top: -6px; margin-bottom: 14px; }
+.fin-mov-prompt { margin-top: 6px; }
+/* Cards de totalizadores do período. */
+.fin-mov-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.fin-mov-card { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-card); }
+.fin-mov-card-lbl { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.fin-mov-card-val { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Coluna de conferência e a linha estornada (mostrada só com o filtro ligado). */
+.fin-mov-conf-col { width: 54px; text-align: center; }
+.fin-mov-estornado { opacity: 0.62; }
+.fin-mov-estornado td:not(.fin-mov-conf-col) { text-decoration: line-through; }
+.fin-mov-tag { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--danger); border: 1px solid var(--danger); }
+
+/* Número do título como link */
+.fin-titulo-link { font-weight: 650; color: var(--fin-entrada); background: none; border: none; padding: 0; cursor: pointer; font-variant-numeric: tabular-nums; }
+.fin-titulo-link:hover { text-decoration: underline; }
+
+/* Linha de total no rodapé da tabela */
+.fin-total-row td { border-top: 2px solid var(--border-strong); font-weight: 600; color: var(--text-secondary); background: var(--bg-list); }
+
+/* Modal do título */
+.fin-modal-body { display: flex; flex-direction: column; gap: 14px; }
+.fin-modal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.fin-field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+.fin-field-wide { grid-column: 1 / -1; }
+.fin-field input, .fin-field select, .fin-field textarea { padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; font-family: inherit; }
+.fin-field input:disabled, .fin-field select:disabled { opacity: 0.55; }
+.fin-field strong { font-size: 14px; color: var(--text-primary); }
+.fin-modal-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.fin-modal-excluir { margin-left: auto; }
+
+/* Cabeçalho do título (nº | correntista + doc | situação) */
+.fin-tit-cab { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: start; padding: 20px 44px 16px 20px; border-bottom: 1px solid var(--border-subtle); }
+.fin-tit-num { display: flex; flex-direction: column; gap: 4px; }
+.fin-tit-num-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.fin-tit-num-value { font-size: 24px; font-weight: 720; font-variant-numeric: tabular-nums; color: var(--fin-entrada); }
+.fin-tit-correntista { gap: 4px; }
+.fin-tit-doc-correntista { font-size: 12px; color: var(--text-muted); min-height: 15px; font-variant-numeric: tabular-nums; }
+.fin-tit-situacao { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; font-size: 12px; color: var(--text-secondary); }
+
+/* Blocos (fieldsets) no estilo do SIGIM */
+.fin-bloco { border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px 14px; margin: 0; }
+.fin-bloco > legend { font-size: 11.5px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 0 6px; }
+.fin-bloco-pagto { background: color-mix(in srgb, var(--fin-entrada) 6%, var(--bg-card)); }
+.fin-tit-liquido strong { font-size: 17px; font-weight: 720; color: var(--fin-entrada); }
+/* Rateio (apropriação) por vários centros de custo no detalhe do título. */
+.fin-rateio { margin-top: 12px; }
+.fin-rateio-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.fin-rateio-titulo { font-size: 13px; font-weight: 650; color: var(--text-secondary); }
+.fin-rateio-cols, .fin-rateio-linha { display: grid; grid-template-columns: 1fr 88px 120px 32px; gap: 8px; align-items: center; }
+.fin-rateio-cols { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.fin-rateio-linha { margin-bottom: 6px; }
+.fin-rateio-linha select, .fin-rateio-linha input { width: 100%; }
+.fin-rateio-x { justify-self: center; }
+.fin-rateio-restante { margin-top: 8px; font-size: 13px; color: var(--text-secondary); }
+.fin-rateio-restante.ok strong { color: var(--success); }
+.fin-rateio-restante.pend strong { color: var(--danger); }
+.fin-rateio-base { color: var(--text-muted); }
+.fin-tag-rateado { font-size: 10.5px; font-weight: 650; padding: 1px 7px; border-radius: 999px; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+/* Lançamento Manual dos Movimentos. */
+.fin-manual-titulo { margin: 0 0 14px; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.fin-manual .fin-field-wide { grid-column: span 2; }
+.fin-manual .fin-field-narrow { max-width: 130px; }
+.fin-manual-rateio-editor { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+.fin-manual-rateio-editor .fin-field { gap: 4px; }
+.fin-manual-add { align-self: flex-end; min-width: 34px; height: 34px; font-size: 18px; line-height: 1; padding: 0; }
+.fin-mov-manual { display: inline-flex; align-items: center; gap: 6px; }
+/* Banco · agência · conta da conta selecionada, sob o select. */
+.fin-conta-detalhe { display: block; margin-top: 4px; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+/* Formulário de novo título (aba Lançamentos): reaproveita os blocos do detalhe
+   (fin-bloco/fin-modal-grid/fin-field), só empilhados com respiro entre eles. */
+.fin-novo-titulo { max-width: 920px; }
+.fin-novo-titulo form { display: flex; flex-direction: column; gap: 14px; }
+.fin-novo-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fin-novo-head h3 { font-size: 15px; font-weight: 650; color: var(--text-primary); }
+.fin-novo-head select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-novo-acoes { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fin-novo-correntista { max-width: 360px; }
+/* Select pesquisável (SearchSelect): controle com lupa + popup com busca. Veste
+   igual aos outros campos do formulário e abre um dropdown filtrável. */
+.fin-ss { position: relative; }
+.fin-ss-control { display: flex; align-items: center; gap: 7px; width: 100%; padding: 8px 10px; font-size: 13px; text-align: left; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; cursor: pointer; }
+.fin-ss-control > svg { color: var(--text-muted); flex-shrink: 0; }
+.fin-ss-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-ss-placeholder { color: var(--text-muted); }
+.fin-ss-chevron { margin-left: auto; }
+.fin-ss.open .fin-ss-control { border-color: var(--border-strong); }
+.fin-ss-pop { position: absolute; z-index: 40; top: calc(100% + 4px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); overflow: hidden; }
+.fin-ss-search { display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); }
+.fin-ss-search input { flex: 1; min-width: 0; border: none; background: none; outline: none; color: var(--text-primary); font-size: 13px; }
+.fin-ss-list { list-style: none; margin: 0; padding: 4px; max-height: 220px; overflow-y: auto; }
+.fin-ss-opt { display: block; width: 100%; text-align: left; padding: 7px 9px; font-size: 13px; color: var(--text-primary); background: none; border: none; border-radius: 6px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-ss-opt:hover { background: var(--bg-list); }
+.fin-ss-opt.sel { background: var(--bg-list); font-weight: 600; }
+.fin-ss-empty { padding: 10px; font-size: 12.5px; color: var(--text-muted); text-align: center; }
+
+/* Impostos aplicados ao título (bloco do detalhe) */
+.fin-imposto-lista { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.fin-imposto-linha {
+  display: grid; grid-template-columns: 1fr auto auto auto auto; align-items: center; gap: 10px;
+  padding: 7px 10px; font-size: 13px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px;
+}
+.fin-imposto-nome { display: flex; align-items: center; gap: 8px; }
+.fin-badge-tipo-retido, .fin-badge-tipo-acrescido {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
+  padding: 1px 7px; border-radius: 999px;
+}
+.fin-badge-tipo-retido { color: var(--fin-saida); background: color-mix(in srgb, var(--fin-saida) 14%, transparent); }
+.fin-badge-tipo-acrescido { color: var(--fin-entrada); background: color-mix(in srgb, var(--fin-entrada) 14%, transparent); }
+.fin-imposto-gerado { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.fin-imposto-adicionar { display: flex; gap: 8px; align-items: center; }
+.fin-imposto-adicionar select { flex: 1; padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+
+/* Vínculo de título de imposto (pai/filho) */
+.fin-vinculo { font-size: 12.5px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); }
+.fin-vinculo-filho { background: color-mix(in srgb, var(--fin-saida) 10%, var(--bg-card)); color: var(--fin-saida); }
+.fin-vinculo-pai { background: color-mix(in srgb, var(--fin-entrada) 8%, var(--bg-card)); color: var(--text-secondary); }
+.fin-tag-imposto { margin-left: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; padding: 1px 6px; border-radius: 999px; color: var(--fin-saida); background: color-mix(in srgb, var(--fin-saida) 14%, transparent); vertical-align: middle; }
+.fin-tag-parcela { margin-left: 6px; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 999px; color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); vertical-align: middle; font-variant-numeric: tabular-nums; }
+.fin-parcela-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); font-variant-numeric: tabular-nums; }
+.fin-desdobrar { margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--border-subtle); }
+.fin-desdobrar-form { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.fin-desdobrar-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+.fin-desdobrar-form input { width: 90px; padding: 7px 9px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+
+@media (max-width: 720px) {
+  .fin-modal-grid { grid-template-columns: repeat(2, 1fr); }
+  .fin-tit-cab { grid-template-columns: 1fr; }
+}
+
+.fin-mov-titulo { font-size: 14px; font-weight: 650; margin: 22px 0 10px; color: var(--text-secondary); }
+.fin-mov-titulo:first-of-type { margin-top: 4px; }
+
+/* Cadastros: sidebar agrupada por categoria + conteúdo do item selecionado */
+.fin-cad-layout { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: start; }
+.fin-cad-nav {
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 14px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px;
+  position: sticky; top: 16px;
+}
+.fin-cad-grupo { display: flex; flex-direction: column; gap: 2px; }
+.fin-cad-grupo-titulo {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-muted); padding: 6px 10px 4px;
+}
+.fin-cad-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 10px; font-size: 13.5px; text-align: left;
+  color: var(--text-primary); background: none; border: none; border-radius: 8px; cursor: pointer;
+}
+.fin-cad-item:hover:not(.disabled) { background: var(--bg-list); }
+.fin-cad-item.active { background: color-mix(in srgb, var(--fin-entrada) 14%, transparent); color: var(--fin-entrada); font-weight: 600; }
+.fin-cad-item.disabled { color: var(--text-muted); cursor: default; opacity: 0.7; }
+.fin-cad-em-breve {
+  font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+  padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+.fin-cad-content { min-width: 0; }
+.fin-cad-hint { font-size: 12.5px; color: var(--text-muted); margin: -6px 0 4px; }
+.fin-cad-acoes { display: inline-flex; gap: 4px; white-space: nowrap; }
+.fin-cad-secao { display: flex; flex-direction: column; gap: 14px; }
+@media (max-width: 900px) {
+  .fin-cad-layout { grid-template-columns: 1fr; }
+  .fin-cad-nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .fin-cad-grupo { flex: 1 1 220px; }
+}
+.fin-baixa-inline { display: inline-flex; align-items: center; gap: 6px; }
+.fin-baixa-inline select { padding: 5px 8px; font-size: 12.5px; background: var(--bg-list); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 6px; }
+
+/* Toggle de acesso ao Financeiro no painel de usuários */
+.finance-access-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; }
+.finance-access-always { font-size: 12px; color: var(--text-muted); }
+
+@media (max-width: 720px) {
+  .fin-dre-grid { grid-template-columns: 1fr; }
+  .fin-body { padding: 20px 14px 48px; }
+}

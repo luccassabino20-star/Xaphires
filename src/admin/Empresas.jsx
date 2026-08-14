@@ -7,6 +7,15 @@ const NOMES = { basic: "Básico", intermediate: "Intermediário", professional: 
 // Empresarial é sob consulta, sem valor de tabela para descontar em cima.
 const PLANOS_COM_DESCONTO = ["intermediate", "professional"];
 const SITUACAO = { active: "Ativa", trialing: "Em teste", grace: "Pagamento em aberto", expired: "Vencida", blocked: "Bloqueada" };
+// Nomes dos módulos da plataforma para o painel (só em português, ferramenta
+// interna). Espelha os ids de server/modules.js.
+const NOMES_MODULOS = {
+  "vendas-crm": "Vendas & CRM",
+  financeiro: "Financeiro",
+  "compras-estoque": "Compras & Estoque",
+  faturamento: "Faturamento",
+  "relatorios-bi": "Relatórios & BI",
+};
 
 function data(iso) {
   return iso ? new Date(iso).toLocaleDateString("pt-BR") : "—";
@@ -28,6 +37,8 @@ function Detalhe({ id, onFechar, onMudou }) {
   const [salvandoLimites, setSalvandoLimites] = useState(false);
   const [diasTeste, setDiasTeste] = useState("");
   const [salvandoTeste, setSalvandoTeste] = useState(null); // 1, -1 ou null
+  const [modulos, setModulos] = useState(null); // [{id, core, available, entitled}]
+  const [salvandoModulo, setSalvandoModulo] = useState(null); // id do módulo em salvamento
 
   const carregar = useCallback(async () => {
     try {
@@ -53,6 +64,8 @@ function Detalhe({ id, onFechar, onMudou }) {
       setLimiteAnexoMb(
         d.company.maxAttachmentBytesOverride != null ? String(Math.round(d.company.maxAttachmentBytesOverride / (1024 * 1024))) : ""
       );
+      const m = await api.verModulos(id);
+      setModulos(m.modules);
     } catch (e) {
       setErro(e.message);
     }
@@ -90,6 +103,27 @@ function Detalhe({ id, onFechar, onMudou }) {
       setErro(e.message);
     } finally {
       setSalvandoDesconto(null);
+    }
+  }
+
+  // Liga/desliga um módulo para a empresa. Monta a lista de ids liberados a
+  // partir do estado atual e envia inteira - o servidor guarda a lista explícita.
+  async function alternarModulo(mid) {
+    if (!modulos) return;
+    // Monta a partir do que está GRAVADO (stored), não do entitled resolvido:
+    // entitled é false para módulo ainda indisponível ("Em breve"), então usá-lo
+    // aqui apagaria a pré-autorização desses módulos a cada alternância.
+    const liberados = modulos.filter((m) => m.stored).map((m) => m.id);
+    const alvo = liberados.includes(mid) ? liberados.filter((x) => x !== mid) : [...liberados, mid];
+    setSalvandoModulo(mid);
+    try {
+      const r = await api.definirModulos(id, alvo);
+      setModulos(r.modules);
+      onMudou?.();
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setSalvandoModulo(null);
     }
   }
 
@@ -357,6 +391,34 @@ function Detalhe({ id, onFechar, onMudou }) {
         <button className="adm-btn adm-btn-primario" onClick={salvarLimites} disabled={salvandoLimites}>
           {salvandoLimites ? "Salvando..." : "Salvar exceções"}
         </button>
+      </div>
+
+      <div className="adm-secao">
+        <h3>Módulos da plataforma</h3>
+        <p className="adm-fraco">
+          Controla o que esta empresa pode usar de cada módulo. "Em breve" ainda não foi construído -
+          liberar aqui já deixa pré-autorizado para quando entrar no ar. Dentro da empresa, o master
+          ainda decide quais usuários acessam cada módulo.
+        </p>
+        {!modulos ? (
+          <p className="adm-fraco">Carregando...</p>
+        ) : (
+          <div className="adm-modulos">
+            {modulos.map((m) => (
+              <label key={m.id} className="adm-modulo">
+                <input
+                  type="checkbox"
+                  checked={m.stored}
+                  disabled={salvandoModulo === m.id}
+                  onChange={() => alternarModulo(m.id)}
+                />
+                <span className="adm-modulo-nome">{NOMES_MODULOS[m.id] || m.id}</span>
+                {m.core && <span className="adm-chip">core</span>}
+                {!m.available && <span className="adm-chip adm-chip-fraco">em breve</span>}
+              </label>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="adm-secao">
