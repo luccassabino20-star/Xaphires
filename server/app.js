@@ -127,6 +127,17 @@ app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);
 // verifyOrigin lá de cima não se aplica - é só GET de arquivo estático.
 app.use("/uploads/popups", express.static(popupUploadsDir()));
 
+// og:image precisa ser embutível por qualquer origem (Facebook, WhatsApp, ferramentas
+// de preview) - o Cross-Origin-Resource-Policy: same-origin que o helmet manda por
+// padrão bloqueia isso NO NAVEGADOR (a URL responde 200 igual, mas o <img> de outro
+// site carrega quebrado); rastreador de servidor (o que o WhatsApp/Facebook realmente
+// usa para montar a prévia) não é afetado, mas qualquer ferramenta client-side de
+// depuração era. Só esse arquivo abre a política; o resto do site continua same-origin.
+app.get("/og-image.png", (req, res, next) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+});
+
 const distPath = path.join(process.cwd(), "dist");
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
