@@ -5,7 +5,7 @@ import * as api from "./api.js";
 // que interessa numa revisão é separar "alguém abriu os dados de um cliente" de
 // "alguém fez login".
 const SENSIVEIS = new Set(["abrir_quadros", "alterar_cartao", "alterar_papel", "listar_usuarios", "abrir_empresa"]);
-const DESTRUTIVAS = new Set(["bloquear_empresa", "desativar_admin", "definir_plano"]);
+const DESTRUTIVAS = new Set(["bloquear_empresa", "desativar_admin", "definir_plano", "conceder_acesso_permanente"]);
 
 export default function Auditoria() {
   const [entradas, setEntradas] = useState(null);

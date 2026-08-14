@@ -75,6 +75,8 @@ export const criarEmpresa = (dados) => req("/companies", { method: "POST", body:
 export const editarEmpresa = (id, dados) => req(`/companies/${id}`, { method: "PATCH", body: dados });
 export const definirPlano = (id, plan, expiresAt) => req(`/companies/${id}/plan`, { method: "POST", body: { plan, expiresAt } });
 export const bloquear = (id, blocked, reason) => req(`/companies/${id}/block`, { method: "POST", body: { blocked, reason } });
+export const definirAcessoPermanente = (id, granted, reason) =>
+  req(`/companies/${id}/permanent-access`, { method: "POST", body: { granted, reason } });
 export const definirDesconto = (id, plan, discountCents) =>
   req(`/companies/${id}/discount`, { method: "POST", body: { plan, discountCents } });
 export const definirLimites = (id, maxUsersOverride, maxAttachmentBytesOverride) =>

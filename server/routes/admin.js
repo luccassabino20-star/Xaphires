@@ -107,6 +107,9 @@ function visaoEmpresa(e) {
     blocked: !!e.blocked_at,
     blockedAt: e.blocked_at,
     blockedReason: e.blocked_reason,
+    permanentAccess: !!e.permanent_access_at,
+    permanentAccessAt: e.permanent_access_at,
+    permanentAccessReason: e.permanent_access_reason,
     expiresAt: e.expires_at,
     contractedAt: e.contracted_at,
     daysLeft: daysLeft(e),
@@ -361,6 +364,26 @@ router.post(
     const { blocked, reason } = req.body || {};
     const atualizada = store.definirBloqueio(req.params.id, { bloqueado: !!blocked, motivo: reason });
     auditar(req, blocked ? "bloquear_empresa" : "desbloquear_empresa", {
+      companyId: e.id,
+      alvo: e.name,
+      detalhe: { motivo: reason || null },
+    });
+    res.json({ company: visaoEmpresa(atualizada) });
+  })
+);
+
+// Acesso permanente: cortesia/prêmio que nunca vence, independente de plano ou
+// expires_at (ver effectiveStatus em plans.js). Mesma forma da rota de bloqueio -
+// motivo fica registrado na auditoria, sem passar por cobrança nem por
+// confirmarPagamento().
+router.post(
+  "/companies/:id/permanent-access",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    const { granted, reason } = req.body || {};
+    const atualizada = store.definirAcessoPermanente(req.params.id, { concedido: !!granted, motivo: reason });
+    auditar(req, granted ? "conceder_acesso_permanente" : "revogar_acesso_permanente", {
       companyId: e.id,
       alvo: e.name,
       detalhe: { motivo: reason || null },

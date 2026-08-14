@@ -73,6 +73,10 @@ export function effectiveStatus(company, now = new Date()) {
   // plataforma, e por isso não pode ser desfeito por pagamento nem por troca de
   // plano — só pelo painel que bloqueou.
   if (company?.blocked_at) return "blocked";
+  // Acesso permanente (cortesia/prêmio) vence o vencimento: ignora expires_at/grace
+  // por completo, mas continua atrás do bloqueio administrativo - conceder cortesia
+  // não é imunidade a decisão da plataforma.
+  if (company?.permanent_access_at) return "active";
   const plan = getPlan(company?.plan);
   if (!plan.paid) return "active";
   if (!company?.expires_at) return "active";

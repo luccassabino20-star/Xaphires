@@ -64,6 +64,12 @@ addColumnIfMissing("companies", "notes", "notes TEXT");
 // desbloquear alguém sem querer.
 addColumnIfMissing("companies", "blocked_at", "blocked_at TEXT");
 addColumnIfMissing("companies", "blocked_reason", "blocked_reason TEXT");
+// Acesso permanente (cortesia/prêmio): a empresa nunca mais vence, independente do
+// plano ou de expires_at. Separado de blocked_at pelo mesmo motivo dele existir
+// separado de status: é decisão da plataforma, não um efeito colateral de cobrança
+// - confirmarPagamento() nunca escreve aqui, e a varredura de cobrança nunca lê.
+addColumnIfMissing("companies", "permanent_access_at", "permanent_access_at TEXT");
+addColumnIfMissing("companies", "permanent_access_reason", "permanent_access_reason TEXT");
 
 function nowIso() {
   return new Date().toISOString();
@@ -193,6 +199,15 @@ export function definirBloqueio(id, { bloqueado, motivo }) {
   db.prepare("UPDATE companies SET blocked_at = ?, blocked_reason = ? WHERE id = ?").run(
     bloqueado ? nowIso() : null,
     bloqueado ? motivo || null : null,
+    id
+  );
+  return acharEmpresa(id);
+}
+
+export function definirAcessoPermanente(id, { concedido, motivo }) {
+  db.prepare("UPDATE companies SET permanent_access_at = ?, permanent_access_reason = ? WHERE id = ?").run(
+    concedido ? nowIso() : null,
+    concedido ? motivo || null : null,
     id
   );
   return acharEmpresa(id);

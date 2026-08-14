@@ -5400,6 +5400,7 @@ img.avatar { object-fit: cover; padding: 0; }
 .adm-chip-trialing { background: color-mix(in srgb, var(--adm-acento) 15%, transparent); color: var(--adm-acento); border-color: transparent; }
 .adm-chip-grace, .adm-chip-expired { background: color-mix(in srgb, var(--adm-alerta) 18%, transparent); color: var(--adm-alerta); border-color: transparent; }
 .adm-chip-blocked { background: color-mix(in srgb, var(--adm-perigo) 15%, transparent); color: var(--adm-perigo); border-color: transparent; }
+.adm-chip-permanente { background: color-mix(in srgb, var(--adm-acento) 15%, transparent); color: var(--adm-acento); border-color: transparent; }
 .adm-chip-master { background: var(--adm-texto); color: #fff; border-color: transparent; }
 /* Centros de custo (árvore): código monoespaçado e indentado pelo nível, linha
    inativa esmaecida, edição inline da descrição, e um select de empresa na barra. */
@@ -5421,6 +5422,10 @@ img.avatar { object-fit: cover; padding: 0; }
 .adm-bloqueio {
   padding: 10px 12px; border-radius: 8px; font-size: 13px;
   background: color-mix(in srgb, var(--adm-perigo) 10%, transparent); color: var(--adm-perigo);
+}
+.adm-permanente {
+  padding: 10px 12px; border-radius: 8px; font-size: 13px;
+  background: color-mix(in srgb, var(--adm-acento) 10%, transparent); color: var(--adm-acento);
 }
 
 .adm-secao {

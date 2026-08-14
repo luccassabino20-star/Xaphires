@@ -198,6 +198,22 @@ function Detalhe({ id, onFechar, onMudou }) {
     }
   }
 
+  async function alternarAcessoPermanente() {
+    const concedendo = !dados.company.permanentAccess;
+    let motivo = null;
+    if (concedendo) {
+      motivo = prompt("Motivo do acesso permanente (fica registrado na auditoria):");
+      if (motivo === null) return;
+    } else if (!confirm("Remover o acesso permanente desta empresa? Ela volta a depender do plano e do vencimento normais.")) return;
+    try {
+      await api.definirAcessoPermanente(id, concedendo, motivo);
+      await carregar();
+      onMudou?.();
+    } catch (e) {
+      setErro(e.message);
+    }
+  }
+
   async function abrirQuadros() {
     try {
       const r = await api.verQuadros(id);
@@ -247,11 +263,18 @@ function Detalhe({ id, onFechar, onMudou }) {
         <span className="adm-chip">{NOMES[c.plan]}</span>
         <span className="adm-chip">{c.maxUsers === null ? "usuários ilimitados" : `até ${c.maxUsers} usuários`}</span>
         {c.expiresAt && <span className="adm-chip">vence {data(c.expiresAt)}</span>}
+        {c.permanentAccess && <span className="adm-chip adm-chip-permanente">acesso permanente</span>}
       </div>
       {c.blocked && (
         <div className="adm-bloqueio">
           Bloqueada em {dataHora(c.blockedAt)}
           {c.blockedReason ? ` — ${c.blockedReason}` : ""}
+        </div>
+      )}
+      {c.permanentAccess && (
+        <div className="adm-permanente">
+          Acesso permanente concedido em {dataHora(c.permanentAccessAt)}
+          {c.permanentAccessReason ? ` — ${c.permanentAccessReason}` : ""}
         </div>
       )}
 
@@ -303,6 +326,13 @@ function Detalhe({ id, onFechar, onMudou }) {
         </div>
         <button className={"adm-btn " + (c.blocked ? "adm-btn-primario" : "adm-btn-perigo")} onClick={alternarBloqueio}>
           {c.blocked ? "Desbloquear empresa" : "Bloquear empresa"}
+        </button>
+        <button
+          className={"adm-btn " + (c.permanentAccess ? "adm-btn-perigo" : "adm-btn-primario")}
+          onClick={alternarAcessoPermanente}
+          style={{ marginLeft: 8 }}
+        >
+          {c.permanentAccess ? "Remover acesso permanente" : "Conceder acesso permanente"}
         </button>
 
         <div className="adm-grade2" style={{ marginTop: 14 }}>
