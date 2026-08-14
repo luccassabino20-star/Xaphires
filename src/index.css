@@ -4736,38 +4736,37 @@ img.avatar { object-fit: cover; padding: 0; }
 .auth-shell .auth-back-btn:hover { background: #1a1a1a; }
 
 /* ---------- Logotipo Xaphires ---------- */
-/* Orbitron só no nome da marca — na nav da landing e no painel do login (era Playfair
-   Display; trocada pela geométrica em caixa alta, estilo sci-fi). O resto da interface
-   continua na Inter, e o contraste entre as duas é proposital: a Orbitron marca o
-   logotipo, a sem-serifa carrega o texto. Caixa alta e tracking largo são a cara dessa
-   fonte - sem os dois ela fica descaracterizada. */
+/* Bodoni Moda só no nome da marca — na nav da landing e no painel do login (passou por
+   Playfair Display e depois Orbitron antes desta; serifada de alto contraste, estilo
+   Bodoni/Didot). O resto da interface continua na Inter, e o contraste entre as duas é
+   proposital: a Bodoni Moda marca o logotipo, a sem-serifa carrega o texto. */
 .landing-nav-brand,
 .auth-brand h1,
 .auth-brand-icon {
-  font-family: "Orbitron", Arial, sans-serif;
+  font-family: "Bodoni Moda", Georgia, "Times New Roman", serif;
   text-transform: uppercase;
 }
 
 .landing-nav-brand {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 /* O quadrado acompanha o corpo do nome: dimensionado para a Inter em 16px, ficava
    subdimensionado ao lado da marca em 24px. */
 .landing-nav-icon {
-  font-family: "Orbitron", Arial, sans-serif;
+  font-family: "Bodoni Moda", Georgia, "Times New Roman", serif;
   font-weight: 700;
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: 21px;
 }
 
 .auth-brand h1 {
   font-weight: 700;
-  font-size: 36px;
-  letter-spacing: 0.07em;
+  font-size: 40px;
+  letter-spacing: 0.03em;
 }
 .auth-brand-icon { font-weight: 700; }
 
@@ -5306,7 +5305,7 @@ img.avatar { object-fit: cover; padding: 0; }
   border-radius: 12px; display: flex; flex-direction: column; gap: 12px;
   box-shadow: 0 6px 24px rgba(20,22,30,0.08);
 }
-.adm-login-marca { font-family: "Orbitron", Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.07em; font-size: 22px; font-weight: 700; }
+.adm-login-marca { font-family: "Bodoni Moda", Georgia, serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 24px; font-weight: 700; }
 .adm-login-sub { font-size: 13px; color: var(--adm-fraco); margin-bottom: 6px; }
 .adm-login-nota { margin: 4px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--adm-fraco); }
 
@@ -5316,7 +5315,7 @@ img.avatar { object-fit: cover; padding: 0; }
   background: var(--adm-superficie); border-bottom: 1px solid var(--adm-borda);
   position: sticky; top: 0; z-index: 10;
 }
-.adm-marca { font-family: "Orbitron", Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.06em; font-size: 16px; font-weight: 700; }
+.adm-marca { font-family: "Bodoni Moda", Georgia, serif; text-transform: uppercase; letter-spacing: 0.02em; font-size: 18px; font-weight: 700; }
 .adm-marca span { font-family: var(--font); font-size: 11px; font-weight: 600; color: var(--adm-fraco); text-transform: uppercase; letter-spacing: 0.06em; margin-left: 6px; }
 .adm-abas { display: flex; gap: 4px; margin-left: 12px; }
 .adm-aba {
@@ -5924,11 +5923,11 @@ img.avatar { object-fit: cover; padding: 0; }
   -webkit-backdrop-filter: saturate(1.3) blur(12px);
 }
 .launcher-brand {
-  font-family: "Orbitron", Arial, sans-serif;
+  font-family: "Bodoni Moda", Georgia, serif;
   text-transform: uppercase;
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 700;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.03em;
   background: linear-gradient(120deg, var(--text-primary), color-mix(in srgb, var(--text-primary) 55%, #6366f1));
   -webkit-background-clip: text;
   background-clip: text;
