@@ -15,7 +15,6 @@ const FinanceiroModule = lazy(() => import("./modules/financeiro/FinanceiroModul
 // Fase 0: só vendas-crm abre de verdade; os outros pilares vêm do servidor como
 // "Em breve" e o launcher os desenha bloqueados. Ligar um módulo novo é plugar o
 // componente no mapa COMPONENTES abaixo.
-const PERSIST_KEY = "xaphires-module";
 
 // Mapa id → componente do módulo. onExit volta ao launcher. Só vendas-crm existe
 // hoje; os demais entram aqui quando forem construídos, um por fase.
@@ -28,6 +27,9 @@ export default function PlatformShell() {
   const { t } = useTranslation();
   const [modules, setModules] = useState(null); // null = ainda carregando
   const [erro, setErro] = useState(false);
+  // Sem persistência de propósito: o painel de módulos é a tela que recebe
+  // quem loga (ou recarrega a página logado), sempre — nunca pula direto para
+  // o último módulo aberto.
   const [activeModule, setActiveModule] = useState(null);
 
   useEffect(() => {
@@ -36,12 +38,6 @@ export default function PlatformShell() {
       .then((data) => {
         if (!vivo) return;
         setModules(data.modules);
-        // Restaura o último módulo aberto, mas só se ele ainda estiver liberado —
-        // um add-on que a empresa perdeu não pode reabrir sozinho no arranque.
-        const salvo = localStorage.getItem(PERSIST_KEY);
-        if (salvo && data.modules.some((m) => m.id === salvo && m.enabled)) {
-          setActiveModule(salvo);
-        }
       })
       .catch(() => {
         if (vivo) setErro(true);
@@ -53,11 +49,9 @@ export default function PlatformShell() {
 
   function abrir(id) {
     setActiveModule(id);
-    localStorage.setItem(PERSIST_KEY, id);
   }
   function voltar() {
     setActiveModule(null);
-    localStorage.removeItem(PERSIST_KEY);
   }
 
   if (erro) {
