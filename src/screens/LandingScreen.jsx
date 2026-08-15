@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import LandingThemeToggle from "../components/LandingThemeToggle.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
+import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 
 const NAV_PAGES = ["home", "features", "solutions", "pricing"];
 
@@ -729,9 +730,6 @@ function ProductTeamsPage({ onEnter, onNavigate }) {
     </>
   );
 }
-
-const WHATSAPP_VENDAS_URL =
-  "https://api.whatsapp.com/send?phone=5527988312023&text=Ol%C3%A1!%20Gostaria%20de%20receber%20mais%20informa%C3%A7%C3%B5es%20sobre%20os%20produtos%2Fservi%C3%A7os%20e%20solicitar%20um%20or%C3%A7amento.";
 
 function PricingPage({ onEnter }) {
   const { t } = useTranslation();

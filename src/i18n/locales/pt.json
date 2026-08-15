@@ -37,6 +37,14 @@
     "relatorios-bi": {
       "name": "Relatórios & BI",
       "desc": "Dashboards operacionais e financeiros consolidados."
+    },
+    "custom": {
+      "seal": "Sob medida",
+      "name": "Soluções Sob Medida",
+      "desc": "Integrações de API, automações e módulos exclusivos, desenvolvidos para o seu negócio.",
+      "bannerTitle": "Não encontrou o que precisa nos módulos prontos?",
+      "bannerText": "Desenvolvemos integrações de API, automações e módulos exclusivos sob medida para o seu negócio.",
+      "bannerCta": "Falar com nossa equipe"
     }
   },
   "financeiro": {

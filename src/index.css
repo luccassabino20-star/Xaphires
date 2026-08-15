@@ -5917,14 +5917,21 @@ img.avatar { object-fit: cover; padding: 0; }
 /* A home da plataforma: um card por pilar. Segue o tema do app (dark/branco) pelas
    mesmas variáveis do resto, com um tratamento mais premium - fundo com halos,
    cabeçalho em vidro e cards com gradiente e brilho de destaque no hover. */
+/* height (não min-height) + overflow-y:auto de propósito, mesmo padrão de
+   .landing-shell: o body do app é overflow:hidden global (o resto do app rola
+   por dentro dos próprios painéis, não pela página toda - ver .app-shell), e
+   sem essa rolagem própria o conteúdo que passasse de 100vh (card+banner de
+   sob medida, ver ModuleLauncher.jsx) ficava cortado sem chance de rolar até
+   ele, por mais padding-bottom que o launcher-body ganhasse. */
 .launcher {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg-column);
   color: var(--text-primary);
-  overflow: hidden;
 }
 /* Dois halos radiais suaves nas cores da marca. Ficam atrás de tudo (z-index 0)
    e o conteúdo sobe com position:relative. No branco eles quase somem, o
@@ -5955,7 +5962,7 @@ img.avatar { object-fit: cover; padding: 0; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 30px;
+  padding: 12px 30px;
   border-bottom: 1px solid var(--border-subtle);
   background: color-mix(in srgb, var(--bg-column) 72%, transparent);
   backdrop-filter: saturate(1.3) blur(12px);
@@ -5976,49 +5983,52 @@ img.avatar { object-fit: cover; padding: 0; }
   align-items: center;
   gap: 12px;
 }
+/* Compacto de propósito - a meta é caber inteiro num viewport comum sem
+   precisar rolar (ver .launcher acima: overflow-y:auto continua como rede de
+   segurança pra janela muito baixa, mas o alvo é nunca precisar dela). */
 .launcher-body {
   flex: 1;
   width: 100%;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 72px 30px 80px;
+  padding: 28px 30px 32px;
 }
 /* Sobrescreve o eyebrow em maiúsculas espaçadas - dá o ar de produto. */
 .launcher-eyebrow {
   display: inline-block;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: #818cf8;
-  margin-bottom: 14px;
+  margin-bottom: 6px;
 }
 .launcher-title {
-  font-size: 38px;
-  line-height: 1.1;
+  font-size: 28px;
+  line-height: 1.15;
   font-weight: 750;
   letter-spacing: -0.5px;
-  margin: 0 0 10px;
+  margin: 0 0 5px;
 }
 .launcher-subtitle {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-secondary);
-  margin: 0 0 48px;
+  margin: 0 0 20px;
   max-width: 560px;
 }
 .launcher-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
-  gap: 20px;
+  gap: 14px;
 }
 .module-card {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
-  padding: 24px 22px;
-  min-height: 176px;
+  gap: 10px;
+  padding: 18px 20px;
+  min-height: 140px;
   text-align: left;
   isolation: isolate;
   background:
@@ -6127,6 +6137,55 @@ img.avatar { object-fit: cover; padding: 0; }
   border: 1px solid var(--border-subtle);
   backdrop-filter: blur(4px);
 }
+/* Card de "soluções sob medida": mesmo molde do .module-card, com borda
+   tracejada na cor do serviço pra não ser confundido com um pilar comum -
+   é vitrine/CTA, não um módulo com plano por trás. */
+.module-card-custom {
+  /* É <a>, não <button> (ver comentário no JSX) - sem isso herda o sublinhado
+     padrão do navegador em cima do nome e da descrição. */
+  text-decoration: none;
+  color: inherit;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--module-accent) 45%, var(--border-subtle));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--module-accent) 9%, var(--bg-card)), var(--bg-card));
+}
+.module-card-custom:hover {
+  border-style: solid;
+}
+.module-card-seal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--module-accent) 85%, #fff), var(--module-accent));
+  box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--module-accent) 60%, transparent);
+}
+
+/* Banner de CTA no rodapé do launcher - mesmo convite do card de sob medida,
+   pra quem chegou até o fim da grade sem clicar. */
+.launcher-cta-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, color-mix(in srgb, #8b5cf6 14%, var(--bg-card)), color-mix(in srgb, #6366f1 10%, var(--bg-card)));
+  border: 1px solid color-mix(in srgb, #8b5cf6 25%, var(--border-subtle));
+}
+.launcher-cta-title { font-size: 16px; font-weight: 700; margin: 0 0 2px; letter-spacing: -0.2px; }
+.launcher-cta-subtitle { font-size: 13px; color: var(--text-secondary); margin: 0; max-width: 480px; }
+.launcher-cta-btn { flex-shrink: 0; white-space: nowrap; text-decoration: none; }
+
 .launcher-error {
   min-height: 100vh;
   display: flex;

@@ -11,6 +11,8 @@ const PATHS = {
   faturamento: "M6 2h9l5 5v15H6V2zm9 0v5h5M9 12h6M9 16h6",
   // Barras de BI
   bi: "M4 20V10m5 10V4m5 16v-7m5 7V8",
+  // Colchetes de código - integrações/automações sob medida
+  custom: "M8 4 2 12l6 8M16 4l6 8-6 8",
 };
 
 export default function ModuleIcon({ name, size = 26 }) {

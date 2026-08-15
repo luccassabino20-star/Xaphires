@@ -37,6 +37,14 @@
     "relatorios-bi": {
       "name": "Informes & BI",
       "desc": "Paneles operativos y financieros consolidados."
+    },
+    "custom": {
+      "seal": "A medida",
+      "name": "Soluciones a Medida",
+      "desc": "Integraciones de API, automatizaciones y módulos exclusivos, desarrollados para tu negocio.",
+      "bannerTitle": "¿No encontraste lo que necesitas en los módulos listos?",
+      "bannerText": "Desarrollamos integraciones de API, automatizaciones y módulos exclusivos a medida para tu negocio.",
+      "bannerCta": "Hablar con nuestro equipo"
     }
   },
   "financeiro": {

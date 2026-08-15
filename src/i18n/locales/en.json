@@ -37,6 +37,14 @@
     "relatorios-bi": {
       "name": "Reports & BI",
       "desc": "Consolidated operational and financial dashboards."
+    },
+    "custom": {
+      "seal": "Custom-built",
+      "name": "Custom Solutions",
+      "desc": "API integrations, automations and exclusive modules, built for your business.",
+      "bannerTitle": "Didn't find what you need in the ready-made modules?",
+      "bannerText": "We build API integrations, automations and exclusive modules tailored to your business.",
+      "bannerCta": "Talk to our team"
     }
   },
   "financeiro": {
