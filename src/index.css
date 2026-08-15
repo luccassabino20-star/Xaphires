@@ -148,10 +148,6 @@ input, textarea { font-family: inherit; }
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  /* A barra flutua sobre o canvas do app (var(--bg-app), o mesmo dos dois temas) -
-     precisa do background explícito aqui porque a margem de .dsb-shell abaixo é o
-     que mostra essa cor por trás do cartão arredondado da barra. */
-  background: var(--bg-app);
 }
 
 /* ---------- Barra lateral dupla (estilo ClickUp 3.0) ----------
@@ -164,29 +160,13 @@ input, textarea { font-family: inherit; }
    e .board-title-lock (usada pela TopBar) não são desta barra - ficam. */
 .board-title-lock { color: var(--text-muted); display: inline-flex; margin-left: -6px; flex-shrink: 0; }
 
-/* Cartão flutuante (referência salva em /sidebar): a barra some da borda da
-   janela, ganha cantos arredondados e uma sombra em camadas, com o canvas do
-   app (var(--bg-app), ver .app-shell) aparecendo no vão. overflow:hidden aqui
-   é o que arredonda rail+painel JUNTOS - eles continuam dois retângulos
-   colados por dentro, só o contêiner comum é que corta os cantos. Margem
-   (não padding no pai) porque precisa ir a 0 junto com width/min-width
-   quando colapsado, sem deixar um vão vazio de 12px sobrando. */
 .dsb-shell {
   display: flex;
   flex-shrink: 0;
-  margin: 12px 0 12px 12px;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow:
-    0px 0px 0px 1px rgba(0, 0, 0, 0.06),
-    0px 1px 1px -0.5px rgba(0, 0, 0, 0.06),
-    0px 3px 3px -1.5px rgba(0, 0, 0, 0.08),
-    0px 6px 6px -3px rgba(0, 0, 0, 0.08),
-    0px 12px 12px -6px rgba(0, 0, 0, 0.1),
-    0px 24px 24px -12px rgba(0, 0, 0, 0.12);
-  transition: width 0.15s ease, min-width 0.15s ease, opacity 0.1s ease, margin 0.15s ease;
+  height: 100%;
+  transition: width 0.15s ease, min-width 0.15s ease, opacity 0.1s ease;
 }
-.dsb-shell-collapsed { width: 0; min-width: 0; margin-left: 0; opacity: 0; pointer-events: none; }
+.dsb-shell-collapsed { width: 0; min-width: 0; opacity: 0; pointer-events: none; }
 
 /* ---- Barra primária: global, ~60px, sempre escura ---- */
 .dsb-rail {
@@ -3034,10 +3014,7 @@ img.avatar { object-fit: cover; padding: 0; }
 .sidebar-backdrop { display: none; }
 
 @media (max-width: 720px) {
-  /* Gaveta de tela cheia, sem o visual de cartão flutuante do desktop: margem e
-     raio voltam a 0, e a sombra passa a ser a de modal (sobre o backdrop), não a
-     do cartão sobre o canvas. */
-  .dsb-shell { position: fixed; z-index: 300; height: 100%; margin: 0; border-radius: 0; box-shadow: var(--shadow-modal); }
+  .dsb-shell { position: fixed; z-index: 300; height: 100%; box-shadow: var(--shadow-modal); }
   /* No celular o toggle desliza (transform), não encolhe (width): a transição de
      width com position:fixed grudava num valor intermediário (~1px) em vez de
      chegar aos 300px, de forma consistente e reproduzível - não é flakiness de
