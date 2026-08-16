@@ -24,7 +24,7 @@ router.patch(
       // não ficar monitorada sem como remover.
       if (h !== null && !canUseBottleneckMonitor(getCompany(req.companyId)?.plan)) {
         return res.status(403).json({
-          error: "O monitor de gargalos está disponível a partir do plano Profissional.",
+          error: "O monitor de gargalos está disponível a partir do plano Pro.",
           code: "PLAN_FEATURE_BOTTLENECK",
         });
       }

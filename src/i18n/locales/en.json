@@ -13,7 +13,29 @@
     "launcher": {
       "eyebrow": "Xaphires Platform",
       "title": "Hello, {{name}}",
-      "subtitle": "Choose where to start. Each module handles one pillar of your business."
+      "subtitle": "Choose where to start. Each module handles one pillar of your business.",
+      "searchPlaceholder": "Search modules, tools, pages...",
+      "noResults": "No modules found for \"{{query}}\".",
+      "sidebar": {
+        "groups": {
+          "learn": "Learning",
+          "tools": "Tools",
+          "account": "My account"
+        },
+        "items": {
+          "dashboard": "Dashboard",
+          "consultor": "Consultant",
+          "solucoes": "Solutions",
+          "formacao": "Training",
+          "mentorias": "Mentorships",
+          "builder": "Builder",
+          "ferramentas": "Tools",
+          "certificados": "Certificates",
+          "metricas": "Metrics",
+          "perfil": "Profile",
+          "atualizacoes": "Updates"
+        }
+      }
     },
     "comingSoon": "Coming soon",
     "backToLauncher": "Modules",
@@ -149,7 +171,10 @@
       "home": "Home",
       "features": "Features",
       "solutions": "Solutions",
-      "pricing": "Pricing",
+      "pricing": "Plans",
+      "mentorias": "Mentoring",
+      "consultorias": "Consulting",
+      "homeMenuToggle": "More Home options",
       "enter": "Sign in"
     },
     "promoPopup": {
@@ -158,8 +183,9 @@
       "defaultButton": "Claim offer"
     },
     "home": {
-      "heroTitle": "Your team organized, with no extra effort",
-      "heroText": "Xaphires replaces loose spreadsheets and WhatsApp groups with one place: boards, deadlines and priorities, synced in real time for the whole team.",
+      "heroEyebrow": "Business management in one place",
+      "heroTitle": "The B2B platform that boosts your results with automations",
+      "heroText": "Ready-made tools, specialized support, hands-on training and guided implementation to cut costs, boost revenue and organize your company's day-to-day.",
       "ctaStart": "Get started",
       "ctaPlans": "See plans",
       "heroNote": "7 days free with every feature, no credit card. After that, stay on the free plan forever if you want.",
@@ -177,10 +203,9 @@
         ] }
       ] },
       "stats": [
-        { "value": "13", "label": "Integrated tools in one place" },
-        { "value": "100%", "label": "Real-time sync across the team" },
-        { "value": "0", "label": "Loose spreadsheets or WhatsApp groups" },
-        { "value": "24/7", "label": "Board access, from anywhere" }
+        { "label": "Features", "value": "13", "desc": "Management tools integrated in one place, no switching systems." },
+        { "label": "Sync", "value": "100%", "desc": "Real time across the whole team, on any device." },
+        { "label": "Availability", "value": "24/7", "desc": "Board access from anywhere, any time." }
       ],
       "benefits": [
         { "title": "Everything in one place", "text": "Replace loose spreadsheets, WhatsApp groups and scattered tools with a single system." },
@@ -190,12 +215,13 @@
       "exploreTitle": "Explore Xaphires",
       "exploreLinks": [
         { "page": "features", "badge": "F", "title": "Features", "text": "Discover Xaphires's tools: board, table, calendar, map and more." },
-        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "See how project, field, management and operations teams use Xaphires day to day." },
-        { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Basic, Professional and Enterprise plans and pick the right one for your team." }
+        { "page": "solutions", "badge": "S", "title": "Solutions", "text": "Sales & CRM, Finance and other pillars ready for your business, all in one place." },
+        { "page": "pricing", "badge": "P", "title": "Pricing", "text": "Compare the Free, Pro and Enterprise plans and pick the right one for your team." }
       ],
+      "pricingPreview": { "title": "A plan for every team size", "text": "Start for free and change plans as your business grows.", "ctaAll": "See all plans and features" },
       "faq": { "title": "Frequently asked questions", "items": [
         { "q": "Do I need to install anything?", "a": "No. Xaphires runs straight in the browser, on desktop or mobile - no app to download and no server to set up." },
-        { "q": "Do I get support if something goes wrong?", "a": "Yes. Every plan includes email support; on the Professional and Enterprise plans, support is priority or dedicated, with faster response times." },
+        { "q": "Do I get support if something goes wrong?", "a": "Yes. Every plan includes email support; on the Pro and Enterprise plans, support is priority or dedicated, with faster response times." },
         { "q": "Can I cancel anytime?", "a": "Yes, no penalty. When you cancel, you keep full access until the end of the period you already paid for; after that, your data stays put - just pick the free plan whenever you want to keep editing." },
         { "q": "Does my team need training to use it?", "a": "In most cases, no. If anyone on your team has used a Kanban board before, even a whiteboard with sticky notes, Xaphires follows the same logic - it takes minutes to learn." }
       ] }
@@ -205,11 +231,11 @@
       "automationsText": "Automations running in the background, so you don't have to remember or chase things by hand.",
       "automations": [
         { "badge": "A", "title": "Card archiving", "text": "Take finished work off the board without deleting it. Archived cards leave every view and return to their original column whenever you want." },
-        { "badge": "R", "title": "Auto-archiving", "text": "Set the number of days and completed cards move to the archive on their own. Available from the Professional plan up." },
-        { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Professional up." },
-        { "badge": "T", "title": "Automatic routines", "text": "Fixed tasks become cards on their own at the right date, with the checklist already filled in. From the Professional plan up." },
-        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue. Available from the Professional plan up." },
-        { "badge": "P", "title": "Personal planner", "text": "A personal agenda outside the boards: your own calendar and task list, with completed ones archiving on their own after 2 days. Available from the Professional plan up." },
+        { "badge": "R", "title": "Auto-archiving", "text": "Set the number of days and completed cards move to the archive on their own. Available from the Pro plan up." },
+        { "badge": "B", "title": "Bottleneck monitor", "text": "Set how long each column may hold a card and see which ones went past it, with a follow-up message ready. From Pro up." },
+        { "badge": "T", "title": "Automatic routines", "text": "Fixed tasks become cards on their own at the right date, with the checklist already filled in. From the Pro plan up." },
+        { "badge": "L", "title": "Task ticker", "text": "A strip at the top of the board cycling through what is pending, highlighting anything overdue. Available from the Pro plan up." },
+        { "badge": "P", "title": "Personal planner", "text": "A personal agenda outside the boards: your own calendar and task list, with completed ones archiving on their own after 2 days. Available from the Pro plan up." },
         { "badge": "X", "title": "Attachments and links", "text": "Contracts, plans and photos straight on the card, plus links to whatever lives outside the system." },
         { "badge": "D", "title": "Automatic completion", "text": "Mark a card as done and it jumps on its own to the board's completed column - no dragging by hand." }
       ],
@@ -219,10 +245,10 @@
         { "badge": "B", "title": "Kanban board", "text": "No more tasks lost in chat screenshots. Drag and drop between lists and see the team's real progress." },
         { "badge": "T", "title": "Table", "text": "Every card in a spreadsheet-like view, with search and filter by member. No need for another tool." },
         { "badge": "C", "title": "Calendar", "text": "Deadlines and start dates in a monthly view, so nothing slips by unnoticed." },
-        { "badge": "L", "title": "Timeline (Gantt)", "text": "Create and open tasks straight from the timeline, with the whole project schedule at a glance, period by period. Available from the Intermediate plan up." },
-        { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet. Available from the Intermediate plan up." },
-        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams. Available from the Intermediate plan up." },
-        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest. Available from the Intermediate plan up." }
+        { "badge": "L", "title": "Timeline (Gantt)", "text": "Create and open tasks straight from the timeline, with the whole project schedule at a glance, period by period. Available from the Unlimited plan up." },
+        { "badge": "D", "title": "Dashboard", "text": "Metrics and indicators ready to show progress without building a single spreadsheet. Available from the Unlimited plan up." },
+        { "badge": "M", "title": "Map", "text": "Tasks with addresses plotted on an interactive map. Great for field teams. Available from the Unlimited plan up." },
+        { "badge": "E", "title": "Eisenhower Matrix", "text": "Prioritize by urgency and importance and stop working only on what shouts loudest. Available from the Unlimited plan up." }
       ],
       "ganttPreview": { "title": "The Gantt in action", "text": "Every task becomes a bar on the timeline, with today's line always visible - create and edit right here, no other tool needed.", "rows": [
         { "title": "Planning", "status": "done" },
@@ -238,16 +264,43 @@
       ]
     },
     "solutions": {
-      "headerTitle": "Solutions for every kind of team",
-      "headerText": "The same Xaphires, organized the way each team needs to work.",
+      "headerTitle": "Solutions for every area of your business",
+      "headerText": "One pillar ready for each side of the business - from the modules already live to custom solutions built for you.",
+      "soon": "Coming soon",
+      "customCta": "Talk to our team",
       "items": [
-        { "title": "Agencies and project teams", "text": "One board per client or project, with a timeline for deadlines and a dashboard ready to show progress in meetings.", "tags": ["Kanban board", "Timeline", "Dashboard"] },
-        { "title": "Field teams", "text": "Tasks with addresses plotted on the map. Ideal for maintenance, deliveries, inspections and any team that works outside the office.", "tags": ["Map", "Kanban board"] },
-        { "title": "Management and leadership", "text": "Prioritize with the Eisenhower Matrix, track indicators on the Dashboard, and keep sensitive planning in private boards.", "tags": ["Eisenhower Matrix", "Dashboard", "Private boards"] },
-        { "title": "Operations and routine", "text": "The Kanban board + Table pair covers day-to-day work, with a Calendar for recurring deadlines so nothing slips by.", "tags": ["Kanban board", "Table", "Calendar"] },
-        { "title": "Product Teams", "text": "From roadmap to launch: organize initiatives on the Timeline, prioritize feature requests, and keep everything in one place.", "tags": ["Timeline", "Eisenhower Matrix", "Attachments"], "page": "productTeams" }
+        { "title": "Sales & CRM", "text": "Leads, Kanban pipeline, proposals, quotes and orders - from first contact to close, in one place.", "tags": ["Kanban board", "Proposals", "Quotes"] },
+        { "title": "Finance", "text": "Cash flow, accounts payable and receivable, bank reconciliation and P&L - the financial backbone of the business.", "tags": ["Cash flow", "Payable/receivable", "P&L"] },
+        { "title": "Purchasing & Inventory", "text": "Stock, suppliers, product margins and reorder points.", "tags": ["Stock", "Suppliers"], "soon": true },
+        { "title": "Invoicing", "text": "Tax invoice issuing, bank slips and payment links.", "tags": ["Tax invoices", "Bank slips"], "soon": true },
+        { "title": "Reports & BI", "text": "Consolidated operational and financial dashboards, to decide with real data.", "tags": ["Dashboards", "Indicators"], "soon": true },
+        { "title": "Custom Solutions", "text": "Didn't find what you need in the ready-made modules? We build API integrations, automations and exclusive modules for your business.", "tags": ["Integrations", "Automations"], "custom": true }
       ],
       "learnMore": "Learn more"
+    },
+    "mentorias": {
+      "badge": "Management mentoring",
+      "heroTitle": "Mentoring to get the most out of Xaphires",
+      "heroText": "Recurring sessions with someone who knows operations management, so your team uses Xaphires the right way from day one.",
+      "cta": "Talk about mentoring",
+      "items": [
+        { "title": "Usage diagnostic", "text": "We analyze how your team uses the board today and where it can improve." },
+        { "title": "Recurring sessions", "text": "Periodic meetings to review indicators, deadlines and bottlenecks with the team." },
+        { "title": "Management best practices", "text": "How to prioritize tasks, distribute workload and keep the team aligned." },
+        { "title": "Reading the indicators", "text": "How to interpret the Dashboard and reports to decide with data, not guesswork." }
+      ]
+    },
+    "consultorias": {
+      "badge": "Implementation consulting",
+      "heroTitle": "Guided implementation, no wasted work",
+      "heroText": "Our team sets up boards, automations and the chart of accounts together with you, so your operation starts off right.",
+      "cta": "Talk about consulting",
+      "items": [
+        { "title": "Initial diagnostic", "text": "We map your current processes before setting up any board." },
+        { "title": "Guided setup", "text": "Boards, lists, automations and cost centers set up together with your team." },
+        { "title": "Data migration", "text": "We help bring over the history that already exists in a spreadsheet or another tool." },
+        { "title": "Team training", "text": "A hands-on session so everyone leaves knowing how to use the system day to day." }
+      ]
     },
     "productTeams": {
       "backLink": "← Back to Solutions",
@@ -277,10 +330,10 @@
       "headerText": "Pick the right plan for your team and change it as it grows.",
       "mostPopular": "Most popular",
       "plans": [
-        { "name": "Basic", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Up to 4 boards, private and shared", "Kanban, Table and Calendar", "Manual card archiving", "Card attachments and links (up to 10 MB)", "Email support"] },
-        { "name": "Intermediate", "price": "R$ 370.00", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Start free trial", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Basic, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Card attachments and links (up to 50 MB)"] },
-        { "name": "Professional", "price": "R$ 730.00", "period": "/month", "tagline": "For teams that want full control", "cta": "Start free trial", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Intermediate, plus:", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Routines that create cards on their own", "Priority support"] },
-        { "name": "Enterprise", "price": "Contact us", "period": "", "tagline": "For organizations with specific needs", "cta": "Talk to sales", "features": ["Everything in Professional, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)", "Development of any custom feature you need", "We build any tailored solution your business requires", "Open scope for exclusive projects and customizations"] }
+        { "name": "Free", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Up to 4 boards, private and shared", "Kanban, Table and Calendar", "Manual card archiving", "Card attachments and links (up to 10 MB)", "Email support"] },
+        { "name": "Unlimited", "price": "R$ 370.00", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Explore the platform", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Free, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Card attachments and links (up to 50 MB)"] },
+        { "name": "Pro", "price": "R$ 850.00", "period": "/month", "tagline": "For teams that want full control", "cta": "Explore the platform", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Unlimited, plus:", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Routines that create cards on their own", "Priority support"] },
+        { "name": "Enterprise", "price": "R$ 2,780.00", "period": "/month", "tagline": "For organizations with specific needs", "cta": "Explore the platform", "note": "7 days free to try", "features": ["Everything in Pro, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)", "Development of any custom feature you need", "We build any tailored solution your business requires", "Open scope for exclusive projects and customizations"] }
       ]
     },
     "privacy": {
@@ -398,17 +451,34 @@
     "footer": {
       "title": "Ready to organize your team?",
       "cta": "Get started",
+      "tagline": "The platform that brings your business's pillars together in one place.",
+      "columnProduct": "Product",
+      "columnContact": "Get in touch",
+      "columnLegal": "Legal",
+      "talkToSales": "Talk to sales",
       "privacy": "Privacy Policy",
       "copyright": "Copyright © 2026 Xaphires"
     }
   },
   "auth": {
     "brandTitle": "Xaphires",
-    "brandText": "Organize your projects in simple, fast and collaborative Kanban boards.",
+    "brandHeadlinePrefix": "Accelerate your business's growth and reach ",
+    "brandHeadlineEmphasis": "the top of efficiency",
+    "brandHeadlineSuffix": ".",
     "back": "← Back",
     "tabLogin": "Sign in",
-    "tabSignup": "Create company",
+    "tabSignup": "Sign up",
     "tabJoin": "Request access",
+    "eyebrow": {
+      "login": "Access platform",
+      "signup": "Create account",
+      "join": "Request access"
+    },
+    "welcome": {
+      "login": "Welcome back.",
+      "signup": "Get started.",
+      "join": "Join your company."
+    },
     "companyName": "Company name",
     "companyDocLabel": "Company CNPJ or CPF",
     "yourName": "Your name",
@@ -418,7 +488,11 @@
     "passwordsMismatch": "Passwords don't match",
     "submitWait": "Please wait...",
     "submitLogin": "Sign in",
-    "submitSignup": "Create company",
+    "submitSignup": "Sign up",
+    "forgotPassword": "Forgot my password",
+    "forgotPasswordHint": "Ask your company's admin to reset your password.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "joinIntro": "Does your company already use Xaphires? Enter its CNPJ or CPF to request access.",
     "cnpjLabel": "Company CNPJ or CPF",
     "cnpjSearch": "Search",
@@ -486,6 +560,7 @@
     "dataMenu": {
       "recurrences": "Recurring routines",
       "bottlenecks": "Bottleneck monitor",
+      "mindMap": "Mind map",
       "archivedCards": "Archived cards",
       "moreOptions": "More options",
       "personalize": "Customize",
@@ -533,7 +608,7 @@
     "recurrences": {
       "title": "Recurring routines",
       "empty": "No routines yet. A routine creates the card on its own at the right date, with the checklist ready.",
-      "planRequired": "Recurring routines are available from the Professional plan up. You can still view and delete existing ones.",
+      "planRequired": "Recurring routines are available from the Pro plan up. You can still view and delete existing ones.",
       "newRule": "New routine",
       "fieldTitle": "Card title",
       "titlePlaceholder": "e.g. Close the monthly books",
@@ -634,8 +709,25 @@
       "msgDue": "The agreed due date is {{date}}.",
       "msgClosing": "Could you let me know where it stands? Thanks!"
     },
+    "mindMap": {
+      "title": "Mind map",
+      "empty": "This board has no lists yet.",
+      "cardsCount": "{{count}} card",
+      "cardsCount_other": "{{count}} cards",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "zoomReset": "Reset zoom",
+      "modeBoard": "From board",
+      "modeFree": "Blank map",
+      "freeHint": "Double-click the background to create a topic. Drag the background to pan, scroll to zoom. Click two topics to link (or unlink) them. Select a topic to drag it, delete it, or use + to branch out.",
+      "clear": "Clear map",
+      "clearConfirm": "Delete all topics in this map? This cannot be undone.",
+      "undo": "Undo",
+      "redo": "Redo",
+      "center": "Center"
+    },
     "archive": {
-      "autoPlanRequired": "Auto-archiving is available from the Professional plan up. Manual archiving stays available.",
+      "autoPlanRequired": "Auto-archiving is available from the Pro plan up. Manual archiving stays available.",
       "autoLabel": "Auto-archive completed cards",
       "autoDaysSuffix": "days",
       "autoOnHint": "Cards completed more than {{days}} days ago move to the archive when the board loads. Unchecking a card restarts the count.",
@@ -654,7 +746,7 @@
       "deletedToast": "Card deleted"
     },
     "listMenu": {
-      "stuckPlanRequired": "The bottleneck monitor is available from the Professional plan up.",
+      "stuckPlanRequired": "The bottleneck monitor is available from the Pro plan up.",
       "stuckConfigure": "Monitor bottlenecks in this column",
       "stuckConfigured": "Bottleneck: alert at {{hours}}h",
       "stuckHint": "Warns when a card sits in this column longer than this.",
@@ -948,7 +1040,7 @@
     "groupTomorrow": "Tomorrow",
     "groupUpcoming": "Upcoming",
     "groupCompleted": "Completed",
-    "planRequired": "The personal planner is available from the Professional plan up. You can still view and delete what already exists."
+    "planRequired": "The personal planner is available from the Pro plan up. You can still view and delete what already exists."
   },
   "plan": {
     "monthlyLabel": "Monthly price",
@@ -973,9 +1065,9 @@
     "masterOnly": "Only the master user can change the company plan.",
     "changed": "Plan changed to {{plan}}",
     "names": {
-      "basic": "Basic",
-      "intermediate": "Intermediate",
-      "professional": "Professional",
+      "basic": "Free",
+      "intermediate": "Unlimited",
+      "professional": "Pro",
       "enterprise": "Enterprise"
     },
     "status": {
@@ -987,10 +1079,10 @@
     "trialEnding": "Your trial ends in {{count}} day",
     "trialEnding_other": "Your trial ends in {{count}} days",
     "expiredMessage": "Your plan expired. You can still see everything, but not create or edit.",
-    "continueOnBasic": "Continue on the free Basic plan",
-    "movedToBasic": "Plan changed to Basic",
+    "continueOnFree": "Continue on the Free plan",
+    "movedToFree": "Plan changed to Free",
     "selectTitle": "Choose a plan",
-    "freeChoiceHint": "You do not have a paid plan in effect, so you can pick any plan below - including the free Basic, which never expires.",
+    "freeChoiceHint": "You do not have a paid plan in effect, so you can pick any plan below - including the Free plan, which never expires.",
     "selectFreeConfirm": "Switch to the {{plan}} plan? It is free and never expires."
   },
   "billing": {
@@ -1069,9 +1161,9 @@
     "REPORT_FORMAT_INVALID": "Unsupported report format",
     "REPORT_STATUS_INVALID": "Invalid status filter",
     "BOARD_LIMIT_REACHED": "Plan board limit reached. Delete a board or upgrade to create another one.",
-    "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Professional plan up.",
-    "PLAN_FEATURE_PERSONAL_PLANNER": "The personal planner is available from the Professional plan up.",
-    "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Professional plan up.",
+    "PLAN_FEATURE_BOTTLENECK": "The bottleneck monitor is available from the Pro plan up.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "The personal planner is available from the Pro plan up.",
+    "PLAN_FEATURE_RECURRING": "Recurring cards are available from the Pro plan up.",
     "INVALID_FREQUENCY": "Invalid frequency",
     "WEEKDAY_REQUIRED": "Choose the day of the week",
     "MONTHDAY_REQUIRED": "Choose a day of the month between 1 and 31",
@@ -1080,7 +1172,7 @@
     "LIST_NOT_FOUND": "Column not found",
     "RECURRENCE_NOT_FOUND": "Routine not found",
     "INVALID_STUCK_HOURS": "Enter a number of hours between 1 and 8760",
-    "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Professional plan up.",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Pro plan up.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Only upgrades are available here. To move down or cancel, contact support.",
     "PLAN_EXPIRED": "Your plan expired. Renew to edit again.",
     "PLAN_USER_LIMIT": "Your plan reached its user limit. Change plans to add more.",

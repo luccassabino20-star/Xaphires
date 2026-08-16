@@ -223,8 +223,8 @@ router.post(
 // billing/lifecycle.js) - o mesmo desconto não acompanha a empresa se ela
 // trocar de plano depois. Zerar manda discountCents: 0, não omitir o campo -
 // omitir seria "não mexer", zerar é "remover o desconto deste plano". Só
-// aceita plano pago com preço de tabela: sem tabela (Empresarial, sob
-// consulta) não há o que descontar, e o Básico é sempre grátis.
+// aceita plano pago com preço de tabela: um plano sob consulta (nenhum hoje)
+// não teria o que descontar, e o Free é sempre grátis.
 router.post(
   "/companies/:id/discount",
   ah(async (req, res) => {

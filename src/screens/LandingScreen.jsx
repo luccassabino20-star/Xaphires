@@ -1,11 +1,14 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
-import LandingThemeToggle from "../components/LandingThemeToggle.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 
 const NAV_PAGES = ["home", "features", "solutions", "pricing"];
+// Submenu do item "Início": mentoria e consultoria são serviços novos, sem
+// espaço próprio na barra principal - entram aqui, igual o dropdown que a
+// referência (viverdeia.ai) usa no primeiro item do menu.
+const HOME_DROPDOWN = ["mentorias", "consultorias", "solutions"];
 
 function useReveal() {
   const containerRef = useRef(null);
@@ -457,7 +460,7 @@ function FeatureSwitcher() {
   );
 }
 
-function StatCard({ value, label }) {
+function StatCard({ value, label, desc }) {
   const ref = useRef(null);
 
   function handleMove(e) {
@@ -481,8 +484,9 @@ function StatCard({ value, label }) {
 
   return (
     <div className="landing-stat-card" ref={ref} onMouseMove={handleMove} onMouseLeave={handleLeave}>
-      <span className="landing-stat-value">{value}</span>
       <span className="landing-stat-label">{label}</span>
+      <span className="landing-stat-value">{value}</span>
+      <span className="landing-stat-desc">{desc}</span>
     </div>
   );
 }
@@ -498,40 +502,49 @@ function HomePage({ onEnter, onNavigate }) {
 
   return (
     <div ref={revealRef}>
-      {/* O hero não usa .landing-reveal: a entrada dele é o reveal letra a letra do título. */}
-      <section className="landing-hero landing-hero-main">
-        <h1>
-          <RevealTitle text={t("landing.home.heroTitle")} />
-        </h1>
-        <p className="landing-reveal" style={{ transitionDelay: "200ms" }}>
-          {t("landing.home.heroText")}
-        </p>
-        <div className="landing-hero-actions landing-reveal" style={{ transitionDelay: "400ms" }}>
-          <button className="btn-primary" onClick={onEnter}>
-            {t("landing.home.ctaStart")}
-          </button>
-          <button className="btn-secondary landing-hero-secondary" onClick={() => onNavigate("pricing")}>
-            {t("landing.home.ctaPlans")}
-          </button>
+      {/* Imagem de fundo provisória (public/hero-photo.png) - trocar pelo arquivo
+          definitivo quando ele existir. */}
+      <section className="landing-hero-dark landing-hero-dark-bg">
+        <div className="landing-hero-dark-inner">
+          <div>
+            <span className="landing-hero-dark-eyebrow landing-reveal">{t("landing.home.heroEyebrow")}</span>
+            {/* O título não usa .landing-reveal: a entrada dele é o reveal letra a letra. */}
+            <h1>
+              <RevealTitle text={t("landing.home.heroTitle")} />
+            </h1>
+            <p className="landing-reveal" style={{ transitionDelay: "200ms" }}>
+              {t("landing.home.heroText")}
+            </p>
+            <div className="landing-hero-actions landing-reveal" style={{ transitionDelay: "400ms" }}>
+              <button className="btn-primary" onClick={onEnter}>
+                {t("landing.home.ctaStart")}
+              </button>
+              <button className="btn-secondary landing-hero-secondary" onClick={() => onNavigate("pricing")}>
+                {t("landing.home.ctaPlans")}
+              </button>
+            </div>
+            <p className="landing-hero-dark-note landing-reveal" style={{ transitionDelay: "500ms" }}>
+              {t("landing.home.heroNote")}
+            </p>
+          </div>
         </div>
-        <p className="landing-hero-note landing-reveal" style={{ transitionDelay: "500ms" }}>
-          {t("landing.home.heroNote")}
-        </p>
       </section>
 
-      <HeroBoardPreview />
-
       <LogoMarquee />
+
+      <FeatureSwitcher />
 
       <section className="landing-stats">
         {stats.map((s, i) => (
           <div className="landing-reveal" style={{ transitionDelay: `${i * 80}ms` }} key={s.label}>
-            <StatCard value={s.value} label={s.label} />
+            <StatCard value={s.value} label={s.label} desc={s.desc} />
           </div>
         ))}
       </section>
 
-      <FeatureSwitcher />
+      <Testimonials />
+
+      <PricingPreview onEnter={onEnter} onNavigate={onNavigate} />
 
       <section className="landing-benefits" ref={benefitsRef}>
         {benefits.map((b, i) => (
@@ -564,10 +577,45 @@ function HomePage({ onEnter, onNavigate }) {
         </div>
       </section>
 
-      <Testimonials />
-
       <Faq />
     </div>
+  );
+}
+
+// Prévia compacta dos planos na Home, com âncora #planos (mesmo id que o resto
+// do site já usa pra "Preços" ir direto pra cá). Reaproveita landing.pricing.plans
+// pra não duplicar preço/nome em dois lugares do locale - só omite a lista de
+// recursos, que fica pra página cheia.
+function PricingPreview({ onEnter, onNavigate }) {
+  const { t } = useTranslation();
+  const plans = t("landing.pricing.plans", { returnObjects: true });
+
+  return (
+    <section className="landing-pricing-preview" id="planos">
+      <h2 className="landing-reveal">{t("landing.home.pricingPreview.title")}</h2>
+      <p className="landing-reveal">{t("landing.home.pricingPreview.text")}</p>
+      <div className="landing-pricing-preview-grid">
+        {plans.map((p) => {
+          const ctaClass = p.highlight ? "btn-primary" : "btn-secondary";
+          return (
+            <div className={"landing-plan-card landing-plan-card-compact" + (p.highlight ? " highlight" : "")} key={p.name}>
+              {p.highlight && <span className="landing-plan-badge">{t("landing.pricing.mostPopular")}</span>}
+              <h3>{p.name}</h3>
+              <div className="landing-plan-price">
+                <span className="landing-plan-price-value">{p.price}</span>
+                <span className="landing-plan-price-period">{p.period}</span>
+              </div>
+              <button className={ctaClass} onClick={onEnter}>
+                {p.cta}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <button type="button" className="landing-pricing-preview-link" onClick={() => onNavigate("pricing")}>
+        {t("landing.home.pricingPreview.ctaAll")} →
+      </button>
+    </section>
   );
 }
 
@@ -648,7 +696,8 @@ function SolutionsPage({ onNavigate }) {
 
       <section className="landing-solutions">
         {items.map((s) => (
-          <div className="landing-solution-card" key={s.title}>
+          <div className={"landing-solution-card" + (s.custom ? " landing-solution-card-custom" : "")} key={s.title}>
+            {s.soon && <span className="landing-solution-soon">{t("landing.solutions.soon")}</span>}
             <h3>{s.title}</h3>
             <p>{s.text}</p>
             <div className="landing-solution-tags">
@@ -663,11 +712,60 @@ function SolutionsPage({ onNavigate }) {
                 {t("landing.solutions.learnMore")} →
               </button>
             )}
+            {s.custom && (
+              <a className="landing-solution-link" href={WHATSAPP_VENDAS_URL} target="_blank" rel="noopener noreferrer">
+                {t("landing.solutions.customCta")} →
+              </a>
+            )}
           </div>
         ))}
       </section>
     </>
   );
+}
+
+// Mentoria e Consultoria compartilham o mesmo formato de página (hero com CTA
+// pro WhatsApp + grade de benefícios) - só o conteúdo muda, então é uma função
+// só parametrizada pela chave de i18n, no mesmo espírito do MindMapFromBoard
+// reaproveitado por modo.
+function ServiceOfferingPage({ i18nKey }) {
+  const { t } = useTranslation();
+  const items = t(`landing.${i18nKey}.items`, { returnObjects: true });
+
+  return (
+    <>
+      <section className="landing-hero">
+        <span className="landing-pill-badge">{t(`landing.${i18nKey}.badge`)}</span>
+        <h1>{t(`landing.${i18nKey}.heroTitle`)}</h1>
+        <p>{t(`landing.${i18nKey}.heroText`)}</p>
+        <div className="landing-hero-actions">
+          <a className="btn-primary landing-service-cta" href={WHATSAPP_VENDAS_URL} target="_blank" rel="noopener noreferrer">
+            {t(`landing.${i18nKey}.cta`)}
+          </a>
+        </div>
+      </section>
+
+      <section className="landing-features">
+        <div className="landing-features-grid">
+          {items.map((it, i) => (
+            <div className="landing-feature-card" key={it.title}>
+              <span className="landing-feature-badge">{String.fromCharCode(65 + i)}</span>
+              <h3>{it.title}</h3>
+              <p>{it.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function MentoriasPage() {
+  return <ServiceOfferingPage i18nKey="mentorias" />;
+}
+
+function ConsultoriasPage() {
+  return <ServiceOfferingPage i18nKey="consultorias" />;
 }
 
 function ProductTeamsPage({ onEnter, onNavigate }) {
@@ -744,9 +842,7 @@ function PricingPage({ onEnter }) {
 
       <section className="landing-pricing">
         <div className="landing-pricing-grid">
-          {plans.map((p, i) => {
-            // Só o último plano (Empresarial) fala com vendas; os demais entram direto no cadastro.
-            const isVendas = i === plans.length - 1;
+          {plans.map((p) => {
             const ctaClass = p.highlight ? "btn-primary" : "btn-secondary";
             return (
               <div className={"landing-plan-card" + (p.highlight ? " highlight" : "")} key={p.name}>
@@ -757,15 +853,9 @@ function PricingPage({ onEnter }) {
                   <span className="landing-plan-price-value">{p.price}</span>
                   <span className="landing-plan-price-period">{p.period}</span>
                 </div>
-                {isVendas ? (
-                  <a className={ctaClass} href={WHATSAPP_VENDAS_URL} target="_blank" rel="noopener noreferrer">
-                    {p.cta}
-                  </a>
-                ) : (
-                  <button className={ctaClass} onClick={onEnter}>
-                    {p.cta}
-                  </button>
-                )}
+                <button className={ctaClass} onClick={onEnter}>
+                  {p.cta}
+                </button>
                 {/* Só os planos com período de teste trazem essa nota. */}
                 {p.note && <p className="landing-plan-note">{p.note}</p>}
                 <ul className="landing-plan-features">
@@ -829,6 +919,8 @@ export default function LandingScreen({ onEnter }) {
   const [page, setPage] = useState("home");
   const [scrolled, setScrolled] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+  const [homeMenuOpen, setHomeMenuOpen] = useState(false);
+  const homeMenuRef = useRef(null);
 
   useEffect(() => {
     // O .landing-shell usa scroll-behavior: smooth, então uma rolagem animada até o topo é
@@ -838,6 +930,17 @@ export default function LandingScreen({ onEnter }) {
     // o painel sobreposto ao conteúdo novo.
     setNavOpen(false);
   }, [page]);
+
+  // Fecha o submenu de "Início" ao clicar fora - sem isso ele fica aberto
+  // sobre o conteúdo até a próxima navegação.
+  useEffect(() => {
+    if (!homeMenuOpen) return;
+    const onClick = (e) => {
+      if (homeMenuRef.current && !homeMenuRef.current.contains(e.target)) setHomeMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [homeMenuOpen]);
 
   useEffect(() => {
     const el = shellRef.current;
@@ -903,19 +1006,55 @@ export default function LandingScreen({ onEnter }) {
           <span>{t("landing.nav.brand")}</span>
         </div>
         <nav className="landing-nav-links">
-          {NAV_PAGES.map((p) => (
-            <button
-              key={p}
-              className={"landing-nav-link" + (page === p ? " active" : "")}
-              onClick={() => setPage(p)}
-            >
-              {t(`landing.nav.${p}`)}
-            </button>
-          ))}
+          {NAV_PAGES.map((p) =>
+            p === "home" ? (
+              <div className="landing-nav-item-dropdown" ref={homeMenuRef} key={p}>
+                <span className={"landing-nav-link" + (page === p ? " active" : "")}>
+                  <button type="button" onClick={() => setPage(p)}>
+                    {t(`landing.nav.${p}`)}
+                  </button>
+                  <button
+                    type="button"
+                    className={"landing-nav-dropdown-chevron" + (homeMenuOpen ? " open" : "")}
+                    onClick={() => setHomeMenuOpen((o) => !o)}
+                    aria-label={t("landing.nav.homeMenuToggle")}
+                    aria-expanded={homeMenuOpen}
+                  >
+                    <svg viewBox="0 0 24 24" width="12" height="12">
+                      <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                </span>
+                {homeMenuOpen && (
+                  <div className="landing-nav-dropdown-panel">
+                    {HOME_DROPDOWN.map((d) => (
+                      <button
+                        type="button"
+                        key={d}
+                        className="landing-nav-dropdown-link"
+                        onClick={() => {
+                          setPage(d);
+                          setHomeMenuOpen(false);
+                        }}
+                      >
+                        {t(`landing.nav.${d}`)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                key={p}
+                className={"landing-nav-link" + (page === p ? " active" : "")}
+                onClick={() => setPage(p)}
+              >
+                {t(`landing.nav.${p}`)}
+              </button>
+            )
+          )}
         </nav>
         <div className="landing-nav-actions">
-          <LandingThemeToggle />
-          <LanguageSwitcher />
           <button className="btn-primary btn-small" onClick={onEnter}>
             {t("landing.nav.enter")}
           </button>
@@ -937,18 +1076,25 @@ export default function LandingScreen({ onEnter }) {
         {navOpen && (
           <div className="landing-nav-mobile">
             {NAV_PAGES.map((p) => (
-              <button
-                key={p}
-                className={"landing-nav-mobile-link" + (page === p ? " active" : "")}
-                onClick={() => setPage(p)}
-              >
-                {t(`landing.nav.${p}`)}
-              </button>
+              <Fragment key={p}>
+                <button
+                  className={"landing-nav-mobile-link" + (page === p ? " active" : "")}
+                  onClick={() => setPage(p)}
+                >
+                  {t(`landing.nav.${p}`)}
+                </button>
+                {p === "home" &&
+                  HOME_DROPDOWN.map((d) => (
+                    <button
+                      key={d}
+                      className={"landing-nav-mobile-link landing-nav-mobile-sublink" + (page === d ? " active" : "")}
+                      onClick={() => setPage(d)}
+                    >
+                      {t(`landing.nav.${d}`)}
+                    </button>
+                  ))}
+              </Fragment>
             ))}
-            <div className="landing-nav-mobile-actions">
-              <LandingThemeToggle />
-              <LanguageSwitcher />
-            </div>
             <button
               className="btn-primary"
               onClick={() => {
@@ -965,21 +1111,48 @@ export default function LandingScreen({ onEnter }) {
       {page === "home" && <HomePage onEnter={onEnter} onNavigate={setPage} />}
       {page === "features" && <FeaturesPage />}
       {page === "solutions" && <SolutionsPage onNavigate={setPage} />}
+      {page === "mentorias" && <MentoriasPage />}
+      {page === "consultorias" && <ConsultoriasPage />}
       {page === "productTeams" && <ProductTeamsPage onEnter={onEnter} onNavigate={setPage} />}
       {page === "pricing" && <PricingPage onEnter={onEnter} />}
       {page === "privacy" && <PrivacyPage onNavigate={setPage} />}
 
       <footer className="landing-footer">
-        <h2>{t("landing.footer.title")}</h2>
-        <button className="btn-primary" onClick={onEnter}>
-          {t("landing.footer.cta")}
-        </button>
-        <nav className="landing-footer-links">
-          <button type="button" className="landing-footer-link" onClick={() => setPage("privacy")}>
-            {t("landing.footer.privacy")}
+        <div className="landing-footer-cta">
+          <h2>{t("landing.footer.title")}</h2>
+          <button className="btn-primary" onClick={onEnter}>
+            {t("landing.footer.cta")}
           </button>
-        </nav>
-        <p className="landing-footer-copyright">{t("landing.footer.copyright")}</p>
+        </div>
+
+        <div className="landing-footer-grid">
+          <div className="landing-footer-brand">
+            <div className="landing-nav-brand">
+              <span className="landing-nav-icon">X</span>
+              <span>{t("landing.nav.brand")}</span>
+            </div>
+            <p>{t("landing.footer.tagline")}</p>
+          </div>
+          <div className="landing-footer-col">
+            <h4>{t("landing.footer.columnProduct")}</h4>
+            <button type="button" onClick={() => setPage("features")}>{t("landing.nav.features")}</button>
+            <button type="button" onClick={() => setPage("solutions")}>{t("landing.nav.solutions")}</button>
+            <button type="button" onClick={() => setPage("pricing")}>{t("landing.nav.pricing")}</button>
+          </div>
+          <div className="landing-footer-col">
+            <h4>{t("landing.footer.columnContact")}</h4>
+            <a href={WHATSAPP_VENDAS_URL} target="_blank" rel="noopener noreferrer">{t("landing.footer.talkToSales")}</a>
+          </div>
+          <div className="landing-footer-col">
+            <h4>{t("landing.footer.columnLegal")}</h4>
+            <button type="button" onClick={() => setPage("privacy")}>{t("landing.footer.privacy")}</button>
+          </div>
+        </div>
+
+        <div className="landing-footer-bottom">
+          <p className="landing-footer-copyright">{t("landing.footer.copyright")}</p>
+          <LanguageSwitcher className="landing-footer-language" />
+        </div>
       </footer>
     </div>
   );

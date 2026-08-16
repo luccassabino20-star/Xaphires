@@ -14,7 +14,7 @@ router.use(requireAuth);
 function exigePlano(req, res, next) {
   if (canUseRecurringCards(getCompany(req.companyId)?.plan)) return next();
   return res.status(403).json({
-    error: "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
+    error: "Os cartões recorrentes estão disponíveis a partir do plano Pro.",
     code: "PLAN_FEATURE_RECURRING",
   });
 }

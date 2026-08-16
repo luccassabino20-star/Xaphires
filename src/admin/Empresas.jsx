@@ -2,10 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import * as api from "./api.js";
 
 const PLANOS = ["basic", "intermediate", "professional", "enterprise"];
-const NOMES = { basic: "Básico", intermediate: "Intermediário", professional: "Profissional", enterprise: "Empresarial" };
-// Só planos pagos com preço de tabela levam desconto - Básico já é grátis, e
-// Empresarial é sob consulta, sem valor de tabela para descontar em cima.
-const PLANOS_COM_DESCONTO = ["intermediate", "professional"];
+const NOMES = { basic: "Free", intermediate: "Unlimited", professional: "Pro", enterprise: "Enterprise" };
+// Só planos pagos com preço de tabela levam desconto - Free já é grátis. O
+// Enterprise passou a ter preço de tabela (autoatendimento igual aos demais),
+// então entra na lista.
+const PLANOS_COM_DESCONTO = ["intermediate", "professional", "enterprise"];
 const SITUACAO = { active: "Ativa", trialing: "Em teste", grace: "Pagamento em aberto", expired: "Vencida", blocked: "Bloqueada" };
 // Nomes dos módulos da plataforma para o painel (só em português, ferramenta
 // interna). Espelha os ids de server/modules.js.

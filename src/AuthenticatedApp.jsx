@@ -62,7 +62,7 @@ export default function AuthenticatedApp({ onExitModule }) {
 
   return (
     <div className="app-shell">
-      <Sidebar collapsed={!sidebarOpen} activeBoardId={activeBoardId} onSelectBoard={selectBoard} />
+      <Sidebar collapsed={!sidebarOpen} activeBoardId={activeBoardId} onSelectBoard={selectBoard} onOpenCard={openCard} />
       {/* Some sozinho fora do celular via CSS - no desktop o sidebar empurra o
           layout em vez de sobrepor, e um véu escurecendo o resto não faria sentido. */}
       {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}

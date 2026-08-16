@@ -24,8 +24,8 @@ import {
 const router = Router();
 router.use(requireAuth);
 
-// Desconto líquido de um plano: nunca deixa o preço negativo, e sob consulta
-// (priceCents null, hoje só o Empresarial) não desconta nada, porque não há
+// Desconto líquido de um plano: nunca deixa o preço negativo, e um plano sob
+// consulta (priceCents null - nenhum hoje) não desconta nada, porque não há
 // tabela para descontar em cima. Mesma trava de emitirCobranca em
 // billing/lifecycle.js, para o valor mostrado aqui nunca destoar do que a
 // cobrança de verdade vai cobrar. `discounts` é o mapa planId -> centavos

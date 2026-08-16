@@ -13,7 +13,29 @@
     "launcher": {
       "eyebrow": "Plataforma Xaphires",
       "title": "Olá, {{name}}",
-      "subtitle": "Escolha por onde começar. Cada módulo cuida de um pilar da sua empresa."
+      "subtitle": "Escolha por onde começar. Cada módulo cuida de um pilar da sua empresa.",
+      "searchPlaceholder": "Buscar módulos, ferramentas, páginas...",
+      "noResults": "Nenhum módulo encontrado para \"{{query}}\".",
+      "sidebar": {
+        "groups": {
+          "learn": "Aprendizado",
+          "tools": "Ferramentas",
+          "account": "Minha conta"
+        },
+        "items": {
+          "dashboard": "Dashboard",
+          "consultor": "Consultor",
+          "solucoes": "Soluções",
+          "formacao": "Formação",
+          "mentorias": "Mentorias",
+          "builder": "Builder",
+          "ferramentas": "Ferramentas",
+          "certificados": "Certificados",
+          "metricas": "Métricas",
+          "perfil": "Perfil",
+          "atualizacoes": "Atualizações"
+        }
+      }
     },
     "comingSoon": "Em breve",
     "backToLauncher": "Módulos",
@@ -149,7 +171,10 @@
       "home": "Início",
       "features": "Recursos",
       "solutions": "Soluções",
-      "pricing": "Preços",
+      "pricing": "Planos",
+      "mentorias": "Mentorias",
+      "consultorias": "Consultorias",
+      "homeMenuToggle": "Mais opções de Início",
       "enter": "Entrar"
     },
     "promoPopup": {
@@ -158,8 +183,9 @@
       "defaultButton": "Aproveitar oferta"
     },
     "home": {
-      "heroTitle": "Sua equipe organizada, sem esforço extra",
-      "heroText": "O Xaphires substitui planilhas soltas e grupos de WhatsApp por um só lugar: quadros, prazos e prioridades, sincronizados em tempo real para toda a equipe.",
+      "heroEyebrow": "Gestão empresarial em um só lugar",
+      "heroTitle": "A plataforma B2B que impulsiona seus resultados com automações",
+      "heroText": "Ferramentas prontas, suporte especializado, treinamento prático e implantação guiada para enxugar despesas, elevar faturamento e organizar o dia a dia da sua empresa.",
       "ctaStart": "Comece agora",
       "ctaPlans": "Ver planos",
       "heroNote": "7 dias grátis com todos os recursos, sem cartão de crédito. Depois, fique no plano gratuito para sempre, se quiser.",
@@ -189,20 +215,19 @@
       },
       "stats": [
         {
+          "label": "Recursos",
           "value": "13",
-          "label": "Ferramentas integradas num só lugar"
+          "desc": "Ferramentas de gestão integradas num só lugar, sem trocar de sistema."
         },
         {
+          "label": "Sincronização",
           "value": "100%",
-          "label": "Sincronização em tempo real entre a equipe"
+          "desc": "Em tempo real entre toda a equipe, em qualquer dispositivo."
         },
         {
-          "value": "0",
-          "label": "Planilhas soltas ou grupos de WhatsApp"
-        },
-        {
+          "label": "Disponibilidade",
           "value": "24/7",
-          "label": "Acesso ao quadro, de qualquer lugar"
+          "desc": "Acesso ao quadro de qualquer lugar, a qualquer hora."
         }
       ],
       "benefits": [
@@ -231,15 +256,20 @@
           "page": "solutions",
           "badge": "S",
           "title": "Soluções",
-          "text": "Veja como times de projeto, campo, gestão e operações usam o Xaphires no dia a dia."
+          "text": "Vendas & CRM, Financeiro e outros pilares prontos para a sua empresa, num só lugar."
         },
         {
           "page": "pricing",
           "badge": "P",
           "title": "Preços",
-          "text": "Compare os planos Básico, Profissional e Empresarial e escolha o ideal pra sua equipe."
+          "text": "Compare os planos Free, Pro e Enterprise e escolha o ideal pra sua equipe."
         }
       ],
+      "pricingPreview": {
+        "title": "Um plano pra cada tamanho de equipe",
+        "text": "Comece grátis e mude de plano quando a empresa crescer.",
+        "ctaAll": "Ver todos os planos e recursos"
+      },
       "faq": {
         "title": "Perguntas frequentes",
         "items": [
@@ -249,7 +279,7 @@
           },
           {
             "q": "Tenho suporte se eu tiver algum problema?",
-            "a": "Sim. Todo plano inclui suporte por e-mail; nos planos Profissional e Empresarial, o suporte é prioritário ou dedicado, com atendimento mais rápido."
+            "a": "Sim. Todo plano inclui suporte por e-mail; nos planos Pro e Enterprise, o suporte é prioritário ou dedicado, com atendimento mais rápido."
           },
           {
             "q": "Posso cancelar quando quiser?",
@@ -274,27 +304,27 @@
         {
           "badge": "A",
           "title": "Arquivamento automático",
-          "text": "Defina os dias e os cartões concluídos vão para o arquivo sozinhos. Disponível do plano Profissional para cima."
+          "text": "Defina os dias e os cartões concluídos vão para o arquivo sozinhos. Disponível do plano Pro para cima."
         },
         {
           "badge": "G",
           "title": "Monitor de gargalos",
-          "text": "Marque o tempo aceitável de cada coluna e veja quais cartões passaram do prazo, com mensagem de cobrança pronta. Do Profissional para cima."
+          "text": "Marque o tempo aceitável de cada coluna e veja quais cartões passaram do prazo, com mensagem de cobrança pronta. Do Pro para cima."
         },
         {
           "badge": "T",
           "title": "Rotinas automáticas",
-          "text": "Tarefas fixas viram cartão sozinhas na data certa, com o checklist já preenchido. Do plano Profissional para cima."
+          "text": "Tarefas fixas viram cartão sozinhas na data certa, com o checklist já preenchido. Do plano Pro para cima."
         },
         {
           "badge": "L",
           "title": "Letreiro de tarefas",
-          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Profissional para cima."
+          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Pro para cima."
         },
         {
           "badge": "P",
           "title": "Planejador pessoal",
-          "text": "Uma agenda fora dos quadros, só sua: calendário e lista de tarefas pessoais, com as concluídas arquivando sozinhas depois de 2 dias. Disponível do plano Profissional para cima."
+          "text": "Uma agenda fora dos quadros, só sua: calendário e lista de tarefas pessoais, com as concluídas arquivando sozinhas depois de 2 dias. Disponível do plano Pro para cima."
         },
         {
           "badge": "X",
@@ -328,22 +358,22 @@
         {
           "badge": "L",
           "title": "Linha do tempo (Gantt)",
-          "text": "Crie e abra tarefas direto na linha do tempo, com o cronograma inteiro do projeto num só olhar, período a período. Disponível do plano Intermediário para cima."
+          "text": "Crie e abra tarefas direto na linha do tempo, com o cronograma inteiro do projeto num só olhar, período a período. Disponível do plano Unlimited para cima."
         },
         {
           "badge": "P",
           "title": "Painel",
-          "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma. Disponível do plano Intermediário para cima."
+          "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma. Disponível do plano Unlimited para cima."
         },
         {
           "badge": "M",
           "title": "Mapa",
-          "text": "Tarefas com endereço plotadas num mapa interativo. Ótimo para equipes em campo. Disponível do plano Intermediário para cima."
+          "text": "Tarefas com endereço plotadas num mapa interativo. Ótimo para equipes em campo. Disponível do plano Unlimited para cima."
         },
         {
           "badge": "E",
           "title": "Matriz Eisenhower",
-          "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto. Disponível do plano Intermediário para cima."
+          "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto. Disponível do plano Unlimited para cima."
         }
       ],
       "ganttPreview": {
@@ -376,56 +406,115 @@
       ]
     },
     "solutions": {
-      "headerTitle": "Soluções para cada tipo de equipe",
-      "headerText": "O mesmo Xaphires, organizado do jeito que cada time precisa trabalhar.",
+      "headerTitle": "Soluções para cada área da sua empresa",
+      "headerText": "Um pilar pronto para cada frente do negócio - dos módulos já disponíveis às soluções sob medida, feitas para você.",
+      "soon": "Em breve",
+      "customCta": "Falar com nossa equipe",
       "items": [
         {
-          "title": "Agências e times de projeto",
-          "text": "Um quadro por cliente ou projeto, com linha do tempo para prazos e painel de métricas prontos para mostrar o progresso em reunião.",
+          "title": "Vendas & CRM",
+          "text": "Leads, funil em Kanban, propostas, orçamentos e pedidos - do primeiro contato ao fechamento, num só lugar.",
           "tags": [
             "Quadro Kanban",
-            "Linha do tempo",
-            "Painel"
+            "Propostas",
+            "Orçamentos"
           ]
         },
         {
-          "title": "Equipes em campo",
-          "text": "Tarefas com endereço plotadas no mapa. Ideal para manutenção, entregas, vistorias e qualquer equipe que trabalha fora do escritório.",
+          "title": "Financeiro",
+          "text": "Fluxo de caixa, contas a pagar e a receber, conciliação bancária e DRE - a espinha dorsal financeira da empresa.",
           "tags": [
-            "Mapa",
-            "Quadro Kanban"
+            "Fluxo de caixa",
+            "Contas a pagar/receber",
+            "DRE"
           ]
         },
         {
-          "title": "Gestão e liderança",
-          "text": "Priorize com a Matriz Eisenhower, acompanhe indicadores no Painel e mantenha planejamentos sensíveis em quadros privados.",
+          "title": "Compras & Estoque",
+          "text": "Inventário, fornecedores, margem de produtos e ponto de reordem.",
           "tags": [
-            "Matriz Eisenhower",
-            "Painel",
-            "Quadros privados"
-          ]
-        },
-        {
-          "title": "Operações e rotina",
-          "text": "O par Quadro Kanban + Tabela cobre o trabalho do dia a dia, com Calendário para prazos recorrentes e nada passa despercebido.",
-          "tags": [
-            "Quadro Kanban",
-            "Tabela",
-            "Calendário"
-          ]
-        },
-        {
-          "title": "Times de Produto",
-          "text": "Do roadmap ao lançamento: organize iniciativas na Linha do tempo, priorize pedidos de feature e mantenha tudo num só lugar.",
-          "tags": [
-            "Linha do tempo",
-            "Matriz Eisenhower",
-            "Anexos"
+            "Inventário",
+            "Fornecedores"
           ],
-          "page": "productTeams"
+          "soon": true
+        },
+        {
+          "title": "Faturamento",
+          "text": "Emissão de notas fiscais, boletos e links de pagamento.",
+          "tags": [
+            "NFe/NFSe",
+            "Boletos"
+          ],
+          "soon": true
+        },
+        {
+          "title": "Relatórios & BI",
+          "text": "Dashboards operacionais e financeiros consolidados, para decidir com dado real.",
+          "tags": [
+            "Dashboards",
+            "Indicadores"
+          ],
+          "soon": true
+        },
+        {
+          "title": "Soluções Sob Medida",
+          "text": "Não achou o que precisa nos módulos prontos? Desenvolvemos integrações de API, automações e módulos exclusivos para o seu negócio.",
+          "tags": [
+            "Integrações",
+            "Automações"
+          ],
+          "custom": true
         }
       ],
       "learnMore": "Saiba mais"
+    },
+    "mentorias": {
+      "badge": "Mentoria de gestão",
+      "heroTitle": "Mentoria pra tirar o máximo do Xaphires",
+      "heroText": "Sessões recorrentes com quem entende de gestão de operação, pra sua equipe usar o Xaphires do jeito certo desde o início.",
+      "cta": "Falar sobre mentoria",
+      "items": [
+        {
+          "title": "Diagnóstico de uso",
+          "text": "Analisamos como sua equipe usa o quadro hoje e onde dá pra melhorar."
+        },
+        {
+          "title": "Sessões recorrentes",
+          "text": "Encontros periódicos pra revisar indicadores, prazos e gargalos com a equipe."
+        },
+        {
+          "title": "Boas práticas de gestão",
+          "text": "Como priorizar tarefas, distribuir carga de trabalho e manter a equipe alinhada."
+        },
+        {
+          "title": "Leitura de indicadores",
+          "text": "Como interpretar o Painel e os relatórios pra decidir com dado, não achismo."
+        }
+      ]
+    },
+    "consultorias": {
+      "badge": "Consultoria de implantação",
+      "heroTitle": "Implantação guiada, sem trabalho perdido",
+      "heroText": "Nossa equipe monta os quadros, as automações e o plano de contas junto com você, pra sua operação começar redonda.",
+      "cta": "Falar sobre consultoria",
+      "items": [
+        {
+          "title": "Diagnóstico inicial",
+          "text": "Mapeamos seus processos atuais antes de montar qualquer quadro."
+        },
+        {
+          "title": "Configuração guiada",
+          "text": "Quadros, listas, automações e centros de custo montados junto com a sua equipe."
+        },
+        {
+          "title": "Migração de dados",
+          "text": "Ajudamos a trazer o histórico que já existe em planilha ou em outra ferramenta."
+        },
+        {
+          "title": "Treinamento da equipe",
+          "text": "Sessão prática pra todo mundo sair sabendo usar o sistema no dia a dia."
+        }
+      ]
     },
     "productTeams": {
       "backLink": "← Voltar para Soluções",
@@ -477,7 +566,7 @@
       "mostPopular": "Mais popular",
       "plans": [
         {
-          "name": "Básico",
+          "name": "Free",
           "price": "Grátis",
           "period": "",
           "tagline": "Para equipes pequenas começarem com o essencial",
@@ -492,29 +581,29 @@
           ]
         },
         {
-          "name": "Intermediário",
+          "name": "Unlimited",
           "price": "R$ 370,00",
           "period": "/mês",
           "tagline": "Para equipes que cresceram além de sete pessoas",
-          "cta": "Experimente grátis", "note": "7 dias grátis para testar",
+          "cta": "Conhecer a plataforma", "note": "7 dias grátis para testar",
           "features": [
             "Até 15 usuários",
-            "Tudo do Básico, mais:",
+            "Tudo do Free, mais:",
             "Quadros ilimitados",
             "Todas as 7 visões (+ Gantt, Painel, Mapa, Matriz Eisenhower)",
             "Anexos e links nos cartões (até 50 MB)"
           ]
         },
         {
-          "name": "Profissional",
-          "price": "R$ 730,00",
+          "name": "Pro",
+          "price": "R$ 850,00",
           "period": "/mês",
           "tagline": "Para equipes que querem controle total",
-          "cta": "Experimente grátis", "note": "7 dias grátis para testar",
+          "cta": "Conhecer a plataforma", "note": "7 dias grátis para testar",
           "highlight": true,
           "features": [
             "Usuários ilimitados",
-            "Tudo do Intermediário, mais:",
+            "Tudo do Unlimited, mais:",
             "Letreiro de tarefas pendentes",
             "Arquivamento automático de concluídos",
             "Monitor de gargalos",
@@ -524,13 +613,13 @@
           ]
         },
         {
-          "name": "Empresarial",
-          "price": "Sob consulta",
-          "period": "",
+          "name": "Enterprise",
+          "price": "R$ 2.780,00",
+          "period": "/mês",
           "tagline": "Para organizações com necessidades específicas",
-          "cta": "Falar com vendas",
+          "cta": "Conhecer a plataforma", "note": "7 dias grátis para testar",
           "features": [
-            "Tudo incluído no profissional, mais:",
+            "Tudo incluído no Pro, mais:",
             "Onboarding dedicado",
             "Suporte dedicado",
             "Acordo de nível de serviço (SLA)",
@@ -611,6 +700,11 @@
     "footer": {
       "title": "Pronto para organizar sua equipe?",
       "cta": "Comece agora",
+      "tagline": "A plataforma que reúne os pilares da sua empresa num só lugar.",
+      "columnProduct": "Produto",
+      "columnContact": "Fale com a gente",
+      "columnLegal": "Legal",
+      "talkToSales": "Falar com vendas",
       "privacy": "Política de Privacidade",
       "copyright": "Direitos autorais © 2026 Xaphires"
     },
@@ -726,11 +820,23 @@
   },
   "auth": {
     "brandTitle": "Xaphires",
-    "brandText": "Organize seus projetos em quadros Kanban simples, rápidos e colaborativos.",
+    "brandHeadlinePrefix": "Acelere a evolução do seu negócio e conquiste ",
+    "brandHeadlineEmphasis": "o topo da eficiência",
+    "brandHeadlineSuffix": ".",
     "back": "← Voltar",
     "tabLogin": "Entrar",
-    "tabSignup": "Criar empresa",
+    "tabSignup": "Cadastrar",
     "tabJoin": "Pedir acesso",
+    "eyebrow": {
+      "login": "Acessar plataforma",
+      "signup": "Criar conta",
+      "join": "Pedir acesso"
+    },
+    "welcome": {
+      "login": "Bem-vindo de volta.",
+      "signup": "Comece agora.",
+      "join": "Junte-se à sua empresa."
+    },
     "companyName": "Nome da empresa",
     "yourName": "Seu nome",
     "email": "E-mail",
@@ -739,7 +845,11 @@
     "passwordsMismatch": "As senhas não coincidem",
     "submitWait": "Aguarde...",
     "submitLogin": "Entrar",
-    "submitSignup": "Criar empresa",
+    "submitSignup": "Cadastrar",
+    "forgotPassword": "Esqueci minha senha",
+    "forgotPasswordHint": "Peça ao admin da empresa para redefinir sua senha.",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
     "companyDocLabel": "CNPJ ou CPF da empresa",
     "joinIntro": "Sua empresa já usa o Xaphires? Informe o CNPJ ou CPF dela para pedir acesso.",
     "cnpjLabel": "CNPJ ou CPF da empresa",
@@ -808,6 +918,7 @@
     "dataMenu": {
       "recurrences": "Rotinas automáticas",
       "bottlenecks": "Monitor de gargalos",
+      "mindMap": "Mapa mental",
       "archivedCards": "Cartões arquivados",
       "moreOptions": "Mais opções",
       "personalize": "Personalizar",
@@ -855,7 +966,7 @@
     "recurrences": {
       "title": "Rotinas automáticas",
       "empty": "Nenhuma rotina criada. Uma rotina cria o cartão sozinha na data certa, com o checklist já preenchido.",
-      "planRequired": "As rotinas automáticas estão disponíveis a partir do plano Profissional. Você pode ver e apagar as que já existem.",
+      "planRequired": "As rotinas automáticas estão disponíveis a partir do plano Pro. Você pode ver e apagar as que já existem.",
       "newRule": "Nova rotina",
       "fieldTitle": "Título do cartão",
       "titlePlaceholder": "Ex: Fechar balancete da contabilidade",
@@ -956,8 +1067,25 @@
       "msgDue": "O prazo combinado é {{date}}.",
       "msgClosing": "Consegue me dar um retorno sobre o andamento? Obrigado!"
     },
+    "mindMap": {
+      "title": "Mapa mental",
+      "empty": "Este quadro ainda não tem nenhuma lista.",
+      "cardsCount": "{{count}} cartão",
+      "cardsCount_other": "{{count}} cartões",
+      "zoomIn": "Aumentar",
+      "zoomOut": "Diminuir",
+      "zoomReset": "Restaurar zoom",
+      "modeBoard": "Do quadro",
+      "modeFree": "Mapa em branco",
+      "freeHint": "Duplo clique no fundo cria um tópico. Arraste o fundo pra mover a tela, e o scroll dá zoom. Clique em dois tópicos pra ligar (ou desligar). Selecione um tópico pra arrastá-lo, apagá-lo ou usar o + para ramificar.",
+      "clear": "Limpar mapa",
+      "clearConfirm": "Apagar todos os tópicos deste mapa? Essa ação não pode ser desfeita.",
+      "undo": "Desfazer",
+      "redo": "Refazer",
+      "center": "Centralizar"
+    },
     "archive": {
-      "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Profissional. O arquivamento manual continua liberado.",
+      "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Pro. O arquivamento manual continua liberado.",
       "autoLabel": "Arquivar concluídos automaticamente",
       "autoDaysSuffix": "dias",
       "autoOnHint": "Cartões concluídos há mais de {{days}} dias vão para o arquivo quando o quadro é carregado. Desmarcar um cartão reinicia a contagem.",
@@ -976,7 +1104,7 @@
       "deletedToast": "Cartão excluído"
     },
     "listMenu": {
-      "stuckPlanRequired": "O monitor de gargalos está disponível a partir do plano Profissional.",
+      "stuckPlanRequired": "O monitor de gargalos está disponível a partir do plano Pro.",
       "stuckConfigure": "Monitorar gargalo nesta coluna",
       "stuckConfigured": "Gargalo: alerta em {{hours}}h",
       "stuckHint": "Avisa quando um cartão passar deste tempo parado nesta coluna.",
@@ -1289,7 +1417,7 @@
     "groupTomorrow": "Amanhã",
     "groupUpcoming": "Em breve",
     "groupCompleted": "Concluídas",
-    "planRequired": "O planejador pessoal está disponível a partir do plano Profissional. Você pode ver e apagar o que já existe."
+    "planRequired": "O planejador pessoal está disponível a partir do plano Pro. Você pode ver e apagar o que já existe."
   },
   "plan": {
     "monthlyLabel": "Mensalidade",
@@ -1314,10 +1442,10 @@
     "masterOnly": "Só o usuário master pode mudar o plano da empresa.",
     "changed": "Plano alterado para {{plan}}",
     "names": {
-      "basic": "Básico",
-      "intermediate": "Intermediário",
-      "professional": "Profissional",
-      "enterprise": "Empresarial"
+      "basic": "Free",
+      "intermediate": "Unlimited",
+      "professional": "Pro",
+      "enterprise": "Enterprise"
     },
     "status": {
       "active": "Ativo",
@@ -1328,10 +1456,10 @@
     "trialEnding": "Seu teste termina em {{count}} dia",
     "trialEnding_other": "Seu teste termina em {{count}} dias",
     "expiredMessage": "Seu plano expirou. Você ainda vê tudo, mas não pode criar nem editar.",
-    "continueOnBasic": "Continuar no Básico grátis",
-    "movedToBasic": "Plano alterado para Básico",
+    "continueOnBasic": "Continuar no Free grátis",
+    "movedToBasic": "Plano alterado para Free",
     "selectTitle": "Escolher plano",
-    "freeChoiceHint": "Você ainda não tem um plano pago em vigor, então pode escolher qualquer plano abaixo - inclusive o Básico gratuito, que não expira.",
+    "freeChoiceHint": "Você ainda não tem um plano pago em vigor, então pode escolher qualquer plano abaixo - inclusive o Free gratuito, que não expira.",
     "selectFreeConfirm": "Passar para o plano {{plan}}? Ele é gratuito e não tem prazo de validade."
   },
   "billing": {
@@ -1410,9 +1538,9 @@
     "REPORT_FORMAT_INVALID": "Formato de relatório não suportado",
     "REPORT_STATUS_INVALID": "Filtro de situação inválido",
     "BOARD_LIMIT_REACHED": "Limite de quadros do plano atingido. Exclua um quadro ou faça upgrade para criar outro.",
-    "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Profissional.",
-    "PLAN_FEATURE_PERSONAL_PLANNER": "O planejador pessoal está disponível a partir do plano Profissional.",
-    "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Profissional.",
+    "PLAN_FEATURE_BOTTLENECK": "O monitor de gargalos está disponível a partir do plano Pro.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "O planejador pessoal está disponível a partir do plano Pro.",
+    "PLAN_FEATURE_RECURRING": "Os cartões recorrentes estão disponíveis a partir do plano Pro.",
     "INVALID_FREQUENCY": "Frequência inválida",
     "WEEKDAY_REQUIRED": "Escolha o dia da semana",
     "MONTHDAY_REQUIRED": "Escolha um dia do mês entre 1 e 31",
@@ -1421,7 +1549,7 @@
     "LIST_NOT_FOUND": "Coluna não encontrada",
     "RECURRENCE_NOT_FOUND": "Rotina não encontrada",
     "INVALID_STUCK_HOURS": "Informe um número de horas entre 1 e 8760",
-    "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Profissional.",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Pro.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",
     "PLAN_EXPIRED": "Seu plano expirou. Renove para voltar a editar.",
     "PLAN_USER_LIMIT": "Seu plano atingiu o limite de usuários. Mude de plano para adicionar mais.",

@@ -12,7 +12,7 @@ const router = Router();
 function exigePlano(req, res, next) {
   if (canUsePersonalPlanner(getCompany(req.companyId)?.plan)) return next();
   return res.status(403).json({
-    error: "O planejador pessoal está disponível a partir do plano Profissional.",
+    error: "O planejador pessoal está disponível a partir do plano Pro.",
     code: "PLAN_FEATURE_PERSONAL_PLANNER",
   });
 }

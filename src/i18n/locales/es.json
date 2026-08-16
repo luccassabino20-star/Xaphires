@@ -13,7 +13,29 @@
     "launcher": {
       "eyebrow": "Plataforma Xaphires",
       "title": "Hola, {{name}}",
-      "subtitle": "Elige por dónde empezar. Cada módulo cuida un pilar de tu empresa."
+      "subtitle": "Elige por dónde empezar. Cada módulo cuida un pilar de tu empresa.",
+      "searchPlaceholder": "Buscar módulos, herramientas, páginas...",
+      "noResults": "Ningún módulo encontrado para \"{{query}}\".",
+      "sidebar": {
+        "groups": {
+          "learn": "Aprendizaje",
+          "tools": "Herramientas",
+          "account": "Mi cuenta"
+        },
+        "items": {
+          "dashboard": "Dashboard",
+          "consultor": "Consultor",
+          "solucoes": "Soluciones",
+          "formacao": "Formación",
+          "mentorias": "Mentorías",
+          "builder": "Builder",
+          "ferramentas": "Herramientas",
+          "certificados": "Certificados",
+          "metricas": "Métricas",
+          "perfil": "Perfil",
+          "atualizacoes": "Actualizaciones"
+        }
+      }
     },
     "comingSoon": "Próximamente",
     "backToLauncher": "Módulos",
@@ -149,7 +171,10 @@
       "home": "Inicio",
       "features": "Funciones",
       "solutions": "Soluciones",
-      "pricing": "Precios",
+      "pricing": "Planes",
+      "mentorias": "Mentorías",
+      "consultorias": "Consultorías",
+      "homeMenuToggle": "Más opciones de Inicio",
       "enter": "Ingresar"
     },
     "promoPopup": {
@@ -158,8 +183,9 @@
       "defaultButton": "Aprovechar oferta"
     },
     "home": {
-      "heroTitle": "Tu equipo organizado, sin esfuerzo extra",
-      "heroText": "Xaphires reemplaza hojas de cálculo sueltas y grupos de WhatsApp por un solo lugar: tableros, plazos y prioridades, sincronizados en tiempo real para todo el equipo.",
+      "heroEyebrow": "Gestión empresarial en un solo lugar",
+      "heroTitle": "La plataforma B2B que impulsa tus resultados con automatizaciones",
+      "heroText": "Herramientas listas, soporte especializado, capacitación práctica e implantación guiada para reducir gastos, aumentar la facturación y organizar el día a día de tu empresa.",
       "ctaStart": "Empieza ahora",
       "ctaPlans": "Ver planes",
       "heroNote": "7 días gratis con todos los recursos, sin tarjeta de crédito. Después, quédate en el plan gratuito para siempre si quieres.",
@@ -177,10 +203,9 @@
         ] }
       ] },
       "stats": [
-        { "value": "13", "label": "Herramientas integradas en un solo lugar" },
-        { "value": "100%", "label": "Sincronización en tiempo real entre el equipo" },
-        { "value": "0", "label": "Hojas de cálculo sueltas o grupos de WhatsApp" },
-        { "value": "24/7", "label": "Acceso al tablero, desde cualquier lugar" }
+        { "label": "Funciones", "value": "13", "desc": "Herramientas de gestión integradas en un solo lugar, sin cambiar de sistema." },
+        { "label": "Sincronización", "value": "100%", "desc": "En tiempo real entre todo el equipo, en cualquier dispositivo." },
+        { "label": "Disponibilidad", "value": "24/7", "desc": "Acceso al tablero desde cualquier lugar, a cualquier hora." }
       ],
       "benefits": [
         { "title": "Todo en un solo lugar", "text": "Reemplaza hojas de cálculo sueltas, grupos de WhatsApp y herramientas dispersas por un único sistema." },
@@ -190,12 +215,13 @@
       "exploreTitle": "Explora Xaphires",
       "exploreLinks": [
         { "page": "features", "badge": "F", "title": "Funciones", "text": "Conoce las herramientas de Xaphires: tablero, tabla, calendario, mapa y más." },
-        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Descubre cómo equipos de proyectos, campo, gestión y operaciones usan Xaphires en el día a día." },
-        { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Básico, Profesional y Empresarial y elige el ideal para tu equipo." }
+        { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Ventas & CRM, Finanzas y otros pilares listos para tu empresa, en un solo lugar." },
+        { "page": "pricing", "badge": "P", "title": "Precios", "text": "Compara los planes Free, Pro y Enterprise y elige el ideal para tu equipo." }
       ],
+      "pricingPreview": { "title": "Un plan para cada tamaño de equipo", "text": "Empieza gratis y cambia de plan cuando tu empresa crezca.", "ctaAll": "Ver todos los planes y funciones" },
       "faq": { "title": "Preguntas frecuentes", "items": [
         { "q": "¿Necesito instalar algo?", "a": "No. Xaphires funciona directo en el navegador, en computadora o celular - sin aplicación para descargar ni servidor para configurar." },
-        { "q": "¿Tengo soporte si tengo algún problema?", "a": "Sí. Todo plan incluye soporte por correo; en los planes Profesional y Empresarial, el soporte es prioritario o dedicado, con atención más rápida." },
+        { "q": "¿Tengo soporte si tengo algún problema?", "a": "Sí. Todo plan incluye soporte por correo; en los planes Pro y Enterprise, el soporte es prioritario o dedicado, con atención más rápida." },
         { "q": "¿Puedo cancelar cuando quiera?", "a": "Sí, sin multa. Al cancelar, mantienes acceso completo hasta el fin del período ya pagado; después, los datos siguen ahí - para volver a editar, solo elige el plan gratuito cuando quieras." },
         { "q": "¿Mi equipo necesita capacitación para usarlo?", "a": "En la mayoría de los casos, no. Si alguien de tu equipo ya usó un tablero Kanban, aunque sea en papel con notas adhesivas, Xaphires sigue la misma lógica - se aprende en minutos." }
       ] }
@@ -205,11 +231,11 @@
       "automationsText": "Automatizaciones que trabajan en segundo plano, para que no tengas que recordar ni reclamar a mano.",
       "automations": [
         { "badge": "A", "title": "Archivado de tarjetas", "text": "Saca lo terminado del tablero sin borrar nada. Lo archivado sale de todas las vistas y vuelve a su columna cuando quieras." },
-        { "badge": "R", "title": "Archivado automático", "text": "Define los días y las tarjetas completadas pasan al archivo solas. Disponible desde el plan Profesional." },
-        { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Profesional." },
-        { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Profesional." },
-        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció. Disponible desde el plan Profesional." },
-        { "badge": "P", "title": "Planificador personal", "text": "Una agenda fuera de los tableros, solo tuya: calendario y lista de tareas personales, con las completadas archivándose solas después de 2 días. Disponible desde el plan Profesional." },
+        { "badge": "R", "title": "Archivado automático", "text": "Define los días y las tarjetas completadas pasan al archivo solas. Disponible desde el plan Pro." },
+        { "badge": "G", "title": "Monitor de atascos", "text": "Marca el tiempo aceptable de cada columna y mira qué tarjetas lo superaron, con mensaje de seguimiento listo. Desde Pro." },
+        { "badge": "T", "title": "Rutinas automáticas", "text": "Las tareas fijas se convierten en tarjetas solas en la fecha correcta, con el checklist ya listo. Desde el plan Pro." },
+        { "badge": "L", "title": "Letrero de tareas", "text": "Una franja arriba del tablero mostrando lo pendiente, destacando lo que ya venció. Disponible desde el plan Pro." },
+        { "badge": "P", "title": "Planificador personal", "text": "Una agenda fuera de los tableros, solo tuya: calendario y lista de tareas personales, con las completadas archivándose solas después de 2 días. Disponible desde el plan Pro." },
         { "badge": "X", "title": "Adjuntos y enlaces", "text": "Contratos, planos y fotos directo en la tarjeta, además de enlaces a lo que vive fuera del sistema." },
         { "badge": "C", "title": "Finalización automática", "text": "Marcaste la tarjeta como completada y ella salta sola a la columna de completadas del tablero - sin arrastrar a mano." }
       ],
@@ -219,10 +245,10 @@
         { "badge": "T", "title": "Tablero Kanban", "text": "Se acabaron las tareas perdidas en capturas de chat. Arrastra y suelta entre listas y ve el avance real del equipo." },
         { "badge": "B", "title": "Tabla", "text": "Todas las tarjetas en formato de planilla, con búsqueda y filtro por miembro, sin necesitar otra herramienta." },
         { "badge": "C", "title": "Calendario", "text": "Plazos y fechas de inicio en una vista mensual, para que nada pase desapercibido." },
-        { "badge": "L", "title": "Línea de tiempo (Gantt)", "text": "Crea y abre tareas directo desde la línea de tiempo, con todo el cronograma del proyecto de un vistazo, período a período. Disponible desde el plan Intermedio." },
-        { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla. Disponible desde el plan Intermedio." },
-        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno. Disponible desde el plan Intermedio." },
-        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte. Disponible desde el plan Intermedio." }
+        { "badge": "L", "title": "Línea de tiempo (Gantt)", "text": "Crea y abre tareas directo desde la línea de tiempo, con todo el cronograma del proyecto de un vistazo, período a período. Disponible desde el plan Unlimited." },
+        { "badge": "P", "title": "Panel", "text": "Métricas e indicadores listos para mostrar el progreso sin armar ninguna planilla. Disponible desde el plan Unlimited." },
+        { "badge": "M", "title": "Mapa", "text": "Tareas con dirección ubicadas en un mapa interactivo. Ideal para equipos en terreno. Disponible desde el plan Unlimited." },
+        { "badge": "E", "title": "Matriz de Eisenhower", "text": "Prioriza por urgencia e importancia y deja de trabajar solo en lo que grita más fuerte. Disponible desde el plan Unlimited." }
       ],
       "ganttPreview": { "title": "El Gantt en acción", "text": "Cada tarea se convierte en una barra en la línea de tiempo, con la línea de hoy siempre visible - crea y edita justo aquí, sin otra herramienta.", "rows": [
         { "title": "Planificación", "status": "done" },
@@ -238,16 +264,43 @@
       ]
     },
     "solutions": {
-      "headerTitle": "Soluciones para cada tipo de equipo",
-      "headerText": "El mismo Xaphires, organizado como cada equipo necesita trabajar.",
+      "headerTitle": "Soluciones para cada área de tu empresa",
+      "headerText": "Un pilar listo para cada frente del negocio - de los módulos ya disponibles a las soluciones a medida, hechas para ti.",
+      "soon": "Próximamente",
+      "customCta": "Hablar con nuestro equipo",
       "items": [
-        { "title": "Agencias y equipos de proyecto", "text": "Un tablero por cliente o proyecto, con línea de tiempo para plazos y panel de métricas listo para mostrar el progreso en reuniones.", "tags": ["Tablero Kanban", "Línea de tiempo", "Panel"] },
-        { "title": "Equipos en terreno", "text": "Tareas con dirección ubicadas en el mapa. Ideal para mantenimiento, entregas, inspecciones y cualquier equipo que trabaje fuera de la oficina.", "tags": ["Mapa", "Tablero Kanban"] },
-        { "title": "Gestión y liderazgo", "text": "Prioriza con la Matriz de Eisenhower, sigue los indicadores en el Panel y mantén la planificación sensible en tableros privados.", "tags": ["Matriz de Eisenhower", "Panel", "Tableros privados"] },
-        { "title": "Operaciones y rutina", "text": "El dúo Tablero Kanban + Tabla cubre el trabajo diario, con Calendario para plazos recurrentes y nada pasa desapercibido.", "tags": ["Tablero Kanban", "Tabla", "Calendario"] },
-        { "title": "Equipos de Producto", "text": "Del roadmap al lanzamiento: organiza iniciativas en la Línea de tiempo, prioriza pedidos de funciones y mantén todo en un solo lugar.", "tags": ["Línea de tiempo", "Matriz de Eisenhower", "Adjuntos"], "page": "productTeams" }
+        { "title": "Ventas & CRM", "text": "Leads, embudo en Kanban, propuestas, presupuestos y pedidos - del primer contacto al cierre, en un solo lugar.", "tags": ["Tablero Kanban", "Propuestas", "Presupuestos"] },
+        { "title": "Finanzas", "text": "Flujo de caja, cuentas por pagar y por cobrar, conciliación bancaria y ERE - la columna vertebral financiera de la empresa.", "tags": ["Flujo de caja", "Cuentas por pagar/cobrar", "ERE"] },
+        { "title": "Compras & Inventario", "text": "Inventario, proveedores, margen de productos y punto de reorden.", "tags": ["Inventario", "Proveedores"], "soon": true },
+        { "title": "Facturación", "text": "Emisión de facturas, boletos y enlaces de pago.", "tags": ["Facturas", "Boletos"], "soon": true },
+        { "title": "Informes & BI", "text": "Paneles operativos y financieros consolidados, para decidir con datos reales.", "tags": ["Paneles", "Indicadores"], "soon": true },
+        { "title": "Soluciones a Medida", "text": "¿No encontraste lo que necesitas en los módulos listos? Desarrollamos integraciones de API, automatizaciones y módulos exclusivos para tu negocio.", "tags": ["Integraciones", "Automatizaciones"], "custom": true }
       ],
       "learnMore": "Saber más"
+    },
+    "mentorias": {
+      "badge": "Mentoría de gestión",
+      "heroTitle": "Mentoría para aprovechar al máximo el Xaphires",
+      "heroText": "Sesiones recurrentes con quien entiende de gestión de operaciones, para que tu equipo use el Xaphires de la forma correcta desde el inicio.",
+      "cta": "Hablar sobre mentoría",
+      "items": [
+        { "title": "Diagnóstico de uso", "text": "Analizamos cómo tu equipo usa el tablero hoy y dónde se puede mejorar." },
+        { "title": "Sesiones recurrentes", "text": "Encuentros periódicos para revisar indicadores, plazos y cuellos de botella con el equipo." },
+        { "title": "Buenas prácticas de gestión", "text": "Cómo priorizar tareas, distribuir la carga de trabajo y mantener al equipo alineado." },
+        { "title": "Lectura de indicadores", "text": "Cómo interpretar el Panel y los informes para decidir con datos, no con suposiciones." }
+      ]
+    },
+    "consultorias": {
+      "badge": "Consultoría de implantación",
+      "heroTitle": "Implantación guiada, sin trabajo perdido",
+      "heroText": "Nuestro equipo arma los tableros, las automatizaciones y el plan de cuentas junto contigo, para que tu operación empiece bien.",
+      "cta": "Hablar sobre consultoría",
+      "items": [
+        { "title": "Diagnóstico inicial", "text": "Mapeamos tus procesos actuales antes de armar cualquier tablero." },
+        { "title": "Configuración guiada", "text": "Tableros, listas, automatizaciones y centros de costo armados junto con tu equipo." },
+        { "title": "Migración de datos", "text": "Ayudamos a traer el historial que ya existe en una hoja de cálculo u otra herramienta." },
+        { "title": "Capacitación del equipo", "text": "Una sesión práctica para que todos salgan sabiendo usar el sistema en el día a día." }
+      ]
     },
     "productTeams": {
       "backLink": "← Volver a Soluciones",
@@ -277,10 +330,10 @@
       "headerText": "Elige el plan ideal para tu equipo y cámbialo cuando crezca.",
       "mostPopular": "Más popular",
       "plans": [
-        { "name": "Básico", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
-        { "name": "Intermedio", "price": "R$ 370,00", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Prueba gratis", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Básico, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
-        { "name": "Profesional", "price": "R$ 730,00", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Prueba gratis", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Intermedio, más:", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
-        { "name": "Empresarial", "price": "Bajo consulta", "period": "", "tagline": "Para organizaciones con necesidades específicas", "cta": "Hablar con ventas", "features": ["Todo lo incluido en Profesional, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)", "Desarrollo de cualquier funcionalidad a medida", "Creamos cualquier solución personalizada que tu negocio necesite", "Alcance abierto para proyectos y personalizaciones exclusivas"] }
+        { "name": "Free", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
+        { "name": "Unlimited", "price": "R$ 370,00", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Conocer la plataforma", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Free, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
+        { "name": "Pro", "price": "R$ 850,00", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Conocer la plataforma", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Unlimited, más:", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
+        { "name": "Enterprise", "price": "R$ 2.780,00", "period": "/mes", "tagline": "Para organizaciones con necesidades específicas", "cta": "Conocer la plataforma", "note": "7 días gratis para probar", "features": ["Todo lo incluido en Pro, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)", "Desarrollo de cualquier funcionalidad a medida", "Creamos cualquier solución personalizada que tu negocio necesite", "Alcance abierto para proyectos y personalizaciones exclusivas"] }
       ]
     },
     "privacy": {
@@ -398,17 +451,34 @@
     "footer": {
       "title": "¿Listo para organizar tu equipo?",
       "cta": "Empieza ahora",
+      "tagline": "La plataforma que reúne los pilares de tu empresa en un solo lugar.",
+      "columnProduct": "Producto",
+      "columnContact": "Habla con nosotros",
+      "columnLegal": "Legal",
+      "talkToSales": "Hablar con ventas",
       "privacy": "Política de Privacidad",
       "copyright": "Derechos de autor © 2026 Xaphires"
     }
   },
   "auth": {
     "brandTitle": "Xaphires",
-    "brandText": "Organiza tus proyectos en tableros Kanban simples, rápidos y colaborativos.",
+    "brandHeadlinePrefix": "Acelera la evolución de tu negocio y alcanza ",
+    "brandHeadlineEmphasis": "la cima de la eficiencia",
+    "brandHeadlineSuffix": ".",
     "back": "← Volver",
     "tabLogin": "Ingresar",
-    "tabSignup": "Crear empresa",
+    "tabSignup": "Registrarse",
     "tabJoin": "Pedir acceso",
+    "eyebrow": {
+      "login": "Acceder a la plataforma",
+      "signup": "Crear cuenta",
+      "join": "Pedir acceso"
+    },
+    "welcome": {
+      "login": "Bienvenido de vuelta.",
+      "signup": "Empieza ahora.",
+      "join": "Únete a tu empresa."
+    },
     "companyName": "Nombre de la empresa",
     "companyDocLabel": "CNPJ o CPF de la empresa",
     "yourName": "Tu nombre",
@@ -418,7 +488,11 @@
     "passwordsMismatch": "Las contraseñas no coinciden",
     "submitWait": "Espera...",
     "submitLogin": "Ingresar",
-    "submitSignup": "Crear empresa",
+    "submitSignup": "Registrarse",
+    "forgotPassword": "Olvidé mi contraseña",
+    "forgotPasswordHint": "Pide al admin de tu empresa que restablezca tu contraseña.",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "joinIntro": "¿Tu empresa ya usa Xaphires? Ingresa su CNPJ o CPF para pedir acceso.",
     "cnpjLabel": "CNPJ o CPF de la empresa",
     "cnpjSearch": "Buscar",
@@ -486,6 +560,7 @@
     "dataMenu": {
       "recurrences": "Rutinas automáticas",
       "bottlenecks": "Monitor de cuellos de botella",
+      "mindMap": "Mapa mental",
       "archivedCards": "Tarjetas archivadas",
       "moreOptions": "Más opciones",
       "personalize": "Personalizar",
@@ -533,7 +608,7 @@
     "recurrences": {
       "title": "Rutinas automáticas",
       "empty": "Todavía no hay rutinas. Una rutina crea la tarjeta sola en la fecha correcta, con el checklist listo.",
-      "planRequired": "Las rutinas automáticas están disponibles desde el plan Profesional. Puedes ver y eliminar las existentes.",
+      "planRequired": "Las rutinas automáticas están disponibles desde el plan Pro. Puedes ver y eliminar las existentes.",
       "newRule": "Nueva rutina",
       "fieldTitle": "Título de la tarjeta",
       "titlePlaceholder": "Ej: Cerrar el balance contable",
@@ -634,8 +709,25 @@
       "msgDue": "La fecha acordada es {{date}}.",
       "msgClosing": "¿Me puedes contar cómo está avanzando? ¡Gracias!"
     },
+    "mindMap": {
+      "title": "Mapa mental",
+      "empty": "Este tablero todavía no tiene ninguna lista.",
+      "cardsCount": "{{count}} tarjeta",
+      "cardsCount_other": "{{count}} tarjetas",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "zoomReset": "Restablecer zoom",
+      "modeBoard": "Del tablero",
+      "modeFree": "Mapa en blanco",
+      "freeHint": "Doble clic en el fondo crea un tema. Arrastra el fondo para mover la vista, y el scroll da zoom. Haz clic en dos temas para enlazarlos (o desenlazarlos). Selecciona un tema para arrastrarlo, borrarlo o usar el + para ramificar.",
+      "clear": "Limpiar mapa",
+      "clearConfirm": "¿Borrar todos los temas de este mapa? Esta acción no se puede deshacer.",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "center": "Centrar"
+    },
     "archive": {
-      "autoPlanRequired": "El archivado automático está disponible desde el plan Profesional. El archivado manual sigue disponible.",
+      "autoPlanRequired": "El archivado automático está disponible desde el plan Pro. El archivado manual sigue disponible.",
       "autoLabel": "Archivar completadas automáticamente",
       "autoDaysSuffix": "días",
       "autoOnHint": "Las tarjetas completadas hace más de {{days}} días pasan al archivo cuando se carga el tablero. Desmarcar una tarjeta reinicia el conteo.",
@@ -654,7 +746,7 @@
       "deletedToast": "Tarjeta eliminada"
     },
     "listMenu": {
-      "stuckPlanRequired": "El monitor de cuellos de botella está disponible desde el plan Profesional.",
+      "stuckPlanRequired": "El monitor de cuellos de botella está disponible desde el plan Pro.",
       "stuckConfigure": "Monitorear atascos en esta columna",
       "stuckConfigured": "Atasco: alerta a las {{hours}}h",
       "stuckHint": "Avisa cuando una tarjeta pase este tiempo detenida en esta columna.",
@@ -948,7 +1040,7 @@
     "groupTomorrow": "Mañana",
     "groupUpcoming": "Próximas",
     "groupCompleted": "Completadas",
-    "planRequired": "El planificador personal está disponible desde el plan Profesional. Puedes ver y borrar lo que ya existe."
+    "planRequired": "El planificador personal está disponible desde el plan Pro. Puedes ver y borrar lo que ya existe."
   },
   "plan": {
     "monthlyLabel": "Mensualidad",
@@ -973,10 +1065,10 @@
     "masterOnly": "Solo el usuario master puede cambiar el plan de la empresa.",
     "changed": "Plan cambiado a {{plan}}",
     "names": {
-      "basic": "Básico",
-      "intermediate": "Intermedio",
-      "professional": "Profesional",
-      "enterprise": "Empresarial"
+      "basic": "Free",
+      "intermediate": "Unlimited",
+      "professional": "Pro",
+      "enterprise": "Enterprise"
     },
     "status": {
       "active": "Activo",
@@ -987,10 +1079,10 @@
     "trialEnding": "Tu prueba termina en {{count}} día",
     "trialEnding_other": "Tu prueba termina en {{count}} días",
     "expiredMessage": "Tu plan expiró. Todavía ves todo, pero no puedes crear ni editar.",
-    "continueOnBasic": "Continuar en el plan Básico gratis",
-    "movedToBasic": "Plan cambiado a Básico",
+    "continueOnBasic": "Continuar en el plan Free gratis",
+    "movedToBasic": "Plan cambiado a Free",
     "selectTitle": "Elegir plan",
-    "freeChoiceHint": "Aún no tienes un plan de pago vigente, así que puedes elegir cualquier plan de abajo, incluido el Básico gratuito, que no caduca.",
+    "freeChoiceHint": "Aún no tienes un plan de pago vigente, así que puedes elegir cualquier plan de abajo, incluido el Free gratuito, que no caduca.",
     "selectFreeConfirm": "¿Pasar al plan {{plan}}? Es gratuito y no tiene fecha de vencimiento."
   },
   "billing": {
@@ -1069,9 +1161,9 @@
     "REPORT_FORMAT_INVALID": "Formato de informe no admitido",
     "REPORT_STATUS_INVALID": "Filtro de estado inválido",
     "BOARD_LIMIT_REACHED": "Límite de tableros del plan alcanzado. Elimina un tablero o mejora tu plan para crear otro.",
-    "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Profesional.",
-    "PLAN_FEATURE_PERSONAL_PLANNER": "El planificador personal está disponible desde el plan Profesional.",
-    "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Profesional.",
+    "PLAN_FEATURE_BOTTLENECK": "El monitor de cuellos de botella está disponible desde el plan Pro.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "El planificador personal está disponible desde el plan Pro.",
+    "PLAN_FEATURE_RECURRING": "Las tarjetas recurrentes están disponibles desde el plan Pro.",
     "INVALID_FREQUENCY": "Frecuencia inválida",
     "WEEKDAY_REQUIRED": "Elige el día de la semana",
     "MONTHDAY_REQUIRED": "Elige un día del mes entre 1 y 31",
@@ -1080,7 +1172,7 @@
     "LIST_NOT_FOUND": "Columna no encontrada",
     "RECURRENCE_NOT_FOUND": "Rutina no encontrada",
     "INVALID_STUCK_HOURS": "Indica un número de horas entre 1 y 8760",
-    "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Profesional.",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "El archivado automático está disponible desde el plan Pro.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Aquí solo se puede subir de plan. Para bajar o cancelar, contacta al soporte.",
     "PLAN_EXPIRED": "Tu plan expiró. Renueva para volver a editar.",
     "PLAN_USER_LIMIT": "Tu plan alcanzó el límite de usuarios. Cambia de plan para agregar más.",

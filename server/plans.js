@@ -4,8 +4,11 @@
 export const TRIAL_DAYS = 7;
 
 // rank ordena os planos; priceCents é a mensalidade em centavos de BRL.
-// priceCents null significa "sob consulta" — sem valor de tabela, então não pode
-// ser contratado sozinho.
+// priceCents null significaria "sob consulta" — sem valor de tabela, então não
+// poderia ser contratado sozinho. Não há plano assim hoje (o Enterprise passou a
+// ter preço de tabela e autoatendimento igual aos demais), mas o resto do
+// arquivo (canSelfSelectPlan, priceCentsOf, o desconto em routes/plan.js) trata
+// esse caso de propósito, para comportar um futuro plano "sob consulta" de novo.
 // autoArchive é o direito à regra de arquivamento automático: o arquivamento
 // manual está em todos os planos, só a automação é paga.
 //
@@ -27,8 +30,8 @@ export const ALL_VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "m
 const DEFINICOES = {
   basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false },
   intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 37000, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false },
-  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 73000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true }, // null = ilimitado
-  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: null, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
+  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 85000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true }, // null = ilimitado
+  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: 278000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
 };
 
 // price derivado de priceCents num único lugar, para os dois nunca discordarem.
@@ -46,8 +49,8 @@ export function getPlan(planId) {
   return PLANS[planId] || PLANS.basic;
 }
 
-// Valor a cobrar por um ciclo do plano, em centavos. null quando não há preço de
-// tabela: o Empresarial é sob consulta e não passa por cobrança automática.
+// Valor a cobrar por um ciclo do plano, em centavos. null só existiria pra um
+// plano sob consulta, sem cobrança automática — hoje nenhum plano está nesse caso.
 export function priceCentsOf(planId) {
   return getPlan(planId).priceCents;
 }
@@ -163,8 +166,8 @@ export function addOneMonth(iso) {
 // receita a perder aqui, porque enquanto está vencido a empresa não paga nada e
 // não consegue escrever.
 //
-// O Empresarial fica de fora sempre: é "sob consulta", sem preço de tabela, então
-// não há o que contratar sozinho.
+// Um plano sob consulta (price null) ficaria de fora sempre - não há o que
+// contratar sozinho sem preço de tabela. Não é o caso de nenhum plano hoje.
 export function canSelfSelectPlan(company, targetPlanId) {
   const alvo = PLANS[targetPlanId];
   if (!alvo) return false;

@@ -17,6 +17,7 @@ import AccountMenu from "./AccountMenu.jsx";
 import ArchiveModal from "./ArchiveModal.jsx";
 import BottlenecksModal from "./BottlenecksModal.jsx";
 import RecurrencesModal from "./RecurrencesModal.jsx";
+import MindMapModal from "./MindMapModal.jsx";
 
 // Mesmo lazy load de AccountMenu.jsx: o painel de plataforma arrasta os
 // componentes de administração junto, e só quem abre precisa pagar o peso.
@@ -112,7 +113,7 @@ function ShortcutRow({ icon, label, badge, onClick, title }) {
   );
 }
 
-export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
+export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpenCard }) {
   const { t } = useTranslation();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -161,6 +162,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [gargalosOpen, setGargalosOpen] = useState(false);
   const [rotinasOpen, setRotinasOpen] = useState(false);
+  const [mapaMentalOpen, setMapaMentalOpen] = useState(false);
 
   // Flyout do "Mais": bate-papo/idioma/tema moraram na fileira sempre visível
   // do painel branco antes; agora só aparecem aqui, sob demanda. Portal +
@@ -509,6 +511,16 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
             >
               {t("app.dataMenu.bottlenecks")}
             </div>
+            <div
+              className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
+              onClick={() => {
+                if (!activeBoard) return;
+                setMapaMentalOpen(true);
+                setMoreOpen(false);
+              }}
+            >
+              {t("app.dataMenu.mindMap")}
+            </div>
             {!activeBoardReadOnly && (
               <>
                 <div
@@ -584,6 +596,9 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard }) {
       {archiveOpen && activeBoard && <ArchiveModal board={activeBoard} onClose={() => setArchiveOpen(false)} />}
       {gargalosOpen && activeBoard && <BottlenecksModal board={activeBoard} onClose={() => setGargalosOpen(false)} />}
       {rotinasOpen && activeBoard && <RecurrencesModal board={activeBoard} onClose={() => setRotinasOpen(false)} />}
+      {mapaMentalOpen && activeBoard && (
+        <MindMapModal board={activeBoard} onClose={() => setMapaMentalOpen(false)} onOpenCard={onOpenCard} />
+      )}
     </div>
   );
 }
