@@ -154,7 +154,7 @@ export default function ModuleLauncher({ modules, onOpen }) {
               <a>, não <button> com onOpen: sai do app em vez de trocar de módulo. */}
           <a
             className="module-card module-card-custom"
-            style={{ "--module-accent": "#8b5cf6" }}
+            style={{ "--module-accent": "#101f47" }}
             href={WHATSAPP_VENDAS_URL}
             target="_blank"
             rel="noopener noreferrer"

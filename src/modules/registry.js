@@ -6,15 +6,20 @@
 //
 // labelKey/descKey apontam para modules.<id>.* nos locales. accent é a cor do
 // card no launcher. icon nomeia o desenho em ModuleIcon (abaixo).
+//
+// accent era um arco-íris (um tom por pilar, sem relação com a marca); agora é
+// o azul-marinho da marca (#101f47, o mesmo de .landing-shell/.auth-shell) em
+// todos - o pedido foi "ícones com as cores da marca", não uma cor por módulo.
+const BRAND = "#101f47";
 
 export const MODULE_META = {
-  "vendas-crm": { icon: "vendas", accent: "#6366f1", labelKey: "modules.vendas-crm.name", descKey: "modules.vendas-crm.desc" },
-  financeiro: { icon: "financeiro", accent: "#10b981", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
-  "compras-estoque": { icon: "estoque", accent: "#f59e0b", labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
-  faturamento: { icon: "faturamento", accent: "#ec4899", labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
-  "relatorios-bi": { icon: "bi", accent: "#3b82f6", labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
+  "vendas-crm": { icon: "vendas", accent: BRAND, labelKey: "modules.vendas-crm.name", descKey: "modules.vendas-crm.desc" },
+  financeiro: { icon: "financeiro", accent: BRAND, labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
+  "compras-estoque": { icon: "estoque", accent: BRAND, labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
+  faturamento: { icon: "faturamento", accent: BRAND, labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
+  "relatorios-bi": { icon: "bi", accent: BRAND, labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
 };
 
 export function metaFor(id) {
-  return MODULE_META[id] || { icon: "vendas", accent: "var(--accent)", labelKey: id, descKey: "" };
+  return MODULE_META[id] || { icon: "vendas", accent: BRAND, labelKey: id, descKey: "" };
 }
