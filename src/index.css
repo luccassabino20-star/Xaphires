@@ -3362,7 +3362,7 @@ img.avatar { object-fit: cover; padding: 0; }
     linear-gradient(to bottom, var(--bg-app) 0%, transparent 22%, transparent 65%, var(--bg-app) 100%),
     url("/hero-photo.png");
   background-size: 100% 100%, 100% 100%, 100% 100%, 72%;
-  background-position: center, center, center, right center;
+  background-position: center, center, center, right 11%;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
   min-height: 620px;
   display: flex;
