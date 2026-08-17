@@ -14,8 +14,33 @@
       "eyebrow": "Plataforma Xaphires",
       "title": "Hola, {{name}}",
       "subtitle": "Elige por dónde empezar. Cada módulo cuida un pilar de tu empresa.",
-      "searchPlaceholder": "Buscar módulos, herramientas, páginas...",
+      "searchPlaceholder": "Busca por nombre, herramienta o área...",
       "noResults": "Ningún módulo encontrado para \"{{query}}\".",
+      "resultCount": "{{count}} módulo",
+      "resultCount_other": "{{count}} módulos",
+      "moreFilters": "Más filtros",
+      "sortLabel": "Ordenar",
+      "categories": {
+        "todas": "Todas",
+        "vendas": "Ventas",
+        "marketing": "Marketing",
+        "atendimento": "Atención",
+        "rh": "RR. HH.",
+        "ia": "Modelos de IA",
+        "financeiro": "Financiero",
+        "juridico": "Legal",
+        "outros": "Otros"
+      },
+      "views": {
+        "todas": "Todas las soluciones",
+        "minhas": "Mis soluciones",
+        "favoritas": "Favoritas"
+      },
+      "sorts": {
+        "recentes": "Recientes",
+        "az": "A-Z",
+        "implementadas": "Más implementadas"
+      },
       "sidebar": {
         "groups": {
           "learn": "Aprendizaje",

@@ -14,8 +14,33 @@
       "eyebrow": "Xaphires Platform",
       "title": "Hello, {{name}}",
       "subtitle": "Choose where to start. Each module handles one pillar of your business.",
-      "searchPlaceholder": "Search modules, tools, pages...",
+      "searchPlaceholder": "Search by name, tool or area...",
       "noResults": "No modules found for \"{{query}}\".",
+      "resultCount": "{{count}} module",
+      "resultCount_other": "{{count}} modules",
+      "moreFilters": "More filters",
+      "sortLabel": "Sort",
+      "categories": {
+        "todas": "All",
+        "vendas": "Sales",
+        "marketing": "Marketing",
+        "atendimento": "Support",
+        "rh": "HR",
+        "ia": "AI Models",
+        "financeiro": "Finance",
+        "juridico": "Legal",
+        "outros": "Other"
+      },
+      "views": {
+        "todas": "All solutions",
+        "minhas": "My solutions",
+        "favoritas": "Favorites"
+      },
+      "sorts": {
+        "recentes": "Recent",
+        "az": "A-Z",
+        "implementadas": "Most adopted"
+      },
       "sidebar": {
         "groups": {
           "learn": "Learning",
