@@ -1,8 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://xaphires.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://xaphires.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://xaphires.com/en" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://xaphires.com/es" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://xaphires.com/fr" />
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://xaphires.com/de" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xaphires.com/" />
+  </url>
+  <url>
+    <loc>https://xaphires.com/en</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://xaphires.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://xaphires.com/en" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://xaphires.com/es" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://xaphires.com/fr" />
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://xaphires.com/de" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xaphires.com/" />
+  </url>
+  <url>
+    <loc>https://xaphires.com/es</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://xaphires.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://xaphires.com/en" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://xaphires.com/es" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://xaphires.com/fr" />
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://xaphires.com/de" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xaphires.com/" />
+  </url>
+  <url>
+    <loc>https://xaphires.com/fr</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://xaphires.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://xaphires.com/en" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://xaphires.com/es" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://xaphires.com/fr" />
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://xaphires.com/de" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xaphires.com/" />
+  </url>
+  <url>
+    <loc>https://xaphires.com/de</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://xaphires.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://xaphires.com/en" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://xaphires.com/es" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://xaphires.com/fr" />
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://xaphires.com/de" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xaphires.com/" />
   </url>
 </urlset>

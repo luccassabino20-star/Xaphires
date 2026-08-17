@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SUPPORTED_LANGUAGES, LANGUAGE_LABELS, normalizeLanguage } from "../i18n/locale.js";
+import { parseLocaleFromPath, pathForLocale } from "../i18n/urlLocale.js";
+import { syncSeoTags } from "../i18n/seo.js";
 
 function GlobeIcon() {
   return (
@@ -49,6 +51,13 @@ export default function LanguageSwitcher({ className }) {
               className={"dropdown-item" + (current === lng ? " active" : "")}
               onClick={() => {
                 i18n.changeLanguage(lng);
+                // Escolha manual também atualiza a URL (/en, /es...) - é o
+                // que faz o idioma sobreviver a um reload ou a um link
+                // compartilhado, e é a fonte que o hreflang aponta.
+                const { rest } = parseLocaleFromPath(window.location.pathname);
+                const novoPath = pathForLocale(lng, rest) + window.location.search + window.location.hash;
+                window.history.pushState(null, "", novoPath);
+                syncSeoTags(lng);
                 setOpen(false);
               }}
             >

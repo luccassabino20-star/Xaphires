@@ -9,6 +9,17 @@
     content="O Xaphires é a plataforma que reúne Vendas & CRM, Financeiro e outros módulos da empresa em um só lugar, sem planilhas soltas nem ferramentas separadas."
   />
   <link rel="canonical" href="https://xaphires.com/" />
+  <!-- Alternativas de idioma da raiz do site - src/i18n/seo.js recria este
+       mesmo bloco em runtime (removendo e regravando os data-hreflang-alt)
+       sempre que o idioma muda ou a URL carrega com prefixo (/en, /es...),
+       porque o canonical/og:url mudam junto. Este bloco estático aqui é só
+       o retrato inicial (pt, raiz) para quem lê o HTML sem executar JS. -->
+  <link rel="alternate" hreflang="pt-BR" href="https://xaphires.com/" data-hreflang-alt="1" />
+  <link rel="alternate" hreflang="en-US" href="https://xaphires.com/en" data-hreflang-alt="1" />
+  <link rel="alternate" hreflang="es-ES" href="https://xaphires.com/es" data-hreflang-alt="1" />
+  <link rel="alternate" hreflang="fr-FR" href="https://xaphires.com/fr" data-hreflang-alt="1" />
+  <link rel="alternate" hreflang="de-DE" href="https://xaphires.com/de" data-hreflang-alt="1" />
+  <link rel="alternate" hreflang="x-default" href="https://xaphires.com/" data-hreflang-alt="1" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Xaphires" />
   <meta property="og:title" content="Xaphires" />

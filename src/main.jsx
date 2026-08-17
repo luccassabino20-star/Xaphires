@@ -4,7 +4,9 @@ import App from "./App.jsx";
 import { AuthProvider } from "./state/AuthContext.jsx";
 import { ToastProvider } from "./state/ToastContext.jsx";
 import { ThemeProvider } from "./state/ThemeContext.jsx";
-import "./i18n/index.js";
+import i18n from "./i18n/index.js";
+import { normalizeLanguage, DEFAULT_LOCALE } from "./i18n/locale.js";
+import { parseLocaleFromPath, pathForLocale } from "./i18n/urlLocale.js";
 import "./index.css";
 
 // O painel de plataforma é outra aplicação, servida no mesmo endereço sob /admin.
@@ -26,6 +28,24 @@ const GanttChartDemo = React.lazy(() => import("./components/gantt/GanttChartDem
 const path = window.location.pathname.replace(/\/+$/, "");
 const ehPainel = path === "/admin";
 const ehGanttDemo = path === "/gantt-demo";
+
+// Sem prefixo de idioma na URL (ex.: alguém chegou em "/" direto): alinha a
+// URL com o idioma que o i18next já resolveu em i18n/index.js (localStorage
+// salvo, ou Accept-Language do navegador na primeira visita) - só troca a
+// URL, nunca o idioma em si, pra não conflitar com o que o LanguageDetector
+// já decidiu. replaceState, não pushState, pra a detecção automática não
+// empurrar uma entrada a mais no histórico (o botão "voltar" não deveria
+// alternar idioma sozinho).
+if (!ehPainel && !ehGanttDemo) {
+  const { locale: urlLocale, rest } = parseLocaleFromPath(path);
+  if (!urlLocale) {
+    const resolved = normalizeLanguage(i18n.language);
+    if (resolved !== DEFAULT_LOCALE) {
+      const novoPath = pathForLocale(resolved, rest) + window.location.search + window.location.hash;
+      window.history.replaceState(null, "", novoPath);
+    }
+  }
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -1,0 +1,1403 @@
+{
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "add": "Hinzufügen",
+    "remove": "Entfernen",
+    "close": "Schließen",
+    "loading": "Wird geladen...",
+    "retry": "Erneut versuchen"
+  },
+  "modules": {
+    "launcher": {
+      "eyebrow": "Xaphires-Plattform",
+      "title": "Hallo, {{name}}",
+      "subtitle": "Wählen Sie, wo Sie beginnen möchten. Jedes Modul deckt einen Bereich Ihres Unternehmens ab.",
+      "searchPlaceholder": "Suche nach Name, Tool oder Bereich...",
+      "noResults": "Keine Module gefunden für \"{{query}}\".",
+      "resultCount": "{{count}} Modul",
+      "resultCount_other": "{{count}} Module",
+      "moreFilters": "Weitere Filter",
+      "sortLabel": "Sortieren",
+      "categories": {
+        "todas": "Alle",
+        "vendas": "Vertrieb",
+        "marketing": "Marketing",
+        "atendimento": "Support",
+        "rh": "Personal",
+        "ia": "KI-Modelle",
+        "financeiro": "Finanzen",
+        "juridico": "Recht",
+        "outros": "Sonstiges"
+      },
+      "views": {
+        "todas": "Alle Lösungen",
+        "minhas": "Meine Lösungen",
+        "favoritas": "Favoriten"
+      },
+      "sorts": {
+        "recentes": "Neueste",
+        "az": "A-Z",
+        "implementadas": "Meistgenutzt"
+      },
+      "sidebar": {
+        "groups": {
+          "learn": "Lernen",
+          "tools": "Werkzeuge",
+          "account": "Mein Konto"
+        },
+        "items": {
+          "dashboard": "Dashboard",
+          "consultor": "Berater",
+          "solucoes": "Lösungen",
+          "formacao": "Schulung",
+          "mentorias": "Mentoring",
+          "builder": "Builder",
+          "ferramentas": "Werkzeuge",
+          "certificados": "Zertifikate",
+          "metricas": "Kennzahlen",
+          "perfil": "Profil",
+          "atualizacoes": "Aktualisierungen"
+        }
+      }
+    },
+    "comingSoon": "Demnächst",
+    "backToLauncher": "Module",
+    "loadError": "Die Module konnten nicht geladen werden.",
+    "vendas-crm": {
+      "name": "Vertrieb & CRM",
+      "desc": "Leads, Kanban-Pipeline, Angebote, Kostenvoranschläge und Bestellungen."
+    },
+    "financeiro": {
+      "name": "Finanzen",
+      "desc": "Cashflow, Verbindlichkeiten und Forderungen, Kontenabgleich und GuV."
+    },
+    "compras-estoque": {
+      "name": "Einkauf & Lager",
+      "desc": "Bestand, Lieferanten, Produktmargen und Meldebestand."
+    },
+    "faturamento": {
+      "name": "Rechnungsstellung",
+      "desc": "Ausstellung von Rechnungen, Zahlscheinen und Zahlungslinks."
+    },
+    "relatorios-bi": {
+      "name": "Berichte & BI",
+      "desc": "Konsolidierte operative und finanzielle Dashboards."
+    },
+    "custom": {
+      "seal": "Maßgeschneidert",
+      "name": "Maßgeschneiderte Lösungen",
+      "desc": "API-Integrationen, Automatisierungen und exklusive Module, entwickelt für Ihr Unternehmen.",
+      "bannerTitle": "Nicht gefunden, was Sie in den fertigen Modulen brauchen?",
+      "bannerText": "Wir entwickeln API-Integrationen, Automatisierungen und exklusive Module maßgeschneidert für Ihr Unternehmen.",
+      "bannerCta": "Mit unserem Team sprechen"
+    }
+  },
+  "financeiro": {
+    "tabs": { "lancamentos": "Buchungen", "titulos": "Titel", "movimentacao": "Bewegung", "contas": "Konten", "fluxo": "Cashflow", "dre": "GuV", "importar": "Kontoauszug importieren", "cadastros": "Stammdaten" },
+    "importar": { "titulo": "Bankauszug importieren", "ajuda": "Laden Sie das PDF des Kontoauszugs hoch (Sicredi oder Banestes). Jede Transaktion wird zu einer abgeschlossenen Buchung auf dem gewählten Konto.", "conta": "Zielkonto", "escolher": "PDF des Kontoauszugs auswählen", "lendo": "PDF wird gelesen...", "banco": "Bank", "creditos": "Gutschriften", "debitos": "Lastschriften", "data": "Datum", "historico": "Verlauf", "saldo": "Saldo", "nenhuma": "In diesem PDF wurde keine Transaktion erkannt.", "importar": "{{n}} Transaktionen importieren", "baixarExcel": "Excel herunterladen", "selecioneConta": "Wählen Sie das Zielkonto vor dem Import aus.", "resultado": "{{imp}} importiert, {{ign}} bereits vorhanden (übersprungen).", "semContas": "Legen Sie zuerst ein Kontokorrentkonto im Tab Konten an." },
+    "manual": { "titulo": "Manuelle Buchung", "dados": "Buchungsdaten", "movimento": "Bewegung", "data": "Datum", "referencia": "Referenz", "referenciaPlaceholder": "Verlauf / Beschreibung", "documento": "Beleg", "credito": "Haben", "debito": "Soll", "dicaCredito": "Diese Bewegung wird als Gutschrift (Eingang) auf dem Konto verbucht.", "dicaDebito": "Diese Bewegung wird als Lastschrift (Ausgang) auf dem Konto verbucht.", "rateioTitulo": "Zuordnung / Aufteilung", "tipoRateio": "Aufteilungsart", "porPercentual": "Prozentsatz (%)", "porValor": "Betrag (R$)", "valorApropriacao": "Zuordnungsbetrag", "semRateio": "Keine Aufteilung hinzugefügt.", "criado": "Manuelle Buchung erstellt.", "salvar": "Buchen", "informeData": "Geben Sie das Datum an.", "escolhaClasse": "Wählen Sie die Klasse.", "mov": { "tarifa_bancaria": "Bankgebühr", "juros_pagos": "Gezahlte Zinsen", "juros_recebidos": "Erhaltene Zinsen", "rendimento_aplicacao": "Anlageertrag", "aplicacao_financeira": "Finanzanlage", "resgate_aplicacao": "Anlagerückzahlung", "outras_entradas": "Sonstige Eingänge", "outras_saidas": "Sonstige Ausgänge" } },
+    "rateio": { "ativar": "Auf mehrere Kostenstellen aufteilen", "desativar": "Aufteilung entfernen", "titulo": "Aufteilung nach Kostenstelle", "adicionar": "Kostenstelle hinzufügen", "restante": "Verbleibend", "escolhaCentro": "Wählen Sie die Kostenstelle in jeder Zeile der Aufteilung.", "valorInvalido": "Geben Sie in jeder Zeile der Aufteilung einen gültigen Betrag an.", "duplicado": "Kostenstelle in der Aufteilung wiederholt.", "naoFecha": "Die Summe der Aufteilung muss dem Betrag des Titels entsprechen.", "rateadoLabel": "Aufgeteilt", "travadoPorRateio": "Titel aufgeteilt - die einzelne Kostenstelle gilt nicht." },
+    "mov": { "pendentes": "Offen", "baixados": "Kürzlich beglichen", "vazioPendentes": "Kein offener Titel.", "vazioBaixados": "Keine kürzliche Begleichung.", "extratoVazio": "Keine Bewegung im Zeitraum.",
+        "dataInicio": "Startdatum",
+        "dataFim": "Enddatum",
+        "filtrar": "Filtern",
+        "incluirEstornados": "Storniert",
+        "filtrePrompt": "Wählen Sie das Konto und den Zeitraum aus und klicken Sie auf Filtern.",
+        "selecioneConta": "Wählen Sie ein Konto aus.",
+        "informePeriodo": "Geben Sie das Start- und Enddatum an.",
+        "periodoInvalido": "Das Startdatum darf nicht nach dem Enddatum liegen.",
+        "saldoAnterior": "Vorheriger Saldo",
+        "saldoAtual": "Aktueller Saldo",
+        "saldoConferido": "Abgeglichener Saldo",
+        "creditos": "Gutschriften im Zeitraum",
+        "debitos": "Lastschriften im Zeitraum",
+        "conf": "Abgl.",
+        "conferir": "Als abgeglichen markieren",
+        "data": "Datum",
+        "estornado": "Storniert" },
+    "tipo": { "receber": "Forderung", "pagar": "Verbindlichkeit" },
+    "status": { "provisionado": "Vorgemerkt", "pendente": "Ausstehend", "disponivel": "Verfügbar", "finalizado": "Beglichen", "anulado": "Annulliert" },
+    "filtro": { "todosTipos": "Alle Typen", "todosStatus": "Alle Status", "emAberto": "Offen", "todosCentros": "Alle Kostenstellen", "todasContas": "Alle Konten", "todasCategorias": "Alle Klassen", "todosContatos": "Alle Kunden/Lieferanten", "numero": "Titel-Nr.", "valorMin": "Mindestbetrag", "valorMax": "Höchstbetrag", "limpar": "Filter zurücksetzen" },
+    "kpi": { "aReceber": "Forderungen", "aPagar": "Verbindlichkeiten", "saldoPrevisto": "Erwarteter Saldo" },
+    "col": { "titulo": "Titel", "tipo": "Typ", "doc": "Beleg", "descricao": "Beschreibung", "categoria": "Klasse", "centro": "Kostenstelle", "contraparte": "Kunde/Lieferant", "vencimento": "Fälligkeit", "valor": "Betrag", "status": "Status" },
+    "busca": "Suche nach Titel, Beleg, Beschreibung oder Kontoinhaber",
+    "pesquisar": "Suchen",
+    "semResultado": "Kein Ergebnis",
+    "tituloNum": "Titel {{n}}",
+    "total": { "titulos": "{{n}} Titel" },
+    "modal": { "pagoEm": "Beglichen am {{data}}" },
+    "form": { "descricao": "Beschreibung", "valor": "Betrag", "semCategoria": "Keine Kategorie", "semClasse": "Keine Klasse", "semCentro": "Keine Kostenstelle", "semContato": "Kein Kunde/Lieferant", "contraparte": "Kunde/Lieferant", "adicionar": "Hinzufügen", "valorInvalido": "Geben Sie einen gültigen Betrag an", "dataObrigatoria": "Geben Sie die Fälligkeit an", "novoTitulo": "Neuer Titel", "impostoAposCriar": "Steuern und Raten fügen Sie später hinzu, indem Sie den erstellten Titel öffnen." },
+    "acao": { "baixar": "Begleichen", "estornar": "Stornieren", "excluir": "Löschen", "anular": "Annullieren", "reativar": "Reaktivieren" },
+    "confirm": { "excluir": "Diese Buchung löschen?", "anular": "Diesen Titel annullieren? Er wird aus dem Cashflow und der GuV entfernt." },
+    "toast": { "criado": "Buchung hinzugefügt", "excluido": "Buchung gelöscht", "salvo": "Titel gespeichert", "baixado": "Titel beglichen", "situacaoAlterada": "Status geändert" },
+    "vazio": "Hier gibt es noch keine Buchungen.",
+    "fluxo": { "entradas": "Eingänge", "saidas": "Ausgänge", "entradasRealizadas": "Realisierte Eingänge", "saidasRealizadas": "Realisierte Ausgänge", "saldoRealizado": "Realisierter Saldo", "mes": "Monat", "saldo": "Saldo", "acumulado": "Kumuliert" },
+    "dre": { "receitas": "Erträge", "despesas": "Aufwendungen", "totalReceitas": "Erträge gesamt", "totalDespesas": "Aufwendungen gesamt", "resultado": "Ergebnis", "semCategoria": "Keine Kategorie" },
+    "periodo": { "de": "Von", "ate": "Bis" },
+    "contas": { "saldoTotal": "Gesamtsaldo", "nome": "Konto", "banco": "Bank", "bancoEscolha": "Bank auswählen", "bancoOutro": "Andere (eingeben)", "bancoOutroPlaceholder": "Name der Bank", "saldoInicial": "Anfangssaldo", "movimento": "Bewegung", "saldo": "Saldo", "vazio": "Kein Konto registriert." },
+    "cad": {
+      "contas": "Kontokorrentkonten", "centros": "Kostenstellen", "classes": "Klassen", "contatos": "Kunden/Lieferanten",
+      "criado": "Stammdaten gespeichert", "nome": "Name", "codigo": "Code", "tipo": "Typ", "doc": "Steuer-ID", "email": "E-Mail",
+      "telefone": "Telefon", "cep": "Postleitzahl", "logradouro": "Straße", "complemento": "Zusatz", "bairro": "Stadtteil", "cidade": "Stadt", "uf": "Bundesland", "pais": "Land", "pontoReferencia": "Orientierungspunkt", "buscandoCep": "Postleitzahl wird gesucht...", "pesquisarEmpresa": "Unternehmen suchen", "buscandoEmpresa": "Unternehmen wird gesucht...", "cnpjInvalido": "Geben Sie eine gültige CNPJ an, um das Unternehmen zu suchen.", "endereco": "Adresse", "contato": "Kontakt", "ativo": "Aktiv", "inativo": "Inaktiv", "semEndereco": "Keine Adresse hinterlegt.", "agencia": "Filiale", "numero": "Nummer", "tipo_fornecedor": "Lieferant", "tipo_cliente": "Kunde", "tipo_ambos": "Beide",
+      "aliquota": "Satz (%)", "descricao": "Beschreibung", "imposto_tipo_retido": "Einbehalten", "imposto_tipo_acrescido": "Hinzugefügt",
+      "editar": "Bearbeiten", "recolher": "Einklappen", "expandir": "Ausklappen", "ativar": "Aktivieren", "desativar": "Deaktivieren", "sintetico": "Sammelkonto", "analitico": "Einzelkonto", "centrosHint": "Kostenstellen sind hierarchisch: Der Code bildet den Baum (z. B. 1.02.01), und die übergeordnete Stelle muss vorher existieren. Sobald sie ein Unterelement erhält, wird die übergeordnete Stelle zum Sammelkonto und nimmt keine Buchungen mehr an; nur Einzelkonten nehmen Buchungen an.", "codigoTravado": "Der Code ist nicht bearbeitbar (er legt die Hierarchie fest). Zum Neuordnen deaktivieren und eine neue anlegen.", "importarExcel": "Excel importieren", "baixarModelo": "Vorlage herunterladen", "importResultado": "{{criados}} erstellt, {{ignorados}} bereits vorhanden, {{erros}} mit Fehler.", "importLinha": "Zeile {{row}} ({{codigo}})", "excluir": "Löschen", "excluirTudo": "Alles löschen", "sim": "Ja", "nao": "Nein", "confirmar": "Löschung bestätigen?", "confirmExcluir": "Kostenstelle {{codigo}} und den gesamten Unterbaum löschen? Buchungen, die sie verwenden, verlieren die Kostenstellenzuordnung (werden nicht gelöscht).", "confirmExcluirTudo": "ALLE Kostenstellen dieses Unternehmens löschen? Buchungen verlieren die Kostenstellenzuordnung (werden nicht gelöscht). Kann nicht rückgängig gemacht werden.", "geridoPlataforma": "Kostenstellen sind hierarchisch aufgebaut und werden im Plattform-Panel verwaltet. Hier können Sie sie nur einsehen und in Buchungen verwenden.",
+      "spedHint": "Stammdatensatz für die Zukunft, wenn die Rechnungsstellung (Rechnungsstellung) eingeführt wird - noch ohne Funktion.",
+      "grupos": {
+        "organizacional": "Organisationsstruktur & Allgemeines",
+        "financeira": "Finanz- und Rechnungswesenstruktur",
+        "fiscal": "Steuern & Abgaben",
+        "fornecedores": "Beschaffung & Lieferanten",
+        "operacional": "Betrieb & Geschäftsregeln",
+        "taxas": "Gebühren & Verträge"
+      },
+      "empresa_unidades": "Unternehmen / Einheiten",
+      "tabelas_basicas": "Basistabellen",
+      "feriados": "Feiertage",
+      "formas_pagto": "Zahlungs-/Empfangsarten",
+      "indices": "Finanzindizes",
+      "impostos": "Steuern",
+      "sped": "Dienstleistungscode (SPED)",
+      "avaliacao_fornecedores": "Lieferantenbewertung",
+      "qualificacao_fornecedores": "Lieferantenqualifizierung",
+      "tipos_movimento": "Bewegungsarten",
+      "tipos_compromisso": "Verpflichtungsarten",
+      "tipos_rateio": "Aufteilungsarten / automatische Aufteilung",
+      "motivos_cancelamento": "Stornierungsgründe",
+      "taxas_desc": "Verwaltungsgebühren (Beschreibung)",
+      "taxas_caract": "Verwaltungsgebühren (Merkmale)",
+      "taxas_regras": "Regeln für Verwaltungsgebühren"
+    },
+    "baixa": { "semConta": "Kein Konto", "confirmar": "Bestätigen" },
+    "tit": { "numero": "Titel-Nr.", "identificacao": "Identifikation", "docNumero": "Belegnummer", "emissao": "Ausstellung", "formaPagto": "Zahlungsart", "semForma": "Nicht angegeben", "apropriacao": "Zuordnung", "valores": "Beträge", "valorTitulo": "Titelbetrag", "impostosRetidos": "Einbehaltene Steuern", "impostosAcrescidos": "Hinzugefügte Steuern", "desconto": "Rabatt", "retencao": "Einbehalt", "multa": "Vertragsstrafe", "juros": "Zinsen", "valorLiquido": "Nettobetrag", "emBreveImpostos": "Im Steuerblock verfügbar (demnächst)", "observacao": "Anmerkung", "detalhesPagto": "Zahlungsdetails", "dataBaixa": "Datum der Begleichung", "darQuitado": "Begleichen ({{n}})", "selecionados": "{{n}} ausgewählt", "quitados": "{{n}} Titel beglichen", "valorPago": "Bezahlter Betrag", "baixaEmMovimentacao": "Begleichung und Stornierung erfolgen im Tab Bewegung.",
+    "impostosAplicados": "Angewendete Steuern", "semImpostoAplicado": "Keine Steuer auf diesen Titel angewendet.", "escolherImposto": "Wählen Sie eine Steuer aus den Stammdaten", "aplicarImposto": "Anwenden", "impostoAplicado": "Steuer angewendet", "recolhimento": "erzeugte Abführung", "valorTravadoImposto": "Entfernen Sie die angewendeten Steuern, um den Titelbetrag zu bearbeiten",
+    "geradoDe": "Steuertitel erstellt aus Titel {{n}}", "gerou": "Steuertitel Nr. {{n}} erstellt", "badgeImposto": "Steuer", "pesquisePrompt": "Nutzen Sie die Suche und Filter oben und klicken Sie auf Suchen.", "rateadoN": "Aufgeteilt ({{n}})" },
+    "forma": { "operacao_bancaria": "Bankgeschäft", "pix": "Pix", "boleto": "Zahlschein", "transferencia": "Überweisung", "dinheiro": "Bargeld", "cheque": "Scheck", "cartao": "Karte" },
+    "parcela": { "botao": "In Raten aufteilen", "qtd": "Raten", "intervalo": "Intervall (Monate)", "confirmar": "Aufteilen", "xdeN": "{{x}}/{{n}}", "deTitulo": "Rate {{x}}/{{n}} von Titel {{t}}", "parcelado": "In {{n}}x aufgeteilt (Raten-Nr. {{nums}})", "desdobrado": "In {{n}} Raten aufgeteilt" }
+  },
+  "theme": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System",
+    "title": "Design",
+    "ariaLabel": "Design wechseln"
+  },
+  "language": {
+    "title": "Sprache",
+    "ariaLabel": "Sprache ändern",
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
+  "landing": {
+    "nav": {
+      "brand": "Xaphires",
+      "home": "Start",
+      "features": "Funktionen",
+      "solutions": "Lösungen",
+      "pricing": "Preise",
+      "mentorias": "Mentoring",
+      "consultorias": "Beratung",
+      "homeMenuToggle": "Weitere Optionen für Start",
+      "enter": "Anmelden"
+    },
+    "promoPopup": {
+      "copy": "Kopieren",
+      "copied": "Kopiert!",
+      "defaultButton": "Angebot nutzen"
+    },
+    "home": {
+      "heroEyebrow": "Unternehmensverwaltung an einem Ort",
+      "heroTitle": "Die B2B-Plattform, die Ihre Produktivität freisetzt und Ihre Ergebnisse skaliert.",
+      "heroText": "Fertige Tools, spezialisierter Support, praxisnahe Schulungen und begleitete Einführung, um Kosten zu senken, den Umsatz zu steigern und den Arbeitsalltag Ihres Unternehmens zu organisieren.",
+      "ctaStart": "Jetzt starten",
+      "ctaPlans": "Preise ansehen",
+      "heroNote": "7 Tage kostenlos mit allen Funktionen, keine Kreditkarte erforderlich. Danach bleiben Sie auf Wunsch für immer im kostenlosen Plan.",
+      "boardPreview": { "columns": [
+        { "title": "Zu erledigen", "cards": [
+          { "title": "Vor-Ort-Termin - Bereich 4", "badge": "Heute", "initials": "LS" },
+          { "title": "Kostenvoranschlag - Renovierung Raum 4", "badge": "Morgen", "initials": "MA" }
+        ] },
+        { "title": "In Bearbeitung", "cards": [
+          { "title": "Material kaufen - Phase 2", "badge": "2/4", "initials": "TC" },
+          { "title": "Lieferantenvertrag prüfen", "badge": "3 Tage", "initials": "LS" }
+        ] },
+        { "title": "Erledigt", "cards": [
+          { "title": "Lieferung - Los 12", "badge": "Erledigt", "initials": "MA", "done": true }
+        ] }
+      ] },
+      "stats": [
+        { "label": "Funktionen", "value": "13", "desc": "Integrierte Managementtools an einem Ort, ohne Systemwechsel." },
+        { "label": "Synchronisierung", "value": "100%", "desc": "In Echtzeit im gesamten Team, auf jedem Gerät." },
+        { "label": "Verfügbarkeit", "value": "24/7", "desc": "Zugriff auf das Board von überall, jederzeit." }
+      ],
+      "benefits": [
+        { "title": "Alles an einem Ort", "text": "Ersetzen Sie lose Tabellen, WhatsApp-Gruppen und verstreute Tools durch ein einziges System." },
+        { "title": "Ihr Team versteht es sofort", "text": "Einfache Oberfläche, ohne Kurs oder Schulung. Wer schon einmal ein Kanban-Board genutzt hat, beginnt in wenigen Minuten." },
+        { "title": "Wächst mit Ihnen", "text": "Von einem kleinen Team bis zu mehreren Bereichen mit privaten und geteilten Boards, Zugriffskontrolle und Rollen." }
+      ],
+      "exploreTitle": "Entdecken Sie Xaphires",
+      "exploreLinks": [
+        { "page": "features", "badge": "F", "title": "Funktionen", "text": "Lernen Sie die Tools von Xaphires kennen: Board, Tabelle, Kalender, Karte und mehr." },
+        { "page": "solutions", "badge": "S", "title": "Lösungen", "text": "Vertrieb & CRM, Finanzen und weitere Bereiche, bereit für Ihr Unternehmen, an einem Ort." },
+        { "page": "pricing", "badge": "P", "title": "Preise", "text": "Vergleichen Sie die Pläne Free, Pro und Enterprise und wählen Sie den passenden für Ihr Team." }
+      ],
+      "pricingPreview": { "title": "Ein Plan für jede Teamgröße", "text": "Starten Sie kostenlos und wechseln Sie den Plan, wenn Ihr Unternehmen wächst.", "ctaAll": "Alle Pläne und Funktionen ansehen" },
+      "faq": { "title": "Häufig gestellte Fragen", "items": [
+        { "q": "Muss ich etwas installieren?", "a": "Nein. Xaphires läuft direkt im Browser, am Computer oder auf dem Smartphone - keine App zum Herunterladen und kein Server zum Einrichten." },
+        { "q": "Bekomme ich Unterstützung, wenn ich ein Problem habe?", "a": "Ja. Jeder Plan enthält E-Mail-Support; in den Plänen Pro und Enterprise ist der Support priorisiert bzw. dediziert, mit schnellerer Reaktionszeit." },
+        { "q": "Kann ich jederzeit kündigen?", "a": "Ja, ohne Vertragsstrafe. Bei einer Kündigung behalten Sie den vollen Zugriff bis zum Ende des bereits bezahlten Zeitraums; danach bleiben die Daten erhalten - um wieder bearbeiten zu können, wählen Sie einfach jederzeit den kostenlosen Plan." },
+        { "q": "Muss ich mein Team schulen, um es zu nutzen?", "a": "In den meisten Fällen nicht. Wenn jemand in Ihrem Team schon einmal ein Kanban-Board genutzt hat, selbst auf Papier mit Haftnotizen, folgt Xaphires derselben Logik - das Erlernen dauert nur wenige Minuten." }
+      ] }
+    },
+    "features": {
+      "automationsTitle": "Was Xaphires von allein erledigt",
+      "automationsText": "Automatisierungen, die im Hintergrund arbeiten, damit Sie nichts von Hand nachhalten oder anmahnen müssen.",
+      "automations": [
+        { "badge": "K", "title": "Kartenarchivierung", "text": "Entfernen Sie Erledigtes vom Board, ohne etwas zu löschen. Archivierte Karten verschwinden aus allen Ansichten und kehren bei Bedarf in die ursprüngliche Spalte zurück." },
+        { "badge": "A", "title": "Automatische Archivierung", "text": "Legen Sie die Anzahl der Tage fest, und erledigte Karten wandern von selbst ins Archiv. Verfügbar ab dem Plan Pro." },
+        { "badge": "E", "title": "Engpass-Monitor", "text": "Legen Sie die akzeptable Zeit für jede Spalte fest und sehen Sie, welche Karten die Frist überschritten haben, mit einer fertigen Nachfrage-Nachricht. Ab Pro." },
+        { "badge": "R", "title": "Automatische Routinen", "text": "Feste Aufgaben werden am richtigen Tag von selbst zu Karten, mit bereits ausgefüllter Checkliste. Ab dem Plan Pro." },
+        { "badge": "T", "title": "Aufgaben-Ticker", "text": "Ein Band oben im Board, das anzeigt, was noch offen ist, mit Hervorhebung von bereits Überfälligem. Verfügbar ab dem Plan Pro." },
+        { "badge": "P", "title": "Persönlicher Planer", "text": "Eine Agenda außerhalb der Boards, nur für Sie: Kalender und persönliche Aufgabenliste, wobei Erledigtes nach 2 Tagen von selbst archiviert wird. Verfügbar ab dem Plan Pro." },
+        { "badge": "L", "title": "Anhänge und Links", "text": "Verträge, Pläne und Fotos direkt an der Karte, dazu Links zu allem, was außerhalb des Systems liegt." },
+        { "badge": "V", "title": "Automatischer Abschluss", "text": "Karte als erledigt markiert, und sie springt von selbst in die Spalte Erledigt des Boards - kein manuelles Verschieben nötig." }
+      ],
+      "headerTitle": "Alles, was Ihr Team braucht",
+      "headerText": "Integrierte Tools, damit Sie nicht auf lose Tabellen oder eine weitere App pro Aufgabe angewiesen sind.",
+      "items": [
+        { "badge": "B", "title": "Kanban-Board", "text": "Schluss mit verlorenen Aufgaben in Chat-Screenshots. Ziehen Sie Karten zwischen Listen und sehen Sie den echten Fortschritt des Teams." },
+        { "badge": "T", "title": "Tabelle", "text": "Alle Karten in Tabellenform, mit Suche und Filter nach Mitglied, ohne ein weiteres Tool zu benötigen." },
+        { "badge": "K", "title": "Kalender", "text": "Fristen und Startdaten in einer Monatsansicht, damit nichts übersehen wird." },
+        { "badge": "Z", "title": "Zeitachse (Gantt)", "text": "Erstellen und öffnen Sie Aufgaben direkt in der Zeitachse, mit dem gesamten Projektzeitplan auf einen Blick, Zeitraum für Zeitraum. Verfügbar ab dem Plan Unlimited." },
+        { "badge": "D", "title": "Dashboard", "text": "Fertige Kennzahlen und Indikatoren, um den Fortschritt zu zeigen, ohne eine Tabelle zu erstellen. Verfügbar ab dem Plan Unlimited." },
+        { "badge": "M", "title": "Karte", "text": "Aufgaben mit Adresse auf einer interaktiven Karte dargestellt. Ideal für Außendienstteams. Verfügbar ab dem Plan Unlimited." },
+        { "badge": "E", "title": "Eisenhower-Matrix", "text": "Priorisieren Sie nach Dringlichkeit und Wichtigkeit und arbeiten Sie nicht mehr nur an dem, was am lautesten schreit. Verfügbar ab dem Plan Unlimited." }
+      ],
+      "ganttPreview": { "title": "Der Gantt in Aktion", "text": "Jede Aufgabe wird zu einem Balken auf der Zeitachse, mit der immer sichtbaren Linie für den heutigen Tag - erstellen und bearbeiten Sie direkt hier, ohne ein weiteres Tool.", "rows": [
+        { "title": "Planung", "status": "done" },
+        { "title": "Entwicklung", "status": "inProgress" },
+        { "title": "Tests", "status": "agency" },
+        { "title": "Abschlussprüfung", "child": true }
+      ] },
+      "secondary": [
+        { "title": "Private und geteilte Boards", "text": "Trennen Sie, was dem Team gehört, von dem, was nur Ihnen gehört, mit voller Kontrolle über die Sichtbarkeit." },
+        { "title": "Benutzer- und Rollenverwaltung", "text": "Legen Sie fest, wer Administrator (Master) und wer Teammitglied ist." },
+        { "title": "Unternehmens-Chat", "text": "Ein allgemeiner Kanal für alle und private Gespräche zwischen Kollegen, ohne das System für WhatsApp zu verlassen." },
+        { "title": "Unteraufgaben mit Verantwortlichem, Frist und Priorität", "text": "Teilen Sie die Karte in kleinere Schritte, jeweils mit eigenem Verantwortlichen, Datum und Priorität - nicht nur eine Liste von Kästchen." }
+      ]
+    },
+    "solutions": {
+      "headerTitle": "Lösungen für jeden Bereich Ihres Unternehmens",
+      "headerText": "Ein fertiger Bereich für jede Front des Geschäfts - von den bereits verfügbaren Modulen bis zu maßgeschneiderten Lösungen für Sie.",
+      "soon": "Demnächst",
+      "customCta": "Mit unserem Team sprechen",
+      "items": [
+        { "title": "Vertrieb & CRM", "text": "Leads, Kanban-Pipeline, Angebote, Kostenvoranschläge und Bestellungen - vom ersten Kontakt bis zum Abschluss, an einem Ort.", "tags": ["Kanban-Board", "Angebote", "Kostenvoranschläge"] },
+        { "title": "Finanzen", "text": "Cashflow, Verbindlichkeiten und Forderungen, Kontenabgleich und GuV - das finanzielle Rückgrat des Unternehmens.", "tags": ["Cashflow", "Verbindlichkeiten/Forderungen", "GuV"] },
+        { "title": "Einkauf & Lager", "text": "Bestand, Lieferanten, Produktmargen und Meldebestand.", "tags": ["Bestand", "Lieferanten"], "soon": true },
+        { "title": "Rechnungsstellung", "text": "Ausstellung von Rechnungen, Zahlscheinen und Zahlungslinks.", "tags": ["Rechnungen", "Zahlscheine"], "soon": true },
+        { "title": "Berichte & BI", "text": "Konsolidierte operative und finanzielle Dashboards, um mit echten Daten zu entscheiden.", "tags": ["Dashboards", "Indikatoren"], "soon": true },
+        { "title": "Maßgeschneiderte Lösungen", "text": "Nicht gefunden, was Sie brauchen? Wir entwickeln API-Integrationen, Automatisierungen und exklusive Module für Ihr Unternehmen.", "tags": ["Integrationen", "Automatisierungen"], "custom": true }
+      ],
+      "learnMore": "Mehr erfahren"
+    },
+    "mentorias": {
+      "badge": "Management-Mentoring",
+      "heroTitle": "Mentoring, um das Beste aus Xaphires herauszuholen",
+      "heroText": "Regelmäßige Sitzungen mit jemandem, der sich mit Betriebsführung auskennt, damit Ihr Team Xaphires von Anfang an richtig nutzt.",
+      "cta": "Über Mentoring sprechen",
+      "items": [
+        { "title": "Nutzungsdiagnose", "text": "Wir analysieren, wie Ihr Team das Board heute nutzt und wo es Verbesserungspotenzial gibt." },
+        { "title": "Regelmäßige Sitzungen", "text": "Periodische Treffen, um Kennzahlen, Fristen und Engpässe mit dem Team zu überprüfen." },
+        { "title": "Bewährte Managementpraktiken", "text": "Wie man Aufgaben priorisiert, die Arbeitslast verteilt und das Team abgestimmt hält." },
+        { "title": "Kennzahlen richtig lesen", "text": "Wie man das Dashboard und die Berichte interpretiert, um mit Daten statt Bauchgefühl zu entscheiden." }
+      ]
+    },
+    "consultorias": {
+      "badge": "Einführungsberatung",
+      "heroTitle": "Begleitete Einführung, ohne verlorene Arbeit",
+      "heroText": "Unser Team richtet gemeinsam mit Ihnen die Boards, die Automatisierungen und den Kontenplan ein, damit Ihr Betrieb von Anfang an rundläuft.",
+      "cta": "Über Beratung sprechen",
+      "items": [
+        { "title": "Erstdiagnose", "text": "Wir erfassen Ihre aktuellen Prozesse, bevor wir ein Board einrichten." },
+        { "title": "Begleitete Einrichtung", "text": "Boards, Listen, Automatisierungen und Kostenstellen, gemeinsam mit Ihrem Team eingerichtet." },
+        { "title": "Datenmigration", "text": "Wir helfen, den bereits vorhandenen Verlauf aus einer Tabelle oder einem anderen Tool zu übertragen." },
+        { "title": "Teamschulung", "text": "Eine praxisnahe Sitzung, damit alle wissen, wie man das System im Alltag nutzt." }
+      ]
+    },
+    "productTeams": {
+      "backLink": "← Zurück zu Lösungen",
+      "badge": "Für Produktteams",
+      "heroTitle": "Roadmap, Sprints und Releases, ohne auf Tabellen angewiesen zu sein",
+      "heroText": "Organisieren Sie die Produktinitiativen, verfolgen Sie den Ablauf jedes Sprints und priorisieren Sie Feature-Anfragen mit Echtzeit-Transparenz für das gesamte Team.",
+      "ctaStart": "Jetzt starten",
+      "ctaPlans": "Preise ansehen",
+      "templatesTitle": "Ein Board für jede Phase des Produkts",
+      "templates": [
+        { "badge": "R", "title": "Produkt-Roadmap", "text": "Organisieren Sie Initiativen nach Quartal und verfolgen Sie alles in der Zeitachse, von der Planung bis zum Release." },
+        { "badge": "S", "title": "Agiler Sprint", "text": "Listen für Backlog, In Bearbeitung und Erledigt, mit Checkliste und Frist bei jeder Karte." },
+        { "badge": "F", "title": "Feature-Anfragen", "text": "Prioritätsetiketten und Anhänge mit Screenshots oder Referenzlinks bei jeder Anfrage." }
+      ],
+      "timelineBadge": "Zeitachse",
+      "timelineTitle": "Planbarere Releases",
+      "timelineText": "Sehen Sie den gesamten Zeitplan der Roadmap auf einen Blick, Zeitraum für Zeitraum, und erkennen Sie Verzögerungen, bevor sie zum Problem beim Release werden.",
+      "extraTitle": "Priorität und Transparenz, ohne zusätzlichen Aufwand",
+      "extra": [
+        { "title": "Eisenhower-Matrix", "text": "Trennen Sie Dringendes von Wichtigem und reagieren Sie nicht mehr nur auf das, was im Backlog am lautesten schreit." },
+        { "title": "Dashboard", "text": "Fertige Kennzahlen, um den Produktfortschritt in jedem Meeting zu zeigen, ohne eine Folie zu erstellen." },
+        { "title": "Private Boards", "text": "Halten Sie sensible Roadmaps nur für die sichtbar, die sie brauchen, vor der offiziellen Ankündigung." }
+      ]
+    },
+    "pricing": {
+      "headerTitle": "Wählen Sie den Plan für Ihr Team",
+      "headerText": "Wählen Sie den passenden Plan für Ihr Team und wechseln Sie, wenn es wächst.",
+      "mostPopular": "Am beliebtesten",
+      "plans": [
+        { "name": "Free", "price": "Kostenlos", "period": "", "tagline": "Für kleine Teams, um mit dem Wesentlichen zu starten", "cta": "Kostenlos starten", "features": ["Bis zu 7 Nutzer", "Bis zu 4 Boards, privat und geteilt", "Kanban, Tabelle und Kalender", "Manuelle Kartenarchivierung", "Anhänge und Links an Karten (bis zu 10 MB)", "E-Mail-Support"] },
+        { "name": "Unlimited", "price": "R$ 530,00", "period": "/Monat", "tagline": "Für Teams, die über sieben Personen hinausgewachsen sind", "cta": "Plattform kennenlernen", "note": "7 Tage kostenlos testen", "features": ["Bis zu 15 Nutzer", "Alles aus Free, plus:", "Unbegrenzte Boards", "Alle 7 Ansichten (+ Gantt, Dashboard, Karte, Eisenhower-Matrix)", "Anhänge und Links an Karten (bis zu 50 MB)"] },
+        { "name": "Pro", "price": "R$ 1.850,00", "period": "/Monat", "tagline": "Für Teams, die volle Kontrolle wollen", "cta": "Plattform kennenlernen", "note": "7 Tage kostenlos testen", "highlight": true, "features": ["Unbegrenzte Nutzer", "Alles aus Unlimited, plus:", "Ticker für offene Aufgaben", "Automatische Archivierung von Erledigtem", "Engpass-Monitor", "Persönlicher Planer", "Routinen, die von selbst Karten erstellen", "Priorisierter Support"] },
+        { "name": "Enterprise", "price": "R$ 3.780,00", "period": "/Monat", "tagline": "Für Organisationen mit spezifischen Anforderungen", "cta": "Plattform kennenlernen", "note": "7 Tage kostenlos testen", "features": ["Alles aus Pro enthalten, plus:", "Dediziertes Onboarding", "Dedizierter Support", "Service-Level-Agreement (SLA)", "Entwicklung jeder maßgeschneiderten Funktion", "Wir erstellen jede individuelle Lösung, die Ihr Unternehmen braucht", "Offener Rahmen für exklusive Projekte und Anpassungen"] }
+      ]
+    },
+    "switcher": {
+      "title": "Ein Tool, das mit dem Arbeitstempo mithält",
+      "text": "Alles, was das Team erfasst, erscheint sofort für alle, mit der richtigen Zugriffsebene für jede Person.",
+      "items": [
+        { "key": "realtime", "mark": "S", "title": "Echtzeit-Synchronisierung", "text": "Karte geändert, für das ganze Team geändert, im selben Moment.", "statusLabel": "Synchronisierung", "statusValue": "Aktiv" },
+        { "key": "access", "mark": "A", "title": "Zugriff nach Rolle", "text": "Jede Person sieht und bearbeitet nur das, was zu ihrer Funktion passt.", "statusLabel": "Zugriffskontrolle", "statusValue": "Nach Rolle" },
+        { "key": "insights", "mark": "D", "title": "Fertige Kennzahlen", "text": "Das Dashboard zeigt den Fortschritt, ohne dass jemand einen Bericht erstellen muss.", "statusLabel": "Dashboard", "statusValue": "Aktuell" }
+      ]
+    },
+    "logos": {
+      "label": "Alles an einem Ort",
+      "items": ["Kanban-Board", "Tabelle", "Kalender", "Zeitachse", "Dashboard", "Karte", "Eisenhower-Matrix", "Automatische Archivierung", "Engpass-Monitor", "Automatische Routinen", "Aufgaben-Ticker", "Anhänge und Links"]
+    },
+    "testimonials": {
+      "title": "Was Teams sagen",
+      "items": [
+        { "quote": "Wir haben drei Tabellen und WhatsApp-Gruppen durch ein einziges Board ersetzt. Das Team hat aufgehört, Aufgaben zu verlieren.", "name": "Alex Rivera", "role": "Teamleiter" },
+        { "quote": "Die Zeitachse wurde zum Montagsmeeting. Alle sehen denselben Zeitplan, und die Versionsdiskussionen sind vorbei. Und ich kann alles auch von meinem Handy aus einsehen.", "name": "Ana Braga", "role": "Planung" },
+        { "quote": "Mit diesem Kanban habe ich mein Zeitmanagement verbessert.", "name": "Lucas Sabino", "role": "Finanzen" }
+      ]
+    },
+    "footer": {
+      "title": "Bereit, Ihr Team zu organisieren?",
+      "cta": "Jetzt starten",
+      "tagline": "Die Plattform, die die Säulen Ihres Unternehmens an einem Ort vereint.",
+      "columnProduct": "Produkt",
+      "columnContact": "Kontaktieren Sie uns",
+      "columnLegal": "Rechtliches",
+      "talkToSales": "Mit dem Vertrieb sprechen",
+      "privacy": "Datenschutzerklärung",
+      "copyright": "Urheberrecht © 2026 Xaphires"
+    },
+    "privacy": {
+      "backLink": "← Zurück",
+      "headerTitle": "Datenschutzerklärung",
+      "headerText": "Wie Xaphires die Daten Ihres Teams erfasst, nutzt, speichert und schützt.",
+      "updatedLabel": "Letzte Aktualisierung",
+      "updatedDate": "25. Juli 2026",
+      "sections": [
+        {
+          "title": "1. Informationen, die wir erfassen",
+          "paragraphs": [
+            "Wir erfassen nur, was für den Betrieb der Plattform notwendig ist. Die Daten stammen aus den Angaben bei der Kontoerstellung und aus den Inhalten, die Sie während der Nutzung erstellen."
+          ],
+          "bullets": [
+            "Registrierungsdaten: Name, E-Mail, Passwort und der bei der Registrierung angegebene Unternehmensname.",
+            "Von Ihnen erstellte Inhalte: Boards, Listen, Karten, Beschreibungen, Fristen, Checklisten, Etiketten, Verantwortliche und angehängte Dateien.",
+            "Adressen: nur wenn Sie einer Karte eine Adresse hinzufügen, um sie auf der Karte anzuzeigen.",
+            "Sitzungsdaten: die Informationen, die nötig sind, um Sie sicher angemeldet zu halten."
+          ]
+        },
+        {
+          "title": "2. Wie wir die Informationen nutzen",
+          "paragraphs": [
+            "Wir nutzen die Daten ausschließlich, um den Dienst bereitzustellen und zu betreiben. Wir verkaufen Ihre Daten nicht, nutzen sie nicht für Werbung und geben sie nicht zu Marketingzwecken an Dritte weiter."
+          ],
+          "bullets": [
+            "Ihren Zugriff authentifizieren und Ihre Sitzung aktiv halten.",
+            "Den Inhalt der Boards zwischen den Mitgliedern Ihres Unternehmens anzeigen und synchronisieren.",
+            "Adressen in Koordinaten für die Anzeige auf der Karte umwandeln.",
+            "Wichtige betriebliche Hinweise zum Dienst mitteilen.",
+            "Missbrauch, Betrug und Sicherheitsvorfälle untersuchen und verhindern."
+          ]
+        },
+        {
+          "title": "3. Weitergabe von Informationen",
+          "paragraphs": [
+            "Wir verkaufen oder vermieten keine personenbezogenen Daten. Eine Weitergabe erfolgt nur in den folgenden Fällen."
+          ],
+          "bullets": [
+            "Mit anderen Nutzern Ihres Unternehmens: Der Inhalt geteilter Boards ist für die übrigen Mitglieder sichtbar. Private Boards sind nur für die Person sichtbar, die sie erstellt hat.",
+            "Mit dem Geocoding-Dienst OpenStreetMap (Nominatim): Wenn Sie eine Adresse suchen, wird nur der Adresstext gesendet, um die Koordinaten zu erhalten. Es werden keine Kontodaten übermittelt.",
+            "Aus rechtlicher Verpflichtung: wenn dies durch Gesetz, gerichtliche Anordnung oder zuständige Behörde verlangt wird."
+          ]
+        },
+        {
+          "title": "4. Wie wir speichern und schützen",
+          "paragraphs": [
+            "Die Daten jedes Unternehmens werden in einer isolierten Datenbank gespeichert, getrennt von den anderen Unternehmen auf der Plattform."
+          ],
+          "bullets": [
+            "Passwörter werden niemals im Klartext gespeichert: Wir speichern nur einen kryptografischen Hash.",
+            "Alle API-Routen erfordern eine Authentifizierung, und jede Anfrage wird gegen das Unternehmen und die Berechtigungen des Nutzers geprüft.",
+            "Die Sitzung nutzt ein httpOnly-Cookie, das für Skripte der Seite nicht zugänglich ist.",
+            "In der Produktion läuft der gesamte Datenverkehr über eine verschlüsselte Verbindung (HTTPS).",
+            "Bei Schreibanfragen wird die Herkunft geprüft, was von Drittseiten gefälschte Aktionen verhindert."
+          ]
+        },
+        {
+          "title": "5. Wie lange wir die Daten aufbewahren",
+          "paragraphs": [
+            "Wir bewahren die Daten auf, solange das Konto aktiv ist, und für den Zeitraum, der zur Erfüllung gesetzlicher Verpflichtungen erforderlich ist.",
+            "Wenn ein Nutzer von einem Administrator gelöscht wird, wird der Datensatz entfernt, seine privaten Boards werden gelöscht, und Verweise auf ihn in Karten werden aufgehoben."
+          ]
+        },
+        {
+          "title": "6. Cookies und lokaler Speicher",
+          "paragraphs": [
+            "Wir verwenden weder Werbe-Cookies noch seitenübergreifendes Tracking."
+          ],
+          "bullets": [
+            "Sitzungs-Cookie: speichert das Token, das Sie angemeldet hält, mit einer Gültigkeit von 7 Tagen.",
+            "Lokaler Speicher des Browsers: speichert nur Ihre Design- und Spracheinstellungen."
+          ]
+        },
+        {
+          "title": "7. Ihre Rechte",
+          "paragraphs": [
+            "Gemäß dem brasilianischen Datenschutzgesetz (Lei Geral de Proteção de Dados, LGPD) können Sie jederzeit:"
+          ],
+          "bullets": [
+            "Das Bestehen einer Verarbeitung bestätigen und auf Ihre Daten zugreifen.",
+            "Unvollständige, ungenaue oder veraltete Daten direkt in Ihrem Profil korrigieren.",
+            "Die Löschung des Kontos und der zugehörigen Daten beantragen.",
+            "Den Inhalt Ihrer Boards im JSON-Format direkt über die Plattform exportieren.",
+            "Die Einwilligung widerrufen und Verarbeitungen widersprechen, die Sie für unangemessen halten."
+          ]
+        },
+        {
+          "title": "8. Kinder und Jugendliche",
+          "paragraphs": [
+            "Xaphires ist ein Unternehmenswerkzeug für den professionellen Einsatz. Wir richten den Dienst nicht an Personen unter 18 Jahren und erfassen nicht wissentlich Daten von Kindern. Konten, die unter diesen Bedingungen identifiziert werden, werden entfernt."
+          ]
+        },
+        {
+          "title": "9. Änderungen dieser Richtlinie",
+          "paragraphs": [
+            "Wir können diese Richtlinie aktualisieren, um Änderungen am Dienst oder an der Gesetzgebung widerzuspiegeln. Das Datum der letzten Aktualisierung oben auf dieser Seite gibt stets die geltende Fassung an. Wesentliche Änderungen werden über die hinterlegten Kontaktkanäle mitgeteilt."
+          ]
+        },
+        {
+          "title": "10. Wie Sie uns kontaktieren",
+          "paragraphs": [
+            "Bei Fragen zu dieser Richtlinie oder zur Verarbeitung Ihrer Daten wenden Sie sich an den Datenschutzbeauftragten:"
+          ],
+          "bullets": [
+            "E-Mail: xaphires@contato.com"
+          ]
+        }
+      ]
+    }
+  },
+  "auth": {
+    "brandTitle": "Xaphires",
+    "brandHeadlinePrefix": "Beschleunigen Sie die Entwicklung Ihres Unternehmens und erreichen Sie ",
+    "brandHeadlineEmphasis": "die Spitze der Effizienz",
+    "brandHeadlineSuffix": ".",
+    "back": "← Zurück",
+    "tabLogin": "Anmelden",
+    "tabSignup": "Registrieren",
+    "tabJoin": "Zugang anfragen",
+    "eyebrow": {
+      "login": "Zur Plattform",
+      "signup": "Konto erstellen",
+      "join": "Zugang anfragen"
+    },
+    "welcome": {
+      "login": "Willkommen zurück.",
+      "signup": "Jetzt starten.",
+      "join": "Treten Sie Ihrem Unternehmen bei."
+    },
+    "companyName": "Unternehmensname",
+    "yourName": "Ihr Name",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "passwordsMismatch": "Die Passwörter stimmen nicht überein",
+    "submitWait": "Bitte warten...",
+    "submitLogin": "Anmelden",
+    "submitSignup": "Registrieren",
+    "forgotPassword": "Passwort vergessen",
+    "forgotPasswordHint": "Bitten Sie den Administrator Ihres Unternehmens, Ihr Passwort zurückzusetzen.",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
+    "companyDocLabel": "CNPJ oder CPF des Unternehmens",
+    "joinIntro": "Nutzt Ihr Unternehmen bereits Xaphires? Geben Sie dessen CNPJ oder CPF an, um Zugang zu beantragen.",
+    "cnpjLabel": "CNPJ oder CPF des Unternehmens",
+    "cnpjSearch": "Suchen",
+    "cnpjSearching": "Wird gesucht...",
+    "companyFound": "Unternehmen gefunden: {{name}}",
+    "notThisCompany": "Nicht das richtige Unternehmen? CNPJ/CPF ändern",
+    "joinSubmit": "Anfrage senden",
+    "joinSubmitWait": "Wird gesendet...",
+    "joinSuccessTitle": "Anfrage gesendet!",
+    "joinSuccessText": "Sobald jemand aus Ihrem Unternehmen zustimmt, können Sie sich mit der E-Mail-Adresse und dem Passwort anmelden, die Sie gerade gewählt haben.",
+    "joinSuccessBackToLogin": "Zur Anmeldung"
+  },
+  "app": {
+    "loadingBoards": "Boards werden geladen...",
+    "noBoards": "Keine Boards. Erstellen Sie eines in der Seitenleiste.",
+    "sidebar": {
+      "comingSoon": "Demnächst",
+      "sharedBoards": "Geteilte Boards",
+      "myPrivateBoards": "Meine privaten Boards",
+      "sharedWithMe": "Mit mir geteilt",
+      "sharedWithCount": "Geteilt mit {{count}} Person(en)",
+      "newBoard": "+ Neues Board",
+      "boardNamePlaceholder": "Name des Boards",
+      "privateToggle": "Privat (nur Sie sehen es)",
+      "create": "Erstellen",
+      "deleteBoardTitle": "Board löschen",
+      "deleteBoardConfirm": "Das Board \"{{title}}\" und den gesamten Inhalt löschen?",
+      "boardDeletedToast": "Board gelöscht",
+      "workspaceLabel": "Arbeitsbereich von {{name}}",
+      "spacesTitle": "Bereiche",
+      "boardsFolder": "Projekte",
+      "rail": {
+        "home": "Start",
+        "planner": "Planer",
+        "ai": "KI",
+        "team": "Teams",
+        "dashboards": "Dashboards",
+        "boards": "Boards",
+        "more": "Mehr",
+        "invite": "Einladen"
+      },
+      "shortcuts": {
+        "inbox": "Posteingang",
+        "meetings": "Meetings",
+        "myTasks": "Meine Aufgaben",
+        "allTasks": "Alle Aufgaben"
+      }
+    },
+    "topbar": {
+      "toggleSidebar": "Seitenleiste ein-/ausblenden",
+      "menu": "Menü",
+      "defaultBoardName": "Board ohne Namen",
+      "privateBoardTitle": "Privates Board, nur für Sie sichtbar",
+      "sharedWithYouTitle": "Mit Ihnen geteiltes privates Board",
+      "shareBtn": "Teilen",
+      "readOnlyBadge": "Nur Lesezugriff",
+      "filterBy": "Nach {{name}} filtern",
+      "usersBtn": "Nutzer",
+      "searchPlaceholder": "Karten durchsuchen...",
+      "clearBoard": "Board leeren",
+      "clearBoardConfirm": "Dadurch werden alle Listen und Karten dieses Boards gelöscht. Fortfahren?",
+      "clearBoardConfirmPartial": "Dadurch werden die von Ihnen erstellten Karten gelöscht (sowie leer werdende Listen). Karten anderer Personen bleiben auf dem Board. Fortfahren?",
+      "clearBoardToast": "Board geleert"
+    },
+    "dataMenu": {
+      "recurrences": "Automatische Routinen",
+      "bottlenecks": "Engpass-Monitor",
+      "mindMap": "Mindmap",
+      "archivedCards": "Archivierte Karten",
+      "moreOptions": "Weitere Optionen",
+      "personalize": "Anpassen",
+      "dataSection": "Daten",
+      "exportReport": "Bericht exportieren",
+      "exportCurrent": "Aktuelles Board exportieren",
+      "exportAll": "Alles exportieren (Backup)",
+      "importJson": "JSON importieren",
+      "importing": "Wird importiert...",
+      "colors": "Farben",
+      "gradients": "Farbverläufe",
+      "monoGradientTitle": "Farbverlauf nach Tonwert",
+      "monoGradientHint": "Wählen Sie eine Farbe, und der Verlauf durchläuft hellere und dunklere Töne davon.",
+      "customColor": "Eigene Farbe",
+      "apply": "Anwenden",
+      "noBackground": "Standard (kein Hintergrund)",
+      "exportBoardToast": "Board exportiert",
+      "exportAllToast": "Vollständiges Backup exportiert",
+      "importSuccessToast": "Import abgeschlossen",
+      "importFailAlert": "Import fehlgeschlagen: {{message}}",
+      "importedBoardTitle": "Importiertes Board"
+    },
+    "accountMenu": {
+      "changePassword": "Passwort ändern",
+      "platformPanel": "Plattform-Panel",
+      "logout": "Abmelden",
+      "currentPassword": "Aktuelles Passwort",
+      "newPassword": "Neues Passwort",
+      "save": "Speichern",
+      "passwordChangedToast": "Passwort geändert",
+      "master": "Master",
+      "myProfile": "Mein Profil",
+      "profileSavedToast": "Profil aktualisiert",
+      "profileName": "Name",
+      "profileBio": "Beschreibung",
+      "profileBioPlaceholder": "Erzählen Sie etwas über sich...",
+      "uploadPhoto": "Foto ändern",
+      "removePhoto": "Foto entfernen"
+    },
+    "taskTicker": {
+      "pending": "Ausstehend ({{count}})"
+    }
+  },
+  "board": {
+    "recurrences": {
+      "title": "Automatische Routinen",
+      "empty": "Noch keine Routine erstellt. Eine Routine erstellt die Karte am richtigen Tag von selbst, mit bereits ausgefüllter Checkliste.",
+      "planRequired": "Automatische Routinen sind ab dem Plan Pro verfügbar. Sie können bestehende ansehen und löschen.",
+      "newRule": "Neue Routine",
+      "fieldTitle": "Titel der Karte",
+      "titlePlaceholder": "z. B.: Buchhaltungsabschluss erstellen",
+      "fieldList": "In Spalte erstellen",
+      "fieldFreq": "Wiederholen",
+      "fieldWeekday": "Wochentag",
+      "fieldMonthday": "Tag des Monats",
+      "fieldMonthday2": "Zweiter Tag des Monats (optional)",
+      "noSecondDay": "nur ein Tag",
+      "fieldHour": "Uhrzeit",
+      "fieldDueInDays": "Frist (Tage)",
+      "noDue": "ohne Frist",
+      "fieldChecklist": "Checkliste der Routine",
+      "checklistPlaceholder": "Ein Punkt pro Zeile:\nKonten abgleichen\nRechnungen prüfen\nAn den Steuerberater senden",
+      "save": "Routine erstellen",
+      "saveEdit": "Änderungen speichern",
+      "created": "Routine erstellt",
+      "updated": "Routine aktualisiert",
+      "editingHint": "Bearbeitung von \"{{title}}\". Bereits erstellte Karten ändern sich nicht.",
+      "deleted": "Routine entfernt",
+      "deleteConfirm": "Die Routine \"{{title}}\" entfernen? Die bereits erstellten Karten bleiben auf dem Board.",
+      "edit": "Bearbeiten",
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "delete": "Entfernen",
+      "everyDay": "Jeden Tag um {{hour}} Uhr",
+      "everyWeek": "Jeden {{day}} um {{hour}} Uhr",
+      "everyMonth": "Jeden Monat am {{day}}. um {{hour}} Uhr",
+      "everyMonthTwoDays": "Jeden Monat am {{day}}. und {{day2}}. um {{hour}} Uhr",
+      "intoList": "in {{list}}",
+      "listGone": "Spalte entfernt",
+      "checklistCount": "{{count}} Punkt in der Checkliste",
+      "checklistCount_other": "{{count}} Punkte in der Checkliste",
+      "lastRun": "Letztes Mal: {{date}}",
+      "monthdayWarning": "In kürzeren Monaten fällt die Routine auf den letzten Tag des Monats.",
+      "hint": "Die Routinen werden beim Laden des Boards geprüft. Wenn mehrere Termine vergehen, ohne dass jemand die App öffnet, wird nur der jüngste zu einer Karte.",
+      "freq": {
+        "daily": "Täglich",
+        "weekly": "Wöchentlich",
+        "monthly": "Monatlich"
+      },
+      "weekdays": {
+        "0": "Sonntag",
+        "1": "Montag",
+        "2": "Dienstag",
+        "3": "Mittwoch",
+        "4": "Donnerstag",
+        "5": "Freitag",
+        "6": "Samstag"
+      }
+    },
+    "exportReport": {
+      "title": "Kanban-Bericht exportieren",
+      "boardLabel": "Board",
+      "allBoards": "Alle Boards",
+      "privateTag": "privat",
+      "allBoardsHint": "Umfasst alle Boards, auf die Sie Zugriff haben, einschließlich privater.",
+      "noBoardsHint": "Wählen Sie mindestens ein Board aus, um den Bericht zu exportieren.",
+      "userLabel": "Nutzer",
+      "allUsers": "Alle Nutzer",
+      "statusLabel": "Kartenstatus",
+      "statusAll": "Alle",
+      "statusOpen": "Nur offene",
+      "statusDone": "Nur erledigte",
+      "count": "{{count}} Karte gefunden",
+      "count_other": "{{count}} Karten gefunden",
+      "counting": "Karten werden gezählt...",
+      "countFailed": "Die Karten konnten nicht gezählt werden",
+      "emptyHint": "Keine Karte entspricht den gewählten Filtern. Die Datei enthält nur die Kopfzeile.",
+      "downloadCsv": "Bericht herunterladen (CSV)",
+      "downloadPdf": "Bericht herunterladen (PDF)",
+      "downloadExcel": "Bericht herunterladen (Excel)",
+      "generating": "Wird erstellt...",
+      "downloadStarted": "Bericht erstellt"
+    },
+    "bottlenecks": {
+      "bareHours": "{{count}} Stunde",
+      "bareHours_other": "{{count}} Stunden",
+      "bareDays": "{{count}} Tag",
+      "bareDays_other": "{{count}} Tage",
+      "msgGreetingNoName": "Hallo!",
+      "title": "Engpass-Monitor",
+      "noneMonitored": "Es wird keine Spalte überwacht. Öffnen Sie das Menü einer Spalte und legen Sie fest, ab welcher Zeit eine festsitzende Karte zum Alarm wird.",
+      "allClear": "Kein Engpass. {{count}} Spalte überwacht, alles in Ordnung.",
+      "allClear_other": "Kein Engpass. {{count}} Spalten überwacht, alles in Ordnung.",
+      "summary": "{{count}} Karte über der Frist der Spalte festsitzend.",
+      "summary_other": "{{count}} Karten über der Frist der Spalte festsitzend.",
+      "inList": "In {{list}} · Limit von {{hours}}h",
+      "hours": "{{count}}h festsitzend",
+      "hours_other": "{{count}}h festsitzend",
+      "days": "{{count}} Tag festsitzend",
+      "days_other": "{{count}} Tage festsitzend",
+      "cardTooltip": "Seit {{duration}} in dieser Spalte festsitzend",
+      "copyFollowUp": "Nachfrage kopieren",
+      "copied": "Nachricht kopiert",
+      "msgGreeting": "Hallo, {{name}}!",
+      "msgBody": "Ich wollte kurz nachfragen, wie es mit \"{{title}}\" steht. Die Karte ist seit {{duration}} in {{list}}.",
+      "msgDue": "Die vereinbarte Frist ist {{date}}.",
+      "msgClosing": "Können Sie mir eine Rückmeldung zum Stand geben? Danke!"
+    },
+    "mindMap": {
+      "title": "Mindmap",
+      "empty": "Dieses Board hat noch keine Liste.",
+      "cardsCount": "{{count}} Karte",
+      "cardsCount_other": "{{count}} Karten",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "zoomReset": "Zoom zurücksetzen",
+      "modeBoard": "Vom Board",
+      "modeFree": "Leere Mindmap",
+      "freeHint": "Doppelklick auf den Hintergrund erstellt ein Thema. Ziehen Sie den Hintergrund, um die Ansicht zu verschieben, und scrollen Sie zum Zoomen. Klicken Sie auf zwei Themen, um sie zu verbinden (oder zu trennen). Wählen Sie ein Thema aus, um es zu verschieben, zu löschen oder mit + zu verzweigen.",
+      "clear": "Mindmap leeren",
+      "clearConfirm": "Alle Themen dieser Mindmap löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "center": "Zentrieren"
+    },
+    "archive": {
+      "autoPlanRequired": "Die automatische Archivierung ist ab dem Plan Pro verfügbar. Die manuelle Archivierung bleibt weiterhin verfügbar.",
+      "autoLabel": "Erledigte automatisch archivieren",
+      "autoDaysSuffix": "Tage",
+      "autoOnHint": "Karten, die seit mehr als {{days}} Tagen erledigt sind, wandern beim Laden des Boards ins Archiv. Das Abwählen einer Karte setzt die Zählung zurück.",
+      "autoOffHint": "Bei ausgeschalteter Regel bleiben erledigte Karten auf dem Board, bis Sie sie manuell archivieren.",
+      "autoInvalid": "Geben Sie eine Anzahl von Tagen zwischen 1 und 365 an",
+      "title": "Archivierte Karten",
+      "searchPlaceholder": "In Archivierten suchen",
+      "empty": "Noch keine archivierte Karte. Archivieren entfernt die Karte vom Board, ohne etwas zu löschen.",
+      "noResults": "Keine archivierte Karte entspricht der Suche",
+      "fromList": "Aus {{list}}",
+      "fromDeletedList": "Ursprüngliche Spalte entfernt",
+      "restore": "Wiederherstellen",
+      "delete": "Löschen",
+      "restoredToast": "{{title}} wiederhergestellt",
+      "deleteConfirm": "\"{{title}}\" endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deletedToast": "Karte gelöscht"
+    },
+    "listMenu": {
+      "stuckPlanRequired": "Der Engpass-Monitor ist ab dem Plan Pro verfügbar.",
+      "stuckConfigure": "Engpass in dieser Spalte überwachen",
+      "stuckConfigured": "Engpass: Alarm bei {{hours}}h",
+      "stuckHint": "Warnt, wenn eine Karte länger als diese Zeit in dieser Spalte festsitzt.",
+      "stuckHoursSuffix": "Stunden",
+      "stuckSave": "Speichern",
+      "stuckDisable": "Überwachung beenden",
+      "stuckOn": "Spalte überwacht: Alarm bei {{hours}}h",
+      "stuckOff": "Überwachung für diese Spalte ausgeschaltet",
+      "stuckInvalid": "Geben Sie eine Anzahl von Stunden zwischen 1 und 8760 an",
+      "archiveCompleted": "Erledigte archivieren",
+      "cardsArchivedToast": "{{count}} Karte archiviert",
+      "cardsArchivedToast_other": "{{count}} Karten archiviert",
+      "noCompletedToArchive": "Keine erledigte Karte in dieser Spalte",
+      "listColor": "Farbe der Liste",
+      "defaultColor": "Standard",
+      "sortAZ": "Nach Titel sortieren (A-Z)",
+      "clearCards": "Alle Karten entfernen",
+      "clearCardsConfirm": "Alle Karten aus \"{{title}}\" entfernen?",
+      "cardsRemovedToast": "Karten entfernt",
+      "deleteList": "Liste löschen",
+      "deleteListConfirm": "Die Liste \"{{title}}\" und alle ihre Karten löschen?",
+      "listDeletedToast": "Liste gelöscht"
+    },
+    "share": {
+      "title": "Zugriff auf \"{{title}}\"",
+      "hint": "Privates Board. Außer Ihnen kann nur öffnen, wer in dieser Liste steht.",
+      "roleOwner": "Eigentümer",
+      "roleEditor": "Kann bearbeiten",
+      "roleViewer": "Nur Lesezugriff",
+      "add": "Hinzufügen",
+      "remove": "Entfernen",
+      "searchPlaceholder": "Person nach Name oder E-Mail suchen...",
+      "noCandidates": "Niemand mehr zum Hinzufügen.",
+      "addedToast": "{{name}} hat jetzt Zugriff",
+      "removedToast": "{{name}} hat keinen Zugriff mehr",
+      "removeConfirm": "Den Zugriff von {{name}} auf dieses Board entfernen?"
+    },
+    "listColumn": {
+      "cardTitlePlaceholder": "Geben Sie einen Titel für diese Karte ein...",
+      "addCard": "+ Karte hinzufügen",
+      "addCardBtn": "Karte hinzufügen",
+      "defaultListName": "Liste"
+    },
+    "boardView": {
+      "listTitlePlaceholder": "Titel der Liste eingeben...",
+      "addList": "Liste hinzufügen",
+      "addAnotherList": "+ Weitere Liste hinzufügen"
+    },
+    "cardItem": {
+      "markComplete": "Als erledigt markieren",
+      "markIncomplete": "Als nicht erledigt markieren",
+      "urgent": "Dringend",
+      "important": "Wichtig",
+      "edit": "Bearbeiten",
+      "moreActions": "Weitere Aktionen",
+      "duplicate": "Duplizieren",
+      "duplicateSuffix": " (Kopie)",
+      "cardDuplicatedToast": "Karte dupliziert",
+      "subtasksCount": "{{count}} Unteraufgabe",
+      "subtasksCount_other": "{{count}} Unteraufgaben"
+    },
+    "cardModal": {
+      "readOnlyNote": "Sie haben nur Lesezugriff auf dieses Board.",
+      "noLocation": "Kein Ort festgelegt",
+      "archiveCard": "Archivieren",
+      "cardArchivedToast": "Karte archiviert",
+      "untitled": "Ohne Titel",
+      "typeBadge": "Aufgabe",
+      "complete": "Erledigt",
+      "markComplete": "Als erledigt markieren",
+      "status": "Status",
+      "statusOpen": "Offen",
+      "empty": "Leer",
+      "datesLabel": "Termine",
+      "descriptionShortcut": "Beschreibung hinzufügen",
+      "collapseEmpty": "Leere Felder ausblenden",
+      "showEmpty": "Leere Felder anzeigen",
+      "moveToList": "In Liste verschieben",
+      "movedToList": "Karte nach \"{{list}}\" verschoben",
+      "members": "Mitglieder",
+      "noUsersYet": "Noch kein Nutzer registriert.",
+      "labels": "Etiketten",
+      "priority": "Priorität (Eisenhower-Matrix)",
+      "urgent": "Dringend",
+      "important": "Wichtig",
+      "startDate": "Startdatum",
+      "dueDate": "Fälligkeitsdatum",
+      "location": "Ort",
+      "addressPlaceholder": "Adresse, Stadt...",
+      "locating": "Wird gesucht...",
+      "locate": "Suchen",
+      "locationFound": "Standort gefunden, sichtbar auf der Karte",
+      "locationPending": "Adresse gespeichert, aber nicht auf der Karte lokalisiert",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Fügen Sie eine ausführlichere Beschreibung hinzu...",
+      "subtasks": "Unteraufgaben",
+      "addSubtask": "Unteraufgabe hinzufügen",
+      "addSubtaskPlaceholder": "Name der Unteraufgabe...",
+      "unassign": "Verantwortlichen entfernen",
+      "checklist": "Checkliste",
+      "addItemPlaceholder": "Punkt hinzufügen",
+      "attachments": "Anhänge",
+      "attachFile": "Datei anhängen",
+      "attachLink": "Link anhängen",
+      "linkUrlPlaceholder": "https://...",
+      "linkNamePlaceholder": "Name des Links (optional)",
+      "attachmentAdded": "Anhang hinzugefügt",
+      "attachmentRemoved": "Anhang entfernt",
+      "attachmentTooLarge": "Die Datei darf höchstens {{mb}} MB groß sein",
+      "uploading": "Wird hochgeladen...",
+      "deleteCard": "Karte löschen",
+      "deleteCardConfirm": "Diese Karte endgültig löschen?",
+      "cardDeletedToast": "Karte gelöscht"
+    }
+  },
+  "views": {
+    "switcher": {
+      "board": "Board",
+      "table": "Tabelle",
+      "calendar": "Kalender",
+      "gantt": "Gantt",
+      "dashboard": "Dashboard",
+      "map": "Karte",
+      "matrix": "Eisenhower-Matrix"
+    },
+    "table": {
+      "columns": {
+        "completed": "",
+        "title": "Titel",
+        "listTitle": "Liste",
+        "labels": "Etiketten",
+        "members": "Mitglieder",
+        "startDate": "Start",
+        "due": "Fällig",
+        "checklist": "Checkliste"
+      },
+      "empty": "Keine Karten gefunden."
+    },
+    "calendar": {
+      "today": "Heute",
+      "prevMonth": "Vorheriger Monat",
+      "nextMonth": "Nächster Monat",
+      "more": "+{{count}} weitere",
+      "routinePreview": "Vorschau der automatischen Routine \"{{title}}\" - noch keine Karte"
+    },
+    "dashboard": {
+      "totalCards": "Karten insgesamt",
+      "completed": "Erledigt",
+      "overdue": "Überfällig",
+      "unassigned": "Ohne Verantwortlichen",
+      "overallProgress": "Gesamtfortschritt",
+      "cardsByList": "Karten nach Liste",
+      "cardsByMember": "Karten nach Mitglied",
+      "cardsByLabel": "Karten nach Etikett",
+      "noLists": "Keine Listen.",
+      "noAssigned": "Noch keiner Person eine Karte zugewiesen.",
+      "noLabels": "Keine Etikette in Verwendung.",
+      "labelNames": {
+        "gray": "Grau",
+        "blue": "Blau",
+        "green": "Grün",
+        "amber": "Bernstein",
+        "red": "Rot",
+        "purple": "Violett"
+      }
+    },
+    "map": {
+      "emptyLine1": "Keine Karte mit festgelegtem Ort.",
+      "emptyLine2": "Öffnen Sie eine Karte und füllen Sie das Feld \"Ort\" aus, um sie hier zu sehen.",
+      "unlocated_one": "{{count}} gespeicherte Adresse nicht auf der Karte lokalisiert.",
+      "unlocated_other": "{{count}} gespeicherte Adressen nicht auf der Karte lokalisiert."
+    },
+    "matrix": {
+      "doNow": {
+        "title": "Jetzt erledigen",
+        "subtitle": "Dringend und wichtig"
+      },
+      "schedule": {
+        "title": "Planen",
+        "subtitle": "Wichtig, nicht dringend"
+      },
+      "delegate": {
+        "title": "Delegieren",
+        "subtitle": "Dringend, nicht wichtig"
+      },
+      "eliminate": {
+        "title": "Eliminieren",
+        "subtitle": "Weder dringend noch wichtig"
+      },
+      "dropHere": "Karten hierher ziehen"
+    }
+  },
+  "datePicker": {
+    "today": "Heute",
+    "clear": "Datum entfernen",
+    "recurrence": "Wiederholung einrichten",
+    "recurrenceHint": "Wiederkehrende Karten werden im Datenmenü des Boards eingerichtet, nicht hier",
+    "presets": {
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "weekend": "Nächstes Wochenende",
+      "nextWeek": "Nächste Woche",
+      "twoWeeks": "2 Wochen",
+      "fourWeeks": "4 Wochen",
+      "eightWeeks": "8 Wochen"
+    }
+  },
+  "gantt": {
+    "columns": { "activity": "Aktivität", "status": "Status", "group": "Gruppe", "start": "Start", "due": "Frist" },
+    "toolbar": {
+      "new": "Neu",
+      "open": "Öffnen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert...",
+      "undo": "Rückgängig",
+      "print": "Drucken",
+      "export": "Exportieren",
+      "search": "Filtern / Suchen",
+      "searchPlaceholder": "Nach Titel suchen...",
+      "zoom": "Zoom",
+      "resetZoom": "Zoom zurücksetzen"
+    },
+    "saveError": "Konnte nicht gespeichert werden: {{erro}}",
+    "newTaskDefaultTitle": "Neue Aufgabe",
+    "noSearchResults": "Keine Aufgabe für diese Suche gefunden.",
+    "status": {
+      "done": "Erledigt",
+      "todo": "Zu erledigen",
+      "inProgress": "In Bearbeitung",
+      "late": "Überfällig",
+      "agency": "Werbeagentur",
+      "lateFlag": "überfällig!"
+    },
+    "legend": {
+      "icons": { "meeting": "Meeting", "call": "Anruf", "mail": "E-Mail", "check": "Fortschritt prüfen" }
+    },
+    "meta": { "event": "Termin:", "venue": "Ort:", "date": "Datum:" },
+    "emptyState": "Noch nichts im Gantt anzuzeigen."
+  },
+  "chat": {
+    "title": "Unternehmens-Chat",
+    "you": "Sie",
+    "unknownAuthor": "Entfernter Nutzer",
+    "empty": "Noch keine Nachricht. Beginnen Sie die Unterhaltung.",
+    "placeholder": "Nachricht schreiben...",
+    "send": "Senden",
+    "generalTitle": "Allgemein",
+    "newConversation": "+ Neue Unterhaltung",
+    "noCandidates": "Niemand mehr zum Anschreiben"
+  },
+  "users": {
+    "title": "Nutzer-Panel",
+    "you": " (Sie)",
+    "colName": "Name",
+    "colEmail": "E-Mail",
+    "colRole": "Rolle",
+    "colFinance": "Finanzen",
+    "financeAlways": "Immer",
+    "financeAccessLabel": "Zugriff",
+    "financeAccessHint": "Erlaubt, das Modul Finanzen einzusehen und zu buchen",
+    "roleMaster": "Master",
+    "roleMember": "Mitglied",
+    "makeMaster": "Zum Master machen",
+    "resetPassword": "Passwort zurücksetzen",
+    "delete": "Löschen",
+    "newPasswordFor": "Neues Passwort für {{name}}",
+    "savePassword": "Neues Passwort speichern",
+    "newUser": "+ Neuer Nutzer",
+    "name": "Name",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "creating": "Wird erstellt...",
+    "createUser": "Nutzer erstellen",
+    "makeMasterConfirm": "\"{{name}}\" zum Master-Nutzer machen? Er erhält vollständigen administrativen Zugriff.",
+    "becameMasterToast": "{{name}} ist jetzt Master",
+    "deleteUserConfirm": "Den Nutzer \"{{name}}\" löschen? Er wird von allen zugewiesenen Karten entfernt.",
+    "userCreatedToast": "Nutzer erstellt",
+    "userDeletedToast": "Nutzer gelöscht",
+    "passwordResetToast": "Passwort zurückgesetzt",
+    "passwordMinLength": "Das neue Passwort muss mindestens 6 Zeichen haben",
+    "companyCnpjLabel": "CNPJ oder CPF des Unternehmens",
+    "companyCnpjHint": "Wer Zugang zu Ihrem Unternehmen anfragen möchte, muss diese Nummer eingeben.",
+    "companyCnpjSave": "Speichern",
+    "companyCnpjSaved": "CNPJ gespeichert",
+    "joinRequestsTitle": "Zugangsanfragen",
+    "joinRequestsEmpty": "Keine ausstehende Anfrage.",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "requestApprovedToast": "{{name}} ist jetzt Teil des Unternehmens",
+    "requestRejectedToast": "Anfrage abgelehnt"
+  },
+  "team": {
+    "title": "Team",
+    "viewProfile": "Profil ansehen",
+    "sendMessage": "Nachricht senden",
+    "back": "Zurück",
+    "manageUsers": "Nutzer verwalten"
+  },
+  "planner": {
+    "title": "Persönlicher Planer",
+    "subtitle": "Ihre Agenda, außerhalb der Boards",
+    "tabCalendar": "Kalender",
+    "tabList": "Meine Aufgaben",
+    "addPlaceholder": "Neue persönliche Aufgabe...",
+    "add": "Hinzufügen",
+    "empty": "Noch keine persönliche Aufgabe.",
+    "deleteConfirm": "Die Aufgabe \"{{title}}\" löschen?",
+    "groupOverdue": "Überfällig",
+    "groupToday": "Heute",
+    "groupTomorrow": "Morgen",
+    "groupUpcoming": "Demnächst",
+    "groupCompleted": "Erledigt",
+    "planRequired": "Der persönliche Planer ist ab dem Plan Pro verfügbar. Sie können sehen und löschen, was bereits existiert."
+  },
+  "plan": {
+    "monthlyLabel": "Monatsbeitrag",
+    "listPriceLabel": "Listenpreis",
+    "discountLabel": "Angewendeter Rabatt",
+    "onRequest": "Auf Anfrage",
+    "contractedAtLabel": "Abgeschlossen am",
+    "perMonth": "/Monat",
+    "upgradeTitle": "Plan upgraden",
+    "upgradeConfirm": "Den Plan {{plan}} für {{price}}/Monat abschließen? Der Zyklus beginnt ab heute.",
+    "downgradeHint": "Um den Plan herabzustufen oder zu kündigen, wenden Sie sich an den Support. Hier ist nur ein Upgrade möglich.",
+    "menuItem": "Mein Plan",
+    "title": "Plan des Unternehmens",
+    "unlimited": "unbegrenzt",
+    "usersLabel": "Nutzer",
+    "renewsOnLabel": "Gültig bis",
+    "expiredOnLabel": "Abgelaufen am",
+    "daysLeftLabel": "Verbleibende Zeit",
+    "daysLeftValue": "{{count}} Tag",
+    "daysLeftValue_other": "{{count}} Tage",
+    "userLimitReached": "Sie haben das Nutzerlimit dieses Plans erreicht. Wechseln Sie den Plan, um weitere Personen hinzuzufügen.",
+    "masterOnly": "Nur der Master-Nutzer kann den Plan des Unternehmens ändern.",
+    "changed": "Plan geändert zu {{plan}}",
+    "names": {
+      "basic": "Free",
+      "intermediate": "Unlimited",
+      "professional": "Pro",
+      "enterprise": "Enterprise"
+    },
+    "status": {
+      "active": "Aktiv",
+      "trialing": "In Testphase",
+      "expired": "Abgelaufen",
+      "grace": "Zahlung ausstehend"
+    },
+    "trialEnding": "Ihre Testphase endet in {{count}} Tag",
+    "trialEnding_other": "Ihre Testphase endet in {{count}} Tagen",
+    "expiredMessage": "Ihr Plan ist abgelaufen. Sie sehen weiterhin alles, können aber nichts erstellen oder bearbeiten.",
+    "continueOnBasic": "Kostenlos im Plan Free fortfahren",
+    "movedToBasic": "Plan geändert zu Free",
+    "selectTitle": "Plan wählen",
+    "freeChoiceHint": "Sie haben noch keinen bezahlten Plan in Kraft, daher können Sie jeden Plan unten wählen - einschließlich des kostenlosen Plans Free, der nicht abläuft.",
+    "selectFreeConfirm": "Zum Plan {{plan}} wechseln? Er ist kostenlos und läuft nicht ab."
+  },
+  "billing": {
+    "checkoutTitle": "{{plan}} abschließen",
+    "chooseMethod": "Wie möchten Sie bezahlen",
+    "methods": {
+      "pix": "Pix",
+      "card": "Kreditkarte",
+      "boleto": "Zahlschein"
+    },
+    "methodNotes": {
+      "pix": "Wird in Sekunden freigeschaltet",
+      "card": "Verlängert sich automatisch jeden Monat",
+      "boleto": "Verrechnet innerhalb von bis zu 3 Werktagen"
+    },
+        "docLabel": "CPF oder CNPJ des Zahlers",
+    "docHint": "Von der Bank zur Ausstellung der Rechnung verlangt.",
+    "docInvalid": "Ungültige CPF oder CNPJ. Prüfen Sie die Nummern.",
+        "cardRedirectNote": "Sie werden zu einer sicheren Seite weitergeleitet, um die Karte einzugeben, und kehren nach Abschluss hierher zurück. Ihre Kartennummer läuft nie über unsere Server.",
+    "continueToCheckout": "Weiter zur Zahlung",
+    "payNow": "Jetzt bezahlen",
+    "processing": "Wird verarbeitet...",
+    "fineprint": "Der Plan wird freigeschaltet, sobald die Zahlung bestätigt ist. Sie können die Verlängerung jederzeit kündigen.",
+    "cardNumber": "Kartennummer",
+    "cardName": "Name auf der Karte",
+    "cardExpiry": "Gültig bis",
+    "cardCvv": "CVV",
+    "testMode": "Testmodus: Es findet keine echte Abbuchung statt.",
+    "testCards": "Testkarten: Endung 1111 genehmigt, 0002 abgelehnt, 0003 kein Guthaben, 0004 abgelaufen.",
+    "awaitingPayment": "Zahlung ausstehend",
+    "pixCopyPaste": "Pix Kopieren und Einfügen",
+    "boletoLine": "Zahlschein-Code",
+    "copyCode": "Code kopieren",
+    "copied": "Kopiert",
+    "copyFailed": "Konnte nicht kopiert werden. Wählen Sie den Code aus und kopieren Sie ihn von Hand.",
+    "payUntil": "Zahlen Sie bis {{date}}",
+    "willUpdateAlone": "Dieser Bildschirm aktualisiert sich automatisch, sobald die Zahlung bestätigt ist.",
+    "simulateConfirm": "Zahlungsbestätigung simulieren",
+    "paid": "Bezahlt",
+    "paidToast": "Zahlung bestätigt",
+    "releasedUntil": "Zugriff freigeschaltet bis {{date}}",
+    "failed": "Nicht genehmigt",
+    "failureGeneric": "Die Zahlung wurde nicht genehmigt. Versuchen Sie eine andere Zahlungsart.",
+    "failureReasons": {
+      "CARD_DECLINED": "Die Karte wurde von der ausstellenden Bank abgelehnt.",
+      "INSUFFICIENT_FUNDS": "Es gab nicht genug Guthaben oder Limit.",
+      "EXPIRED_CARD": "Die Karte ist abgelaufen.",
+      "EXPIRED": "Die Rechnung ist vor der Zahlung abgelaufen."
+    },
+    "tryAgain": "Erneut versuchen",
+    "finishPayment": "Zahlung abschließen",
+    "subscriptionTitle": "Abonnement",
+    "methodLabel": "Zahlungsart",
+    "nextChargeLabel": "Nächste Abbuchung",
+    "subStatusLabel": "Status",
+    "subStatus": {
+      "active": "Aktiv",
+      "past_due": "Zahlung überfällig",
+      "canceled": "Gekündigt"
+    },
+    "cancelSubscription": "Verlängerung kündigen",
+    "cancelConfirm": "Die automatische Verlängerung kündigen? Sie behalten den Zugriff bis zum Ende des bereits bezahlten Zeitraums.",
+    "canceled": "Verlängerung gekündigt",
+    "canceledHint": "Die Verlängerung ist gekündigt. Der Zugriff gilt bis zum Ende des bereits bezahlten Zeitraums.",
+    "historyTitle": "Zahlungsverlauf",
+    "payStatus": {
+      "paid": "Bezahlt",
+      "pending": "Ausstehend",
+      "failed": "Nicht genehmigt",
+      "canceled": "Storniert",
+      "refunded": "Erstattet"
+    }
+  },
+  "errors": {
+    "NETWORK_UNREACHABLE": "Der Server hat nicht geantwortet. Prüfen Sie, ob er läuft, und versuchen Sie es erneut.",
+    "REPORT_FORMAT_INVALID": "Nicht unterstütztes Berichtsformat",
+    "REPORT_STATUS_INVALID": "Ungültiger Statusfilter",
+    "BOARD_LIMIT_REACHED": "Board-Limit des Plans erreicht. Löschen Sie ein Board oder führen Sie ein Upgrade durch, um ein weiteres zu erstellen.",
+    "PLAN_FEATURE_BOTTLENECK": "Der Engpass-Monitor ist ab dem Plan Pro verfügbar.",
+    "PLAN_FEATURE_PERSONAL_PLANNER": "Der persönliche Planer ist ab dem Plan Pro verfügbar.",
+    "PLAN_FEATURE_RECURRING": "Wiederkehrende Karten sind ab dem Plan Pro verfügbar.",
+    "INVALID_FREQUENCY": "Ungültige Häufigkeit",
+    "WEEKDAY_REQUIRED": "Wählen Sie den Wochentag",
+    "MONTHDAY_REQUIRED": "Wählen Sie einen Tag des Monats zwischen 1 und 31",
+    "INVALID_HOUR": "Die Stunde muss zwischen 0 und 23 liegen",
+    "LIST_REQUIRED": "Wählen Sie die Zielspalte",
+    "LIST_NOT_FOUND": "Spalte nicht gefunden",
+    "RECURRENCE_NOT_FOUND": "Routine nicht gefunden",
+    "INVALID_STUCK_HOURS": "Geben Sie eine Anzahl von Stunden zwischen 1 und 8760 an",
+    "PLAN_FEATURE_AUTO_ARCHIVE": "Die automatische Archivierung ist ab dem Plan Pro verfügbar.",
+    "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Hier ist nur ein Upgrade möglich. Um herabzustufen oder zu kündigen, wenden Sie sich an den Support.",
+    "PLAN_EXPIRED": "Ihr Plan ist abgelaufen. Erneuern Sie ihn, um wieder bearbeiten zu können.",
+    "PLAN_USER_LIMIT": "Ihr Plan hat das Nutzerlimit erreicht. Wechseln Sie den Plan, um mehr hinzuzufügen.",
+    "PLAN_USER_LIMIT_EXCEEDED": "Das Unternehmen hat mehr Nutzer, als der gewählte Plan erlaubt.",
+    "INVALID_PLAN": "Ungültiger Plan",
+    "NOT_AUTHENTICATED": "Nicht authentifiziert",
+    "FORBIDDEN_MASTER_ONLY": "Zugriff nur für den Master-Nutzer",
+    "BOARD_NOT_FOUND": "Board nicht gefunden",
+    "FORBIDDEN_BOARD_ACCESS": "Sie haben keinen Zugriff auf dieses Board",
+    "FORBIDDEN_BOARD_READ_ONLY": "Ihr Zugriff auf dieses Board ist nur Lesezugriff",
+    "FORBIDDEN_BOARD_OWNER_ONLY": "Nur der Eigentümer des Boards kann dies tun",
+    "FORBIDDEN_NOT_CARD_CREATOR": "Nur wer die Karte erstellt hat, kann sie löschen",
+    "BOARD_NOT_PRIVATE": "Nur private Boards haben eine Zugriffsliste",
+    "INVALID_BOARD_ROLE": "Ungültige Rolle",
+    "USER_ID_REQUIRED": "Wählen Sie einen Nutzer aus",
+    "CANNOT_CHANGE_BOARD_OWNER": "Der Eigentümer hat bereits Zugriff auf das Board",
+    "NOT_FOUND": "Nicht gefunden",
+    "VALIDATION_MISSING_FIELDS": "Geben Sie Name, E-Mail und ein Passwort mit mindestens 6 Zeichen ein",
+    "COMPANY_NAME_REQUIRED": "Geben Sie den Namen des Unternehmens an",
+    "EMAIL_ALREADY_REGISTERED": "E-Mail bereits registriert",
+    "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "E-Mail bereits registriert (könnte bereits einem anderen Unternehmen gehören)",
+    "INVALID_CREDENTIALS": "Ungültige E-Mail oder ungültiges Passwort",
+    "CNPJ_INVALID": "Ungültige CNPJ oder CPF",
+    "COMPANY_NOT_FOUND": "Kein Unternehmen mit dieser CNPJ oder CPF gefunden",
+    "CNPJ_IN_USE": "Diese CNPJ oder CPF wird bereits von einem anderen Unternehmen verwendet",
+    "JOIN_REQUEST_PENDING": "Es gibt bereits eine ausstehende Anfrage für diese E-Mail",
+    "JOIN_REQUEST_NOT_FOUND": "Anfrage nicht gefunden",
+    "CHAT_MESSAGE_REQUIRED": "Schreiben Sie eine Nachricht, bevor Sie senden",
+    "CHAT_MESSAGE_TOO_LONG": "Nachricht ist zu lang",
+    "CHAT_USER_REQUIRED": "Wählen Sie einen anderen Nutzer",
+    "CHAT_USER_NOT_FOUND": "Nutzer nicht gefunden",
+    "FORBIDDEN_CHAT_CONVERSATION": "Sie nehmen an dieser Unterhaltung nicht teil",
+    "TOO_MANY_CNPJ_LOOKUPS": "Zu viele CNPJ-Suchen von dieser Adresse. Versuchen Sie es später erneut.",
+    "TOO_MANY_JOIN_REQUESTS": "Zu viele Anfragen von dieser Adresse. Versuchen Sie es später erneut.",
+    "PASSWORD_TOO_SHORT": "Das neue Passwort muss mindestens 6 Zeichen haben",
+    "CURRENT_PASSWORD_INCORRECT": "Aktuelles Passwort falsch",
+    "TITLE_REQUIRED": "Titel erforderlich",
+    "DUE_REQUIRED": "Wählen Sie ein Datum",
+    "PERSONAL_TASK_NOT_FOUND": "Aufgabe nicht gefunden",
+    "NAME_REQUIRED": "Name erforderlich",
+    "BIO_TOO_LONG": "Die Beschreibung ist zu lang",
+    "INVALID_IMAGE_TYPE": "Laden Sie ein Bild im Format PNG, JPEG, WEBP oder GIF hoch",
+    "AVATAR_TOO_LARGE": "Das Foto darf höchstens 3 MB groß sein",
+    "AVATAR_NOT_FOUND": "Foto nicht gefunden",
+    "AVATAR_SAVE_FAILED": "Fehler beim Speichern des Fotos",
+    "UPLOAD_FAILED": "Fehler beim Empfangen der Datei",
+    "INVALID_UPLOAD": "Ungültiger Upload",
+    "FORBIDDEN_DELETE_SHARED_BOARD": "Nur der Master-Nutzer kann geteilte Boards löschen",
+    "ORDERED_LIST_IDS_REQUIRED": "orderedListIds erforderlich",
+    "CARD_IDS_REQUIRED": "cardIds erforderlich",
+    "USER_NOT_FOUND": "Nutzer nicht gefunden",
+    "EMAIL_IN_USE": "E-Mail bereits in Verwendung",
+    "INVALID_ROLE": "Ungültige Rolle",
+    "CANNOT_DELETE_MASTER": "Der Master-Nutzer kann nicht gelöscht werden",
+    "MODULE_FORBIDDEN": "Modul für Sie nicht verfügbar.",
+    "FIN_MASTER_ALWAYS": "Der Master hat bereits Zugriff auf Finanzen.",
+    "FIN_TIPO_INVALID": "Ungültiger Buchungstyp.",
+    "FIN_VALUE_INVALID": "Ungültiger Betrag.",
+    "FIN_DATE_INVALID": "Ungültiges Fälligkeitsdatum.",
+    "FIN_PERIODO_INVALIDO": "Das Startdatum darf nicht nach dem Enddatum liegen.",
+    "FIN_CONFERIR_NAO_FINALIZADO": "Nur ein beglichener Titel kann abgeglichen werden.",
+    "FIN_APROP_TRAVADO": "Ein beglichener oder annullierter Titel akzeptiert keine Aufteilung.",
+    "FIN_APROP_DUPLICADO": "Kostenstelle in der Aufteilung wiederholt.",
+    "FIN_APROP_VALOR": "Ungültiger Aufteilungsbetrag.",
+    "FIN_APROP_SOMA": "Die Summe der Aufteilung muss dem Betrag des Titels entsprechen.",
+    "FIN_MOV_INVALIDO": "Ungültige Bewegung.",
+    "FIN_CATEGORY_NOT_FOUND": "Kategorie nicht gefunden.",
+    "FIN_CATEGORY_NAME_REQUIRED": "Geben Sie den Namen der Kategorie an.",
+    "FIN_CATEGORY_TIPO_INVALID": "Ungültiger Kategorietyp.",
+    "FIN_LANCAMENTO_NOT_FOUND": "Buchung nicht gefunden.",
+    "FIN_CONTA_NAME_REQUIRED": "Geben Sie den Namen des Kontos an.",
+    "FIN_CONTA_NOT_FOUND": "Konto nicht gefunden.",
+    "FIN_CC_NAME_REQUIRED": "Geben Sie den Namen der Kostenstelle an.",
+    "FIN_CC_NOT_FOUND": "Kostenstelle nicht gefunden.",
+    "FIN_CC_SINTETICO": "Ein Sammelkonto nimmt keine Buchungen an; wählen Sie ein Einzelkonto.",
+    "FIN_CC_INATIVO": "Inaktive Kostenstelle.",
+    "CC_EMPRESA_NOT_FOUND": "Unternehmen nicht gefunden.",
+    "CC_CODIGO_INVALID": "Ungültiger Code - verwenden Sie durch Punkte getrennte numerische Ebenen (z. B. 1.02.01).",
+    "CC_NOME_REQUIRED": "Geben Sie die Beschreibung der Kostenstelle an.",
+    "CC_CODIGO_DUPLICADO": "Es existiert bereits eine Kostenstelle mit diesem Code in diesem Unternehmen.",
+    "CC_PAI_AUSENTE": "Legen Sie die übergeordnete Kostenstelle vor dieser an.",
+    "CC_PAI_INATIVO": "Reaktivieren Sie die übergeordnete Kostenstelle vor dieser.",
+    "CC_NOT_FOUND": "Kostenstelle nicht gefunden.",
+    "FIN_CC_XLSX_GRANDE": "Datei zu groß.",
+    "FIN_CC_XLSX_SEM_ARQUIVO": "Laden Sie eine .xlsx-Tabelle hoch.",
+    "FIN_CC_XLSX_ILEGIVEL": "Diese Tabelle konnte nicht gelesen werden.",
+    "FIN_CC_XLSX_VAZIO": "Die Tabelle hat keine Zeilen zum Importieren.",
+    "FIN_CAT_XLSX_GRANDE": "Datei zu groß.",
+    "FIN_CAT_XLSX_SEM_ARQUIVO": "Laden Sie eine .xlsx-Tabelle hoch.",
+    "FIN_CAT_XLSX_ILEGIVEL": "Diese Tabelle konnte nicht gelesen werden.",
+    "FIN_CAT_XLSX_VAZIO": "Die Tabelle hat keine Zeilen zum Importieren.",
+    "FIN_CAT_DUPLICADO": "Code bereits registriert.",
+    "FIN_CAT_NOME_REQUIRED": "Geben Sie die Beschreibung der Klasse an.",
+    "FIN_CAT_TIPO_INVALID": "Ungültiger Typ (verwenden Sie Ertrag oder Aufwand).",
+    "FIN_EXTRATO_VAZIO": "Keine Transaktion zum Importieren.",
+    "FIN_EXTRATO_DATA": "Ungültiges Bewegungsdatum im Kontoauszug.",
+    "FIN_EXTRATO_VALOR": "Ungültiger Betrag im Kontoauszug.",
+    "FIN_EXTRATO_TIPO": "Typ muss C (Gutschrift) oder D (Lastschrift) sein.",
+    "FIN_EXTRATO_GRANDE": "Datei zu groß.",
+    "FIN_EXTRATO_SEM_ARQUIVO": "Laden Sie eine PDF-Datei hoch.",
+    "FIN_EXTRATO_PDF_ILEGIVEL": "Dieses PDF konnte nicht gelesen werden.",
+    "CEP_INVALID": "Ungültige Postleitzahl.",
+    "CEP_NOT_FOUND": "Postleitzahl nicht gefunden.",
+    "CEP_UNAVAILABLE": "Die Postleitzahl konnte gerade nicht abgerufen werden. Versuchen Sie es erneut.",
+    "TOO_MANY_CEP_REQUESTS": "Zu viele Postleitzahl-Suchen in kurzer Zeit. Warten Sie einen Moment.",
+    "CNPJ_LOOKUP_INVALID": "Ungültige CNPJ.",
+    "CNPJ_NOT_FOUND": "CNPJ nicht gefunden.",
+    "CNPJ_UNAVAILABLE": "Die CNPJ konnte gerade nicht abgerufen werden. Versuchen Sie es erneut.",
+    "TOO_MANY_CNPJ_REQUESTS": "Zu viele CNPJ-Suchen in kurzer Zeit. Warten Sie einen Moment.",
+    "FIN_CONTATO_NAME_REQUIRED": "Geben Sie den Namen an.",
+    "FIN_CONTATO_NOT_FOUND": "Kontakt nicht gefunden.",
+    "FIN_PARCELA_PAGO": "Nur ein ausstehender Titel kann aufgeteilt werden.",
+    "FIN_PARCELA_INVALIDO": "Ein erstellter Titel kann nicht aufgeteilt werden.",
+    "FIN_PARCELA_JA": "Titel ist bereits in Raten aufgeteilt.",
+    "FIN_PARCELA_IMPOSTOS": "Setzen Sie Steuern/Rabatt/Zuschläge vor dem Aufteilen auf null.",
+    "FIN_PARCELA_RATEIO": "Entfernen Sie die Aufteilung vor dem Aufteilen in Raten.",
+    "FIN_IMPORT_ERRO": "Fehler beim Importieren der Tabelle.",
+    "FIN_DELETE_GERADO": "Entfernen Sie die Steuer im Ursprungstitel; löschen Sie nicht direkt die Abführung.",
+    "FIN_EDIT_TRAVADO": "Ein beglichener oder annullierter Titel akzeptiert keine Änderung von Betrag oder Datum.",
+    "FIN_STATUS_INVALID": "Ungültiger Status.",
+    "FIN_STATUS_FINALIZADO": "Machen Sie die Begleichung rückgängig, bevor Sie den Status ändern.",
+    "FIN_STATUS_ANULADO": "Ein annullierter Titel kann nicht beglichen werden.",
+    "FIN_PARCELA_QTD": "Ungültige Anzahl von Raten.",
+    "FIN_IMPOSTO_NAME_REQUIRED": "Geben Sie den Namen der Steuer an.",
+    "FIN_IMPOSTO_TIPO_INVALID": "Ungültiger Steuertyp.",
+    "FIN_IMPOSTO_ALIQUOTA_INVALID": "Ungültiger Satz.",
+    "FIN_IMPOSTO_NOT_FOUND": "Steuer nicht gefunden.",
+    "FIN_SPED_CODIGO_REQUIRED": "Geben Sie den Code an.",
+    "FIN_SPED_DESC_REQUIRED": "Geben Sie die Beschreibung an.",
+    "FIN_SPED_NOT_FOUND": "Dienstleistungscode nicht gefunden.",
+    "FIN_IMPOSTO_APLICADO_TITULO_PAGO": "Nur ein ausstehender Titel kann eine Steuer erhalten.",
+    "FIN_IMPOSTO_APLICADO_INVALIDO": "Ein Steuertitel kann keine weitere Steuer erhalten.",
+    "FIN_IMPOSTO_JA_APLICADO": "Diese Steuer wurde bereits auf den Titel angewendet.",
+    "FIN_IMPOSTO_APLICADO_NOT_FOUND": "Angewendete Steuer nicht gefunden.",
+    "FIN_IMPOSTO_APLICADO_PAGO": "Die Abführung dieser Steuer wurde bereits bezahlt - kann nicht rückgängig gemacht werden.",
+    "FIN_VALOR_COM_IMPOSTOS": "Entfernen Sie die angewendeten Steuern, bevor Sie den Titelbetrag ändern.",
+    "ADDRESS_REQUIRED": "Geben Sie eine Adresse zum Suchen an",
+    "ADDRESS_NOT_FOUND": "Adresse nicht gefunden",
+    "GEOCODE_UNAVAILABLE": "Die Adresse konnte gerade nicht gesucht werden. Versuchen Sie es erneut.",
+    "INTERNAL_ERROR": "Interner Serverfehler",
+    "GENERIC": "Fehler {{status}}",
+    "IMPORT_READ_FAIL": "Die Datei konnte nicht gelesen werden",
+    "IMPORT_UNRECOGNIZED_FORMAT": "Nicht erkanntes Dateiformat",
+    "IMPORT_INVALID_JSON": "Ungültiges JSON",
+    "URL_REQUIRED": "Geben Sie eine URL an",
+    "INVALID_URL": "Ungültige URL",
+    "FILE_REQUIRED": "Wählen Sie eine Datei aus",
+    "FILE_TOO_LARGE": "Die Datei ist größer als das Limit Ihres Plans.",
+    "ATTACHMENT_NOT_FOUND": "Anhang nicht gefunden",
+    "LIST_NOT_IN_BOARD": "Diese Spalte gehört nicht zu diesem Board.",
+    "TOO_MANY_GEOCODE_REQUESTS": "Zu viele Adresssuchen in kurzer Zeit. Warten Sie einen Moment und versuchen Sie es erneut.",
+    "INVALID_TITLE": "Ungültiger Titel.",
+    "PAYER_DOCUMENT_REQUIRED": "Geben Sie die CPF oder CNPJ des Zahlers an.",
+    "PAYER_DOCUMENT_INVALID": "Ungültige CPF oder CNPJ. Prüfen Sie die Nummern.",
+    "PAYER_EMAIL_REQUIRED": "E-Mail des Zahlers fehlt.",
+    "CARD_TOKEN_REQUIRED": "Die Karte konnte nicht validiert werden. Versuchen Sie es erneut.",
+    "PLAN_REQUIRES_PAYMENT": "Der Abschluss eines bezahlten Plans erfordert eine Zahlung.",
+    "PLAN_NOT_CHARGEABLE": "Dieser Plan wird nicht automatisch abgerechnet.",
+    "INVALID_PAYMENT_METHOD": "Wählen Sie eine Zahlungsart.",
+    "PAYMENT_ALREADY_PENDING": "Es gibt bereits eine offene Rechnung. Bezahlen Sie sie oder warten Sie deren Fälligkeit ab.",
+    "CARD_DECLINED": "Die Karte wurde abgelehnt. Prüfen Sie die Daten oder versuchen Sie eine andere.",
+    "PAYMENT_NOT_FOUND": "Rechnung nicht gefunden.",
+    "NO_SUBSCRIPTION": "Es gibt kein aktives Abonnement.",
+    "BILLING_PROVIDER_NOT_CONFIGURED": "Die Zahlungsart ist noch nicht konfiguriert. Wenden Sie sich an den Support."
+  }
+}
