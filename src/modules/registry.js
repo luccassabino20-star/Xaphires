@@ -8,8 +8,8 @@
 // card no launcher. icon nomeia o desenho em ModuleIcon (abaixo). category
 // alimenta as abas de filtro do launcher (ver CATEGORIES em ModuleLauncher.jsx)
 // - só existem categorias com pelo menos um módulo real; o resto (Marketing,
-// Atendimento, RH, Modelos de IA, Jurídico) fica com o selo "Em breve" na aba,
-// porque hoje não haveria nada pra mostrar nelas.
+// Atendimento, Saúde & Clínicas, RH, Modelos de IA, Jurídico) fica com o selo
+// "Em breve" na aba, porque hoje não haveria nada pra mostrar nelas.
 //
 // accent era um arco-íris (um tom por pilar, sem relação com a marca); agora é
 // o azul-marinho da marca (#101f47, o mesmo de .landing-shell/.auth-shell) em

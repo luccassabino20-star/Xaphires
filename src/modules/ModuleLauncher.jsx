@@ -23,10 +23,10 @@ const SIDEBAR_GROUPS = [
 // Abas de categoria da barra de Soluções, na mesma ordem da referência. Só
 // entram como filtro clicável as que têm pelo menos um módulo real hoje
 // (calculado em ModuleLauncher a partir de MODULE_META.category) - o resto
-// (Marketing, Atendimento, RH, Modelos de IA, Jurídico) fica com o selo "Em
-// breve": o Xaphires não tem pilar nessas áreas ainda, e uma aba que abre
-// vazia pareceria bug, não "em construção".
-const CATEGORIES = ["todas", "vendas", "marketing", "atendimento", "rh", "ia", "financeiro", "juridico", "outros"];
+// (Marketing, Atendimento, Saúde & Clínicas, RH, Modelos de IA, Jurídico) fica
+// com o selo "Em breve": o Xaphires não tem pilar nessas áreas ainda, e uma
+// aba que abre vazia pareceria bug, não "em construção".
+const CATEGORIES = ["todas", "vendas", "marketing", "atendimento", "saude", "rh", "ia", "financeiro", "juridico", "outros"];
 
 // Segunda linha da barra: só "todas" tem lista por trás (é a própria grade).
 // "Minhas soluções"/"Favoritas" exigiriam favoritar/rastrear uso por módulo,
