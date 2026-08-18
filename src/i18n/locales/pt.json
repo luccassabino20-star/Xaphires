@@ -23,13 +23,11 @@
       "categories": {
         "todas": "Todas",
         "vendas": "Vendas",
-        "marketing": "Marketing",
         "atendimento": "Atendimento",
         "saude": "Saúde & Clínicas",
         "rh": "RH",
         "ia": "Modelos de IA",
         "financeiro": "Financeiro",
-        "juridico": "Jurídico",
         "outros": "Outros"
       },
       "views": {
@@ -85,6 +83,14 @@
     "relatorios-bi": {
       "name": "Relatórios & BI",
       "desc": "Dashboards operacionais e financeiros consolidados."
+    },
+    "marketing": {
+      "name": "Marketing",
+      "desc": "Campanhas, funil de conteúdo e métricas de aquisição."
+    },
+    "juridico": {
+      "name": "Jurídico",
+      "desc": "Contratos, prazos e conformidade documental da empresa."
     },
     "custom": {
       "seal": "Sob medida",

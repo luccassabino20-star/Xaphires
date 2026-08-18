@@ -7,9 +7,9 @@
 // labelKey/descKey apontam para modules.<id>.* nos locales. accent é a cor do
 // card no launcher. icon nomeia o desenho em ModuleIcon (abaixo). category
 // alimenta as abas de filtro do launcher (ver CATEGORIES em ModuleLauncher.jsx)
-// - só existem categorias com pelo menos um módulo real; o resto (Marketing,
-// Atendimento, Saúde & Clínicas, RH, Modelos de IA, Jurídico) fica com o selo
-// "Em breve" na aba, porque hoje não haveria nada pra mostrar nelas.
+// - só existem categorias com pelo menos um módulo real; o resto (Atendimento,
+// Saúde & Clínicas, RH, Modelos de IA) fica com o selo "Em breve" na aba,
+// porque hoje não haveria nada pra mostrar nelas.
 //
 // accent era um arco-íris (um tom por pilar, sem relação com a marca); agora é
 // o azul-marinho da marca (#101f47, o mesmo de .landing-shell/.auth-shell) em
@@ -22,6 +22,13 @@ export const MODULE_META = {
   "compras-estoque": { icon: "estoque", accent: BRAND, category: "outros", labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
   faturamento: { icon: "faturamento", accent: BRAND, category: "financeiro", labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
   "relatorios-bi": { icon: "bi", accent: BRAND, category: "outros", labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
+  // Marketing e Jurídico não têm pilar real (não vêm de server/modules.js) e
+  // não têm aba própria na barra de filtro - o pedido foi mantê-los visíveis
+  // mesmo assim, como cartão travado dentro de "outros" (ver
+  // PILARES_PLACEHOLDER em ModuleLauncher.jsx, que injeta esses dois ids na
+  // lista de módulos com enabled:false antes de filtrar por categoria).
+  marketing: { icon: "marketing", accent: BRAND, category: "outros", labelKey: "modules.marketing.name", descKey: "modules.marketing.desc" },
+  juridico: { icon: "juridico", accent: BRAND, category: "outros", labelKey: "modules.juridico.name", descKey: "modules.juridico.desc" },
 };
 
 export function metaFor(id) {

@@ -23,13 +23,11 @@
       "categories": {
         "todas": "All",
         "vendas": "Sales",
-        "marketing": "Marketing",
         "atendimento": "Support",
         "saude": "Health & Clinics",
         "rh": "HR",
         "ia": "AI Models",
         "financeiro": "Finance",
-        "juridico": "Legal",
         "outros": "Other"
       },
       "views": {
@@ -85,6 +83,14 @@
     "relatorios-bi": {
       "name": "Reports & BI",
       "desc": "Consolidated operational and financial dashboards."
+    },
+    "marketing": {
+      "name": "Marketing",
+      "desc": "Campaigns, content funnel and acquisition metrics."
+    },
+    "juridico": {
+      "name": "Legal",
+      "desc": "Contracts, deadlines and document compliance for the company."
     },
     "custom": {
       "seal": "Custom-built",

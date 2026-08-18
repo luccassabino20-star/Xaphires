@@ -23,13 +23,11 @@
       "categories": {
         "todas": "Toutes",
         "vendas": "Ventes",
-        "marketing": "Marketing",
         "atendimento": "Support",
         "saude": "Santé & Cliniques",
         "rh": "RH",
         "ia": "Modèles d'IA",
         "financeiro": "Finance",
-        "juridico": "Juridique",
         "outros": "Autres"
       },
       "views": {
@@ -85,6 +83,14 @@
     "relatorios-bi": {
       "name": "Rapports & BI",
       "desc": "Tableaux de bord opérationnels et financiers consolidés."
+    },
+    "marketing": {
+      "name": "Marketing",
+      "desc": "Campagnes, tunnel de contenu et métriques d'acquisition."
+    },
+    "juridico": {
+      "name": "Juridique",
+      "desc": "Contrats, délais et conformité documentaire de l'entreprise."
     },
     "custom": {
       "seal": "Sur mesure",

@@ -13,6 +13,10 @@ const PATHS = {
   bi: "M4 20V10m5 10V4m5 16v-7m5 7V8",
   // Colchetes de código - integrações/automações sob medida
   custom: "M8 4 2 12l6 8M16 4l6 8-6 8",
+  // Megafone - campanhas e divulgação
+  marketing: "M3 11v2a2 2 0 0 0 2 2h1l2 6h2l-1.5-6H10l9 4V5l-9 4H5a2 2 0 0 0-2 2z",
+  // Balança da justiça - contratos e compliance
+  juridico: "M12 3v18M5 21h14M12 3 5 8m7-5 7 5M3 8h4l-2 6a2 2 0 0 1-4 0zm14 0h4l-2 6a2 2 0 0 1-4 0z",
 };
 
 export default function ModuleIcon({ name, size = 26 }) {

@@ -23,13 +23,11 @@
       "categories": {
         "todas": "Todas",
         "vendas": "Ventas",
-        "marketing": "Marketing",
         "atendimento": "Atención",
         "saude": "Salud y Clínicas",
         "rh": "RR. HH.",
         "ia": "Modelos de IA",
         "financeiro": "Financiero",
-        "juridico": "Legal",
         "outros": "Otros"
       },
       "views": {
@@ -85,6 +83,14 @@
     "relatorios-bi": {
       "name": "Informes & BI",
       "desc": "Paneles operativos y financieros consolidados."
+    },
+    "marketing": {
+      "name": "Marketing",
+      "desc": "Campañas, embudo de contenido y métricas de adquisición."
+    },
+    "juridico": {
+      "name": "Legal",
+      "desc": "Contratos, plazos y cumplimiento documental de la empresa."
     },
     "custom": {
       "seal": "A medida",

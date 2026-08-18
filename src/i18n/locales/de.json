@@ -23,13 +23,11 @@
       "categories": {
         "todas": "Alle",
         "vendas": "Vertrieb",
-        "marketing": "Marketing",
         "atendimento": "Support",
         "saude": "Gesundheit & Kliniken",
         "rh": "Personal",
         "ia": "KI-Modelle",
         "financeiro": "Finanzen",
-        "juridico": "Recht",
         "outros": "Sonstiges"
       },
       "views": {
@@ -85,6 +83,14 @@
     "relatorios-bi": {
       "name": "Berichte & BI",
       "desc": "Konsolidierte operative und finanzielle Dashboards."
+    },
+    "marketing": {
+      "name": "Marketing",
+      "desc": "Kampagnen, Content-Funnel und Akquisemetriken."
+    },
+    "juridico": {
+      "name": "Recht",
+      "desc": "Verträge, Fristen und Dokumentenkonformität des Unternehmens."
     },
     "custom": {
       "seal": "Maßgeschneidert",

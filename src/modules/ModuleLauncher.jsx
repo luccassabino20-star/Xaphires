@@ -23,10 +23,32 @@ const SIDEBAR_GROUPS = [
 // Abas de categoria da barra de Soluções, na mesma ordem da referência. Só
 // entram como filtro clicável as que têm pelo menos um módulo real hoje
 // (calculado em ModuleLauncher a partir de MODULE_META.category) - o resto
-// (Marketing, Atendimento, Saúde & Clínicas, RH, Modelos de IA, Jurídico) fica
-// com o selo "Em breve": o Xaphires não tem pilar nessas áreas ainda, e uma
-// aba que abre vazia pareceria bug, não "em construção".
-const CATEGORIES = ["todas", "vendas", "marketing", "atendimento", "saude", "rh", "ia", "financeiro", "juridico", "outros"];
+// (Atendimento, Saúde & Clínicas, RH, Modelos de IA) fica com o selo "Em
+// breve": o Xaphires não tem pilar nessas áreas ainda, e uma aba que abre
+// vazia pareceria bug, não "em construção".
+//
+// Marketing e Jurídico não têm aba própria de propósito - a barra não pode
+// crescer sem limite (linha única, sem rolagem lateral pedida pelo cliente),
+// então categoria com pouco uso entra direto em "outros". Qualquer categoria
+// nova que apareça em registry.js e não estiver nesta lista cai em "outros"
+// pelo mesmo motivo (ver categoriaDaAba abaixo) - crescer esta lista é decisão
+// consciente, não automática. Os dois continuam visíveis como cartão dentro de
+// "outros" (ver PILARES_PLACEHOLDER, abaixo) - só a aba própria que sumiu.
+const CATEGORIES = ["todas", "vendas", "atendimento", "saude", "rh", "ia", "financeiro", "outros"];
+
+// Categoria do módulo (registry.js) que não tem aba própria em CATEGORIES cai
+// em "outros" - é o que evita a barra ganhar uma aba nova (e a rolagem
+// lateral) a cada categoria que MODULE_META passar a usar.
+function categoriaDaAba(category) {
+  return CATEGORIES.includes(category) ? category : "outros";
+}
+
+// Pilares sem módulo real (não vêm de server/modules.js) que o cliente pediu
+// para continuar aparecendo - entram como cartão travado dentro de "outros",
+// mesmo tratamento visual de um módulo real ainda não habilitado (badge "Em
+// breve", sem onClick). category "outros" já vem de MODULE_META; aqui só se
+// fabrica o objeto no formato que o resto do componente espera de `modules`.
+const PILARES_PLACEHOLDER = ["marketing", "juridico"].map((id) => ({ id, enabled: false }));
 
 // Segunda linha da barra: só "todas" tem lista por trás (é a própria grade).
 // "Minhas soluções"/"Favoritas" exigiriam favoritar/rastrear uso por módulo,
@@ -57,19 +79,23 @@ export default function ModuleLauncher({ modules, onOpen }) {
   const [activeCategory, setActiveCategory] = useState("todas");
   const [sortBy, setSortBy] = useState("recentes");
 
+  // Módulos vindos do servidor + os pilares sem módulo real (Marketing,
+  // Jurídico) que ainda assim precisam de cartão - ver PILARES_PLACEHOLDER.
+  const todosOsModulos = useMemo(() => [...modules, ...PILARES_PLACEHOLDER], [modules]);
+
   // Categoria só é clicável se algum módulo real já mora nela - ver comentário
   // de CATEGORIES acima.
   const categoriasComConteudo = useMemo(() => {
     const set = new Set(["todas"]);
-    modules.forEach((m) => set.add(metaFor(m.id).category));
+    todosOsModulos.forEach((m) => set.add(categoriaDaAba(metaFor(m.id).category)));
     return set;
-  }, [modules]);
+  }, [todosOsModulos]);
 
   const modulesFiltrados = useMemo(() => {
     const q = normalizar(query.trim());
-    let lista = modules.filter((m) => {
+    let lista = todosOsModulos.filter((m) => {
       const meta = metaFor(m.id);
-      if (activeCategory !== "todas" && meta.category !== activeCategory) return false;
+      if (activeCategory !== "todas" && categoriaDaAba(meta.category) !== activeCategory) return false;
       if (!q) return true;
       return normalizar(t(meta.labelKey)).includes(q) || normalizar(t(meta.descKey)).includes(q);
     });
@@ -77,7 +103,7 @@ export default function ModuleLauncher({ modules, onOpen }) {
       lista = [...lista].sort((a, b) => t(metaFor(a.id).labelKey).localeCompare(t(metaFor(b.id).labelKey), "pt"));
     }
     return lista;
-  }, [modules, query, activeCategory, sortBy, t]);
+  }, [todosOsModulos, query, activeCategory, sortBy, t]);
 
   function abrirItemSidebar(id) {
     if (id === "perfil") setProfileOpen(true);
