@@ -1045,6 +1045,8 @@ function parsePersonalTask(row) {
     completedAt: row.completed_at || null,
     archived: !!row.archived,
     createdAt: row.created_at,
+    description: row.description || "",
+    checklist: JSON.parse(row.checklist || "[]"),
   };
 }
 
@@ -1080,9 +1082,11 @@ export function updatePersonalTask(id, patch) {
   // some se ela for desmarcada, senão desmarcar e marcar de novo não
   // reiniciaria a contagem dos 2 dias.
   const completedAt = completed ? atual.completedAt || nowIso() : null;
+  const description = patch.description === undefined ? atual.description : patch.description;
+  const checklist = patch.checklist === undefined ? atual.checklist : patch.checklist;
   getDb()
-    .prepare("UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=? WHERE id=?")
-    .run(patch.title ?? atual.title, patch.due ?? atual.due, completed ? 1 : 0, completedAt, id);
+    .prepare("UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=?, description=?, checklist=? WHERE id=?")
+    .run(patch.title ?? atual.title, patch.due ?? atual.due, completed ? 1 : 0, completedAt, description, JSON.stringify(checklist), id);
   return getPersonalTask(id);
 }
 

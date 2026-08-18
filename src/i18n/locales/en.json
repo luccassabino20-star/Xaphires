@@ -922,7 +922,8 @@
       "prevMonth": "Previous month",
       "nextMonth": "Next month",
       "more": "+{{count}} more",
-      "routinePreview": "Preview of the automatic routine \"{{title}}\" - not a card yet"
+      "routinePreview": "Preview of the automatic routine \"{{title}}\" - not a card yet",
+      "quickAdd": "Add card on this date"
     },
     "dashboard": {
       "totalCards": "Total cards",
@@ -1072,7 +1073,11 @@
     "groupTomorrow": "Tomorrow",
     "groupUpcoming": "Upcoming",
     "groupCompleted": "Completed",
-    "planRequired": "The personal planner is available from the Pro plan up. You can still view and delete what already exists."
+    "planRequired": "The personal planner is available from the Pro plan up. You can still view and delete what already exists.",
+    "subtasks": "Subtasks",
+    "subtasksProgress": "{{done}} of {{total}} subtasks completed",
+    "addSubtaskPlaceholder": "Add a subtask...",
+    "saveAndClose": "Save and close"
   },
   "plan": {
     "monthlyLabel": "Monthly price",

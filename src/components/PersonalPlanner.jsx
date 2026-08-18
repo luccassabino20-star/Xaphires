@@ -6,6 +6,7 @@ import { translateError } from "../utils/errors.js";
 import { localeTag } from "../i18n/locale.js";
 import { weekdayNames, monthNames, toISODate, buildGrid } from "../utils/calendarGrid.js";
 import DatePicker from "./DatePicker.jsx";
+import PersonalTaskDetailModal from "./PersonalTaskDetailModal.jsx";
 
 function CalendarBadgeIcon() {
   return (
@@ -18,6 +19,20 @@ function CheckMarkIcon() {
   return (
     <svg viewBox="0 0 24 24" width="12" height="12">
       <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
+    </svg>
+  );
+}
+function ChecklistIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="12" height="12">
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m3 6 1.5 1.5L7 5m-4 7 1.5 1.5L7 11m-4 7 1.5 1.5L7 17M10 6h11M10 12h11M10 18h11"
+      />
     </svg>
   );
 }
@@ -72,6 +87,7 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
   const [draftTitle, setDraftTitle] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newDue, setNewDue] = useState(() => toISODate(new Date()));
+  const [detailTaskId, setDetailTaskId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -176,10 +192,17 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
     try {
       await api.deletePersonalTask(tsk.id);
       setTasks((atual) => atual.filter((x) => x.id !== tsk.id));
+      setDetailTaskId((atual) => (atual === tsk.id ? null : atual));
     } catch (err) {
       showToast(translateError(err, t));
     }
   }
+
+  function handleDetailChange(atualizada) {
+    setTasks((atual) => atual.map((x) => (x.id === atualizada.id ? atualizada : x)));
+  }
+
+  const detailTask = tasks.find((x) => x.id === detailTaskId) || null;
 
   return (
     <div
@@ -335,26 +358,56 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
                           <span className="planner-group-count">{g.items.length}</span>
                         </div>
                         <ul className="planner-task-list">
-                          {g.items.map((tsk) => (
-                            <li key={tsk.id} className={"planner-task-row" + (tsk.completed ? " completed" : "")}>
-                              <button
-                                type="button"
-                                className={"planner-task-check" + (tsk.completed ? " checked" : "")}
-                                onClick={() => toggleTask(tsk)}
-                                disabled={!canUse}
-                                aria-label={tsk.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
+                          {g.items.map((tsk) => {
+                            const checklistDone = (tsk.checklist || []).filter((i) => i.done).length;
+                            const checklistTotal = (tsk.checklist || []).length;
+                            return (
+                              <li
+                                key={tsk.id}
+                                className={"planner-task-row" + (tsk.completed ? " completed" : "")}
+                                onClick={() => setDetailTaskId(tsk.id)}
                               >
-                                {tsk.completed && <CheckMarkIcon />}
-                              </button>
-                              <span className={"planner-task-title" + (tsk.completed ? " completed" : "")}>{tsk.title}</span>
-                              <span className={"planner-task-due" + (g.key === "overdue" ? " overdue" : "")}>
-                                {formatDue(tsk.due, i18n.language)}
-                              </span>
-                              <button type="button" className="planner-task-delete" onClick={() => removeTask(tsk)} aria-label={t("common.delete")}>
-                                <TrashIcon />
-                              </button>
-                            </li>
-                          ))}
+                                <button
+                                  type="button"
+                                  className={"planner-task-check" + (tsk.completed ? " checked" : "")}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleTask(tsk);
+                                  }}
+                                  disabled={!canUse}
+                                  aria-label={tsk.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
+                                >
+                                  {tsk.completed && <CheckMarkIcon />}
+                                </button>
+                                <span className={"planner-task-title" + (tsk.completed ? " completed" : "")}>{tsk.title}</span>
+                                <div className="planner-task-badges">
+                                  {checklistTotal > 0 && (
+                                    <span
+                                      className={"planner-task-checklist-badge" + (checklistDone === checklistTotal ? " all-done" : "")}
+                                      title={t("planner.subtasksProgress", { done: checklistDone, total: checklistTotal })}
+                                    >
+                                      <ChecklistIcon />
+                                      {checklistDone}/{checklistTotal}
+                                    </span>
+                                  )}
+                                  <span className={"planner-task-due" + (g.key === "overdue" ? " overdue" : "")}>
+                                    {formatDue(tsk.due, i18n.language)}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="planner-task-delete"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeTask(tsk);
+                                  }}
+                                  aria-label={t("common.delete")}
+                                >
+                                  <TrashIcon />
+                                </button>
+                              </li>
+                            );
+                          })}
                         </ul>
                       </div>
                     ))
@@ -365,6 +418,14 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
           )}
         </div>
       </div>
+      {detailTask && (
+        <PersonalTaskDetailModal
+          task={detailTask}
+          canUse={canUse}
+          onClose={() => setDetailTaskId(null)}
+          onChange={handleDetailChange}
+        />
+      )}
     </div>
   );
 }

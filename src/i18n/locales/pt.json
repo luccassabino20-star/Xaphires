@@ -1280,7 +1280,8 @@
       "prevMonth": "Mês anterior",
       "nextMonth": "Próximo mês",
       "more": "+{{count}} mais",
-      "routinePreview": "Prévia da rotina automática \"{{title}}\" - ainda não virou cartão"
+      "routinePreview": "Prévia da rotina automática \"{{title}}\" - ainda não virou cartão",
+      "quickAdd": "Adicionar cartão nesta data"
     },
     "dashboard": {
       "totalCards": "Total de cartões",
@@ -1449,7 +1450,11 @@
     "groupTomorrow": "Amanhã",
     "groupUpcoming": "Em breve",
     "groupCompleted": "Concluídas",
-    "planRequired": "O planejador pessoal está disponível a partir do plano Pro. Você pode ver e apagar o que já existe."
+    "planRequired": "O planejador pessoal está disponível a partir do plano Pro. Você pode ver e apagar o que já existe.",
+    "subtasks": "Subtarefas",
+    "subtasksProgress": "{{done}} de {{total}} subtarefas concluídas",
+    "addSubtaskPlaceholder": "Adicionar subtarefa...",
+    "saveAndClose": "Salvar e fechar"
   },
   "plan": {
     "monthlyLabel": "Mensalidade",

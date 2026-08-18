@@ -179,6 +179,11 @@ function applySchema(companyDb) {
   companyDb
     .prepare("UPDATE personal_tasks SET completed_at = ? WHERE completed = 1 AND completed_at IS NULL")
     .run(new Date().toISOString());
+  // Detalhes da tarefa pessoal: descrição livre e checklist de subtarefas, mesmo
+  // formato ({text, done} em JSON) que cards.checklist já usa - sem tabela própria
+  // porque o volume por tarefa é pequeno e não precisa ser consultado à parte.
+  addColumnIfMissing(companyDb, "personal_tasks", "description", "description TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "personal_tasks", "checklist", "checklist TEXT NOT NULL DEFAULT '[]'");
 
   // Perfil pessoal (routes/profile.js): as únicas duas coisas que o próprio
   // usuário edita sobre si mesmo. E-mail continua fora daqui de propósito -
