@@ -7158,10 +7158,33 @@ img.avatar { object-fit: cover; padding: 0; }
    .sc-toggle-btn.active etc. dentro de .sc - não precisa repetir a regra em
    cada um. "padrao" não aparece aqui de propósito: sem override, o CSS já
    cai no --accent neutro do :root. */
-.sc[data-sc-theme="rosa"] { --accent: #d6547e; --accent-hover: #c23f68; }
-.sc[data-sc-theme="azul"] { --accent: #2563eb; --accent-hover: #1d4ed8; }
-.sc[data-sc-theme="verde"] { --accent: #16a34a; --accent-hover: #15803d; }
-.sc[data-sc-theme="roxo"] { --accent: #7c3aed; --accent-hover: #6d28d9; }
+/* Os quatro temas de cor tingem a SUPERFÍCIE inteira do módulo (fundo,
+   topo, sidebar, bordas), não só o destaque - senão o resultado é "alguns
+   botões mudam de cor" em vez de uma identidade visual coesa, que foi
+   exatamente o problema relatado (2026-08-19). --bg-card fica branco puro
+   nos quatro (cartões/tabelas de dado ficam nítidos por cima do fundo
+   tingido - é o motivo do "wash" ser sutil e não a cor cheia: fundo 100%
+   saturado por trás de tabela/formulário cansa a leitura). */
+.sc[data-sc-theme="rosa"] {
+  --accent: #d6547e; --accent-hover: #c23f68;
+  --bg-topbar: #fffafb; --bg-list: #fbeef2; --bg-column: #fdf3f6; --bg-card: #ffffff; --bg-card-hover: #fff5f8;
+  --border-subtle: #f3d9e2; --border-strong: #e8b7c8;
+}
+.sc[data-sc-theme="azul"] {
+  --accent: #2563eb; --accent-hover: #1d4ed8;
+  --bg-topbar: #f7fbff; --bg-list: #e8f1fc; --bg-column: #f0f6fd; --bg-card: #ffffff; --bg-card-hover: #f2f8ff;
+  --border-subtle: #d7e6f7; --border-strong: #b7d2f0;
+}
+.sc[data-sc-theme="verde"] {
+  --accent: #16a34a; --accent-hover: #15803d;
+  --bg-topbar: #f7fdf9; --bg-list: #e6f6ec; --bg-column: #f1faf4; --bg-card: #ffffff; --bg-card-hover: #f0fbf4;
+  --border-subtle: #d3ecdc; --border-strong: #b3ddc2;
+}
+.sc[data-sc-theme="roxo"] {
+  --accent: #7c3aed; --accent-hover: #6d28d9;
+  --bg-topbar: #faf7fe; --bg-list: #efe6fb; --bg-column: #f6f2fd; --bg-card: #ffffff; --bg-card-hover: #f8f3ff;
+  --border-subtle: #e4d4f7; --border-strong: #cfb0ee;
+}
 /* "Modo Escuro" do módulo é independente da preferência de tema do app (uma
    pessoa pode estar no app claro e ainda assim ter a clínica configurada
    pra escuro, ou vice-versa) - por isso é uma paleta própria, cópia dos
@@ -7171,17 +7194,47 @@ img.avatar { object-fit: cover; padding: 0; }
   /* --bg-app entra aqui só porque .btn-primary usa var(--bg-app) como cor do
      texto (contraste garantido contra --accent nos dois temas do app - ver
      a regra em .btn-primary) - sem isso o botão ficava com texto quase
-     branco em cima de um destaque quase branco (--accent: #e5e5e5). */
+     branco em cima de um destaque quase branco. Diferente do dark mode
+     genérico do app (cinza neutro): este tem cor de assinatura própria
+     (índigo) - senão os cinco temas "premium" viravam quatro coloridos e um
+     cinza sem graça, o único que não parece ter identidade escolhida. */
   --bg-app: #050505;
   --bg-topbar: #0d0d0d; --bg-list: #131313; --bg-column: #131313; --bg-card: #1e1e1e; --bg-card-hover: #2a2a2a;
   --border-subtle: #262626; --border-strong: #3d3d3d;
   --text-primary: #f0f0f0; --text-secondary: #a3a3a3; --text-muted: #737373;
-  --accent: #e5e5e5; --accent-hover: #ffffff; --success: #22c55e;
+  --accent: #818cf8; --accent-hover: #6366f1; --success: #22c55e;
   --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.25);
   --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
   --shadow-list: 0 1px 3px rgba(0,0,0,0.2); --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
   --list-border: #262626; --card-border: #2e2e2e; --status-pill-bg: #2a2a2a; --status-pill-text: #a3a3a3;
+  /* Dois halos de cor bem apagados atrás de tudo - sem isso o
+     backdrop-filter: blur() das superfícies "vidro" abaixo não tem nada
+     colorido pra borrar, e o efeito de vidro fica invisível num fundo liso. */
+  background:
+    radial-gradient(560px circle at 12% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 62%),
+    radial-gradient(480px circle at 92% 18%, color-mix(in srgb, #f472b6 10%, transparent), transparent 55%),
+    var(--bg-column);
 }
+/* Vidro fosco nas superfícies "estruturais" (topo, sidebar, cards de
+   configuração, modais) - não nos cards de agendamento nem nos itens do
+   painel "Pacientes do dia", porque esses têm cor própria por status
+   (--sc-status-*-bg, fixa e universal) e um blur escuro por cima lavaria
+   essa cor. `.modal` é classe global do app inteiro - por isso o seletor
+   vem sempre prefixado com [data-sc-theme="escuro"], pra não vazar pros
+   modais de outros módulos. */
+.sc[data-sc-theme="escuro"] .sc-top,
+.sc[data-sc-theme="escuro"] .sc-sidebar,
+.sc[data-sc-theme="escuro"] .sc-config-card,
+.sc[data-sc-theme="escuro"] .modal {
+  background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+/* .modal (classe global do app) não tem borda nenhuma fora daqui - sem
+   isso o vidro fica sem contorno, meio "sem moldura" flutuando na tela. */
+.sc[data-sc-theme="escuro"] .modal { border: 1px solid rgba(255, 255, 255, 0.08); }
+.sc[data-sc-theme="escuro"] .btn-primary { box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
 .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-topbar); }
 .sc-top-left { display: flex; align-items: center; gap: 12px; }
 .sc-title { font-size: 18px; font-weight: 680; margin: 0; }
