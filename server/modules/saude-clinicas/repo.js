@@ -5,8 +5,11 @@
 // entra no contexto na mão, por isso as funções aqui não sabem (nem precisam
 // saber) se quem chamou tem sessão ou não.
 import crypto from "node:crypto";
-import { getDb } from "../../db.js";
+import fs from "node:fs";
+import path from "node:path";
+import { getDb, companiesDir } from "../../db.js";
 import { uid } from "../../repo.js";
+import { getCurrentCompanyId } from "../../context.js";
 
 function nowIso() {
   return new Date().toISOString();
@@ -34,14 +37,51 @@ export function listPatients() {
 export function getPatient(id) {
   return getDb().prepare("SELECT * FROM patients WHERE id = ?").get(id) || null;
 }
-export function insertPatient({ name, birthDate, gender, phone, cpf, email, notes }, userId) {
+function proximoPatientNumber() {
+  const r = getDb().prepare("SELECT COALESCE(MAX(patient_number), 0) AS maxNum FROM patients").get();
+  return r.maxNum + 1;
+}
+export function insertPatient(
+  { name, birthDate, gender, phone, cpf, email, notes, civilName, socialGender, rg, phoneHome, phoneWork, smsReminderOptIn, cep, address, addressNumber, complement, neighborhood, city, state, country },
+  userId
+) {
   const id = uid();
   getDb()
     .prepare(
-      `INSERT INTO patients (id, name, birth_date, gender, phone, cpf, email, notes, active, created_at, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`
+      `INSERT INTO patients
+         (id, patient_number, name, birth_date, gender, phone, cpf, email, notes, active,
+          civil_name, social_gender, rg, phone_home, phone_work, sms_reminder_opt_in,
+          cep, address, address_number, complement, neighborhood, city, state, country,
+          created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(id, name, birthDate || null, gender || "", phone || "", cpf || "", email || "", notes || "", nowIso(), userId || null);
+    .run(
+      id,
+      proximoPatientNumber(),
+      name,
+      birthDate || null,
+      gender || "",
+      phone || "",
+      cpf || "",
+      email || "",
+      notes || "",
+      civilName || "",
+      socialGender || "",
+      rg || "",
+      phoneHome || "",
+      phoneWork || "",
+      smsReminderOptIn ? 1 : 0,
+      cep || "",
+      address || "",
+      addressNumber || "",
+      complement || "",
+      neighborhood || "",
+      city || "",
+      state || "",
+      country || "Brasil",
+      nowIso(),
+      userId || null
+    );
   return getPatient(id);
 }
 export function updatePatient(id, p) {
@@ -49,7 +89,10 @@ export function updatePatient(id, p) {
   if (!a) return null;
   getDb()
     .prepare(
-      `UPDATE patients SET name = ?, birth_date = ?, gender = ?, phone = ?, cpf = ?, email = ?, notes = ?, active = ? WHERE id = ?`
+      `UPDATE patients SET name = ?, birth_date = ?, gender = ?, phone = ?, cpf = ?, email = ?, notes = ?, active = ?,
+              civil_name = ?, social_gender = ?, rg = ?, phone_home = ?, phone_work = ?, sms_reminder_opt_in = ?,
+              cep = ?, address = ?, address_number = ?, complement = ?, neighborhood = ?, city = ?, state = ?, country = ?
+       WHERE id = ?`
     )
     .run(
       p.name ?? a.name,
@@ -60,9 +103,58 @@ export function updatePatient(id, p) {
       p.email ?? a.email,
       p.notes ?? a.notes,
       p.active !== undefined ? (p.active ? 1 : 0) : a.active,
+      p.civilName ?? a.civil_name,
+      p.socialGender ?? a.social_gender,
+      p.rg ?? a.rg,
+      p.phoneHome ?? a.phone_home,
+      p.phoneWork ?? a.phone_work,
+      p.smsReminderOptIn !== undefined ? (p.smsReminderOptIn ? 1 : 0) : a.sms_reminder_opt_in,
+      p.cep ?? a.cep,
+      p.address ?? a.address,
+      p.addressNumber ?? a.address_number,
+      p.complement ?? a.complement,
+      p.neighborhood ?? a.neighborhood,
+      p.city ?? a.city,
+      p.state ?? a.state,
+      p.country ?? a.country,
       id
     );
   return getPatient(id);
+}
+
+// ---------- Foto do paciente ----------
+// Mesmo desenho de avatar de usuário (server/repo.js: newAvatarTarget/
+// setUserAvatar/getAvatarFile/discardAvatarFile), pasta própria pra não
+// misturar com uploads/avatars (que é de usuário da plataforma, outra
+// entidade).
+function patientAvatarsDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "patient-photos");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+export function newPatientAvatarTarget() {
+  const id = uid();
+  return { id, path: path.join(patientAvatarsDir(), id) };
+}
+export function setPatientAvatar(patientId, { id, mimeType }) {
+  const atual = getPatient(patientId);
+  getDb().prepare("UPDATE patients SET avatar_path = ?, avatar_mime = ? WHERE id = ?").run(id, mimeType, patientId);
+  if (atual?.avatar_path) discardPatientAvatarFile(path.join(patientAvatarsDir(), atual.avatar_path));
+  return getPatient(patientId);
+}
+export function getPatientAvatarFile(patientId) {
+  const p = getPatient(patientId);
+  if (!p?.avatar_path) return null;
+  const filePath = path.join(patientAvatarsDir(), p.avatar_path);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, mimeType: p.avatar_mime || "application/octet-stream" };
+}
+export function discardPatientAvatarFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* já pode ter sumido */
+  }
 }
 
 // ---------- Templates de anamnese ----------
@@ -234,6 +326,55 @@ export function listAppointmentsByPatient(patientId) {
     .prepare("SELECT * FROM appointments WHERE patient_id = ? ORDER BY date DESC, time DESC")
     .all(patientId);
 }
+// ---------- Log de eventos do agendamento ----------
+
+function resumoProcedimentos(procedures) {
+  try {
+    const arr = typeof procedures === "string" ? JSON.parse(procedures) : procedures;
+    return Array.isArray(arr) ? arr.map((p) => p.name).join(", ") : "";
+  } catch {
+    return "";
+  }
+}
+
+// Grava um snapshot do agendamento no momento do evento - chamado de dentro
+// de insertAppointment/updateAppointment, nunca direto da rota, pra nenhum
+// caminho de escrita esquecer de registrar (mesmo motivo de
+// comAcessoAEmpresa no painel de plataforma centralizar a auditoria).
+function registrarLogAgendamento(agendamento, event, userId) {
+  getDb()
+    .prepare(
+      `INSERT INTO appointment_logs
+         (id, appointment_id, event, status, date, time, duration_min, payment_type, procedure_summary, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .run(
+      uid(),
+      agendamento.id,
+      event,
+      agendamento.status,
+      agendamento.date,
+      agendamento.time,
+      agendamento.duration_min,
+      agendamento.payment_type,
+      resumoProcedimentos(agendamento.procedures),
+      nowIso(),
+      userId || null
+    );
+}
+
+export function listLogsAgendamento(appointmentId) {
+  return getDb()
+    .prepare(
+      `SELECT l.*, u.name AS modificado_por
+         FROM appointment_logs l
+         LEFT JOIN users u ON u.id = l.created_by
+        WHERE l.appointment_id = ?
+        ORDER BY l.created_at DESC`
+    )
+    .all(appointmentId);
+}
+
 export function insertAppointment(
   { patientId, professionalUserId, title, date, time, durationMin, paymentType, paymentStatus, procedures, notes },
   userId
@@ -260,7 +401,9 @@ export function insertAppointment(
       nowIso(),
       userId || null
     );
-  return getAppointment(id);
+  const criado = getAppointment(id);
+  registrarLogAgendamento(criado, "criado", userId);
+  return criado;
 }
 // Cria a partir da rota: aceita um paciente existente (patientId) OU cadastro
 // rápido (patientName obrigatório nesse caso) - mesmo desenho de
@@ -275,7 +418,7 @@ export function criarAgendamento({ patientId, patientName, patientPhone, ...rest
   return insertAppointment({ ...resto, patientId: idPaciente }, userId);
 }
 
-export function updateAppointment(id, a) {
+export function updateAppointment(id, a, userId) {
   const atual = getAppointment(id);
   if (!atual) return null;
   getDb()
@@ -296,7 +439,19 @@ export function updateAppointment(id, a) {
       a.notes ?? atual.notes,
       id
     );
-  return getAppointment(id);
+  const atualizado = getAppointment(id);
+  // Um evento por PATCH, priorizando reagendamento: se data/hora mudou, é
+  // isso que importa registrar (o status "andou junto" não é o que a
+  // recepção quer ver na hora de explicar pro paciente por que a consulta
+  // mudou). Editar só procedimento/pagamento/notas não gera log - não é um
+  // evento que a tela de log promete mostrar (ver o mock: só Agendado e
+  // Reagendado).
+  if (atualizado.date !== atual.date || atualizado.time !== atual.time) {
+    registrarLogAgendamento(atualizado, "reagendado", userId);
+  } else if (atualizado.status !== atual.status) {
+    registrarLogAgendamento(atualizado, "status_alterado", userId);
+  }
+  return atualizado;
 }
 
 // ---------- Agenda: bloqueios ----------

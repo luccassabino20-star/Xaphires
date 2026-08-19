@@ -5,6 +5,7 @@ import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { formatCents } from "../financeiro/dinheiro.js";
 import { whatsappLink } from "../../utils/contact.js";
+import AppointmentLogModal from "./AppointmentLogModal.jsx";
 import { calcularIdade, minutosDesde, minutosParaHora, paraMinutos } from "./agendaUtils.js";
 
 const STATUS_VALIDOS = ["agendado", "confirmado", "em_atendimento", "concluido", "cancelado", "faltou"];
@@ -46,6 +47,7 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
   const [historico, setHistorico] = useState(null);
   const [salvando, setSalvando] = useState(false);
   const [confirmarCancelar, setConfirmarCancelar] = useState(false);
+  const [logAberto, setLogAberto] = useState(false);
 
   useEffect(() => {
     api
@@ -70,6 +72,10 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
   const idade = calcularIdade(patient.birth_date);
   const procedures = parseProcedures(appointment.procedures);
   const totalCents = procedures.reduce((soma, p) => soma + (p.priceCents || 0) * (p.quantity || 1), 0);
+  // Campo só de exibição/rascunho - "Gerar Cobrança" ainda não manda pra
+  // gateway nenhum (ver comentário no botão), então não há pra onde
+  // persistir um valor diferente do total calculado dos procedimentos.
+  const [valorCobranca, setValorCobranca] = useState(() => formatCents(totalCents, i18n.language).replace(/[^\d,.-]/g, ""));
 
   async function mudarStatus(status) {
     setSalvando(true);
@@ -117,6 +123,10 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
   const dataLegivel = new Date(appointment.date + "T00:00:00").toLocaleDateString(i18n.language, { weekday: "long", day: "numeric", month: "long" });
   const horaFim = minutosParaHora(paraMinutos(appointment.time) + appointment.duration_min);
 
+  if (logAberto) {
+    return <AppointmentLogModal appointment={appointment} patient={patient} onClose={onClose} />;
+  }
+
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal sc-detail-modal">
@@ -133,12 +143,12 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
             <span className="sc-hint">{patient.phone || "-"}</span>
           </div>
           <div className="sc-detail-paciente-meta">
-            {idade && (
-              <span className="sc-hint">{t("saudeClinicas.agenda.idade", { anos: idade.anos, meses: idade.meses, dias: idade.dias })}</span>
-            )}
-            {ultimaConsulta && (
-              <span className="sc-hint">{t("saudeClinicas.agenda.ultimaConsulta")}: {tempoRelativo(minutosDesde(ultimaConsulta.date, ultimaConsulta.time), t)}</span>
-            )}
+            <span className="sc-hint">
+              {idade ? t("saudeClinicas.agenda.idade", { anos: idade.anos, meses: idade.meses, dias: idade.dias }) : t("saudeClinicas.agenda.idadeNaoInformada")}
+            </span>
+            <span className="sc-hint">
+              {t("saudeClinicas.agenda.ultimaConsulta")}: {ultimaConsulta ? tempoRelativo(minutosDesde(ultimaConsulta.date, ultimaConsulta.time), t) : t("saudeClinicas.agenda.semConsultaAnterior")}
+            </span>
           </div>
         </div>
 
@@ -155,13 +165,26 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
           </select>
         </div>
 
+        <div className="sc-detail-cobranca">
+          <span>{t("saudeClinicas.agenda.cobrarAgendamento")}</span>
+          <div className="sc-detail-cobranca-acao">
+            <label className="sc-detail-valor-campo">
+              <span className="sc-hint">{t("saudeClinicas.agenda.valorCobranca")}</span>
+              <input type="text" inputMode="decimal" value={valorCobranca} onChange={(e) => setValorCobranca(e.target.value)} />
+            </label>
+            {/* Sem gateway pra cobrar o PACIENTE ainda (o billing atual só
+                cobra a própria clínica pela assinatura, via Asaas) - fica
+                travado como "Em breve" no mesmo padrão do resto do módulo,
+                até a clínica escolher a forma de pagamento na implantação. */}
+            <button type="button" className="sc-detail-gerar-cobranca" disabled title={t("modules.comingSoon")}>
+              {t("saudeClinicas.agenda.gerarCobranca")}
+            </button>
+          </div>
+        </div>
+        <p className="sc-hint">{t(`saudeClinicas.agenda.${appointment.payment_type}`)}</p>
+
         {procedures.length > 0 && (
           <>
-            <div className="sc-detail-cobranca">
-              <span>{t("saudeClinicas.agenda.cobrarAgendamento")}</span>
-              <span className="sc-agenda-total">{formatCents(totalCents, i18n.language)}</span>
-            </div>
-            <p className="sc-hint">{t(`saudeClinicas.agenda.${appointment.payment_type}`)}</p>
             <table className="sc-detail-procedimentos">
               <thead>
                 <tr>
@@ -197,9 +220,14 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
               <button type="button" className="btn-ghost btn-small" onClick={() => setConfirmarCancelar(false)}>{t("common.cancel")}</button>
             </span>
           ) : (
-            <button type="button" className="icon-btn" title={t("saudeClinicas.agenda.cancelarAgendamento")} onClick={() => setConfirmarCancelar(true)}>
-              <svg viewBox="0 0 24 24" width="17" height="17"><path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M9 7V4h6v3m-9 0 1 13h8l1-13" /></svg>
-            </button>
+            <span className="sc-detail-rodape-icones">
+              <button type="button" className="icon-btn" title={t("saudeClinicas.agenda.cancelarAgendamento")} onClick={() => setConfirmarCancelar(true)}>
+                <svg viewBox="0 0 24 24" width="17" height="17"><path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M9 7V4h6v3m-9 0 1 13h8l1-13" /></svg>
+              </button>
+              <button type="button" className="icon-btn" title={t("saudeClinicas.agenda.verLog")} onClick={() => setLogAberto(true)}>
+                <svg viewBox="0 0 24 24" width="17" height="17"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.8" /><path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 2" /></svg>
+              </button>
+            </span>
           )}
           <div className="sc-detail-rodape-acoes">
             {appointment.payment_status !== "pago" && procedures.length > 0 && (

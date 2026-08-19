@@ -1,6 +1,9 @@
 import { Router } from "express";
+import fs from "node:fs";
+import Busboy from "busboy";
 import { requireAuth, requireWritablePlan, requireModule, requireMaster } from "../../middleware.js";
 import { ah } from "../../asyncHandler.js";
+import { runWithCompany } from "../../context.js";
 import {
   getClinicConfig,
   setClinicType,
@@ -8,6 +11,10 @@ import {
   getPatient,
   insertPatient,
   updatePatient,
+  newPatientAvatarTarget,
+  setPatientAvatar,
+  getPatientAvatarFile,
+  discardPatientAvatarFile,
   listAnamneseTemplates,
   getAnamneseTemplate,
   insertAnamneseTemplate,
@@ -20,6 +27,7 @@ import {
   existeConflitoHorario,
   listAppointments,
   listAppointmentsByPatient,
+  listLogsAgendamento,
   criarAgendamento,
   updateAppointment,
   getAppointment,
@@ -114,6 +122,118 @@ router.get(
   ah(async (req, res) => {
     if (!getPatient(req.params.id)) return res.status(404).json({ error: "Paciente não encontrado", code: "PATIENT_NOT_FOUND" });
     res.json(listAppointmentsByPatient(req.params.id));
+  })
+);
+
+// ---------- Foto do paciente ----------
+// Upload em streaming, mesmo desenho de POST /profile/avatar: grava no disco
+// aos poucos, conferindo o limite DURANTE a transferência. router.use(...)
+// no topo do arquivo já rodou requireAuth (o ALS de companyId está ativo
+// aqui, na parte síncrona) - só os eventos do busboy (assíncronos, nascem do
+// socket) precisam reentrar no contexto na mão, exatamente como lá.
+const PATIENT_PHOTO_MAX_BYTES = 3 * 1024 * 1024;
+const TIPOS_IMAGEM_ACEITOS = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
+
+router.post("/patients/:id/photo", (req, res) => {
+  if (!getPatient(req.params.id)) return res.status(404).json({ error: "Paciente não encontrado", code: "PATIENT_NOT_FOUND" });
+  const alvo = newPatientAvatarTarget();
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: PATIENT_PHOTO_MAX_BYTES } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let tipo = "";
+  let bytes = 0;
+  let excedeu = false;
+  let tipoInvalido = false;
+  let respondido = false;
+  let saida = null;
+  let descartar = false;
+
+  function apagarQuandoPuder() {
+    descartar = true;
+    if (!saida || saida.destroyed) discardPatientAvatarFile(alvo.path);
+  }
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    tipo = info.mimeType || "";
+    if (!TIPOS_IMAGEM_ACEITOS.has(tipo)) {
+      tipoInvalido = true;
+      stream.resume();
+      return falhar(400, { error: "Envie uma imagem PNG, JPEG, WEBP ou GIF", code: "INVALID_IMAGE_TYPE" });
+    }
+    saida = fs.createWriteStream(alvo.path);
+    saida.on("error", () => falhar(500, { error: "Erro ao gravar o arquivo", code: "UPLOAD_FAILED" }));
+    saida.on("close", () => {
+      if (descartar) discardPatientAvatarFile(alvo.path);
+    });
+    stream.on("data", (chunk) => {
+      bytes += chunk.length;
+    });
+    stream.on("limit", () => {
+      excedeu = true;
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, { error: `A foto deve ter até ${Math.round(PATIENT_PHOTO_MAX_BYTES / 1024 / 1024)} MB`, code: "PHOTO_TOO_LARGE" });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+
+  function registrar() {
+    if (respondido || excedeu || tipoInvalido) return;
+    try {
+      const atualizado = runWithCompany(req.companyId, () => setPatientAvatar(req.params.id, { id: alvo.id, mimeType: tipo }));
+      respondido = true;
+      res.status(201).json(atualizado);
+    } catch (err) {
+      console.error("Falha ao salvar a foto do paciente:", err);
+      falhar(500, { error: "Erro ao salvar a foto", code: "PHOTO_SAVE_FAILED" });
+    }
+  }
+
+  bb.on("close", () => {
+    if (respondido || excedeu || tipoInvalido) return;
+    if (bytes === 0) return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  req.on("aborted", () => {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    saida?.destroy();
+  });
+
+  req.pipe(bb);
+});
+
+router.get(
+  "/patients/:id/photo",
+  ah(async (req, res) => {
+    const file = getPatientAvatarFile(req.params.id);
+    if (!file) return res.status(404).json({ error: "Foto não encontrada", code: "PHOTO_NOT_FOUND" });
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", file.mimeType);
+    res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
+    res.sendFile(file.path);
   })
 );
 
@@ -246,7 +366,15 @@ router.patch(
     if (mudouEncaixe && existeConflitoHorario({ professionalUserId, date, time, durationMin, excludeAppointmentId: atual.id })) {
       return res.status(409).json({ error: "Já existe um agendamento ou bloqueio nesse horário", code: "AGENDA_CONFLITO_HORARIO" });
     }
-    res.json(updateAppointment(req.params.id, req.body));
+    res.json(updateAppointment(req.params.id, req.body, req.user.id));
+  })
+);
+
+router.get(
+  "/appointments/:id/logs",
+  ah(async (req, res) => {
+    if (!getAppointment(req.params.id)) return res.status(404).json({ error: "Agendamento não encontrado", code: "AGENDA_APPOINTMENT_NOT_FOUND" });
+    res.json(listLogsAgendamento(req.params.id));
   })
 );
 

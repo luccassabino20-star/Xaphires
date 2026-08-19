@@ -266,6 +266,28 @@ export function applySaudeClinicasSchema(companyDb) {
       created_by TEXT REFERENCES users(id)
     );
     CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status);
+
+    -- Log de eventos do agendamento (append-only, mesmo espírito de
+    -- admin_audit no painel de plataforma: sem função de update/delete no
+    -- repo, de propósito). Cada linha é um SNAPSHOT do agendamento no
+    -- momento do evento - não um diff - porque é isso que a tela de log
+    -- mostra (o estado inteiro em cada ponto do tempo), e snapshot não
+    -- perde informação se um campo antigo mudar de significado depois.
+    CREATE TABLE IF NOT EXISTS appointment_logs (
+      id TEXT PRIMARY KEY,
+      appointment_id TEXT NOT NULL REFERENCES appointments(id),
+      -- 'criado' | 'reagendado' (mudou data/hora) | 'status_alterado'
+      event TEXT NOT NULL,
+      status TEXT NOT NULL,
+      date TEXT NOT NULL,
+      time TEXT NOT NULL,
+      duration_min INTEGER NOT NULL DEFAULT 30,
+      payment_type TEXT NOT NULL DEFAULT 'particular',
+      procedure_summary TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      created_by TEXT REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_apptlogs_appointment ON appointment_logs(appointment_id);
   `);
 
   // Colunas novas em appointments (a tabela já existia, sem tela por trás,
@@ -279,4 +301,41 @@ export function applySaudeClinicasSchema(companyDb) {
   addColumnIfMissing(companyDb, "appointments", "payment_type", "payment_type TEXT NOT NULL DEFAULT 'particular'");
   addColumnIfMissing(companyDb, "appointments", "payment_status", "payment_status TEXT NOT NULL DEFAULT 'pendente'");
   addColumnIfMissing(companyDb, "appointments", "procedures", "procedures TEXT NOT NULL DEFAULT '[]'");
+
+  // Cadastro completo de paciente (a Fase "casca completa" só tinha nome,
+  // nascimento, sexo, telefone, cpf, e-mail, notas - o resto entrou quando a
+  // tela de cadastro ganhou as abas Dados pessoais/complementares).
+  // patient_number é o "código" sequencial mostrado na tela - não é a chave
+  // primária (essa continua sendo o uid), é só um número de referência fácil
+  // de falar ao telefone; calculado no repo (MAX+1), não é AUTOINCREMENT
+  // porque a PK já é TEXT.
+  addColumnIfMissing(companyDb, "patients", "patient_number", "patient_number INTEGER");
+  // Nome civil e gênero social são campos de cuidado inclusivo (paciente
+  // trans, p.ex.): o nome de registro pode diferir do nome social já
+  // cadastrado em `name`, e o gênero social pode diferir do sexo clínico
+  // (`gender`) - por isso são colunas separadas, não um only-um-ou-outro.
+  addColumnIfMissing(companyDb, "patients", "civil_name", "civil_name TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "social_gender", "social_gender TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "rg", "rg TEXT NOT NULL DEFAULT ''");
+  // `phone` (já existia) segue sendo o celular - é o que o lembrete por
+  // WhatsApp usa. Casa/trabalho são complementares, opcionais.
+  addColumnIfMissing(companyDb, "patients", "phone_home", "phone_home TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "phone_work", "phone_work TEXT NOT NULL DEFAULT ''");
+  // Preferência armazenada, sem envio de verdade ainda (não há provedor de
+  // SMS no projeto - mesmo estágio do "Gerar Cobrança" no agendamento).
+  addColumnIfMissing(companyDb, "patients", "sms_reminder_opt_in", "sms_reminder_opt_in INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing(companyDb, "patients", "cep", "cep TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "address", "address TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "address_number", "address_number TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "complement", "complement TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "neighborhood", "neighborhood TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "city", "city TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "state", "state TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "country", "country TEXT NOT NULL DEFAULT 'Brasil'");
+  // Foto de perfil: mesmo desenho de avatar_path/avatar_mime de users (ver
+  // server/repo.js) - o arquivo em si mora em
+  // companies/<id>/uploads/patients/, nomeado pelo id gravado aqui, nunca
+  // pelo nome original do arquivo.
+  addColumnIfMissing(companyDb, "patients", "avatar_path", "avatar_path TEXT");
+  addColumnIfMissing(companyDb, "patients", "avatar_mime", "avatar_mime TEXT");
 }

@@ -438,6 +438,31 @@ export const scResponderAnamnesePublica = (companyId, token, answers) =>
 export const scListProcedures = () => request("/saude-clinicas/procedures");
 export const scListAppointments = (from, to) => request(`/saude-clinicas/appointments?from=${from}&to=${to}`);
 export const scListPatientAppointments = (patientId) => request(`/saude-clinicas/patients/${patientId}/appointments`);
+export const scListAppointmentLogs = (appointmentId) => request(`/saude-clinicas/appointments/${appointmentId}/logs`);
+// Upload não passa pelo request() (corpo multipart) - mesmo desenho de uploadMyAvatar.
+export async function scUploadPatientPhoto(patientId, file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/saude-clinicas/patients/${patientId}/photo`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 export const scCreateAppointment = (data) => request("/saude-clinicas/appointments", { method: "POST", body: data });
 export const scUpdateAppointment = (id, data) => request(`/saude-clinicas/appointments/${id}`, { method: "PATCH", body: data });
 export const scListBlocks = (from, to) => request(`/saude-clinicas/blocks?from=${from}&to=${to}`);

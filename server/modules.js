@@ -121,12 +121,17 @@ function parseEnabledModules(company) {
 
 // A empresa tem direito ao módulo? available é pré-requisito sempre (não se libera
 // o que ainda não existe). Com lista definida, vale a lista; sem lista, o padrão
-// é core.
+// é core. "*" na lista é acesso total: entitled a qualquer módulo já
+// disponível e a qualquer um que vier a ficar available depois, sem precisar
+// tocar na empresa de novo a cada módulo novo lançado - é o que dá a uma
+// empresa (ex.: a conta interna da própria plataforma) acesso permanente a
+// tudo, "sempre que for implantado", sem virar uma lista pra manter manualmente.
 export function companyEntitled(company, moduleId) {
   const mod = getModule(moduleId);
   if (!mod || !mod.available) return false;
   const lista = parseEnabledModules(company);
   if (lista === null) return mod.core === true;
+  if (lista.includes("*")) return true;
   return lista.includes(moduleId);
 }
 
@@ -153,7 +158,7 @@ export function moduleEntitlementsFor(company) {
     // remontar a lista ao alternar: usar `entitled` descartava a pré-autorização
     // de um módulo "Em breve" - a marca voltava desmarcada e, pior, o próximo
     // toque em qualquer outro módulo apagava a pré-autorização gravada.
-    stored: lista === null ? m.core === true : lista.includes(m.id),
+    stored: lista === null ? m.core === true : (lista.includes("*") || lista.includes(m.id)),
   }));
 }
 

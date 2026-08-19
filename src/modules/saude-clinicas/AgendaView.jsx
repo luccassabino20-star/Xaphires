@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
@@ -42,6 +42,17 @@ export default function AgendaView() {
   const [detalhe, setDetalhe] = useState(null); // agendamento aberto no modal de detalhes, ou null
   const [waitlistAberta, setWaitlistAberta] = useState(false);
   const [printAberto, setPrintAberto] = useState(false);
+  // Preview de drag-and-drop/resize: { id, dado, dia, slot, duracaoSlots } ou
+  // null fora de arrasto. Nunca toca em `appointments` durante o gesto - só
+  // troca o que é desenhado por cima; se o PATCH falhar (ex. conflito de
+  // horário), soltar o dedo simplesmente limpa isso e o card volta sozinho
+  // pra posição original, sem precisar de rollback de estado.
+  const [arrasto, setArrasto] = useState(null);
+  // true assim que um gesto passa do limiar de "foi só um clique" - o board
+  // onClick do card confere essa ref pra não abrir o modal de detalhes
+  // depois de um arraste (setPointerCapture garante que o click ainda cai no
+  // mesmo botão mesmo tendo soltado em cima de outra célula da grade).
+  const arrastouRef = useRef(false);
 
   const dias = useMemo(() => (viewMode === "semana" ? diasDaSemana(segundaDaSemana(anchor)) : [anchor]), [viewMode, anchor]);
   const from = dias[0];
@@ -125,6 +136,119 @@ export default function AgendaView() {
 
   const slots = Array.from({ length: TOTAL_SLOTS }, (_, i) => minutosParaHora(HORA_INICIO + i * PASSO_MIN));
 
+  const LIMIAR_ARRASTO_PX = 4; // abaixo disso ainda é considerado um clique, não um arraste
+
+  async function confirmarMovimento(a, novoDia, novoSlot) {
+    const novoTime = minutosParaHora(HORA_INICIO + novoSlot * PASSO_MIN);
+    if (novoDia === a.date && novoTime === a.time) return;
+    try {
+      await api.scUpdateAppointment(a.id, { date: novoDia, time: novoTime });
+      await carregarAgenda();
+    } catch (e) {
+      setErro(translateError(e, t));
+    }
+  }
+
+  async function confirmarRedimensionamento(a, duracaoSlots) {
+    const novaDuracaoMin = duracaoSlots * PASSO_MIN;
+    if (novaDuracaoMin === a.duration_min) return;
+    try {
+      await api.scUpdateAppointment(a.id, { durationMin: novaDuracaoMin });
+      await carregarAgenda();
+    } catch (e) {
+      setErro(translateError(e, t));
+    }
+  }
+
+  // Arrastar o card inteiro: muda dia (troca de coluna, na visão semana) e/ou
+  // horário. A posição é lida a cada movimento por elementFromPoint - mais
+  // simples e mais robusto que medir cada coluna na mão, e funciona igual em
+  // "dia" e "semana" sem precisar de dois caminhos de código.
+  function iniciarArrastoAgendamento(e, item) {
+    const a = item.dado;
+    if (a.status === "cancelado") return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    arrastouRef.current = false;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const cardRect = e.currentTarget.getBoundingClientRect();
+    const grabOffsetY = startY - cardRect.top;
+    const duracaoSlots = Math.max(1, Math.round(a.duration_min / PASSO_MIN));
+    let arrastando = false;
+
+    function onMove(ev) {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      if (!arrastando && Math.abs(dx) < LIMIAR_ARRASTO_PX && Math.abs(dy) < LIMIAR_ARRASTO_PX) return;
+      arrastando = true;
+      arrastouRef.current = true;
+      document.body.style.cursor = "grabbing";
+
+      const alvo = document.elementFromPoint(ev.clientX, ev.clientY);
+      const dayEl = alvo && alvo.closest(".sc-agenda-day-body");
+      if (!dayEl) return; // ponteiro saiu da grade - mantém o preview anterior
+      const dayRect = dayEl.getBoundingClientRect();
+      const localY = ev.clientY - dayRect.top - grabOffsetY;
+      let novoSlot = Math.round(localY / SLOT_ALTURA);
+      novoSlot = Math.max(0, Math.min(novoSlot, TOTAL_SLOTS - duracaoSlots));
+      setArrasto({ id: item.id, dado: a, dia: dayEl.dataset.dia, slot: novoSlot, duracaoSlots });
+    }
+    function onUp() {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      document.body.style.cursor = "";
+      if (!arrastando) return;
+      setArrasto((atual) => {
+        if (atual && atual.id === item.id) confirmarMovimento(a, atual.dia, atual.slot);
+        return null;
+      });
+    }
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  // Puxar a borda de baixo do card: só muda a duração, sempre no mesmo dia e
+  // no mesmo horário de início - por isso não precisa do elementFromPoint,
+  // só da posição vertical dentro do dia onde o card já está.
+  function iniciarRedimensionamento(e, item) {
+    e.stopPropagation(); // não deixa o pointerdown também iniciar o "mover" do card
+    const a = item.dado;
+    if (a.status === "cancelado") return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    arrastouRef.current = false;
+
+    const dayEl = e.currentTarget.closest(".sc-agenda-day-body");
+    const dayRect = dayEl.getBoundingClientRect();
+    const inicioSlot = slotDoHorario(a.time);
+    const startY = e.clientY;
+    let arrastando = false;
+
+    function onMove(ev) {
+      if (!arrastando && Math.abs(ev.clientY - startY) < LIMIAR_ARRASTO_PX) return;
+      arrastando = true;
+      arrastouRef.current = true;
+      document.body.style.cursor = "ns-resize";
+
+      const localY = ev.clientY - dayRect.top;
+      let fimSlot = Math.round(localY / SLOT_ALTURA);
+      fimSlot = Math.max(inicioSlot + 1, Math.min(fimSlot, TOTAL_SLOTS));
+      setArrasto({ id: item.id, dado: a, dia: a.date, slot: inicioSlot, duracaoSlots: fimSlot - inicioSlot });
+    }
+    function onUp() {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      document.body.style.cursor = "";
+      if (!arrastando) return;
+      setArrasto((atual) => {
+        if (atual && atual.id === item.id) confirmarRedimensionamento(a, atual.duracaoSlots);
+        return null;
+      });
+    }
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
   return (
     <div className="sc-agenda">
       <div className="sc-agenda-toolbar">
@@ -182,7 +306,7 @@ export default function AgendaView() {
                   <span className="sc-agenda-day-semana">{semana}</span>
                   <span className="sc-agenda-day-numero">{data}</span>
                 </div>
-                <div className="sc-agenda-day-body" style={{ height: TOTAL_SLOTS * SLOT_ALTURA }}>
+                <div className="sc-agenda-day-body" data-dia={dia} style={{ height: TOTAL_SLOTS * SLOT_ALTURA }}>
                   {slots.map((s) => (
                     <button
                       key={s}
@@ -193,7 +317,7 @@ export default function AgendaView() {
                       title={s}
                     />
                   ))}
-                  {itensDoDia(dia).map((it) => {
+                  {itensDoDia(dia).filter((it) => !arrasto || arrasto.id !== it.id).map((it) => {
                     const largura = 100 / it.totalRaias;
                     const estilo = {
                       top: (slotDoHorario(it.dado.time)) * SLOT_ALTURA,
@@ -210,22 +334,50 @@ export default function AgendaView() {
                       );
                     }
                     const a = it.dado;
+                    const arrastavel = a.status !== "cancelado";
                     return (
                       <button
                         key={it.id}
                         type="button"
-                        className={"sc-agenda-card sc-agenda-card-" + a.status}
+                        className={"sc-agenda-card sc-agenda-card-" + a.status + (arrastavel ? " sc-agenda-card-arrastavel" : "")}
                         style={estilo}
-                        onClick={() => setDetalhe(a)}
+                        onPointerDown={arrastavel ? (e) => iniciarArrastoAgendamento(e, it) : undefined}
+                        onClick={() => {
+                          if (arrastouRef.current) { arrastouRef.current = false; return; }
+                          setDetalhe(a);
+                        }}
                       >
                         <span className="sc-agenda-card-top" />
                         <span className="sc-agenda-card-hora">{a.time} - {minutosParaHora(paraMinutos(a.time) + a.duration_min)}</span>
                         <span className="sc-agenda-card-nome">{a.patient_name}</span>
                         <span className="sc-agenda-card-status-label">{t(`saudeClinicas.agenda.status.${a.status}`)}</span>
                         {a.payment_status === "pago" && <span className="sc-agenda-card-pago">{t("saudeClinicas.agenda.pago")}</span>}
+                        {arrastavel && (
+                          <span
+                            className="sc-agenda-card-resize"
+                            onPointerDown={(e) => iniciarRedimensionamento(e, it)}
+                          />
+                        )}
                       </button>
                     );
                   })}
+                  {arrasto && arrasto.dia === dia && (
+                    <div
+                      className={"sc-agenda-card sc-agenda-card-preview sc-agenda-card-" + arrasto.dado.status}
+                      style={{
+                        top: arrasto.slot * SLOT_ALTURA,
+                        height: arrasto.duracaoSlots * SLOT_ALTURA,
+                        left: 0,
+                        width: "calc(100% - 3px)",
+                      }}
+                    >
+                      <span className="sc-agenda-card-top" />
+                      <span className="sc-agenda-card-hora">
+                        {minutosParaHora(HORA_INICIO + arrasto.slot * PASSO_MIN)} - {minutosParaHora(HORA_INICIO + (arrasto.slot + arrasto.duracaoSlots) * PASSO_MIN)}
+                      </span>
+                      <span className="sc-agenda-card-nome">{arrasto.dado.patient_name}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
