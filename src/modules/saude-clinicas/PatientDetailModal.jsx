@@ -4,6 +4,7 @@ import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { mascararTelefone } from "./agendaUtils.js";
+import { formatarDoc } from "../../utils/doc.js";
 
 const ESTADOS_BR = [
   "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal", "Espírito Santo", "Goiás",
@@ -35,11 +36,14 @@ function vazioFormulario(p) {
     email: p?.email || "",
     cpf: p?.cpf || "",
     rg: p?.rg || "",
+    referralSource: p?.referral_source || "",
     notes: p?.notes || "",
     phone: p?.phone || "",
     phoneHome: p?.phone_home || "",
     phoneWork: p?.phone_work || "",
     smsReminderOptIn: !!p?.sms_reminder_opt_in,
+    criticalAlert: !!p?.critical_alert,
+    criticalAlertNotes: p?.critical_alert_notes || "",
     cep: p?.cep || "",
     address: p?.address || "",
     addressNumber: p?.address_number || "",
@@ -51,21 +55,19 @@ function vazioFormulario(p) {
   };
 }
 
-// Cadastro completo do paciente, em abas - a versão rica do formulário
-// enxuto de PatientsView (que continua existindo pra edição rápida da
-// listagem). Aberto tanto da listagem de pacientes quanto de "Dados do
-// paciente" no log do agendamento (AppointmentLogModal).
-// PATIENT_NOVO é o sentinel de "ainda não existe no banco" - permite este
-// modal servir tanto de edição (aberto com um id real, de AppointmentLogModal
-// ou de uma listagem futura) quanto de criação ("Salvar e adicionar outro"
-// reseta pra este estado sem fechar o modal).
+// Cadastro completo do paciente, em abas - tela única de criação e edição
+// (aberta da listagem de Pacientes e de "Dados do paciente" no log do
+// agendamento). PATIENT_NOVO é o sentinel de "ainda não existe no banco" -
+// permite este modal servir tanto de edição (aberto com um id real) quanto
+// de criação ("Salvar e adicionar outro" reseta pra este estado sem fechar
+// o modal).
 const PATIENT_NOVO = { id: null, patient_number: null, created_at: null, avatar_path: null };
 
 export default function PatientDetailModal({ patientId, onClose, onSaved }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const fileInputRef = useRef(null);
-  const [aba, setAba] = useState("pessoais"); // 'pessoais' | 'complementares' | 'convenios' | 'historico'
+  const [aba, setAba] = useState("pessoais"); // 'pessoais' | 'contato' | 'complementares' | 'preferencias' | 'historico'
   const [currentId, setCurrentId] = useState(patientId || null);
   const [patient, setPatient] = useState(patientId ? null : PATIENT_NOVO);
   const [f, setF] = useState(vazioFormulario(null));
@@ -136,11 +138,14 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
       email: f.email,
       cpf: f.cpf,
       rg: f.rg,
+      referralSource: f.referralSource,
       notes: f.notes,
       phone: f.phone,
       phoneHome: f.phoneHome,
       phoneWork: f.phoneWork,
       smsReminderOptIn: f.smsReminderOptIn,
+      criticalAlert: f.criticalAlert,
+      criticalAlertNotes: f.criticalAlert ? f.criticalAlertNotes : "",
       cep: f.cep,
       address: f.address,
       addressNumber: f.addressNumber,
@@ -222,32 +227,57 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
     );
   }
 
+  const ABAS = [
+    { id: "pessoais", label: t("saudeClinicas.pacientes.abaPessoais") },
+    { id: "contato", label: t("saudeClinicas.pacientes.abaContato") },
+    { id: "complementares", label: t("saudeClinicas.pacientes.abaComplementares") },
+    { id: "convenios", label: t("saudeClinicas.pacientes.abaConvenios"), disabled: true },
+    { id: "preferencias", label: t("saudeClinicas.pacientes.abaPreferencias") },
+    { id: "historico", label: t("saudeClinicas.pacientes.abaHistorico") },
+  ];
+
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal sc-patient-modal">
         <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>&times;</button>
         <div className="sc-log-layout sc-patient-layout">
           <nav className="sc-log-nav">
-            <button type="button" className={"sc-log-nav-item" + (aba === "pessoais" ? " active" : "")} onClick={() => setAba("pessoais")}>
-              {t("saudeClinicas.pacientes.abaPessoais")}
-            </button>
-            <button type="button" className={"sc-log-nav-item" + (aba === "complementares" ? " active" : "")} onClick={() => setAba("complementares")}>
-              {t("saudeClinicas.pacientes.abaComplementares")}
-            </button>
-            <button type="button" className="sc-log-nav-item disabled" disabled title={t("modules.comingSoon")}>
-              {t("saudeClinicas.pacientes.abaConvenios")}
-            </button>
-            <button type="button" className={"sc-log-nav-item" + (aba === "historico" ? " active" : "")} onClick={() => setAba("historico")}>
-              {t("saudeClinicas.pacientes.abaHistorico")}
-            </button>
+            {ABAS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={"sc-log-nav-item" + (aba === item.id ? " active" : "") + (item.disabled ? " disabled" : "")}
+                disabled={item.disabled}
+                title={item.disabled ? t("modules.comingSoon") : undefined}
+                onClick={() => setAba(item.id)}
+              >
+                {item.label}
+                {item.id === "preferencias" && f.criticalAlert && <span className="sc-patient-nav-alerta" title={t("saudeClinicas.pacientes.alertaCritico")} />}
+              </button>
+            ))}
           </nav>
 
           <div className="sc-log-conteudo sc-patient-conteudo">
-            <h3 className="sc-config-title">{patient.name}</h3>
+            <div className="sc-patient-titulo-linha">
+              <h3 className="sc-config-title">{patient.name || t("saudeClinicas.pacientes.novoPaciente")}</h3>
+              {f.criticalAlert && <span className="sc-patient-badge-alerta">{t("saudeClinicas.pacientes.alertaCritico")}</span>}
+            </div>
             {erro && <div className="sc-error">{erro}</div>}
 
             {aba === "pessoais" && (
               <div className="sc-patient-grid">
+                <div className="sc-patient-foto">
+                  <div className="sc-patient-foto-wrap">
+                    {fotoUrl ? <img className="sc-patient-foto-img" src={fotoUrl} alt="" /> : <span className="sc-detail-avatar sc-patient-foto-vazia">{(f.name || "?").charAt(0).toUpperCase()}</span>}
+                    <button type="button" className="sc-patient-foto-botao" onClick={() => fileInputRef.current?.click()} disabled={enviandoFoto || !currentId} title={t("saudeClinicas.pacientes.editarFoto")}>
+                      <svg viewBox="0 0 24 24" width="14" height="14"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="m4 20 1-4L18 3l3 3L8 19l-4 1zM14 6l4 4" /></svg>
+                    </button>
+                  </div>
+                  <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden onChange={enviarFoto} />
+                  <p className="sc-hint">{currentId ? t("saudeClinicas.pacientes.imagemPerfilHint") : t("saudeClinicas.pacientes.salvePrimeiro")}</p>
+                  {currentId && <p className="sc-hint">{t("saudeClinicas.pacientes.cadastradoEm", { data: new Date(patient.created_at).toLocaleString(i18n.language) })}</p>}
+                </div>
+
                 <div className="sc-patient-campos">
                   <div className="sc-agenda-linha">
                     <label className="sc-patient-campo sc-patient-campo-grande">
@@ -260,23 +290,6 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                     </label>
                   </div>
 
-                  <label className="sc-patient-campo">
-                    <span className="sc-hint">{t("saudeClinicas.pacientes.nascimento")}*</span>
-                    <input type="date" value={f.birthDate} onChange={(e) => setF({ ...f, birthDate: e.target.value })} />
-                  </label>
-
-                  <div className="sc-patient-campo">
-                    <span className="sc-hint">{t("saudeClinicas.pacientes.sexo")}*</span>
-                    <div className="sc-patient-radios">
-                      {["masculino", "feminino", "outro"].map((g) => (
-                        <label key={g} className="sc-checkbox">
-                          <input type="radio" name="gender" checked={f.gender === g} onChange={() => setF({ ...f, gender: g })} />
-                          {t(`saudeClinicas.pacientes.genero.${g}`)}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
                   <label className="sc-checkbox">
                     <input type="checkbox" checked={f.usaCivilName} onChange={(e) => setF({ ...f, usaCivilName: e.target.checked })} />
                     {t("saudeClinicas.pacientes.nomeCivil")}
@@ -284,6 +297,24 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                   {f.usaCivilName && (
                     <input type="text" className="sc-patient-subcampo" placeholder={t("saudeClinicas.pacientes.nomeCivil")} value={f.civilName} onChange={(e) => setF({ ...f, civilName: e.target.value })} />
                   )}
+
+                  <div className="sc-agenda-linha">
+                    <label className="sc-patient-campo">
+                      <span className="sc-hint">{t("saudeClinicas.pacientes.nascimento")}*</span>
+                      <input type="date" value={f.birthDate} onChange={(e) => setF({ ...f, birthDate: e.target.value })} />
+                    </label>
+                    <div className="sc-patient-campo">
+                      <span className="sc-hint">{t("saudeClinicas.pacientes.sexo")}*</span>
+                      <div className="sc-patient-radios">
+                        {["masculino", "feminino", "outro"].map((g) => (
+                          <label key={g} className="sc-checkbox">
+                            <input type="radio" name="gender" checked={f.gender === g} onChange={() => setF({ ...f, gender: g })} />
+                            {t(`saudeClinicas.pacientes.genero.${g}`)}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
 
                   <label className="sc-checkbox">
                     <input type="checkbox" checked={f.usaSocialGender} onChange={(e) => setF({ ...f, usaSocialGender: e.target.checked })} />
@@ -293,15 +324,10 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                     <input type="text" className="sc-patient-subcampo" placeholder={t("saudeClinicas.pacientes.generoOpcional")} value={f.socialGender} onChange={(e) => setF({ ...f, socialGender: e.target.value })} />
                   )}
 
-                  <label className="sc-patient-campo">
-                    <span className="sc-hint">{t("saudeClinicas.pacientes.email")}</span>
-                    <input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-                  </label>
-
                   <div className="sc-agenda-linha">
                     <label className="sc-patient-campo">
                       <span className="sc-hint">{t("saudeClinicas.pacientes.cpf")}</span>
-                      <input type="text" value={f.cpf} onChange={(e) => setF({ ...f, cpf: e.target.value })} />
+                      <input type="text" inputMode="numeric" value={f.cpf} onChange={(e) => setF({ ...f, cpf: formatarDoc(e.target.value) })} />
                     </label>
                     <label className="sc-patient-campo">
                       <span className="sc-hint">{t("saudeClinicas.pacientes.rg")}</span>
@@ -310,27 +336,19 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                   </div>
 
                   <label className="sc-patient-campo">
-                    <span className="sc-hint">{t("saudeClinicas.pacientes.notas")}</span>
-                    <textarea rows={3} value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} />
+                    <span className="sc-hint">{t("saudeClinicas.pacientes.email")}</span>
+                    <input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
                   </label>
-                </div>
 
-                <div className="sc-patient-foto">
-                  {fotoUrl ? <img className="sc-patient-foto-img" src={fotoUrl} alt="" /> : <span className="sc-detail-avatar sc-patient-foto-vazia" />}
-                  <p className="sc-hint">{currentId ? t("saudeClinicas.pacientes.imagemPerfilHint") : t("saudeClinicas.pacientes.salvePrimeiro")}</p>
-                  <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden onChange={enviarFoto} />
-                  <button type="button" className="btn-secondary btn-small" onClick={() => fileInputRef.current?.click()} disabled={enviandoFoto || !currentId}>
-                    {enviandoFoto ? t("common.loading") : t("saudeClinicas.pacientes.editarFoto")}
-                  </button>
-                  <button type="button" className="btn-primary btn-small" disabled title={t("modules.comingSoon")}>
-                    {t("saudeClinicas.pacientes.verProntuario")}
-                  </button>
-                  {currentId && <p className="sc-hint">{t("saudeClinicas.pacientes.cadastradoEm", { data: new Date(patient.created_at).toLocaleString(i18n.language) })}</p>}
+                  <label className="sc-patient-campo">
+                    <span className="sc-hint">{t("saudeClinicas.pacientes.origem")}</span>
+                    <input type="text" placeholder={t("saudeClinicas.pacientes.origemPlaceholder")} value={f.referralSource} onChange={(e) => setF({ ...f, referralSource: e.target.value })} />
+                  </label>
                 </div>
               </div>
             )}
 
-            {aba === "complementares" && (
+            {aba === "contato" && (
               <div className="sc-patient-campos">
                 <h4 className="sc-config-title">{t("saudeClinicas.pacientes.telefones")}</h4>
                 <div className="sc-agenda-linha">
@@ -339,7 +357,7 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                     <input type="text" value={f.phone} onChange={(e) => setF({ ...f, phone: mascararTelefone(e.target.value) })} />
                   </label>
                   <label className="sc-patient-campo">
-                    <span className="sc-hint">{t("saudeClinicas.pacientes.telefoneCasa")}</span>
+                    <span className="sc-hint">{t("saudeClinicas.pacientes.telefoneSecundario")}</span>
                     <input type="text" value={f.phoneHome} onChange={(e) => setF({ ...f, phoneHome: mascararTelefone(e.target.value) })} />
                   </label>
                   <label className="sc-patient-campo">
@@ -347,13 +365,6 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                     <input type="text" value={f.phoneWork} onChange={(e) => setF({ ...f, phoneWork: mascararTelefone(e.target.value) })} />
                   </label>
                 </div>
-
-                <h4 className="sc-config-title">{t("saudeClinicas.pacientes.lembreteAgendamento")}</h4>
-                <label className="sc-checkbox">
-                  <input type="checkbox" checked={f.smsReminderOptIn} onChange={(e) => setF({ ...f, smsReminderOptIn: e.target.checked })} />
-                  {t("saudeClinicas.pacientes.aceitaSms")}
-                </label>
-                <p className="sc-hint">{t("saudeClinicas.pacientes.smsEmBreve")}</p>
 
                 <h4 className="sc-config-title">{t("saudeClinicas.pacientes.endereco")}</h4>
                 <div className="sc-agenda-linha">
@@ -409,6 +420,56 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
               </div>
             )}
 
+            {aba === "complementares" && (
+              <div className="sc-patient-campos">
+                <label className="sc-patient-campo">
+                  <span className="sc-hint">
+                    {t("saudeClinicas.pacientes.notas")}
+                    <span className="sc-patient-tag-interna">{t("saudeClinicas.pacientes.visivelEquipe")}</span>
+                  </span>
+                  <textarea rows={8} placeholder={t("saudeClinicas.pacientes.notasPlaceholder")} value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} />
+                </label>
+              </div>
+            )}
+
+            {aba === "preferencias" && (
+              <div className="sc-patient-campos">
+                <div className="sc-patient-switch-linha">
+                  <div className="sc-patient-switch-texto">
+                    <span className="sc-patient-switch-titulo">
+                      <svg viewBox="0 0 24 24" width="16" height="16" className="sc-patient-icone-whats"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.5c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5.1a6.6 6.6 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.3.1-.4l.3-.4.2-.3a.5.5 0 0 0 0-.4c-.1-.1-.5-1.3-.7-1.7s-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.8 2 4.7 4.7 0 0 0 1 2.5 10.6 10.6 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.3 3.3 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z" /></svg>
+                      {t("saudeClinicas.pacientes.aceitaSms")}
+                    </span>
+                    <span className="sc-hint">{t("saudeClinicas.pacientes.smsEmBreve")}</span>
+                  </div>
+                  <label className="sc-switch">
+                    <input type="checkbox" checked={f.smsReminderOptIn} onChange={(e) => setF({ ...f, smsReminderOptIn: e.target.checked })} />
+                    <span className="sc-switch-trilho"><span className="sc-switch-bola" /></span>
+                  </label>
+                </div>
+
+                <div className={"sc-patient-switch-linha" + (f.criticalAlert ? " sc-patient-switch-linha-alerta" : "")}>
+                  <div className="sc-patient-switch-texto">
+                    <span className="sc-patient-switch-titulo">
+                      <svg viewBox="0 0 24 24" width="16" height="16" className="sc-patient-icone-alerta"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg>
+                      {t("saudeClinicas.pacientes.necessidadesEspeciais")}
+                    </span>
+                    <span className="sc-hint">{t("saudeClinicas.pacientes.necessidadesEspeciaisHint")}</span>
+                  </div>
+                  <label className="sc-switch sc-switch-alerta">
+                    <input type="checkbox" checked={f.criticalAlert} onChange={(e) => setF({ ...f, criticalAlert: e.target.checked })} />
+                    <span className="sc-switch-trilho"><span className="sc-switch-bola" /></span>
+                  </label>
+                </div>
+                {f.criticalAlert && (
+                  <label className="sc-patient-campo sc-patient-alerta-campo">
+                    <span className="sc-hint">{t("saudeClinicas.pacientes.detalheAlerta")}</span>
+                    <textarea rows={3} placeholder={t("saudeClinicas.pacientes.detalheAlertaPlaceholder")} value={f.criticalAlertNotes} onChange={(e) => setF({ ...f, criticalAlertNotes: e.target.value })} />
+                  </label>
+                )}
+              </div>
+            )}
+
             {aba === "historico" && (
               <div className="sc-table-wrap">
                 <table className="sc-table">
@@ -457,6 +518,9 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                   </button>
                 )}
                 <div className="sc-patient-rodape-acoes">
+                  <button type="button" className="btn-ghost btn-small" onClick={onClose} disabled={salvando}>
+                    {t("common.cancel")}
+                  </button>
                   <button type="button" className="btn-secondary btn-small" onClick={() => salvar("novo")} disabled={salvando || !f.name.trim()}>
                     {t("saudeClinicas.pacientes.salvarEAdicionarOutro")}
                   </button>
@@ -464,7 +528,7 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                     {t("saudeClinicas.pacientes.salvarEContinuar")}
                   </button>
                   <button type="button" className="btn-primary btn-small" onClick={() => salvar("fechar")} disabled={salvando || !f.name.trim()}>
-                    {t("common.save")}
+                    {t("saudeClinicas.pacientes.salvarPaciente")}
                   </button>
                 </div>
               </div>

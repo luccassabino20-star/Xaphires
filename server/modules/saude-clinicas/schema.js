@@ -339,6 +339,15 @@ export function applySaudeClinicasSchema(companyDb) {
   addColumnIfMissing(companyDb, "patients", "avatar_path", "avatar_path TEXT");
   addColumnIfMissing(companyDb, "patients", "avatar_mime", "avatar_mime TEXT");
 
+  // Aba "Preferências" do cadastro rico: como o paciente chegou até a
+  // clínica (indicação, Instagram, Google...) e um alerta clínico crítico
+  // (alergia grave, necessidade especial) que precisa saltar aos olhos de
+  // quem abre a ficha - por isso vem com nota livre própria, não misturado
+  // em `notes` (que é observação geral, sem destaque visual nenhum).
+  addColumnIfMissing(companyDb, "patients", "referral_source", "referral_source TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "patients", "critical_alert", "critical_alert INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing(companyDb, "patients", "critical_alert_notes", "critical_alert_notes TEXT NOT NULL DEFAULT ''");
+
   // Tema visual do módulo (Aparência e Temas, em Configurações): cor de
   // destaque que a própria clínica escolhe para os botões/menus/destaques da
   // sua instância - não é o tema claro/escuro do app inteiro (esse já existe

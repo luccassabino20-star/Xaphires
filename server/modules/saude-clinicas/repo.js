@@ -48,7 +48,11 @@ function proximoPatientNumber() {
   return r.maxNum + 1;
 }
 export function insertPatient(
-  { name, birthDate, gender, phone, cpf, email, notes, civilName, socialGender, rg, phoneHome, phoneWork, smsReminderOptIn, cep, address, addressNumber, complement, neighborhood, city, state, country },
+  {
+    name, birthDate, gender, phone, cpf, email, notes, civilName, socialGender, rg, phoneHome, phoneWork,
+    smsReminderOptIn, cep, address, addressNumber, complement, neighborhood, city, state, country,
+    referralSource, criticalAlert, criticalAlertNotes,
+  },
   userId
 ) {
   const id = uid();
@@ -58,8 +62,9 @@ export function insertPatient(
          (id, patient_number, name, birth_date, gender, phone, cpf, email, notes, active,
           civil_name, social_gender, rg, phone_home, phone_work, sms_reminder_opt_in,
           cep, address, address_number, complement, neighborhood, city, state, country,
+          referral_source, critical_alert, critical_alert_notes,
           created_at, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       id,
@@ -85,6 +90,9 @@ export function insertPatient(
       city || "",
       state || "",
       country || "Brasil",
+      referralSource || "",
+      criticalAlert ? 1 : 0,
+      criticalAlertNotes || "",
       nowIso(),
       userId || null
     );
@@ -97,7 +105,8 @@ export function updatePatient(id, p) {
     .prepare(
       `UPDATE patients SET name = ?, birth_date = ?, gender = ?, phone = ?, cpf = ?, email = ?, notes = ?, active = ?,
               civil_name = ?, social_gender = ?, rg = ?, phone_home = ?, phone_work = ?, sms_reminder_opt_in = ?,
-              cep = ?, address = ?, address_number = ?, complement = ?, neighborhood = ?, city = ?, state = ?, country = ?
+              cep = ?, address = ?, address_number = ?, complement = ?, neighborhood = ?, city = ?, state = ?, country = ?,
+              referral_source = ?, critical_alert = ?, critical_alert_notes = ?
        WHERE id = ?`
     )
     .run(
@@ -123,6 +132,9 @@ export function updatePatient(id, p) {
       p.city ?? a.city,
       p.state ?? a.state,
       p.country ?? a.country,
+      p.referralSource ?? a.referral_source,
+      p.criticalAlert !== undefined ? (p.criticalAlert ? 1 : 0) : a.critical_alert,
+      p.criticalAlertNotes ?? a.critical_alert_notes,
       id
     );
   return getPatient(id);

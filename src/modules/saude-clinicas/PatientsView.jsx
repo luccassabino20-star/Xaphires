@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
+import PatientDetailModal from "./PatientDetailModal.jsx";
 
-const VAZIO = { name: "", birthDate: "", gender: "", phone: "", cpf: "", email: "", notes: "" };
-
-// Cadastro de pacientes: formulário + tabela, mesmo molde das seções de
-// CadastrosView.jsx do Financeiro (form no topo, edição inline carregando o
-// mesmo formulário, ativar/desativar em vez de excluir de verdade).
+// Listagem de pacientes: a edição rica (abas, foto, endereço, preferências)
+// mora inteira em PatientDetailModal - esta tela só lista, busca, ativa/
+// desativa e abre o modal pra criar ou editar. Não existe mais um formulário
+// simples paralelo aqui: tinha campos de menos e duas telas de cadastro
+// divergentes convidava a esquecer de manter uma delas atualizada.
 export default function PatientsView() {
   const { t } = useTranslation();
-  const showToast = useToast();
   const [patients, setPatients] = useState([]);
   const [erro, setErro] = useState("");
-  const [f, setF] = useState(VAZIO);
-  const [editandoId, setEditandoId] = useState(null);
+  const [busca, setBusca] = useState("");
+  const [modalId, setModalId] = useState(undefined); // undefined = fechado, null = novo, id = editar
 
   async function carregar() {
     try {
@@ -30,64 +29,29 @@ export default function PatientsView() {
     // eslint-disable-next-line
   }, []);
 
-  function editar(p) {
-    setEditandoId(p.id);
-    setF({
-      name: p.name,
-      birthDate: p.birth_date || "",
-      gender: p.gender || "",
-      phone: p.phone || "",
-      cpf: p.cpf || "",
-      email: p.email || "",
-      notes: p.notes || "",
-    });
-  }
-  function cancelar() {
-    setEditandoId(null);
-    setF(VAZIO);
-  }
-
-  async function salvar(e) {
-    e.preventDefault();
-    if (!f.name.trim()) return;
-    try {
-      if (editandoId) await api.scUpdatePatient(editandoId, f);
-      else await api.scCreatePatient(f);
-      showToast(t("saudeClinicas.pacientes.salvo"));
-      cancelar();
-      await carregar();
-    } catch (err) {
-      showToast(translateError(err, t));
-    }
-  }
-
   async function alternarAtivo(p) {
     try {
       await api.scUpdatePatient(p.id, { active: !p.active });
       await carregar();
     } catch (err) {
-      showToast(translateError(err, t));
+      setErro(translateError(err, t));
     }
   }
 
+  const filtrados = patients.filter((p) => {
+    const q = busca.trim().toLowerCase();
+    if (!q) return true;
+    return p.name.toLowerCase().includes(q) || (p.phone || "").includes(q) || (p.cpf || "").includes(q);
+  });
+
   return (
     <div className="sc-cad-secao">
-      <form className="sc-form" onSubmit={salvar}>
-        <input type="text" placeholder={t("saudeClinicas.pacientes.nome")} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
-        <input type="date" title={t("saudeClinicas.pacientes.nascimento")} value={f.birthDate} onChange={(e) => setF({ ...f, birthDate: e.target.value })} />
-        <select value={f.gender} onChange={(e) => setF({ ...f, gender: e.target.value })}>
-          <option value="">{t("saudeClinicas.pacientes.generoEscolha")}</option>
-          <option value="feminino">{t("saudeClinicas.pacientes.genero.feminino")}</option>
-          <option value="masculino">{t("saudeClinicas.pacientes.genero.masculino")}</option>
-          <option value="outro">{t("saudeClinicas.pacientes.genero.outro")}</option>
-        </select>
-        <input type="text" placeholder={t("saudeClinicas.pacientes.telefone")} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
-        <input type="text" placeholder={t("saudeClinicas.pacientes.cpf")} value={f.cpf} onChange={(e) => setF({ ...f, cpf: e.target.value })} />
-        <input type="text" placeholder={t("saudeClinicas.pacientes.email")} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-        <input type="text" placeholder={t("saudeClinicas.pacientes.notas")} value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} />
-        <button type="submit" className="btn-primary btn-small">{editandoId ? t("common.save") : t("common.add")}</button>
-        {editandoId && <button type="button" className="btn-ghost btn-small" onClick={cancelar}>{t("common.cancel")}</button>}
-      </form>
+      <div className="sc-form">
+        <input type="text" placeholder={t("saudeClinicas.pacientes.buscar")} value={busca} onChange={(e) => setBusca(e.target.value)} />
+        <button type="button" className="btn-primary btn-small" onClick={() => setModalId(null)}>
+          {t("saudeClinicas.pacientes.novoPaciente")}
+        </button>
+      </div>
 
       {erro && <div className="sc-error">{erro}</div>}
 
@@ -102,18 +66,21 @@ export default function PatientsView() {
             </tr>
           </thead>
           <tbody>
-            {patients.length === 0 ? (
+            {filtrados.length === 0 ? (
               <tr>
                 <td colSpan={4} className="sc-empty">{t("saudeClinicas.pacientes.vazio")}</td>
               </tr>
             ) : (
-              patients.map((p) => (
+              filtrados.map((p) => (
                 <tr key={p.id} className={!p.active ? "sc-row-inativo" : ""}>
-                  <td>{p.name}</td>
+                  <td>
+                    {p.name}
+                    {p.critical_alert === 1 && <span className="sc-patient-badge-alerta sc-patient-badge-alerta-mini" title={t("saudeClinicas.pacientes.alertaCritico")}>!</span>}
+                  </td>
                   <td>{p.phone || "-"}</td>
                   <td>{p.birth_date || "-"}</td>
                   <td className="sc-row-actions">
-                    <button type="button" className="btn-ghost btn-small" onClick={() => editar(p)}>{t("financeiro.cad.editar")}</button>
+                    <button type="button" className="btn-ghost btn-small" onClick={() => setModalId(p.id)}>{t("financeiro.cad.editar")}</button>
                     <button type="button" className="btn-ghost btn-small" onClick={() => alternarAtivo(p)}>
                       {p.active ? t("financeiro.cad.desativar") : t("financeiro.cad.ativar")}
                     </button>
@@ -124,6 +91,14 @@ export default function PatientsView() {
           </tbody>
         </table>
       </div>
+
+      {modalId !== undefined && (
+        <PatientDetailModal
+          patientId={modalId}
+          onClose={() => setModalId(undefined)}
+          onSaved={carregar}
+        />
+      )}
     </div>
   );
 }

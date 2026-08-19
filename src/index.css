@@ -7691,7 +7691,11 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-patient-modal { width: min(920px, 96vw); max-width: min(920px, 96vw); padding: 0; overflow: hidden; }
 .sc-patient-layout { min-height: 520px; }
 .sc-patient-conteudo { max-height: 78vh; overflow-y: auto; }
-.sc-patient-grid { display: grid; grid-template-columns: 1fr 220px; gap: 28px; align-items: start; }
+.sc-patient-titulo-linha { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+/* Foto vem primeiro no grid (220px) e os campos depois (1fr) - ordem
+   inversa da original, pra foto ficar em cima no mobile empilhado em vez
+   de embaixo de um formulário inteiro. */
+.sc-patient-grid { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
 .sc-patient-campos { display: flex; flex-direction: column; gap: 10px; }
 .sc-patient-campo { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 140px; }
 .sc-patient-campo-grande { flex: 2; }
@@ -7706,11 +7710,66 @@ img.avatar { object-fit: cover; padding: 0; }
   border: 1px solid var(--border-subtle); border-radius: 8px; width: 100%;
 }
 .sc-patient-foto { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding-top: 4px; }
-.sc-patient-foto-img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; }
-.sc-patient-foto-vazia { width: 96px; height: 96px; }
+/* Avatar com botão de câmera flutuando no canto - affordance de upload mais
+   óbvia que um botão de texto solto embaixo (mantido como legenda, mas o
+   ponto de clique principal agora é o próprio avatar). */
+.sc-patient-foto-wrap { position: relative; width: 96px; height: 96px; }
+.sc-patient-foto-img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; display: block; }
+.sc-patient-foto-vazia { width: 96px; height: 96px; font-size: 32px; color: #fff; background: var(--accent); }
+.sc-patient-foto-botao {
+  position: absolute; right: -2px; bottom: -2px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  color: #fff; background: var(--accent); border: 2px solid var(--bg-card); border-radius: 50%; cursor: pointer;
+}
+.sc-patient-foto-botao:hover:not(:disabled) { background: var(--accent-hover); }
+.sc-patient-foto-botao:disabled { opacity: 0.5; cursor: not-allowed; }
 .sc-patient-rodape { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
 .sc-patient-rodape-acoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .sc-patient-excluir { display: inline-flex; align-items: center; gap: 6px; padding: 6px 4px; font-size: 13px; color: var(--danger); background: none; border: none; cursor: pointer; }
+
+/* Tag "visível só pra equipe" ao lado do rótulo de Notas - mesma linguagem
+   visual de badge neutro do resto do módulo, só menor. */
+.sc-patient-tag-interna {
+  margin-left: 6px; padding: 1px 6px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+  color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 999px;
+}
+
+/* Switch moderno (Preferências): checkbox real por baixo (acessível,
+   funciona com teclado), só escondido visualmente - a "bolinha" desliza via
+   transform quando :checked. */
+.sc-patient-switch-linha {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 12px 14px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 12px;
+}
+.sc-patient-switch-texto { display: flex; flex-direction: column; gap: 2px; }
+.sc-patient-switch-titulo { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 650; color: var(--text-primary); }
+.sc-patient-icone-whats { color: #25d366; flex-shrink: 0; }
+.sc-patient-icone-alerta { color: var(--danger); flex-shrink: 0; }
+.sc-switch { position: relative; display: inline-flex; flex-shrink: 0; cursor: pointer; }
+.sc-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.sc-switch-trilho { width: 40px; height: 23px; background: var(--border-strong); border-radius: 999px; transition: background .15s ease; }
+.sc-switch-bola { display: block; width: 17px; height: 17px; margin: 3px; background: #fff; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.25); transition: transform .15s ease; }
+.sc-switch input:checked + .sc-switch-trilho { background: var(--success); }
+.sc-switch input:checked + .sc-switch-trilho .sc-switch-bola { transform: translateX(17px); }
+.sc-switch-alerta input:checked + .sc-switch-trilho { background: var(--danger); }
+.sc-switch input:focus-visible + .sc-switch-trilho { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Linha do alerta crítico destaca em vermelho quando ligado - "highlight de
+   alerta visual" pedido, não só o switch mudando de cor sozinho. */
+.sc-patient-switch-linha-alerta { background: color-mix(in srgb, var(--danger) 10%, var(--bg-list)); border-color: color-mix(in srgb, var(--danger) 40%, var(--border-subtle)); }
+.sc-patient-alerta-campo textarea { border-color: color-mix(in srgb, var(--danger) 45%, var(--border-subtle)); }
+
+/* Selo de alerta crítico: no título do modal, na aba Preferências (pontinho
+   sem texto, cabe no botão da aba) e na listagem de pacientes (mini, junto
+   do nome). */
+.sc-patient-badge-alerta {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.3px; color: #fff; background: var(--danger); border-radius: 999px;
+}
+.sc-patient-badge-alerta-mini {
+  display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; margin-left: 6px;
+  font-size: 10px; font-weight: 800; color: #fff; background: var(--danger); border-radius: 50%; vertical-align: middle;
+}
+.sc-patient-nav-alerta { display: inline-block; width: 7px; height: 7px; margin-left: 5px; background: var(--danger); border-radius: 50%; vertical-align: middle; }
+
 @media (max-width: 720px) {
   .sc-patient-grid { grid-template-columns: 1fr; }
 }
