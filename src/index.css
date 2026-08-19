@@ -7406,6 +7406,13 @@ img.avatar { object-fit: cover; padding: 0; }
   padding: 6px 7px 4px; font: inherit; font-size: 11px; line-height: 1.25; text-align: left;
   border: 1px solid transparent; border-left-width: 4px; border-radius: 12px; z-index: 1; cursor: pointer;
   box-shadow: var(--shadow-card); transition: box-shadow .15s ease, transform .15s ease;
+  /* Sem isso, arrastar o mouse por cima do nome/horário (texto) inicia uma
+     SELEÇÃO DE TEXTO nativa do navegador em vez do arrasto customizado do
+     AgendaView (iniciarArrastoAgendamento) - o gesto "morre" ali, a raia azul
+     de seleção aparece por cima do card e nada se move. É a causa real de
+     "arrastar não funciona": o pointerdown chega e o estado interno de
+     arrasto liga, mas a seleção nativa consome os pointermove seguintes. */
+  user-select: none; -webkit-user-select: none;
 }
 .sc-agenda-card:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-1px); }
 /* Sheen de vidro no topo do card - um brilho sutil, não mais a cor do status

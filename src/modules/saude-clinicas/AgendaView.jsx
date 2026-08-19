@@ -225,6 +225,11 @@ export default function AgendaView({ initialViewMode = "semana" }) {
   function iniciarArrastoAgendamento(e, item) {
     const a = item.dado;
     if (a.status === "cancelado") return;
+    // Sem isso, o navegador entende o pointerdown+arrasto sobre o texto do
+    // card (nome, horário) como início de seleção de texto nativa - e some
+    // com os pointermove seguintes antes de chegarem no onMove abaixo. É a
+    // mesma proteção do user-select:none no CSS, em duas camadas.
+    e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
     arrastouRef.current = false;
 
@@ -273,6 +278,7 @@ export default function AgendaView({ initialViewMode = "semana" }) {
     e.stopPropagation(); // não deixa o pointerdown também iniciar o "mover" do card
     const a = item.dado;
     if (a.status === "cancelado") return;
+    e.preventDefault(); // mesma razão do iniciarArrastoAgendamento - evita seleção de texto nativa
     e.currentTarget.setPointerCapture(e.pointerId);
     arrastouRef.current = false;
 
