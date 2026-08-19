@@ -303,7 +303,7 @@ export default function PatientDetailModal({ patientId, onClose, onSaved }) {
                       <span className="sc-hint">{t("saudeClinicas.pacientes.nascimento")}*</span>
                       <input type="date" value={f.birthDate} onChange={(e) => setF({ ...f, birthDate: e.target.value })} />
                     </label>
-                    <div className="sc-patient-campo">
+                    <div className="sc-patient-campo sc-patient-campo-grande">
                       <span className="sc-hint">{t("saudeClinicas.pacientes.sexo")}*</span>
                       <div className="sc-patient-radios">
                         {["masculino", "feminino", "outro"].map((g) => (

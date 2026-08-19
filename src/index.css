@@ -7688,9 +7688,15 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-badge-log-status_alterado { color: var(--text-secondary); background: var(--bg-list); }
 
 /* Cadastro completo de paciente */
-.sc-patient-modal { width: min(920px, 96vw); max-width: min(920px, 96vw); padding: 0; overflow: hidden; }
-.sc-patient-layout { min-height: 520px; }
-.sc-patient-conteudo { max-height: 78vh; overflow-y: auto; }
+/* Largo o bastante pra três campos numa linha (telefones, endereço) nunca
+   forçarem rolagem horizontal - o valor antigo (920px) apertava demais com
+   a sidebar de abas (190px) tirando espaço do conteúdo. overflow-x:hidden
+   nos dois níveis (modal e conteúdo) é a garantia final: mesmo que algo
+   erre a conta de largura no futuro, não aparece barra de rolagem lateral -
+   pior caso é cortar sem avisar, nunca vazar pro lado. */
+.sc-patient-modal { width: min(1180px, 94vw); max-width: min(1180px, 94vw); max-height: 90vh; padding: 0; overflow: hidden; }
+.sc-patient-layout { min-height: 520px; max-height: 90vh; }
+.sc-patient-conteudo { max-height: 90vh; overflow-y: auto; overflow-x: hidden; }
 .sc-patient-titulo-linha { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 /* Foto vem primeiro no grid (220px) e os campos depois (1fr) - ordem
    inversa da original, pra foto ficar em cima no mobile empilhado em vez
@@ -7704,7 +7710,7 @@ img.avatar { object-fit: cover; padding: 0; }
   border: 1px solid var(--border-subtle); border-radius: 8px;
 }
 .sc-patient-campo input:disabled { color: var(--text-muted); background: var(--bg-column); }
-.sc-patient-radios { display: flex; gap: 14px; padding-top: 2px; }
+.sc-patient-radios { display: flex; flex-wrap: wrap; gap: 6px 14px; padding-top: 2px; white-space: nowrap; }
 .sc-patient-subcampo {
   margin: -4px 0 0; padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list);
   border: 1px solid var(--border-subtle); border-radius: 8px; width: 100%;
@@ -7722,8 +7728,8 @@ img.avatar { object-fit: cover; padding: 0; }
 }
 .sc-patient-foto-botao:hover:not(:disabled) { background: var(--accent-hover); }
 .sc-patient-foto-botao:disabled { opacity: 0.5; cursor: not-allowed; }
-.sc-patient-rodape { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
-.sc-patient-rodape-acoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.sc-patient-rodape { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+.sc-patient-rodape-acoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; flex: 1; min-width: 0; }
 .sc-patient-excluir { display: inline-flex; align-items: center; gap: 6px; padding: 6px 4px; font-size: 13px; color: var(--danger); background: none; border: none; cursor: pointer; }
 
 /* Tag "visível só pra equipe" ao lado do rótulo de Notas - mesma linguagem
