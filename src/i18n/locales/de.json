@@ -197,7 +197,9 @@
       "expandir": "Menü ausklappen", "recolher": "Menü einklappen", "especialidade": "Fachbereich",
       "dashboard": "Dashboard", "agenda": "Terminplanung", "pacientes": "Patienten",
       "financeiro": "Finanzen", "servicos": "Leistungen & Behandlungen", "usuarios": "Benutzer & Team",
-      "config": "Profil & Einstellungen"
+      "config": "Profil & Einstellungen",
+      "agendaSemanal": "Wochenplan", "agendaDiaria": "Tagesplan",
+      "bloqueioAgenda": "Terminsperre", "matrizDisponibilidade": "Verfügbarkeitsmatrix"
     },
     "dashboard": {
       "pacientesAtivos": "Aktive Patienten", "fichasEnviadas": "Gesendete Anamneseformulare",
@@ -206,7 +208,11 @@
     },
     "config": {
       "especialidade": "Fachbereich der Klinik", "especialidadeHint": "Bestimmt, welche Karten im Bereich Patienten angezeigt werden.",
-      "dadosClinica": "Klinikdaten", "dadosClinicaEmBreve": "Name, Logo und Kontaktdaten der Klinik sind bald verfügbar."
+      "dadosClinica": "Klinikdaten", "dadosClinicaEmBreve": "Name, Logo und Kontaktdaten der Klinik sind bald verfügbar.",
+      "aparencia": "Erscheinungsbild & Themen", "aparenciaHint": "Wählen Sie die Akzentfarbe Ihrer Klinik innerhalb des Moduls Gesundheit & Kliniken.",
+      "tema": {
+        "padrao": "Standard", "rosa": "Rosé Clinique", "azul": "Medizinisches Blau", "verde": "Minzgrün", "roxo": "Ästhetik Vip", "escuro": "Dunkelmodus"
+      }
     },
     "clinicType": {
       "MULTIDISCIPLINAR": "Multidisziplinär",
@@ -282,7 +288,8 @@
       "novoAgendamento": "Neuer Termin",
       "bloqueado": "Blockiert",
       "pago": "Bezahlt",
-      "status": { "agendado": "Geplant", "confirmado": "Bestätigt", "em_atendimento": "In Behandlung", "concluido": "Abgeschlossen", "cancelado": "Storniert", "faltou": "Nicht erschienen" },
+      "status": { "agendado": "Ausstehend", "confirmado": "Bestätigt", "em_atendimento": "In Behandlung", "concluido": "Abgeschlossen", "cancelado": "Storniert", "faltou": "Nicht erschienen" },
+      "legenda": { "agendado": "Ausstehend", "confirmado": "Bestätigt", "em_atendimento": "Unterlagen ausstehend", "concluido": "Abgeschlossen", "cancelado": "Storniert", "faltou": "Nicht erschienen" },
       "abaAgendamento": "Termin", "abaBloqueio": "Blockierung",
       "novoPaciente": "+ Neuer Patient",
       "semProfissional": "Kein Behandler festgelegt",
@@ -337,7 +344,19 @@
       "modificadoPor": "Geändert von",
       "semLogs": "Keine Ereignisse erfasst.",
       "alteradoEm": "Geändert am",
-      "evento": { "criado": "Geplant", "reagendado": "Verschoben", "status_alterado": "Status geändert" }
+      "evento": { "criado": "Geplant", "reagendado": "Verschoben", "status_alterado": "Status geändert" },
+      "profissional": "Behandler",
+      "filtroProfissionalTodos": "Alle Behandler", "filtroSalaTodas": "Alle Räume",
+      "filtroStatusTodos": "Alle Status", "filtroProcedimentoTodos": "Alle Behandlungen",
+      "limparFiltros": "Filter zurücksetzen",
+      "exportar": "Exportieren", "telaCheia": "Vollbild", "sairTelaCheia": "Vollbild verlassen",
+      "lembreteAtivo": "WhatsApp-Erinnerung aktiv",
+      "agendaInteira": "Gesamter Terminplan (alle Behandler)",
+      "motivoBloqueio": "Grund der Sperre", "criarBloqueio": "Sperre erstellen",
+      "bloqueioCriado": "Sperre erstellt", "bloqueioHint": "Reservieren Sie eine Zeit für Pause, Mittagessen oder Feiertag - der Terminplan nimmt in diesem Zeitraum keine neuen Termine mehr an.",
+      "periodoLista": "Zeitraum", "bloqueiosVazio": "Keine Sperren in diesem Zeitraum.",
+      "ocupado": "Belegt", "livre": "Frei", "semProfissionais": "Kein Behandler registriert.",
+      "matrizHint": "Auslastung berechnet aus den bereits erfassten Terminen und Sperren."
     }
   },
   "crm": {
@@ -1402,6 +1421,7 @@
   "errors": {
     "MODULE_FORBIDDEN": "Modul nicht verfügbar",
     "CLINIC_TYPE_INVALID": "Ungültiger Fachbereich",
+    "CLINIC_THEME_INVALID": "Ungültiges Thema",
     "PATIENT_NAME_REQUIRED": "Geben Sie den Namen des Patienten ein",
     "PATIENT_NOT_FOUND": "Patient nicht gefunden",
     "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Geben Sie den Namen der Vorlage ein",

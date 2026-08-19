@@ -197,7 +197,9 @@
       "expandir": "Étendre le menu", "recolher": "Réduire le menu", "especialidade": "Spécialité",
       "dashboard": "Tableau de bord", "agenda": "Agenda & Rendez-vous", "pacientes": "Patients",
       "financeiro": "Finance", "servicos": "Services & Actes", "usuarios": "Utilisateurs & Équipe",
-      "config": "Profil & Paramètres"
+      "config": "Profil & Paramètres",
+      "agendaSemanal": "Agenda Hebdomadaire", "agendaDiaria": "Agenda Journalier",
+      "bloqueioAgenda": "Blocage d'Agenda", "matrizDisponibilidade": "Matrice de Disponibilité"
     },
     "dashboard": {
       "pacientesAtivos": "Patients actifs", "fichasEnviadas": "Fiches d'anamnèse envoyées",
@@ -206,7 +208,11 @@
     },
     "config": {
       "especialidade": "Spécialité de la clinique", "especialidadeHint": "Détermine les cartes affichées dans la section Patients.",
-      "dadosClinica": "Coordonnées de la clinique", "dadosClinicaEmBreve": "Le nom, le logo et les coordonnées de la clinique seront bientôt disponibles."
+      "dadosClinica": "Coordonnées de la clinique", "dadosClinicaEmBreve": "Le nom, le logo et les coordonnées de la clinique seront bientôt disponibles.",
+      "aparencia": "Apparence et Thèmes", "aparenciaHint": "Choisissez la couleur d'accent de votre clinique dans le module Santé & Cliniques.",
+      "tema": {
+        "padrao": "Par défaut", "rosa": "Rosé Clinique", "azul": "Bleu Médical", "verde": "Vert Menthe", "roxo": "Esthétique Vip", "escuro": "Mode Sombre"
+      }
     },
     "clinicType": {
       "MULTIDISCIPLINAR": "Multidisciplinaire",
@@ -282,7 +288,8 @@
       "novoAgendamento": "Nouveau rendez-vous",
       "bloqueado": "Bloqué",
       "pago": "Payé",
-      "status": { "agendado": "Planifié", "confirmado": "Confirmé", "em_atendimento": "En cours", "concluido": "Terminé", "cancelado": "Annulé", "faltou": "Absent" },
+      "status": { "agendado": "En attente", "confirmado": "Confirmé", "em_atendimento": "En cours", "concluido": "Terminé", "cancelado": "Annulé", "faltou": "Absence" },
+      "legenda": { "agendado": "En attente", "confirmado": "Confirmé", "em_atendimento": "Docs en attente", "concluido": "Terminé", "cancelado": "Annulé", "faltou": "Absence" },
       "abaAgendamento": "Rendez-vous", "abaBloqueio": "Blocage",
       "novoPaciente": "+ Nouveau patient",
       "semProfissional": "Aucun professionnel défini",
@@ -337,7 +344,19 @@
       "modificadoPor": "Modifié par",
       "semLogs": "Aucun événement enregistré.",
       "alteradoEm": "Modifié le",
-      "evento": { "criado": "Planifié", "reagendado": "Reprogrammé", "status_alterado": "Statut modifié" }
+      "evento": { "criado": "Planifié", "reagendado": "Reprogrammé", "status_alterado": "Statut modifié" },
+      "profissional": "Praticien",
+      "filtroProfissionalTodos": "Tous les praticiens", "filtroSalaTodas": "Toutes les salles",
+      "filtroStatusTodos": "Tous les statuts", "filtroProcedimentoTodos": "Tous les actes",
+      "limparFiltros": "Effacer les filtres",
+      "exportar": "Exporter", "telaCheia": "Plein écran", "sairTelaCheia": "Quitter le plein écran",
+      "lembreteAtivo": "Rappel WhatsApp activé",
+      "agendaInteira": "Agenda complet (tous les praticiens)",
+      "motivoBloqueio": "Motif du blocage", "criarBloqueio": "Créer un blocage",
+      "bloqueioCriado": "Blocage créé", "bloqueioHint": "Réservez un créneau pour une pause, le déjeuner ou un jour férié - l'agenda n'accepte plus de nouveau rendez-vous sur cet intervalle.",
+      "periodoLista": "Période", "bloqueiosVazio": "Aucun blocage sur cette période.",
+      "ocupado": "Occupé", "livre": "Libre", "semProfissionais": "Aucun praticien enregistré.",
+      "matrizHint": "Occupation calculée à partir des rendez-vous et blocages déjà enregistrés."
     }
   },
   "crm": {
@@ -1742,6 +1761,7 @@
   "errors": {
     "MODULE_FORBIDDEN": "Module indisponible",
     "CLINIC_TYPE_INVALID": "Spécialité invalide",
+    "CLINIC_THEME_INVALID": "Thème invalide",
     "PATIENT_NAME_REQUIRED": "Indiquez le nom du patient",
     "PATIENT_NOT_FOUND": "Patient introuvable",
     "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Indiquez le nom du modèle",

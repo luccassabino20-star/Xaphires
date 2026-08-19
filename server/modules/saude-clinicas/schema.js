@@ -338,4 +338,12 @@ export function applySaudeClinicasSchema(companyDb) {
   // pelo nome original do arquivo.
   addColumnIfMissing(companyDb, "patients", "avatar_path", "avatar_path TEXT");
   addColumnIfMissing(companyDb, "patients", "avatar_mime", "avatar_mime TEXT");
+
+  // Tema visual do módulo (Aparência e Temas, em Configurações): cor de
+  // destaque que a própria clínica escolhe para os botões/menus/destaques da
+  // sua instância - não é o tema claro/escuro do app inteiro (esse já existe
+  // por conta própria via ThemeContext), é uma segunda camada só dentro do
+  // módulo. 'padrao' mantém a cor neutra atual sem precisar de uma linha
+  // NULL/vazia com significado especial.
+  addColumnIfMissing(companyDb, "clinica_config", "theme", "theme TEXT NOT NULL DEFAULT 'padrao'");
 }

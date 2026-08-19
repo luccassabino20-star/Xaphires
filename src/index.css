@@ -7148,6 +7148,40 @@ img.avatar { object-fit: cover; padding: 0; }
    diferença é que a "home" é a grade de cards (reaproveita .launcher-grid/
    .module-card do launcher) em vez de uma barra de abas fixa. */
 .sc { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--bg-column); color: var(--text-primary); }
+
+/* Aparência e Temas (Configurações do módulo): a clínica escolhe uma cor de
+   destaque que vale só dentro do módulo Saúde & Clínicas, independente do
+   claro/escuro do app inteiro (ThemeContext/data-theme, ver index.css raiz).
+   Como --accent é herdada e todo botão/menu-ativo/destaque do módulo já
+   usa var(--accent) (não uma cor fixa), redefinir só essa variável aqui
+   propaga sozinha pra .btn-primary, .sc-sidebar-item.active,
+   .sc-toggle-btn.active etc. dentro de .sc - não precisa repetir a regra em
+   cada um. "padrao" não aparece aqui de propósito: sem override, o CSS já
+   cai no --accent neutro do :root. */
+.sc[data-sc-theme="rosa"] { --accent: #d6547e; --accent-hover: #c23f68; }
+.sc[data-sc-theme="azul"] { --accent: #2563eb; --accent-hover: #1d4ed8; }
+.sc[data-sc-theme="verde"] { --accent: #16a34a; --accent-hover: #15803d; }
+.sc[data-sc-theme="roxo"] { --accent: #7c3aed; --accent-hover: #6d28d9; }
+/* "Modo Escuro" do módulo é independente da preferência de tema do app (uma
+   pessoa pode estar no app claro e ainda assim ter a clínica configurada
+   pra escuro, ou vice-versa) - por isso é uma paleta própria, cópia dos
+   mesmos tons de :root[data-theme="dark"] (ver topo do arquivo), não um
+   "seguir o tema do app". */
+.sc[data-sc-theme="escuro"] {
+  /* --bg-app entra aqui só porque .btn-primary usa var(--bg-app) como cor do
+     texto (contraste garantido contra --accent nos dois temas do app - ver
+     a regra em .btn-primary) - sem isso o botão ficava com texto quase
+     branco em cima de um destaque quase branco (--accent: #e5e5e5). */
+  --bg-app: #050505;
+  --bg-topbar: #0d0d0d; --bg-list: #131313; --bg-column: #131313; --bg-card: #1e1e1e; --bg-card-hover: #2a2a2a;
+  --border-subtle: #262626; --border-strong: #3d3d3d;
+  --text-primary: #f0f0f0; --text-secondary: #a3a3a3; --text-muted: #737373;
+  --accent: #e5e5e5; --accent-hover: #ffffff; --success: #22c55e;
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.25);
+  --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
+  --shadow-list: 0 1px 3px rgba(0,0,0,0.2); --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
+  --list-border: #262626; --card-border: #2e2e2e; --status-pill-bg: #2a2a2a; --status-pill-text: #a3a3a3;
+}
 .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-topbar); }
 .sc-top-left { display: flex; align-items: center; gap: 12px; }
 .sc-title { font-size: 18px; font-weight: 680; margin: 0; }
@@ -7198,6 +7232,14 @@ img.avatar { object-fit: cover; padding: 0; }
   font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
   padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
 }
+/* Grupo com submenu (hoje só "Agenda"): seta indicando aberto/fechado, e uma
+   lista recuada de sub-seções embaixo do item quando aberto. */
+.sc-sidebar-group-chevron { flex-shrink: 0; margin-left: auto; color: var(--text-muted); transition: transform 0.12s ease; }
+.sc-sidebar-group-chevron-aberto { transform: rotate(180deg); }
+.sc-sidebar-subnav { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 4px 14px; padding-left: 22px; border-left: 1px solid var(--border-subtle); }
+.sc-sidebar-subitem { text-align: left; padding: 7px 10px; font-size: 12.5px; color: var(--text-secondary); background: none; border: none; border-radius: 7px; cursor: pointer; }
+.sc-sidebar-subitem:hover { background: var(--bg-list); color: var(--text-primary); }
+.sc-sidebar-subitem.active { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600; }
 
 /* Aviso de recurso ainda não construído dentro de uma seção real (ex.:
    Dashboard, que já tem KPIs de verdade mas não os de agenda/financeiro). */
@@ -7206,6 +7248,21 @@ img.avatar { object-fit: cover; padding: 0; }
 /* Configurações */
 .sc-config-card { padding: 16px 18px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .sc-config-title { margin: 0; font-size: 14.5px; font-weight: 650; }
+
+/* Aparência e Temas: amostra quadrada com a cor de destaque do tema em cima
+   e o nome embaixo - --sc-tema-cor/--sc-tema-fundo vêm inline de cada botão
+   (ConfigView.jsx), então esta regra só desenha o molde. */
+.sc-tema-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.sc-tema-swatch {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; width: 84px; padding: 8px;
+  background: none; border: 2px solid transparent; border-radius: 12px; cursor: pointer;
+}
+.sc-tema-swatch:hover:not(:disabled) { background: var(--bg-list); }
+.sc-tema-swatch.active { border-color: var(--sc-tema-cor); background: var(--bg-list); }
+.sc-tema-swatch:disabled { cursor: default; opacity: 0.6; }
+.sc-tema-swatch-amostra { width: 100%; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--sc-tema-cor) 0 60%, var(--sc-tema-fundo) 60% 100%); border: 1px solid var(--border-subtle); }
+.sc-tema-swatch-nome { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-align: center; }
+.sc-tema-swatch.active .sc-tema-swatch-nome { color: var(--text-primary); }
 
 /* Pacientes / listas em geral */
 .sc-cad-secao { display: flex; flex-direction: column; gap: 14px; }
@@ -7281,7 +7338,24 @@ img.avatar { object-fit: cover; padding: 0; }
 .crm-card-value { font-size: 12px; font-weight: 600; color: var(--accent); }
 
 /* ---------- Agenda (Saúde & Clínicas) ---------- */
-.sc-agenda { display: flex; flex-direction: column; gap: 14px; height: 100%; min-height: 0; }
+.sc-agenda {
+  display: flex; flex-direction: column; gap: 14px; height: 100%; min-height: 0;
+  /* Cor por status do agendamento - fixa, independente do tema de cor da
+     clínica (--accent muda por .sc[data-sc-theme], estas não). Cada status
+     tem três tons: -500 (borda esquerda + bolinha da legenda, saturado),
+     -bg (preenchimento pastel do card) e -text (texto sobre esse pastel -
+     escuro o bastante pra ler mesmo com o card em cor viva). Público-alvo
+     do módulo é clínica de estética/biomedicina/nutrição - pediram uma
+     agenda "extremamente atraente, com cores vivas", não os tons neutros
+     que o resto da plataforma usa. */
+  --sc-status-agendado: #f59e0b; --sc-status-agendado-bg: #fef3c7; --sc-status-agendado-text: #451a03;
+  --sc-status-confirmado: #10b981; --sc-status-confirmado-bg: #d1fae5; --sc-status-confirmado-text: #022c22;
+  --sc-status-docs: #f97316; --sc-status-docs-bg: #ffedd5; --sc-status-docs-text: #431407;
+  --sc-status-concluido: #0ea5e9; --sc-status-concluido-bg: #e0f2fe; --sc-status-concluido-text: #082f49;
+  --sc-status-cancelado: #f43f5e; --sc-status-cancelado-bg: #ffe4e6; --sc-status-cancelado-text: #4c0519;
+  --sc-status-faltou: #64748b; --sc-status-faltou-bg: #f1f5f9; --sc-status-faltou-text: #0f172a;
+}
+.sc-agenda-tela-cheia { padding: 18px 22px; background: var(--bg-column); }
 .sc-agenda-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .sc-agenda-toolbar-esquerda, .sc-agenda-toolbar-direita { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .sc-agenda-periodo-label { font-size: 13px; color: var(--text-secondary); margin-left: 4px; white-space: nowrap; }
@@ -7328,27 +7402,47 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-agenda-slot-hora-cheia { border-top: 1px solid var(--border-strong); }
 .sc-agenda-slot:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .sc-agenda-card {
-  position: absolute; display: flex; flex-direction: column; gap: 1px; overflow: hidden;
-  padding: 5px 6px 3px; font: inherit; font-size: 11px; line-height: 1.25; text-align: left; color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border-subtle));
-  border-radius: 8px; z-index: 1; cursor: pointer;
+  position: absolute; display: flex; flex-direction: column; gap: 2px; overflow: hidden;
+  padding: 6px 7px 4px; font: inherit; font-size: 11px; line-height: 1.25; text-align: left;
+  border: 1px solid transparent; border-left-width: 4px; border-radius: 12px; z-index: 1; cursor: pointer;
+  box-shadow: var(--shadow-card); transition: box-shadow .15s ease, transform .15s ease;
 }
-.sc-agenda-card-top { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
-.sc-agenda-card-hora { font-weight: 700; }
-.sc-agenda-card-nome { color: var(--text-primary); font-weight: 600; }
-.sc-agenda-card-sub { color: var(--text-secondary); }
-.sc-agenda-card-status-label { margin-top: auto; font-size: 9.5px; color: var(--text-secondary); }
+.sc-agenda-card:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-1px); }
+/* Sheen de vidro no topo do card - um brilho sutil, não mais a cor do status
+   (essa virou a borda esquerda + o preenchimento inteiro, ver os blocos por
+   status abaixo). Só o bloqueio (sem status/cor viva) mantém a barra sólida. */
+.sc-agenda-card-top { position: absolute; top: 0; left: 0; right: 0; height: 40%; background: linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,255,255,0)); pointer-events: none; }
+.sc-agenda-card-hora {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 3px;
+  padding: 1px 6px; margin-bottom: 1px; font-size: 10px; font-weight: 700;
+  background: rgba(255,255,255,0.55); border-radius: 999px;
+}
+.sc-agenda-card-nome { font-weight: 700; font-size: 12px; }
+.sc-agenda-card-sub { opacity: 0.85; }
+.sc-agenda-card-status-label { margin-top: auto; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.8; }
 .sc-agenda-proc-nome { flex: 1; font-size: 13.5px; color: var(--text-secondary); }
 .sc-agenda-card-pago { align-self: flex-start; font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--success); }
 .sc-agenda-card-status { margin-top: auto; font-size: 10px; padding: 1px 2px; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 4px; }
-.sc-agenda-card-cancelado { opacity: 0.55; text-decoration: line-through; }
-.sc-agenda-card-cancelado .sc-agenda-card-top { background: var(--danger); }
-.sc-agenda-card-faltou .sc-agenda-card-top { background: var(--danger); }
-.sc-agenda-card-concluido .sc-agenda-card-top { background: var(--success); }
-.sc-agenda-card-em_atendimento { border-color: color-mix(in srgb, var(--success) 45%, var(--border-subtle)); }
-.sc-agenda-card-em_atendimento .sc-agenda-card-top { background: var(--success); }
-.sc-agenda-card-bloqueio { background: repeating-linear-gradient(45deg, var(--bg-list), var(--bg-list) 6px, var(--border-subtle) 6px, var(--border-subtle) 12px); border-color: var(--border-subtle); color: var(--text-secondary); }
-.sc-agenda-card-bloqueio .sc-agenda-card-top { background: var(--text-muted); }
+/* Cor por status: preenchimento pastel vivo + texto escuro da mesma família +
+   borda esquerda grossa no tom saturado (--sc-status-*, ver .sc-agenda) -
+   fixa, não muda com --accent do tema da clínica, porque o significado é
+   universal (mesma regra da legenda no topo). */
+.sc-agenda-card-agendado { background: color-mix(in srgb, var(--sc-status-agendado-bg) 90%, transparent); color: var(--sc-status-agendado-text); border-left-color: var(--sc-status-agendado); }
+.sc-agenda-card-confirmado { background: color-mix(in srgb, var(--sc-status-confirmado-bg) 90%, transparent); color: var(--sc-status-confirmado-text); border-left-color: var(--sc-status-confirmado); }
+.sc-agenda-card-em_atendimento { background: color-mix(in srgb, var(--sc-status-docs-bg) 90%, transparent); color: var(--sc-status-docs-text); border-left-color: var(--sc-status-docs); }
+.sc-agenda-card-concluido { background: color-mix(in srgb, var(--sc-status-concluido-bg) 90%, transparent); color: var(--sc-status-concluido-text); border-left-color: var(--sc-status-concluido); }
+.sc-agenda-card-cancelado { background: color-mix(in srgb, var(--sc-status-cancelado-bg) 90%, transparent); color: var(--sc-status-cancelado-text); border-left-color: var(--sc-status-cancelado); }
+.sc-agenda-card-cancelado .sc-agenda-card-nome { text-decoration: line-through; }
+.sc-agenda-card-faltou { background: color-mix(in srgb, var(--sc-status-faltou-bg) 90%, transparent); color: var(--sc-status-faltou-text); border-left-color: var(--sc-status-faltou); }
+.sc-agenda-card-prof { font-size: 10.5px; font-weight: 600; opacity: 0.85; }
+/* Selo do WhatsApp: canto inferior direito, bolha verde vibrante flutuando
+   por cima do card (não empurra o layout do resto do conteúdo). */
+.sc-agenda-card-whats {
+  position: absolute; right: 4px; bottom: 4px; display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; color: #fff; background: #25d366; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.sc-agenda-card-bloqueio { background: repeating-linear-gradient(45deg, var(--bg-list), var(--bg-list) 6px, var(--border-subtle) 6px, var(--border-subtle) 12px); border-color: var(--border-subtle); border-left-color: var(--text-muted); color: var(--text-secondary); }
+.sc-agenda-card-bloqueio .sc-agenda-card-top { background: none; }
 /* Drag-and-drop (mover o card) e resize (puxar a borda de baixo). touch-action:
    none evita o navegador roubar o gesto pra rolar a página num touchscreen
    enquanto a pessoa está arrastando um agendamento. */
@@ -7360,6 +7454,46 @@ img.avatar { object-fit: cover; padding: 0; }
    AgendaView.jsx) e é redesenhado a cada movimento na posição de destino -
    sombra e leve transparência deixam claro que ainda não foi confirmado. */
 .sc-agenda-card-preview { pointer-events: none; z-index: 2; opacity: 0.85; box-shadow: var(--shadow-card-hover); }
+
+/* Barra de filtros + legenda de status, abaixo da toolbar principal. Legenda
+   usa as mesmas --sc-status-* do card (ver .sc-agenda), então mudar uma cor
+   muda as duas em conjunto - não dá pra elas discordarem. */
+.sc-agenda-filtros { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sc-agenda-filtro { padding: 6px 10px; font-size: 12.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-agenda-filtro:disabled { opacity: 0.55; cursor: not-allowed; }
+.sc-agenda-legenda { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-left: auto; }
+.sc-agenda-legenda-item { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+/* Bolinha com brilho (glow) na cor do status - o anel mais largo e mais
+   transparente por fora imita o "shadow-sm" pedido sem precisar de Tailwind
+   (o projeto não usa Tailwind, ver CLAUDE.md - só CSS puro com variáveis). */
+.sc-agenda-legenda-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.sc-agenda-legenda-dot-agendado { background: var(--sc-status-agendado); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-status-agendado) 25%, transparent), 0 0 5px color-mix(in srgb, var(--sc-status-agendado) 70%, transparent); }
+.sc-agenda-legenda-dot-confirmado { background: var(--sc-status-confirmado); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-status-confirmado) 25%, transparent), 0 0 5px color-mix(in srgb, var(--sc-status-confirmado) 70%, transparent); }
+.sc-agenda-legenda-dot-em_atendimento { background: var(--sc-status-docs); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-status-docs) 25%, transparent), 0 0 5px color-mix(in srgb, var(--sc-status-docs) 70%, transparent); }
+.sc-agenda-legenda-dot-concluido { background: var(--sc-status-concluido); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-status-concluido) 25%, transparent), 0 0 5px color-mix(in srgb, var(--sc-status-concluido) 70%, transparent); }
+.sc-agenda-legenda-dot-cancelado { background: var(--sc-status-cancelado); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-status-cancelado) 25%, transparent), 0 0 5px color-mix(in srgb, var(--sc-status-cancelado) 70%, transparent); }
+.sc-agenda-legenda-dot-faltou { background: var(--sc-status-faltou); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-status-faltou) 25%, transparent), 0 0 5px color-mix(in srgb, var(--sc-status-faltou) 70%, transparent); }
+@media (max-width: 960px) {
+  .sc-agenda-legenda { margin-left: 0; }
+}
+
+/* Matriz de Disponibilidade: tabela profissional × dia, cada célula uma
+   tira horizontal de quadradinhos (mesmo TOTAL_SLOTS da grade principal,
+   só deitada) - ver AvailabilityMatrixView.jsx. */
+.sc-matrix-legenda { display: flex; align-items: center; gap: 14px; }
+.sc-matrix-legenda-item { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+.sc-matrix-dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; }
+.sc-matrix-dot-ocupado { background: var(--accent); }
+.sc-matrix-dot-livre { background: var(--bg-list); border: 1px solid var(--border-subtle); }
+.sc-matrix-wrap { overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: 12px; }
+.sc-matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sc-matrix-table th, .sc-matrix-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
+.sc-matrix-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); background: var(--bg-list); white-space: nowrap; }
+.sc-matrix-table tr:last-child td { border-bottom: none; }
+.sc-matrix-col-prof { font-weight: 600; white-space: nowrap; }
+.sc-matrix-strip { display: flex; gap: 1px; min-width: 140px; height: 20px; }
+.sc-matrix-slot { flex: 1; background: var(--bg-list); border-radius: 1px; }
+.sc-matrix-slot-ocupado { background: var(--accent); }
 
 /* Modal de agendamento/bloqueio e lista de espera */
 /* max-width some junto do width nos modais abaixo: a base .modal tem

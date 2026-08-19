@@ -12,6 +12,8 @@ import CardIcon from "./CardIcon.jsx";
 import SaudeSidebar from "./SaudeSidebar.jsx";
 import DashboardView from "./DashboardView.jsx";
 import AgendaView from "./AgendaView.jsx";
+import BlockAgendaView from "./BlockAgendaView.jsx";
+import AvailabilityMatrixView from "./AvailabilityMatrixView.jsx";
 import ConfigView from "./ConfigView.jsx";
 import { cardsParaClinicType } from "./cardCatalog.js";
 import PatientsView from "./PatientsView.jsx";
@@ -48,10 +50,18 @@ export default function SaudeClinicasModule({ onExit }) {
     }
   }
 
+  async function trocarTema(theme) {
+    try {
+      setConfig(await api.scSetTheme(theme));
+    } catch (err) {
+      showToast(translateError(err, t));
+    }
+  }
+
   const isMaster = user?.role === "master";
 
   return (
-    <div className="sc">
+    <div className="sc" data-sc-theme={config?.theme || "padrao"}>
       <header className="sc-top">
         <div className="sc-top-left">
           <button className="icon-btn" onClick={onExit} title={t("modules.backToLauncher")} aria-label={t("modules.backToLauncher")}>
@@ -82,10 +92,20 @@ export default function SaudeClinicasModule({ onExit }) {
         <div className="sc-body">
           {erro && <div className="sc-error">{erro}</div>}
           {section === "dashboard" && <DashboardView />}
-          {section === "agenda" && <AgendaView />}
+          {(section === "agenda-semana" || section === "agenda-dia") && (
+            <AgendaView key={section} initialViewMode={section === "agenda-dia" ? "dia" : "semana"} />
+          )}
+          {section === "agenda-bloqueio" && <BlockAgendaView />}
+          {section === "agenda-disponibilidade" && <AvailabilityMatrixView />}
           {section === "pacientes" && config && <PacientesSection clinicType={config.clinic_type} />}
           {section === "config" && config && (
-            <ConfigView clinicType={config.clinic_type} isMaster={isMaster} onClinicTypeChange={trocarClinicType} />
+            <ConfigView
+              clinicType={config.clinic_type}
+              theme={config.theme || "padrao"}
+              isMaster={isMaster}
+              onClinicTypeChange={trocarClinicType}
+              onThemeChange={trocarTema}
+            />
           )}
         </div>
       </div>

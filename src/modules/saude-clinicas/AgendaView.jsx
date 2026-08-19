@@ -14,6 +14,14 @@ import PrintModal from "./PrintModal.jsx";
 
 const SLOT_ALTURA = 22; // px por slot de 15min
 
+// Status na ordem em que aparecem na legenda e nos filtros - mesma ordem do
+// ciclo natural de um agendamento (marcado -> confirmado -> em atendimento ->
+// concluído, com cancelado/faltou por fora). A cor de cada um é fixa por
+// status (não muda com o tema de cor da clínica - ver CSS
+// .sc-agenda-card-<status>), porque o significado é universal, diferente do
+// destaque (--accent) que é identidade visual da clínica.
+const STATUS_AGENDA = ["agendado", "confirmado", "em_atendimento", "concluido", "cancelado", "faltou"];
+
 function rotuloDia(dataCivil, t) {
   const d = new Date(dataCivil + "T00:00:00");
   const semana = t(`saudeClinicas.agenda.diaSemana.${d.getDay()}`);
@@ -21,14 +29,28 @@ function rotuloDia(dataCivil, t) {
   return { semana, data };
 }
 
+// Nomes dos procedimentos escolhidos num agendamento - vem gravado como JSON
+// livre em appointment.procedures (ver o comentário em schema.js: não é FK
+// pra procedures, é preço/quantidade congelados na hora). O filtro por
+// procedimento compara por nome contra o catálogo, então precisa reabrir
+// esse JSON aqui no cliente.
+function nomesProcedimentos(appointment) {
+  try {
+    const arr = typeof appointment.procedures === "string" ? JSON.parse(appointment.procedures) : appointment.procedures;
+    return Array.isArray(arr) ? arr.map((p) => p.name) : [];
+  } catch {
+    return [];
+  }
+}
+
 // Agenda semanal/diária: grade de slots de 15min à esquerda de cada dia,
 // agendamentos e bloqueios posicionados por cima (position:absolute) pela
 // hora de início e pela duração - mesma técnica de qualquer calendário web,
 // sem biblioteca nova. Raias (agendaUtils.calcularRaias) evitam dois itens
 // no mesmo horário desenharem um em cima do outro.
-export default function AgendaView() {
+export default function AgendaView({ initialViewMode = "semana" }) {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState("semana"); // 'semana' | 'dia'
+  const [viewMode, setViewMode] = useState(initialViewMode); // 'semana' | 'dia'
   const [anchor, setAnchor] = useState(hojeCivil());
   const [appointments, setAppointments] = useState([]);
   const [blocks, setBlocks] = useState([]);
@@ -42,6 +64,14 @@ export default function AgendaView() {
   const [detalhe, setDetalhe] = useState(null); // agendamento aberto no modal de detalhes, ou null
   const [waitlistAberta, setWaitlistAberta] = useState(false);
   const [printAberto, setPrintAberto] = useState(false);
+  const [telaCheia, setTelaCheia] = useState(false);
+  const containerRef = useRef(null);
+  // Filtros da barra de cima: "" em qualquer um deles é "todos". Sala fica de
+  // fora de propósito - não existe cadastro de sala ainda (ver comentário do
+  // select mais abaixo), então o campo aparece desabilitado.
+  const [filtroProfissional, setFiltroProfissional] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("");
+  const [filtroProcedimento, setFiltroProcedimento] = useState("");
   // Preview de drag-and-drop/resize: { id, dado, dia, slot, duracaoSlots } ou
   // null fora de arrasto. Nunca toca em `appointments` durante o gesto - só
   // troca o que é desenhado por cima; se o PATCH falhar (ex. conflito de
@@ -122,17 +152,45 @@ export default function AgendaView() {
     setModal({ initialDate: dataCivil || anchor, initialTime: horario || proximoHorarioLivre() });
   }
 
+// Agendamento passa nos três filtros da barra (profissional/status/
+  // procedimento) - "" em qualquer um é "não filtra por isso". Bloqueio só
+  // reage ao filtro de profissional (não tem status nem procedimento), e
+  // continua aparecendo quando o filtro pede outro profissional mas o
+  // bloqueio vale pra agenda inteira (professional_user_id nulo).
+  function passaNosFiltros(a) {
+    if (filtroProfissional && a.professional_user_id !== filtroProfissional) return false;
+    if (filtroStatus && a.status !== filtroStatus) return false;
+    if (filtroProcedimento && !nomesProcedimentos(a).includes(filtroProcedimento)) return false;
+    return true;
+  }
+
   function itensDoDia(dataCivil) {
     const ags = appointments
-      .filter((a) => a.date === dataCivil)
+      .filter((a) => a.date === dataCivil && passaNosFiltros(a))
       .map((a) => ({ id: "a" + a.id, tipo: "agendamento", dado: a, inicioMin: paraMinutos(a.time), fimMin: paraMinutos(a.time) + a.duration_min }));
     const bls = blocks
-      .filter((b) => b.date === dataCivil)
+      .filter((b) => b.date === dataCivil && (!filtroProfissional || !b.professional_user_id || b.professional_user_id === filtroProfissional))
       .map((b) => ({ id: "b" + b.id, tipo: "bloqueio", dado: b, inicioMin: paraMinutos(b.time), fimMin: paraMinutos(b.time) + b.duration_min }));
     const todos = [...ags, ...bls];
     const raias = calcularRaias(todos);
     return todos.map((it) => ({ ...it, ...raias.get(it.id) }));
   }
+
+  function alternarTelaCheia() {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen?.().then(() => setTelaCheia(true)).catch(() => {});
+    } else {
+      document.exitFullscreen?.().then(() => setTelaCheia(false)).catch(() => {});
+    }
+  }
+  // O navegador também sai de tela cheia pela tecla Esc (sem passar por
+  // alternarTelaCheia) - sem este listener o botão ficava com o rótulo
+  // trocado (mostrando "Sair" quando já tinha saído).
+  useEffect(() => {
+    function onChange() { setTelaCheia(!!document.fullscreenElement); }
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
 
   const slots = Array.from({ length: TOTAL_SLOTS }, (_, i) => minutosParaHora(HORA_INICIO + i * PASSO_MIN));
 
@@ -250,7 +308,7 @@ export default function AgendaView() {
   }
 
   return (
-    <div className="sc-agenda">
+    <div className={"sc-agenda" + (telaCheia ? " sc-agenda-tela-cheia" : "")} ref={containerRef}>
       <div className="sc-agenda-toolbar">
         <div className="sc-agenda-toolbar-esquerda">
           <div className="sc-toggle-group">
@@ -279,8 +337,56 @@ export default function AgendaView() {
           <button type="button" className="btn-ghost btn-small" onClick={() => setWaitlistAberta(true)}>
             {t("saudeClinicas.agenda.listaEspera")}{waitlistCount > 0 && <span className="sc-agenda-badge">{waitlistCount}</span>}
           </button>
-          <button type="button" className="btn-ghost btn-small" onClick={() => setPrintAberto(true)}>{t("saudeClinicas.agenda.imprimir")}</button>
+          <button type="button" className="btn-ghost btn-small" onClick={() => setPrintAberto(true)}>{t("saudeClinicas.agenda.exportar")}</button>
+          <button type="button" className="icon-btn" title={t(telaCheia ? "saudeClinicas.agenda.sairTelaCheia" : "saudeClinicas.agenda.telaCheia")} onClick={alternarTelaCheia}>
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d={telaCheia
+                ? "M9 4v3a2 2 0 0 1-2 2H4M15 4v3a2 2 0 0 0 2 2h3M9 20v-3a2 2 0 0 0-2-2H4M15 20v-3a2 2 0 0 1 2-2h3"
+                : "M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"} />
+            </svg>
+          </button>
           <button type="button" className="btn-primary btn-small" onClick={() => abrirNovoAgendamento()}>{t("saudeClinicas.agenda.novoAgendamento")}</button>
+        </div>
+      </div>
+
+      <div className="sc-agenda-filtros">
+        <select className="sc-agenda-filtro" value={filtroProfissional} onChange={(e) => setFiltroProfissional(e.target.value)}>
+          <option value="">{t("saudeClinicas.agenda.filtroProfissionalTodos")}</option>
+          {professionals.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+        {/* Não existe cadastro de sala ainda - o filtro fica reservado aqui,
+            desabilitado, pra não prometer um recurso que não existe (mesmo
+            tratamento de "Em breve" do resto do módulo). */}
+        <select className="sc-agenda-filtro" disabled title={t("modules.comingSoon")}>
+          <option value="">{t("saudeClinicas.agenda.filtroSalaTodas")}</option>
+        </select>
+        <select className="sc-agenda-filtro" value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
+          <option value="">{t("saudeClinicas.agenda.filtroStatusTodos")}</option>
+          {STATUS_AGENDA.map((s) => (
+            <option key={s} value={s}>{t(`saudeClinicas.agenda.status.${s}`)}</option>
+          ))}
+        </select>
+        <select className="sc-agenda-filtro" value={filtroProcedimento} onChange={(e) => setFiltroProcedimento(e.target.value)}>
+          <option value="">{t("saudeClinicas.agenda.filtroProcedimentoTodos")}</option>
+          {procedures.map((p) => (
+            <option key={p.id} value={p.name}>{p.name}</option>
+          ))}
+        </select>
+        {(filtroProfissional || filtroStatus || filtroProcedimento) && (
+          <button type="button" className="btn-ghost btn-small" onClick={() => { setFiltroProfissional(""); setFiltroStatus(""); setFiltroProcedimento(""); }}>
+            {t("saudeClinicas.agenda.limparFiltros")}
+          </button>
+        )}
+
+        <div className="sc-agenda-legenda">
+          {STATUS_AGENDA.map((s) => (
+            <span key={s} className="sc-agenda-legenda-item">
+              <i className={"sc-agenda-legenda-dot sc-agenda-legenda-dot-" + s} />
+              {t(`saudeClinicas.agenda.legenda.${s}`)}
+            </span>
+          ))}
         </div>
       </div>
 
@@ -333,8 +439,10 @@ export default function AgendaView() {
                         </div>
                       );
                     }
-                    const a = it.dado;
+const a = it.dado;
                     const arrastavel = a.status !== "cancelado";
+                    const profissional = professionals.find((p) => p.id === a.professional_user_id);
+                    const paciente = patients.find((p) => p.id === a.patient_id);
                     return (
                       <button
                         key={it.id}
@@ -350,8 +458,14 @@ export default function AgendaView() {
                         <span className="sc-agenda-card-top" />
                         <span className="sc-agenda-card-hora">{a.time} - {minutosParaHora(paraMinutos(a.time) + a.duration_min)}</span>
                         <span className="sc-agenda-card-nome">{a.patient_name}</span>
+                        {profissional && <span className="sc-agenda-card-prof">{profissional.name}</span>}
                         <span className="sc-agenda-card-status-label">{t(`saudeClinicas.agenda.status.${a.status}`)}</span>
                         {a.payment_status === "pago" && <span className="sc-agenda-card-pago">{t("saudeClinicas.agenda.pago")}</span>}
+                        {paciente?.sms_reminder_opt_in === 1 && (
+                          <span className="sc-agenda-card-whats" title={t("saudeClinicas.agenda.lembreteAtivo")}>
+                            <svg viewBox="0 0 24 24" width="10" height="10"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.5c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5.1a6.6 6.6 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.3.1-.4l.3-.4.2-.3a.5.5 0 0 0 0-.4c-.1-.1-.5-1.3-.7-1.7s-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.8 2 4.7 4.7 0 0 0 1 2.5 10.6 10.6 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.3 3.3 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z" /></svg>
+                          </span>
+                        )}
                         {arrastavel && (
                           <span
                             className="sc-agenda-card-resize"

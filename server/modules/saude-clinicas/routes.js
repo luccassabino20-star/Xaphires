@@ -7,6 +7,7 @@ import { runWithCompany } from "../../context.js";
 import {
   getClinicConfig,
   setClinicType,
+  setClinicTheme,
   listPatients,
   getPatient,
   insertPatient,
@@ -48,6 +49,7 @@ const router = Router();
 router.use(requireAuth, requireWritablePlan, requireModule("saude-clinicas"));
 
 const TIPOS_CLINICA = ["ESTETICA", "NUTRICAO", "BIOMEDICINA_ESTETICA", "MULTIDISCIPLINAR"];
+const TEMAS_VALIDOS = ["padrao", "rosa", "azul", "verde", "roxo", "escuro"];
 const DATA_CIVIL = /^\d{4}-\d{2}-\d{2}$/;
 const HORA = /^\d{2}:\d{2}$/;
 
@@ -71,17 +73,29 @@ router.get(
   })
 );
 
-// Só master troca a especialidade da clínica - mesmo padrão de outras
-// configurações administrativas do app (ver setFinanceAccess em users.js).
+// Só master troca a especialidade da clínica (e agora também o tema visual) -
+// mesmo padrão de outras configurações administrativas do app (ver
+// setFinanceAccess em users.js). Os dois campos são independentes: o corpo
+// pode trazer só um deles (é o que a tela de Aparência faz), e o que não vier
+// fica como estava - por isso `!== undefined`, não um valor default.
 router.put(
   "/config",
   requireMaster,
   ah(async (req, res) => {
-    const { clinicType } = req.body || {};
-    if (!TIPOS_CLINICA.includes(clinicType)) {
-      return res.status(400).json({ error: "Especialidade inválida", code: "CLINIC_TYPE_INVALID" });
+    const { clinicType, theme } = req.body || {};
+    if (clinicType !== undefined) {
+      if (!TIPOS_CLINICA.includes(clinicType)) {
+        return res.status(400).json({ error: "Especialidade inválida", code: "CLINIC_TYPE_INVALID" });
+      }
+      setClinicType(clinicType);
     }
-    res.json(setClinicType(clinicType));
+    if (theme !== undefined) {
+      if (!TEMAS_VALIDOS.includes(theme)) {
+        return res.status(400).json({ error: "Tema inválido", code: "CLINIC_THEME_INVALID" });
+      }
+      setClinicTheme(theme);
+    }
+    res.json(getClinicConfig());
   })
 );
 

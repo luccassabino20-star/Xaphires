@@ -413,6 +413,7 @@ export async function finExtratoExcel(transacoes) {
 // Prefixo sc*, mesmo padrão do fin* do Financeiro.
 export const scGetConfig = () => request("/saude-clinicas/config");
 export const scSetClinicType = (clinicType) => request("/saude-clinicas/config", { method: "PUT", body: { clinicType } });
+export const scSetTheme = (theme) => request("/saude-clinicas/config", { method: "PUT", body: { theme } });
 
 export const scListPatients = () => request("/saude-clinicas/patients");
 export const scCreatePatient = (data) => request("/saude-clinicas/patients", { method: "POST", body: data });

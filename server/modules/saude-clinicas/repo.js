@@ -29,6 +29,12 @@ export function setClinicType(clinicType) {
   return getClinicConfig();
 }
 
+export function setClinicTheme(theme) {
+  getClinicConfig(); // garante a linha
+  getDb().prepare("UPDATE clinica_config SET theme = ?, updated_at = ? WHERE id = 'default'").run(theme, nowIso());
+  return getClinicConfig();
+}
+
 // ---------- Pacientes ----------
 
 export function listPatients() {

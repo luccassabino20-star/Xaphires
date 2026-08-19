@@ -197,7 +197,9 @@
       "expandir": "Expandir menú", "recolher": "Contraer menú", "especialidade": "Especialidad",
       "dashboard": "Panel", "agenda": "Agenda & Citas", "pacientes": "Pacientes",
       "financeiro": "Finanzas", "servicos": "Servicios & Procedimientos", "usuarios": "Usuarios & Equipo",
-      "config": "Perfil & Configuración"
+      "config": "Perfil & Configuración",
+      "agendaSemanal": "Agenda Semanal", "agendaDiaria": "Agenda Diaria",
+      "bloqueioAgenda": "Bloqueo de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidad"
     },
     "dashboard": {
       "pacientesAtivos": "Pacientes activos", "fichasEnviadas": "Fichas de anamnesis enviadas",
@@ -206,7 +208,11 @@
     },
     "config": {
       "especialidade": "Especialidad de la clínica", "especialidadeHint": "Define qué tarjetas aparecen en la sección Pacientes.",
-      "dadosClinica": "Datos de la clínica", "dadosClinicaEmBreve": "El nombre, logotipo y datos de contacto de la clínica estarán disponibles pronto."
+      "dadosClinica": "Datos de la clínica", "dadosClinicaEmBreve": "El nombre, logotipo y datos de contacto de la clínica estarán disponibles pronto.",
+      "aparencia": "Apariencia y Temas", "aparenciaHint": "Elige el color de acento de tu clínica dentro del módulo Salud & Clínicas.",
+      "tema": {
+        "padrao": "Predeterminado", "rosa": "Rosé Clinique", "azul": "Azul Médico", "verde": "Verde Menta", "roxo": "Estética Vip", "escuro": "Modo Oscuro"
+      }
     },
     "clinicType": {
       "MULTIDISCIPLINAR": "Multidisciplinaria",
@@ -282,7 +288,8 @@
       "novoAgendamento": "Nueva cita",
       "bloqueado": "Bloqueado",
       "pago": "Pagado",
-      "status": { "agendado": "Agendado", "confirmado": "Confirmado", "em_atendimento": "En atención", "concluido": "Completado", "cancelado": "Cancelado", "faltou": "No asistió" },
+      "status": { "agendado": "Pendiente", "confirmado": "Confirmado", "em_atendimento": "En atención", "concluido": "Completado", "cancelado": "Cancelado", "faltou": "Inasistencia" },
+      "legenda": { "agendado": "Pendiente", "confirmado": "Confirmado", "em_atendimento": "Docs Pendientes", "concluido": "Completado", "cancelado": "Cancelado", "faltou": "Inasistencia" },
       "abaAgendamento": "Cita", "abaBloqueio": "Bloqueo",
       "novoPaciente": "+ Nuevo paciente",
       "semProfissional": "Sin profesional definido",
@@ -337,7 +344,19 @@
       "modificadoPor": "Modificado por",
       "semLogs": "Ningún evento registrado.",
       "alteradoEm": "Cambiado el",
-      "evento": { "criado": "Agendado", "reagendado": "Reprogramado", "status_alterado": "Estado modificado" }
+      "evento": { "criado": "Agendado", "reagendado": "Reprogramado", "status_alterado": "Estado modificado" },
+      "profissional": "Profesional",
+      "filtroProfissionalTodos": "Todos los profesionales", "filtroSalaTodas": "Todas las salas",
+      "filtroStatusTodos": "Todos los estados", "filtroProcedimentoTodos": "Todos los procedimientos",
+      "limparFiltros": "Limpiar filtros",
+      "exportar": "Exportar", "telaCheia": "Pantalla completa", "sairTelaCheia": "Salir de pantalla completa",
+      "lembreteAtivo": "Recordatorio por WhatsApp activo",
+      "agendaInteira": "Agenda completa (todos los profesionales)",
+      "motivoBloqueio": "Motivo del bloqueo", "criarBloqueio": "Crear bloqueo",
+      "bloqueioCriado": "Bloqueo creado", "bloqueioHint": "Reserva un horario para descanso, almuerzo o feriado - la agenda deja de aceptar nuevas citas en ese intervalo.",
+      "periodoLista": "Período", "bloqueiosVazio": "Ningún bloqueo en este período.",
+      "ocupado": "Ocupado", "livre": "Libre", "semProfissionais": "Ningún profesional registrado.",
+      "matrizHint": "Ocupación calculada a partir de las citas y bloqueos ya registrados."
     }
   },
   "crm": {
@@ -1365,6 +1384,7 @@
   "errors": {
     "MODULE_FORBIDDEN": "Módulo no disponible",
     "CLINIC_TYPE_INVALID": "Especialidad inválida",
+    "CLINIC_THEME_INVALID": "Tema inválido",
     "PATIENT_NAME_REQUIRED": "Indique el nombre del paciente",
     "PATIENT_NOT_FOUND": "Paciente no encontrado",
     "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Indique el nombre de la plantilla",

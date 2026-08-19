@@ -197,7 +197,9 @@
       "expandir": "Expand menu", "recolher": "Collapse menu", "especialidade": "Specialty",
       "dashboard": "Dashboard", "agenda": "Schedule & Appointments", "pacientes": "Patients",
       "financeiro": "Finance", "servicos": "Services & Procedures", "usuarios": "Users & Team",
-      "config": "Profile & Settings"
+      "config": "Profile & Settings",
+      "agendaSemanal": "Weekly Schedule", "agendaDiaria": "Daily Schedule",
+      "bloqueioAgenda": "Schedule Block", "matrizDisponibilidade": "Availability Matrix"
     },
     "dashboard": {
       "pacientesAtivos": "Active patients", "fichasEnviadas": "Intake forms sent",
@@ -206,7 +208,11 @@
     },
     "config": {
       "especialidade": "Clinic specialty", "especialidadeHint": "Determines which cards show up in the Patients section.",
-      "dadosClinica": "Clinic details", "dadosClinicaEmBreve": "The clinic's name, logo and contact details will be available soon."
+      "dadosClinica": "Clinic details", "dadosClinicaEmBreve": "The clinic's name, logo and contact details will be available soon.",
+      "aparencia": "Appearance & Themes", "aparenciaHint": "Choose your clinic's accent color within the Health & Clinics module.",
+      "tema": {
+        "padrao": "Default", "rosa": "Rosé Clinique", "azul": "Medical Blue", "verde": "Mint Green", "roxo": "Aesthetic Vip", "escuro": "Dark Mode"
+      }
     },
     "clinicType": {
       "MULTIDISCIPLINAR": "Multidisciplinary",
@@ -282,7 +288,8 @@
       "novoAgendamento": "New appointment",
       "bloqueado": "Blocked",
       "pago": "Paid",
-      "status": { "agendado": "Scheduled", "confirmado": "Confirmed", "em_atendimento": "In progress", "concluido": "Completed", "cancelado": "Cancelled", "faltou": "No-show" },
+      "status": { "agendado": "Pending", "confirmado": "Confirmed", "em_atendimento": "In progress", "concluido": "Completed", "cancelado": "Cancelled", "faltou": "No-show" },
+      "legenda": { "agendado": "Pending", "confirmado": "Confirmed", "em_atendimento": "Docs Pending", "concluido": "Completed", "cancelado": "Cancelled", "faltou": "No-show" },
       "abaAgendamento": "Appointment", "abaBloqueio": "Block",
       "novoPaciente": "+ New patient",
       "semProfissional": "No professional set",
@@ -337,7 +344,19 @@
       "modificadoPor": "Modified by",
       "semLogs": "No events recorded.",
       "alteradoEm": "Changed on",
-      "evento": { "criado": "Scheduled", "reagendado": "Rescheduled", "status_alterado": "Status changed" }
+      "evento": { "criado": "Scheduled", "reagendado": "Rescheduled", "status_alterado": "Status changed" },
+      "profissional": "Professional",
+      "filtroProfissionalTodos": "All professionals", "filtroSalaTodas": "All rooms",
+      "filtroStatusTodos": "All statuses", "filtroProcedimentoTodos": "All procedures",
+      "limparFiltros": "Clear filters",
+      "exportar": "Export", "telaCheia": "Full screen", "sairTelaCheia": "Exit full screen",
+      "lembreteAtivo": "WhatsApp reminder enabled",
+      "agendaInteira": "Whole schedule (all professionals)",
+      "motivoBloqueio": "Block reason", "criarBloqueio": "Create block",
+      "bloqueioCriado": "Block created", "bloqueioHint": "Reserve a time slot for time off, lunch or a holiday - the schedule stops accepting new appointments in that window.",
+      "periodoLista": "Period", "bloqueiosVazio": "No blocks in this period.",
+      "ocupado": "Busy", "livre": "Free", "semProfissionais": "No professionals registered.",
+      "matrizHint": "Occupancy calculated from the appointments and blocks already entered."
     }
   },
   "crm": {
@@ -1365,6 +1384,7 @@
   "errors": {
     "MODULE_FORBIDDEN": "Module unavailable",
     "CLINIC_TYPE_INVALID": "Invalid specialty",
+    "CLINIC_THEME_INVALID": "Invalid theme",
     "PATIENT_NAME_REQUIRED": "Enter the patient's name",
     "PATIENT_NOT_FOUND": "Patient not found",
     "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Enter the template name",

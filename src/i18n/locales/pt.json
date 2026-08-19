@@ -197,7 +197,9 @@
       "expandir": "Expandir menu", "recolher": "Recolher menu", "especialidade": "Especialidade",
       "dashboard": "Dashboard", "agenda": "Agenda & Agendamentos", "pacientes": "Pacientes",
       "financeiro": "Financeiro", "servicos": "Serviços & Procedimentos", "usuarios": "Usuários & Equipe",
-      "config": "Perfil & Configurações"
+      "config": "Perfil & Configurações",
+      "agendaSemanal": "Agenda Semanal", "agendaDiaria": "Agenda Diária",
+      "bloqueioAgenda": "Bloqueio de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidade"
     },
     "dashboard": {
       "pacientesAtivos": "Pacientes ativos", "fichasEnviadas": "Fichas de anamnese enviadas",
@@ -206,7 +208,11 @@
     },
     "config": {
       "especialidade": "Especialidade da clínica", "especialidadeHint": "Define quais cards aparecem na seção Pacientes.",
-      "dadosClinica": "Dados da clínica", "dadosClinicaEmBreve": "Nome, logotipo e dados de contato da clínica estarão disponíveis em breve."
+      "dadosClinica": "Dados da clínica", "dadosClinicaEmBreve": "Nome, logotipo e dados de contato da clínica estarão disponíveis em breve.",
+      "aparencia": "Aparência e Temas", "aparenciaHint": "Escolha a cor de destaque da sua clínica dentro do módulo Saúde & Clínicas.",
+      "tema": {
+        "padrao": "Padrão", "rosa": "Rosé Clinique", "azul": "Azul Médico", "verde": "Verde Menta", "roxo": "Estética Vip", "escuro": "Modo Escuro"
+      }
     },
     "clinicType": {
       "MULTIDISCIPLINAR": "Multidisciplinar",
@@ -282,7 +288,8 @@
       "novoAgendamento": "Novo agendamento",
       "bloqueado": "Bloqueado",
       "pago": "Pago",
-      "status": { "agendado": "Agendado", "confirmado": "Confirmado", "em_atendimento": "Em atendimento", "concluido": "Concluído", "cancelado": "Cancelado", "faltou": "Faltou" },
+      "status": { "agendado": "Pendente", "confirmado": "Confirmado", "em_atendimento": "Em atendimento", "concluido": "Concluído", "cancelado": "Cancelado", "faltou": "Falta" },
+      "legenda": { "agendado": "Pendente", "confirmado": "Confirmado", "em_atendimento": "Docs Pendentes", "concluido": "Concluído", "cancelado": "Cancelado", "faltou": "Falta" },
       "abaAgendamento": "Agendamento", "abaBloqueio": "Bloqueio",
       "novoPaciente": "+ Novo paciente",
       "semProfissional": "Sem profissional definido",
@@ -337,7 +344,19 @@
       "modificadoPor": "Modificado por",
       "semLogs": "Nenhum evento registrado.",
       "alteradoEm": "Alterado em",
-      "evento": { "criado": "Agendado", "reagendado": "Reagendado", "status_alterado": "Situação alterada" }
+      "evento": { "criado": "Agendado", "reagendado": "Reagendado", "status_alterado": "Situação alterada" },
+      "profissional": "Profissional",
+      "filtroProfissionalTodos": "Todos os profissionais", "filtroSalaTodas": "Todas as salas",
+      "filtroStatusTodos": "Todos os status", "filtroProcedimentoTodos": "Todos os procedimentos",
+      "limparFiltros": "Limpar filtros",
+      "exportar": "Exportar", "telaCheia": "Tela cheia", "sairTelaCheia": "Sair da tela cheia",
+      "lembreteAtivo": "Lembrete por WhatsApp ativo",
+      "agendaInteira": "Agenda inteira (todos os profissionais)",
+      "motivoBloqueio": "Motivo do bloqueio", "criarBloqueio": "Criar bloqueio",
+      "bloqueioCriado": "Bloqueio criado", "bloqueioHint": "Reserve um horário para folga, almoço ou feriado - a agenda deixa de aceitar novo agendamento nesse intervalo.",
+      "periodoLista": "Período", "bloqueiosVazio": "Nenhum bloqueio neste período.",
+      "ocupado": "Ocupado", "livre": "Livre", "semProfissionais": "Nenhum profissional cadastrado.",
+      "matrizHint": "Ocupação calculada a partir dos agendamentos e bloqueios já lançados."
     }
   },
   "crm": {
@@ -1742,6 +1761,7 @@
   "errors": {
     "MODULE_FORBIDDEN": "Módulo indisponível",
     "CLINIC_TYPE_INVALID": "Especialidade inválida",
+    "CLINIC_THEME_INVALID": "Tema inválido",
     "PATIENT_NAME_REQUIRED": "Informe o nome do paciente",
     "PATIENT_NOT_FOUND": "Paciente não encontrado",
     "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Informe o nome do template",
