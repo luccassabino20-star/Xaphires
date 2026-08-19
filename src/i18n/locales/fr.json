@@ -64,6 +64,10 @@
     "comingSoon": "Bientôt disponible",
     "backToLauncher": "Modules",
     "loadError": "Impossible de charger les modules.",
+    "quadro": {
+      "name": "Tableau Kanban",
+      "desc": "Votre tableau de tâches et flux de travail, libre pour tout usage."
+    },
     "vendas-crm": {
       "name": "Ventes & CRM",
       "desc": "Prospects, pipeline Kanban, propositions, devis et commandes."
@@ -71,6 +75,10 @@
     "financeiro": {
       "name": "Finance",
       "desc": "Trésorerie, comptes à payer et à recevoir, rapprochement et compte de résultat."
+    },
+    "saude-clinicas": {
+      "name": "Santé & Cliniques",
+      "desc": "Dossier patient, anamnèse, agenda et gestion pour cliniques d'esthétique, biomédecine et nutrition."
     },
     "compras-estoque": {
       "name": "Achats & Stocks",
@@ -182,6 +190,137 @@
     "geradoDe": "Titre de taxe généré à partir du titre {{n}}", "gerou": "A généré le titre de taxe n° {{n}}", "badgeImposto": "taxe", "pesquisePrompt": "Utilisez la recherche et les filtres ci-dessus, puis cliquez sur Rechercher.", "rateadoN": "Réparti ({{n}})" },
     "forma": { "operacao_bancaria": "Opération bancaire", "pix": "Pix", "boleto": "Bordereau", "transferencia": "Virement", "dinheiro": "Espèces", "cheque": "Chèque", "cartao": "Carte" },
     "parcela": { "botao": "Répartir en échéances", "qtd": "Échéances", "intervalo": "Intervalle (mois)", "confirmar": "Répartir", "xdeN": "{{x}}/{{n}}", "deTitulo": "Échéance {{x}}/{{n}} du titre {{t}}", "parcelado": "Réparti en {{n}}x (échéances n° {{nums}})", "desdobrado": "Réparti en {{n}} échéances" }
+  },
+  "saudeClinicas": {
+    "voltarCards": "Retour aux cartes",
+    "sidebar": {
+      "expandir": "Étendre le menu", "recolher": "Réduire le menu", "especialidade": "Spécialité",
+      "dashboard": "Tableau de bord", "agenda": "Agenda & Rendez-vous", "pacientes": "Patients",
+      "financeiro": "Finance", "servicos": "Services & Actes", "usuarios": "Utilisateurs & Équipe",
+      "config": "Profil & Paramètres"
+    },
+    "dashboard": {
+      "pacientesAtivos": "Patients actifs", "fichasEnviadas": "Fiches d'anamnèse envoyées",
+      "fichasRespondidas": "Fiches d'anamnèse répondues",
+      "avisoIndicadores": "Le chiffre d'affaires mensuel et les indicateurs de fréquentation arriveront avec l'Agenda et la Finance de la clinique, encore en développement."
+    },
+    "config": {
+      "especialidade": "Spécialité de la clinique", "especialidadeHint": "Détermine les cartes affichées dans la section Patients.",
+      "dadosClinica": "Coordonnées de la clinique", "dadosClinicaEmBreve": "Le nom, le logo et les coordonnées de la clinique seront bientôt disponibles."
+    },
+    "clinicType": {
+      "MULTIDISCIPLINAR": "Multidisciplinaire",
+      "ESTETICA": "Esthétique",
+      "BIOMEDICINA_ESTETICA": "Biomédecine Esthétique",
+      "NUTRICAO": "Nutrition"
+    },
+    "cards": {
+      "pacientes": { "name": "Patients", "desc": "Registre central des patients de la clinique." },
+      "anamnese": { "name": "Fiches d'Anamnèse & Formulaires", "desc": "Questionnaires par spécialité, constructeur personnalisé et envoi par WhatsApp." },
+      "prontuario-estetico": { "name": "Dossier Esthétique", "desc": "Anamnèse faciale/corporelle, phototype de Fitzpatrick et suivi des actes." },
+      "mapeamento-procedimentos": { "name": "Cartographie des Actes", "desc": "Face & Body Mapping pour marquer les points d'injection et la quantité de produit." },
+      "galeria-antes-depois": { "name": "Galerie Avant & Après", "desc": "Comparatif photo standardisé de l'évolution du patient." },
+      "prontuario-injetaveis": { "name": "Dossier Injectables & Harmonisation", "desc": "Anamnèse des actes invasifs, alertes de risque et cartographie des points/unités/ml." },
+      "rastreabilidade-lotes": { "name": "Traçabilité des Lots", "desc": "Contrôle de marque, lot et péremption des toxines, produits de comblement et bio-stimulateurs." },
+      "termos-legais": { "name": "Consentement & Responsabilité Légale", "desc": "Consentement éclairé pour les injectables, avec signature numérique à l'écran." },
+      "prontuario-nutricional": { "name": "Dossier & Anamnèse Nutritionnelle", "desc": "Rappel alimentaire, habitudes et antécédents métaboliques." },
+      "avaliacao-antropometrica": { "name": "Évaluation Anthropométrique", "desc": "Mesures, plis cutanés, bio-impédance et graphiques d'évolution." },
+      "gerador-plano-alimentar": { "name": "Générateur de Plan Alimentaire", "desc": "Calcul automatique des macros/micronutriments et équivalences." },
+      "prescritor-suplementos": { "name": "Prescripteur de Compléments & Formules", "desc": "Ordonnances et formules prêtes à prescrire." },
+      "agenda-multiprofissional": { "name": "Agenda Multiprofessionnel", "desc": "Vue quotidienne/hebdomadaire, blocage de créneaux et rappels automatiques." },
+      "pacotes-sessoes": { "name": "Forfaits & Suivi des Séances", "desc": "Vente de forfaits avec décompte automatique des séances réalisées." },
+      "estoque-insumos": { "name": "Stock de Consommables Cliniques", "desc": "Contrôle des seringues, ampoules et matériels, avec décompte automatique." }
+    },
+    "pacientes": {
+      "nome": "Nom", "nascimento": "Naissance", "telefone": "Téléphone", "cpf": "Pièce d'identité", "email": "E-mail", "notas": "Notes",
+      "salvo": "Patient enregistré", "vazio": "Aucun patient enregistré pour le moment.",
+      "generoEscolha": "Sexe",
+      "genero": { "feminino": "Féminin", "masculino": "Masculin", "outro": "Autre" }
+    },
+    "anamnese": {
+      "abaTemplates": "Modèles", "abaRespostas": "Réponses",
+      "nomeTemplate": "Nom du modèle", "descricaoTemplate": "Description", "universal": "Universel (toutes spécialités)",
+      "perguntaLabel": "Question", "opcoesPlaceholder": "Options, séparées par une virgule",
+      "obrigatorio": "Obligatoire", "alerta": "Alerte de risque", "adicionarPergunta": "Ajouter une question",
+      "salvarTemplate": "Enregistrer le modèle", "templateCriado": "Modèle créé",
+      "nPerguntas": "{{count}} question", "nPerguntas_other": "{{count}} questions",
+      "tipoCampo": {
+        "text": "Texte court", "textarea": "Texte long", "single_choice": "Choix unique",
+        "multi_choice": "Choix multiple", "boolean": "Oui/Non", "file": "Envoi d'examen"
+      },
+      "escolhaPaciente": "Choisir le patient", "escolhaTemplate": "Choisir le modèle",
+      "novaFichaEnviar": "Créer la fiche et envoyer par WhatsApp", "enviando": "Envoi en cours...",
+      "selecionePaciente": "Sélectionnez un patient pour voir les fiches envoyées.",
+      "colTemplate": "Modèle", "colStatus": "Statut", "vazioRespostas": "Aucune fiche envoyée à ce patient pour le moment.",
+      "enviarWhatsapp": "Envoyer par WhatsApp",
+      "mensagemWhatsapp": "Bonjour ! Merci de remplir votre fiche de pré-anamnèse avant votre rendez-vous : {{url}}",
+      "status": { "rascunho": "Brouillon", "enviado": "Envoyé", "respondido": "Répondu" }
+    },
+    "agenda": {
+      "diaSemana": { "0": "Dimanche", "1": "Lundi", "2": "Mardi", "3": "Mercredi", "4": "Jeudi", "5": "Vendredi", "6": "Samedi" },
+      "mes": { "0": "Janvier", "1": "Février", "2": "Mars", "3": "Avril", "4": "Mai", "5": "Juin", "6": "Juillet", "7": "Août", "8": "Septembre", "9": "Octobre", "10": "Novembre", "11": "Décembre" },
+      "dia": "Jour", "semana": "Semaine", "hoje": "Aujourd'hui",
+      "buscarPaciente": "Rechercher un patient...",
+      "listaEspera": "Liste d'attente",
+      "imprimir": "Imprimer",
+      "novoAgendamento": "Nouveau rendez-vous",
+      "bloqueado": "Bloqué",
+      "pago": "Payé",
+      "status": { "agendado": "Planifié", "confirmado": "Confirmé", "em_atendimento": "En cours", "concluido": "Terminé", "cancelado": "Annulé", "faltou": "Absent" },
+      "abaAgendamento": "Rendez-vous", "abaBloqueio": "Blocage",
+      "novoPaciente": "+ Nouveau patient",
+      "semProfissional": "Aucun professionnel défini",
+      "duracaoMin": "Durée (min)",
+      "adicionarProcedimento": "Ajouter un acte",
+      "total": "Total",
+      "particular": "Particulier", "convenio": "Assurance",
+      "salvarAgendamento": "Enregistrer le rendez-vous", "salvarBloqueio": "Enregistrer le blocage",
+      "todosProfissionais": "Tous les professionnels",
+      "motivo": "Motif du blocage",
+      "esperaVazia": "Personne dans la liste d'attente.",
+      "esperaAdicionada": "Ajouté à la liste d'attente",
+      "esperaConvertida": "Rendez-vous créé depuis la liste d'attente",
+      "periodo": { "qualquer": "N'importe quand", "manha": "Matin", "tarde": "Après-midi" },
+      "agendar": "Planifier",
+      "novaEspera": "Ajouter à l'attente",
+      "semProcedimento": "Aucun acte défini",
+      "imprimirDia": "Jour actuel", "imprimirSemana": "Semaine actuelle",
+      "incluirBloqueios": "Inclure les blocages d'horaire",
+      "gerarPrevia": "Générer l'aperçu",
+      "voltarOpcoes": "Retour",
+      "tituloImpressao": "Agenda du {{from}} au {{to}}",
+      "colData": "Date", "colHora": "Heure", "colStatus": "Statut",
+      "semItensPeriodo": "Aucun élément sur cette période.",
+      "detalhes": "Détails du rendez-vous",
+      "idade": "{{anos}} ans, {{meses}} mois, {{dias}} jours",
+      "ultimaConsulta": "Dernière visite",
+      "haMinutos": "il y a {{count}} minute", "haMinutos_other": "il y a {{count}} minutes",
+      "haHoras": "il y a {{count}} heure", "haHoras_other": "il y a {{count}} heures",
+      "haDias": "il y a {{count}} jour", "haDias_other": "il y a {{count}} jours",
+      "enviarLembrete": "Envoyer un rappel de rendez-vous",
+      "mensagemLembrete": "Bonjour ! Petit rappel de votre rendez-vous le {{data}} à {{hora}}.",
+      "as": "à",
+      "cobrarAgendamento": "Facturer le rendez-vous",
+      "procedimento": "Acte", "quant": "Qté", "valor": "Montant", "totalReceber": "Total à recevoir",
+      "confirmarCancelar": "Annuler ce rendez-vous ?",
+      "cancelarAgendamento": "Annuler le rendez-vous",
+      "lancarRecebimento": "Enregistrer le paiement",
+      "recebimentoLancado": "Paiement enregistré",
+      "editarAgendamento": "Modifier le rendez-vous",
+      "iniciarAtendimento": "Démarrer la visite"
+    }
+  },
+  "crm": {
+    "tabs": { "funil": "Pipeline", "contatos": "Contacts", "propostas": "Propositions", "pedidos": "Commandes" },
+    "contatos": {
+      "nome": "Nom", "telefone": "Téléphone", "email": "E-mail", "empresa": "Entreprise", "notas": "Notes",
+      "salvo": "Contact enregistré", "vazio": "Aucun contact enregistré pour le moment."
+    },
+    "funil": {
+      "novoLead": "Nouveau prospect", "tituloLead": "Titre de l'affaire", "contatoNovo": "Nouveau contact",
+      "valorEstimado": "Valeur estimée", "origem": "Origine du prospect", "criarLead": "Créer le prospect",
+      "leadCriado": "Prospect créé", "colunaVazia": "Aucune affaire à cette étape."
+    }
   },
   "theme": {
     "light": "Clair",
@@ -1571,6 +1710,30 @@
     }
   },
   "errors": {
+    "MODULE_FORBIDDEN": "Module indisponible",
+    "CLINIC_TYPE_INVALID": "Spécialité invalide",
+    "PATIENT_NAME_REQUIRED": "Indiquez le nom du patient",
+    "PATIENT_NOT_FOUND": "Patient introuvable",
+    "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Indiquez le nom du modèle",
+    "ANAMNESE_TEMPLATE_NOT_FOUND": "Modèle introuvable",
+    "ANAMNESE_RESPONSE_NOT_FOUND": "Fiche introuvable",
+    "ANAMNESE_TOKEN_INVALIDO": "Lien invalide ou expiré",
+    "ANAMNESE_JA_RESPONDIDA": "Cette fiche a déjà été remplie",
+    "CRM_CONTACT_REQUIRED": "Indiquez le contact",
+    "CRM_CONTACT_NAME_REQUIRED": "Indiquez le nom du contact",
+    "CRM_CONTACT_NOT_FOUND": "Contact introuvable",
+    "CRM_OPPORTUNITY_TITLE_REQUIRED": "Indiquez le titre de l'affaire",
+    "CRM_OPPORTUNITY_NOT_FOUND": "Affaire introuvable",
+    "CRM_STAGE_NOT_FOUND": "Étape invalide",
+    "CRM_NO_STAGES": "Le pipeline n'a aucune étape",
+    "PATIENT_REQUIRED": "Indiquez le patient",
+    "AGENDA_PERIODO_INVALIDO": "Indiquez une période valide",
+    "AGENDA_DATA_HORA_INVALIDOS": "Indiquez une date et une heure valides",
+    "AGENDA_CONFLITO_HORARIO": "Il existe déjà un rendez-vous ou un blocage à cet horaire",
+    "AGENDA_APPOINTMENT_NOT_FOUND": "Rendez-vous introuvable",
+    "AGENDA_BLOCK_NOT_FOUND": "Blocage introuvable",
+    "WAITLIST_NOT_FOUND": "Élément de la liste d'attente introuvable",
+    "TOO_MANY_REQUESTS": "Trop de tentatives. Veuillez patienter quelques minutes.",
     "NETWORK_UNREACHABLE": "Le serveur n'a pas répondu. Vérifiez qu'il est en cours d'exécution et réessayez.",
     "REPORT_FORMAT_INVALID": "Format de rapport non pris en charge",
     "REPORT_STATUS_INVALID": "Filtre de statut invalide",

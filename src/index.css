@@ -7142,3 +7142,269 @@ img.avatar { object-fit: cover; padding: 0; }
   .fin-dre-grid { grid-template-columns: 1fr; }
   .fin-body { padding: 20px 14px 48px; }
 }
+
+/* ---------- Saúde & Clínicas ---------- */
+/* Casca do módulo, mesmo desenho de .fin/.fin-top/.fin-body - a única
+   diferença é que a "home" é a grade de cards (reaproveita .launcher-grid/
+   .module-card do launcher) em vez de uma barra de abas fixa. */
+.sc { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--bg-column); color: var(--text-primary); }
+.sc-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-topbar); }
+.sc-top-left { display: flex; align-items: center; gap: 12px; }
+.sc-title { font-size: 18px; font-weight: 680; margin: 0; }
+.sc-top-actions { display: flex; align-items: center; gap: 12px; }
+.sc-clinictype-select { padding: 6px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-clinictype-label { font-size: 13px; color: var(--text-secondary); padding: 4px 10px; background: var(--bg-list); border-radius: 999px; }
+/* Corpo do módulo: sidebar fixa + conteúdo rolável, lado a lado. */
+.sc-shell { flex: 1; min-height: 0; display: flex; }
+.sc-body { flex: 1; min-width: 0; overflow-y: auto; padding: 28px 32px 56px; }
+.sc-error { color: var(--danger); padding: 20px 4px; }
+.sc-empty { text-align: center; color: var(--text-muted); padding: 24px; }
+.sc-hint { font-size: 12.5px; color: var(--text-muted); }
+.sc-voltar-cards { margin-bottom: 16px; }
+
+/* Sidebar de administração da clínica */
+.sc-sidebar {
+  flex-shrink: 0; width: 268px; display: flex; flex-direction: column; gap: 14px;
+  padding: 16px 10px; background: var(--bg-card); border-right: 1px solid var(--border-subtle);
+  transition: width 0.15s ease;
+}
+.sc-sidebar-collapsed { width: 60px; }
+.sc-sidebar-toggle {
+  align-self: flex-end; display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; color: var(--text-secondary); background: none; border: 1px solid var(--border-subtle);
+  border-radius: 7px; cursor: pointer;
+}
+.sc-sidebar-collapsed .sc-sidebar-toggle { align-self: center; }
+.sc-sidebar-toggle:hover { color: var(--text-primary); border-color: var(--border-strong); }
+.sc-sidebar-specialty { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; }
+.sc-sidebar-specialty-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.sc-sidebar-specialty .sc-clinictype-select { width: 100%; }
+.sc-sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+.sc-sidebar-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 10px; font-size: 13.5px;
+  text-align: left; color: var(--text-primary); background: none; border: none; border-radius: 8px; cursor: pointer;
+}
+.sc-sidebar-collapsed .sc-sidebar-item { justify-content: center; }
+.sc-sidebar-item:hover:not(:disabled) { background: var(--bg-list); }
+.sc-sidebar-item.active { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600; }
+.sc-sidebar-item:disabled { color: var(--text-muted); cursor: default; opacity: 0.7; }
+.sc-sidebar-item-icon { display: inline-flex; flex-shrink: 0; }
+/* Sem nowrap/ellipsis de propósito: "Serviços & Procedimentos" e afins cortavam
+   em "..." num sidebar estreito - melhor a rotulagem quebrar em duas linhas do
+   que virar texto ilegível. */
+.sc-sidebar-item-label { flex: 1; line-height: 1.25; }
+.sc-sidebar-item-badge {
+  flex-shrink: 0; align-self: flex-start;
+  font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
+  padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
+}
+
+/* Aviso de recurso ainda não construído dentro de uma seção real (ex.:
+   Dashboard, que já tem KPIs de verdade mas não os de agenda/financeiro). */
+.sc-placeholder-pane { padding: 16px 18px; background: var(--bg-list); border: 1px dashed var(--border-strong); border-radius: 12px; color: var(--text-secondary); font-size: 13.5px; }
+
+/* Configurações */
+.sc-config-card { padding: 16px 18px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.sc-config-title { margin: 0; font-size: 14.5px; font-weight: 650; }
+
+/* Pacientes / listas em geral */
+.sc-cad-secao { display: flex; flex-direction: column; gap: 14px; }
+.sc-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.sc-form-column { flex-direction: column; align-items: flex-start; }
+.sc-form input, .sc-form select { padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-form input[type="text"] { flex: 1; min-width: 140px; }
+.sc-table-wrap { overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: 12px; }
+.sc-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.sc-table th, .sc-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+.sc-table th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg-list); }
+.sc-table tr:last-child td { border-bottom: none; }
+.sc-row-inativo { opacity: 0.6; }
+.sc-row-actions { text-align: right; white-space: nowrap; display: flex; gap: 4px; justify-content: flex-end; }
+
+/* Anamnese: sub-abas Templates/Respostas, construtor de campos e badges de status */
+.sc-subtabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--border-subtle); }
+.sc-subtab { padding: 10px 14px; font-size: 13.5px; font-weight: 550; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; }
+.sc-subtab:hover { color: var(--text-primary); }
+.sc-subtab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+.sc-campos-builder { display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 10px; background: var(--bg-list); border-radius: 10px; }
+.sc-campo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sc-campo-row input[type="text"] { flex: 1; min-width: 140px; padding: 6px 8px; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-primary); }
+.sc-campo-row select { padding: 6px 8px; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-primary); }
+.sc-checkbox { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; }
+.sc-checkbox-alert { color: var(--danger); }
+.sc-template-list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.sc-template-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; }
+.sc-template-nome { font-weight: 600; }
+.sc-template-campos { margin-left: auto; font-size: 12.5px; color: var(--text-muted); }
+.sc-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); }
+.sc-badge-rascunho { color: var(--text-secondary); }
+.sc-badge-enviado { color: #fff; background: var(--accent); border-color: transparent; }
+.sc-badge-respondido { color: #fff; background: var(--success); border-color: transparent; }
+
+/* Formulário público de pré-anamnese (paciente sem login, sem casca do app) */
+.sc-pub { min-height: 100vh; display: flex; justify-content: center; padding: 32px 16px; background: var(--bg-column); color: var(--text-primary); }
+.sc-pub-card { width: 100%; max-width: 560px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 28px 26px; height: fit-content; }
+.sc-pub-title { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+.sc-pub-sub { font-size: 13.5px; color: var(--text-secondary); margin: 0 0 20px; }
+.sc-pub-erro { color: var(--danger); font-size: 13.5px; margin: 0 0 14px; }
+.sc-pub-obrigado { font-size: 15px; color: var(--success); }
+.sc-pub-campo { display: block; margin-bottom: 16px; }
+.sc-pub-label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+.sc-pub-campo input[type="text"], .sc-pub-campo textarea { width: 100%; padding: 9px 11px; font-size: 14px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-pub-opcao { display: flex; align-items: center; gap: 6px; font-size: 13.5px; margin: 4px 0; }
+.sc-pub-checkbox { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+.sc-pub-em-breve { font-size: 12.5px; color: var(--text-muted); margin: 0; }
+.sc-pub-card form > button { margin-top: 6px; }
+
+/* ---------- CRM ---------- */
+.crm-tabs { display: flex; gap: 4px; padding: 0 20px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-topbar); overflow-x: auto; }
+.crm-tab { display: flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 12px 16px; font-size: 14px; font-weight: 550; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; }
+.crm-tab:hover:not(:disabled) { color: var(--text-primary); }
+.crm-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+.crm-tab:disabled { color: var(--text-muted); cursor: default; }
+.crm-tab-badge { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle); }
+
+.crm-funil-topo { margin-bottom: 16px; }
+
+/* Quadro do funil: colunas lado a lado, rolagem horizontal se não couber -
+   independente do quadro genérico (dados e componente próprios). */
+.crm-board { display: flex; gap: 14px; align-items: flex-start; overflow-x: auto; padding-bottom: 8px; }
+.crm-column { flex: 0 0 260px; display: flex; flex-direction: column; gap: 8px; background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 10px; min-height: 120px; }
+.crm-column-header { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px; font-size: 13px; font-weight: 650; color: var(--text-primary); }
+.crm-column-count { font-size: 11.5px; font-weight: 600; color: var(--text-muted); background: var(--bg-card); border-radius: 999px; padding: 1px 7px; }
+.crm-column-body { display: flex; flex-direction: column; gap: 8px; min-height: 40px; }
+.crm-column-empty { font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px 4px; }
+.crm-card { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; cursor: grab; }
+.crm-card:active { cursor: grabbing; }
+.crm-card-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+.crm-card-contact { font-size: 12px; color: var(--text-secondary); }
+.crm-card-value { font-size: 12px; font-weight: 600; color: var(--accent); }
+
+/* ---------- Agenda (Saúde & Clínicas) ---------- */
+.sc-agenda { display: flex; flex-direction: column; gap: 14px; height: 100%; min-height: 0; }
+.sc-agenda-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.sc-agenda-toolbar-esquerda, .sc-agenda-toolbar-direita { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sc-agenda-periodo-label { font-size: 13px; color: var(--text-secondary); margin-left: 4px; white-space: nowrap; }
+
+.sc-toggle-group { display: inline-flex; border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; }
+.sc-toggle-btn { padding: 6px 12px; font-size: 12.5px; font-weight: 550; color: var(--text-secondary); background: var(--bg-list); border: none; border-right: 1px solid var(--border-subtle); cursor: pointer; }
+.sc-toggle-btn:last-child { border-right: none; }
+.sc-toggle-btn.active { color: #fff; background: var(--accent); }
+
+.sc-agenda-busca { position: relative; }
+.sc-agenda-busca input { padding: 7px 10px; font-size: 13px; width: 220px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-agenda-busca-resultados { position: absolute; z-index: 5; top: calc(100% + 4px); left: 0; width: 100%; max-height: 260px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; box-shadow: var(--shadow-card-hover); }
+.sc-agenda-busca-resultados button { display: flex; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 12px; font-size: 13px; text-align: left; color: var(--text-primary); background: none; border: none; border-bottom: 1px solid var(--border-subtle); cursor: pointer; }
+.sc-agenda-busca-resultados button:last-child { border-bottom: none; }
+.sc-agenda-busca-resultados button:hover { background: var(--bg-list); }
+.sc-agenda-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; margin-left: 6px; padding: 0 4px; font-size: 10px; font-weight: 700; color: #fff; background: var(--danger); border-radius: 999px; }
+
+.sc-agenda-grid-wrap { flex: 1; min-height: 0; overflow: auto; border: 1px solid var(--border-subtle); border-radius: 12px; }
+.sc-agenda-grid { display: grid; grid-template-columns: 52px repeat(var(--sc-dias), minmax(150px, 1fr)); }
+.sc-agenda-gutter { position: relative; border-right: 1px solid var(--border-subtle); }
+.sc-agenda-gutter-header { height: 46px; border-bottom: 1px solid var(--border-subtle); }
+/* Um rótulo por slot de 15min (não só na hora cheia) - a hora cheia vem mais
+   forte (negrito, cor de destaque) pra continuar dando o "andaime" visual sem
+   precisar esconder os quartos de hora, no espírito da referência do cliente. */
+.sc-agenda-gutter-slot { position: absolute; left: 0; right: 0; height: 22px; font-size: 9px; color: var(--text-muted); text-align: right; padding-right: 6px; transform: translateY(-6px); }
+.sc-agenda-gutter-hora-cheia { font-size: 10.5px; font-weight: 700; color: var(--accent); }
+.sc-agenda-day { border-right: 1px solid var(--border-subtle); min-width: 0; }
+.sc-agenda-day:last-child { border-right: none; }
+.sc-agenda-day-header { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; height: 46px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-list); }
+.sc-agenda-day-semana { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+.sc-agenda-day-numero { font-size: 11.5px; color: var(--text-muted); }
+.sc-agenda-day-current .sc-agenda-day-header { background: color-mix(in srgb, var(--accent) 14%, var(--bg-list)); }
+.sc-agenda-day-current .sc-agenda-day-semana, .sc-agenda-day-current .sc-agenda-day-numero { color: var(--accent); font-weight: 700; }
+/* Coluna do dia atual ganha um fundo levemente tingido por inteiro (não só o
+   cabeçalho) - mesmo destaque da referência, na cor de marca do projeto em vez
+   do amarelo do exemplo (não há variável de "amarelo" na paleta do app). */
+.sc-agenda-day-current .sc-agenda-day-body { background-color: color-mix(in srgb, var(--accent) 5%, transparent); }
+.sc-agenda-day-body { position: relative; }
+/* Linha pontilhada a cada 15min, cheia na hora exata - desenhada pela borda
+   de cima de cada botão de slot (mesmo elemento que recebe o clique), não por
+   um background-image separado: evita dessincronizar grade visual e área
+   clicável se o SLOT_ALTURA mudar um dia. */
+.sc-agenda-slot { position: absolute; left: 0; right: 0; background: none; border: none; border-top: 1px dashed var(--border-subtle); cursor: pointer; }
+.sc-agenda-slot-hora-cheia { border-top: 1px solid var(--border-strong); }
+.sc-agenda-slot:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.sc-agenda-card {
+  position: absolute; display: flex; flex-direction: column; gap: 1px; overflow: hidden;
+  padding: 5px 6px 3px; font: inherit; font-size: 11px; line-height: 1.25; text-align: left; color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border-subtle));
+  border-radius: 8px; z-index: 1; cursor: pointer;
+}
+.sc-agenda-card-top { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+.sc-agenda-card-hora { font-weight: 700; }
+.sc-agenda-card-nome { color: var(--text-primary); font-weight: 600; }
+.sc-agenda-card-sub { color: var(--text-secondary); }
+.sc-agenda-card-status-label { margin-top: auto; font-size: 9.5px; color: var(--text-secondary); }
+.sc-agenda-proc-nome { flex: 1; font-size: 13.5px; color: var(--text-secondary); }
+.sc-agenda-card-pago { align-self: flex-start; font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--success); }
+.sc-agenda-card-status { margin-top: auto; font-size: 10px; padding: 1px 2px; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 4px; }
+.sc-agenda-card-cancelado { opacity: 0.55; text-decoration: line-through; }
+.sc-agenda-card-cancelado .sc-agenda-card-top { background: var(--danger); }
+.sc-agenda-card-faltou .sc-agenda-card-top { background: var(--danger); }
+.sc-agenda-card-concluido .sc-agenda-card-top { background: var(--success); }
+.sc-agenda-card-em_atendimento { border-color: color-mix(in srgb, var(--success) 45%, var(--border-subtle)); }
+.sc-agenda-card-em_atendimento .sc-agenda-card-top { background: var(--success); }
+.sc-agenda-card-bloqueio { background: repeating-linear-gradient(45deg, var(--bg-list), var(--bg-list) 6px, var(--border-subtle) 6px, var(--border-subtle) 12px); border-color: var(--border-subtle); color: var(--text-secondary); }
+.sc-agenda-card-bloqueio .sc-agenda-card-top { background: var(--text-muted); }
+
+/* Modal de agendamento/bloqueio e lista de espera */
+.sc-agenda-modal { width: min(560px, 92vw); }
+.sc-agenda-linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sc-agenda-linha input, .sc-agenda-linha select { padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-agenda-linha input[type="number"] { width: 70px; }
+.sc-procedimentos-lista { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--bg-list); border-radius: 10px; }
+.sc-agenda-total { font-size: 13px; font-weight: 650; color: var(--text-primary); }
+.sc-agenda-pagamento { display: flex; align-items: center; gap: 16px; }
+.sc-modal-acoes { display: flex; justify-content: flex-end; margin-top: 4px; }
+
+.sc-waitlist-modal { width: min(760px, 94vw); }
+.sc-waitlist-cols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; margin-top: 14px; }
+.sc-waitlist-lista { display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow-y: auto; }
+.sc-waitlist-item { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; }
+.sc-waitlist-item-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sc-waitlist-item-nome { font-weight: 600; font-size: 13.5px; }
+.sc-waitlist-item-acoes { display: flex; gap: 6px; margin-top: 4px; }
+.sc-waitlist-agendar-form { margin-top: 6px; }
+.sc-waitlist-form { display: flex; flex-direction: column; gap: 8px; align-self: flex-start; }
+.sc-waitlist-form input, .sc-waitlist-form select, .sc-waitlist-form textarea { padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+@media (max-width: 720px) {
+  .sc-waitlist-cols { grid-template-columns: 1fr; }
+}
+
+/* Impressão */
+.sc-print-modal { width: min(640px, 94vw); }
+.sc-print-preview-acoes { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.sc-print-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sc-print-table th, .sc-print-table td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+.sc-print-bloqueio { color: var(--text-muted); font-style: italic; }
+@media print {
+  body * { visibility: hidden; }
+  #sc-print-area, #sc-print-area * { visibility: visible; }
+  #sc-print-area { position: absolute; top: 0; left: 0; width: 100%; }
+  .sc-no-print { display: none !important; }
+}
+
+/* Detalhe do agendamento */
+.sc-detail-modal { width: min(560px, 94vw); }
+.sc-detail-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.sc-detail-titulo { font-size: 12px; font-weight: 650; color: var(--accent); text-transform: uppercase; letter-spacing: 0.4px; }
+.sc-detail-paciente { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.sc-detail-avatar { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; font-size: 15px; font-weight: 700; color: var(--text-secondary); background: var(--bg-list); }
+.sc-detail-paciente-info { display: flex; flex-direction: column; gap: 2px; }
+.sc-detail-paciente-nome { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.sc-detail-paciente-meta { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; }
+.sc-detail-lembrete { color: var(--success); border-color: color-mix(in srgb, var(--success) 45%, var(--border-subtle)); margin-bottom: 14px; }
+.sc-detail-linha-data { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 0; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); margin-bottom: 14px; }
+.sc-detail-data { font-size: 13.5px; font-weight: 600; color: var(--accent); }
+.sc-detail-status { padding: 5px 8px; font-size: 12.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-detail-cobranca { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; margin-bottom: 6px; background: var(--bg-list); border-radius: 10px; font-size: 13px; font-weight: 600; }
+.sc-detail-procedimentos { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0 14px; }
+.sc-detail-procedimentos th, .sc-detail-procedimentos td { padding: 6px 4px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+.sc-detail-procedimentos th { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.sc-detail-procedimentos tfoot td { border-bottom: none; border-top: 1px solid var(--border-subtle); font-weight: 700; padding-top: 8px; }
+.sc-detail-rodape { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 14px; border-top: 1px solid var(--border-subtle); }
+.sc-detail-rodape-acoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.sc-detail-confirm { display: inline-flex; align-items: center; gap: 6px; }

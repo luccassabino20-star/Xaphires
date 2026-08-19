@@ -24,10 +24,15 @@ const AdminApp = React.lazy(() => import("./admin/AdminApp.jsx"));
 // sentido pendurar a rota atrás de AuthProvider. Mesmo padrão de lazy load do
 // painel: ninguém além de quem for testar/integrar isto abre esse caminho.
 const GanttChartDemo = React.lazy(() => import("./components/gantt/GanttChartDemo.jsx"));
+// Formulário público de pré-anamnese, aberto pelo PACIENTE a partir de um link
+// de WhatsApp - sem login, sem os providers do app (mesmo isolamento do
+// painel/demo acima). O componente extrai companyId/token do próprio path.
+const AnamnesePublicPage = React.lazy(() => import("./modules/saude-clinicas/AnamnesePublicPage.jsx"));
 
 const path = window.location.pathname.replace(/\/+$/, "");
 const ehPainel = path === "/admin";
 const ehGanttDemo = path === "/gantt-demo";
+const anamnesePublicaMatch = path.match(/^\/anamnese\/([^/]+)\/([^/]+)$/);
 
 // Sem prefixo de idioma na URL (ex.: alguém chegou em "/" direto): alinha a
 // URL com o idioma que o i18next já resolveu em i18n/index.js (localStorage
@@ -36,7 +41,7 @@ const ehGanttDemo = path === "/gantt-demo";
 // já decidiu. replaceState, não pushState, pra a detecção automática não
 // empurrar uma entrada a mais no histórico (o botão "voltar" não deveria
 // alternar idioma sozinho).
-if (!ehPainel && !ehGanttDemo) {
+if (!ehPainel && !ehGanttDemo && !anamnesePublicaMatch) {
   const { locale: urlLocale, rest } = parseLocaleFromPath(path);
   if (!urlLocale) {
     const resolved = normalizeLanguage(i18n.language);
@@ -57,6 +62,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ThemeProvider>
         <Suspense fallback={null}>
           <GanttChartDemo />
+        </Suspense>
+      </ThemeProvider>
+    ) : anamnesePublicaMatch ? (
+      <ThemeProvider>
+        <Suspense fallback={null}>
+          <AnamnesePublicPage companyId={anamnesePublicaMatch[1]} token={anamnesePublicaMatch[2]} />
         </Suspense>
       </ThemeProvider>
     ) : (

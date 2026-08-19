@@ -64,6 +64,10 @@
     "comingSoon": "Em breve",
     "backToLauncher": "Módulos",
     "loadError": "Não foi possível carregar os módulos.",
+    "quadro": {
+      "name": "Quadro Kanban",
+      "desc": "Seu quadro de tarefas e fluxo de trabalho, livre para qualquer uso."
+    },
     "vendas-crm": {
       "name": "Vendas & CRM",
       "desc": "Leads, funil em Kanban, propostas, orçamentos e pedidos."
@@ -71,6 +75,10 @@
     "financeiro": {
       "name": "Financeiro",
       "desc": "Fluxo de caixa, contas a pagar e a receber, conciliação e DRE."
+    },
+    "saude-clinicas": {
+      "name": "Saúde & Clínicas",
+      "desc": "Prontuário, anamnese, agenda e gestão para clínicas de estética, biomedicina e nutrição."
     },
     "compras-estoque": {
       "name": "Compras & Estoque",
@@ -182,6 +190,137 @@
     "geradoDe": "Título de imposto gerado a partir do título {{n}}", "gerou": "Gerou o título de imposto nº {{n}}", "badgeImposto": "imposto", "pesquisePrompt": "Use a busca e os filtros acima e clique em Pesquisar.", "rateadoN": "Rateado ({{n}})" },
     "forma": { "operacao_bancaria": "Operação bancária", "pix": "Pix", "boleto": "Boleto", "transferencia": "Transferência", "dinheiro": "Dinheiro", "cheque": "Cheque", "cartao": "Cartão" },
     "parcela": { "botao": "Desdobrar em parcelas", "qtd": "Parcelas", "intervalo": "Intervalo (meses)", "confirmar": "Desdobrar", "xdeN": "{{x}}/{{n}}", "deTitulo": "Parcela {{x}}/{{n}} do título {{t}}", "parcelado": "Parcelado em {{n}}x (parcelas nº {{nums}})", "desdobrado": "Desdobrado em {{n}} parcelas" }
+  },
+  "saudeClinicas": {
+    "voltarCards": "Voltar aos cards",
+    "sidebar": {
+      "expandir": "Expandir menu", "recolher": "Recolher menu", "especialidade": "Especialidade",
+      "dashboard": "Dashboard", "agenda": "Agenda & Agendamentos", "pacientes": "Pacientes",
+      "financeiro": "Financeiro", "servicos": "Serviços & Procedimentos", "usuarios": "Usuários & Equipe",
+      "config": "Perfil & Configurações"
+    },
+    "dashboard": {
+      "pacientesAtivos": "Pacientes ativos", "fichasEnviadas": "Fichas de anamnese enviadas",
+      "fichasRespondidas": "Fichas de anamnese respondidas",
+      "avisoIndicadores": "Faturamento do mês e indicadores de atendimento chegam junto com a Agenda e o Financeiro da clínica, ainda em desenvolvimento."
+    },
+    "config": {
+      "especialidade": "Especialidade da clínica", "especialidadeHint": "Define quais cards aparecem na seção Pacientes.",
+      "dadosClinica": "Dados da clínica", "dadosClinicaEmBreve": "Nome, logotipo e dados de contato da clínica estarão disponíveis em breve."
+    },
+    "clinicType": {
+      "MULTIDISCIPLINAR": "Multidisciplinar",
+      "ESTETICA": "Estética",
+      "BIOMEDICINA_ESTETICA": "Biomedicina Estética",
+      "NUTRICAO": "Nutrição"
+    },
+    "cards": {
+      "pacientes": { "name": "Pacientes", "desc": "Cadastro central de pacientes da clínica." },
+      "anamnese": { "name": "Fichas de Anamnese & Formulários", "desc": "Questionários por especialidade, construtor personalizado e envio por WhatsApp." },
+      "prontuario-estetico": { "name": "Prontuário Estético", "desc": "Anamnese facial/corporal, fototipo Fitzpatrick e registro de procedimentos." },
+      "mapeamento-procedimentos": { "name": "Mapeamento de Procedimentos", "desc": "Face & Body Mapping para marcação de pontos e quantidade de produto." },
+      "galeria-antes-depois": { "name": "Galeria Antes & Depois", "desc": "Comparativo fotográfico padronizado da evolução do paciente." },
+      "prontuario-injetaveis": { "name": "Prontuário de Injetáveis & Harmonização", "desc": "Anamnese de invasivos, alertas de risco e mapeamento de pontos/unidades/ml." },
+      "rastreabilidade-lotes": { "name": "Rastreabilidade de Lotes", "desc": "Controle de marca, lote e validade de toxinas, preenchedores e bioestimuladores." },
+      "termos-legais": { "name": "Termos & Responsabilidade Legal", "desc": "TCLE específico para injetáveis, com assinatura digital na tela." },
+      "prontuario-nutricional": { "name": "Prontuário & Anamnese Nutricional", "desc": "Recordatório alimentar, hábitos e histórico metabólico." },
+      "avaliacao-antropometrica": { "name": "Avaliação Antropométrica", "desc": "Medidas, dobras cutâneas, bioimpedância e gráficos de evolução." },
+      "gerador-plano-alimentar": { "name": "Gerador de Plano Alimentar", "desc": "Cálculo automático de macros/micros e equivalentes." },
+      "prescritor-suplementos": { "name": "Prescritor de Suplementos & Manipulados", "desc": "Receitas e fórmulas prontas para prescrição." },
+      "agenda-multiprofissional": { "name": "Agenda Multiprofissional", "desc": "Visualização diária/semanal, bloqueio de horários e lembretes automáticos." },
+      "pacotes-sessoes": { "name": "Pacotes & Controle de Sessões", "desc": "Venda de pacotes e abate automático de sessões realizadas." },
+      "estoque-insumos": { "name": "Estoque & Insumos Clínicos", "desc": "Controle de seringas, ampolas e materiais, com baixa automática." }
+    },
+    "pacientes": {
+      "nome": "Nome", "nascimento": "Nascimento", "telefone": "Telefone", "cpf": "CPF", "email": "E-mail", "notas": "Notas",
+      "salvo": "Paciente salvo", "vazio": "Nenhum paciente cadastrado.",
+      "generoEscolha": "Sexo",
+      "genero": { "feminino": "Feminino", "masculino": "Masculino", "outro": "Outro" }
+    },
+    "anamnese": {
+      "abaTemplates": "Templates", "abaRespostas": "Respostas",
+      "nomeTemplate": "Nome do template", "descricaoTemplate": "Descrição", "universal": "Universal (todas as especialidades)",
+      "perguntaLabel": "Pergunta", "opcoesPlaceholder": "Opções, separadas por vírgula",
+      "obrigatorio": "Obrigatório", "alerta": "Alerta de risco", "adicionarPergunta": "Adicionar pergunta",
+      "salvarTemplate": "Salvar template", "templateCriado": "Template criado",
+      "nPerguntas": "{{count}} pergunta", "nPerguntas_other": "{{count}} perguntas",
+      "tipoCampo": {
+        "text": "Texto curto", "textarea": "Texto longo", "single_choice": "Escolha única",
+        "multi_choice": "Múltipla escolha", "boolean": "Sim/Não", "file": "Upload de exame"
+      },
+      "escolhaPaciente": "Escolha o paciente", "escolhaTemplate": "Escolha o template",
+      "novaFichaEnviar": "Criar ficha e enviar por WhatsApp", "enviando": "Enviando...",
+      "selecionePaciente": "Selecione um paciente para ver as fichas enviadas.",
+      "colTemplate": "Template", "colStatus": "Situação", "vazioRespostas": "Nenhuma ficha enviada a este paciente ainda.",
+      "enviarWhatsapp": "Enviar por WhatsApp",
+      "mensagemWhatsapp": "Olá! Por favor, preencha sua ficha de pré-anamnese antes da consulta: {{url}}",
+      "status": { "rascunho": "Rascunho", "enviado": "Enviado", "respondido": "Respondido" }
+    },
+    "agenda": {
+      "diaSemana": { "0": "Domingo", "1": "Segunda", "2": "Terça", "3": "Quarta", "4": "Quinta", "5": "Sexta", "6": "Sábado" },
+      "mes": { "0": "Janeiro", "1": "Fevereiro", "2": "Março", "3": "Abril", "4": "Maio", "5": "Junho", "6": "Julho", "7": "Agosto", "8": "Setembro", "9": "Outubro", "10": "Novembro", "11": "Dezembro" },
+      "dia": "Dia", "semana": "Semana", "hoje": "Hoje",
+      "buscarPaciente": "Buscar paciente...",
+      "listaEspera": "Lista de espera",
+      "imprimir": "Imprimir",
+      "novoAgendamento": "Novo agendamento",
+      "bloqueado": "Bloqueado",
+      "pago": "Pago",
+      "status": { "agendado": "Agendado", "confirmado": "Confirmado", "em_atendimento": "Em atendimento", "concluido": "Concluído", "cancelado": "Cancelado", "faltou": "Faltou" },
+      "abaAgendamento": "Agendamento", "abaBloqueio": "Bloqueio",
+      "novoPaciente": "+ Novo paciente",
+      "semProfissional": "Sem profissional definido",
+      "duracaoMin": "Duração (min)",
+      "adicionarProcedimento": "Adicionar procedimento",
+      "total": "Total",
+      "particular": "Particular", "convenio": "Convênio",
+      "salvarAgendamento": "Salvar agendamento", "salvarBloqueio": "Salvar bloqueio",
+      "todosProfissionais": "Todos os profissionais",
+      "motivo": "Motivo do bloqueio",
+      "esperaVazia": "Ninguém na lista de espera.",
+      "esperaAdicionada": "Adicionado à lista de espera",
+      "esperaConvertida": "Agendamento criado a partir da lista de espera",
+      "periodo": { "qualquer": "Qualquer período", "manha": "Manhã", "tarde": "Tarde" },
+      "agendar": "Agendar",
+      "novaEspera": "Adicionar à espera",
+      "semProcedimento": "Sem procedimento definido",
+      "imprimirDia": "Dia atual", "imprimirSemana": "Semana atual",
+      "incluirBloqueios": "Incluir bloqueios de horário",
+      "gerarPrevia": "Gerar prévia",
+      "voltarOpcoes": "Voltar",
+      "tituloImpressao": "Agenda de {{from}} a {{to}}",
+      "colData": "Data", "colHora": "Horário", "colStatus": "Situação",
+      "semItensPeriodo": "Nenhum item neste período.",
+      "detalhes": "Detalhes do agendamento",
+      "idade": "{{anos}} anos, {{meses}} meses, {{dias}} dias",
+      "ultimaConsulta": "Última consulta",
+      "haMinutos": "há {{count}} minuto", "haMinutos_other": "há {{count}} minutos",
+      "haHoras": "há {{count}} hora", "haHoras_other": "há {{count}} horas",
+      "haDias": "há {{count}} dia", "haDias_other": "há {{count}} dias",
+      "enviarLembrete": "Enviar lembrete de consulta",
+      "mensagemLembrete": "Olá! Passando para lembrar da sua consulta em {{data}} às {{hora}}.",
+      "as": "às",
+      "cobrarAgendamento": "Cobrar agendamento",
+      "procedimento": "Procedimento", "quant": "Quant.", "valor": "Valor", "totalReceber": "Total a receber",
+      "confirmarCancelar": "Cancelar este agendamento?",
+      "cancelarAgendamento": "Cancelar agendamento",
+      "lancarRecebimento": "Lançar recebimento",
+      "recebimentoLancado": "Recebimento lançado",
+      "editarAgendamento": "Editar agendamento",
+      "iniciarAtendimento": "Iniciar atendimento"
+    }
+  },
+  "crm": {
+    "tabs": { "funil": "Funil", "contatos": "Contatos", "propostas": "Propostas", "pedidos": "Pedidos" },
+    "contatos": {
+      "nome": "Nome", "telefone": "Telefone", "email": "E-mail", "empresa": "Empresa", "notas": "Notas",
+      "salvo": "Contato salvo", "vazio": "Nenhum contato cadastrado."
+    },
+    "funil": {
+      "novoLead": "Novo lead", "tituloLead": "Título do negócio", "contatoNovo": "Contato novo",
+      "valorEstimado": "Valor estimado", "origem": "Origem do lead", "criarLead": "Criar lead",
+      "leadCriado": "Lead criado", "colunaVazia": "Nenhum negócio neste estágio."
+    }
   },
   "theme": {
     "light": "Claro",
@@ -1571,6 +1710,30 @@
     }
   },
   "errors": {
+    "MODULE_FORBIDDEN": "Módulo indisponível",
+    "CLINIC_TYPE_INVALID": "Especialidade inválida",
+    "PATIENT_NAME_REQUIRED": "Informe o nome do paciente",
+    "PATIENT_NOT_FOUND": "Paciente não encontrado",
+    "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Informe o nome do template",
+    "ANAMNESE_TEMPLATE_NOT_FOUND": "Template não encontrado",
+    "ANAMNESE_RESPONSE_NOT_FOUND": "Ficha não encontrada",
+    "ANAMNESE_TOKEN_INVALIDO": "Link inválido ou expirado",
+    "ANAMNESE_JA_RESPONDIDA": "Esta ficha já foi respondida",
+    "CRM_CONTACT_REQUIRED": "Informe o contato",
+    "CRM_CONTACT_NAME_REQUIRED": "Informe o nome do contato",
+    "CRM_CONTACT_NOT_FOUND": "Contato não encontrado",
+    "CRM_OPPORTUNITY_TITLE_REQUIRED": "Informe o título da oportunidade",
+    "CRM_OPPORTUNITY_NOT_FOUND": "Oportunidade não encontrada",
+    "CRM_STAGE_NOT_FOUND": "Estágio inválido",
+    "CRM_NO_STAGES": "Funil sem estágios",
+    "PATIENT_REQUIRED": "Informe o paciente",
+    "AGENDA_PERIODO_INVALIDO": "Informe o período em formato válido",
+    "AGENDA_DATA_HORA_INVALIDOS": "Informe data e horário válidos",
+    "AGENDA_CONFLITO_HORARIO": "Já existe um agendamento ou bloqueio nesse horário",
+    "AGENDA_APPOINTMENT_NOT_FOUND": "Agendamento não encontrado",
+    "AGENDA_BLOCK_NOT_FOUND": "Bloqueio não encontrado",
+    "WAITLIST_NOT_FOUND": "Item da lista de espera não encontrado",
+    "TOO_MANY_REQUESTS": "Muitas tentativas. Aguarde alguns minutos.",
     "NETWORK_UNREACHABLE": "O servidor não respondeu. Verifique se ele está em execução e tente de novo.",
     "REPORT_FORMAT_INVALID": "Formato de relatório não suportado",
     "REPORT_STATUS_INVALID": "Filtro de situação inválido",

@@ -11,8 +11,10 @@ const SITUACAO = { active: "Ativa", trialing: "Em teste", grace: "Pagamento em a
 // Nomes dos módulos da plataforma para o painel (só em português, ferramenta
 // interna). Espelha os ids de server/modules.js.
 const NOMES_MODULOS = {
+  quadro: "Quadro Kanban",
   "vendas-crm": "Vendas & CRM",
   financeiro: "Financeiro",
+  "saude-clinicas": "Saúde & Clínicas",
   "compras-estoque": "Compras & Estoque",
   faturamento: "Faturamento",
   "relatorios-bi": "Relatórios & BI",

@@ -6,21 +6,29 @@ import AuthenticatedApp from "./AuthenticatedApp.jsx";
 // Lazy: o Financeiro (com exceljs/pdf-parse na cauda) não deve pesar no pacote que
 // todo cliente baixa - só é buscado quando alguém abre o módulo.
 const FinanceiroModule = lazy(() => import("./modules/financeiro/FinanceiroModule.jsx"));
+// Idem, para o módulo Saúde & Clínicas.
+const SaudeClinicasModule = lazy(() => import("./modules/saude-clinicas/SaudeClinicasModule.jsx"));
+// Idem, para o CRM (o "vendas-crm" de verdade, separado do quadro genérico).
+const CrmModule = lazy(() => import("./modules/crm/CrmModule.jsx"));
 
 // A casca da plataforma: decide entre o launcher (grid de pilares) e o módulo
 // aberto. Fica ABAIXO dos providers do app (Board/Users/Chat, montados em
 // App.jsx) — os mesmos que já subiam no login, então trazer a casca para cá não
-// muda o que é buscado nem quando. O Kanban de hoje é o módulo "vendas-crm".
+// muda o que é buscado nem quando.
 //
-// Fase 0: só vendas-crm abre de verdade; os outros pilares vêm do servidor como
-// "Em breve" e o launcher os desenha bloqueados. Ligar um módulo novo é plugar o
-// componente no mapa COMPONENTES abaixo.
+// "vendas-crm" nasceu como apelido do quadro genérico (Fase 0); virou dois
+// módulos quando o CRM ganhou schema próprio: "quadro" continua sendo o
+// Kanban de sempre (AuthenticatedApp), e "vendas-crm" passou a ser o CRM de
+// verdade. Ver server/modules.js e a migração em directory.js
+// (migrarIdModuloQuadro) para quem já tinha entitlement explícito do id antigo.
 
-// Mapa id → componente do módulo. onExit volta ao launcher. Só vendas-crm existe
-// hoje; os demais entram aqui quando forem construídos, um por fase.
+// Mapa id → componente do módulo. onExit volta ao launcher. Ligar um módulo
+// novo é plugar o componente aqui.
 const COMPONENTES = {
-  "vendas-crm": ({ onExit }) => <AuthenticatedApp onExitModule={onExit} />,
+  quadro: ({ onExit }) => <AuthenticatedApp onExitModule={onExit} />,
+  "vendas-crm": ({ onExit }) => <CrmModule onExit={onExit} />,
   financeiro: ({ onExit }) => <FinanceiroModule onExit={onExit} />,
+  "saude-clinicas": ({ onExit }) => <SaudeClinicasModule onExit={onExit} />,
 };
 
 export default function PlatformShell() {

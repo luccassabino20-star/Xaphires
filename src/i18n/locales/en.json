@@ -64,6 +64,10 @@
     "comingSoon": "Coming soon",
     "backToLauncher": "Modules",
     "loadError": "Couldn't load the modules.",
+    "quadro": {
+      "name": "Kanban Board",
+      "desc": "Your task board and workflow, free for any use."
+    },
     "vendas-crm": {
       "name": "Sales & CRM",
       "desc": "Leads, Kanban pipeline, proposals, quotes and orders."
@@ -71,6 +75,10 @@
     "financeiro": {
       "name": "Finance",
       "desc": "Cash flow, accounts payable and receivable, reconciliation and P&L."
+    },
+    "saude-clinicas": {
+      "name": "Health & Clinics",
+      "desc": "Records, intake forms, scheduling and management for aesthetics, biomedicine and nutrition clinics."
     },
     "compras-estoque": {
       "name": "Purchasing & Inventory",
@@ -182,6 +190,137 @@
     "geradoDe": "Tax title generated from title {{n}}", "gerou": "Generated tax title no. {{n}}", "badgeImposto": "tax", "pesquisePrompt": "Use the search and filters above, then click Search.", "rateadoN": "Split ({{n}})" },
     "forma": { "operacao_bancaria": "Bank operation", "pix": "Pix", "boleto": "Bank slip", "transferencia": "Transfer", "dinheiro": "Cash", "cheque": "Check", "cartao": "Card" },
     "parcela": { "botao": "Split into installments", "qtd": "Installments", "intervalo": "Interval (months)", "confirmar": "Split", "xdeN": "{{x}}/{{n}}", "deTitulo": "Installment {{x}}/{{n}} of title {{t}}", "parcelado": "Split into {{n}}x (installments no. {{nums}})", "desdobrado": "Split into {{n}} installments" }
+  },
+  "saudeClinicas": {
+    "voltarCards": "Back to cards",
+    "sidebar": {
+      "expandir": "Expand menu", "recolher": "Collapse menu", "especialidade": "Specialty",
+      "dashboard": "Dashboard", "agenda": "Schedule & Appointments", "pacientes": "Patients",
+      "financeiro": "Finance", "servicos": "Services & Procedures", "usuarios": "Users & Team",
+      "config": "Profile & Settings"
+    },
+    "dashboard": {
+      "pacientesAtivos": "Active patients", "fichasEnviadas": "Intake forms sent",
+      "fichasRespondidas": "Intake forms answered",
+      "avisoIndicadores": "Monthly revenue and appointment metrics will arrive together with Schedule and the clinic's Finance section, still in development."
+    },
+    "config": {
+      "especialidade": "Clinic specialty", "especialidadeHint": "Determines which cards show up in the Patients section.",
+      "dadosClinica": "Clinic details", "dadosClinicaEmBreve": "The clinic's name, logo and contact details will be available soon."
+    },
+    "clinicType": {
+      "MULTIDISCIPLINAR": "Multidisciplinary",
+      "ESTETICA": "Aesthetics",
+      "BIOMEDICINA_ESTETICA": "Aesthetic Biomedicine",
+      "NUTRICAO": "Nutrition"
+    },
+    "cards": {
+      "pacientes": { "name": "Patients", "desc": "Central patient registry for the clinic." },
+      "anamnese": { "name": "Intake Forms & Questionnaires", "desc": "Specialty-based questionnaires, a custom builder and WhatsApp delivery." },
+      "prontuario-estetico": { "name": "Aesthetic Record", "desc": "Facial/body intake, Fitzpatrick phototype and procedure log." },
+      "mapeamento-procedimentos": { "name": "Procedure Mapping", "desc": "Face & body mapping to mark application points and product amount." },
+      "galeria-antes-depois": { "name": "Before & After Gallery", "desc": "Standardized photo comparison of the patient's progress." },
+      "prontuario-injetaveis": { "name": "Injectables & Harmonization Record", "desc": "Intake for invasive procedures, risk alerts and point/unit/ml mapping." },
+      "rastreabilidade-lotes": { "name": "Lot Traceability", "desc": "Brand, lot and expiry control for toxins, fillers and biostimulators." },
+      "termos-legais": { "name": "Consent & Legal Terms", "desc": "Informed consent for injectables, with on-screen digital signature." },
+      "prontuario-nutricional": { "name": "Nutrition Record & Intake", "desc": "Food recall, habits and metabolic history." },
+      "avaliacao-antropometrica": { "name": "Anthropometric Assessment", "desc": "Measurements, skinfolds, bioimpedance and progress charts." },
+      "gerador-plano-alimentar": { "name": "Meal Plan Generator", "desc": "Automatic macro/micro calculation and food equivalents." },
+      "prescritor-suplementos": { "name": "Supplement & Compounding Prescriber", "desc": "Ready-made prescriptions and formulas." },
+      "agenda-multiprofissional": { "name": "Multi-professional Schedule", "desc": "Daily/weekly view, time blocking and automatic reminders." },
+      "pacotes-sessoes": { "name": "Packages & Session Tracking", "desc": "Package sales with automatic session deduction." },
+      "estoque-insumos": { "name": "Clinical Supplies Inventory", "desc": "Syringes, ampoules and materials, with automatic deduction." }
+    },
+    "pacientes": {
+      "nome": "Name", "nascimento": "Birth date", "telefone": "Phone", "cpf": "CPF/ID", "email": "Email", "notas": "Notes",
+      "salvo": "Patient saved", "vazio": "No patients registered yet.",
+      "generoEscolha": "Gender",
+      "genero": { "feminino": "Female", "masculino": "Male", "outro": "Other" }
+    },
+    "anamnese": {
+      "abaTemplates": "Templates", "abaRespostas": "Responses",
+      "nomeTemplate": "Template name", "descricaoTemplate": "Description", "universal": "Universal (all specialties)",
+      "perguntaLabel": "Question", "opcoesPlaceholder": "Options, comma-separated",
+      "obrigatorio": "Required", "alerta": "Risk alert", "adicionarPergunta": "Add question",
+      "salvarTemplate": "Save template", "templateCriado": "Template created",
+      "nPerguntas": "{{count}} question", "nPerguntas_other": "{{count}} questions",
+      "tipoCampo": {
+        "text": "Short text", "textarea": "Long text", "single_choice": "Single choice",
+        "multi_choice": "Multiple choice", "boolean": "Yes/No", "file": "Exam upload"
+      },
+      "escolhaPaciente": "Choose the patient", "escolhaTemplate": "Choose the template",
+      "novaFichaEnviar": "Create form and send via WhatsApp", "enviando": "Sending...",
+      "selecionePaciente": "Select a patient to see the forms sent to them.",
+      "colTemplate": "Template", "colStatus": "Status", "vazioRespostas": "No form sent to this patient yet.",
+      "enviarWhatsapp": "Send via WhatsApp",
+      "mensagemWhatsapp": "Hello! Please fill out your intake form before your appointment: {{url}}",
+      "status": { "rascunho": "Draft", "enviado": "Sent", "respondido": "Answered" }
+    },
+    "agenda": {
+      "diaSemana": { "0": "Sunday", "1": "Monday", "2": "Tuesday", "3": "Wednesday", "4": "Thursday", "5": "Friday", "6": "Saturday" },
+      "mes": { "0": "January", "1": "February", "2": "March", "3": "April", "4": "May", "5": "June", "6": "July", "7": "August", "8": "September", "9": "October", "10": "November", "11": "December" },
+      "dia": "Day", "semana": "Week", "hoje": "Today",
+      "buscarPaciente": "Search patient...",
+      "listaEspera": "Waiting list",
+      "imprimir": "Print",
+      "novoAgendamento": "New appointment",
+      "bloqueado": "Blocked",
+      "pago": "Paid",
+      "status": { "agendado": "Scheduled", "confirmado": "Confirmed", "em_atendimento": "In progress", "concluido": "Completed", "cancelado": "Cancelled", "faltou": "No-show" },
+      "abaAgendamento": "Appointment", "abaBloqueio": "Block",
+      "novoPaciente": "+ New patient",
+      "semProfissional": "No professional set",
+      "duracaoMin": "Duration (min)",
+      "adicionarProcedimento": "Add procedure",
+      "total": "Total",
+      "particular": "Self-pay", "convenio": "Insurance",
+      "salvarAgendamento": "Save appointment", "salvarBloqueio": "Save block",
+      "todosProfissionais": "All professionals",
+      "motivo": "Block reason",
+      "esperaVazia": "Nobody on the waiting list.",
+      "esperaAdicionada": "Added to the waiting list",
+      "esperaConvertida": "Appointment created from the waiting list",
+      "periodo": { "qualquer": "Any time", "manha": "Morning", "tarde": "Afternoon" },
+      "agendar": "Schedule",
+      "novaEspera": "Add to waiting list",
+      "semProcedimento": "No procedure set",
+      "imprimirDia": "Current day", "imprimirSemana": "Current week",
+      "incluirBloqueios": "Include time blocks",
+      "gerarPrevia": "Generate preview",
+      "voltarOpcoes": "Back",
+      "tituloImpressao": "Schedule from {{from}} to {{to}}",
+      "colData": "Date", "colHora": "Time", "colStatus": "Status",
+      "semItensPeriodo": "No items in this period.",
+      "detalhes": "Appointment details",
+      "idade": "{{anos}} years, {{meses}} months, {{dias}} days",
+      "ultimaConsulta": "Last visit",
+      "haMinutos": "{{count}} minute ago", "haMinutos_other": "{{count}} minutes ago",
+      "haHoras": "{{count}} hour ago", "haHoras_other": "{{count}} hours ago",
+      "haDias": "{{count}} day ago", "haDias_other": "{{count}} days ago",
+      "enviarLembrete": "Send appointment reminder",
+      "mensagemLembrete": "Hello! Just a reminder about your appointment on {{data}} at {{hora}}.",
+      "as": "at",
+      "cobrarAgendamento": "Charge appointment",
+      "procedimento": "Procedure", "quant": "Qty.", "valor": "Amount", "totalReceber": "Total due",
+      "confirmarCancelar": "Cancel this appointment?",
+      "cancelarAgendamento": "Cancel appointment",
+      "lancarRecebimento": "Record payment",
+      "recebimentoLancado": "Payment recorded",
+      "editarAgendamento": "Edit appointment",
+      "iniciarAtendimento": "Start visit"
+    }
+  },
+  "crm": {
+    "tabs": { "funil": "Pipeline", "contatos": "Contacts", "propostas": "Proposals", "pedidos": "Orders" },
+    "contatos": {
+      "nome": "Name", "telefone": "Phone", "email": "Email", "empresa": "Company", "notas": "Notes",
+      "salvo": "Contact saved", "vazio": "No contacts registered yet."
+    },
+    "funil": {
+      "novoLead": "New lead", "tituloLead": "Deal title", "contatoNovo": "New contact",
+      "valorEstimado": "Estimated value", "origem": "Lead source", "criarLead": "Create lead",
+      "leadCriado": "Lead created", "colunaVazia": "No deals in this stage."
+    }
   },
   "theme": {
     "light": "Light",
@@ -1194,6 +1333,30 @@
     }
   },
   "errors": {
+    "MODULE_FORBIDDEN": "Module unavailable",
+    "CLINIC_TYPE_INVALID": "Invalid specialty",
+    "PATIENT_NAME_REQUIRED": "Enter the patient's name",
+    "PATIENT_NOT_FOUND": "Patient not found",
+    "ANAMNESE_TEMPLATE_NAME_REQUIRED": "Enter the template name",
+    "ANAMNESE_TEMPLATE_NOT_FOUND": "Template not found",
+    "ANAMNESE_RESPONSE_NOT_FOUND": "Form not found",
+    "ANAMNESE_TOKEN_INVALIDO": "Invalid or expired link",
+    "ANAMNESE_JA_RESPONDIDA": "This form has already been answered",
+    "CRM_CONTACT_REQUIRED": "Enter the contact",
+    "CRM_CONTACT_NAME_REQUIRED": "Enter the contact's name",
+    "CRM_CONTACT_NOT_FOUND": "Contact not found",
+    "CRM_OPPORTUNITY_TITLE_REQUIRED": "Enter the deal title",
+    "CRM_OPPORTUNITY_NOT_FOUND": "Deal not found",
+    "CRM_STAGE_NOT_FOUND": "Invalid stage",
+    "CRM_NO_STAGES": "Pipeline has no stages",
+    "PATIENT_REQUIRED": "Enter the patient",
+    "AGENDA_PERIODO_INVALIDO": "Enter a valid period",
+    "AGENDA_DATA_HORA_INVALIDOS": "Enter a valid date and time",
+    "AGENDA_CONFLITO_HORARIO": "There is already an appointment or block at that time",
+    "AGENDA_APPOINTMENT_NOT_FOUND": "Appointment not found",
+    "AGENDA_BLOCK_NOT_FOUND": "Block not found",
+    "WAITLIST_NOT_FOUND": "Waiting list item not found",
+    "TOO_MANY_REQUESTS": "Too many attempts. Please wait a few minutes.",
     "NETWORK_UNREACHABLE": "The server did not respond. Check that it is running and try again.",
     "REPORT_FORMAT_INVALID": "Unsupported report format",
     "REPORT_STATUS_INVALID": "Invalid status filter",

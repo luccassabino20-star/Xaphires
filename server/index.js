@@ -2,8 +2,10 @@ import "dotenv/config";
 import { app } from "./app.js";
 import { closeAllDbs } from "./db.js";
 import { migrateLegacyIfNeeded } from "./migrateLegacy.js";
+import { migrarIdModuloQuadro } from "./directory.js";
 
 migrateLegacyIfNeeded();
+migrarIdModuloQuadro();
 
 const PORT = process.env.PORT || 4000;
 const server = app.listen(PORT, () => {

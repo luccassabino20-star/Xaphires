@@ -3,6 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { getCurrentCompanyId } from "./context.js";
 import { applyFinanceiroSchema } from "./modules/financeiro/schema.js";
+import { applySaudeClinicasSchema } from "./modules/saude-clinicas/schema.js";
+import { applyCrmSchema } from "./modules/crm/schema.js";
 
 const dataDir = process.env.KANBAN_DATA_DIR || path.join(process.cwd(), "server", "data");
 fs.mkdirSync(dataDir, { recursive: true });
@@ -300,6 +302,12 @@ function applySchema(companyDb) {
   // mas roda aqui, no mesmo ponto preguiçoso do resto - a tabela nasce na primeira
   // requisição autenticada da empresa, não no arranque do servidor.
   applyFinanceiroSchema(companyDb);
+
+  // Schema do módulo Saúde & Clínicas, mesmo ponto preguiçoso do Financeiro.
+  applySaudeClinicasSchema(companyDb);
+
+  // Schema do módulo CRM, mesmo ponto preguiçoso.
+  applyCrmSchema(companyDb);
 }
 
 const cache = new Map();

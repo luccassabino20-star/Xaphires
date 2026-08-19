@@ -409,6 +409,56 @@ export async function finExtratoExcel(transacoes) {
   URL.revokeObjectURL(url);
 }
 
+// ---------- Saúde & Clínicas ----------
+// Prefixo sc*, mesmo padrão do fin* do Financeiro.
+export const scGetConfig = () => request("/saude-clinicas/config");
+export const scSetClinicType = (clinicType) => request("/saude-clinicas/config", { method: "PUT", body: { clinicType } });
+
+export const scListPatients = () => request("/saude-clinicas/patients");
+export const scCreatePatient = (data) => request("/saude-clinicas/patients", { method: "POST", body: data });
+export const scUpdatePatient = (id, data) => request(`/saude-clinicas/patients/${id}`, { method: "PATCH", body: data });
+
+export const scListAnamneseTemplates = () => request("/saude-clinicas/anamnesis-templates");
+export const scCreateAnamneseTemplate = (data) => request("/saude-clinicas/anamnesis-templates", { method: "POST", body: data });
+export const scUpdateAnamneseTemplate = (id, data) => request(`/saude-clinicas/anamnesis-templates/${id}`, { method: "PATCH", body: data });
+
+export const scListAnamneseResponses = (patientId) =>
+  request(`/saude-clinicas/anamnesis-responses${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ""}`);
+export const scCreateAnamneseResponse = (templateId, patientId) =>
+  request("/saude-clinicas/anamnesis-responses", { method: "POST", body: { templateId, patientId } });
+export const scEnviarAnamneseResponse = (id) => request(`/saude-clinicas/anamnesis-responses/${id}/enviar`, { method: "POST" });
+
+// Formulário público (o paciente, sem sessão) - fora de /saude-clinicas, mora
+// em /public/anamnese no servidor (server/routes/anamnesePublica.js).
+export const scGetAnamnesePublica = (companyId, token) => request(`/public/anamnese/${companyId}/${token}`);
+export const scResponderAnamnesePublica = (companyId, token, answers) =>
+  request(`/public/anamnese/${companyId}/${token}`, { method: "POST", body: { answers } });
+
+// ---------- Agenda (Saúde & Clínicas) ----------
+export const scListProcedures = () => request("/saude-clinicas/procedures");
+export const scListAppointments = (from, to) => request(`/saude-clinicas/appointments?from=${from}&to=${to}`);
+export const scListPatientAppointments = (patientId) => request(`/saude-clinicas/patients/${patientId}/appointments`);
+export const scCreateAppointment = (data) => request("/saude-clinicas/appointments", { method: "POST", body: data });
+export const scUpdateAppointment = (id, data) => request(`/saude-clinicas/appointments/${id}`, { method: "PATCH", body: data });
+export const scListBlocks = (from, to) => request(`/saude-clinicas/blocks?from=${from}&to=${to}`);
+export const scCreateBlock = (data) => request("/saude-clinicas/blocks", { method: "POST", body: data });
+export const scDeleteBlock = (id) => request(`/saude-clinicas/blocks/${id}`, { method: "DELETE" });
+export const scListWaitlist = () => request("/saude-clinicas/waitlist");
+export const scCreateWaitlistEntry = (data) => request("/saude-clinicas/waitlist", { method: "POST", body: data });
+export const scCancelarEspera = (id) => request(`/saude-clinicas/waitlist/${id}/cancelar`, { method: "POST" });
+export const scConverterEspera = (id, data) => request(`/saude-clinicas/waitlist/${id}/converter`, { method: "POST", body: data });
+
+// ---------- CRM ----------
+export const crmListContacts = () => request("/crm/contacts");
+export const crmCreateContact = (data) => request("/crm/contacts", { method: "POST", body: data });
+export const crmUpdateContact = (id, data) => request(`/crm/contacts/${id}`, { method: "PATCH", body: data });
+
+export const crmListStages = () => request("/crm/stages");
+export const crmListOpportunities = () => request("/crm/opportunities");
+export const crmCreateOpportunity = (data) => request("/crm/opportunities", { method: "POST", body: data });
+export const crmUpdateOpportunity = (id, data) => request(`/crm/opportunities/${id}`, { method: "PATCH", body: data });
+export const crmMoverOportunidade = (id, stageId) => request(`/crm/opportunities/${id}/mover`, { method: "POST", body: { stageId } });
+
 // ---------- Plano ----------
 // Cache curto do resumo do plano. CardModal, ArchiveModal e ListMenu consultam
 // isto de forma independente ao abrir, e sem cache eram três requisições iguais

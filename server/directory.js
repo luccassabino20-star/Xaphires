@@ -102,6 +102,29 @@ export function getDirectoryDb() {
   return directoryDb;
 }
 
+// O módulo "vendas-crm" (o Kanban genérico) virou dois: "quadro" (o mesmo
+// quadro de sempre, continua core) e "vendas-crm" (CRM de verdade, add-on
+// novo). Quem tinha uma lista EXPLÍCITA de módulos liberados com "vendas-crm"
+// perderia o quadro no split (o id passou a significar outra coisa) - troca
+// "vendas-crm" por "quadro" na lista de quem estiver nesse caso. Idempotente
+// e roda no boot (ver server/index.js): depois da primeira passagem nenhuma
+// empresa tem mais "vendas-crm" sem "quadro" na lista, então não há o que
+// migrar nas próximas.
+export function migrarIdModuloQuadro() {
+  const linhas = directoryDb.prepare("SELECT id, enabled_modules FROM companies WHERE enabled_modules IS NOT NULL").all();
+  for (const linha of linhas) {
+    let lista;
+    try {
+      lista = JSON.parse(linha.enabled_modules);
+    } catch {
+      continue;
+    }
+    if (!Array.isArray(lista) || !lista.includes("vendas-crm") || lista.includes("quadro")) continue;
+    const nova = [...lista.filter((id) => id !== "vendas-crm"), "quadro"];
+    directoryDb.prepare("UPDATE companies SET enabled_modules = ? WHERE id = ?").run(JSON.stringify(nova), linha.id);
+  }
+}
+
 function nowIso() {
   return new Date().toISOString();
 }

@@ -3,6 +3,8 @@
 const PATHS = {
   // Funil de vendas
   vendas: "M3 4h18l-7 8v6l-4 2v-8L3 4z",
+  // Três colunas - o quadro Kanban genérico
+  quadro: "M4 4h5v16H4zm7.5 0h5v11h-5zM19 4h1v7h-1z",
   // Cifrão / fluxo de caixa
   financeiro: "M12 2v2m0 16v2m5-14a4 4 0 0 0-4-3H11a3 3 0 0 0 0 6h2a3 3 0 0 1 0 6h-1a4 4 0 0 1-4-3",
   // Caixa de estoque
@@ -11,6 +13,8 @@ const PATHS = {
   faturamento: "M6 2h9l5 5v15H6V2zm9 0v5h5M9 12h6M9 16h6",
   // Barras de BI
   bi: "M4 20V10m5 10V4m5 16v-7m5 7V8",
+  // Cruz médica (contorno de "+"), mesmo traço dos demais ícones do launcher
+  saude: "M9 3h6v6h6v6h-6v6H9v-6H3V9h6V3z",
   // Colchetes de código - integrações/automações sob medida
   custom: "M8 4 2 12l6 8M16 4l6 8-6 8",
   // Megafone - campanhas e divulgação

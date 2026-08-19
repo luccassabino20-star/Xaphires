@@ -20,10 +20,22 @@
 // A ordem do array é a ordem em que os cards aparecem no launcher.
 const DEFINICOES = [
   {
-    id: "vendas-crm",
-    // O Kanban de hoje é a visão de funil dentro deste pilar. É o único módulo
-    // pronto, e o único core que já responde de verdade.
+    id: "quadro",
+    // O Kanban genérico que o produto sempre teve - virou módulo próprio,
+    // separado do CRM (abaixo). Continua core: é a base gratuita de sempre,
+    // com os limites de sempre vindos do plano (quantidade de quadros,
+    // usuários, anexo, features como arquivamento automático) - nada disso
+    // muda com o módulo virar dois. Ver plans.js, inalterado por este split.
     core: true,
+    available: true,
+    icon: "quadro",
+  },
+  {
+    id: "vendas-crm",
+    // CRM de verdade (leads, funil, propostas, orçamentos, pedidos) - antes
+    // "vendas-crm" era só um apelido para o quadro genérico acima; agora é
+    // um módulo próprio, add-on como Financeiro/Saúde & Clínicas.
+    core: false,
     available: true,
     icon: "vendas",
   },
@@ -38,6 +50,16 @@ const DEFINICOES = [
     // usuário. O master sempre acessa; os demais só com a concessão
     // (users.finance_access). Ver usuarioAutorizado abaixo e o toggle no UsersPanel.
     restricted: true,
+  },
+  {
+    id: "saude-clinicas",
+    // Fase 2: vertical de gestão para clínicas de estética, biomedicina
+    // estética, nutrição e multidisciplinares. Add-on (não é core), e sem
+    // restrição por usuário — diferente do Financeiro, aqui não há dado
+    // sensível o bastante para justificar um segundo gate por pessoa.
+    core: false,
+    available: true,
+    icon: "saude",
   },
   {
     id: "compras-estoque",

@@ -21,6 +21,9 @@ import { router as chatRouter } from "./routes/chat.js";
 import { router as planRouter } from "./routes/plan.js";
 import { router as modulesRouter } from "./routes/modules.js";
 import { router as financeiroRouter } from "./modules/financeiro/routes.js";
+import { router as saudeClinicasRouter } from "./modules/saude-clinicas/routes.js";
+import { router as crmRouter } from "./modules/crm/routes.js";
+import { router as anamnesePublicaRouter } from "./routes/anamnesePublica.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as personalTasksRouter } from "./routes/personalTasks.js";
 import { router as billingRouter } from "./routes/billing.js";
@@ -82,6 +85,12 @@ app.use(cookieParser());
 // dela — ver o comentário em routes/billingWebhook.js.
 app.use("/api/billing/webhook", billingWebhookRouter);
 
+// Formulário público de pré-anamnese (o paciente, sem sessão, abrindo um link
+// de WhatsApp): mesmo motivo do webhook acima - o navegador dentro do app do
+// WhatsApp pode não mandar Origin/Referer, e não há cookie de sessão para o
+// verifyOrigin proteger aqui. Ver o comentário no topo do arquivo da rota.
+app.use("/api/public/anamnese", anamnesePublicaRouter);
+
 app.use("/api", verifyOrigin);
 
 // Auth e plano ficam fora do bloqueio de escrita: sem isso, uma empresa vencida
@@ -118,6 +127,12 @@ app.use("/api/personal-tasks", requireAuth, requireWritablePlan, personalTasksRo
 // requireModule("financeiro") internamente, então monta direto - o requireModule
 // é que barra empresa sem o módulo ou usuário sem autorização.
 app.use("/api/financeiro", financeiroRouter);
+// Módulo Saúde & Clínicas. Mesmo desenho do Financeiro: o router já aplica
+// requireAuth/requireWritablePlan/requireModule("saude-clinicas") internamente.
+app.use("/api/saude-clinicas", saudeClinicasRouter);
+// Módulo CRM, mesmo desenho: o router já aplica requireAuth/
+// requireWritablePlan/requireModule("vendas-crm") internamente.
+app.use("/api/crm", crmRouter);
 // Relatório é leitura, e requireWritablePlan já libera GET - fica no mesmo grupo por
 // coerência, e empresa vencida continua conseguindo exportar os próprios dados.
 app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);
