@@ -356,7 +356,9 @@
       "bloqueioCriado": "Bloqueio criado", "bloqueioHint": "Reserve um horário para folga, almoço ou feriado - a agenda deixa de aceitar novo agendamento nesse intervalo.",
       "periodoLista": "Período", "bloqueiosVazio": "Nenhum bloqueio neste período.",
       "ocupado": "Ocupado", "livre": "Livre", "semProfissionais": "Nenhum profissional cadastrado.",
-      "matrizHint": "Ocupação calculada a partir dos agendamentos e bloqueios já lançados."
+      "matrizHint": "Ocupação calculada a partir dos agendamentos e bloqueios já lançados.",
+      "painelTitulo": "Pacientes do dia ({{n}})", "painelVazio": "Nenhum paciente agendado para este dia.",
+      "focarNaGrade": "Focar na grade", "selecionarDia": "Ver este dia no painel"
     }
   },
   "crm": {

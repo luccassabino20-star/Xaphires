@@ -356,7 +356,9 @@
       "bloqueioCriado": "Sperre erstellt", "bloqueioHint": "Reservieren Sie eine Zeit für Pause, Mittagessen oder Feiertag - der Terminplan nimmt in diesem Zeitraum keine neuen Termine mehr an.",
       "periodoLista": "Zeitraum", "bloqueiosVazio": "Keine Sperren in diesem Zeitraum.",
       "ocupado": "Belegt", "livre": "Frei", "semProfissionais": "Kein Behandler registriert.",
-      "matrizHint": "Auslastung berechnet aus den bereits erfassten Terminen und Sperren."
+      "matrizHint": "Auslastung berechnet aus den bereits erfassten Terminen und Sperren.",
+      "painelTitulo": "Patienten heute ({{n}})", "painelVazio": "Keine Termine für diesen Tag.",
+      "focarNaGrade": "Im Zeitplan anzeigen", "selecionarDia": "Diesen Tag im Panel anzeigen"
     }
   },
   "crm": {

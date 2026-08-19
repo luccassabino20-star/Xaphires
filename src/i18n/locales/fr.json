@@ -356,7 +356,9 @@
       "bloqueioCriado": "Blocage créé", "bloqueioHint": "Réservez un créneau pour une pause, le déjeuner ou un jour férié - l'agenda n'accepte plus de nouveau rendez-vous sur cet intervalle.",
       "periodoLista": "Période", "bloqueiosVazio": "Aucun blocage sur cette période.",
       "ocupado": "Occupé", "livre": "Libre", "semProfissionais": "Aucun praticien enregistré.",
-      "matrizHint": "Occupation calculée à partir des rendez-vous et blocages déjà enregistrés."
+      "matrizHint": "Occupation calculée à partir des rendez-vous et blocages déjà enregistrés.",
+      "painelTitulo": "Patients du jour ({{n}})", "painelVazio": "Aucun patient prévu pour ce jour.",
+      "focarNaGrade": "Centrer sur l'agenda", "selecionarDia": "Voir ce jour dans le panneau"
     }
   },
   "crm": {

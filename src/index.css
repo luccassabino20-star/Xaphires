@@ -7384,7 +7384,15 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-agenda-gutter-hora-cheia { font-size: 10.5px; font-weight: 700; color: var(--accent); }
 .sc-agenda-day { border-right: 1px solid var(--border-subtle); min-width: 0; }
 .sc-agenda-day:last-child { border-right: none; }
-.sc-agenda-day-header { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; height: 46px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-list); }
+/* É um <button> (clicar seleciona o dia pro painel "Pacientes do dia") - os
+   resets abaixo (width/border/font/cursor) desfazem o botão nativo, senão
+   herdava padding/borda de <button> do navegador por cima do layout. */
+.sc-agenda-day-header {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  width: 100%; height: 46px; padding: 0; border: none; border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-list); font: inherit; cursor: pointer;
+}
+.sc-agenda-day-header:hover { background: color-mix(in srgb, var(--accent) 8%, var(--bg-list)); }
 .sc-agenda-day-semana { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
 .sc-agenda-day-numero { font-size: 11.5px; color: var(--text-muted); }
 .sc-agenda-day-current .sc-agenda-day-header { background: color-mix(in srgb, var(--accent) 14%, var(--bg-list)); }
@@ -7450,6 +7458,13 @@ img.avatar { object-fit: cover; padding: 0; }
 }
 .sc-agenda-card-bloqueio { background: repeating-linear-gradient(45deg, var(--bg-list), var(--bg-list) 6px, var(--border-subtle) 6px, var(--border-subtle) 12px); border-color: var(--border-subtle); border-left-color: var(--text-muted); color: var(--text-secondary); }
 .sc-agenda-card-bloqueio .sc-agenda-card-top { background: none; }
+/* Pulso de destaque ao "focar na grade" a partir do painel lateral - some
+   sozinho (JS limpa a classe por timeout, ver focarAgendamento). */
+@keyframes sc-pulso-destaque {
+  0%, 100% { box-shadow: var(--shadow-card-hover), 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent); }
+  50% { box-shadow: var(--shadow-card-hover), 0 0 0 6px color-mix(in srgb, var(--accent) 20%, transparent); }
+}
+.sc-agenda-card-destaque { animation: sc-pulso-destaque 0.7s ease-in-out 2; z-index: 3; }
 /* Drag-and-drop (mover o card) e resize (puxar a borda de baixo). touch-action:
    none evita o navegador roubar o gesto pra rolar a página num touchscreen
    enquanto a pessoa está arrastando um agendamento. */
@@ -7501,6 +7516,37 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-matrix-strip { display: flex; gap: 1px; min-width: 140px; height: 20px; }
 .sc-matrix-slot { flex: 1; background: var(--bg-list); border-radius: 1px; }
 .sc-matrix-slot-ocupado { background: var(--accent); }
+
+/* Painel lateral fixo "Pacientes do dia" - ver DayPanel em AgendaView.jsx.
+   Fica à esquerda da grade, dentro de .sc-agenda-main (linha nova que
+   envolve o painel + o wrap da grade, lado a lado). */
+.sc-agenda-main { display: flex; gap: 14px; flex: 1; min-height: 0; }
+.sc-daypanel { flex-shrink: 0; width: 264px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.sc-daypanel-header { display: flex; flex-direction: column; gap: 2px; padding: 2px 2px 0; }
+.sc-daypanel-titulo { margin: 0; font-size: 14px; font-weight: 650; }
+.sc-daypanel-lista { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
+/* Reaproveita as cores por status do card da grade (sc-agenda-card-<status>
+   já define background/color/border-left-color) - só falta o "molde" do
+   card em si, já que aqui o item não carrega a classe base .sc-agenda-card
+   (essa é position:absolute, feita pra grade, não pra uma lista vertical). */
+.sc-daypanel-item {
+  display: flex; flex-direction: column; gap: 3px; padding: 8px 9px; font-size: 12px;
+  border: 1px solid transparent; border-left-width: 4px; border-radius: 10px; cursor: pointer;
+  box-shadow: var(--shadow-card); transition: box-shadow .15s ease;
+}
+.sc-daypanel-item:hover { box-shadow: var(--shadow-card-hover); }
+.sc-daypanel-item-topo { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.sc-daypanel-item-hora { font-weight: 700; }
+.sc-daypanel-item-status { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.8; }
+.sc-daypanel-item-nome { font-weight: 700; font-size: 12.5px; }
+.sc-daypanel-item-acoes { display: flex; align-items: center; gap: 2px; margin: 2px -4px -2px; }
+.sc-daypanel-item-acoes .icon-btn { width: 24px; height: 24px; color: inherit; opacity: 0.75; }
+.sc-daypanel-item-acoes .icon-btn:hover:not(:disabled) { opacity: 1; background: rgba(255,255,255,0.4); }
+.sc-daypanel-item-acoes .icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+@media (max-width: 960px) {
+  .sc-agenda-main { flex-direction: column; }
+  .sc-daypanel { width: 100%; max-height: 220px; }
+}
 
 /* Modal de agendamento/bloqueio e lista de espera */
 /* max-width some junto do width nos modais abaixo: a base .modal tem

@@ -356,7 +356,9 @@
       "bloqueioCriado": "Block created", "bloqueioHint": "Reserve a time slot for time off, lunch or a holiday - the schedule stops accepting new appointments in that window.",
       "periodoLista": "Period", "bloqueiosVazio": "No blocks in this period.",
       "ocupado": "Busy", "livre": "Free", "semProfissionais": "No professionals registered.",
-      "matrizHint": "Occupancy calculated from the appointments and blocks already entered."
+      "matrizHint": "Occupancy calculated from the appointments and blocks already entered.",
+      "painelTitulo": "Patients today ({{n}})", "painelVazio": "No patients scheduled for this day.",
+      "focarNaGrade": "Focus on the grid", "selecionarDia": "View this day in the panel"
     }
   },
   "crm": {

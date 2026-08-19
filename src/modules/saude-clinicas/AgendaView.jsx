@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { translateError } from "../../utils/errors.js";
+import { whatsappLink } from "../../utils/contact.js";
 import * as api from "../../state/api.js";
 import {
   HORA_INICIO, HORA_FIM, PASSO_MIN, TOTAL_SLOTS,
@@ -83,6 +84,15 @@ export default function AgendaView({ initialViewMode = "semana" }) {
   // depois de um arraste (setPointerCapture garante que o click ainda cai no
   // mesmo botão mesmo tendo soltado em cima de outra célula da grade).
   const arrastouRef = useRef(false);
+  // Nó DOM de cada card, indexado por id do agendamento - só pra "focar na
+  // grade" saber pra onde rolar (scrollIntoView) quando a pessoa clica num
+  // item do painel "Pacientes do dia". Não é estado porque não precisa
+  // re-renderizar nada quando muda.
+  const cardRefs = useRef({});
+  // Id do agendamento em destaque (pulso visual) depois de "focar na grade" -
+  // limpo sozinho por timeout, então é estado mesmo (precisa re-renderizar
+  // pra tirar a classe).
+  const [destaque, setDestaque] = useState(null);
 
   const dias = useMemo(() => (viewMode === "semana" ? diasDaSemana(segundaDaSemana(anchor)) : [anchor]), [viewMode, anchor]);
   const from = dias[0];
@@ -216,6 +226,38 @@ export default function AgendaView({ initialViewMode = "semana" }) {
     } catch (e) {
       setErro(translateError(e, t));
     }
+  }
+
+  // Painel "Pacientes do dia": sempre o dia focado (`anchor`), não os 7 dias
+  // da semana visível - é isso que "dia selecionado no calendário" quer dizer
+  // aqui, já que não há um segundo estado de "dia selecionado" distinto do
+  // dia âncora (clicar no cabeçalho de uma coluna, abaixo, move o âncora).
+  const pacientesDoDia = useMemo(
+    () => appointments.filter((a) => a.date === anchor).sort((a, b) => paraMinutos(a.time) - paraMinutos(b.time)),
+    [appointments, anchor]
+  );
+
+  // Rola a grade até o card do agendamento e pisca uma borda nele por um
+  // instante - mesmo padrão de "ir para" de qualquer agenda: não teleporta a
+  // visão sem dar pista de onde parou.
+  function focarAgendamento(a) {
+    cardRefs.current[a.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setDestaque(a.id);
+    setTimeout(() => setDestaque((atual) => (atual === a.id ? null : atual)), 1400);
+  }
+
+  async function iniciarAtendimentoRapido(a) {
+    try {
+      await api.scUpdateAppointment(a.id, { status: "em_atendimento" });
+      await carregarAgenda();
+    } catch (e) {
+      setErro(translateError(e, t));
+    }
+  }
+
+  function enviarLembretePainel(a) {
+    const texto = t("saudeClinicas.agenda.mensagemLembrete", { data: a.date, hora: a.time });
+    window.open(whatsappLink(a.patient_phone, texto), "_blank", "noopener,noreferrer");
   }
 
   // Arrastar o card inteiro: muda dia (troca de coluna, na visão semana) e/ou
@@ -398,6 +440,15 @@ export default function AgendaView({ initialViewMode = "semana" }) {
 
       {erro && <div className="sc-error">{erro}</div>}
 
+      <div className="sc-agenda-main">
+      <DayPanel
+        anchor={anchor}
+        pacientes={pacientesDoDia}
+        t={t}
+        onFocar={focarAgendamento}
+        onCheckin={iniciarAtendimentoRapido}
+        onWhatsapp={enviarLembretePainel}
+      />
       <div className="sc-agenda-grid-wrap">
         <div className="sc-agenda-grid" style={{ "--sc-dias": dias.length }}>
           <div className="sc-agenda-gutter">
@@ -414,10 +465,10 @@ export default function AgendaView({ initialViewMode = "semana" }) {
             const ehHoje = dia === hojeCivil();
             return (
               <div key={dia} className={"sc-agenda-day" + (ehHoje ? " sc-agenda-day-current" : "")}>
-                <div className="sc-agenda-day-header">
+                <button type="button" className="sc-agenda-day-header" onClick={() => setAnchor(dia)} title={t("saudeClinicas.agenda.selecionarDia")}>
                   <span className="sc-agenda-day-semana">{semana}</span>
                   <span className="sc-agenda-day-numero">{data}</span>
-                </div>
+                </button>
                 <div className="sc-agenda-day-body" data-dia={dia} style={{ height: TOTAL_SLOTS * SLOT_ALTURA }}>
                   {slots.map((s) => (
                     <button
@@ -452,8 +503,9 @@ const a = it.dado;
                     return (
                       <button
                         key={it.id}
+                        ref={(el) => { if (el) cardRefs.current[a.id] = el; }}
                         type="button"
-                        className={"sc-agenda-card sc-agenda-card-" + a.status + (arrastavel ? " sc-agenda-card-arrastavel" : "")}
+                        className={"sc-agenda-card sc-agenda-card-" + a.status + (arrastavel ? " sc-agenda-card-arrastavel" : "") + (destaque === a.id ? " sc-agenda-card-destaque" : "")}
                         style={estilo}
                         onPointerDown={arrastavel ? (e) => iniciarArrastoAgendamento(e, it) : undefined}
                         onClick={() => {
@@ -504,6 +556,7 @@ const a = it.dado;
           })}
         </div>
       </div>
+      </div>
 
       {modal && (
         <AppointmentModal
@@ -540,5 +593,54 @@ const a = it.dado;
       )}
       {printAberto && <PrintModal onClose={() => setPrintAberto(false)} />}
     </div>
+  );
+}
+
+// Painel lateral fixo "Pacientes do dia": lista os agendamentos do dia
+// âncora (ordenados por horário) com ações rápidas, sem duplicar dado - só
+// lê `appointments`/`patients` que a AgendaView já carregou. Clicar na linha
+// ou no ícone de foco rola a grade até o card (scrollIntoView, ver
+// focarAgendamento); os outros dois ícones agem direto pela API sem abrir o
+// modal de detalhes, pelo mesmo motivo de "Iniciar atendimento" existir como
+// botão avulso no detalhe: são as duas ações mais repetidas do dia.
+function DayPanel({ anchor, pacientes, t, onFocar, onCheckin, onWhatsapp }) {
+  const { semana, data } = rotuloDia(anchor, t);
+
+  return (
+    <aside className="sc-daypanel">
+      <div className="sc-daypanel-header">
+        <h3 className="sc-daypanel-titulo">{t("saudeClinicas.agenda.painelTitulo", { n: pacientes.length })}</h3>
+        <span className="sc-hint">{semana}, {data}</span>
+      </div>
+      <div className="sc-daypanel-lista">
+        {pacientes.length === 0 ? (
+          <p className="sc-empty">{t("saudeClinicas.agenda.painelVazio")}</p>
+        ) : (
+          pacientes.map((a) => {
+            const podeIniciar = a.status === "agendado" || a.status === "confirmado";
+            return (
+              <div key={a.id} className={"sc-daypanel-item sc-agenda-card-" + a.status} onClick={() => onFocar(a)}>
+                <div className="sc-daypanel-item-topo">
+                  <span className="sc-daypanel-item-hora">{a.time}</span>
+                  <span className="sc-daypanel-item-status">{t(`saudeClinicas.agenda.status.${a.status}`)}</span>
+                </div>
+                <span className="sc-daypanel-item-nome">{a.patient_name}</span>
+                <div className="sc-daypanel-item-acoes">
+                  <button type="button" className="icon-btn" title={t("saudeClinicas.agenda.focarNaGrade")} onClick={(e) => { e.stopPropagation(); onFocar(a); }}>
+                    <svg viewBox="0 0 24 24" width="15" height="15"><path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v16H4V5zm0 5h16M8 3v4M16 3v4" /></svg>
+                  </button>
+                  <button type="button" className="icon-btn" title={t("saudeClinicas.agenda.iniciarAtendimento")} disabled={!podeIniciar} onClick={(e) => { e.stopPropagation(); onCheckin(a); }}>
+                    <svg viewBox="0 0 24 24" width="15" height="15"><path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M20 6 9 17l-5-5" /></svg>
+                  </button>
+                  <button type="button" className="icon-btn" title={t("saudeClinicas.agenda.enviarLembrete")} disabled={!a.patient_phone} onClick={(e) => { e.stopPropagation(); onWhatsapp(a); }}>
+                    <svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.5c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5.1a6.6 6.6 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.3.1-.4l.3-.4.2-.3a.5.5 0 0 0 0-.4c-.1-.1-.5-1.3-.7-1.7s-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.8 2 4.7 4.7 0 0 0 1 2.5 10.6 10.6 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.3 3.3 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z" /></svg>
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </aside>
   );
 }
