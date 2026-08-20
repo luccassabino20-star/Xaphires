@@ -6752,7 +6752,11 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
      últimas (Cadastros). flex-shrink:0 nas abas mantém o rótulo legível. */
   overflow-x: auto;
 }
-.fin-tab { flex-shrink: 0; }
+/* Cada aba mora num wrap próprio (position:relative) pra o popover das abas "Em
+   breve" (abaixo) poder se ancorar exatamente embaixo DAQUELA aba, via
+   position:absolute - sem isso ele nasceria relativo à .fin-tabs inteira, longe
+   do botão que a pessoa clicou. */
+.fin-tab-wrap { position: relative; flex-shrink: 0; display: inline-flex; }
 .fin-tab {
   padding: 12px 16px;
   font-size: 14px;
@@ -6766,26 +6770,43 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-tab:hover { color: var(--text-primary); }
 .fin-tab.active { color: var(--text-primary); border-bottom-color: var(--fin-entrada); }
 /* Compras & Estoque, Faturamento e Relatórios & BI vivem aqui como aba "Em
-   breve" (ver ABAS em FinanceiroModule.jsx) - CLICÁVEL (abre o painel
-   AbaEmBreve), diferente do item de menu travado do resto da plataforma; só o
-   badge segue o mesmo desenho visual (.sc-sidebar-item-badge). */
+   breve" (ver ABAS em FinanceiroModule.jsx) - CLICÁVEL (abre o popover
+   AbaEmBrevePopover ancorado nela mesma, sem trocar o que está aberto no
+   corpo), diferente do item de menu travado do resto da plataforma; só o badge
+   segue o mesmo desenho visual (.sc-sidebar-item-badge). */
 .fin-tab.disabled { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); }
 .fin-tab-badge {
   font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
   padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
 }
-.fin-em-breve {
-  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
-  max-width: 420px; margin: 60px auto; padding: 40px 32px;
-  background: var(--bg-card); border: 1px dashed var(--border-strong); border-radius: 16px;
+/* position:fixed (não absolute) porque é portalado pra document.body - a barra
+   de abas (.fin-tabs) tem overflow-x:auto, e o CSS força overflow-y a deixar
+   de ser "visible" nesse caso, cortando qualquer position:absolute que
+   vazasse dela por baixo. top/left vêm calculados de getBoundingClientRect()
+   da aba clicada (ver alternarPopover em FinanceiroModule.jsx), não deste CSS. */
+.fin-em-breve-popover {
+  position: fixed; z-index: 1000;
+  display: flex; align-items: flex-start; gap: 12px;
+  width: 300px; padding: 16px; text-align: left;
+  background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+}
+/* Setinha apontando pra aba que abriu o popover - mesmo truque de dois
+   quadrados girados 45° que o resto do app usa pra tooltip. Posição horizontal
+   vem de --fin-em-breve-caret-left (centralizada na aba, calculada em JS). */
+.fin-em-breve-popover::before {
+  content: ""; position: absolute; top: -6px; left: var(--fin-em-breve-caret-left, 20px);
+  width: 11px; height: 11px; background: var(--bg-card);
+  border-left: 1px solid var(--border-strong); border-top: 1px solid var(--border-strong);
+  transform: rotate(45deg);
 }
 .fin-em-breve-icone {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 56px; height: 56px; border-radius: 14px;
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 10px;
   background: color-mix(in srgb, var(--accent) 12%, var(--bg-card)); color: var(--accent);
 }
-.fin-em-breve-titulo { margin: 4px 0 0; font-size: 19px; font-weight: 700; }
-.fin-em-breve-desc { margin: 0; font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; }
+.fin-em-breve-titulo { margin: 0 0 4px; font-size: 14.5px; font-weight: 700; }
+.fin-em-breve-desc { margin: 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; }
 .fin-body {
   flex: 1;
   min-height: 0;
