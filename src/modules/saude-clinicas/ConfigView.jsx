@@ -16,6 +16,63 @@ const TEMAS = [
   { id: "escuro", cor: "#e5e5e5", corFundo: "#131313" },
 ];
 
+// Muita logo exportada pra uso de ícone/app vem num canvas quadrado enorme
+// com a marca ocupando só uma fração central (padding de segurança de
+// design system) - no cabeçalho, que só tem ~48px de altura, isso rende
+// minúsculo mesmo com o CSS certo, porque object-fit:contain escala a tela
+// toda, vazio incluso. Corta a margem transparente ANTES do upload, no
+// cliente, pra marca preencher a caixa disponível de verdade. Só mexe em
+// imagem com canal alfa (PNG/WEBP/GIF) e só quando sobra bastante espaço
+// vazio - imagem já enquadrada ou opaca (JPEG) sai intocada.
+async function recortarMargemTransparente(file) {
+  if (!/^image\/(png|webp|gif)$/.test(file.type)) return file;
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return file;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(bitmap, 0, 0);
+  let dados;
+  try {
+    dados = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  } catch {
+    return file;
+  }
+  let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      if (dados[(y * canvas.width + x) * 4 + 3] > 8) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+  if (maxX < 0) return file;
+  const larguraConteudo = maxX - minX + 1;
+  const alturaConteudo = maxY - minY + 1;
+  const jaEnquadrada = larguraConteudo > canvas.width * 0.92 && alturaConteudo > canvas.height * 0.92;
+  if (jaEnquadrada) return file;
+  const margem = Math.round(Math.max(larguraConteudo, alturaConteudo) * 0.06);
+  const cropX = Math.max(0, minX - margem);
+  const cropY = Math.max(0, minY - margem);
+  const cropW = Math.min(canvas.width, maxX + margem + 1) - cropX;
+  const cropH = Math.min(canvas.height, maxY + margem + 1) - cropY;
+  const recorte = document.createElement("canvas");
+  recorte.width = cropW;
+  recorte.height = cropH;
+  recorte.getContext("2d").drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+  const blob = await new Promise((resolve) => recorte.toBlob(resolve, "image/png"));
+  if (!blob) return file;
+  return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".png", { type: "image/png" });
+}
+
 // Configurações do módulo: especialidade + Aparência e Temas (cor de
 // destaque escolhida pela clínica - ver applySaudeClinicasSchema para o
 // porquê da coluna e SaudeClinicasModule para onde o data-sc-theme é
@@ -33,7 +90,7 @@ export default function ConfigView({ clinicType, theme, clinicName, logoUrl, isM
     if (!file) return;
     setEnviandoLogo(true);
     try {
-      await onLogoChange(file);
+      await onLogoChange(await recortarMargemTransparente(file));
     } finally {
       setEnviandoLogo(false);
     }

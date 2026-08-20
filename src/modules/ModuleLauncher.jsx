@@ -8,6 +8,7 @@ import ModuleIcon from "./ModuleIcon.jsx";
 import LauncherSidebarIcon from "./LauncherSidebarIcon.jsx";
 import { metaFor } from "./registry.js";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
+import xaphiresLogo from "../assets/xaphires-logo.png";
 
 // Estrutura da sidebar pedida pelo cliente, replicando a referência (Viver de
 // IA) item a item. Só "solucoes" (a grade de módulos, abaixo) e "perfil" (o
@@ -115,7 +116,7 @@ export default function ModuleLauncher({ modules, onOpen }) {
     <div className="launcher-shell">
       <aside className="launcher-sidebar">
         <div className="launcher-sidebar-brand">
-          <span className="landing-nav-icon">X</span>
+          <img className="landing-nav-icon" src={xaphiresLogo} alt="Xaphires" />
           <span>{t("auth.brandTitle")}</span>
         </div>
         <nav className="launcher-sidebar-nav">

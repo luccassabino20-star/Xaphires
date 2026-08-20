@@ -4,6 +4,11 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
+    // logo/ é rascunho de asset fora da árvore do app (nunca importado por
+    // código nenhum) - editor de imagem gravando ali deixa o arquivo
+    // brevemente travado, e o watcher do Vite derrubava o dev server inteiro
+    // com EBUSY ao tentar abrir o handle. Não observar essa pasta.
+    watch: { ignored: ["**/logo/**"] },
     proxy: {
       "/api": {
         target: "http://localhost:4000",

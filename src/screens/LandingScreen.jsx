@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
+import xaphiresLogo from "../assets/xaphires-logo.png";
 
 const NAV_PAGES = ["home", "features", "solutions", "pricing"];
 // Submenu do item "Início": mentoria e consultoria são serviços novos, sem
@@ -1002,7 +1003,7 @@ export default function LandingScreen({ onEnter }) {
       <PromoPopup onEnter={onEnter} />
       <header className={"landing-nav" + (scrolled ? " scrolled" : "")}>
         <div className="landing-nav-brand">
-          <span className="landing-nav-icon">X</span>
+          <img className="landing-nav-icon" src={xaphiresLogo} alt="Xaphires" />
           <span>{t("landing.nav.brand")}</span>
         </div>
         <nav className="landing-nav-links">
@@ -1128,7 +1129,7 @@ export default function LandingScreen({ onEnter }) {
         <div className="landing-footer-grid">
           <div className="landing-footer-brand">
             <div className="landing-nav-brand">
-              <span className="landing-nav-icon">X</span>
+              <img className="landing-nav-icon" src={xaphiresLogo} alt="Xaphires" />
               <span>{t("landing.nav.brand")}</span>
             </div>
             <p>{t("landing.footer.tagline")}</p>

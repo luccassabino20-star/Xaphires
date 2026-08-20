@@ -3145,6 +3145,10 @@ img.avatar { object-fit: cover; padding: 0; }
   font-size: 17px;
   font-weight: 800;
 }
+/* Marca real da Xaphires (logo/2.png, recortada e reduzida em src/assets) -
+   substitui o quadrado com "X" de fundo sólido; a logo já carrega o próprio
+   gradiente, então o fundo/cor de texto do span não se aplicam aqui. */
+img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .landing-nav-actions { display: flex; align-items: center; gap: 12px; }
 .landing-nav-links { display: flex; align-items: center; gap: 4px; }
 .landing-nav-link {
@@ -5079,14 +5083,14 @@ img.avatar { object-fit: cover; padding: 0; }
 /* No login o mesmo brasão vira só um selo pequeno acima da manchete, do
    tamanho da nav da landing - não o quadrado gigante que era ali antes. */
 .auth-brand .landing-nav-brand { font-size: 22px; gap: 12px; }
-.auth-brand .landing-nav-icon { width: 42px; height: 42px; font-size: 24px; border-radius: 11px; }
+.auth-brand .landing-nav-icon { width: 72px; height: 72px; font-size: 24px; border-radius: 11px; }
 /* O quadrado acompanha o corpo do nome: dimensionado para a Inter em 16px, ficava
    subdimensionado ao lado da marca em 24px. */
 .landing-nav-icon {
   font-family: "Playfair Display", Georgia, "Times New Roman", serif;
   font-weight: 700;
-  width: 38px;
-  height: 38px;
+  width: 64px;
+  height: 64px;
   border-radius: 10px;
   font-size: 22px;
 }
@@ -7239,9 +7243,13 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-top-left { display: flex; align-items: center; gap: 12px; }
 .sc-title { font-size: 18px; font-weight: 680; margin: 0; }
 /* Marca white-label do topo (ver SaudeBrand em SaudeClinicasModule.jsx) -
-   altura máxima de 32px pra logo nunca esticar o header, largura livre
-   (object-fit: contain preserva a proporção sozinho). */
-.sc-brand-logo { max-height: 32px; max-width: 220px; object-fit: contain; display: block; }
+   altura máxima pra logo nunca esticar o header, largura livre
+   (object-fit: contain preserva a proporção sozinho). .sc-top não tem
+   altura fixa (só padding), então o header cresce sozinho pra acomodar -
+   32px e 40px ainda ficavam pequenos demais, mesmo depois do recorte de
+   margem transparente no upload (ver recortarMargemTransparente em
+   ConfigView.jsx). 56px. */
+.sc-brand-logo { max-height: 56px; max-width: 280px; object-fit: contain; display: block; }
 .sc-brand { display: flex; align-items: center; gap: 10px; }
 .sc-brand-avatar {
   display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;

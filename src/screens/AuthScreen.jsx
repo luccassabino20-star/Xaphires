@@ -6,6 +6,7 @@ import { translateError } from "../utils/errors.js";
 import { normalizarDoc, formatarDoc, docValido } from "../utils/doc.js";
 import { getCompanyByCnpj, sendJoinRequest } from "../state/api.js";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
+import xaphiresLogo from "../assets/xaphires-logo.png";
 
 function MailIcon() {
   return (
@@ -276,7 +277,7 @@ export default function AuthScreen({ onBack }) {
       )}
       <div className="auth-brand">
         <div className="landing-nav-brand">
-          <span className="landing-nav-icon">X</span>
+          <img className="landing-nav-icon" src={xaphiresLogo} alt="Xaphires" />
           <span>{t("auth.brandTitle")}</span>
         </div>
         <h1 className="auth-brand-headline">
