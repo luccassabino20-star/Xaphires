@@ -254,6 +254,55 @@ export const finRemoverImpostoAplicado = (id, aplicadoId) => request(`/financeir
 export const finDeleteLancamento = (id) => request(`/financeiro/lancamentos/${id}`, { method: "DELETE" });
 export const finGetFluxo = (ano) => request(`/financeiro/fluxo?ano=${ano}`);
 export const finGetDRE = (de, ate) => request(`/financeiro/dre?de=${de}&ate=${ate}`);
+// Fluxo de Caixa em matriz (DRE de caixa por período) - visão alternativa ao
+// /fluxo acima (que é só o resumo do ano corrente).
+export const finFluxoCaixaMatriz = ({ view, referencia, contaId }) => {
+  const p = new URLSearchParams({ view, referencia });
+  if (contaId) p.set("contaId", contaId);
+  return request(`/financeiro/fluxo-caixa/matriz?${p}`);
+};
+export const finFluxoCaixaLancamentos = ({ grupo, de, ate, contaId }) => {
+  const p = new URLSearchParams({ grupo, de, ate });
+  if (contaId) p.set("contaId", contaId);
+  return request(`/financeiro/fluxo-caixa/lancamentos?${p}`);
+};
+// Mesmo desenho de scBaixarRelatorio (Saúde & Clínicas) - blob + link temporário; a
+// matriz não passa pelo formato colunas/linhas genérico, então tem sua própria rota.
+export async function finFluxoCaixaExport({ view, referencia, contaId, formato, lang }) {
+  const p = new URLSearchParams({ view, referencia, formato });
+  if (contaId) p.set("contaId", contaId);
+  if (lang) p.set("lang", lang);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/fluxo-caixa/export?${p}`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      /* resposta sem corpo JSON */
+    }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  const disposicao = res.headers.get("Content-Disposition") || "";
+  const casado = /filename="?([^";]+)"?/i.exec(disposicao);
+  const nome = casado ? casado[1] : `fluxo-caixa.${formato}`;
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 // Fundação: cadastros de apoio e saldos por conta.
 export const finListContas = () => request("/financeiro/contas");
 export const finCreateConta = (data) => request("/financeiro/contas", { method: "POST", body: data });

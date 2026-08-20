@@ -110,7 +110,29 @@
     }
   },
   "financeiro": {
-    "tabs": { "lancamentos": "Lançamentos", "titulos": "Títulos", "movimentacao": "Movimentação", "contas": "Contas", "fluxo": "Fluxo de caixa", "dre": "DRE", "importar": "Importar extrato", "cadastros": "Cadastros" },
+    "tabs": { "lancamentos": "Lançamentos", "titulos": "Títulos", "movimentacao": "Movimentação", "contas": "Contas", "fluxo": "Fluxo de caixa", "matriz": "Matriz de Caixa", "dre": "DRE", "importar": "Importar extrato", "cadastros": "Cadastros" },
+    "fluxoCaixa": {
+      "conta": "Conta", "contaTodas": "Todas as contas", "mensal": "Mensal", "diario": "Diário",
+      "periodoColuna": "Grupo", "exportarExcel": "Exportar Excel", "exportarCsv": "Exportar CSV", "exportarPdf": "Exportar PDF",
+      "mapearCategorias": "Mapear categorias",
+      "totalReceitas": "Total Receitas", "totalDespesas": "Total Despesas", "totalColuna": "Total",
+      "grupo": {
+        "receita_atendimento": "Atendimento / Procedimentos", "receita_produtos": "Vendas de Produtos", "receita_outras": "Outras Receitas",
+        "despesa_operacional": "Despesas Operacionais / Suprimentos", "despesa_financeira": "Despesas Financeiras / Taxas de Cartão",
+        "despesa_pessoal": "Funcionários & Pro-labore", "despesa_impostos": "Impostos e Tributos", "despesa_outras": "Outras Despesas",
+        "transferencia_entrada": "Transferências (Entrada)", "transferencia_saida": "Transferências (Saída)"
+      },
+      "secao": { "receitas": "Receitas", "despesas": "Despesas", "transferencias": "Transferências", "resumo": "Resumo Financeiro" },
+      "resumo": { "geracaoCaixa": "Geração de Caixa", "saldoAnterior": "Saldo Anterior", "saldoFinal": "Saldo Final" },
+      "coluna": { "data": "Data", "descricao": "Descrição", "contraparte": "Contraparte", "conta": "Conta", "valor": "Valor" },
+      "categorias": {
+        "titulo": "Mapear categorias",
+        "hint": "Classifique cada classe num dos grupos do Fluxo de Caixa. Sem classificação, ela entra em \"Outras Receitas\"/\"Outras Despesas\".",
+        "semGrupo": "Sem grupo", "novaCategoria": "Nova classe", "nomePlaceholder": "Nome da classe",
+        "tipoReceita": "Receita", "tipoDespesa": "Despesa", "adicionar": "Adicionar"
+      },
+      "lancamentos": { "titulo": "Lançamentos", "semLancamentos": "Nenhum lançamento neste período." }
+    },
     "importar": { "titulo": "Importar extrato bancário", "ajuda": "Envie o PDF do extrato (Sicredi ou Banestes). Cada transação vira um lançamento finalizado na conta escolhida.", "conta": "Conta de destino", "escolher": "Escolher PDF do extrato", "lendo": "Lendo o PDF...", "banco": "Banco", "creditos": "Créditos", "debitos": "Débitos", "data": "Data", "historico": "Histórico", "saldo": "Saldo", "nenhuma": "Nenhuma transação reconhecida neste PDF.", "importar": "Importar {{n}} transações", "baixarExcel": "Baixar Excel", "selecioneConta": "Selecione a conta de destino antes de importar.", "resultado": "{{imp}} importadas, {{ign}} já existiam (ignoradas).", "semContas": "Cadastre uma conta corrente antes, na aba Contas." },
     "manual": { "titulo": "Lançamento Manual", "dados": "Dados do lançamento", "movimento": "Movimento", "data": "Data", "referencia": "Referência", "referenciaPlaceholder": "Histórico / descrição", "documento": "Documento", "credito": "crédito", "debito": "débito", "dicaCredito": "Este movimento entra como crédito (entrada) na conta.", "dicaDebito": "Este movimento entra como débito (saída) na conta.", "rateioTitulo": "Apropriação / Rateio", "tipoRateio": "Tipo de rateio", "porPercentual": "Percentual (%)", "porValor": "Valor (R$)", "valorApropriacao": "Valor apropriação", "semRateio": "Nenhum rateio adicionado.", "criado": "Lançamento manual criado.", "salvar": "Lançar", "informeData": "Informe a data.", "escolhaClasse": "Escolha a classe.", "mov": { "tarifa_bancaria": "Tarifa Bancária", "juros_pagos": "Juros Pagos", "juros_recebidos": "Juros Recebidos", "rendimento_aplicacao": "Rendimento de Aplicação", "aplicacao_financeira": "Aplicação Financeira", "resgate_aplicacao": "Resgate de Aplicação", "outras_entradas": "Outras Entradas", "outras_saidas": "Outras Saídas" } },
     "rateio": { "ativar": "Ratear entre vários centros", "desativar": "Remover rateio", "titulo": "Rateio por centro de custo", "adicionar": "Adicionar centro", "restante": "Restante", "escolhaCentro": "Escolha o centro em cada linha do rateio.", "valorInvalido": "Informe um valor válido em cada linha do rateio.", "duplicado": "Centro repetido no rateio.", "naoFecha": "A soma do rateio precisa fechar o valor do título.", "rateadoLabel": "Rateado", "travadoPorRateio": "Título rateado - o centro único não se aplica." },
@@ -196,7 +218,7 @@
     "sidebar": {
       "expandir": "Expandir menu", "recolher": "Recolher menu", "especialidade": "Especialidade",
       "dashboard": "Dashboard", "agenda": "Agenda & Agendamentos", "pacientes": "Pacientes",
-      "financeiro": "Financeiro", "servicos": "Serviços & Procedimentos", "usuarios": "Usuários & Equipe",
+      "servicos": "Serviços & Procedimentos", "usuarios": "Usuários & Equipe",
       "config": "Perfil & Configurações",
       "agendaSemanal": "Agenda Semanal", "agendaDiaria": "Agenda Diária",
       "bloqueioAgenda": "Bloqueio de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidade", "relatorios": "Relatórios"

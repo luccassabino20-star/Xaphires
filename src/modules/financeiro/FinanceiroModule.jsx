@@ -6,6 +6,7 @@ import LancamentosView from "./LancamentosView.jsx";
 import TitulosView from "./TitulosView.jsx";
 import MovimentacaoView from "./MovimentacaoView.jsx";
 import FluxoView from "./FluxoView.jsx";
+import FluxoCaixaMatrizView from "./FluxoCaixaMatrizView.jsx";
 import DREView from "./DREView.jsx";
 import ContasView from "./ContasView.jsx";
 import ImportarExtratoView from "./ImportarExtratoView.jsx";
@@ -18,7 +19,7 @@ import CadastrosView from "./CadastrosView.jsx";
 // existe) e Movimentação (baixa/estorna) são abas separadas de propósito -
 // lançar, consultar e mover o dinheiro são passos diferentes, cada um com sua
 // tela.
-const ABAS = ["lancamentos", "titulos", "movimentacao", "contas", "importar", "fluxo", "dre", "cadastros"];
+const ABAS = ["lancamentos", "titulos", "movimentacao", "contas", "importar", "fluxo", "matriz", "dre", "cadastros"];
 
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
@@ -56,6 +57,7 @@ export default function FinanceiroModule({ onExit }) {
         {aba === "contas" && <ContasView />}
         {aba === "importar" && <ImportarExtratoView />}
         {aba === "fluxo" && <FluxoView />}
+        {aba === "matriz" && <FluxoCaixaMatrizView />}
         {aba === "dre" && <DREView />}
         {aba === "cadastros" && <CadastrosView />}
       </div>

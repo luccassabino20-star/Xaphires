@@ -6909,6 +6909,78 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-dre-resultado.negativo { background: color-mix(in srgb, var(--fin-saida) 14%, var(--bg-card)); color: var(--fin-saida); }
 .fin-num { font-variant-numeric: tabular-nums; }
 
+/* ---------- Matriz de Caixa (DRE de caixa por período, aba "Matriz") ---------- */
+/* Verde/vermelho aqui de propósito - é semântica contábil (receita boa/despesa
+   ruim), diferente do par azul/laranja de --fin-entrada/--fin-saida usado no
+   gráfico do resumo (aquele é escolhido por ser seguro pra daltonismo, não por
+   significado). Sobre o MESMO livro-razão das outras abas - ver
+   server/modules/financeiro/calculos.js montarFluxoCaixaMatriz. */
+.fin-matriz { display: flex; flex-direction: column; gap: 14px; }
+.fin-matriz-topo { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.fin-matriz-select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-matriz-topo-acoes { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.fin-matriz-toggle { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg-list); border-radius: 9px; }
+.fin-matriz-toggle-btn { padding: 6px 12px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); background: none; border: none; border-radius: 6px; cursor: pointer; }
+.fin-matriz-toggle-btn.active { background: var(--bg-card); color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.fin-matriz-nav { display: inline-flex; align-items: center; gap: 8px; }
+.fin-matriz-periodo { font-size: 13.5px; font-weight: 650; min-width: 120px; text-align: center; text-transform: capitalize; }
+
+/* Corpo com rolagem nos dois eixos (visão diária chega a 31 colunas) - cabeçalho
+   E primeira coluna (rótulo do grupo) ficam fixos via position:sticky, senão a
+   legenda da linha some assim que a pessoa rola para a direita. */
+.fin-matriz-table-wrap { overflow: auto; max-height: 70vh; border: 1px solid var(--border-subtle); border-radius: 12px; }
+.fin-matriz-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+.fin-matriz-table th, .fin-matriz-table td { padding: 9px 14px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border-subtle); }
+.fin-matriz-table .fin-num { text-align: right; }
+.fin-matriz-table thead th {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--bg-list); color: var(--text-muted);
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 700;
+  border-bottom: 1px solid var(--border-strong);
+}
+.fin-matriz-th-rotulo { min-width: 220px; }
+.fin-matriz-table tr > .fin-matriz-th-rotulo { position: sticky; left: 0; z-index: 2; }
+.fin-matriz-table thead th.fin-matriz-th-rotulo { z-index: 4; }
+
+/* --fin-matriz-row-bg é redefinida por cada tipo de linha; todo th/td da linha lê
+   a mesma variável, então a coluna fixa nunca destoa do resto da linha ao rolar. */
+.fin-matriz-table tbody tr { --fin-matriz-row-bg: var(--bg-card); }
+.fin-matriz-table tbody tr > * { background: var(--fin-matriz-row-bg); }
+.fin-matriz-secao { --fin-matriz-row-bg: var(--bg-list); }
+.fin-matriz-secao td { font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-secondary); }
+.fin-matriz-linha.fin-matriz-tom-receita { --fin-matriz-row-bg: color-mix(in srgb, var(--success) 8%, var(--bg-card)); }
+.fin-matriz-linha.fin-matriz-tom-despesa { --fin-matriz-row-bg: color-mix(in srgb, var(--danger) 8%, var(--bg-card)); }
+.fin-matriz-linha.fin-matriz-tom-receita .fin-matriz-th-rotulo,
+.fin-matriz-linha.fin-matriz-tom-receita .fin-num { color: var(--success); }
+.fin-matriz-linha.fin-matriz-tom-despesa .fin-matriz-th-rotulo,
+.fin-matriz-linha.fin-matriz-tom-despesa .fin-num { color: var(--danger); }
+.fin-matriz-total { --fin-matriz-row-bg: var(--bg-list); font-weight: 700; border-top: 1px solid var(--border-strong); }
+.fin-matriz-total.fin-matriz-tom-receita { --fin-matriz-row-bg: color-mix(in srgb, var(--success) 14%, var(--bg-card)); color: var(--success); }
+.fin-matriz-total.fin-matriz-tom-despesa { --fin-matriz-row-bg: color-mix(in srgb, var(--danger) 14%, var(--bg-card)); color: var(--danger); }
+.fin-matriz-total-destaque { --fin-matriz-row-bg: color-mix(in srgb, var(--accent) 12%, var(--bg-card)); font-size: 13.5px; }
+.fin-matriz-positivo { color: var(--success); }
+.fin-matriz-negativo { color: var(--danger); }
+
+/* Clique numa célula abre o drill-down (FluxoCaixaLancamentosModal) - outline em
+   vez de trocar o fundo, para não brigar com o tom de receita/despesa já aplicado. */
+.fin-matriz-celula { cursor: pointer; }
+.fin-matriz-celula:hover, .fin-matriz-celula:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.fin-matriz-hint { font-size: 13px; color: var(--text-secondary); margin: 4px 0; }
+.fin-matriz-modal-titulo { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+.fin-matriz-lanc-modal, .fin-matriz-categorias-modal { width: min(680px, 92vw); max-width: min(680px, 92vw); }
+.fin-matriz-categorias-lista { display: flex; flex-direction: column; gap: 6px; max-height: 40vh; overflow-y: auto; margin: 10px 0; }
+.fin-matriz-categoria-linha { display: flex; align-items: center; gap: 10px; padding: 6px 4px; border-bottom: 1px solid var(--border-subtle); }
+.fin-matriz-categoria-linha .fin-badge.fin-matriz-tom-receita { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+.fin-matriz-categoria-linha .fin-badge.fin-matriz-tom-despesa { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+.fin-matriz-categoria-nome { flex: 1; font-size: 13.5px; }
+.fin-matriz-categoria-linha select { padding: 6px 8px; font-size: 12.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 7px; }
+.fin-matriz-categoria-nova { border-top: 1px solid var(--border-subtle); padding-top: 12px; }
+.fin-matriz-categoria-nova-titulo { margin: 0 0 8px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.fin-matriz-categoria-nova-linha { display: flex; flex-wrap: wrap; gap: 8px; }
+.fin-matriz-categoria-nova-linha input, .fin-matriz-categoria-nova-linha select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.fin-matriz-categoria-nova-linha input { flex: 1; min-width: 160px; }
+
 /* Barra de busca + filtros dos lançamentos */
 .fin-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
 .fin-toolbar select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }

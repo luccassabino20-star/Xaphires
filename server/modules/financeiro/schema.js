@@ -257,6 +257,15 @@ export function applyFinanceiroSchema(companyDb) {
   // rateia por Classe E Centro, então cada linha guarda também a classe. Nulo nas
   // apropriações antigas (rateio só por centro).
   addColumn(companyDb, "financeiro_apropriacoes", "category_id", "category_id TEXT");
+
+  // Grupo do DRE de caixa (matriz do Fluxo de Caixa em Saúde & Clínicas): classifica
+  // a categoria num dos 8 baldes fixos do relatório, em vez do par livre
+  // receita/despesa. NULL nas categorias ainda não classificadas - a matriz não some
+  // com elas, cai no default pelo `tipo` (receita_outras/despesa_outras), resolvido em
+  // calculos.montarFluxoCaixaMatriz. Valores válidos: receita_atendimento,
+  // receita_produtos, receita_outras, despesa_operacional, despesa_financeira,
+  // despesa_pessoal, despesa_impostos, despesa_outras.
+  addColumn(companyDb, "financeiro_categorias", "grupo_dre", "grupo_dre TEXT");
 }
 
 function addColumn(companyDb, table, name, ddl) {

@@ -30,19 +30,26 @@ export function countCategorias() {
 export function getCategoria(id) {
   return getDb().prepare("SELECT * FROM financeiro_categorias WHERE id = ?").get(id) || null;
 }
-export function insertCategoria({ nome, tipo, codigo }) {
+export function insertCategoria({ nome, tipo, codigo, grupoDre }) {
   const id = uid();
   getDb()
-    .prepare("INSERT INTO financeiro_categorias (id, nome, tipo, codigo, created_at) VALUES (?, ?, ?, ?, ?)")
-    .run(id, nome, tipo, codigo || "", new Date().toISOString());
+    .prepare("INSERT INTO financeiro_categorias (id, nome, tipo, codigo, grupo_dre, created_at) VALUES (?, ?, ?, ?, ?, ?)")
+    .run(id, nome, tipo, codigo || "", grupoDre || null, new Date().toISOString());
   return getCategoria(id);
 }
 export function updateCategoria(id, c) {
   const a = getCategoria(id);
   if (!a) return null;
   getDb()
-    .prepare("UPDATE financeiro_categorias SET nome = ?, tipo = ?, codigo = ?, ativo = ? WHERE id = ?")
-    .run(c.nome ?? a.nome, c.tipo ?? a.tipo, c.codigo ?? a.codigo, c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo, id);
+    .prepare("UPDATE financeiro_categorias SET nome = ?, tipo = ?, codigo = ?, ativo = ?, grupo_dre = ? WHERE id = ?")
+    .run(
+      c.nome ?? a.nome,
+      c.tipo ?? a.tipo,
+      c.codigo ?? a.codigo,
+      c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo,
+      c.grupoDre !== undefined ? c.grupoDre : a.grupo_dre,
+      id
+    );
   return getCategoria(id);
 }
 
@@ -930,6 +937,13 @@ export function lancamentosPagosNoPeriodo(de, ate) {
   return getDb()
     .prepare("SELECT * FROM financeiro_lancamentos WHERE status = 'finalizado' AND paid_at >= ? AND paid_at <= ?")
     .all(de, ate);
+}
+
+// Todos os finalizados com baixa ANTES de `data` (civil) - a base do "saldo
+// anterior" da matriz do Fluxo de Caixa (calculos.montarFluxoCaixaMatriz), que
+// precisa do movimento acumulado antes da primeira coluna da janela mostrada.
+export function lancamentosFinalizadosAntesDe(data) {
+  return getDb().prepare("SELECT * FROM financeiro_lancamentos WHERE status = 'finalizado' AND paid_at < ?").all(data);
 }
 
 // Movimento líquido por conta (só do que está finalizado e tem conta): receber soma,

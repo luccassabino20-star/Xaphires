@@ -110,7 +110,29 @@
     }
   },
   "financeiro": {
-    "tabs": { "lancamentos": "Entries", "titulos": "Titles", "movimentacao": "Movements", "contas": "Accounts", "fluxo": "Cash flow", "dre": "P&L", "importar": "Import statement", "cadastros": "Registers" },
+    "tabs": { "lancamentos": "Entries", "titulos": "Titles", "movimentacao": "Movements", "contas": "Accounts", "fluxo": "Cash flow", "matriz": "Cash Flow Matrix", "dre": "P&L", "importar": "Import statement", "cadastros": "Registers" },
+    "fluxoCaixa": {
+      "conta": "Account", "contaTodas": "All accounts", "mensal": "Monthly", "diario": "Daily",
+      "periodoColuna": "Group", "exportarExcel": "Export Excel", "exportarCsv": "Export CSV", "exportarPdf": "Export PDF",
+      "mapearCategorias": "Map categories",
+      "totalReceitas": "Total Revenue", "totalDespesas": "Total Expenses", "totalColuna": "Total",
+      "grupo": {
+        "receita_atendimento": "Appointments / Procedures", "receita_produtos": "Product Sales", "receita_outras": "Other Revenue",
+        "despesa_operacional": "Operating Expenses / Supplies", "despesa_financeira": "Financial Expenses / Card Fees",
+        "despesa_pessoal": "Staff & Owner Draws", "despesa_impostos": "Taxes", "despesa_outras": "Other Expenses",
+        "transferencia_entrada": "Transfers (In)", "transferencia_saida": "Transfers (Out)"
+      },
+      "secao": { "receitas": "Revenue", "despesas": "Expenses", "transferencias": "Transfers", "resumo": "Financial Summary" },
+      "resumo": { "geracaoCaixa": "Cash Generated", "saldoAnterior": "Opening Balance", "saldoFinal": "Closing Balance" },
+      "coluna": { "data": "Date", "descricao": "Description", "contraparte": "Counterparty", "conta": "Account", "valor": "Amount" },
+      "categorias": {
+        "titulo": "Map categories",
+        "hint": "Classify each class into one of the Cash Flow groups. Unclassified classes fall into \"Other Revenue\"/\"Other Expenses\".",
+        "semGrupo": "No group", "novaCategoria": "New class", "nomePlaceholder": "Class name",
+        "tipoReceita": "Revenue", "tipoDespesa": "Expense", "adicionar": "Add"
+      },
+      "lancamentos": { "titulo": "Transactions", "semLancamentos": "No transactions in this period." }
+    },
     "importar": { "titulo": "Import bank statement", "ajuda": "Upload the statement PDF (Sicredi or Banestes). Each transaction becomes a settled entry on the chosen account.", "conta": "Target account", "escolher": "Choose statement PDF", "lendo": "Reading the PDF...", "banco": "Bank", "creditos": "Credits", "debitos": "Debits", "data": "Date", "historico": "Description", "saldo": "Balance", "nenhuma": "No transactions recognized in this PDF.", "importar": "Import {{n}} transactions", "baixarExcel": "Download Excel", "selecioneConta": "Select the target account before importing.", "resultado": "{{imp}} imported, {{ign}} already existed (skipped).", "semContas": "Register a bank account first, in the Accounts tab." },
     "manual": { "titulo": "Manual Entry", "dados": "Entry details", "movimento": "Movement", "data": "Date", "referencia": "Reference", "referenciaPlaceholder": "History / description", "documento": "Document", "credito": "credit", "debito": "debit", "dicaCredito": "This movement is a credit (inflow) to the account.", "dicaDebito": "This movement is a debit (outflow) from the account.", "rateioTitulo": "Allocation / Split", "tipoRateio": "Split type", "porPercentual": "Percent (%)", "porValor": "Amount (R$)", "valorApropriacao": "Allocation amount", "semRateio": "No split added.", "criado": "Manual entry created.", "salvar": "Post", "informeData": "Enter the date.", "escolhaClasse": "Choose the class.", "mov": { "tarifa_bancaria": "Bank Fee", "juros_pagos": "Interest Paid", "juros_recebidos": "Interest Received", "rendimento_aplicacao": "Investment Yield", "aplicacao_financeira": "Financial Investment", "resgate_aplicacao": "Investment Redemption", "outras_entradas": "Other Inflows", "outras_saidas": "Other Outflows" } },
     "rateio": { "ativar": "Split across cost centers", "desativar": "Remove split", "titulo": "Cost-center split", "adicionar": "Add center", "restante": "Remaining", "escolhaCentro": "Choose the center on each split line.", "valorInvalido": "Enter a valid amount on each split line.", "duplicado": "Center repeated in the split.", "naoFecha": "The split must add up to the title value.", "rateadoLabel": "Split", "travadoPorRateio": "Title is split - single center does not apply." },
@@ -196,7 +218,7 @@
     "sidebar": {
       "expandir": "Expand menu", "recolher": "Collapse menu", "especialidade": "Specialty",
       "dashboard": "Dashboard", "agenda": "Schedule & Appointments", "pacientes": "Patients",
-      "financeiro": "Finance", "servicos": "Services & Procedures", "usuarios": "Users & Team",
+      "servicos": "Services & Procedures", "usuarios": "Users & Team",
       "config": "Profile & Settings",
       "agendaSemanal": "Weekly Schedule", "agendaDiaria": "Daily Schedule",
       "bloqueioAgenda": "Schedule Block", "matrizDisponibilidade": "Availability Matrix", "relatorios": "Reports"

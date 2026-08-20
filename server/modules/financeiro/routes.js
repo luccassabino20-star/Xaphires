@@ -51,7 +51,7 @@ import {
   importarExtrato,
 } from "./repo.js";
 import { seedCategoriasSeVazio } from "./seed.js";
-import { montarFluxo, montarDRE, montarSaldos, montarMovimentacao } from "./calculos.js";
+import { montarFluxo, montarDRE, montarSaldos, montarMovimentacao, montarFluxoCaixaMatriz, listarLancamentosDoGrupo, GRUPOS_DRE_VALIDOS } from "./calculos.js";
 import { gerarExcelExtrato } from "./extrato/excelExtrato.js";
 import { parseExtrato } from "./extrato/parseExtrato.js";
 import { RegraError } from "../../admin/centrosCustoStore.js";
@@ -60,6 +60,9 @@ import { parseCategoriasXlsx, modeloCategoriasXlsx } from "./importCategorias.js
 import { runWithCompany } from "../../context.js";
 import Busboy from "busboy";
 import { PDFParse } from "pdf-parse";
+import { gerarCsvFluxoCaixa, gerarPdfFluxoCaixa, gerarExcelFluxoCaixa } from "./fluxoCaixaExport.js";
+import { rotulosFluxoCaixa } from "./fluxoCaixaLabels.js";
+import { getCompany } from "../../directory.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -111,11 +114,17 @@ router.get(
 router.post(
   "/categorias",
   ah(async (req, res) => {
-    const { nome, tipo, codigo } = req.body || {};
+    const { nome, tipo, codigo, grupoDre } = req.body || {};
     if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome da classe", code: "FIN_CATEGORY_NAME_REQUIRED" });
     if (tipo !== "receita" && tipo !== "despesa")
       return res.status(400).json({ error: "Tipo de classe inválido", code: "FIN_CATEGORY_TIPO_INVALID" });
-    res.status(201).json(insertCategoria({ nome: nome.trim(), tipo, codigo: (codigo || "").trim() }));
+    // grupoDre é opcional - classifica a categoria num dos 8 baldes do Fluxo de
+    // Caixa em matriz (ver calculos.GRUPOS_DRE_VALIDOS). Sem ele, a matriz cai no
+    // default por tipo (receita_outras/despesa_outras).
+    if (grupoDre !== undefined && grupoDre !== null && !GRUPOS_DRE_VALIDOS.includes(grupoDre)) {
+      return res.status(400).json({ error: "Grupo inválido", code: "FLUXO_CAIXA_GRUPO_INVALID" });
+    }
+    res.status(201).json(insertCategoria({ nome: nome.trim(), tipo, codigo: (codigo || "").trim(), grupoDre: grupoDre || null }));
   })
 );
 
@@ -164,9 +173,12 @@ router.patch(
   "/categorias/:id",
   ah(async (req, res) => {
     if (!getCategoria(req.params.id)) return res.status(404).json({ error: "Classe não encontrada", code: "FIN_CATEGORY_NOT_FOUND" });
-    const { tipo } = req.body || {};
+    const { tipo, grupoDre } = req.body || {};
     if (tipo !== undefined && tipo !== "receita" && tipo !== "despesa")
       return res.status(400).json({ error: "Tipo de classe inválido", code: "FIN_CATEGORY_TIPO_INVALID" });
+    if (grupoDre !== undefined && grupoDre !== null && !GRUPOS_DRE_VALIDOS.includes(grupoDre)) {
+      return res.status(400).json({ error: "Grupo inválido", code: "FLUXO_CAIXA_GRUPO_INVALID" });
+    }
     res.json(updateCategoria(req.params.id, req.body || {}));
   })
 );
@@ -777,6 +789,85 @@ router.get(
     const de = DATA_CIVIL.test(req.query.de || "") ? req.query.de : `${ano}-01-01`;
     const ate = DATA_CIVIL.test(req.query.ate || "") ? req.query.ate : `${ano}-12-31`;
     res.json(montarDRE(de, ate));
+  })
+);
+
+// ---------- Fluxo de Caixa em matriz (DRE de caixa por período) ----------
+// Visão alternativa ao /fluxo (que é só o resumo do ano): uma linha por grupo fixo
+// do DRE, uma coluna por mês ou por dia. Mesma fonte única (calculos.js), mesmo
+// livro-razão - é só outra apresentação. "view"/"referencia" definem as colunas.
+
+const VIEWS_FLUXO_CAIXA = new Set(["mensal", "diario"]);
+
+function paramsFluxoCaixa(req) {
+  const view = VIEWS_FLUXO_CAIXA.has(req.query.view) ? req.query.view : "mensal";
+  const hoje = new Date();
+  const hojeCivilLocal = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;
+  const referencia = DATA_CIVIL.test(req.query.referencia || "") ? req.query.referencia : hojeCivilLocal;
+  const contaId = req.query.contaId || null;
+  return { view, referencia, contaId };
+}
+
+router.get(
+  "/fluxo-caixa/matriz",
+  ah(async (req, res) => {
+    const { view, referencia, contaId } = paramsFluxoCaixa(req);
+    if (contaId && !getConta(contaId)) {
+      return res.status(400).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
+    }
+    res.json(montarFluxoCaixaMatriz({ view, referencia, contaId }));
+  })
+);
+
+router.get(
+  "/fluxo-caixa/lancamentos",
+  ah(async (req, res) => {
+    const { grupo, de, ate } = req.query;
+    const contaId = req.query.contaId || null;
+    if (!GRUPOS_DRE_VALIDOS.includes(grupo) && grupo !== "transferencia_entrada" && grupo !== "transferencia_saida") {
+      return res.status(400).json({ error: "Grupo inválido", code: "FLUXO_CAIXA_GRUPO_INVALID" });
+    }
+    if (!DATA_CIVIL.test(de || "") || !DATA_CIVIL.test(ate || "")) {
+      return res.status(400).json({ error: "Informe o período (de/ate) em YYYY-MM-DD", code: "FLUXO_CAIXA_PERIODO_INVALIDO" });
+    }
+    // Transferência não tem lançamento por trás ainda (ver calculos.js) - devolve
+    // lista vazia em vez de 400, para o clique na célula (sempre zero) não quebrar.
+    if (grupo === "transferencia_entrada" || grupo === "transferencia_saida") return res.json([]);
+    res.json(listarLancamentosDoGrupo({ grupo, de, ate, contaId }));
+  })
+);
+
+// Reclassificar o grupo de uma categoria já existente é PATCH /categorias/:id
+// (acima, com { grupoDre }) - não duplica rota aqui.
+
+const FORMATOS_FLUXO_CAIXA = {
+  csv: "text/csv; charset=utf-8",
+  pdf: "application/pdf",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
+const ACENTOS_RE_FLUXO_CAIXA = new RegExp("[\\u0300-\\u036f]", "g");
+
+router.get(
+  "/fluxo-caixa/export",
+  ah(async (req, res) => {
+    const formato = req.query.formato;
+    if (!FORMATOS_FLUXO_CAIXA[formato]) return res.status(400).json({ error: "Formato não suportado", code: "REPORT_FORMAT_INVALID" });
+    const { view, referencia, contaId } = paramsFluxoCaixa(req);
+    if (contaId && !getConta(contaId)) {
+      return res.status(400).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
+    }
+    const matriz = montarFluxoCaixaMatriz({ view, referencia, contaId });
+    const idioma = LOCALES.includes(req.query.lang) ? req.query.lang : "pt";
+    const t = rotulosFluxoCaixa(idioma);
+    const conta = contaId ? getConta(contaId) : null;
+    const args = { matriz, idioma, t, contaNome: conta ? conta.nome : null, empresa: getCompany(req.companyId)?.name || "" };
+    const arquivo =
+      formato === "csv" ? gerarCsvFluxoCaixa(args) : formato === "xlsx" ? await gerarExcelFluxoCaixa(args) : await gerarPdfFluxoCaixa(args);
+    const nomeSemAcento = "fluxo-caixa".normalize("NFD").replace(ACENTOS_RE_FLUXO_CAIXA, "");
+    res.setHeader("Content-Type", FORMATOS_FLUXO_CAIXA[formato]);
+    res.setHeader("Content-Disposition", `attachment; filename="${nomeSemAcento}-${new Date().toISOString().slice(0, 10)}.${formato}"`);
+    res.setHeader("Content-Length", arquivo.length);
+    res.send(arquivo);
   })
 );
 
