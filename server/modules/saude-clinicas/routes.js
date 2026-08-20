@@ -8,6 +8,12 @@ import {
   getClinicConfig,
   setClinicType,
   setClinicTheme,
+  setClinicName,
+  newClinicLogoTarget,
+  setClinicLogo,
+  getClinicLogoFile,
+  discardClinicLogoFile,
+  removerClinicLogo,
   listPatients,
   getPatient,
   insertPatient,
@@ -39,9 +45,15 @@ import {
   insertWaitlistEntry,
   cancelarEspera,
   converterEsperaEmAgendamento,
+  listComissoes,
+  definirComissao,
 } from "./repo.js";
 import { seedAnamneseTemplatesSeVazio, seedProceduresSeVazio } from "./seed.js";
 import { montarDashboard } from "./dashboard.js";
+import { montarRelatorio, TIPOS_RELATORIO } from "./reports.js";
+import { gerarCsvRelatorio, gerarPdfRelatorio } from "./reportsExport.js";
+import { rotulos } from "./reportsLabels.js";
+import { getCompany } from "../../directory.js";
 
 const router = Router();
 // Mesma camada tripla do Financeiro: requireAuth resolve o companyId/ALS;
@@ -51,6 +63,10 @@ router.use(requireAuth, requireWritablePlan, requireModule("saude-clinicas"));
 
 const TIPOS_CLINICA = ["ESTETICA", "NUTRICAO", "BIOMEDICINA_ESTETICA", "MULTIDISCIPLINAR"];
 const TEMAS_VALIDOS = ["padrao", "rosa", "azul", "verde", "roxo", "escuro"];
+// Compartilhado pelos dois uploads de imagem do módulo (logo da clínica e
+// foto do paciente) - subiu pro topo do arquivo pra estar disponível nos
+// dois pontos, na ordem em que aparecem no arquivo.
+const TIPOS_IMAGEM_ACEITOS = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 const DATA_CIVIL = /^\d{4}-\d{2}-\d{2}$/;
 const HORA = /^\d{2}:\d{2}$/;
 
@@ -74,16 +90,17 @@ router.get(
   })
 );
 
-// Só master troca a especialidade da clínica (e agora também o tema visual) -
+// Só master troca a especialidade, o tema visual e o nome da clínica -
 // mesmo padrão de outras configurações administrativas do app (ver
-// setFinanceAccess em users.js). Os dois campos são independentes: o corpo
-// pode trazer só um deles (é o que a tela de Aparência faz), e o que não vier
-// fica como estava - por isso `!== undefined`, não um valor default.
+// setFinanceAccess em users.js). Os três campos são independentes: o corpo
+// pode trazer só um deles (é o que cada card de Configurações faz sozinho),
+// e o que não vier fica como estava - por isso `!== undefined`, não um
+// valor default.
 router.put(
   "/config",
   requireMaster,
   ah(async (req, res) => {
-    const { clinicType, theme } = req.body || {};
+    const { clinicType, theme, clinicName } = req.body || {};
     if (clinicType !== undefined) {
       if (!TIPOS_CLINICA.includes(clinicType)) {
         return res.status(400).json({ error: "Especialidade inválida", code: "CLINIC_TYPE_INVALID" });
@@ -96,7 +113,127 @@ router.put(
       }
       setClinicTheme(theme);
     }
+    if (clinicName !== undefined) {
+      setClinicName(String(clinicName).slice(0, 80));
+    }
     res.json(getClinicConfig());
+  })
+);
+
+// ---------- Logo da clínica (white-label) ----------
+// Upload em streaming, mesmo desenho de POST /patients/:id/photo logo acima
+// (por sua vez espelhado de POST /profile/avatar) - grava no disco aos
+// poucos, conferindo o limite DURANTE a transferência. Só master troca,
+// mesma régua de especialidade/tema/nome.
+const LOGO_MAX_BYTES = 2 * 1024 * 1024;
+
+router.post("/config/logo", requireMaster, (req, res) => {
+  const alvo = newClinicLogoTarget();
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: LOGO_MAX_BYTES } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let tipo = "";
+  let bytes = 0;
+  let excedeu = false;
+  let tipoInvalido = false;
+  let respondido = false;
+  let saida = null;
+  let descartar = false;
+
+  function apagarQuandoPuder() {
+    descartar = true;
+    if (!saida || saida.destroyed) discardClinicLogoFile(alvo.path);
+  }
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    tipo = info.mimeType || "";
+    if (!TIPOS_IMAGEM_ACEITOS.has(tipo)) {
+      tipoInvalido = true;
+      stream.resume();
+      return falhar(400, { error: "Envie uma imagem PNG, JPEG, WEBP ou GIF", code: "INVALID_IMAGE_TYPE" });
+    }
+    saida = fs.createWriteStream(alvo.path);
+    saida.on("error", () => falhar(500, { error: "Erro ao gravar o arquivo", code: "UPLOAD_FAILED" }));
+    saida.on("close", () => {
+      if (descartar) discardClinicLogoFile(alvo.path);
+    });
+    stream.on("data", (chunk) => {
+      bytes += chunk.length;
+    });
+    stream.on("limit", () => {
+      excedeu = true;
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, { error: `A logo deve ter até ${Math.round(LOGO_MAX_BYTES / 1024 / 1024)} MB`, code: "LOGO_TOO_LARGE" });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+
+  function registrar() {
+    if (respondido || excedeu || tipoInvalido) return;
+    try {
+      const atualizado = runWithCompany(req.companyId, () => setClinicLogo({ id: alvo.id, mimeType: tipo }));
+      respondido = true;
+      res.status(201).json(atualizado);
+    } catch (err) {
+      console.error("Falha ao salvar a logo da clínica:", err);
+      falhar(500, { error: "Erro ao salvar a logo", code: "LOGO_SAVE_FAILED" });
+    }
+  }
+
+  bb.on("close", () => {
+    if (respondido || excedeu || tipoInvalido) return;
+    if (bytes === 0) return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  req.on("aborted", () => {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    saida?.destroy();
+  });
+
+  req.pipe(bb);
+});
+
+router.get(
+  "/config/logo",
+  ah(async (req, res) => {
+    const file = getClinicLogoFile();
+    if (!file) return res.status(404).json({ error: "Logo não encontrada", code: "LOGO_NOT_FOUND" });
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", file.mimeType);
+    res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
+    res.sendFile(file.path);
+  })
+);
+
+router.delete(
+  "/config/logo",
+  requireMaster,
+  ah(async (req, res) => {
+    res.json(removerClinicLogo());
   })
 );
 
@@ -110,6 +247,87 @@ router.get(
       return res.status(400).json({ error: "Informe o período (from/to) em YYYY-MM-DD", code: "AGENDA_PERIODO_INVALIDO" });
     }
     res.json(montarDashboard({ from, to, professionalId: professionalId || null }));
+  })
+);
+
+// ---------- Relatórios ----------
+
+const IDIOMAS_RELATORIO = new Set(["pt", "en", "es"]);
+const TIPO_DO_FORMATO = { pdf: "application/pdf", csv: "text/csv; charset=utf-8" };
+const ACENTOS_RE = new RegExp("[\\u0300-\\u036f]", "g");
+// Mesma regra do nome de arquivo do relatório do Kanban: sem acento nem
+// espaço, porque Content-Disposition com caractere fora do ASCII exige a
+// forma RFC 5987 e navegador antigo salva o nome cru como lixo.
+function nomeDeArquivoRelatorio(tipo, extensao) {
+  return `${tipo}-${new Date().toISOString().slice(0, 10)}.${extensao}`;
+}
+
+function filtrosDoRelatorio(req) {
+  const { from, to, professionalId, groupBy, page, pageSize } = req.query;
+  if (!DATA_CIVIL.test(from || "") || !DATA_CIVIL.test(to || "")) return null;
+  return { from, to, professionalId: professionalId || null, groupBy: groupBy || "categoria", page, pageSize };
+}
+
+router.get(
+  "/reports/:tipo",
+  ah(async (req, res) => {
+    if (!TIPOS_RELATORIO.includes(req.params.tipo)) {
+      return res.status(404).json({ error: "Relatório não encontrado", code: "REPORT_TYPE_INVALID" });
+    }
+    const filtros = filtrosDoRelatorio(req);
+    if (!filtros) {
+      return res.status(400).json({ error: "Informe o período (from/to) em YYYY-MM-DD", code: "AGENDA_PERIODO_INVALIDO" });
+    }
+    res.json(montarRelatorio(req.params.tipo, filtros));
+  })
+);
+
+router.get(
+  "/reports/:tipo/export",
+  ah(async (req, res) => {
+    const formato = req.query.formato;
+    if (!TIPOS_RELATORIO.includes(req.params.tipo)) {
+      return res.status(404).json({ error: "Relatório não encontrado", code: "REPORT_TYPE_INVALID" });
+    }
+    if (!TIPO_DO_FORMATO[formato]) {
+      return res.status(400).json({ error: "Formato não suportado", code: "REPORT_FORMAT_INVALID" });
+    }
+    const filtros = filtrosDoRelatorio(req);
+    if (!filtros) {
+      return res.status(400).json({ error: "Informe o período (from/to) em YYYY-MM-DD", code: "AGENDA_PERIODO_INVALIDO" });
+    }
+    // Exportação não pagina - é o arquivo inteiro que a pessoa pediu, ao
+    // contrário da tabela na tela (que só mostra uma página por vez).
+    const relatorio = montarRelatorio(req.params.tipo, { ...filtros, page: 1, pageSize: 100000 });
+    const idioma = IDIOMAS_RELATORIO.has(req.query.lang) ? req.query.lang : "pt";
+    const t = rotulos(idioma);
+    const periodoLabel = `${filtros.from} – ${filtros.to}`;
+    const args = { tipo: req.params.tipo, colunas: relatorio.colunas, linhas: relatorio.linhas, idioma, t, periodoLabel, empresa: getCompany(req.companyId)?.name || "" };
+    const arquivo = formato === "csv" ? gerarCsvRelatorio(args) : await gerarPdfRelatorio(args);
+    res.setHeader("Content-Type", TIPO_DO_FORMATO[formato]);
+    res.setHeader("Content-Disposition", `attachment; filename="${nomeDeArquivoRelatorio(req.params.tipo, formato)}"`);
+    res.setHeader("Content-Length", arquivo.length);
+    res.send(arquivo);
+  })
+);
+
+router.get(
+  "/commissions",
+  ah(async (req, res) => {
+    res.json(listComissoes());
+  })
+);
+// Repasse é dado sensível (percentual sobre a receita de cada profissional) -
+// só master configura, mesmo padrão de setFinanceAccess e de trocar tema.
+router.put(
+  "/commissions/:userId",
+  requireMaster,
+  ah(async (req, res) => {
+    const pct = Number(req.body?.commissionPct);
+    if (!Number.isFinite(pct) || pct < 0 || pct > 100) {
+      return res.status(400).json({ error: "Informe um percentual entre 0 e 100", code: "COMMISSION_PCT_INVALID" });
+    }
+    res.json(definirComissao(req.params.userId, pct));
   })
 );
 
@@ -160,7 +378,6 @@ router.get(
 // aqui, na parte síncrona) - só os eventos do busboy (assíncronos, nascem do
 // socket) precisam reentrar no contexto na mão, exatamente como lá.
 const PATIENT_PHOTO_MAX_BYTES = 3 * 1024 * 1024;
-const TIPOS_IMAGEM_ACEITOS = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
 router.post("/patients/:id/photo", (req, res) => {
   if (!getPatient(req.params.id)) return res.status(404).json({ error: "Paciente não encontrado", code: "PATIENT_NOT_FOUND" });

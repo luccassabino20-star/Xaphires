@@ -35,6 +35,52 @@ export function setClinicTheme(theme) {
   return getClinicConfig();
 }
 
+export function setClinicName(clinicName) {
+  getClinicConfig(); // garante a linha
+  getDb().prepare("UPDATE clinica_config SET clinic_name = ?, updated_at = ? WHERE id = 'default'").run(clinicName, nowIso());
+  return getClinicConfig();
+}
+
+// ---------- Logo da clínica (white-label) ----------
+// Mesmo desenho da foto do paciente (ver mais abaixo): pasta própria pra não
+// misturar com uploads de paciente nem com uploads/avatars de usuário da
+// plataforma.
+function clinicLogoDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "clinic-logo");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+export function newClinicLogoTarget() {
+  const id = uid();
+  return { id, path: path.join(clinicLogoDir(), id) };
+}
+export function setClinicLogo({ id, mimeType }) {
+  const atual = getClinicConfig();
+  getDb().prepare("UPDATE clinica_config SET logo_path = ?, logo_mime = ?, updated_at = ? WHERE id = 'default'").run(id, mimeType, nowIso());
+  if (atual?.logo_path) discardClinicLogoFile(path.join(clinicLogoDir(), atual.logo_path));
+  return getClinicConfig();
+}
+export function getClinicLogoFile() {
+  const c = getClinicConfig();
+  if (!c?.logo_path) return null;
+  const filePath = path.join(clinicLogoDir(), c.logo_path);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, mimeType: c.logo_mime || "application/octet-stream" };
+}
+export function discardClinicLogoFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* já pode ter sumido */
+  }
+}
+export function removerClinicLogo() {
+  const atual = getClinicConfig();
+  if (atual?.logo_path) discardClinicLogoFile(path.join(clinicLogoDir(), atual.logo_path));
+  getDb().prepare("UPDATE clinica_config SET logo_path = NULL, logo_mime = NULL, updated_at = ? WHERE id = 'default'").run(nowIso());
+  return getClinicConfig();
+}
+
 // ---------- Pacientes ----------
 
 export function listPatients() {
@@ -394,15 +440,15 @@ export function listLogsAgendamento(appointmentId) {
 }
 
 export function insertAppointment(
-  { patientId, professionalUserId, title, date, time, durationMin, paymentType, paymentStatus, procedures, notes },
+  { patientId, professionalUserId, title, date, time, durationMin, paymentType, paymentStatus, procedures, notes, insuranceProvider },
   userId
 ) {
   const id = uid();
   getDb()
     .prepare(
       `INSERT INTO appointments
-         (id, patient_id, professional_user_id, title, date, time, duration_min, status, payment_type, payment_status, procedures, notes, created_at, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'agendado', ?, ?, ?, ?, ?, ?)`
+         (id, patient_id, professional_user_id, title, date, time, duration_min, status, payment_type, payment_status, procedures, notes, insurance_provider, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'agendado', ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       id,
@@ -416,6 +462,7 @@ export function insertAppointment(
       paymentStatus || "pendente",
       JSON.stringify(procedures || []),
       notes || "",
+      insuranceProvider || "",
       nowIso(),
       userId || null
     );
@@ -442,7 +489,8 @@ export function updateAppointment(id, a, userId) {
   getDb()
     .prepare(
       `UPDATE appointments SET professional_user_id = ?, title = ?, date = ?, time = ?, duration_min = ?, status = ?,
-              payment_type = ?, payment_status = ?, procedures = ?, notes = ? WHERE id = ?`
+              payment_type = ?, payment_status = ?, procedures = ?, notes = ?,
+              cid_code = ?, cid_description = ?, insurance_provider = ?, satisfaction_score = ? WHERE id = ?`
     )
     .run(
       a.professionalUserId !== undefined ? a.professionalUserId || null : atual.professional_user_id,
@@ -455,6 +503,10 @@ export function updateAppointment(id, a, userId) {
       a.paymentStatus ?? atual.payment_status,
       a.procedures !== undefined ? JSON.stringify(a.procedures) : atual.procedures,
       a.notes ?? atual.notes,
+      a.cidCode ?? atual.cid_code,
+      a.cidDescription ?? atual.cid_description,
+      a.insuranceProvider ?? atual.insurance_provider,
+      a.satisfactionScore !== undefined ? a.satisfactionScore : atual.satisfaction_score,
       id
     );
   const atualizado = getAppointment(id);
@@ -543,4 +595,31 @@ export function converterEsperaEmAgendamento(waitlistId, { professionalUserId, d
 
   getDb().prepare("UPDATE waitlist SET status = 'convertido', patient_id = ? WHERE id = ?").run(patientId, waitlistId);
   return agendamento;
+}
+
+// ---------- Comissão por profissional (Relatórios › Repasse) ----------
+
+// Todo mundo da equipe aparece, com 0% pra quem nunca configurou - a tela de
+// Repasse precisa listar todos os profissionais, não só os que já têm linha
+// em professional_settings.
+export function listComissoes() {
+  return getDb()
+    .prepare(
+      `SELECT u.id AS user_id, u.name, COALESCE(ps.commission_pct, 0) AS commission_pct
+         FROM users u
+         LEFT JOIN professional_settings ps ON ps.user_id = u.id
+        ORDER BY u.name COLLATE NOCASE`
+    )
+    .all();
+}
+
+export function definirComissao(userId, commissionPct) {
+  const db = getDb();
+  const existente = db.prepare("SELECT id FROM professional_settings WHERE user_id = ?").get(userId);
+  if (existente) {
+    db.prepare("UPDATE professional_settings SET commission_pct = ?, updated_at = ? WHERE user_id = ?").run(commissionPct, nowIso(), userId);
+  } else {
+    db.prepare("INSERT INTO professional_settings (id, user_id, commission_pct, updated_at) VALUES (?, ?, ?, ?)").run(uid(), userId, commissionPct, nowIso());
+  }
+  return listComissoes().find((c) => c.user_id === userId);
 }

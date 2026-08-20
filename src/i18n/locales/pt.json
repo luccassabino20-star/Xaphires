@@ -199,7 +199,7 @@
       "financeiro": "Financeiro", "servicos": "Serviços & Procedimentos", "usuarios": "Usuários & Equipe",
       "config": "Perfil & Configurações",
       "agendaSemanal": "Agenda Semanal", "agendaDiaria": "Agenda Diária",
-      "bloqueioAgenda": "Bloqueio de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidade"
+      "bloqueioAgenda": "Bloqueio de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidade", "relatorios": "Relatórios"
     },
     "dashboard": {
       "preset": { "hoje": "Hoje", "7dias": "7 dias", "30dias": "30 dias", "mes": "Este mês" },
@@ -211,9 +211,41 @@
       "aniversariantes": "Aniversariantes do dia", "semAniversariantes": "Nenhum paciente faz aniversário hoje.",
       "mensagemAniversario": "Olá {{nome}}! A equipe da clínica deseja um feliz aniversário! 🎉"
     },
+    "relatorios": {
+      "grupo": { "atendimentos": "Atendimentos", "financas": "Finanças", "relacionamentos": "Relacionamentos" },
+      "tipo": {
+        "atendimentos-realizados": "Atendimentos realizados", "pacientes-retorno": "Pacientes para retorno",
+        "pacientes-periodo": "Pacientes por período", "pacientes-cid": "Pacientes por CID",
+        "pacientes-indicacao": "Paciente por indicação", "faltas-paciente": "Faltas por paciente",
+        "analise-despesas": "Análise de despesas", "analise-receitas": "Análise de receitas",
+        "repasse-profissionais": "Repasse por profissionais", "fluxo-caixa": "Fluxo de caixa",
+        "aniversariantes": "Aniversariantes", "satisfacao-paciente": "Satisfação do paciente"
+      },
+      "disponivelFinanceiro": "Este relatório já existe no módulo Financeiro da sua empresa - fluxo de caixa e despesas são dado de contas a pagar/receber, não de agendamento.",
+      "gerar": "Gerar relatório",
+      "agrupadoPor": { "categoria": "Categoria", "profissional": "Profissional", "convenio": "Convênio" },
+      "semRegistro": "Nenhum registro encontrado.",
+      "paginaDe": "Página {{pagina}} de {{total}}",
+      "exportarCsv": "Exportar CSV", "exportarPdf": "Exportar PDF",
+      "comissaoSalva": "Comissão salva",
+      "mediaGeral": "média geral",
+      "coluna": {
+        "data": "Data", "hora": "Hora", "paciente": "Paciente", "profissional": "Profissional",
+        "procedimentos": "Procedimentos", "convenio": "Convênio", "telefone": "Telefone",
+        "ultimaConsulta": "Última consulta", "primeiraConsulta": "Primeira consulta", "numConsultas": "Nº consultas",
+        "cid": "CID", "descricao": "Descrição", "ocorrencias": "Ocorrências", "pacientes": "Pacientes",
+        "origem": "Origem", "numPacientes": "Nº pacientes", "numFaltas": "Nº faltas", "ultimaFalta": "Última falta",
+        "grupo": "Grupo", "numAtendimentos": "Nº atendimentos", "receitaCents": "Receita", "comissaoPct": "Comissão",
+        "repasseCents": "Valor a repassar", "nota": "Nota", "quantidade": "Quantidade", "percentual": "Percentual",
+        "dataNascimento": "Data de nascimento"
+      }
+    },
     "config": {
       "especialidade": "Especialidade da clínica", "especialidadeHint": "Define quais cards aparecem na seção Pacientes.",
-      "dadosClinica": "Dados da clínica", "dadosClinicaEmBreve": "Nome, logotipo e dados de contato da clínica estarão disponíveis em breve.",
+      "dadosClinica": "Dados da clínica", "dadosClinicaHint": "Nome e logotipo aparecem no topo do módulo, no lugar de \"Saúde & Clínicas\".",
+      "editarLogo": "Alterar logo", "removerLogo": "Remover logo",
+      "logoHint": "PNG, JPEG, WEBP ou GIF, até 2 MB.",
+      "nomeClinica": "Nome da clínica", "nomeClinicaPlaceholder": "Ex.: Clínica Vida Plena",
       "aparencia": "Aparência e Temas", "aparenciaHint": "Escolha a cor de destaque da sua clínica dentro do módulo Saúde & Clínicas.",
       "tema": {
         "padrao": "Padrão", "rosa": "Rosé Clinique", "azul": "Azul Médico", "verde": "Verde Menta", "roxo": "Estética Vip", "escuro": "Modo Escuro"
@@ -361,6 +393,8 @@
       "semLogs": "Nenhum evento registrado.",
       "alteradoEm": "Alterado em",
       "evento": { "criado": "Agendado", "reagendado": "Reagendado", "status_alterado": "Situação alterada" },
+      "nomeConvenio": "Nome do convênio", "nomeConvenioPlaceholder": "Unimed, Bradesco Saúde...",
+      "cid": "CID", "cidDescricao": "Descrição do diagnóstico", "satisfacao": "Satisfação do paciente",
       "profissional": "Profissional",
       "filtroProfissionalTodos": "Todos os profissionais", "filtroSalaTodas": "Todas as salas",
       "filtroStatusTodos": "Todos os status", "filtroProcedimentoTodos": "Todos os procedimentos",

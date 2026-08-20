@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const TIPOS_CLINICA = ["MULTIDISCIPLINAR", "ESTETICA", "BIOMEDICINA_ESTETICA", "NUTRICAO"];
@@ -15,13 +16,28 @@ const TEMAS = [
   { id: "escuro", cor: "#e5e5e5", corFundo: "#131313" },
 ];
 
-// Configurações do módulo: especialidade (já existia) + Aparência e Temas
-// (cor de destaque escolhida pela clínica - ver applySaudeClinicasSchema
-// para o porquê da coluna e SaudeClinicasModule para onde o data-sc-theme é
-// aplicado). Nome/logotipo da clínica não têm schema ainda; entram como
-// aviso "Em breve" em vez de campo morto que parece salvar e não salva nada.
-export default function ConfigView({ clinicType, theme, isMaster, onClinicTypeChange, onThemeChange }) {
+// Configurações do módulo: especialidade + Aparência e Temas (cor de
+// destaque escolhida pela clínica - ver applySaudeClinicasSchema para o
+// porquê da coluna e SaudeClinicasModule para onde o data-sc-theme é
+// aplicado) + Dados da clínica (nome e logo white-label - ver SaudeBrand em
+// SaudeClinicasModule, é quem lê o que fica salvo aqui pro topo do módulo).
+export default function ConfigView({ clinicType, theme, clinicName, logoUrl, isMaster, onClinicTypeChange, onThemeChange, onNameChange, onLogoChange, onLogoRemove }) {
   const { t } = useTranslation();
+  const fileInputRef = useRef(null);
+  const [nome, setNome] = useState(clinicName);
+  const [enviandoLogo, setEnviandoLogo] = useState(false);
+
+  async function selecionarLogo(e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setEnviandoLogo(true);
+    try {
+      await onLogoChange(file);
+    } finally {
+      setEnviandoLogo(false);
+    }
+  }
 
   return (
     <div className="sc-cad-secao">
@@ -62,7 +78,38 @@ export default function ConfigView({ clinicType, theme, isMaster, onClinicTypeCh
 
       <div className="sc-config-card">
         <h3 className="sc-config-title">{t("saudeClinicas.config.dadosClinica")}</h3>
-        <p className="sc-hint">{t("saudeClinicas.config.dadosClinicaEmBreve")}</p>
+        <p className="sc-hint">{t("saudeClinicas.config.dadosClinicaHint")}</p>
+
+        <div className="sc-config-logo-linha">
+          <div className="sc-patient-foto-wrap sc-config-logo-wrap">
+            {logoUrl ? (
+              <img className="sc-config-logo-preview" src={logoUrl} alt="" />
+            ) : (
+              <span className="sc-detail-avatar sc-patient-foto-vazia">{(nome || "?").charAt(0).toUpperCase()}</span>
+            )}
+            {isMaster && (
+              <button type="button" className="sc-patient-foto-botao" onClick={() => fileInputRef.current?.click()} disabled={enviandoLogo} title={t("saudeClinicas.config.editarLogo")}>
+                <svg viewBox="0 0 24 24" width="14" height="14"><path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="m4 20 1-4L18 3l3 3L8 19l-4 1zM14 6l4 4" /></svg>
+              </button>
+            )}
+          </div>
+          <div className="sc-config-logo-info">
+            <p className="sc-hint">{t("saudeClinicas.config.logoHint")}</p>
+            {isMaster && logoUrl && (
+              <button type="button" className="btn-ghost btn-small" onClick={onLogoRemove}>{t("saudeClinicas.config.removerLogo")}</button>
+            )}
+          </div>
+          {isMaster && <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden onChange={selecionarLogo} />}
+        </div>
+
+        <label className="sc-patient-campo">
+          <span className="sc-hint">{t("saudeClinicas.config.nomeClinica")}</span>
+          {isMaster ? (
+            <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} onBlur={() => nome !== clinicName && onNameChange(nome)} placeholder={t("saudeClinicas.config.nomeClinicaPlaceholder")} />
+          ) : (
+            <span className="sc-clinictype-label">{clinicName || "-"}</span>
+          )}
+        </label>
       </div>
     </div>
   );

@@ -414,6 +414,32 @@ export async function finExtratoExcel(transacoes) {
 export const scGetConfig = () => request("/saude-clinicas/config");
 export const scSetClinicType = (clinicType) => request("/saude-clinicas/config", { method: "PUT", body: { clinicType } });
 export const scSetTheme = (theme) => request("/saude-clinicas/config", { method: "PUT", body: { theme } });
+export const scSetClinicName = (clinicName) => request("/saude-clinicas/config", { method: "PUT", body: { clinicName } });
+export const scRemoverClinicLogo = () => request("/saude-clinicas/config/logo", { method: "DELETE" });
+// Upload não passa pelo request() (corpo multipart) - mesmo desenho de scUploadPatientPhoto.
+export async function scUploadClinicLogo(file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/saude-clinicas/config/logo`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 
 export const scListPatients = () => request("/saude-clinicas/patients");
 export const scCreatePatient = (data) => request("/saude-clinicas/patients", { method: "POST", body: data });
@@ -438,6 +464,58 @@ export const scResponderAnamnesePublica = (companyId, token, answers) =>
 // ---------- Agenda (Saúde & Clínicas) ----------
 export const scGetDashboard = (from, to, professionalId) =>
   request(`/saude-clinicas/dashboard?from=${from}&to=${to}${professionalId ? `&professionalId=${professionalId}` : ""}`);
+
+function filtrosDoRelatorioSc({ from, to, professionalId, groupBy, page, pageSize }) {
+  const p = new URLSearchParams({ from, to });
+  if (professionalId) p.set("professionalId", professionalId);
+  if (groupBy) p.set("groupBy", groupBy);
+  if (page) p.set("page", page);
+  if (pageSize) p.set("pageSize", pageSize);
+  return p;
+}
+export const scGetReport = (tipo, filtros) => request(`/saude-clinicas/reports/${tipo}?${filtrosDoRelatorioSc(filtros)}`);
+export const scListComissoes = () => request("/saude-clinicas/commissions");
+export const scSetComissao = (userId, commissionPct) => request(`/saude-clinicas/commissions/${userId}`, { method: "PUT", body: { commissionPct } });
+
+// Mesmo desenho de baixarRelatorio (Kanban): busca o arquivo via fetch (não
+// dá pra baixar arquivo binário com <a href> direto porque a rota exige
+// sessão/cookie), monta um blob e simula o clique num link temporário. Nome
+// do arquivo vem do Content-Disposition que o servidor já decidiu.
+export async function scBaixarRelatorio(tipo, formato, filtros, lang) {
+  const p = filtrosDoRelatorioSc(filtros);
+  p.set("formato", formato);
+  if (lang) p.set("lang", lang);
+  let res;
+  try {
+    res = await fetch(`${BASE}/saude-clinicas/reports/${tipo}/export?${p}`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      /* resposta sem corpo JSON */
+    }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  const disposicao = res.headers.get("Content-Disposition") || "";
+  const casado = /filename="?([^";]+)"?/i.exec(disposicao);
+  const nome = casado ? casado[1] : `${tipo}.${formato}`;
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 export const scListProcedures = () => request("/saude-clinicas/procedures");
 export const scListAppointments = (from, to) => request(`/saude-clinicas/appointments?from=${from}&to=${to}`);
 export const scListPatientAppointments = (patientId) => request(`/saude-clinicas/patients/${patientId}/appointments`);

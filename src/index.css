@@ -7238,6 +7238,16 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-topbar); }
 .sc-top-left { display: flex; align-items: center; gap: 12px; }
 .sc-title { font-size: 18px; font-weight: 680; margin: 0; }
+/* Marca white-label do topo (ver SaudeBrand em SaudeClinicasModule.jsx) -
+   altura máxima de 32px pra logo nunca esticar o header, largura livre
+   (object-fit: contain preserva a proporção sozinho). */
+.sc-brand-logo { max-height: 32px; max-width: 220px; object-fit: contain; display: block; }
+.sc-brand { display: flex; align-items: center; gap: 10px; }
+.sc-brand-avatar {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 28px; height: 28px; font-size: 13px; font-weight: 700; color: #fff;
+  background: var(--accent); border-radius: 50%;
+}
 .sc-top-actions { display: flex; align-items: center; gap: 12px; }
 .sc-clinictype-select { padding: 6px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
 .sc-clinictype-label { font-size: 13px; color: var(--text-secondary); padding: 4px 10px; background: var(--bg-list); border-radius: 999px; }
@@ -7316,6 +7326,16 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-tema-swatch-amostra { width: 100%; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--sc-tema-cor) 0 60%, var(--sc-tema-fundo) 60% 100%); border: 1px solid var(--border-subtle); }
 .sc-tema-swatch-nome { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-align: center; }
 .sc-tema-swatch.active .sc-tema-swatch-nome { color: var(--text-primary); }
+
+/* Logo da clínica (Dados da clínica) - reaproveita o molde do avatar de
+   paciente (.sc-patient-foto-wrap/-botao já existem), só menor e com a
+   imagem em object-fit:contain em vez de cover (a logo não pode ser
+   cortada como uma foto de rosto seria). */
+.sc-config-logo-linha { display: flex; align-items: center; gap: 14px; }
+.sc-config-logo-wrap { width: 64px; height: 64px; flex-shrink: 0; }
+.sc-config-logo-wrap .sc-patient-foto-vazia { width: 64px; height: 64px; font-size: 22px; }
+.sc-config-logo-preview { width: 64px; height: 64px; object-fit: contain; background: var(--bg-list); border-radius: 10px; padding: 4px; }
+.sc-config-logo-info { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
 
 /* Pacientes / listas em geral */
 .sc-cad-secao { display: flex; flex-direction: column; gap: 14px; }
@@ -7681,6 +7701,36 @@ img.avatar { object-fit: cover; padding: 0; }
 .sc-dash-aniversariantes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .sc-dash-aniversariante { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; background: var(--bg-list); border-radius: 10px; font-size: 13px; }
 .sc-dash-aniversariante-nome { font-weight: 600; color: var(--text-primary); }
+
+/* ---------- Relatórios (Saúde & Clínicas) ---------- */
+.sc-relatorios { display: flex; gap: 20px; align-items: flex-start; }
+.sc-rel-nav { flex-shrink: 0; width: 220px; display: flex; flex-direction: column; gap: 16px; }
+.sc-rel-nav-grupo { display: flex; flex-direction: column; gap: 2px; }
+.sc-rel-nav-titulo { margin: 0 0 4px; padding: 0 8px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.sc-rel-nav-item {
+  display: flex; align-items: center; gap: 6px; padding: 8px 8px; text-align: left; font-size: 13px;
+  color: var(--text-secondary); background: none; border: none; border-radius: 8px; cursor: pointer;
+}
+.sc-rel-nav-item:hover:not(.disabled) { background: var(--bg-list); color: var(--text-primary); }
+.sc-rel-nav-item.active { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600; }
+.sc-rel-nav-item.disabled { color: var(--text-muted); cursor: default; }
+.sc-rel-conteudo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.sc-rel-filtros { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.sc-rel-paginacao { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.sc-rel-exportar { display: flex; gap: 8px; justify-content: flex-end; }
+.sc-rel-comissao { display: inline-flex; align-items: center; gap: 6px; }
+.sc-rel-comissao-input { width: 52px; padding: 4px 6px; font-size: 12.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 6px; }
+@media (max-width: 860px) {
+  .sc-relatorios { flex-direction: column; }
+  .sc-rel-nav { width: 100%; flex-direction: row; flex-wrap: wrap; }
+}
+
+/* Nota de satisfação (5 estrelas) no detalhe do agendamento */
+.sc-detail-satisfacao { display: flex; align-items: center; gap: 10px; }
+.sc-detail-estrelas { display: flex; gap: 2px; }
+.sc-detail-estrela { padding: 2px; color: var(--border-strong); background: none; border: none; cursor: pointer; }
+.sc-detail-estrela.active { color: #f59e0b; }
+.sc-detail-estrela:hover { color: #f59e0b; }
 
 /* Modal de agendamento/bloqueio e lista de espera */
 /* max-width some junto do width nos modais abaixo: a base .modal tem

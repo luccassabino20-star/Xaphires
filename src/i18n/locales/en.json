@@ -199,7 +199,7 @@
       "financeiro": "Finance", "servicos": "Services & Procedures", "usuarios": "Users & Team",
       "config": "Profile & Settings",
       "agendaSemanal": "Weekly Schedule", "agendaDiaria": "Daily Schedule",
-      "bloqueioAgenda": "Schedule Block", "matrizDisponibilidade": "Availability Matrix"
+      "bloqueioAgenda": "Schedule Block", "matrizDisponibilidade": "Availability Matrix", "relatorios": "Reports"
     },
     "dashboard": {
       "preset": { "hoje": "Today", "7dias": "7 days", "30dias": "30 days", "mes": "This month" },
@@ -211,9 +211,41 @@
       "aniversariantes": "Birthdays today", "semAniversariantes": "No patient has a birthday today.",
       "mensagemAniversario": "Hi {{nome}}! The clinic team wishes you a happy birthday! 🎉"
     },
+    "relatorios": {
+      "grupo": { "atendimentos": "Appointments", "financas": "Finance", "relacionamentos": "Relationships" },
+      "tipo": {
+        "atendimentos-realizados": "Appointments completed", "pacientes-retorno": "Patients due for return",
+        "pacientes-periodo": "Patients by period", "pacientes-cid": "Patients by diagnosis (ICD)",
+        "pacientes-indicacao": "Patients by referral", "faltas-paciente": "No-shows by patient",
+        "analise-despesas": "Expense analysis", "analise-receitas": "Revenue analysis",
+        "repasse-profissionais": "Professional payouts", "fluxo-caixa": "Cash flow",
+        "aniversariantes": "Birthdays", "satisfacao-paciente": "Patient satisfaction"
+      },
+      "disponivelFinanceiro": "This report already exists in your company's Finance module - cash flow and expenses are accounts payable/receivable data, not appointment data.",
+      "gerar": "Generate report",
+      "agrupadoPor": { "categoria": "Category", "profissional": "Professional", "convenio": "Insurance" },
+      "semRegistro": "No records found.",
+      "paginaDe": "Page {{pagina}} of {{total}}",
+      "exportarCsv": "Export CSV", "exportarPdf": "Export PDF",
+      "comissaoSalva": "Commission saved",
+      "mediaGeral": "overall average",
+      "coluna": {
+        "data": "Date", "hora": "Time", "paciente": "Patient", "profissional": "Professional",
+        "procedimentos": "Procedures", "convenio": "Insurance", "telefone": "Phone",
+        "ultimaConsulta": "Last visit", "primeiraConsulta": "First visit", "numConsultas": "# visits",
+        "cid": "ICD", "descricao": "Description", "ocorrencias": "Occurrences", "pacientes": "Patients",
+        "origem": "Source", "numPacientes": "# patients", "numFaltas": "# no-shows", "ultimaFalta": "Last no-show",
+        "grupo": "Group", "numAtendimentos": "# appointments", "receitaCents": "Revenue", "comissaoPct": "Commission",
+        "repasseCents": "Payout amount", "nota": "Score", "quantidade": "Count", "percentual": "Percentage",
+        "dataNascimento": "Date of birth"
+      }
+    },
     "config": {
       "especialidade": "Clinic specialty", "especialidadeHint": "Determines which cards show up in the Patients section.",
-      "dadosClinica": "Clinic details", "dadosClinicaEmBreve": "The clinic's name, logo and contact details will be available soon.",
+      "dadosClinica": "Clinic details", "dadosClinicaHint": "Name and logo appear at the top of the module, replacing \"Health & Clinics\".",
+      "editarLogo": "Change logo", "removerLogo": "Remove logo",
+      "logoHint": "PNG, JPEG, WEBP or GIF, up to 2 MB.",
+      "nomeClinica": "Clinic name", "nomeClinicaPlaceholder": "E.g.: Vida Plena Clinic",
       "aparencia": "Appearance & Themes", "aparenciaHint": "Choose your clinic's accent color within the Health & Clinics module.",
       "tema": {
         "padrao": "Default", "rosa": "Rosé Clinique", "azul": "Medical Blue", "verde": "Mint Green", "roxo": "Aesthetic Vip", "escuro": "Dark Mode"
@@ -361,6 +393,8 @@
       "semLogs": "No events recorded.",
       "alteradoEm": "Changed on",
       "evento": { "criado": "Scheduled", "reagendado": "Rescheduled", "status_alterado": "Status changed" },
+      "nomeConvenio": "Insurance provider name", "nomeConvenioPlaceholder": "Unimed, Blue Cross...",
+      "cid": "ICD", "cidDescricao": "Diagnosis description", "satisfacao": "Patient satisfaction",
       "profissional": "Professional",
       "filtroProfissionalTodos": "All professionals", "filtroSalaTodas": "All rooms",
       "filtroStatusTodos": "All statuses", "filtroProcedimentoTodos": "All procedures",

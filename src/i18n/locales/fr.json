@@ -199,7 +199,7 @@
       "financeiro": "Finance", "servicos": "Services & Actes", "usuarios": "Utilisateurs & Équipe",
       "config": "Profil & Paramètres",
       "agendaSemanal": "Agenda Hebdomadaire", "agendaDiaria": "Agenda Journalier",
-      "bloqueioAgenda": "Blocage d'Agenda", "matrizDisponibilidade": "Matrice de Disponibilité"
+      "bloqueioAgenda": "Blocage d'Agenda", "matrizDisponibilidade": "Matrice de Disponibilité", "relatorios": "Rapports"
     },
     "dashboard": {
       "preset": { "hoje": "Aujourd'hui", "7dias": "7 jours", "30dias": "30 jours", "mes": "Ce mois" },
@@ -211,9 +211,41 @@
       "aniversariantes": "Anniversaires du jour", "semAniversariantes": "Aucun patient ne fête son anniversaire aujourd'hui.",
       "mensagemAniversario": "Bonjour {{nome}} ! L'équipe de la clinique vous souhaite un joyeux anniversaire ! 🎉"
     },
+    "relatorios": {
+      "grupo": { "atendimentos": "Rendez-vous", "financas": "Finance", "relacionamentos": "Relations" },
+      "tipo": {
+        "atendimentos-realizados": "Rendez-vous réalisés", "pacientes-retorno": "Patients à relancer",
+        "pacientes-periodo": "Patients par période", "pacientes-cid": "Patients par diagnostic (CIM)",
+        "pacientes-indicacao": "Patients par recommandation", "faltas-paciente": "Absences par patient",
+        "analise-despesas": "Analyse des dépenses", "analise-receitas": "Analyse des revenus",
+        "repasse-profissionais": "Rétrocessions par praticien", "fluxo-caixa": "Trésorerie",
+        "aniversariantes": "Anniversaires", "satisfacao-paciente": "Satisfaction du patient"
+      },
+      "disponivelFinanceiro": "Ce rapport existe déjà dans le module Finance de votre entreprise - la trésorerie et les dépenses sont des données de comptes à payer/recevoir, pas de rendez-vous.",
+      "gerar": "Générer le rapport",
+      "agrupadoPor": { "categoria": "Catégorie", "profissional": "Praticien", "convenio": "Assurance" },
+      "semRegistro": "Aucun enregistrement trouvé.",
+      "paginaDe": "Page {{pagina}} sur {{total}}",
+      "exportarCsv": "Exporter en CSV", "exportarPdf": "Exporter en PDF",
+      "comissaoSalva": "Commission enregistrée",
+      "mediaGeral": "moyenne générale",
+      "coluna": {
+        "data": "Date", "hora": "Heure", "paciente": "Patient", "profissional": "Praticien",
+        "procedimentos": "Actes", "convenio": "Assurance", "telefone": "Téléphone",
+        "ultimaConsulta": "Dernière visite", "primeiraConsulta": "Première visite", "numConsultas": "Nb visites",
+        "cid": "CIM", "descricao": "Description", "ocorrencias": "Occurrences", "pacientes": "Patients",
+        "origem": "Source", "numPacientes": "Nb patients", "numFaltas": "Nb absences", "ultimaFalta": "Dernière absence",
+        "grupo": "Groupe", "numAtendimentos": "Nb rendez-vous", "receitaCents": "Revenu", "comissaoPct": "Commission",
+        "repasseCents": "Montant à reverser", "nota": "Note", "quantidade": "Nombre", "percentual": "Pourcentage",
+        "dataNascimento": "Date de naissance"
+      }
+    },
     "config": {
       "especialidade": "Spécialité de la clinique", "especialidadeHint": "Détermine les cartes affichées dans la section Patients.",
-      "dadosClinica": "Coordonnées de la clinique", "dadosClinicaEmBreve": "Le nom, le logo et les coordonnées de la clinique seront bientôt disponibles.",
+      "dadosClinica": "Coordonnées de la clinique", "dadosClinicaHint": "Le nom et le logo apparaissent en haut du module, à la place de \"Santé & Cliniques\".",
+      "editarLogo": "Changer le logo", "removerLogo": "Supprimer le logo",
+      "logoHint": "PNG, JPEG, WEBP ou GIF, jusqu'à 2 Mo.",
+      "nomeClinica": "Nom de la clinique", "nomeClinicaPlaceholder": "Ex. : Clinique Vida Plena",
       "aparencia": "Apparence et Thèmes", "aparenciaHint": "Choisissez la couleur d'accent de votre clinique dans le module Santé & Cliniques.",
       "tema": {
         "padrao": "Par défaut", "rosa": "Rosé Clinique", "azul": "Bleu Médical", "verde": "Vert Menthe", "roxo": "Esthétique Vip", "escuro": "Mode Sombre"
@@ -361,6 +393,8 @@
       "semLogs": "Aucun événement enregistré.",
       "alteradoEm": "Modifié le",
       "evento": { "criado": "Planifié", "reagendado": "Reprogrammé", "status_alterado": "Statut modifié" },
+      "nomeConvenio": "Nom de l'assurance", "nomeConvenioPlaceholder": "Mutuelle, assurance santé...",
+      "cid": "CIM", "cidDescricao": "Description du diagnostic", "satisfacao": "Satisfaction du patient",
       "profissional": "Praticien",
       "filtroProfissionalTodos": "Tous les praticiens", "filtroSalaTodas": "Toutes les salles",
       "filtroStatusTodos": "Tous les statuts", "filtroProcedimentoTodos": "Tous les actes",

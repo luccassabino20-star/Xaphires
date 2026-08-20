@@ -27,6 +27,7 @@ const ITENS = [
     ],
   },
   { id: "pacientes", icon: "pacientes", real: true },
+  { id: "relatorios", icon: "relatorios", real: true },
   { id: "financeiro", icon: "financeiro", real: false },
   { id: "servicos", icon: "servicos", real: false },
   { id: "usuarios", icon: "usuarios", real: true, modal: true },

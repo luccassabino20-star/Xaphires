@@ -199,7 +199,7 @@
       "financeiro": "Finanzen", "servicos": "Leistungen & Behandlungen", "usuarios": "Benutzer & Team",
       "config": "Profil & Einstellungen",
       "agendaSemanal": "Wochenplan", "agendaDiaria": "Tagesplan",
-      "bloqueioAgenda": "Terminsperre", "matrizDisponibilidade": "Verfügbarkeitsmatrix"
+      "bloqueioAgenda": "Terminsperre", "matrizDisponibilidade": "Verfügbarkeitsmatrix", "relatorios": "Berichte"
     },
     "dashboard": {
       "preset": { "hoje": "Heute", "7dias": "7 Tage", "30dias": "30 Tage", "mes": "Dieser Monat" },
@@ -211,9 +211,41 @@
       "aniversariantes": "Geburtstage heute", "semAniversariantes": "Kein Patient hat heute Geburtstag.",
       "mensagemAniversario": "Hallo {{nome}}! Das Praxisteam wünscht dir alles Gute zum Geburtstag! 🎉"
     },
+    "relatorios": {
+      "grupo": { "atendimentos": "Termine", "financas": "Finanzen", "relacionamentos": "Beziehungen" },
+      "tipo": {
+        "atendimentos-realizados": "Durchgeführte Termine", "pacientes-retorno": "Patienten für Nachsorge",
+        "pacientes-periodo": "Patienten nach Zeitraum", "pacientes-cid": "Patienten nach Diagnose (ICD)",
+        "pacientes-indicacao": "Patienten nach Empfehlung", "faltas-paciente": "Fehltermine nach Patient",
+        "analise-despesas": "Ausgabenanalyse", "analise-receitas": "Umsatzanalyse",
+        "repasse-profissionais": "Provisionen je Behandler", "fluxo-caixa": "Kassenfluss",
+        "aniversariantes": "Geburtstage", "satisfacao-paciente": "Patientenzufriedenheit"
+      },
+      "disponivelFinanceiro": "Dieser Bericht existiert bereits im Finanzmodul Ihres Unternehmens - Kassenfluss und Ausgaben sind Daten aus offenen Posten, keine Termindaten.",
+      "gerar": "Bericht erstellen",
+      "agrupadoPor": { "categoria": "Kategorie", "profissional": "Behandler", "convenio": "Versicherung" },
+      "semRegistro": "Keine Einträge gefunden.",
+      "paginaDe": "Seite {{pagina}} von {{total}}",
+      "exportarCsv": "CSV exportieren", "exportarPdf": "PDF exportieren",
+      "comissaoSalva": "Provision gespeichert",
+      "mediaGeral": "Gesamtdurchschnitt",
+      "coluna": {
+        "data": "Datum", "hora": "Uhrzeit", "paciente": "Patient", "profissional": "Behandler",
+        "procedimentos": "Behandlungen", "convenio": "Versicherung", "telefone": "Telefon",
+        "ultimaConsulta": "Letzter Besuch", "primeiraConsulta": "Erster Besuch", "numConsultas": "Anz. Besuche",
+        "cid": "ICD", "descricao": "Beschreibung", "ocorrencias": "Häufigkeit", "pacientes": "Patienten",
+        "origem": "Herkunft", "numPacientes": "Anz. Patienten", "numFaltas": "Anz. Fehltermine", "ultimaFalta": "Letzter Fehltermin",
+        "grupo": "Gruppe", "numAtendimentos": "Anz. Termine", "receitaCents": "Umsatz", "comissaoPct": "Provision",
+        "repasseCents": "Auszahlungsbetrag", "nota": "Bewertung", "quantidade": "Anzahl", "percentual": "Prozentsatz",
+        "dataNascimento": "Geburtsdatum"
+      }
+    },
     "config": {
       "especialidade": "Fachbereich der Klinik", "especialidadeHint": "Bestimmt, welche Karten im Bereich Patienten angezeigt werden.",
-      "dadosClinica": "Klinikdaten", "dadosClinicaEmBreve": "Name, Logo und Kontaktdaten der Klinik sind bald verfügbar.",
+      "dadosClinica": "Klinikdaten", "dadosClinicaHint": "Name und Logo erscheinen oben im Modul anstelle von \"Gesundheit & Kliniken\".",
+      "editarLogo": "Logo ändern", "removerLogo": "Logo entfernen",
+      "logoHint": "PNG, JPEG, WEBP oder GIF, bis zu 2 MB.",
+      "nomeClinica": "Name der Klinik", "nomeClinicaPlaceholder": "Z. B.: Klinik Vida Plena",
       "aparencia": "Erscheinungsbild & Themen", "aparenciaHint": "Wählen Sie die Akzentfarbe Ihrer Klinik innerhalb des Moduls Gesundheit & Kliniken.",
       "tema": {
         "padrao": "Standard", "rosa": "Rosé Clinique", "azul": "Medizinisches Blau", "verde": "Minzgrün", "roxo": "Ästhetik Vip", "escuro": "Dunkelmodus"
@@ -361,6 +393,8 @@
       "semLogs": "Keine Ereignisse erfasst.",
       "alteradoEm": "Geändert am",
       "evento": { "criado": "Geplant", "reagendado": "Verschoben", "status_alterado": "Status geändert" },
+      "nomeConvenio": "Name der Versicherung", "nomeConvenioPlaceholder": "Techniker Krankenkasse, AOK...",
+      "cid": "ICD", "cidDescricao": "Diagnosebeschreibung", "satisfacao": "Patientenzufriedenheit",
       "profissional": "Behandler",
       "filtroProfissionalTodos": "Alle Behandler", "filtroSalaTodas": "Alle Räume",
       "filtroStatusTodos": "Alle Status", "filtroProcedimentoTodos": "Alle Behandlungen",

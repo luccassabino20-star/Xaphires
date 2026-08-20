@@ -355,4 +355,45 @@ export function applySaudeClinicasSchema(companyDb) {
   // módulo. 'padrao' mantém a cor neutra atual sem precisar de uma linha
   // NULL/vazia com significado especial.
   addColumnIfMissing(companyDb, "clinica_config", "theme", "theme TEXT NOT NULL DEFAULT 'padrao'");
+
+  // White-label: nome e logo que a clínica escolhe pro topo do módulo (ver
+  // "Dados da clínica" em Configurações - o "Em breve" de antes virou real
+  // aqui). logo_path/logo_mime é o mesmo desenho do avatar de paciente
+  // (avatar_path/avatar_mime): o arquivo em si mora em
+  // companies/<id>/uploads/clinic-logo/, nomeado pelo id gravado aqui, nunca
+  // pelo nome original do arquivo.
+  addColumnIfMissing(companyDb, "clinica_config", "clinic_name", "clinic_name TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "clinica_config", "logo_path", "logo_path TEXT");
+  addColumnIfMissing(companyDb, "clinica_config", "logo_mime", "logo_mime TEXT");
+
+  // Campos do agendamento que só a tela de Relatórios usa (nenhum deles
+  // aparecia antes): CID é o diagnóstico daquele atendimento específico, não
+  // do paciente em geral (a mesma pessoa pode voltar com CID diferente a
+  // cada consulta) - por isso mora em appointments, não em patients.
+  // insurance_provider é o NOME do convênio (Unimed, Bradesco Saúde...),
+  // livre porque não existe catálogo fechado de operadoras no projeto - só
+  // faz sentido quando payment_type='convenio', mas não é obrigatório nem
+  // nesse caso (clínica pode não ter cadastrado ainda). satisfaction_score
+  // é 1-5, gravado manualmente por quem atendeu (não existe envio de
+  // pesquisa automática - mesmo estágio de "SMS ainda não disponível" do
+  // lembrete de agendamento).
+  addColumnIfMissing(companyDb, "appointments", "cid_code", "cid_code TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "appointments", "cid_description", "cid_description TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "appointments", "insurance_provider", "insurance_provider TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "appointments", "satisfaction_score", "satisfaction_score INTEGER");
+
+  // Repasse por profissional (Relatórios › Finanças): percentual de comissão
+  // sobre a receita dos atendimentos concluídos daquele profissional. Tabela
+  // própria (não coluna em `users`, que é global da plataforma, compartilhada
+  // por todos os módulos) - só o Saúde & Clínicas sabe o que é "repasse".
+  // user_id é único de propósito: um profissional tem uma comissão só, o
+  // repo faz UPSERT nela.
+  companyDb.exec(`
+    CREATE TABLE IF NOT EXISTS professional_settings (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL UNIQUE REFERENCES users(id),
+      commission_pct REAL NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL
+    );
+  `);
 }

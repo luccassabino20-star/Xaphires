@@ -14,6 +14,7 @@ import DashboardView from "./DashboardView.jsx";
 import AgendaView from "./AgendaView.jsx";
 import BlockAgendaView from "./BlockAgendaView.jsx";
 import AvailabilityMatrixView from "./AvailabilityMatrixView.jsx";
+import ReportsView from "./ReportsView.jsx";
 import ConfigView from "./ConfigView.jsx";
 import { cardsParaClinicType } from "./cardCatalog.js";
 import PatientsView from "./PatientsView.jsx";
@@ -58,7 +59,35 @@ export default function SaudeClinicasModule({ onExit }) {
     }
   }
 
+  async function trocarNome(clinicName) {
+    try {
+      setConfig(await api.scSetClinicName(clinicName));
+    } catch (err) {
+      showToast(translateError(err, t));
+    }
+  }
+
+  async function trocarLogo(file) {
+    try {
+      setConfig(await api.scUploadClinicLogo(file));
+    } catch (err) {
+      showToast(translateError(err, t));
+    }
+  }
+
+  async function removerLogo() {
+    try {
+      setConfig(await api.scRemoverClinicLogo());
+    } catch (err) {
+      showToast(translateError(err, t));
+    }
+  }
+
   const isMaster = user?.role === "master";
+  // "v" força o navegador a buscar a imagem de novo quando a logo é trocada -
+  // sem isso, a URL fica idêntica (o path do arquivo não muda de nome) e o
+  // cache do navegador continuaria mostrando a logo antiga até um F5 manual.
+  const logoUrl = config?.logo_path ? `/api/saude-clinicas/config/logo?v=${config.logo_path}` : null;
 
   return (
     <div className="sc" data-sc-theme={config?.theme || "padrao"}>
@@ -69,7 +98,7 @@ export default function SaudeClinicasModule({ onExit }) {
               <path fill="currentColor" d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z" />
             </svg>
           </button>
-          <h1 className="sc-title">{t("modules.saude-clinicas.name")}</h1>
+          <SaudeBrand nome={config?.clinic_name} logoUrl={logoUrl} nomeModulo={t("modules.saude-clinicas.name")} />
         </div>
         <div className="sc-top-actions">
           <LanguageSwitcher />
@@ -98,13 +127,19 @@ export default function SaudeClinicasModule({ onExit }) {
           {section === "agenda-bloqueio" && <BlockAgendaView />}
           {section === "agenda-disponibilidade" && <AvailabilityMatrixView />}
           {section === "pacientes" && config && <PacientesSection clinicType={config.clinic_type} />}
+          {section === "relatorios" && <ReportsView />}
           {section === "config" && config && (
             <ConfigView
               clinicType={config.clinic_type}
               theme={config.theme || "padrao"}
+              clinicName={config.clinic_name || ""}
+              logoUrl={logoUrl}
               isMaster={isMaster}
               onClinicTypeChange={trocarClinicType}
               onThemeChange={trocarTema}
+              onNameChange={trocarNome}
+              onLogoChange={trocarLogo}
+              onLogoRemove={removerLogo}
             />
           )}
         </div>
@@ -167,4 +202,30 @@ function PacientesSection({ clinicType }) {
       ))}
     </div>
   );
+}
+
+// Marca no topo do módulo, white-label por empresa (nome e logo configurados
+// em Perfil & Configurações › Dados da clínica). Logo e nome aparecem
+// juntos sempre que existirem - a logo não substitui o texto, senão o
+// nome que a clínica acabou de digitar "some" da tela ao enviar a imagem.
+// Sem nome, só a logo (com o nome do módulo no alt). Sem nenhum dos dois,
+// avatar com a inicial some junto - fallback é o nome do módulo padrão.
+function SaudeBrand({ nome, logoUrl, nomeModulo }) {
+  if (logoUrl) {
+    return (
+      <span className="sc-brand">
+        <img className="sc-brand-logo" src={logoUrl} alt={nome || nomeModulo} />
+        {nome && <h1 className="sc-title">{nome}</h1>}
+      </span>
+    );
+  }
+  if (nome) {
+    return (
+      <span className="sc-brand">
+        <span className="sc-brand-avatar">{nome.charAt(0).toUpperCase()}</span>
+        <h1 className="sc-title">{nome}</h1>
+      </span>
+    );
+  }
+  return <h1 className="sc-title">{nomeModulo}</h1>;
 }

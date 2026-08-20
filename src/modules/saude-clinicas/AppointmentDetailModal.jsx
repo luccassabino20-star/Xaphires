@@ -89,6 +89,25 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
     }
   }
 
+  // Um PATCH por campo, no blur (não a cada tecla) - CID e nome do convênio
+  // são texto livre digitado devagar, diferente de status/pagamento que são
+  // clique único. Nota de satisfação não passa por aqui: é clique direto na
+  // estrela, sem estado de digitação no meio.
+  const [cidCode, setCidCode] = useState(appointment.cid_code || "");
+  const [cidDescription, setCidDescription] = useState(appointment.cid_description || "");
+  const [insuranceProvider, setInsuranceProvider] = useState(appointment.insurance_provider || "");
+  async function salvarCampo(campo, valor) {
+    try {
+      await api.scUpdateAppointment(appointment.id, { [campo]: valor });
+      await onChanged();
+    } catch (err) {
+      showToast(translateError(err, t));
+    }
+  }
+  async function definirSatisfacao(nota) {
+    await salvarCampo("satisfactionScore", nota === appointment.satisfaction_score ? null : nota);
+  }
+
   async function lancarRecebimento() {
     setSalvando(true);
     try {
@@ -182,6 +201,35 @@ export default function AppointmentDetailModal({ appointment, patient, onClose, 
           </div>
         </div>
         <p className="sc-hint">{t(`saudeClinicas.agenda.${appointment.payment_type}`)}</p>
+
+        {appointment.payment_type === "convenio" && (
+          <label className="sc-patient-campo">
+            <span className="sc-hint">{t("saudeClinicas.agenda.nomeConvenio")}</span>
+            <input type="text" value={insuranceProvider} onChange={(e) => setInsuranceProvider(e.target.value)} onBlur={() => salvarCampo("insuranceProvider", insuranceProvider)} placeholder={t("saudeClinicas.agenda.nomeConvenioPlaceholder")} />
+          </label>
+        )}
+
+        <div className="sc-agenda-linha">
+          <label className="sc-patient-campo">
+            <span className="sc-hint">{t("saudeClinicas.agenda.cid")}</span>
+            <input type="text" value={cidCode} onChange={(e) => setCidCode(e.target.value)} onBlur={() => salvarCampo("cidCode", cidCode)} placeholder="F32.1" />
+          </label>
+          <label className="sc-patient-campo sc-patient-campo-grande">
+            <span className="sc-hint">{t("saudeClinicas.agenda.cidDescricao")}</span>
+            <input type="text" value={cidDescription} onChange={(e) => setCidDescription(e.target.value)} onBlur={() => salvarCampo("cidDescription", cidDescription)} />
+          </label>
+        </div>
+
+        <div className="sc-detail-satisfacao">
+          <span className="sc-hint">{t("saudeClinicas.agenda.satisfacao")}</span>
+          <div className="sc-detail-estrelas">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button key={n} type="button" className={"sc-detail-estrela" + (n <= (appointment.satisfaction_score || 0) ? " active" : "")} onClick={() => definirSatisfacao(n)} title={String(n)}>
+                <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+              </button>
+            ))}
+          </div>
+        </div>
 
         {procedures.length > 0 && (
           <>
