@@ -436,6 +436,8 @@ export const scResponderAnamnesePublica = (companyId, token, answers) =>
   request(`/public/anamnese/${companyId}/${token}`, { method: "POST", body: { answers } });
 
 // ---------- Agenda (Saúde & Clínicas) ----------
+export const scGetDashboard = (from, to, professionalId) =>
+  request(`/saude-clinicas/dashboard?from=${from}&to=${to}${professionalId ? `&professionalId=${professionalId}` : ""}`);
 export const scListProcedures = () => request("/saude-clinicas/procedures");
 export const scListAppointments = (from, to) => request(`/saude-clinicas/appointments?from=${from}&to=${to}`);
 export const scListPatientAppointments = (patientId) => request(`/saude-clinicas/patients/${patientId}/appointments`);

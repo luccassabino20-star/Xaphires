@@ -202,9 +202,14 @@
       "bloqueioAgenda": "Blocage d'Agenda", "matrizDisponibilidade": "Matrice de Disponibilité"
     },
     "dashboard": {
-      "pacientesAtivos": "Patients actifs", "fichasEnviadas": "Fiches d'anamnèse envoyées",
-      "fichasRespondidas": "Fiches d'anamnèse répondues",
-      "avisoIndicadores": "Le chiffre d'affaires mensuel et les indicateurs de fréquentation arriveront avec l'Agenda et la Finance de la clinique, encore en développement."
+      "preset": { "hoje": "Aujourd'hui", "7dias": "7 jours", "30dias": "30 jours", "mes": "Ce mois" },
+      "kpi": { "agendados": "Planifiés", "confirmados": "Confirmés", "atendidos": "Reçus", "faltas": "Absences" },
+      "bloco": { "pacientes": "Patients", "procedimentos": "Actes réalisés", "convenio": "Patients × Assurance", "duracao": "Durée moyenne" },
+      "novos": "Nouveaux", "recorrentes": "Récurrents", "outros": "Autres", "total": "Total", "pacientes": "Patients",
+      "minutos": "min", "duracaoHint": "Durée moyenne par rendez-vous sur la période.",
+      "evolucao": "Rendez-vous sur la période", "semDados": "Aucune donnée sur cette période.",
+      "aniversariantes": "Anniversaires du jour", "semAniversariantes": "Aucun patient ne fête son anniversaire aujourd'hui.",
+      "mensagemAniversario": "Bonjour {{nome}} ! L'équipe de la clinique vous souhaite un joyeux anniversaire ! 🎉"
     },
     "config": {
       "especialidade": "Spécialité de la clinique", "especialidadeHint": "Détermine les cartes affichées dans la section Patients.",

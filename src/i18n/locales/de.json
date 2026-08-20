@@ -202,9 +202,14 @@
       "bloqueioAgenda": "Terminsperre", "matrizDisponibilidade": "Verfügbarkeitsmatrix"
     },
     "dashboard": {
-      "pacientesAtivos": "Aktive Patienten", "fichasEnviadas": "Gesendete Anamneseformulare",
-      "fichasRespondidas": "Beantwortete Anamneseformulare",
-      "avisoIndicadores": "Monatsumsatz und Terminkennzahlen kommen zusammen mit der Terminplanung und den Klinikfinanzen, die sich noch in Entwicklung befinden."
+      "preset": { "hoje": "Heute", "7dias": "7 Tage", "30dias": "30 Tage", "mes": "Dieser Monat" },
+      "kpi": { "agendados": "Geplant", "confirmados": "Bestätigt", "atendidos": "Behandelt", "faltas": "Fehltermine" },
+      "bloco": { "pacientes": "Patienten", "procedimentos": "Durchgeführte Behandlungen", "convenio": "Patienten × Versicherung", "duracao": "Durchschnittsdauer" },
+      "novos": "Neu", "recorrentes": "Wiederkehrend", "outros": "Sonstige", "total": "Gesamt", "pacientes": "Patienten",
+      "minutos": "Min.", "duracaoHint": "Durchschnittliche Dauer pro Termin im Zeitraum.",
+      "evolucao": "Termine im Zeitraum", "semDados": "Keine Daten in diesem Zeitraum.",
+      "aniversariantes": "Geburtstage heute", "semAniversariantes": "Kein Patient hat heute Geburtstag.",
+      "mensagemAniversario": "Hallo {{nome}}! Das Praxisteam wünscht dir alles Gute zum Geburtstag! 🎉"
     },
     "config": {
       "especialidade": "Fachbereich der Klinik", "especialidadeHint": "Bestimmt, welche Karten im Bereich Patienten angezeigt werden.",

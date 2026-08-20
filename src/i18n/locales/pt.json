@@ -202,9 +202,14 @@
       "bloqueioAgenda": "Bloqueio de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidade"
     },
     "dashboard": {
-      "pacientesAtivos": "Pacientes ativos", "fichasEnviadas": "Fichas de anamnese enviadas",
-      "fichasRespondidas": "Fichas de anamnese respondidas",
-      "avisoIndicadores": "Faturamento do mês e indicadores de atendimento chegam junto com a Agenda e o Financeiro da clínica, ainda em desenvolvimento."
+      "preset": { "hoje": "Hoje", "7dias": "7 dias", "30dias": "30 dias", "mes": "Este mês" },
+      "kpi": { "agendados": "Agendados", "confirmados": "Confirmados", "atendidos": "Atendidos", "faltas": "Faltas" },
+      "bloco": { "pacientes": "Pacientes", "procedimentos": "Procedimentos realizados", "convenio": "Pacientes × Convênio", "duracao": "Duração média" },
+      "novos": "Novos", "recorrentes": "Recorrentes", "outros": "Outros", "total": "Total", "pacientes": "Pacientes",
+      "minutos": "min", "duracaoHint": "Tempo médio por agendamento no período.",
+      "evolucao": "Atendimentos no período", "semDados": "Sem dados neste período.",
+      "aniversariantes": "Aniversariantes do dia", "semAniversariantes": "Nenhum paciente faz aniversário hoje.",
+      "mensagemAniversario": "Olá {{nome}}! A equipe da clínica deseja um feliz aniversário! 🎉"
     },
     "config": {
       "especialidade": "Especialidade da clínica", "especialidadeHint": "Define quais cards aparecem na seção Pacientes.",

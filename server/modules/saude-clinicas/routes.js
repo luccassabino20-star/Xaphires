@@ -41,6 +41,7 @@ import {
   converterEsperaEmAgendamento,
 } from "./repo.js";
 import { seedAnamneseTemplatesSeVazio, seedProceduresSeVazio } from "./seed.js";
+import { montarDashboard } from "./dashboard.js";
 
 const router = Router();
 // Mesma camada tripla do Financeiro: requireAuth resolve o companyId/ALS;
@@ -96,6 +97,19 @@ router.put(
       setClinicTheme(theme);
     }
     res.json(getClinicConfig());
+  })
+);
+
+// ---------- Dashboard ----------
+
+router.get(
+  "/dashboard",
+  ah(async (req, res) => {
+    const { from, to, professionalId } = req.query;
+    if (!DATA_CIVIL.test(from || "") || !DATA_CIVIL.test(to || "")) {
+      return res.status(400).json({ error: "Informe o período (from/to) em YYYY-MM-DD", code: "AGENDA_PERIODO_INVALIDO" });
+    }
+    res.json(montarDashboard({ from, to, professionalId: professionalId || null }));
   })
 );
 

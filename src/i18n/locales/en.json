@@ -202,9 +202,14 @@
       "bloqueioAgenda": "Schedule Block", "matrizDisponibilidade": "Availability Matrix"
     },
     "dashboard": {
-      "pacientesAtivos": "Active patients", "fichasEnviadas": "Intake forms sent",
-      "fichasRespondidas": "Intake forms answered",
-      "avisoIndicadores": "Monthly revenue and appointment metrics will arrive together with Schedule and the clinic's Finance section, still in development."
+      "preset": { "hoje": "Today", "7dias": "7 days", "30dias": "30 days", "mes": "This month" },
+      "kpi": { "agendados": "Scheduled", "confirmados": "Confirmed", "atendidos": "Attended", "faltas": "No-shows" },
+      "bloco": { "pacientes": "Patients", "procedimentos": "Procedures performed", "convenio": "Patients × Insurance", "duracao": "Average duration" },
+      "novos": "New", "recorrentes": "Returning", "outros": "Other", "total": "Total", "pacientes": "Patients",
+      "minutos": "min", "duracaoHint": "Average time per appointment in the period.",
+      "evolucao": "Appointments over the period", "semDados": "No data in this period.",
+      "aniversariantes": "Birthdays today", "semAniversariantes": "No patient has a birthday today.",
+      "mensagemAniversario": "Hi {{nome}}! The clinic team wishes you a happy birthday! 🎉"
     },
     "config": {
       "especialidade": "Clinic specialty", "especialidadeHint": "Determines which cards show up in the Patients section.",
