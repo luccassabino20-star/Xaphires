@@ -111,6 +111,11 @@
   },
   "financeiro": {
     "tabs": { "lancamentos": "Entries", "titulos": "Titles", "movimentacao": "Movements", "contas": "Accounts", "fluxo": "Cash flow", "matriz": "Cash Flow Matrix", "dre": "P&L", "importar": "Import statement", "cadastros": "Registers" },
+    "sidebar": {
+      "expandir": "Expand menu", "recolher": "Collapse menu",
+      "grupo": { "financeiro": "Finance", "relatorios": "Reports & P&L", "futuros": "Upcoming Modules" },
+      "itens": { "contas": "Bank Accounts & Cash", "importar": "Reconciliation & Statement Import" }
+    },
     "fluxoCaixa": {
       "conta": "Account", "contaTodas": "All accounts", "mensal": "Monthly", "diario": "Daily",
       "periodoColuna": "Group", "exportarExcel": "Export Excel", "exportarCsv": "Export CSV", "exportarPdf": "Export PDF",

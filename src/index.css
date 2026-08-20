@@ -6742,48 +6742,72 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-top-left { display: flex; align-items: center; gap: 12px; }
 .fin-title { font-size: 18px; font-weight: 680; margin: 0; }
 .fin-top-actions { display: flex; align-items: center; gap: 12px; }
-.fin-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 0 20px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-topbar);
-  /* Sete abas: se a largura apertar, rola na horizontal em vez de sumir com as
-     últimas (Cadastros). flex-shrink:0 nas abas mantém o rótulo legível. */
-  overflow-x: auto;
+
+/* ---------- Sidebar vertical do ERP IRES (substituiu a barra de abas
+   horizontal - com 12 itens ela rolava na lateral, escondendo Cadastros/
+   Compras & Estoque sem aviso nenhum) ---------- */
+.fin-shell { flex: 1; min-height: 0; display: flex; }
+.fin-sidebar {
+  flex-shrink: 0; width: 256px; display: flex; flex-direction: column; gap: 6px;
+  padding: 16px 10px; background: var(--bg-card); border-right: 1px solid var(--border-subtle);
+  overflow-y: auto; transition: width 0.15s ease;
 }
-/* Cada aba mora num wrap próprio (position:relative) pra o popover das abas "Em
-   breve" (abaixo) poder se ancorar exatamente embaixo DAQUELA aba, via
-   position:absolute - sem isso ele nasceria relativo à .fin-tabs inteira, longe
-   do botão que a pessoa clicou. */
-.fin-tab-wrap { position: relative; flex-shrink: 0; display: inline-flex; }
-.fin-tab {
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 550;
-  color: var(--text-secondary);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
+.fin-sidebar-collapsed { width: 80px; }
+.fin-sidebar-toggle {
+  align-self: flex-end; display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; margin-bottom: 8px; color: var(--text-secondary); background: none;
+  border: 1px solid var(--border-subtle); border-radius: 7px; cursor: pointer;
 }
-.fin-tab:hover { color: var(--text-primary); }
-.fin-tab.active { color: var(--text-primary); border-bottom-color: var(--fin-entrada); }
-/* Compras & Estoque, Faturamento e Relatórios & BI vivem aqui como aba "Em
-   breve" (ver ABAS em FinanceiroModule.jsx) - CLICÁVEL (abre o popover
-   AbaEmBrevePopover ancorado nela mesma, sem trocar o que está aberto no
-   corpo), diferente do item de menu travado do resto da plataforma; só o badge
-   segue o mesmo desenho visual (.sc-sidebar-item-badge). */
-.fin-tab.disabled { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); }
-.fin-tab-badge {
+.fin-sidebar-collapsed .fin-sidebar-toggle { align-self: center; }
+.fin-sidebar-toggle:hover { color: var(--text-primary); border-color: var(--border-strong); }
+.fin-sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+.fin-sidebar-group { display: flex; flex-direction: column; }
+.fin-sidebar-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; font-size: 13.5px;
+  text-align: left; color: var(--text-primary); background: none; border: none; border-radius: 8px; cursor: pointer;
+}
+.fin-sidebar-collapsed .fin-sidebar-item { justify-content: center; }
+.fin-sidebar-item:hover { background: var(--bg-list); }
+/* Indicador de borda à esquerda + fundo com a cor do tema + negrito no item
+   ativo, como pedido - mesma linguagem visual de .sc-sidebar-item.active, só
+   que com a borda que aqui faltava. */
+.fin-sidebar-item.active {
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.fin-sidebar-item-icon { display: inline-flex; flex-shrink: 0; }
+.fin-sidebar-item-label { flex: 1; line-height: 1.25; }
+.fin-sidebar-item-futuro { color: var(--text-muted); }
+.fin-sidebar-item-badge {
+  flex-shrink: 0;
   font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
   padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
 }
-/* position:fixed (não absolute) porque é portalado pra document.body - a barra
-   de abas (.fin-tabs) tem overflow-x:auto, e o CSS força overflow-y a deixar
-   de ser "visible" nesse caso, cortando qualquer position:absolute que
-   vazasse dela por baixo. top/left vêm calculados de getBoundingClientRect()
-   da aba clicada (ver alternarPopover em FinanceiroModule.jsx), não deste CSS. */
+.fin-sidebar-chevron { flex-shrink: 0; margin-left: auto; color: var(--text-muted); transition: transform 0.15s ease; }
+.fin-sidebar-chevron-aberto { transform: rotate(180deg); }
+/* Accordion/dropdown do grupo - max-height com transição em vez de só
+   display:none, pra abrir/fechar com uma transição suave em vez de um corte
+   seco. */
+.fin-sidebar-subnav {
+  display: flex; flex-direction: column; gap: 1px; margin: 2px 0 4px 14px; padding-left: 22px;
+  border-left: 1px solid var(--border-subtle);
+  animation: fin-sidebar-subnav-abre 0.15s ease;
+}
+@keyframes fin-sidebar-subnav-abre { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.fin-sidebar-subitem { text-align: left; padding: 7px 10px; font-size: 12.5px; color: var(--text-secondary); background: none; border: none; border-radius: 7px; cursor: pointer; }
+.fin-sidebar-subitem:hover { background: var(--bg-list); color: var(--text-primary); }
+.fin-sidebar-subitem.active {
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.fin-sidebar-separador { margin: 10px 4px 2px; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
+.fin-sidebar-separador-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+
+/* Popover dos itens "Em breve" - portalado pra document.body (a sidebar tem
+   overflow-y:auto, que cortaria um position:absolute que vazasse dela pros
+   lados, mesma armadilha que a barra de abas horizontal já tinha por overflow-
+   x). Abre à DIREITA do item clicado (não embaixo, como na barra antiga),
+   coerente com o menu ser agora vertical. */
 .fin-em-breve-popover {
   position: fixed; z-index: 1000;
   display: flex; align-items: flex-start; gap: 12px;
@@ -6791,13 +6815,14 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: 12px;
   box-shadow: 0 16px 36px rgba(0,0,0,0.18);
 }
-/* Setinha apontando pra aba que abriu o popover - mesmo truque de dois
-   quadrados girados 45° que o resto do app usa pra tooltip. Posição horizontal
-   vem de --fin-em-breve-caret-left (centralizada na aba, calculada em JS). */
-.fin-em-breve-popover::before {
-  content: ""; position: absolute; top: -6px; left: var(--fin-em-breve-caret-left, 20px);
+/* Setinha apontando pro item que abriu o popover, agora à esquerda do balão
+   (o popover abre pra direita da sidebar) - mesmo truque de dois quadrados
+   girados 45°, só que na borda oposta à versão anterior (topo→esquerda).
+   --fin-em-breve-caret-top vem calculado em JS (alinhado ao centro do botão). */
+.fin-em-breve-popover-lateral::before {
+  content: ""; position: absolute; left: -6px; top: var(--fin-em-breve-caret-top, 14px);
   width: 11px; height: 11px; background: var(--bg-card);
-  border-left: 1px solid var(--border-strong); border-top: 1px solid var(--border-strong);
+  border-left: 1px solid var(--border-strong); border-bottom: 1px solid var(--border-strong);
   transform: rotate(45deg);
 }
 .fin-em-breve-icone {
@@ -6807,12 +6832,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 .fin-em-breve-titulo { margin: 0 0 4px; font-size: 14.5px; font-weight: 700; }
 .fin-em-breve-desc { margin: 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; }
+
 .fin-body {
   flex: 1;
   min-height: 0;
-  width: 100%;
-  /* Rola dentro de si (cabeçalho e abas ficam fixos em cima); sem isso as telas
-     mais altas que a viewport eram cortadas, porque o body é overflow:hidden. */
+  min-width: 0;
+  /* Rola dentro de si (header e sidebar ficam fixos); sem isso as telas mais
+     altas que a viewport eram cortadas, porque o body é overflow:hidden. */
   overflow-y: auto;
   /* Sem max-width: o Financeiro ocupa a tela toda, para o grid de título (muitas
      colunas) caber sem a barra de rolagem lateral. */

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import AccountMenu from "../../components/AccountMenu.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import ModuleIcon from "../ModuleIcon.jsx";
+import IresSidebar from "./IresSidebar.jsx";
 import LancamentosView from "./LancamentosView.jsx";
 import TitulosView from "./TitulosView.jsx";
 import MovimentacaoView from "./MovimentacaoView.jsx";
@@ -14,80 +15,58 @@ import ContasView from "./ContasView.jsx";
 import ImportarExtratoView from "./ImportarExtratoView.jsx";
 import CadastrosView from "./CadastrosView.jsx";
 
-// Casca do módulo ERP IRES (id interno "financeiro"): cabeçalho próprio (voltar
-// ao launcher + conta) e as abas. Diferente do Kanban, não há reducer otimista -
-// cada view busca e re-busca por conta própria, que é o padrão mais seguro para
-// dado financeiro.
-// Lançamentos (só o formulário de lançar), Títulos (a lista e a busca do que já
-// existe) e Movimentação (baixa/estorna) são abas separadas de propósito -
-// lançar, consultar e mover o dinheiro são passos diferentes, cada um com sua
-// tela.
+// Casca do módulo ERP IRES (id interno "financeiro"): header enxuto (voltar ao
+// launcher + logo/nome + conta) e sidebar vertical retrátil à esquerda (ver
+// IresSidebar.jsx) - trocou a barra de abas horizontal de propósito: com 9 telas
+// reais mais 3 "em breve", a barra rolava na horizontal (scrollbar feia,
+// descoberta só clicando). Sidebar com grupos (Financeiro/Relatórios & DRE)
+// resolve isso sem esconder nada.
 //
-// Compras & Estoque, Faturamento e Relatórios & BI ENTRAM AQUI DENTRO como abas
-// (não são mais cards próprios no launcher - saíram de server/modules.js e do
-// registry.js do cliente) - ainda sem tela nenhuma, então nascem `real: false`.
-// Clicar numa delas NÃO navega (não troca `aba`, não mexe no que está aberto no
-// corpo) - abre um popover ancorado na própria aba (ícone, nome e a descrição
-// que ela tinha como card no launcher, reaproveitando modules.<id>.desc), como
-// uma prévia rápida em vez de uma tela cheia pra algo que ainda não existe.
-const ABAS = [
-  { id: "lancamentos", real: true },
-  { id: "titulos", real: true },
-  { id: "movimentacao", real: true },
-  { id: "contas", real: true },
-  { id: "importar", real: true },
-  { id: "fluxo", real: true },
-  { id: "matriz", real: true },
-  { id: "dre", real: true },
-  { id: "cadastros", real: true },
-  { id: "compras-estoque", real: false, icon: "estoque", labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
-  { id: "faturamento", real: false, icon: "faturamento", labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
-  { id: "relatorios-bi", real: false, icon: "bi", labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
-];
-
-// Largura fixa do popover (bate com .fin-em-breve-popover em index.css) - usada
-// pra calcular a posição sem esperar um segundo render medindo o próprio DOM.
+// Diferente do Kanban, não há reducer otimista - cada view busca e re-busca por
+// conta própria, que é o padrão mais seguro para dado financeiro.
 const POPOVER_LARGURA = 300;
 
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
   const [aba, setAba] = useState("lancamentos");
+  const [sidebarRecolhida, setSidebarRecolhida] = useState(false);
   const [popoverId, setPopoverId] = useState(null);
   const [popoverPos, setPopoverPos] = useState(null); // { top, left, caretLeft }
-  // A aba clicada mora dentro de .fin-tabs, que tem overflow-x:auto - e por
-  // regra do CSS (overflow num eixo força o outro a deixar de ser "visible"),
-  // qualquer coisa position:absolute que vazasse pra fora da barra ficaria
-  // CORTADA verticalmente. Só apareceu isso testando no navegador (mesma
-  // armadilha que o CLAUDE.md descreve para CSS em geral) - por isso o popover
-  // vai por createPortal pra document.body, com position:fixed calculada a
-  // partir do retângulo real da aba (getBoundingClientRect), em vez de
-  // position:absolute dentro da barra.
-  const triggerRef = useRef(null); // wrap da aba aberta (o botão)
-  const popoverRef = useRef(null); // o próprio popover, portalado
+  // O botão que abriu o popover pode ficar dentro da sidebar (overflow-y:auto
+  // quando muitos itens) - mesma armadilha do popover das abas antigas (ver
+  // histórico deste arquivo): position:fixed calculado do
+  // getBoundingClientRect() do botão, portalado pra document.body, nunca
+  // position:absolute relativo a um pai com overflow.
+  const triggerRef = useRef(null);
+  const popoverRef = useRef(null);
 
   useEffect(() => {
     if (!popoverId) return;
     function handleClick(e) {
-      const dentroDaAba = triggerRef.current && triggerRef.current.contains(e.target);
+      const dentroDoBotao = triggerRef.current && triggerRef.current.contains(e.target);
       const dentroDoPopover = popoverRef.current && popoverRef.current.contains(e.target);
-      if (!dentroDaAba && !dentroDoPopover) setPopoverId(null);
+      if (!dentroDoBotao && !dentroDoPopover) setPopoverId(null);
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [popoverId]);
 
-  function alternarPopover(a, e) {
-    if (popoverId === a.id) {
+  function abrirFuturo(item, e) {
+    if (popoverId === item.id) {
       setPopoverId(null);
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
-    const left = Math.min(rect.left, window.innerWidth - POPOVER_LARGURA - 16);
-    setPopoverPos({ top: rect.bottom + 10, left, caretLeft: rect.left + rect.width / 2 - left - 6 });
-    setPopoverId(a.id);
+    const left = Math.min(rect.right + 10, window.innerWidth - POPOVER_LARGURA - 16);
+    setPopoverPos({ top: rect.top, left, caretTop: rect.height / 2 - 6 });
+    setPopoverId(item.id);
+    triggerRef.current = e.currentTarget;
   }
 
-  const abaPopover = ABAS.find((a) => a.id === popoverId);
+  function selecionarAba(id) {
+    setPopoverId(null);
+    setAba(id);
+  }
 
   return (
     <div className="fin">
@@ -106,55 +85,61 @@ export default function FinanceiroModule({ onExit }) {
         </div>
       </header>
 
-      <nav className="fin-tabs">
-        {ABAS.map((a) => (
-          <div key={a.id} className="fin-tab-wrap" ref={popoverId === a.id ? triggerRef : null}>
-            <button
-              className={"fin-tab" + (aba === a.id || popoverId === a.id ? " active" : "") + (!a.real ? " disabled" : "")}
-              onClick={(e) => (a.real ? setAba(a.id) : alternarPopover(a, e))}
-            >
-              {a.labelKey ? t(a.labelKey) : t(`financeiro.tabs.${a.id}`)}
-              {!a.real && <span className="fin-tab-badge">{t("modules.comingSoon")}</span>}
-            </button>
-          </div>
-        ))}
-      </nav>
+      <div className="fin-shell">
+        <IresSidebar
+          collapsed={sidebarRecolhida}
+          onToggleCollapsed={() => setSidebarRecolhida((v) => !v)}
+          aba={aba}
+          onSelectAba={selecionarAba}
+          onAbrirFuturo={abrirFuturo}
+        />
 
-      <div className="fin-body">
-        {aba === "lancamentos" && <LancamentosView />}
-        {aba === "titulos" && <TitulosView />}
-        {aba === "movimentacao" && <MovimentacaoView />}
-        {aba === "contas" && <ContasView />}
-        {aba === "importar" && <ImportarExtratoView />}
-        {aba === "fluxo" && <FluxoView />}
-        {aba === "matriz" && <FluxoCaixaMatrizView />}
-        {aba === "dre" && <DREView />}
-        {aba === "cadastros" && <CadastrosView />}
+        <div className="fin-body">
+          {aba === "lancamentos" && <LancamentosView />}
+          {aba === "titulos" && <TitulosView />}
+          {aba === "movimentacao" && <MovimentacaoView />}
+          {aba === "contas" && <ContasView />}
+          {aba === "importar" && <ImportarExtratoView />}
+          {aba === "fluxo" && <FluxoView />}
+          {aba === "matriz" && <FluxoCaixaMatrizView />}
+          {aba === "dre" && <DREView />}
+          {aba === "cadastros" && <CadastrosView />}
+        </div>
       </div>
 
-      {abaPopover &&
+      {popoverId &&
         popoverPos &&
-        createPortal(<AbaEmBrevePopover aba={abaPopover} pos={popoverPos} contentRef={popoverRef} />, document.body)}
+        createPortal(
+          <AbaEmBrevePopover
+            item={{ id: popoverId, icon: iconeDoFuturo(popoverId), labelKey: `modules.${popoverId}.name`, descKey: `modules.${popoverId}.desc` }}
+            pos={popoverPos}
+            contentRef={popoverRef}
+          />,
+          document.body
+        )}
     </div>
   );
 }
 
-// Popover das abas "Em breve" - ícone, nome e descrição (mesmo texto que a aba
-// tinha como card no launcher). Portalado pra document.body (ver comentário
-// acima, em FinanceiroModule) - position:fixed com a posição já calculada em
-// alternarPopover, não position:absolute relativo a um pai.
-function AbaEmBrevePopover({ aba, pos, contentRef }) {
+function iconeDoFuturo(id) {
+  return { "compras-estoque": "estoque", faturamento: "faturamento", "relatorios-bi": "bi" }[id];
+}
+
+// Popover dos itens "Em breve" da sidebar - ícone, nome e descrição (mesmo
+// texto que o item tinha como card no launcher). Portalado pra document.body,
+// position:fixed já calculada em abrirFuturo (acima).
+function AbaEmBrevePopover({ item, pos, contentRef }) {
   const { t } = useTranslation();
   return (
     <div
-      className="fin-em-breve-popover"
+      className="fin-em-breve-popover fin-em-breve-popover-lateral"
       ref={contentRef}
-      style={{ top: pos.top, left: pos.left, "--fin-em-breve-caret-left": `${pos.caretLeft}px` }}
+      style={{ top: pos.top, left: pos.left, "--fin-em-breve-caret-top": `${pos.caretTop}px` }}
     >
-      <span className="fin-em-breve-icone"><ModuleIcon name={aba.icon} size={22} /></span>
+      <span className="fin-em-breve-icone"><ModuleIcon name={item.icon} size={22} /></span>
       <div>
-        <h3 className="fin-em-breve-titulo">{t(aba.labelKey)}</h3>
-        <p className="fin-em-breve-desc">{t(aba.descKey)}</p>
+        <h3 className="fin-em-breve-titulo">{t(item.labelKey)}</h3>
+        <p className="fin-em-breve-desc">{t(item.descKey)}</p>
       </div>
     </div>
   );

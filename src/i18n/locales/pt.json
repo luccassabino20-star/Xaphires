@@ -111,6 +111,11 @@
   },
   "financeiro": {
     "tabs": { "lancamentos": "Lançamentos", "titulos": "Títulos", "movimentacao": "Movimentação", "contas": "Contas", "fluxo": "Fluxo de caixa", "matriz": "Matriz de Caixa", "dre": "DRE", "importar": "Importar extrato", "cadastros": "Cadastros" },
+    "sidebar": {
+      "expandir": "Expandir menu", "recolher": "Recolher menu",
+      "grupo": { "financeiro": "Financeiro", "relatorios": "Relatórios & DRE", "futuros": "Módulos Futuros" },
+      "itens": { "contas": "Contas Bancárias & Caixa", "importar": "Conciliação & Importar Extrato" }
+    },
     "fluxoCaixa": {
       "conta": "Conta", "contaTodas": "Todas as contas", "mensal": "Mensal", "diario": "Diário",
       "periodoColuna": "Grupo", "exportarExcel": "Exportar Excel", "exportarCsv": "Exportar CSV", "exportarPdf": "Exportar PDF",
