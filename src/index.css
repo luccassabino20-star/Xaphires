@@ -6459,6 +6459,14 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   max-width: 1080px;
   margin: 0 auto;
   padding: 28px 30px 40px;
+  /* A área rola (comentário acima explica o porquê), mas como o miolo é
+     centralizado e mais estreito que a janela, a barra nativa do navegador
+     cai colada no "Mais filtros" em vez de na borda da tela e passa por
+     controle solto ali. Some com a barra, mantendo a rolagem. */
+  scrollbar-width: none;
+}
+.launcher-body::-webkit-scrollbar {
+  display: none;
 }
 .launcher-eyebrow {
   display: inline-block;
@@ -6490,6 +6498,7 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   align-items: center;
   gap: 4px;
   overflow-x: auto;
+  overflow-y: hidden;
   white-space: nowrap;
   border-bottom: 1px solid var(--border-subtle);
   scrollbar-width: thin;
