@@ -294,7 +294,7 @@
       "prescritor-suplementos": { "name": "Supplement & Compounding Prescriber", "desc": "Ready-made prescriptions and formulas." },
       "agenda-multiprofissional": { "name": "Multi-professional Schedule", "desc": "Daily/weekly view, time blocking and automatic reminders." },
       "pacotes-sessoes": { "name": "Packages & Session Tracking", "desc": "Package sales with automatic session deduction." },
-      "estoque-insumos": { "name": "Clinical Supplies Inventory", "desc": "Syringes, ampoules and materials, with automatic deduction." }
+      "insumos-clinicos": { "name": "Clinical Supplies Control", "desc": "Syringes, ampoules and materials, with automatic deduction." }
     },
     "pacientes": {
       "nome": "Name", "nascimento": "Birth date", "telefone": "Phone", "cpf": "CPF/ID", "email": "Email", "notas": "Notes",

@@ -14,10 +14,9 @@ const PATHS = {
   suplementos: "M9 3h6v5H9zM7 8h10v13H7zM7 13h10",
   agenda: "M4 5h16v16H4V5zm0 5h16M8 3v4M16 3v4",
   pacotes: "M3 7l9-4 9 4v10l-9 4-9-4V7zm9-4v18M3 7l9 4 9-4",
-  estoque: "M3 7l9-4 9 4v10l-9 4-9-4V7zm9-4v18M3 7l9 4 9-4",
+  insumos: "M3 7l9-4 9 4v10l-9 4-9-4V7zm9-4v18M3 7l9 4 9-4",
   // Ícones da sidebar de administração da clínica
   dashboard: "M4 20V10m5 10V4m5 16v-7m5 7V8",
-  financeiro: "M12 2v2m0 16v2m5-14a4 4 0 0 0-4-3H11a3 3 0 0 0 0 6h2a3 3 0 0 1 0 6h-1a4 4 0 0 1-4-3",
   servicos: "M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
   usuarios: "M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm7 10v-2a4 4 0 0 0-3-3.87M15 3.13A4 4 0 0 1 15 10.87",
   config: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2m0 16v2M4.2 4.2l1.4 1.4m12.8 12.8 1.4 1.4M2 12h2m16 0h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4",

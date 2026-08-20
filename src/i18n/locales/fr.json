@@ -272,7 +272,7 @@
       "prescritor-suplementos": { "name": "Prescripteur de Compléments & Formules", "desc": "Ordonnances et formules prêtes à prescrire." },
       "agenda-multiprofissional": { "name": "Agenda Multiprofessionnel", "desc": "Vue quotidienne/hebdomadaire, blocage de créneaux et rappels automatiques." },
       "pacotes-sessoes": { "name": "Forfaits & Suivi des Séances", "desc": "Vente de forfaits avec décompte automatique des séances réalisées." },
-      "estoque-insumos": { "name": "Stock de Consommables Cliniques", "desc": "Contrôle des seringues, ampoules et matériels, avec décompte automatique." }
+      "insumos-clinicos": { "name": "Contrôle des Consommables Cliniques", "desc": "Contrôle des seringues, ampoules et matériels, avec décompte automatique." }
     },
     "pacientes": {
       "nome": "Nom", "nascimento": "Naissance", "telefone": "Téléphone", "cpf": "Pièce d'identité", "email": "E-mail", "notas": "Notes",

@@ -5,7 +5,7 @@
 //
 // `areas: "all"` cobre tanto os módulos universais (Pacientes, Anamnese, que
 // fazem sentido para qualquer especialidade) quanto os transversais (Agenda,
-// Pacotes, Estoque, que atravessam especialidades) - os dois aparecem sempre,
+// Pacotes, Insumos, que atravessam especialidades) - os dois aparecem sempre,
 // independente do clinicType escolhido. Os demais só aparecem quando a área
 // bate, ou quando a clínica é MULTIDISCIPLINAR (mostra tudo).
 export const CARDS = [
@@ -29,7 +29,11 @@ export const CARDS = [
   // não um card dentro de Pacientes - dois pontos de entrada pra mesma coisa
   // confundiria mais do que ajudaria.
   { id: "pacotes-sessoes", icon: "pacotes", areas: "all", real: false },
-  { id: "estoque-insumos", icon: "estoque", areas: "all", real: false },
+  // Renomeado de "estoque-insumos": é controle de INSUMO CLÍNICO (seringa,
+  // ampola, material usado por procedimento) - conceito de clínica, não o
+  // "Compras & Estoque" do ERP (inventário/fornecedor/reordem da empresa
+  // toda). "Estoque" no id/ícone confundia os dois na leitura do código.
+  { id: "insumos-clinicos", icon: "insumos", areas: "all", real: false },
 ];
 
 export function cardsParaClinicType(clinicType) {

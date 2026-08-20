@@ -294,7 +294,7 @@
       "prescritor-suplementos": { "name": "Prescriptor de Suplementos & Fórmulas", "desc": "Recetas y fórmulas listas para prescribir." },
       "agenda-multiprofissional": { "name": "Agenda Multiprofesional", "desc": "Vista diaria/semanal, bloqueo de horarios y recordatorios automáticos." },
       "pacotes-sessoes": { "name": "Paquetes & Control de Sesiones", "desc": "Venta de paquetes y descuento automático de sesiones realizadas." },
-      "estoque-insumos": { "name": "Inventario de Insumos Clínicos", "desc": "Control de jeringas, ampollas y materiales, con descuento automático." }
+      "insumos-clinicos": { "name": "Control de Insumos Clínicos", "desc": "Control de jeringas, ampollas y materiales, con descuento automático." }
     },
     "pacientes": {
       "nome": "Nombre", "nascimento": "Nacimiento", "telefone": "Teléfono", "cpf": "Documento", "email": "Correo", "notas": "Notas",

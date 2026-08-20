@@ -272,7 +272,7 @@
       "prescritor-suplementos": { "name": "Verordnung für Nahrungsergänzung & Rezepturen", "desc": "Fertige Rezepte und Formeln." },
       "agenda-multiprofissional": { "name": "Multiprofessioneller Terminkalender", "desc": "Tages-/Wochenansicht, Zeitblockierung und automatische Erinnerungen." },
       "pacotes-sessoes": { "name": "Pakete & Sitzungsverwaltung", "desc": "Paketverkauf mit automatischem Abzug durchgeführter Sitzungen." },
-      "estoque-insumos": { "name": "Klinikmaterial-Lager", "desc": "Kontrolle von Spritzen, Ampullen und Material, mit automatischem Abzug." }
+      "insumos-clinicos": { "name": "Klinikmaterial-Kontrolle", "desc": "Kontrolle von Spritzen, Ampullen und Material, mit automatischem Abzug." }
     },
     "pacientes": {
       "nome": "Name", "nascimento": "Geburtsdatum", "telefone": "Telefon", "cpf": "Ausweisnummer", "email": "E-Mail", "notas": "Notizen",
