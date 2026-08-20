@@ -21,9 +21,10 @@ export const MODULE_META = {
   "vendas-crm": { icon: "vendas", accent: BRAND, category: "vendas", labelKey: "modules.vendas-crm.name", descKey: "modules.vendas-crm.desc" },
   financeiro: { icon: "financeiro", accent: BRAND, category: "financeiro", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
   "saude-clinicas": { icon: "saude", accent: BRAND, category: "saude", labelKey: "modules.saude-clinicas.name", descKey: "modules.saude-clinicas.desc" },
-  "compras-estoque": { icon: "estoque", accent: BRAND, category: "outros", labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
-  faturamento: { icon: "faturamento", accent: BRAND, category: "financeiro", labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
-  "relatorios-bi": { icon: "bi", accent: BRAND, category: "outros", labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
+  // Compras & Estoque, Faturamento e Relatórios & BI saíram daqui - viraram abas
+  // "Em breve" dentro do ERP IRES (id "financeiro" acima), não cards próprios do
+  // launcher. Os nomes (modules.<id>.name/.desc) continuam nos locales, agora
+  // reaproveitados como rótulo das abas (ver FinanceiroModule.jsx).
   // Marketing e Jurídico não têm pilar real (não vêm de server/modules.js) e
   // não têm aba própria na barra de filtro - o pedido foi mantê-los visíveis
   // mesmo assim, como cartão travado dentro de "outros" (ver

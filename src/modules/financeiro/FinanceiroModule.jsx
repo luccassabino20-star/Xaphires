@@ -12,14 +12,35 @@ import ContasView from "./ContasView.jsx";
 import ImportarExtratoView from "./ImportarExtratoView.jsx";
 import CadastrosView from "./CadastrosView.jsx";
 
-// Casca do módulo Financeiro: cabeçalho próprio (voltar ao launcher + conta) e as
-// abas. Diferente do Kanban, não há reducer otimista - cada view busca e re-busca
-// por conta própria, que é o padrão mais seguro para dado financeiro.
+// Casca do módulo ERP IRES (id interno "financeiro"): cabeçalho próprio (voltar
+// ao launcher + conta) e as abas. Diferente do Kanban, não há reducer otimista -
+// cada view busca e re-busca por conta própria, que é o padrão mais seguro para
+// dado financeiro.
 // Lançamentos (só o formulário de lançar), Títulos (a lista e a busca do que já
 // existe) e Movimentação (baixa/estorna) são abas separadas de propósito -
 // lançar, consultar e mover o dinheiro são passos diferentes, cada um com sua
 // tela.
-const ABAS = ["lancamentos", "titulos", "movimentacao", "contas", "importar", "fluxo", "matriz", "dre", "cadastros"];
+//
+// Compras & Estoque, Faturamento e Relatórios & BI ENTRAM AQUI DENTRO como abas
+// (não são mais cards próprios no launcher - saíram de server/modules.js e do
+// registry.js do cliente) - ainda sem tela nenhuma, então nascem `real: false`,
+// mesmo tratamento "Em breve" do resto da plataforma (SaudeSidebar.jsx,
+// ReportsView.jsx). O rótulo reaproveita o nome que essas três já tinham como
+// módulo (`modules.<id>.name`), pra não duplicar texto em dois lugares.
+const ABAS = [
+  { id: "lancamentos", real: true },
+  { id: "titulos", real: true },
+  { id: "movimentacao", real: true },
+  { id: "contas", real: true },
+  { id: "importar", real: true },
+  { id: "fluxo", real: true },
+  { id: "matriz", real: true },
+  { id: "dre", real: true },
+  { id: "cadastros", real: true },
+  { id: "compras-estoque", real: false, labelKey: "modules.compras-estoque.name" },
+  { id: "faturamento", real: false, labelKey: "modules.faturamento.name" },
+  { id: "relatorios-bi", real: false, labelKey: "modules.relatorios-bi.name" },
+];
 
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
@@ -44,8 +65,15 @@ export default function FinanceiroModule({ onExit }) {
 
       <nav className="fin-tabs">
         {ABAS.map((a) => (
-          <button key={a} className={"fin-tab" + (aba === a ? " active" : "")} onClick={() => setAba(a)}>
-            {t(`financeiro.tabs.${a}`)}
+          <button
+            key={a.id}
+            className={"fin-tab" + (aba === a.id ? " active" : "") + (!a.real ? " disabled" : "")}
+            onClick={() => a.real && setAba(a.id)}
+            disabled={!a.real}
+            title={a.real ? undefined : t("modules.comingSoon")}
+          >
+            {a.labelKey ? t(a.labelKey) : t(`financeiro.tabs.${a.id}`)}
+            {!a.real && <span className="fin-tab-badge">{t("modules.comingSoon")}</span>}
           </button>
         ))}
       </nav>

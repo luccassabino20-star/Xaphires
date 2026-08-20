@@ -15,9 +15,6 @@ const NOMES_MODULOS = {
   "vendas-crm": "Vendas & CRM",
   financeiro: "ERP IRES",
   "saude-clinicas": "Saúde & Clínicas",
-  "compras-estoque": "Compras & Estoque",
-  faturamento: "Faturamento",
-  "relatorios-bi": "Relatórios & BI",
 };
 
 function data(iso) {

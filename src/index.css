@@ -6765,6 +6765,15 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 .fin-tab:hover { color: var(--text-primary); }
 .fin-tab.active { color: var(--text-primary); border-bottom-color: var(--fin-entrada); }
+/* Compras & Estoque, Faturamento e Relatórios & BI vivem aqui como aba "Em
+   breve" (ver ABAS em FinanceiroModule.jsx) - mesmo tratamento visual do resto
+   da plataforma (.sc-sidebar-item-badge). */
+.fin-tab.disabled { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); cursor: default; }
+.fin-tab.disabled:hover { color: var(--text-muted); }
+.fin-tab-badge {
+  font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
+  padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
+}
 .fin-body {
   flex: 1;
   min-height: 0;

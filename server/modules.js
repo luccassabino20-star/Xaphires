@@ -61,26 +61,11 @@ const DEFINICOES = [
     available: true,
     icon: "saude",
   },
-  {
-    id: "compras-estoque",
-    core: false,
-    available: false,
-    icon: "estoque",
-  },
-  {
-    id: "faturamento",
-    // Emissão fiscal (NFe/NFSe) depende de gateway externo e certificado — o
-    // mais pesado, fica entre os últimos.
-    core: false,
-    available: false,
-    icon: "faturamento",
-  },
-  {
-    id: "relatorios-bi",
-    core: false,
-    available: false,
-    icon: "bi",
-  },
+  // Compras & Estoque, Faturamento e Relatórios & BI deixaram de ser cards
+  // próprios do launcher - viraram abas "Em breve" dentro do ERP IRES (id
+  // "financeiro" acima; ver ABAS em src/modules/financeiro/FinanceiroModule.jsx).
+  // Não há mais entitlement separado pra eles: quem tem acesso ao ERP IRES já
+  // "tem" as três, mesmo enquanto seguem sem tela.
 ];
 
 export const MODULES = DEFINICOES;
