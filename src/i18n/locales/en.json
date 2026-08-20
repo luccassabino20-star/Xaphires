@@ -73,7 +73,7 @@
       "desc": "Leads, Kanban pipeline, proposals, quotes and orders."
     },
     "financeiro": {
-      "name": "Finance",
+      "name": "ERP IRES",
       "desc": "Cash flow, accounts payable and receivable, reconciliation and P&L."
     },
     "saude-clinicas": {

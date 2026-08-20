@@ -73,7 +73,7 @@
       "desc": "Leads, embudo en Kanban, propuestas, presupuestos y pedidos."
     },
     "financeiro": {
-      "name": "Finanzas",
+      "name": "ERP IRES",
       "desc": "Flujo de caja, cuentas por pagar y por cobrar, conciliación y ERE."
     },
     "saude-clinicas": {

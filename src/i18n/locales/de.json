@@ -73,7 +73,7 @@
       "desc": "Leads, Kanban-Pipeline, Angebote, Kostenvoranschläge und Bestellungen."
     },
     "financeiro": {
-      "name": "Finanzen",
+      "name": "ERP IRES",
       "desc": "Cashflow, Verbindlichkeiten und Forderungen, Kontenabgleich und GuV."
     },
     "saude-clinicas": {

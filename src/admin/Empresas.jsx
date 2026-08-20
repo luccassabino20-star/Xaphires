@@ -13,7 +13,7 @@ const SITUACAO = { active: "Ativa", trialing: "Em teste", grace: "Pagamento em a
 const NOMES_MODULOS = {
   quadro: "Quadro Kanban",
   "vendas-crm": "Vendas & CRM",
-  financeiro: "Financeiro",
+  financeiro: "ERP IRES",
   "saude-clinicas": "Saúde & Clínicas",
   "compras-estoque": "Compras & Estoque",
   faturamento: "Faturamento",
