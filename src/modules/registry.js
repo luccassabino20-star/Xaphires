@@ -19,7 +19,11 @@ const BRAND = "#101f47";
 export const MODULE_META = {
   quadro: { icon: "quadro", accent: BRAND, category: "vendas", labelKey: "modules.quadro.name", descKey: "modules.quadro.desc" },
   "vendas-crm": { icon: "vendas", accent: BRAND, category: "vendas", labelKey: "modules.vendas-crm.name", descKey: "modules.vendas-crm.desc" },
-  financeiro: { icon: "financeiro", accent: BRAND, category: "financeiro", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
+  // Ícone "layers" (não o cifrão) de propósito: o card representa o ERP IRES
+  // inteiro (Financeiro, Compras & Estoque, Faturamento, Relatórios & BI - ver
+  // FinanceiroModule.jsx), não só a parte financeira. O cifrão continua valendo
+  // só para o grupo "Financeiro" de dentro da sidebar do módulo.
+  financeiro: { icon: "layers", accent: BRAND, category: "financeiro", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
   "saude-clinicas": { icon: "saude", accent: BRAND, category: "saude", labelKey: "modules.saude-clinicas.name", descKey: "modules.saude-clinicas.desc" },
   // Compras & Estoque, Faturamento e Relatórios & BI saíram daqui - viraram abas
   // "Em breve" dentro do ERP IRES (id "financeiro" acima), não cards próprios do

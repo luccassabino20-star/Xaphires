@@ -7,6 +7,11 @@ const PATHS = {
   quadro: "M4 4h5v16H4zm7.5 0h5v11h-5zM19 4h1v7h-1z",
   // Cifrão / fluxo de caixa
   financeiro: "M12 2v2m0 16v2m5-14a4 4 0 0 0-4-3H11a3 3 0 0 0 0 6h2a3 3 0 0 1 0 6h-1a4 4 0 0 1-4-3",
+  // Camadas empilhadas (losango + dois chevrons) - o card do ERP IRES no
+  // launcher usa este em vez do cifrão acima: o cifrão sozinho lia "é só
+  // financeiro", e o IRES já é a suíte inteira (Financeiro, Compras & Estoque,
+  // Faturamento, Relatórios & BI por dentro - ver FinanceiroModule.jsx).
+  layers: "M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
   // Caixa de estoque
   estoque: "M3 7l9-4 9 4v10l-9 4-9-4V7zm9-4v18M3 7l9 4 9-4",
   // Documento fiscal
