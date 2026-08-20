@@ -6766,14 +6766,26 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-tab:hover { color: var(--text-primary); }
 .fin-tab.active { color: var(--text-primary); border-bottom-color: var(--fin-entrada); }
 /* Compras & Estoque, Faturamento e Relatórios & BI vivem aqui como aba "Em
-   breve" (ver ABAS em FinanceiroModule.jsx) - mesmo tratamento visual do resto
-   da plataforma (.sc-sidebar-item-badge). */
-.fin-tab.disabled { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); cursor: default; }
-.fin-tab.disabled:hover { color: var(--text-muted); }
+   breve" (ver ABAS em FinanceiroModule.jsx) - CLICÁVEL (abre o painel
+   AbaEmBreve), diferente do item de menu travado do resto da plataforma; só o
+   badge segue o mesmo desenho visual (.sc-sidebar-item-badge). */
+.fin-tab.disabled { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); }
 .fin-tab-badge {
   font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
   padding: 1px 6px; border-radius: 999px; color: var(--text-muted); background: var(--bg-list); border: 1px solid var(--border-subtle);
 }
+.fin-em-breve {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+  max-width: 420px; margin: 60px auto; padding: 40px 32px;
+  background: var(--bg-card); border: 1px dashed var(--border-strong); border-radius: 16px;
+}
+.fin-em-breve-icone {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card)); color: var(--accent);
+}
+.fin-em-breve-titulo { margin: 4px 0 0; font-size: 19px; font-weight: 700; }
+.fin-em-breve-desc { margin: 0; font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; }
 .fin-body {
   flex: 1;
   min-height: 0;

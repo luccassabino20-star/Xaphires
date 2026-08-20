@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import AccountMenu from "../../components/AccountMenu.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
+import ModuleIcon from "../ModuleIcon.jsx";
 import LancamentosView from "./LancamentosView.jsx";
 import TitulosView from "./TitulosView.jsx";
 import MovimentacaoView from "./MovimentacaoView.jsx";
@@ -23,10 +24,11 @@ import CadastrosView from "./CadastrosView.jsx";
 //
 // Compras & Estoque, Faturamento e Relatórios & BI ENTRAM AQUI DENTRO como abas
 // (não são mais cards próprios no launcher - saíram de server/modules.js e do
-// registry.js do cliente) - ainda sem tela nenhuma, então nascem `real: false`,
-// mesmo tratamento "Em breve" do resto da plataforma (SaudeSidebar.jsx,
-// ReportsView.jsx). O rótulo reaproveita o nome que essas três já tinham como
-// módulo (`modules.<id>.name`), pra não duplicar texto em dois lugares.
+// registry.js do cliente) - ainda sem tela nenhuma, então nascem `real: false`.
+// Diferente do badge "Em breve" travado do resto da plataforma (SaudeSidebar.jsx,
+// ReportsView.jsx), aqui a aba É clicável: abre o painel AbaEmBreve (ícone, nome
+// e descrição - reaproveita modules.<id>.name/.desc, o mesmo texto que a aba
+// tinha como card no launcher, pra não duplicar em dois lugares).
 const ABAS = [
   { id: "lancamentos", real: true },
   { id: "titulos", real: true },
@@ -37,9 +39,9 @@ const ABAS = [
   { id: "matriz", real: true },
   { id: "dre", real: true },
   { id: "cadastros", real: true },
-  { id: "compras-estoque", real: false, labelKey: "modules.compras-estoque.name" },
-  { id: "faturamento", real: false, labelKey: "modules.faturamento.name" },
-  { id: "relatorios-bi", real: false, labelKey: "modules.relatorios-bi.name" },
+  { id: "compras-estoque", real: false, icon: "estoque", labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
+  { id: "faturamento", real: false, icon: "faturamento", labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
+  { id: "relatorios-bi", real: false, icon: "bi", labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
 ];
 
 export default function FinanceiroModule({ onExit }) {
@@ -68,9 +70,7 @@ export default function FinanceiroModule({ onExit }) {
           <button
             key={a.id}
             className={"fin-tab" + (aba === a.id ? " active" : "") + (!a.real ? " disabled" : "")}
-            onClick={() => a.real && setAba(a.id)}
-            disabled={!a.real}
-            title={a.real ? undefined : t("modules.comingSoon")}
+            onClick={() => setAba(a.id)}
           >
             {a.labelKey ? t(a.labelKey) : t(`financeiro.tabs.${a.id}`)}
             {!a.real && <span className="fin-tab-badge">{t("modules.comingSoon")}</span>}
@@ -88,7 +88,27 @@ export default function FinanceiroModule({ onExit }) {
         {aba === "matriz" && <FluxoCaixaMatrizView />}
         {aba === "dre" && <DREView />}
         {aba === "cadastros" && <CadastrosView />}
+        {(() => {
+          const pendente = ABAS.find((a) => a.id === aba && !a.real);
+          return pendente && <AbaEmBreve aba={pendente} />;
+        })()}
       </div>
+    </div>
+  );
+}
+
+// Painel das abas "Em breve" (Compras & Estoque, Faturamento, Relatórios & BI) -
+// clicável, ao contrário de um item de menu travado: mostra ícone, nome e a
+// mesma descrição que a aba tinha como card no launcher (modules.<id>.desc),
+// pra quem clica entender o que está por vir, não só ver que não dá pra entrar.
+function AbaEmBreve({ aba }) {
+  const { t } = useTranslation();
+  return (
+    <div className="fin-em-breve">
+      <span className="fin-em-breve-icone"><ModuleIcon name={aba.icon} size={32} /></span>
+      <h2 className="fin-em-breve-titulo">{t(aba.labelKey)}</h2>
+      <p className="fin-em-breve-desc">{t(aba.descKey)}</p>
+      <span className="fin-tab-badge">{t("modules.comingSoon")}</span>
     </div>
   );
 }
