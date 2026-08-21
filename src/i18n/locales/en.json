@@ -113,9 +113,16 @@
     "tabs": { "lancamentos": "Entries", "titulos": "Titles", "movimentacao": "Movements", "contas": "Accounts", "fluxo": "Cash flow", "matriz": "Cash Flow Matrix", "dre": "P&L", "importar": "Import statement", "cadastros": "Registers" },
     "sidebar": {
       "expandir": "Expand menu", "recolher": "Collapse menu",
-      "grupo": { "financeiro": "Finance", "relatorios": "Reports & P&L", "futuros": "Upcoming Modules" },
-      "itens": { "contas": "Bank Accounts & Cash", "importar": "Reconciliation & Statement Import" }
+      "grupo": { "painel": "Overview", "transacoes": "Transactions", "relatorios": "Reports", "configuracoes": "Settings" },
+      "itens": {
+        "resumo": "Summary", "fluxoCaixa": "Cash flow",
+        "extrato": "Statement", "receitas": "Revenue", "despesas": "Expenses",
+        "analiseDespesas": "Expense analysis", "analiseReceitas": "Revenue analysis",
+        "categoriasFinanceiras": "Financial categories", "contasBancarias": "Bank accounts",
+        "centrosDeCusto": "Cost centers", "outrasConfiguracoes": "Other settings"
+      }
     },
+    "transacoes": { "consultar": "View", "novo": "New entry" },
     "fluxoCaixa": {
       "conta": "Account", "contaTodas": "All accounts", "mensal": "Monthly", "diario": "Daily",
       "periodoColuna": "Group", "exportarExcel": "Export Excel", "exportarCsv": "Export CSV", "exportarPdf": "Export PDF",
@@ -138,7 +145,7 @@
       },
       "lancamentos": { "titulo": "Transactions", "semLancamentos": "No transactions in this period." }
     },
-    "importar": { "titulo": "Import bank statement", "ajuda": "Upload the statement PDF (Sicredi or Banestes). Each transaction becomes a settled entry on the chosen account.", "conta": "Target account", "escolher": "Choose statement PDF", "lendo": "Reading the PDF...", "banco": "Bank", "creditos": "Credits", "debitos": "Debits", "data": "Date", "historico": "Description", "saldo": "Balance", "nenhuma": "No transactions recognized in this PDF.", "importar": "Import {{n}} transactions", "baixarExcel": "Download Excel", "selecioneConta": "Select the target account before importing.", "resultado": "{{imp}} imported, {{ign}} already existed (skipped).", "semContas": "Register a bank account first, in the Accounts tab." },
+    "importar": { "titulo": "Import bank statement", "ajuda": "Upload the statement PDF (Sicredi or Banestes). Each transaction becomes a settled entry on the chosen account.", "conta": "Target account", "escolher": "Choose statement PDF", "lendo": "Reading the PDF...", "banco": "Bank", "creditos": "Credits", "debitos": "Debits", "data": "Date", "historico": "Description", "saldo": "Balance", "nenhuma": "No transactions recognized in this PDF.", "importar": "Import {{n}} transactions", "baixarExcel": "Download Excel", "selecioneConta": "Select the target account before importing.", "resultado": "{{imp}} imported, {{ign}} already existed (skipped).", "semContas": "Register a bank account first, in the Accounts tab.", "abrir": "Import bank statement", "voltarExtrato": "← Back to Statement" },
     "manual": { "titulo": "Manual Entry", "dados": "Entry details", "movimento": "Movement", "data": "Date", "referencia": "Reference", "referenciaPlaceholder": "History / description", "documento": "Document", "credito": "credit", "debito": "debit", "dicaCredito": "This movement is a credit (inflow) to the account.", "dicaDebito": "This movement is a debit (outflow) from the account.", "rateioTitulo": "Allocation / Split", "tipoRateio": "Split type", "porPercentual": "Percent (%)", "porValor": "Amount (R$)", "valorApropriacao": "Allocation amount", "semRateio": "No split added.", "criado": "Manual entry created.", "salvar": "Post", "informeData": "Enter the date.", "escolhaClasse": "Choose the class.", "mov": { "tarifa_bancaria": "Bank Fee", "juros_pagos": "Interest Paid", "juros_recebidos": "Interest Received", "rendimento_aplicacao": "Investment Yield", "aplicacao_financeira": "Financial Investment", "resgate_aplicacao": "Investment Redemption", "outras_entradas": "Other Inflows", "outras_saidas": "Other Outflows" } },
     "rateio": { "ativar": "Split across cost centers", "desativar": "Remove split", "titulo": "Cost-center split", "adicionar": "Add center", "restante": "Remaining", "escolhaCentro": "Choose the center on each split line.", "valorInvalido": "Enter a valid amount on each split line.", "duplicado": "Center repeated in the split.", "naoFecha": "The split must add up to the title value.", "rateadoLabel": "Split", "travadoPorRateio": "Title is split - single center does not apply." },
     "mov": { "pendentes": "Open", "baixados": "Recently settled", "vazioPendentes": "No open titles.", "vazioBaixados": "No recent settlements.", "extratoVazio": "No movements in the period.",

@@ -30,7 +30,10 @@ function hojeCivil() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-export default function TitulosView() {
+// `tipoFixo` ("receber" | "pagar") é usado pelas telas Receitas/Despesas: o
+// filtro de tipo some (a busca já nasce restrita) em vez de deixar a pessoa
+// escapar do contexto pelo próprio filtro.
+export default function TitulosView({ tipoFixo } = {}) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -58,7 +61,7 @@ export default function TitulosView() {
   const [buscaInput, setBuscaInput] = useState("");
   const [buscou, setBuscou] = useState(false);
   const [buscando, setBuscando] = useState(false);
-  const [fTipo, setFTipo] = useState("");
+  const [fTipo, setFTipo] = useState(tipoFixo || "");
   const [fStatus, setFStatus] = useState("");
   const [fCategoria, setFCategoria] = useState("");
   const [fCentro, setFCentro] = useState("");
@@ -207,7 +210,7 @@ export default function TitulosView() {
   }
   // Limpar volta a tela ao estado inicial: sem filtros e sem lista (nova busca do zero).
   function limparFiltros() {
-    setBusca(""); setBuscaInput(""); setFTipo(""); setFStatus(""); setFCategoria(""); setFCentro(""); setFConta("");
+    setBusca(""); setBuscaInput(""); setFTipo(tipoFixo || ""); setFStatus(""); setFCategoria(""); setFCentro(""); setFConta("");
     setFContato(""); setFNumero(""); setFDe(""); setFAte(""); setFValMin(""); setFValMax("");
     setBuscou(false); setLancamentos([]); setSelecionados(new Set());
   }
@@ -230,11 +233,13 @@ export default function TitulosView() {
         </div>
         <button className="btn-primary btn-small" onClick={pesquisar} disabled={buscando}>{t("financeiro.pesquisar")}</button>
         <input className="fin-filtro-numero" type="text" inputMode="numeric" placeholder={t("financeiro.filtro.numero")} value={fNumero} onChange={(e) => setFNumero(e.target.value)} />
-        <select value={fTipo} onChange={(e) => setFTipo(e.target.value)}>
-          <option value="">{t("financeiro.filtro.todosTipos")}</option>
-          <option value="receber">{t("financeiro.tipo.receber")}</option>
-          <option value="pagar">{t("financeiro.tipo.pagar")}</option>
-        </select>
+        {!tipoFixo && (
+          <select value={fTipo} onChange={(e) => setFTipo(e.target.value)}>
+            <option value="">{t("financeiro.filtro.todosTipos")}</option>
+            <option value="receber">{t("financeiro.tipo.receber")}</option>
+            <option value="pagar">{t("financeiro.tipo.pagar")}</option>
+          </select>
+        )}
         <select value={fStatus} onChange={(e) => setFStatus(e.target.value)}>
           <option value="">{t("financeiro.filtro.emAberto")}</option>
           <option value="todos">{t("financeiro.filtro.todosStatus")}</option>

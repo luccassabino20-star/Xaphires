@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { getModules } from "./state/api.js";
+import { parseLocaleFromPath } from "./i18n/urlLocale.js";
 import ModuleLauncher from "./modules/ModuleLauncher.jsx";
 import AuthenticatedApp from "./AuthenticatedApp.jsx";
 // Lazy: o Financeiro (com exceljs/pdf-parse na cauda) não deve pesar no pacote que
@@ -38,7 +39,16 @@ export default function PlatformShell() {
   // Sem persistência de propósito: o painel de módulos é a tela que recebe
   // quem loga (ou recarrega a página logado), sempre — nunca pula direto para
   // o último módulo aberto.
-  const [activeModule, setActiveModule] = useState(null);
+  //
+  // Exceção deliberada: o Financeiro tem URL navegável de verdade
+  // (react-router-dom, só nele - ver o comentário em FinanceiroModule.jsx). Se
+  // a página abre já em /financas/algo (F5 ou link direto), é a URL pedindo
+  // aquele módulo explicitamente - não é "lembrar o último módulo aberto",
+  // que continua não acontecendo para nenhum outro caso.
+  const [activeModule, setActiveModule] = useState(() => {
+    const { rest } = parseLocaleFromPath(window.location.pathname);
+    return rest.startsWith("/financas") ? "financeiro" : null;
+  });
 
   useEffect(() => {
     let vivo = true;

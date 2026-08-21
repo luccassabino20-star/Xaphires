@@ -47,11 +47,15 @@ const GRUPOS_CADASTRO = [
   ]},
 ];
 
-export default function CadastrosView() {
+// `selecionadoInicial` deixa a página Configurações do menu Finanças abrir
+// direto na aba certa (Categorias/Contas/Centros de custo/Outras) - o menu
+// interno (GRUPOS_CADASTRO) continua visível e navegável dali, então nenhum
+// outro cadastro fica inalcançável, só a entrada muda.
+export default function CadastrosView({ selecionadoInicial } = {}) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
-  const [selecionado, setSelecionado] = useState("contas");
+  const [selecionado, setSelecionado] = useState(selecionadoInicial || "contas");
 
   const [contas, setContas] = useState([]);
   const [centros, setCentros] = useState([]);
@@ -73,6 +77,10 @@ export default function CadastrosView() {
     }
   }
   useEffect(() => { carregar(); /* eslint-disable-next-line */ }, []);
+  // As 4 rotas de Configurações (Categorias/Contas/Centros de custo/Outras)
+  // renderizam o mesmo componente - troca de rota não desmonta CadastrosView,
+  // então sem isto a aba ficaria travada na primeira que abriu.
+  useEffect(() => { setSelecionado(selecionadoInicial || "contas"); }, [selecionadoInicial]);
 
   // Cria um cadastro novo.
   async function criar(fn, dados, limpar) {

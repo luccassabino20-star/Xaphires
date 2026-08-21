@@ -6986,6 +6986,39 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-dre-resultado.negativo { background: color-mix(in srgb, var(--fin-saida) 14%, var(--bg-card)); color: var(--fin-saida); }
 .fin-num { font-variant-numeric: tabular-nums; }
 
+/* ---------- Análise de receitas/despesas (Relatórios, menu Finanças) ---------- */
+.fin-analise { display: flex; flex-direction: column; gap: 16px; max-width: 720px; }
+.fin-analise-total {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; border-radius: 12px; font-size: 15px; font-weight: 650;
+  background: var(--bg-list);
+}
+.fin-analise-lista { display: flex; flex-direction: column; gap: 14px; list-style: none; margin: 0; padding: 0; }
+.fin-analise-item-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.fin-analise-item-nome { font-size: 13.5px; color: var(--text-primary); }
+.fin-analise-item-valores { display: flex; align-items: baseline; gap: 8px; }
+.fin-analise-item-pct { font-size: 12px; color: var(--text-muted); min-width: 34px; text-align: right; }
+.fin-analise-bar { height: 8px; border-radius: 4px; background: var(--bg-list); overflow: hidden; }
+.fin-analise-bar-fill { height: 100%; border-radius: 4px; }
+.fin-analise-bar-fill.fin-receber { background: var(--fin-entrada); }
+.fin-analise-bar-fill.fin-pagar { background: var(--fin-saida); }
+
+/* ---------- Transações: Receitas/Despesas (Lançamentos + Títulos travados por tipo) ---------- */
+.fin-transacoes-tipo { display: flex; flex-direction: column; gap: 16px; }
+.fin-tipo-badge {
+  font-size: 12px; font-weight: 650; padding: 4px 10px; border-radius: 999px;
+  background: var(--bg-list);
+}
+.fin-toggle-group { display: inline-flex; border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; align-self: flex-start; }
+.fin-toggle-btn { padding: 6px 12px; font-size: 12.5px; font-weight: 550; color: var(--text-secondary); background: var(--bg-list); border: none; border-right: 1px solid var(--border-subtle); cursor: pointer; }
+.fin-toggle-btn:last-child { border-right: none; }
+.fin-toggle-btn.active { color: #fff; background: var(--accent); }
+
+/* ---------- Extrato (Transações, menu Finanças) ---------- */
+.fin-extrato-topo { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.fin-voltar-link { display: inline-block; margin-bottom: 14px; font-size: 13px; color: var(--accent); text-decoration: none; }
+.fin-voltar-link:hover { text-decoration: underline; }
+
 /* ---------- Matriz de Caixa (DRE de caixa por período, aba "Matriz") ---------- */
 /* Verde/vermelho aqui de propósito - é semântica contábil (receita boa/despesa
    ruim), diferente do par azul/laranja de --fin-entrada/--fin-saida usado no

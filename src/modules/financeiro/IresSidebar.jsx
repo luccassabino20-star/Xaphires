@@ -1,22 +1,23 @@
 import { useState } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import ModuleIcon from "../ModuleIcon.jsx";
 
 // Ícones próprios da sidebar do ERP IRES - mesmo padrão de CardIcon.jsx
-// (Saúde & Clínicas): SVG inline, sem biblioteca. Os três "futuros" reaproveitam
-// ModuleIcon (mesmos ícones que já tinham como card no launcher, antes de virar
-// item de sidebar aqui dentro).
+// (Saúde & Clínicas): SVG inline, sem biblioteca.
 const PATHS = {
-  // Cifrão / fluxo de caixa - mesmo traço de ModuleIcon.financeiro
-  financeiro: "M12 2v2m0 16v2m5-14a4 4 0 0 0-4-3H11a3 3 0 0 0 0 6h2a3 3 0 0 1 0 6h-1a4 4 0 0 1-4-3",
-  // Barras + linha de base
+  // Grid 2x2 - "Painel"
+  painel: "M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z",
+  // Duas setas cruzadas - "Transações"
+  transacoes: "M7 7h12M15 3l4 4-4 4M17 17H5m2 4-4-4 4-4",
+  // Barras + linha de base - "Relatórios"
   relatorios: "M4 20V10m5 10V4m5 16v-7m5 7V8M4 20h16",
-  // Duas pessoas - "Users"
-  cadastros: "M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm7 10v-2a4 4 0 0 0-3-3.87M15 3.13A4 4 0 0 1 15 10.87",
+  // Engrenagem - "Configurações"
+  configuracoes:
+    "M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM19.4 13a7.7 7.7 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.6h-4l-.3 2.4a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.7 7.7 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 0 0 1.7 1l.3 2.4h4l.3-2.4a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.4z",
 };
 function Icon({ name, size = 19 }) {
   const d = PATHS[name];
-  if (!d) return <ModuleIcon name={name} size={size} />;
+  if (!d) return null;
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
       <path d={d} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
@@ -24,56 +25,74 @@ function Icon({ name, size = 19 }) {
   );
 }
 
-// Estrutura pedida: Financeiro e Relatórios & DRE são grupos com submenu
-// (accordion); Cadastros entra como "grupo" sem `children` - a própria
-// CadastrosView.jsx já tem a divisão interna (Clientes/Fornecedores, Classes,
-// Centros de custo...), então duplicar isso aqui em cima seria um menu dentro
-// do outro pelo mesmo dado. O header de Cadastros É o link (sem seta, sem
-// expandir).
+// Estrutura pedida: 4 blocos fixos (Painel/Transações/Relatórios/
+// Configurações), cada um com submenu (accordion). `path` é absoluto, sob
+// /financas - cada item vira uma rota de verdade (ver Router em
+// FinanceiroModule.jsx), navegável por URL/F5/link direto.
+//
+// Mapeamento pro que já existia (nada foi jogado fora, só reorganizado):
+// - Resumo = a antiga aba "Fluxo" (KPIs do ano + gráfico entradas x saídas).
+// - Fluxo de caixa = a antiga aba "Matriz" (DRE de caixa em matriz mensal/diária).
+// - Extrato = a antiga aba "Movimentação"; Importar extrato virou ação
+//   secundária dentro dela (ExtratoView.jsx), não item de menu próprio.
+// - Receitas/Despesas = Lançamentos (criar) + Títulos (consultar/baixar) da
+//   antiga sidebar, cada um agora com o tipo travado (TransacoesTipoView.jsx).
+// - Análise de despesas/receitas = novo, lê o mesmo DRE (financeiro.dre.*)
+//   já usado pela aba DRE, só que como ranking por categoria de um lado só.
+// - Categorias financeiras/Contas bancárias/Centros de custo/Outras
+//   configurações = a antiga aba Cadastros, com 4 portas de entrada em vez de
+//   uma (CadastrosView.jsx ganhou `selecionadoInicial`) - o menu interno dela
+//   continua ali, então nenhum cadastro (impostos, SPED, contatos...) ficou
+//   inalcançável.
 const GRUPOS = [
   {
-    id: "grupo-financeiro", icon: "financeiro", labelKey: "financeiro.sidebar.grupo.financeiro",
+    id: "painel", icon: "painel", labelKey: "financeiro.sidebar.grupo.painel",
     children: [
-      { id: "lancamentos" },
-      { id: "titulos" },
-      { id: "movimentacao" },
-      { id: "contas", labelKey: "financeiro.sidebar.itens.contas" },
-      { id: "importar", labelKey: "financeiro.sidebar.itens.importar" },
+      { id: "resumo", path: "/financas/resumo", labelKey: "financeiro.sidebar.itens.resumo" },
+      { id: "fluxo-caixa", path: "/financas/fluxo-caixa", labelKey: "financeiro.sidebar.itens.fluxoCaixa" },
     ],
   },
   {
-    id: "grupo-relatorios", icon: "relatorios", labelKey: "financeiro.sidebar.grupo.relatorios",
+    id: "transacoes", icon: "transacoes", labelKey: "financeiro.sidebar.grupo.transacoes",
     children: [
-      { id: "fluxo" },
-      { id: "matriz" },
-      { id: "dre" },
+      { id: "extrato", path: "/financas/transacoes/extrato", labelKey: "financeiro.sidebar.itens.extrato" },
+      { id: "receitas", path: "/financas/transacoes/receitas", labelKey: "financeiro.sidebar.itens.receitas" },
+      { id: "despesas", path: "/financas/transacoes/despesas", labelKey: "financeiro.sidebar.itens.despesas" },
     ],
   },
-  { id: "cadastros", icon: "cadastros", labelKey: "financeiro.tabs.cadastros" },
+  {
+    id: "relatorios", icon: "relatorios", labelKey: "financeiro.sidebar.grupo.relatorios",
+    children: [
+      { id: "analise-despesas", path: "/financas/relatorios/analise-despesas", labelKey: "financeiro.sidebar.itens.analiseDespesas" },
+      { id: "analise-receitas", path: "/financas/relatorios/analise-receitas", labelKey: "financeiro.sidebar.itens.analiseReceitas" },
+    ],
+  },
+  {
+    id: "configuracoes", icon: "configuracoes", labelKey: "financeiro.sidebar.grupo.configuracoes",
+    children: [
+      { id: "categorias", path: "/financas/configuracoes/categorias", labelKey: "financeiro.sidebar.itens.categoriasFinanceiras" },
+      { id: "contas-bancarias", path: "/financas/configuracoes/contas", labelKey: "financeiro.sidebar.itens.contasBancarias" },
+      { id: "centros-de-custo", path: "/financas/configuracoes/centros-de-custo", labelKey: "financeiro.sidebar.itens.centrosDeCusto" },
+      { id: "outras-configuracoes", path: "/financas/configuracoes/outras", labelKey: "financeiro.sidebar.itens.outrasConfiguracoes" },
+    ],
+  },
 ];
 
-// Compras & Estoque, Faturamento e Relatórios & BI - ver o comentário em
-// FinanceiroModule.jsx sobre por que viram popover em vez de navegar.
-export const ITENS_FUTUROS = [
-  { id: "compras-estoque", icon: "estoque", labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
-  { id: "faturamento", icon: "faturamento", labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
-  { id: "relatorios-bi", icon: "bi", labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
-];
-
-export default function IresSidebar({ collapsed, onToggleCollapsed, aba, onSelectAba, onAbrirFuturo }) {
+export default function IresSidebar({ collapsed, onToggleCollapsed }) {
   const { t } = useTranslation();
-  // Grupo com a aba ativa já começa aberto - senão a pessoa abriria o módulo
-  // numa sub-seção (ex.: "fluxo") e ela ficaria escondida dentro de um grupo
-  // fechado, mesmo comportamento de SaudeSidebar.jsx.
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Grupo com o item ativo já começa aberto - senão a pessoa chegaria numa
+  // sub-rota (ex.: /financas/relatorios/analise-receitas) e ela ficaria
+  // escondida dentro de um grupo fechado, mesmo comportamento de
+  // SaudeSidebar.jsx.
   const [grupoAberto, setGrupoAberto] = useState(() =>
-    GRUPOS.filter((g) => g.children).map((g) => g.id).filter((id) =>
-      GRUPOS.find((g) => g.id === id).children.some((c) => c.id === aba)
-    )
+    GRUPOS.filter((g) => g.children.some((c) => location.pathname.startsWith(c.path))).map((g) => g.id)
   );
 
   function clicarGrupo(grupo) {
-    if (!grupo.children) return onSelectAba(grupo.id);
-    if (collapsed) return onSelectAba(grupo.children[0].id);
+    if (collapsed) return navigate(grupo.children[0].path);
     setGrupoAberto((atual) => (atual.includes(grupo.id) ? atual.filter((id) => id !== grupo.id) : [...atual, grupo.id]));
   }
 
@@ -92,7 +111,7 @@ export default function IresSidebar({ collapsed, onToggleCollapsed, aba, onSelec
 
       <nav className="fin-sidebar-nav">
         {GRUPOS.map((grupo) => {
-          const grupoAtivo = grupo.children ? grupo.children.some((c) => c.id === aba) : aba === grupo.id;
+          const grupoAtivo = grupo.children.some((c) => location.pathname.startsWith(c.path));
           const aberto = grupoAberto.includes(grupo.id);
           return (
             <div key={grupo.id} className="fin-sidebar-group">
@@ -104,46 +123,28 @@ export default function IresSidebar({ collapsed, onToggleCollapsed, aba, onSelec
               >
                 <span className="fin-sidebar-item-icon"><Icon name={grupo.icon} /></span>
                 {!collapsed && <span className="fin-sidebar-item-label">{t(grupo.labelKey)}</span>}
-                {!collapsed && grupo.children && (
+                {!collapsed && (
                   <svg className={"fin-sidebar-chevron" + (aberto ? " fin-sidebar-chevron-aberto" : "")} viewBox="0 0 24 24" width="13" height="13">
                     <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
                   </svg>
                 )}
               </button>
-              {!collapsed && grupo.children && aberto && (
+              {!collapsed && aberto && (
                 <div className="fin-sidebar-subnav">
                   {grupo.children.map((item) => (
-                    <button
+                    <NavLink
                       key={item.id}
-                      type="button"
-                      className={"fin-sidebar-subitem" + (aba === item.id ? " active" : "")}
-                      onClick={() => onSelectAba(item.id)}
+                      to={item.path}
+                      className={({ isActive }) => "fin-sidebar-subitem" + (isActive ? " active" : "")}
                     >
-                      {t(item.labelKey || `financeiro.tabs.${item.id}`)}
-                    </button>
+                      {t(item.labelKey)}
+                    </NavLink>
                   ))}
                 </div>
               )}
             </div>
           );
         })}
-
-        <div className="fin-sidebar-separador">
-          {!collapsed && <span className="fin-sidebar-separador-label">{t("financeiro.sidebar.grupo.futuros")}</span>}
-        </div>
-        {ITENS_FUTUROS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className="fin-sidebar-item fin-sidebar-item-futuro"
-            onClick={(e) => onAbrirFuturo(item, e)}
-            title={collapsed ? t(item.labelKey) : undefined}
-          >
-            <span className="fin-sidebar-item-icon"><Icon name={item.icon} /></span>
-            {!collapsed && <span className="fin-sidebar-item-label">{t(item.labelKey)}</span>}
-            {!collapsed && <span className="fin-sidebar-item-badge">{t("modules.comingSoon")}</span>}
-          </button>
-        ))}
       </nav>
     </aside>
   );

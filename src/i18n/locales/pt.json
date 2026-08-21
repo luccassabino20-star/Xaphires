@@ -113,9 +113,16 @@
     "tabs": { "lancamentos": "Lançamentos", "titulos": "Títulos", "movimentacao": "Movimentação", "contas": "Contas", "fluxo": "Fluxo de caixa", "matriz": "Matriz de Caixa", "dre": "DRE", "importar": "Importar extrato", "cadastros": "Cadastros" },
     "sidebar": {
       "expandir": "Expandir menu", "recolher": "Recolher menu",
-      "grupo": { "financeiro": "Financeiro", "relatorios": "Relatórios & DRE", "futuros": "Módulos Futuros" },
-      "itens": { "contas": "Contas Bancárias & Caixa", "importar": "Conciliação & Importar Extrato" }
+      "grupo": { "painel": "Painel", "transacoes": "Transações", "relatorios": "Relatórios", "configuracoes": "Configurações" },
+      "itens": {
+        "resumo": "Resumo", "fluxoCaixa": "Fluxo de caixa",
+        "extrato": "Extrato", "receitas": "Receitas", "despesas": "Despesas",
+        "analiseDespesas": "Análise de despesas", "analiseReceitas": "Análise de receitas",
+        "categoriasFinanceiras": "Categorias financeiras", "contasBancarias": "Contas bancárias",
+        "centrosDeCusto": "Centros de custo", "outrasConfiguracoes": "Outras configurações"
+      }
     },
+    "transacoes": { "consultar": "Consultar", "novo": "Novo lançamento" },
     "fluxoCaixa": {
       "conta": "Conta", "contaTodas": "Todas as contas", "mensal": "Mensal", "diario": "Diário",
       "periodoColuna": "Grupo", "exportarExcel": "Exportar Excel", "exportarCsv": "Exportar CSV", "exportarPdf": "Exportar PDF",
@@ -138,7 +145,7 @@
       },
       "lancamentos": { "titulo": "Lançamentos", "semLancamentos": "Nenhum lançamento neste período." }
     },
-    "importar": { "titulo": "Importar extrato bancário", "ajuda": "Envie o PDF do extrato (Sicredi ou Banestes). Cada transação vira um lançamento finalizado na conta escolhida.", "conta": "Conta de destino", "escolher": "Escolher PDF do extrato", "lendo": "Lendo o PDF...", "banco": "Banco", "creditos": "Créditos", "debitos": "Débitos", "data": "Data", "historico": "Histórico", "saldo": "Saldo", "nenhuma": "Nenhuma transação reconhecida neste PDF.", "importar": "Importar {{n}} transações", "baixarExcel": "Baixar Excel", "selecioneConta": "Selecione a conta de destino antes de importar.", "resultado": "{{imp}} importadas, {{ign}} já existiam (ignoradas).", "semContas": "Cadastre uma conta corrente antes, na aba Contas." },
+    "importar": { "titulo": "Importar extrato bancário", "ajuda": "Envie o PDF do extrato (Sicredi ou Banestes). Cada transação vira um lançamento finalizado na conta escolhida.", "conta": "Conta de destino", "escolher": "Escolher PDF do extrato", "lendo": "Lendo o PDF...", "banco": "Banco", "creditos": "Créditos", "debitos": "Débitos", "data": "Data", "historico": "Histórico", "saldo": "Saldo", "nenhuma": "Nenhuma transação reconhecida neste PDF.", "importar": "Importar {{n}} transações", "baixarExcel": "Baixar Excel", "selecioneConta": "Selecione a conta de destino antes de importar.", "resultado": "{{imp}} importadas, {{ign}} já existiam (ignoradas).", "semContas": "Cadastre uma conta corrente antes, na aba Contas.", "abrir": "Importar extrato bancário", "voltarExtrato": "← Voltar ao Extrato" },
     "manual": { "titulo": "Lançamento Manual", "dados": "Dados do lançamento", "movimento": "Movimento", "data": "Data", "referencia": "Referência", "referenciaPlaceholder": "Histórico / descrição", "documento": "Documento", "credito": "crédito", "debito": "débito", "dicaCredito": "Este movimento entra como crédito (entrada) na conta.", "dicaDebito": "Este movimento entra como débito (saída) na conta.", "rateioTitulo": "Apropriação / Rateio", "tipoRateio": "Tipo de rateio", "porPercentual": "Percentual (%)", "porValor": "Valor (R$)", "valorApropriacao": "Valor apropriação", "semRateio": "Nenhum rateio adicionado.", "criado": "Lançamento manual criado.", "salvar": "Lançar", "informeData": "Informe a data.", "escolhaClasse": "Escolha a classe.", "mov": { "tarifa_bancaria": "Tarifa Bancária", "juros_pagos": "Juros Pagos", "juros_recebidos": "Juros Recebidos", "rendimento_aplicacao": "Rendimento de Aplicação", "aplicacao_financeira": "Aplicação Financeira", "resgate_aplicacao": "Resgate de Aplicação", "outras_entradas": "Outras Entradas", "outras_saidas": "Outras Saídas" } },
     "rateio": { "ativar": "Ratear entre vários centros", "desativar": "Remover rateio", "titulo": "Rateio por centro de custo", "adicionar": "Adicionar centro", "restante": "Restante", "escolhaCentro": "Escolha o centro em cada linha do rateio.", "valorInvalido": "Informe um valor válido em cada linha do rateio.", "duplicado": "Centro repetido no rateio.", "naoFecha": "A soma do rateio precisa fechar o valor do título.", "rateadoLabel": "Rateado", "travadoPorRateio": "Título rateado - o centro único não se aplica." },
     "mov": { "pendentes": "Em aberto", "baixados": "Baixados recentemente", "vazioPendentes": "Nenhum título em aberto.", "vazioBaixados": "Nenhuma baixa recente.", "extratoVazio": "Nenhuma movimentação no período.",
