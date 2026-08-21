@@ -7128,9 +7128,11 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 /* Modal do título */
 .fin-modal-body { display: flex; flex-direction: column; gap: 14px; }
 .fin-modal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.fin-field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+/* min-width:0 - sem isso, um <select> com opção longa (nome de conta/categoria)
+   força a coluna do grid além do 1fr dela e o campo vaza pra fora do modal. */
+.fin-field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--text-secondary); min-width: 0; }
 .fin-field-wide { grid-column: 1 / -1; }
-.fin-field input, .fin-field select, .fin-field textarea { padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; font-family: inherit; }
+.fin-field input, .fin-field select, .fin-field textarea { width: 100%; min-width: 0; padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; font-family: inherit; }
 .fin-field input:disabled, .fin-field select:disabled { opacity: 0.55; }
 .fin-field strong { font-size: 14px; color: var(--text-primary); }
 .fin-modal-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
