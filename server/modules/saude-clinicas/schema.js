@@ -272,6 +272,70 @@ export function applySaudeClinicasSchema(companyDb) {
     );
     CREATE INDEX IF NOT EXISTS idx_plan_prices_plan ON insurance_plan_prices(plan_id);
 
+    -- ---------- Financeiro (Saúde & Clínicas) ----------
+    -- Painel financeiro próprio do módulo, pedido explicitamente pelo usuário
+    -- mesmo depois de ter sido avisado que isso duplica o escopo do módulo
+    -- Financeiro (ERP IRES) - decisão consciente, registrada em conversa.
+    -- Justamente por isso este bloco NÃO importa nada de
+    -- server/modules/financeiro/: schema, repo e rotas são 100% próprios,
+    -- sem FK nem código compartilhado com o outro módulo (a regra que
+    -- continua valendo é só essa: os dois produtos não se acoplam no código).
+    -- Lançamento aqui é direto e já realizado (sem estado provisionado/baixa
+    -- como o módulo Financeiro) - o pedido descreveu botões "+ Receita/+
+    -- Despesa/+ Transferência" que lançam na hora, não um título em aberto.
+    CREATE TABLE IF NOT EXISTS sc_fin_contas (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      banco TEXT NOT NULL DEFAULT '',
+      saldo_inicial_cents INTEGER NOT NULL DEFAULT 0,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS sc_fin_categorias (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      -- 'receita' | 'despesa'
+      tipo TEXT NOT NULL,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS sc_fin_centros_custo (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+
+    -- Um lançamento por linha, inclusive transferência (conta_destino_id
+    -- preenchido só nesse caso - sai de conta_id, entra em conta_destino_id,
+    -- não mexe em receita/despesa). convenio_id e procedure_id são opcionais
+    -- e só fazem sentido em receita - alimentam os dois donuts do Resumo
+    -- (Receita × Convênio, Receita × Procedimento). Ambos referenciam tabelas
+    -- que já são deste módulo (insurance_plans/procedures, de Serviços &
+    -- Procedimentos) - não é acoplamento com o Financeiro, é o próprio
+    -- domínio clínico.
+    CREATE TABLE IF NOT EXISTS sc_fin_lancamentos (
+      id TEXT PRIMARY KEY,
+      -- 'receita' | 'despesa' | 'transferencia'
+      tipo TEXT NOT NULL,
+      descricao TEXT NOT NULL DEFAULT '',
+      valor_cents INTEGER NOT NULL,
+      -- Data civil YYYY-MM-DD, mesma regra do resto do módulo.
+      data TEXT NOT NULL,
+      conta_id TEXT NOT NULL REFERENCES sc_fin_contas(id),
+      conta_destino_id TEXT REFERENCES sc_fin_contas(id),
+      categoria_id TEXT REFERENCES sc_fin_categorias(id),
+      centro_custo_id TEXT REFERENCES sc_fin_centros_custo(id),
+      convenio_id TEXT REFERENCES insurance_plans(id),
+      procedure_id TEXT REFERENCES procedures(id),
+      created_at TEXT NOT NULL,
+      created_by TEXT REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_sc_fin_lanc_data ON sc_fin_lancamentos(data);
+    CREATE INDEX IF NOT EXISTS idx_sc_fin_lanc_conta ON sc_fin_lancamentos(conta_id);
+
     -- Lista de espera. name/phone ficam gravados na própria linha (não só via
     -- patient_id): quem entra na espera muitas vezes ainda não é um paciente
     -- cadastrado - o cadastro rápido do modal grava aqui direto, e um Patient

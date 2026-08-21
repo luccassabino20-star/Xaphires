@@ -576,6 +576,36 @@ export const scUpdateInsurancePlan = (id, dados) => request(`/saude-clinicas/ins
 export const scListPlanPrices = (planId) => request(`/saude-clinicas/insurance-plans/${planId}/prices`);
 export const scSetPlanPrice = (planId, procedureId, priceCents) =>
   request(`/saude-clinicas/insurance-plans/${planId}/prices/${procedureId}`, { method: "PUT", body: { priceCents } });
+
+// ---------- Financeiro (Saúde & Clínicas) ----------
+export const scFinListContas = () => request("/saude-clinicas/financeiro/contas");
+export const scFinListAllContas = () => request("/saude-clinicas/financeiro/contas/all");
+export const scFinCreateConta = (dados) => request("/saude-clinicas/financeiro/contas", { method: "POST", body: dados });
+export const scFinUpdateConta = (id, dados) => request(`/saude-clinicas/financeiro/contas/${id}`, { method: "PATCH", body: dados });
+
+export const scFinListCategorias = (tipo) => request(`/saude-clinicas/financeiro/categorias${tipo ? `?tipo=${tipo}` : ""}`);
+export const scFinListAllCategorias = () => request("/saude-clinicas/financeiro/categorias/all");
+export const scFinCreateCategoria = (dados) => request("/saude-clinicas/financeiro/categorias", { method: "POST", body: dados });
+export const scFinUpdateCategoria = (id, dados) => request(`/saude-clinicas/financeiro/categorias/${id}`, { method: "PATCH", body: dados });
+
+export const scFinListCentrosCusto = () => request("/saude-clinicas/financeiro/centros-custo");
+export const scFinListAllCentrosCusto = () => request("/saude-clinicas/financeiro/centros-custo/all");
+export const scFinCreateCentroCusto = (dados) => request("/saude-clinicas/financeiro/centros-custo", { method: "POST", body: dados });
+export const scFinUpdateCentroCusto = (id, dados) => request(`/saude-clinicas/financeiro/centros-custo/${id}`, { method: "PATCH", body: dados });
+
+export const scFinListLancamentos = ({ tipo, contaId, de, ate } = {}) => {
+  const p = new URLSearchParams();
+  if (tipo) p.set("tipo", tipo);
+  if (contaId) p.set("contaId", contaId);
+  if (de) p.set("de", de);
+  if (ate) p.set("ate", ate);
+  return request(`/saude-clinicas/financeiro/lancamentos?${p}`);
+};
+export const scFinCreateLancamento = (dados) => request("/saude-clinicas/financeiro/lancamentos", { method: "POST", body: dados });
+export const scFinUpdateLancamento = (id, dados) => request(`/saude-clinicas/financeiro/lancamentos/${id}`, { method: "PATCH", body: dados });
+export const scFinDeleteLancamento = (id) => request(`/saude-clinicas/financeiro/lancamentos/${id}`, { method: "DELETE" });
+
+export const scFinGetResumo = (de, ate) => request(`/saude-clinicas/financeiro/resumo?de=${de}&ate=${ate}`);
 export const scListAppointments = (from, to) => request(`/saude-clinicas/appointments?from=${from}&to=${to}`);
 export const scListPatientAppointments = (patientId) => request(`/saude-clinicas/patients/${patientId}/appointments`);
 export const scListAppointmentLogs = (appointmentId) => request(`/saude-clinicas/appointments/${appointmentId}/logs`);

@@ -205,7 +205,13 @@
       "config": "Profil & Paramètres",
       "agendaSemanal": "Agenda Hebdomadaire", "agendaDiaria": "Agenda Journalier",
       "bloqueioAgenda": "Blocage d'Agenda", "matrizDisponibilidade": "Matrice de Disponibilité", "relatorios": "Rapports",
-      "catalogoServicos": "Catalogue de Services", "desempenhoServicos": "Performance des Services", "tabelasConvenios": "Grilles Tarifaires des Mutuelles"
+      "catalogoServicos": "Catalogue de Services", "desempenhoServicos": "Performance des Services", "tabelasConvenios": "Grilles Tarifaires des Mutuelles",
+      "financeiroGrupo": { "painel": "Tableau de bord", "transacoes": "Transactions", "relatorios-financeiro": "Rapports", "configuracoes-financeiro": "Paramètres" },
+      "resumo": "Résumé", "fluxoCaixaFin": "Trésorerie",
+      "extratoFin": "Relevé", "receitasFin": "Recettes", "despesasFin": "Dépenses",
+      "analiseDespesasFin": "Analyse des dépenses", "analiseReceitasFin": "Analyse des recettes",
+      "categoriasFinanceirasFin": "Catégories financières", "contasBancariasFin": "Comptes bancaires",
+      "centrosDeCustoFin": "Centres de coûts", "outrasConfiguracoesFin": "Autres paramètres"
     },
     "dashboard": {
       "preset": { "hoje": "Aujourd'hui", "7dias": "7 jours", "30dias": "30 jours", "mes": "Ce mois" },
@@ -273,6 +279,32 @@
         "tabelaPrecos": "Grille tarifaire - {{nome}}",
         "servico": "Service", "precoParticular": "Prix particulier", "precoConvenio": "Prix mutuelle",
         "naoDefinido": "Non défini", "precoSalvo": "Prix enregistré.", "fechar": "Fermer"
+      }
+    },
+    "financeiro": {
+      "receita": "Recette", "despesa": "Dépense", "transferencia": "Virement", "tipo": "Type",
+      "total": "Total", "semLancamentos": "Aucune écriture pour le moment.", "semCategoria": "Sans catégorie",
+      "resumo": {
+        "transacoes": "Transactions", "saldoGeral": "Solde Général",
+        "receitaConvenio": "Recettes x Mutuelle", "receitaProcedimento": "Recettes x Acte",
+        "balanco": "Balance", "saldo": "Solde"
+      },
+      "fluxo": { "mes": "Mois", "acumulado": "Cumulé" },
+      "lanc": {
+        "titulo": { "receita": "Nouvelle recette", "despesa": "Nouvelle dépense", "transferencia": "Nouveau virement" },
+        "descricao": "Description", "valor": "Montant", "data": "Date", "conta": "Compte",
+        "contaOrigem": "Compte d'origine", "contaDestino": "Compte de destination", "semConta": "Sélectionnez le compte",
+        "semCategoria": "Sans catégorie", "semCentro": "Sans centre de coûts", "particular": "Particulier",
+        "semProcedimento": "Sans acte", "valorInvalido": "Indiquez un montant valide.",
+        "contaObrigatoria": "Sélectionnez le compte.", "destinoInvalido": "Sélectionnez un compte de destination différent de l'origine.",
+        "criado": "Écriture enregistrée.", "excluido": "Écriture supprimée.", "salvar": "Enregistrer"
+      },
+      "config": {
+        "aba": { "categorias": "Catégories", "contas": "Comptes", "centros": "Centres de coûts", "outras": "Autres" },
+        "nome": "Nom", "nomePlaceholder": "Nom", "nomeObrigatorio": "Indiquez le nom.",
+        "banco": "Banque", "saldoInicial": "Solde initial", "semItens": "Aucun élément enregistré pour le moment.",
+        "semOutras": "Aucun autre paramètre pour le moment.",
+        "semContasCadastradas": "Créez un compte dans Finance > Paramètres > Comptes bancaires."
       }
     },
     "config": {

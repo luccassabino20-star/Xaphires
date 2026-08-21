@@ -223,11 +223,17 @@
     "sidebar": {
       "expandir": "Expand menu", "recolher": "Collapse menu", "especialidade": "Specialty",
       "dashboard": "Dashboard", "agenda": "Schedule & Appointments", "pacientes": "Patients",
-      "servicos": "Services & Procedures", "usuarios": "Users & Team",
+      "servicos": "Services & Procedures", "financeiro": "Finance", "usuarios": "Users & Team",
       "config": "Profile & Settings",
       "agendaSemanal": "Weekly Schedule", "agendaDiaria": "Daily Schedule",
       "bloqueioAgenda": "Schedule Block", "matrizDisponibilidade": "Availability Matrix", "relatorios": "Reports",
-      "catalogoServicos": "Service Catalog", "desempenhoServicos": "Service Performance", "tabelasConvenios": "Insurance Price Tables"
+      "catalogoServicos": "Service Catalog", "desempenhoServicos": "Service Performance", "tabelasConvenios": "Insurance Price Tables",
+      "financeiroGrupo": { "painel": "Overview", "transacoes": "Transactions", "relatorios-financeiro": "Reports", "configuracoes-financeiro": "Settings" },
+      "resumo": "Summary", "fluxoCaixaFin": "Cash flow",
+      "extratoFin": "Statement", "receitasFin": "Revenue", "despesasFin": "Expenses",
+      "analiseDespesasFin": "Expense analysis", "analiseReceitasFin": "Revenue analysis",
+      "categoriasFinanceirasFin": "Financial categories", "contasBancariasFin": "Bank accounts",
+      "centrosDeCustoFin": "Cost centers", "outrasConfiguracoesFin": "Other settings"
     },
     "dashboard": {
       "preset": { "hoje": "Today", "7dias": "7 days", "30dias": "30 days", "mes": "This month" },
@@ -295,6 +301,32 @@
         "tabelaPrecos": "Price table - {{nome}}",
         "servico": "Service", "precoParticular": "Regular price", "precoConvenio": "Insurance price",
         "naoDefinido": "Not set", "precoSalvo": "Price saved.", "fechar": "Close"
+      }
+    },
+    "financeiro": {
+      "receita": "Revenue", "despesa": "Expense", "transferencia": "Transfer", "tipo": "Type",
+      "total": "Total", "semLancamentos": "No entries yet.", "semCategoria": "No category",
+      "resumo": {
+        "transacoes": "Transactions", "saldoGeral": "Overall Balance",
+        "receitaConvenio": "Revenue x Insurance", "receitaProcedimento": "Revenue x Procedure",
+        "balanco": "Balance", "saldo": "Balance"
+      },
+      "fluxo": { "mes": "Month", "acumulado": "Cumulative" },
+      "lanc": {
+        "titulo": { "receita": "New revenue", "despesa": "New expense", "transferencia": "New transfer" },
+        "descricao": "Description", "valor": "Amount", "data": "Date", "conta": "Account",
+        "contaOrigem": "Source account", "contaDestino": "Destination account", "semConta": "Select the account",
+        "semCategoria": "No category", "semCentro": "No cost center", "particular": "Private",
+        "semProcedimento": "No procedure", "valorInvalido": "Enter a valid amount.",
+        "contaObrigatoria": "Select the account.", "destinoInvalido": "Select a destination account different from the source.",
+        "criado": "Entry recorded.", "excluido": "Entry deleted.", "salvar": "Save"
+      },
+      "config": {
+        "aba": { "categorias": "Categories", "contas": "Accounts", "centros": "Cost centers", "outras": "Other" },
+        "nome": "Name", "nomePlaceholder": "Name", "nomeObrigatorio": "Enter the name.",
+        "banco": "Bank", "saldoInicial": "Starting balance", "semItens": "No items registered yet.",
+        "semOutras": "No additional settings here yet.",
+        "semContasCadastradas": "Register an account in Finance > Settings > Bank accounts."
       }
     },
     "config": {

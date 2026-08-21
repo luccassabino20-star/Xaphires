@@ -56,6 +56,23 @@ import {
   converterEsperaEmAgendamento,
   listComissoes,
   definirComissao,
+  listFinContas,
+  listAllFinContas,
+  insertFinConta,
+  updateFinConta,
+  listFinCategorias,
+  listAllFinCategorias,
+  insertFinCategoria,
+  updateFinCategoria,
+  listFinCentrosCusto,
+  listAllFinCentrosCusto,
+  insertFinCentroCusto,
+  updateFinCentroCusto,
+  listFinLancamentos,
+  insertFinLancamento,
+  updateFinLancamento,
+  deleteFinLancamento,
+  montarResumoFinanceiro,
 } from "./repo.js";
 import { seedAnamneseTemplatesSeVazio, seedProceduresSeVazio } from "./seed.js";
 import { montarDashboard } from "./dashboard.js";
@@ -792,6 +809,126 @@ router.post(
     const criado = converterEsperaEmAgendamento(req.params.id, req.body, req.user.id);
     if (!criado) return res.status(404).json({ error: "Item da lista de espera não encontrado ou já resolvido", code: "WAITLIST_NOT_FOUND" });
     res.status(201).json(criado);
+  })
+);
+
+// ---------- Financeiro (Saúde & Clínicas) ----------
+// Ver o comentário grande em schema.js: painel próprio do módulo, sem
+// nenhuma dependência de server/modules/financeiro/.
+
+router.get("/financeiro/contas", ah(async (req, res) => res.json(listFinContas())));
+router.get("/financeiro/contas/all", requireMaster, ah(async (req, res) => res.json(listAllFinContas())));
+router.post(
+  "/financeiro/contas",
+  requireMaster,
+  ah(async (req, res) => {
+    const { nome, banco, saldoInicialCents } = req.body || {};
+    if (!(nome || "").trim()) return res.status(400).json({ error: "Informe o nome da conta", code: "SC_FIN_CONTA_NOME_REQUIRED" });
+    res.status(201).json(insertFinConta({ nome: nome.trim(), banco, saldoInicialCents: Number(saldoInicialCents) || 0 }));
+  })
+);
+router.patch(
+  "/financeiro/contas/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    const atualizado = updateFinConta(req.params.id, req.body || {});
+    if (!atualizado) return res.status(404).json({ error: "Conta não encontrada", code: "SC_FIN_CONTA_NOT_FOUND" });
+    res.json(atualizado);
+  })
+);
+
+router.get("/financeiro/categorias", ah(async (req, res) => res.json(listFinCategorias(req.query.tipo))));
+router.get("/financeiro/categorias/all", requireMaster, ah(async (req, res) => res.json(listAllFinCategorias())));
+router.post(
+  "/financeiro/categorias",
+  requireMaster,
+  ah(async (req, res) => {
+    const { nome, tipo } = req.body || {};
+    if (!(nome || "").trim()) return res.status(400).json({ error: "Informe o nome da categoria", code: "SC_FIN_CATEGORIA_NOME_REQUIRED" });
+    if (tipo !== "receita" && tipo !== "despesa") return res.status(400).json({ error: "Tipo inválido", code: "SC_FIN_CATEGORIA_TIPO_INVALIDO" });
+    res.status(201).json(insertFinCategoria({ nome: nome.trim(), tipo }));
+  })
+);
+router.patch(
+  "/financeiro/categorias/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    const atualizado = updateFinCategoria(req.params.id, req.body || {});
+    if (!atualizado) return res.status(404).json({ error: "Categoria não encontrada", code: "SC_FIN_CATEGORIA_NOT_FOUND" });
+    res.json(atualizado);
+  })
+);
+
+router.get("/financeiro/centros-custo", ah(async (req, res) => res.json(listFinCentrosCusto())));
+router.get("/financeiro/centros-custo/all", requireMaster, ah(async (req, res) => res.json(listAllFinCentrosCusto())));
+router.post(
+  "/financeiro/centros-custo",
+  requireMaster,
+  ah(async (req, res) => {
+    const { nome } = req.body || {};
+    if (!(nome || "").trim()) return res.status(400).json({ error: "Informe o nome do centro de custo", code: "SC_FIN_CENTRO_NOME_REQUIRED" });
+    res.status(201).json(insertFinCentroCusto({ nome: nome.trim() }));
+  })
+);
+router.patch(
+  "/financeiro/centros-custo/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    const atualizado = updateFinCentroCusto(req.params.id, req.body || {});
+    if (!atualizado) return res.status(404).json({ error: "Centro de custo não encontrado", code: "SC_FIN_CENTRO_NOT_FOUND" });
+    res.json(atualizado);
+  })
+);
+
+router.get(
+  "/financeiro/lancamentos",
+  ah(async (req, res) => {
+    const { tipo, contaId, de, ate } = req.query;
+    res.json(listFinLancamentos({ tipo: tipo || undefined, contaId: contaId || undefined, de: de || undefined, ate: ate || undefined }));
+  })
+);
+router.post(
+  "/financeiro/lancamentos",
+  ah(async (req, res) => {
+    const { tipo, valorCents, data, contaId, contaDestinoId } = req.body || {};
+    if (!["receita", "despesa", "transferencia"].includes(tipo)) {
+      return res.status(400).json({ error: "Tipo inválido", code: "SC_FIN_LANC_TIPO_INVALIDO" });
+    }
+    if (!Number.isFinite(Number(valorCents)) || Number(valorCents) <= 0) {
+      return res.status(400).json({ error: "Informe um valor válido", code: "SC_FIN_LANC_VALOR_INVALIDO" });
+    }
+    if (!DATA_CIVIL.test(data || "")) return res.status(400).json({ error: "Informe uma data válida", code: "SC_FIN_LANC_DATA_INVALIDA" });
+    if (!contaId) return res.status(400).json({ error: "Informe a conta", code: "SC_FIN_LANC_CONTA_REQUIRED" });
+    if (tipo === "transferencia" && (!contaDestinoId || contaDestinoId === contaId)) {
+      return res.status(400).json({ error: "Informe uma conta de destino diferente da origem", code: "SC_FIN_LANC_DESTINO_INVALIDO" });
+    }
+    res.status(201).json(insertFinLancamento({ ...req.body, valorCents: Math.round(Number(valorCents)) }, req.user.id));
+  })
+);
+router.patch(
+  "/financeiro/lancamentos/:id",
+  ah(async (req, res) => {
+    const atualizado = updateFinLancamento(req.params.id, req.body || {});
+    if (!atualizado) return res.status(404).json({ error: "Lançamento não encontrado", code: "SC_FIN_LANC_NOT_FOUND" });
+    res.json(atualizado);
+  })
+);
+router.delete(
+  "/financeiro/lancamentos/:id",
+  ah(async (req, res) => {
+    deleteFinLancamento(req.params.id);
+    res.status(204).end();
+  })
+);
+
+router.get(
+  "/financeiro/resumo",
+  ah(async (req, res) => {
+    const { de, ate } = req.query;
+    if (!DATA_CIVIL.test(de || "") || !DATA_CIVIL.test(ate || "")) {
+      return res.status(400).json({ error: "Informe o período (de/ate) em YYYY-MM-DD", code: "SC_FIN_PERIODO_INVALIDO" });
+    }
+    res.json(montarResumoFinanceiro({ de, ate }));
   })
 );
 

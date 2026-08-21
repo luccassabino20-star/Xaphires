@@ -704,3 +704,236 @@ export function definirComissao(userId, commissionPct) {
   }
   return listComissoes().find((c) => c.user_id === userId);
 }
+
+// ---------- Financeiro (Saúde & Clínicas) ----------
+// Painel financeiro próprio do módulo - ver o comentário grande em schema.js
+// sobre por que este bloco não importa nada de server/modules/financeiro/.
+
+export function listFinContas() {
+  return getDb().prepare("SELECT * FROM sc_fin_contas WHERE ativo = 1 ORDER BY nome COLLATE NOCASE").all();
+}
+export function listAllFinContas() {
+  return getDb().prepare("SELECT * FROM sc_fin_contas ORDER BY ativo DESC, nome COLLATE NOCASE").all();
+}
+export function getFinConta(id) {
+  return getDb().prepare("SELECT * FROM sc_fin_contas WHERE id = ?").get(id);
+}
+export function insertFinConta({ nome, banco, saldoInicialCents }) {
+  const id = uid();
+  getDb()
+    .prepare("INSERT INTO sc_fin_contas (id, nome, banco, saldo_inicial_cents, ativo, created_at) VALUES (?, ?, ?, ?, 1, ?)")
+    .run(id, nome, banco || "", saldoInicialCents || 0, nowIso());
+  return getFinConta(id);
+}
+export function updateFinConta(id, { nome, banco, saldoInicialCents, ativo }) {
+  const atual = getFinConta(id);
+  if (!atual) return null;
+  getDb()
+    .prepare("UPDATE sc_fin_contas SET nome = ?, banco = ?, saldo_inicial_cents = ?, ativo = ? WHERE id = ?")
+    .run(
+      nome !== undefined ? nome : atual.nome,
+      banco !== undefined ? banco : atual.banco,
+      saldoInicialCents !== undefined ? saldoInicialCents : atual.saldo_inicial_cents,
+      ativo !== undefined ? (ativo ? 1 : 0) : atual.ativo,
+      id
+    );
+  return getFinConta(id);
+}
+
+export function listFinCategorias(tipo) {
+  const db = getDb();
+  return tipo
+    ? db.prepare("SELECT * FROM sc_fin_categorias WHERE ativo = 1 AND tipo = ? ORDER BY nome COLLATE NOCASE").all(tipo)
+    : db.prepare("SELECT * FROM sc_fin_categorias WHERE ativo = 1 ORDER BY nome COLLATE NOCASE").all();
+}
+export function listAllFinCategorias() {
+  return getDb().prepare("SELECT * FROM sc_fin_categorias ORDER BY ativo DESC, tipo, nome COLLATE NOCASE").all();
+}
+export function getFinCategoria(id) {
+  return getDb().prepare("SELECT * FROM sc_fin_categorias WHERE id = ?").get(id);
+}
+export function insertFinCategoria({ nome, tipo }) {
+  const id = uid();
+  getDb().prepare("INSERT INTO sc_fin_categorias (id, nome, tipo, ativo, created_at) VALUES (?, ?, ?, 1, ?)").run(id, nome, tipo, nowIso());
+  return getFinCategoria(id);
+}
+export function updateFinCategoria(id, { nome, tipo, ativo }) {
+  const atual = getFinCategoria(id);
+  if (!atual) return null;
+  getDb()
+    .prepare("UPDATE sc_fin_categorias SET nome = ?, tipo = ?, ativo = ? WHERE id = ?")
+    .run(nome !== undefined ? nome : atual.nome, tipo !== undefined ? tipo : atual.tipo, ativo !== undefined ? (ativo ? 1 : 0) : atual.ativo, id);
+  return getFinCategoria(id);
+}
+
+export function listFinCentrosCusto() {
+  return getDb().prepare("SELECT * FROM sc_fin_centros_custo WHERE ativo = 1 ORDER BY nome COLLATE NOCASE").all();
+}
+export function listAllFinCentrosCusto() {
+  return getDb().prepare("SELECT * FROM sc_fin_centros_custo ORDER BY ativo DESC, nome COLLATE NOCASE").all();
+}
+export function getFinCentroCusto(id) {
+  return getDb().prepare("SELECT * FROM sc_fin_centros_custo WHERE id = ?").get(id);
+}
+export function insertFinCentroCusto({ nome }) {
+  const id = uid();
+  getDb().prepare("INSERT INTO sc_fin_centros_custo (id, nome, ativo, created_at) VALUES (?, ?, 1, ?)").run(id, nome, nowIso());
+  return getFinCentroCusto(id);
+}
+export function updateFinCentroCusto(id, { nome, ativo }) {
+  const atual = getFinCentroCusto(id);
+  if (!atual) return null;
+  getDb()
+    .prepare("UPDATE sc_fin_centros_custo SET nome = ?, ativo = ? WHERE id = ?")
+    .run(nome !== undefined ? nome : atual.nome, ativo !== undefined ? (ativo ? 1 : 0) : atual.ativo, id);
+  return getFinCentroCusto(id);
+}
+
+// Lançamento com os nomes já resolvidos (join), pra tela não precisar de mais
+// nenhuma chamada pra desenhar a lista/extrato.
+function linhaLancamentoFin(l) {
+  return {
+    id: l.id, tipo: l.tipo, descricao: l.descricao, valor_cents: l.valor_cents, data: l.data,
+    conta_id: l.conta_id, conta_nome: l.conta_nome,
+    conta_destino_id: l.conta_destino_id, conta_destino_nome: l.conta_destino_nome,
+    categoria_id: l.categoria_id, categoria_nome: l.categoria_nome,
+    centro_custo_id: l.centro_custo_id, centro_custo_nome: l.centro_custo_nome,
+    convenio_id: l.convenio_id, convenio_nome: l.convenio_nome,
+    procedure_id: l.procedure_id, procedure_nome: l.procedure_nome,
+  };
+}
+
+const SELECT_LANCAMENTOS_FIN = `
+  SELECT l.*, c.nome AS conta_nome, cd.nome AS conta_destino_nome, cat.nome AS categoria_nome,
+         cc.nome AS centro_custo_nome, ip.name AS convenio_nome, p.name AS procedure_nome
+    FROM sc_fin_lancamentos l
+    LEFT JOIN sc_fin_contas c ON c.id = l.conta_id
+    LEFT JOIN sc_fin_contas cd ON cd.id = l.conta_destino_id
+    LEFT JOIN sc_fin_categorias cat ON cat.id = l.categoria_id
+    LEFT JOIN sc_fin_centros_custo cc ON cc.id = l.centro_custo_id
+    LEFT JOIN insurance_plans ip ON ip.id = l.convenio_id
+    LEFT JOIN procedures p ON p.id = l.procedure_id
+`;
+
+export function listFinLancamentos({ tipo, contaId, de, ate } = {}) {
+  const cond = [];
+  const params = [];
+  if (tipo) { cond.push("l.tipo = ?"); params.push(tipo); }
+  if (contaId) { cond.push("(l.conta_id = ? OR l.conta_destino_id = ?)"); params.push(contaId, contaId); }
+  if (de) { cond.push("l.data >= ?"); params.push(de); }
+  if (ate) { cond.push("l.data <= ?"); params.push(ate); }
+  const where = cond.length ? `WHERE ${cond.join(" AND ")}` : "";
+  return getDb()
+    .prepare(`${SELECT_LANCAMENTOS_FIN} ${where} ORDER BY l.data DESC, l.created_at DESC`)
+    .all(...params)
+    .map(linhaLancamentoFin);
+}
+export function getFinLancamento(id) {
+  const row = getDb().prepare(`${SELECT_LANCAMENTOS_FIN} WHERE l.id = ?`).get(id);
+  return row ? linhaLancamentoFin(row) : null;
+}
+export function insertFinLancamento(dados, userId) {
+  const id = uid();
+  getDb()
+    .prepare(
+      `INSERT INTO sc_fin_lancamentos
+         (id, tipo, descricao, valor_cents, data, conta_id, conta_destino_id, categoria_id, centro_custo_id, convenio_id, procedure_id, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .run(
+      id, dados.tipo, dados.descricao || "", dados.valorCents, dados.data,
+      dados.contaId, dados.contaDestinoId || null, dados.categoriaId || null, dados.centroCustoId || null,
+      dados.convenioId || null, dados.procedureId || null, nowIso(), userId || null
+    );
+  return getFinLancamento(id);
+}
+export function updateFinLancamento(id, dados) {
+  const atual = getDb().prepare("SELECT * FROM sc_fin_lancamentos WHERE id = ?").get(id);
+  if (!atual) return null;
+  getDb()
+    .prepare(
+      `UPDATE sc_fin_lancamentos SET
+         tipo = ?, descricao = ?, valor_cents = ?, data = ?, conta_id = ?, conta_destino_id = ?,
+         categoria_id = ?, centro_custo_id = ?, convenio_id = ?, procedure_id = ?
+       WHERE id = ?`
+    )
+    .run(
+      dados.tipo !== undefined ? dados.tipo : atual.tipo,
+      dados.descricao !== undefined ? dados.descricao : atual.descricao,
+      dados.valorCents !== undefined ? dados.valorCents : atual.valor_cents,
+      dados.data !== undefined ? dados.data : atual.data,
+      dados.contaId !== undefined ? dados.contaId : atual.conta_id,
+      dados.contaDestinoId !== undefined ? dados.contaDestinoId : atual.conta_destino_id,
+      dados.categoriaId !== undefined ? dados.categoriaId : atual.categoria_id,
+      dados.centroCustoId !== undefined ? dados.centroCustoId : atual.centro_custo_id,
+      dados.convenioId !== undefined ? dados.convenioId : atual.convenio_id,
+      dados.procedureId !== undefined ? dados.procedureId : atual.procedure_id,
+      id
+    );
+  return getFinLancamento(id);
+}
+export function deleteFinLancamento(id) {
+  getDb().prepare("DELETE FROM sc_fin_lancamentos WHERE id = ?").run(id);
+}
+
+// Saldo geral é sempre o total ATUAL (independe do filtro de período do
+// Resumo) - soma o saldo inicial de cada conta ativa com todo o movimento já
+// lançado nela (receita soma, despesa subtrai; transferência sai de uma
+// conta e entra noutra, então soma zero no total geral, só muda a
+// distribuição entre contas).
+export function calcularSaldoGeralFin() {
+  const db = getDb();
+  const saldoInicial = db.prepare("SELECT COALESCE(SUM(saldo_inicial_cents), 0) AS s FROM sc_fin_contas WHERE ativo = 1").get().s;
+  const receitas = db.prepare("SELECT COALESCE(SUM(valor_cents), 0) AS s FROM sc_fin_lancamentos WHERE tipo = 'receita'").get().s;
+  const despesas = db.prepare("SELECT COALESCE(SUM(valor_cents), 0) AS s FROM sc_fin_lancamentos WHERE tipo = 'despesa'").get().s;
+  return saldoInicial + receitas - despesas;
+}
+
+// Resumo do painel (tela Resumo): saldo geral (sempre atual) + três recortes
+// do período escolhido - receita por convênio, receita por procedimento e
+// balanço mensal (receita x despesa, sem transferência, que é neutra).
+export function montarResumoFinanceiro({ de, ate }) {
+  const db = getDb();
+  const receitas = db
+    .prepare(
+      `SELECT l.valor_cents, l.convenio_id, ip.name AS convenio_nome, l.procedure_id, p.name AS procedure_nome
+         FROM sc_fin_lancamentos l
+         LEFT JOIN insurance_plans ip ON ip.id = l.convenio_id
+         LEFT JOIN procedures p ON p.id = l.procedure_id
+        WHERE l.tipo = 'receita' AND l.data BETWEEN ? AND ?`
+    )
+    .all(de, ate);
+
+  const porConvenio = new Map();
+  const porProcedimento = new Map();
+  for (const r of receitas) {
+    const chaveConv = r.convenio_nome || "Particular";
+    porConvenio.set(chaveConv, (porConvenio.get(chaveConv) || 0) + r.valor_cents);
+    const chaveProc = r.procedure_nome || "Outras receitas";
+    porProcedimento.set(chaveProc, (porProcedimento.get(chaveProc) || 0) + r.valor_cents);
+  }
+
+  const linhas = db
+    .prepare(
+      `SELECT substr(data, 1, 7) AS mes, tipo, SUM(valor_cents) AS total
+         FROM sc_fin_lancamentos
+        WHERE tipo IN ('receita', 'despesa') AND data BETWEEN ? AND ?
+        GROUP BY mes, tipo
+        ORDER BY mes`
+    )
+    .all(de, ate);
+  const balancoPorMes = new Map();
+  for (const l of linhas) {
+    const atual = balancoPorMes.get(l.mes) || { mes: l.mes, receitas: 0, despesas: 0 };
+    if (l.tipo === "receita") atual.receitas = l.total;
+    else atual.despesas = l.total;
+    balancoPorMes.set(l.mes, atual);
+  }
+
+  return {
+    saldoGeral: calcularSaldoGeralFin(),
+    receitasPorConvenio: [...porConvenio.entries()].map(([nome, total]) => ({ nome, total })).sort((a, b) => b.total - a.total),
+    receitasPorProcedimento: [...porProcedimento.entries()].map(([nome, total]) => ({ nome, total })).sort((a, b) => b.total - a.total),
+    balancoMensal: [...balancoPorMes.values()],
+  };
+}

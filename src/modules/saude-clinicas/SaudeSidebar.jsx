@@ -36,9 +36,47 @@ const ITENS = [
       { id: "servicos-convenios", labelKey: "tabelasConvenios" },
     ],
   },
+  // "Financeiro" tem dois níveis de submenu (categoria > item), diferente de
+  // agenda/serviços (um nível só) - por isso usa `categorias` em vez de
+  // `children`. Painel financeiro próprio do módulo (não é o módulo
+  // Financeiro/ERP IRES por trás) - decisão explícita do usuário, registrada
+  // em conversa, mesmo depois de avisado que isso duplica escopo.
+  {
+    id: "financeiro", icon: "financeiro", real: true, sectionPrefix: "financeiro-",
+    categorias: [
+      { id: "painel", itens: [
+        { id: "financeiro-resumo", labelKey: "resumo" },
+        { id: "financeiro-fluxo-caixa", labelKey: "fluxoCaixaFin" },
+      ]},
+      { id: "transacoes", itens: [
+        { id: "financeiro-extrato", labelKey: "extratoFin" },
+        { id: "financeiro-receitas", labelKey: "receitasFin" },
+        { id: "financeiro-despesas", labelKey: "despesasFin" },
+      ]},
+      { id: "relatorios-financeiro", itens: [
+        { id: "financeiro-analise-despesas", labelKey: "analiseDespesasFin" },
+        { id: "financeiro-analise-receitas", labelKey: "analiseReceitasFin" },
+      ]},
+      { id: "configuracoes-financeiro", itens: [
+        { id: "financeiro-categorias", labelKey: "categoriasFinanceirasFin" },
+        { id: "financeiro-contas", labelKey: "contasBancariasFin" },
+        { id: "financeiro-centros-custo", labelKey: "centrosDeCustoFin" },
+        { id: "financeiro-outras-config", labelKey: "outrasConfiguracoesFin" },
+      ]},
+    ],
+  },
   { id: "usuarios", icon: "usuarios", real: true, modal: true },
   { id: "config", icon: "config", real: true },
 ];
+
+// Itens de um item de menu, seja o formato de um nível (`children`) ou de
+// dois níveis (`categorias`, achatado) - usado pra achar a seção ativa e pro
+// clique-quando-colapsada (que sempre navega pro primeiro item de verdade).
+function itensDoGrupo(item) {
+  if (item.children) return item.children;
+  if (item.categorias) return item.categorias.flatMap((c) => c.itens);
+  return [];
+}
 
 // Menu lateral de administração da clínica: fixo à esquerda, colapsável para
 // só ícones. O seletor de especialidade mora no topo dela (some quando
@@ -51,15 +89,15 @@ export default function SaudeSidebar({ collapsed, onToggleCollapsed, activeSecti
   // sem isso a pessoa abriria a Agenda e veria o próprio item ativo escondido
   // dentro de um grupo fechado.
   const [grupoAberto, setGrupoAberto] = useState(() =>
-    ITENS.filter((it) => it.children).map((it) => it.id).filter((id) =>
-      ITENS.find((it) => it.id === id).children.some((c) => c.id === activeSection)
+    ITENS.filter((it) => it.children || it.categorias).map((it) => it.id).filter((id) =>
+      itensDoGrupo(ITENS.find((it) => it.id === id)).some((c) => c.id === activeSection)
     )
   );
 
   function clicarItem(item) {
     if (!item.real) return;
     if (item.modal) return onAbrirEquipe();
-    if (item.children) {
+    if (item.children || item.categorias) {
       setGrupoAberto((atual) => (atual.includes(item.id) ? atual.filter((id) => id !== item.id) : [...atual, item.id]));
       return;
     }
@@ -91,7 +129,8 @@ export default function SaudeSidebar({ collapsed, onToggleCollapsed, activeSecti
 
       <nav className="sc-sidebar-nav">
         {ITENS.map((item) => {
-          const ehGrupoAtivo = item.children?.some((c) => c.id === activeSection);
+          const temSubmenu = Boolean(item.children || item.categorias);
+          const ehGrupoAtivo = itensDoGrupo(item).some((c) => c.id === activeSection);
           const aberto = grupoAberto.includes(item.id);
           return (
             <div key={item.id} className="sc-sidebar-group">
@@ -102,7 +141,7 @@ export default function SaudeSidebar({ collapsed, onToggleCollapsed, activeSecti
                   // Colapsada não tem espaço pro submenu - clique no grupo já
                   // navega direto pra primeira sub-seção, em vez de só abrir
                   // um leque que ninguém vai ver com a sidebar estreita.
-                  if (item.children && collapsed) return onSelectSection(item.children[0].id);
+                  if (temSubmenu && collapsed) return onSelectSection(itensDoGrupo(item)[0].id);
                   clicarItem(item);
                 }}
                 disabled={!item.real}
@@ -113,7 +152,7 @@ export default function SaudeSidebar({ collapsed, onToggleCollapsed, activeSecti
                 </span>
                 {!collapsed && <span className="sc-sidebar-item-label">{t(`saudeClinicas.sidebar.${item.id}`)}</span>}
                 {!collapsed && !item.real && <span className="sc-sidebar-item-badge">{t("modules.comingSoon")}</span>}
-                {!collapsed && item.children && (
+                {!collapsed && temSubmenu && (
                   <svg className={"sc-sidebar-group-chevron" + (aberto ? " sc-sidebar-group-chevron-aberto" : "")} viewBox="0 0 24 24" width="13" height="13">
                     <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
                   </svg>
@@ -130,6 +169,25 @@ export default function SaudeSidebar({ collapsed, onToggleCollapsed, activeSecti
                     >
                       {t(`saudeClinicas.sidebar.${sub.labelKey}`)}
                     </button>
+                  ))}
+                </div>
+              )}
+              {!collapsed && item.categorias && aberto && (
+                <div className="sc-sidebar-subnav sc-sidebar-subnav-categorias">
+                  {item.categorias.map((cat) => (
+                    <div key={cat.id} className="sc-sidebar-categoria">
+                      <div className="sc-sidebar-categoria-titulo">{t(`saudeClinicas.sidebar.financeiroGrupo.${cat.id}`)}</div>
+                      {cat.itens.map((sub) => (
+                        <button
+                          key={sub.id}
+                          type="button"
+                          className={"sc-sidebar-subitem" + (activeSection === sub.id ? " active" : "")}
+                          onClick={() => onSelectSection(sub.id)}
+                        >
+                          {t(`saudeClinicas.sidebar.${sub.labelKey}`)}
+                        </button>
+                      ))}
+                    </div>
                   ))}
                 </div>
               )}

@@ -7461,6 +7461,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .sc-sidebar-subitem:hover { background: var(--bg-list); color: var(--text-primary); }
 .sc-sidebar-subitem.active { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600; }
 
+/* Submenu de dois níveis (só "Financeiro" usa hoje): categoria > itens, em
+   vez da lista achatada de children. Categoria é só um rótulo, não clicável -
+   quem navega são os itens dela, com o mesmo .sc-sidebar-subitem de sempre. */
+.sc-sidebar-subnav-categorias { gap: 10px; }
+.sc-sidebar-categoria { display: flex; flex-direction: column; gap: 1px; }
+.sc-sidebar-categoria-titulo { padding: 4px 10px 2px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+
 /* Aviso de recurso ainda não construído dentro de uma seção real (ex.:
    Dashboard, que já tem KPIs de verdade mas não os de agenda/financeiro). */
 .sc-placeholder-pane { padding: 16px 18px; background: var(--bg-list); border: 1px dashed var(--border-strong); border-radius: 12px; color: var(--text-secondary); font-size: 13.5px; }
@@ -7902,6 +7909,91 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 
 .sc-convenio-modal { width: min(680px, 94vw); max-width: min(680px, 94vw); }
 .sc-convenio-modal .sc-table-wrap { max-height: 60vh; overflow-y: auto; }
+
+/* ---------- Financeiro (Saúde & Clínicas) ---------- */
+/* Par próprio (azul/vermelho, como pedido) - deliberadamente diferente de
+   --fin-entrada/--fin-saida do módulo Financeiro, pra não ter nem uma
+   variável em comum entre os dois (ver o comentário em schema.js). */
+:root { --sc-fin-receita: #2563eb; --sc-fin-despesa: #dc2626; }
+.sc-fin-receita { color: var(--sc-fin-receita); }
+.sc-fin-despesa { color: var(--sc-fin-despesa); }
+.sc-fin-receita-bg { fill: var(--sc-fin-receita); background: var(--sc-fin-receita); }
+.sc-fin-despesa-bg { fill: var(--sc-fin-despesa); background: var(--sc-fin-despesa); }
+
+.sc-fin-card { padding: 16px 18px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; }
+.sc-fin-transacoes, .sc-fin-extrato, .sc-fin-analise, .sc-fin-fluxo, .sc-fin-resumo, .sc-fin-config { display: flex; flex-direction: column; gap: 14px; }
+
+/* Config (Categorias/Contas/Centros/Outras) */
+.sc-fin-config-secao { display: flex; flex-direction: column; gap: 14px; }
+
+/* Modal de lançamento */
+.sc-fin-lanc-modal { width: min(640px, 94vw); max-width: min(640px, 94vw); }
+.sc-fin-lanc-form { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+
+/* Receitas/Despesas */
+.sc-fin-transacoes-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sc-fin-transacoes-total {
+  display: flex; justify-content: space-between; align-items: center; font-weight: 650; font-size: 15px;
+  padding: 12px 16px; border-radius: 10px; background: var(--bg-list);
+}
+.btn-primary.sc-fin-receita { background: var(--sc-fin-receita); border-color: var(--sc-fin-receita); color: #fff; }
+.btn-primary.sc-fin-despesa { background: var(--sc-fin-despesa); border-color: var(--sc-fin-despesa); color: #fff; }
+
+/* Análise de despesas/receitas */
+.sc-fin-analise-lista { display: flex; flex-direction: column; gap: 14px; list-style: none; margin: 0; padding: 0; max-width: 720px; }
+.sc-fin-analise-item-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; font-size: 13.5px; }
+.sc-fin-analise-item-topo em { font-style: normal; color: var(--text-muted); font-size: 12px; margin-left: 6px; }
+.sc-fin-analise-bar { height: 8px; border-radius: 4px; background: var(--bg-list); overflow: hidden; }
+.sc-fin-analise-bar-fill { height: 100%; border-radius: 4px; }
+
+/* Fluxo de caixa: KPIs + gráfico (compartilhado com o Balanço do Resumo) */
+.sc-fin-kpis { display: flex; gap: 14px; flex-wrap: wrap; }
+.sc-fin-kpi { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: var(--bg-list); border-radius: 12px; }
+.sc-fin-kpi span { font-size: 12px; color: var(--text-muted); }
+.sc-fin-kpi strong { font-size: 19px; }
+.sc-year { display: inline-flex; align-items: center; gap: 10px; }
+.sc-year-value { font-size: 15px; font-weight: 650; min-width: 44px; text-align: center; }
+
+.sc-fin-chart { display: flex; flex-direction: column; gap: 10px; }
+.sc-fin-chart-empty { padding: 40px 0; text-align: center; }
+.sc-fin-legend { display: flex; gap: 16px; }
+.sc-fin-legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+.sc-fin-legend-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.sc-fin-chart-svg { width: 100%; height: auto; }
+.sc-fin-grid { stroke: var(--border-subtle); stroke-width: 1; }
+.sc-fin-axis-label { font-size: 9.5px; fill: var(--text-muted); }
+.sc-fin-tip-bg { fill: var(--text-primary); opacity: 0.9; }
+.sc-fin-tip-text { font-size: 10.5px; fill: var(--bg-card); font-weight: 600; }
+
+/* Resumo: ações rápidas + saldo + donuts + balanço */
+.sc-fin-resumo-topo { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+.sc-fin-donut-titulo { margin: 0 0 12px; font-size: 13px; font-weight: 650; color: var(--text-secondary); }
+.sc-fin-acoes-rapidas { display: flex; gap: 10px; flex-wrap: wrap; }
+.sc-fin-acao-btn {
+  padding: 10px 16px; font-size: 13px; font-weight: 650; border-radius: 10px; border: none; cursor: pointer; color: #fff;
+}
+.sc-fin-acao-receita { background: var(--sc-fin-receita); }
+.sc-fin-acao-despesa { background: var(--sc-fin-despesa); }
+.sc-fin-acao-transferencia { background: var(--text-muted); }
+.sc-fin-acao-btn:hover { filter: brightness(1.08); }
+.sc-fin-saldo-card { display: flex; flex-direction: column; justify-content: center; }
+.sc-fin-saldo-valor { font-size: 26px; font-weight: 720; color: var(--text-primary); }
+
+.sc-fin-resumo-donuts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sc-fin-donut-card { padding: 16px 18px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; }
+.sc-fin-donut-body { display: flex; align-items: center; gap: 18px; }
+.sc-fin-donut-svg { flex-shrink: 0; }
+.sc-fin-donut-total { font-size: 12px; font-weight: 700; fill: var(--text-primary); }
+.sc-fin-donut-vazio { padding: 30px 0; text-align: center; }
+.sc-fin-donut-legenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.sc-fin-donut-legenda li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.sc-fin-donut-swatch { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.sc-fin-donut-nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
+.sc-fin-donut-pct { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 860px) {
+  .sc-fin-resumo-topo, .sc-fin-resumo-donuts { grid-template-columns: 1fr; }
+}
 
 /* Nota de satisfação (5 estrelas) no detalhe do agendamento */
 .sc-detail-satisfacao { display: flex; align-items: center; gap: 10px; }

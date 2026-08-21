@@ -223,11 +223,17 @@
     "sidebar": {
       "expandir": "Expandir menú", "recolher": "Contraer menú", "especialidade": "Especialidad",
       "dashboard": "Panel", "agenda": "Agenda & Citas", "pacientes": "Pacientes",
-      "servicos": "Servicios & Procedimientos", "usuarios": "Usuarios & Equipo",
+      "servicos": "Servicios & Procedimientos", "financeiro": "Finanzas", "usuarios": "Usuarios & Equipo",
       "config": "Perfil & Configuración",
       "agendaSemanal": "Agenda Semanal", "agendaDiaria": "Agenda Diaria",
       "bloqueioAgenda": "Bloqueo de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidad", "relatorios": "Informes",
-      "catalogoServicos": "Catálogo de Servicios", "desempenhoServicos": "Desempeño de Servicios", "tabelasConvenios": "Tablas de Convenios"
+      "catalogoServicos": "Catálogo de Servicios", "desempenhoServicos": "Desempeño de Servicios", "tabelasConvenios": "Tablas de Convenios",
+      "financeiroGrupo": { "painel": "Panel", "transacoes": "Transacciones", "relatorios-financeiro": "Informes", "configuracoes-financeiro": "Configuración" },
+      "resumo": "Resumen", "fluxoCaixaFin": "Flujo de caja",
+      "extratoFin": "Extracto", "receitasFin": "Ingresos", "despesasFin": "Gastos",
+      "analiseDespesasFin": "Análisis de gastos", "analiseReceitasFin": "Análisis de ingresos",
+      "categoriasFinanceirasFin": "Categorías financieras", "contasBancariasFin": "Cuentas bancarias",
+      "centrosDeCustoFin": "Centros de costo", "outrasConfiguracoesFin": "Otras configuraciones"
     },
     "dashboard": {
       "preset": { "hoje": "Hoy", "7dias": "7 días", "30dias": "30 días", "mes": "Este mes" },
@@ -295,6 +301,32 @@
         "tabelaPrecos": "Tabla de precios - {{nome}}",
         "servico": "Servicio", "precoParticular": "Precio particular", "precoConvenio": "Precio del convenio",
         "naoDefinido": "No definido", "precoSalvo": "Precio guardado.", "fechar": "Cerrar"
+      }
+    },
+    "financeiro": {
+      "receita": "Ingreso", "despesa": "Gasto", "transferencia": "Transferencia", "tipo": "Tipo",
+      "total": "Total", "semLancamentos": "Aún no hay movimientos.", "semCategoria": "Sin categoría",
+      "resumo": {
+        "transacoes": "Transacciones", "saldoGeral": "Saldo General",
+        "receitaConvenio": "Ingresos x Convenio", "receitaProcedimento": "Ingresos x Procedimiento",
+        "balanco": "Balance", "saldo": "Saldo"
+      },
+      "fluxo": { "mes": "Mes", "acumulado": "Acumulado" },
+      "lanc": {
+        "titulo": { "receita": "Nuevo ingreso", "despesa": "Nuevo gasto", "transferencia": "Nueva transferencia" },
+        "descricao": "Descripción", "valor": "Valor", "data": "Fecha", "conta": "Cuenta",
+        "contaOrigem": "Cuenta de origen", "contaDestino": "Cuenta de destino", "semConta": "Selecciona la cuenta",
+        "semCategoria": "Sin categoría", "semCentro": "Sin centro de costo", "particular": "Particular",
+        "semProcedimento": "Sin procedimiento", "valorInvalido": "Indica un valor válido.",
+        "contaObrigatoria": "Selecciona la cuenta.", "destinoInvalido": "Selecciona una cuenta de destino diferente del origen.",
+        "criado": "Movimiento registrado.", "excluido": "Movimiento eliminado.", "salvar": "Guardar"
+      },
+      "config": {
+        "aba": { "categorias": "Categorías", "contas": "Cuentas", "centros": "Centros de costo", "outras": "Otras" },
+        "nome": "Nombre", "nomePlaceholder": "Nombre", "nomeObrigatorio": "Indica el nombre.",
+        "banco": "Banco", "saldoInicial": "Saldo inicial", "semItens": "Aún no hay elementos registrados.",
+        "semOutras": "Aún no hay configuraciones adicionales aquí.",
+        "semContasCadastradas": "Registra una cuenta en Finanzas > Configuración > Cuentas bancarias."
       }
     },
     "config": {

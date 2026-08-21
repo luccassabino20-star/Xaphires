@@ -205,7 +205,13 @@
       "config": "Profil & Einstellungen",
       "agendaSemanal": "Wochenplan", "agendaDiaria": "Tagesplan",
       "bloqueioAgenda": "Terminsperre", "matrizDisponibilidade": "Verfügbarkeitsmatrix", "relatorios": "Berichte",
-      "catalogoServicos": "Leistungskatalog", "desempenhoServicos": "Leistungsübersicht", "tabelasConvenios": "Versicherungspreistabellen"
+      "catalogoServicos": "Leistungskatalog", "desempenhoServicos": "Leistungsübersicht", "tabelasConvenios": "Versicherungspreistabellen",
+      "financeiroGrupo": { "painel": "Übersicht", "transacoes": "Transaktionen", "relatorios-financeiro": "Berichte", "configuracoes-financeiro": "Einstellungen" },
+      "resumo": "Zusammenfassung", "fluxoCaixaFin": "Cashflow",
+      "extratoFin": "Kontoauszug", "receitasFin": "Einnahmen", "despesasFin": "Ausgaben",
+      "analiseDespesasFin": "Ausgabenanalyse", "analiseReceitasFin": "Einnahmenanalyse",
+      "categoriasFinanceirasFin": "Finanzkategorien", "contasBancariasFin": "Bankkonten",
+      "centrosDeCustoFin": "Kostenstellen", "outrasConfiguracoesFin": "Weitere Einstellungen"
     },
     "dashboard": {
       "preset": { "hoje": "Heute", "7dias": "7 Tage", "30dias": "30 Tage", "mes": "Dieser Monat" },
@@ -273,6 +279,32 @@
         "tabelaPrecos": "Preistabelle - {{nome}}",
         "servico": "Leistung", "precoParticular": "Regulärer Preis", "precoConvenio": "Versicherungspreis",
         "naoDefinido": "Nicht festgelegt", "precoSalvo": "Preis gespeichert.", "fechar": "Schließen"
+      }
+    },
+    "financeiro": {
+      "receita": "Einnahme", "despesa": "Ausgabe", "transferencia": "Überweisung", "tipo": "Typ",
+      "total": "Gesamt", "semLancamentos": "Noch keine Buchungen.", "semCategoria": "Keine Kategorie",
+      "resumo": {
+        "transacoes": "Transaktionen", "saldoGeral": "Gesamtsaldo",
+        "receitaConvenio": "Einnahmen x Versicherung", "receitaProcedimento": "Einnahmen x Behandlung",
+        "balanco": "Bilanz", "saldo": "Saldo"
+      },
+      "fluxo": { "mes": "Monat", "acumulado": "Kumuliert" },
+      "lanc": {
+        "titulo": { "receita": "Neue Einnahme", "despesa": "Neue Ausgabe", "transferencia": "Neue Überweisung" },
+        "descricao": "Beschreibung", "valor": "Betrag", "data": "Datum", "conta": "Konto",
+        "contaOrigem": "Herkunftskonto", "contaDestino": "Zielkonto", "semConta": "Konto auswählen",
+        "semCategoria": "Keine Kategorie", "semCentro": "Keine Kostenstelle", "particular": "Privat",
+        "semProcedimento": "Keine Behandlung", "valorInvalido": "Geben Sie einen gültigen Betrag an.",
+        "contaObrigatoria": "Wählen Sie das Konto aus.", "destinoInvalido": "Wählen Sie ein Zielkonto, das sich vom Herkunftskonto unterscheidet.",
+        "criado": "Buchung erfasst.", "excluido": "Buchung gelöscht.", "salvar": "Speichern"
+      },
+      "config": {
+        "aba": { "categorias": "Kategorien", "contas": "Konten", "centros": "Kostenstellen", "outras": "Weitere" },
+        "nome": "Name", "nomePlaceholder": "Name", "nomeObrigatorio": "Geben Sie den Namen an.",
+        "banco": "Bank", "saldoInicial": "Anfangssaldo", "semItens": "Noch keine Einträge registriert.",
+        "semOutras": "Noch keine weiteren Einstellungen hier.",
+        "semContasCadastradas": "Legen Sie ein Konto unter Finanzen > Einstellungen > Bankkonten an."
       }
     },
     "config": {

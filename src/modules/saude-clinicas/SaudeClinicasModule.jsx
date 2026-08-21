@@ -18,6 +18,12 @@ import ReportsView from "./ReportsView.jsx";
 import ServicosCatalogoView from "./ServicosCatalogoView.jsx";
 import ServicosDesempenhoView from "./ServicosDesempenhoView.jsx";
 import ServicosConveniosView from "./ServicosConveniosView.jsx";
+import FinanceiroResumoView from "./FinanceiroResumoView.jsx";
+import FinanceiroFluxoCaixaView from "./FinanceiroFluxoCaixaView.jsx";
+import FinanceiroExtratoView from "./FinanceiroExtratoView.jsx";
+import FinanceiroTransacoesView from "./FinanceiroTransacoesView.jsx";
+import FinanceiroAnaliseView from "./FinanceiroAnaliseView.jsx";
+import FinanceiroConfigView from "./FinanceiroConfigView.jsx";
 import ConfigView from "./ConfigView.jsx";
 import { cardsParaClinicType } from "./cardCatalog.js";
 import PatientsView from "./PatientsView.jsx";
@@ -134,6 +140,17 @@ export default function SaudeClinicasModule({ onExit }) {
           {section === "servicos-catalogo" && <ServicosCatalogoView />}
           {section === "servicos-desempenho" && <ServicosDesempenhoView />}
           {section === "servicos-convenios" && <ServicosConveniosView />}
+          {section === "financeiro-resumo" && <FinanceiroResumoView />}
+          {section === "financeiro-fluxo-caixa" && <FinanceiroFluxoCaixaView />}
+          {section === "financeiro-extrato" && <FinanceiroExtratoView />}
+          {section === "financeiro-receitas" && <FinanceiroTransacoesView tipo="receita" />}
+          {section === "financeiro-despesas" && <FinanceiroTransacoesView tipo="despesa" />}
+          {section === "financeiro-analise-despesas" && <FinanceiroAnaliseView tipo="despesa" />}
+          {section === "financeiro-analise-receitas" && <FinanceiroAnaliseView tipo="receita" />}
+          {section === "financeiro-categorias" && <FinanceiroConfigView abaInicial="categorias" />}
+          {section === "financeiro-contas" && <FinanceiroConfigView abaInicial="contas" />}
+          {section === "financeiro-centros-custo" && <FinanceiroConfigView abaInicial="centros" />}
+          {section === "financeiro-outras-config" && <FinanceiroConfigView abaInicial="outras" />}
           {section === "config" && config && (
             <ConfigView
               clinicType={config.clinic_type}
