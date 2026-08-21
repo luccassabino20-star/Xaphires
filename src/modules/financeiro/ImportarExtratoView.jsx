@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
@@ -76,7 +75,6 @@ export default function ImportarExtratoView() {
 
   return (
     <div className="fin-importar">
-      <Link to=".." relative="path" className="fin-voltar-link">{t("financeiro.importar.voltarExtrato")}</Link>
       <h3 className="fin-mov-titulo">{t("financeiro.importar.titulo")}</h3>
       <p className="fin-cad-hint">{t("financeiro.importar.ajuda")}</p>
 

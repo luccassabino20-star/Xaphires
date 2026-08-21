@@ -17,9 +17,9 @@ const hoje = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
-function formVazio(tipoFixo) {
+function formVazio() {
   return {
-    tipo: tipoFixo || "receber", descricao: "", doc: "", emissao: hoje(), due: hoje(), formaPagto: "",
+    tipo: "receber", descricao: "", doc: "", emissao: hoje(), due: hoje(), formaPagto: "",
     categoryId: "", centroCustoId: "", contatoId: "",
     valor: "", desconto: "", retencao: "", multa: "", juros: "", observacao: "",
   };
@@ -31,12 +31,7 @@ function formVazio(tipoFixo) {
 // dois geram títulos vinculados e precisam do título já salvo (id/número), então
 // são adicionados logo depois - por isso, ao criar, o título recém-nascido abre
 // no detalhe, onde se aplica imposto e se desdobra.
-//
-// `tipoFixo` ("receber" | "pagar") é usado pelas telas Receitas/Despesas
-// (dentro de Transações, no menu Finanças): o seletor de tipo vira um rótulo
-// fixo em vez de select, para a pessoa não lançar uma despesa na tela de
-// Receitas por engano.
-export default function LancamentosView({ tipoFixo } = {}) {
+export default function LancamentosView() {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -49,7 +44,7 @@ export default function LancamentosView({ tipoFixo } = {}) {
   const [lancamentos, setLancamentos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
-  const [form, setForm] = useState(() => formVazio(tipoFixo));
+  const [form, setForm] = useState(formVazio());
   const [enviando, setEnviando] = useState(false);
   const [formErro, setFormErro] = useState("");
   const [detalheId, setDetalheId] = useState(null);
@@ -94,7 +89,7 @@ export default function LancamentosView({ tipoFixo } = {}) {
         categoryId: form.categoryId || undefined, centroCustoId: form.centroCustoId || undefined,
         contatoId: form.contatoId || undefined,
       });
-      setForm(formVazio(tipoFixo));
+      setForm(formVazio());
       showToast(t("financeiro.toast.criado"));
       // Recarrega e abre o título criado, para aplicar imposto/desdobrar já.
       await carregar();
@@ -126,16 +121,10 @@ export default function LancamentosView({ tipoFixo } = {}) {
       <form onSubmit={submitNovo}>
         <div className="fin-novo-head">
           <h3>{t("financeiro.form.novoTitulo")}</h3>
-          {tipoFixo ? (
-            <span className={"fin-tipo-badge " + (tipoFixo === "receber" ? "fin-receber" : "fin-pagar")}>
-              {t(`financeiro.tipo.${tipoFixo}`)}
-            </span>
-          ) : (
-            <select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
-              <option value="receber">{t("financeiro.tipo.receber")}</option>
-              <option value="pagar">{t("financeiro.tipo.pagar")}</option>
-            </select>
-          )}
+          <select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
+            <option value="receber">{t("financeiro.tipo.receber")}</option>
+            <option value="pagar">{t("financeiro.tipo.pagar")}</option>
+          </select>
         </div>
 
         {/* Cliente/Fornecedor no topo, acima da identificação - é a primeira

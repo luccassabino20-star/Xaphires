@@ -113,16 +113,9 @@
     "tabs": { "lancamentos": "Asientos", "titulos": "Títulos", "movimentacao": "Movimientos", "contas": "Cuentas", "fluxo": "Flujo de caja", "matriz": "Matriz de Caja", "dre": "ERE", "importar": "Importar extracto", "cadastros": "Registros" },
     "sidebar": {
       "expandir": "Expandir menú", "recolher": "Contraer menú",
-      "grupo": { "painel": "Panel", "transacoes": "Transacciones", "relatorios": "Informes", "configuracoes": "Configuración" },
-      "itens": {
-        "resumo": "Resumen", "fluxoCaixa": "Flujo de caja",
-        "extrato": "Extracto", "receitas": "Ingresos", "despesas": "Gastos",
-        "analiseDespesas": "Análisis de gastos", "analiseReceitas": "Análisis de ingresos",
-        "categoriasFinanceiras": "Categorías financieras", "contasBancarias": "Cuentas bancarias",
-        "centrosDeCusto": "Centros de costo", "outrasConfiguracoes": "Otras configuraciones"
-      }
+      "grupo": { "financeiro": "Finanzas", "relatorios": "Informes y ERE", "futuros": "Próximos Módulos" },
+      "itens": { "contas": "Cuentas Bancarias y Caja", "importar": "Conciliación e Importar Extracto" }
     },
-    "transacoes": { "consultar": "Consultar", "novo": "Nuevo asiento" },
     "fluxoCaixa": {
       "conta": "Cuenta", "contaTodas": "Todas las cuentas", "mensal": "Mensual", "diario": "Diario",
       "periodoColuna": "Grupo", "exportarExcel": "Exportar Excel", "exportarCsv": "Exportar CSV", "exportarPdf": "Exportar PDF",
@@ -145,7 +138,7 @@
       },
       "lancamentos": { "titulo": "Movimientos", "semLancamentos": "Ningún movimiento en este período." }
     },
-    "importar": { "titulo": "Importar extracto bancario", "ajuda": "Sube el PDF del extracto (Sicredi o Banestes). Cada transacción se vuelve un movimiento finalizado en la cuenta elegida.", "conta": "Cuenta de destino", "escolher": "Elegir PDF del extracto", "lendo": "Leyendo el PDF...", "banco": "Banco", "creditos": "Créditos", "debitos": "Débitos", "data": "Fecha", "historico": "Descripción", "saldo": "Saldo", "nenhuma": "Ninguna transacción reconocida en este PDF.", "importar": "Importar {{n}} transacciones", "baixarExcel": "Descargar Excel", "selecioneConta": "Selecciona la cuenta de destino antes de importar.", "resultado": "{{imp}} importadas, {{ign}} ya existían (ignoradas).", "semContas": "Registra una cuenta bancaria antes, en la pestaña Cuentas.", "abrir": "Importar extracto bancario", "voltarExtrato": "← Volver al Extracto" },
+    "importar": { "titulo": "Importar extracto bancario", "ajuda": "Sube el PDF del extracto (Sicredi o Banestes). Cada transacción se vuelve un movimiento finalizado en la cuenta elegida.", "conta": "Cuenta de destino", "escolher": "Elegir PDF del extracto", "lendo": "Leyendo el PDF...", "banco": "Banco", "creditos": "Créditos", "debitos": "Débitos", "data": "Fecha", "historico": "Descripción", "saldo": "Saldo", "nenhuma": "Ninguna transacción reconocida en este PDF.", "importar": "Importar {{n}} transacciones", "baixarExcel": "Descargar Excel", "selecioneConta": "Selecciona la cuenta de destino antes de importar.", "resultado": "{{imp}} importadas, {{ign}} ya existían (ignoradas).", "semContas": "Registra una cuenta bancaria antes, en la pestaña Cuentas." },
     "manual": { "titulo": "Asiento Manual", "dados": "Datos del asiento", "movimento": "Movimiento", "data": "Fecha", "referencia": "Referencia", "referenciaPlaceholder": "Histórico / descripción", "documento": "Documento", "credito": "crédito", "debito": "débito", "dicaCredito": "Este movimiento es un crédito (entrada) en la cuenta.", "dicaDebito": "Este movimiento es un débito (salida) de la cuenta.", "rateioTitulo": "Apropiación / Prorrateo", "tipoRateio": "Tipo de prorrateo", "porPercentual": "Porcentaje (%)", "porValor": "Valor (R$)", "valorApropriacao": "Valor apropiación", "semRateio": "Ningún prorrateo agregado.", "criado": "Asiento manual creado.", "salvar": "Registrar", "informeData": "Indique la fecha.", "escolhaClasse": "Elija la clase.", "mov": { "tarifa_bancaria": "Tarifa Bancaria", "juros_pagos": "Intereses Pagados", "juros_recebidos": "Intereses Recibidos", "rendimento_aplicacao": "Rendimiento de Inversión", "aplicacao_financeira": "Inversión Financiera", "resgate_aplicacao": "Rescate de Inversión", "outras_entradas": "Otras Entradas", "outras_saidas": "Otras Salidas" } },
     "rateio": { "ativar": "Prorratear entre varios centros", "desativar": "Quitar prorrateo", "titulo": "Prorrateo por centro de costo", "adicionar": "Agregar centro", "restante": "Restante", "escolhaCentro": "Elija el centro en cada línea del prorrateo.", "valorInvalido": "Indique un valor válido en cada línea.", "duplicado": "Centro repetido en el prorrateo.", "naoFecha": "La suma del prorrateo debe igualar el valor del título.", "rateadoLabel": "Prorrateado", "travadoPorRateio": "Título prorrateado - el centro único no aplica." },
     "mov": { "pendentes": "Abiertos", "baixados": "Saldados recientemente", "vazioPendentes": "Ningún título abierto.", "vazioBaixados": "Sin saldos recientes.", "extratoVazio": "Sin movimientos en el período.",
