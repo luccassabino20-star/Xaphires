@@ -204,7 +204,8 @@
       "financeiro": "Finance", "servicos": "Services & Actes", "usuarios": "Utilisateurs & Équipe",
       "config": "Profil & Paramètres",
       "agendaSemanal": "Agenda Hebdomadaire", "agendaDiaria": "Agenda Journalier",
-      "bloqueioAgenda": "Blocage d'Agenda", "matrizDisponibilidade": "Matrice de Disponibilité", "relatorios": "Rapports"
+      "bloqueioAgenda": "Blocage d'Agenda", "matrizDisponibilidade": "Matrice de Disponibilité", "relatorios": "Rapports",
+      "catalogoServicos": "Catalogue de Services", "desempenhoServicos": "Performance des Services", "tabelasConvenios": "Grilles Tarifaires des Mutuelles"
     },
     "dashboard": {
       "preset": { "hoje": "Aujourd'hui", "7dias": "7 jours", "30dias": "30 jours", "mes": "Ce mois" },
@@ -243,6 +244,35 @@
         "grupo": "Groupe", "numAtendimentos": "Nb rendez-vous", "receitaCents": "Revenu", "comissaoPct": "Commission",
         "repasseCents": "Montant à reverser", "nota": "Note", "quantidade": "Nombre", "percentual": "Pourcentage",
         "dataNascimento": "Date de naissance"
+      }
+    },
+    "servicos": {
+      "catalogo": {
+        "titulo": "Catalogue de Services",
+        "novo": "Nouveau service", "nome": "Nom", "nomePlaceholder": "Ex. : Nettoyage de peau",
+        "preco": "Prix", "duracao": "Durée (min)", "status": "Statut",
+        "ativo": "Actif", "inativo": "Inactif", "acoes": "Actions",
+        "editar": "Modifier", "salvar": "Enregistrer", "cancelar": "Annuler",
+        "ativar": "Activer", "desativar": "Désactiver", "adicionar": "Ajouter",
+        "semServicos": "Aucun service enregistré pour le moment.",
+        "criado": "Service créé.", "atualizado": "Service mis à jour.",
+        "nomeObrigatorio": "Indiquez le nom du service."
+      },
+      "desempenho": {
+        "titulo": "Performance des Services",
+        "hint": "Revenu généré par chaque acte sur la période, à partir des rendez-vous terminés."
+      },
+      "convenios": {
+        "titulo": "Grilles Tarifaires des Mutuelles",
+        "novo": "Nouvelle mutuelle", "nome": "Nom", "nomePlaceholder": "Ex. : Unimed",
+        "status": "Statut", "ativo": "Actif", "inativo": "Inactif",
+        "verPrecos": "Voir la grille tarifaire", "adicionar": "Ajouter",
+        "semConvenios": "Aucune mutuelle enregistrée pour le moment.",
+        "criado": "Mutuelle créée.", "atualizado": "Mutuelle mise à jour.",
+        "nomeObrigatorio": "Indiquez le nom de la mutuelle.",
+        "tabelaPrecos": "Grille tarifaire - {{nome}}",
+        "servico": "Service", "precoParticular": "Prix particulier", "precoConvenio": "Prix mutuelle",
+        "naoDefinido": "Non défini", "precoSalvo": "Prix enregistré.", "fechar": "Fermer"
       }
     },
     "config": {

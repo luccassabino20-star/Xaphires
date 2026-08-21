@@ -246,6 +246,32 @@ export function applySaudeClinicasSchema(companyDb) {
       created_at TEXT NOT NULL
     );
 
+    -- Convênios aceitos pela clínica. Cadastro simples (nome + ativo) - o
+    -- preço negociado por procedimento mora em insurance_plan_prices, não
+    -- aqui, porque cada convênio paga um valor diferente pelo mesmo
+    -- procedimento.
+    CREATE TABLE IF NOT EXISTS insurance_plans (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+
+    -- Preço de cada procedimento dentro de um convênio. Sem linha aqui, o
+    -- convênio ainda não tem valor definido para aquele procedimento - a
+    -- tela mostra "não definido" e nunca cai de volta no preço particular
+    -- por conta própria (evitaria cobrar convênio por engano com o preço
+    -- particular).
+    CREATE TABLE IF NOT EXISTS insurance_plan_prices (
+      id TEXT PRIMARY KEY,
+      plan_id TEXT NOT NULL REFERENCES insurance_plans(id),
+      procedure_id TEXT NOT NULL REFERENCES procedures(id),
+      price_cents INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      UNIQUE(plan_id, procedure_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_plan_prices_plan ON insurance_plan_prices(plan_id);
+
     -- Lista de espera. name/phone ficam gravados na própria linha (não só via
     -- patient_id): quem entra na espera muitas vezes ainda não é um paciente
     -- cadastrado - o cadastro rápido do modal grava aqui direto, e um Patient

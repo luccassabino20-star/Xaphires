@@ -226,7 +226,8 @@
       "servicos": "Servicios & Procedimientos", "usuarios": "Usuarios & Equipo",
       "config": "Perfil & Configuración",
       "agendaSemanal": "Agenda Semanal", "agendaDiaria": "Agenda Diaria",
-      "bloqueioAgenda": "Bloqueo de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidad", "relatorios": "Informes"
+      "bloqueioAgenda": "Bloqueo de Agenda", "matrizDisponibilidade": "Matriz de Disponibilidad", "relatorios": "Informes",
+      "catalogoServicos": "Catálogo de Servicios", "desempenhoServicos": "Desempeño de Servicios", "tabelasConvenios": "Tablas de Convenios"
     },
     "dashboard": {
       "preset": { "hoje": "Hoy", "7dias": "7 días", "30dias": "30 días", "mes": "Este mes" },
@@ -265,6 +266,35 @@
         "grupo": "Grupo", "numAtendimentos": "Nº atenciones", "receitaCents": "Ingresos", "comissaoPct": "Comisión",
         "repasseCents": "Monto a pagar", "nota": "Nota", "quantidade": "Cantidad", "percentual": "Porcentaje",
         "dataNascimento": "Fecha de nacimiento"
+      }
+    },
+    "servicos": {
+      "catalogo": {
+        "titulo": "Catálogo de Servicios",
+        "novo": "Nuevo servicio", "nome": "Nombre", "nomePlaceholder": "Ej.: Limpieza facial",
+        "preco": "Precio", "duracao": "Duración (min)", "status": "Estado",
+        "ativo": "Activo", "inativo": "Inactivo", "acoes": "Acciones",
+        "editar": "Editar", "salvar": "Guardar", "cancelar": "Cancelar",
+        "ativar": "Activar", "desativar": "Desactivar", "adicionar": "Agregar",
+        "semServicos": "Aún no hay servicios registrados.",
+        "criado": "Servicio creado.", "atualizado": "Servicio actualizado.",
+        "nomeObrigatorio": "Indique el nombre del servicio."
+      },
+      "desempenho": {
+        "titulo": "Desempeño de Servicios",
+        "hint": "Ingresos generados por cada procedimiento en el período, a partir de las citas concluidas."
+      },
+      "convenios": {
+        "titulo": "Tablas de Convenios",
+        "novo": "Nuevo convenio", "nome": "Nombre", "nomePlaceholder": "Ej.: Unimed",
+        "status": "Estado", "ativo": "Activo", "inativo": "Inactivo",
+        "verPrecos": "Ver tabla de precios", "adicionar": "Agregar",
+        "semConvenios": "Aún no hay convenios registrados.",
+        "criado": "Convenio creado.", "atualizado": "Convenio actualizado.",
+        "nomeObrigatorio": "Indique el nombre del convenio.",
+        "tabelaPrecos": "Tabla de precios - {{nome}}",
+        "servico": "Servicio", "precoParticular": "Precio particular", "precoConvenio": "Precio del convenio",
+        "naoDefinido": "No definido", "precoSalvo": "Precio guardado.", "fechar": "Cerrar"
       }
     },
     "config": {

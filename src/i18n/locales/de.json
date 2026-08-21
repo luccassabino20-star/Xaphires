@@ -204,7 +204,8 @@
       "financeiro": "Finanzen", "servicos": "Leistungen & Behandlungen", "usuarios": "Benutzer & Team",
       "config": "Profil & Einstellungen",
       "agendaSemanal": "Wochenplan", "agendaDiaria": "Tagesplan",
-      "bloqueioAgenda": "Terminsperre", "matrizDisponibilidade": "Verfügbarkeitsmatrix", "relatorios": "Berichte"
+      "bloqueioAgenda": "Terminsperre", "matrizDisponibilidade": "Verfügbarkeitsmatrix", "relatorios": "Berichte",
+      "catalogoServicos": "Leistungskatalog", "desempenhoServicos": "Leistungsübersicht", "tabelasConvenios": "Versicherungspreistabellen"
     },
     "dashboard": {
       "preset": { "hoje": "Heute", "7dias": "7 Tage", "30dias": "30 Tage", "mes": "Dieser Monat" },
@@ -243,6 +244,35 @@
         "grupo": "Gruppe", "numAtendimentos": "Anz. Termine", "receitaCents": "Umsatz", "comissaoPct": "Provision",
         "repasseCents": "Auszahlungsbetrag", "nota": "Bewertung", "quantidade": "Anzahl", "percentual": "Prozentsatz",
         "dataNascimento": "Geburtsdatum"
+      }
+    },
+    "servicos": {
+      "catalogo": {
+        "titulo": "Leistungskatalog",
+        "novo": "Neue Leistung", "nome": "Name", "nomePlaceholder": "z. B.: Gesichtsreinigung",
+        "preco": "Preis", "duracao": "Dauer (Min.)", "status": "Status",
+        "ativo": "Aktiv", "inativo": "Inaktiv", "acoes": "Aktionen",
+        "editar": "Bearbeiten", "salvar": "Speichern", "cancelar": "Abbrechen",
+        "ativar": "Aktivieren", "desativar": "Deaktivieren", "adicionar": "Hinzufügen",
+        "semServicos": "Noch keine Leistungen registriert.",
+        "criado": "Leistung erstellt.", "atualizado": "Leistung aktualisiert.",
+        "nomeObrigatorio": "Geben Sie den Namen der Leistung an."
+      },
+      "desempenho": {
+        "titulo": "Leistungsübersicht",
+        "hint": "Umsatz je Behandlung im Zeitraum, basierend auf abgeschlossenen Terminen."
+      },
+      "convenios": {
+        "titulo": "Versicherungspreistabellen",
+        "novo": "Neue Versicherung", "nome": "Name", "nomePlaceholder": "z. B.: Unimed",
+        "status": "Status", "ativo": "Aktiv", "inativo": "Inaktiv",
+        "verPrecos": "Preistabelle ansehen", "adicionar": "Hinzufügen",
+        "semConvenios": "Noch keine Versicherungen registriert.",
+        "criado": "Versicherung erstellt.", "atualizado": "Versicherung aktualisiert.",
+        "nomeObrigatorio": "Geben Sie den Namen der Versicherung an.",
+        "tabelaPrecos": "Preistabelle - {{nome}}",
+        "servico": "Leistung", "precoParticular": "Regulärer Preis", "precoConvenio": "Versicherungspreis",
+        "naoDefinido": "Nicht festgelegt", "precoSalvo": "Preis gespeichert.", "fechar": "Schließen"
       }
     },
     "config": {

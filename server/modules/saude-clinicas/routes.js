@@ -31,6 +31,15 @@ import {
   criarRascunhoResposta,
   enviarResposta,
   listProcedures,
+  listAllProcedures,
+  insertProcedure,
+  updateProcedure,
+  listInsurancePlans,
+  getInsurancePlan,
+  insertInsurancePlan,
+  updateInsurancePlan,
+  listPlanPrices,
+  setPlanPrice,
   existeConflitoHorario,
   listAppointments,
   listAppointmentsByPatient,
@@ -554,6 +563,88 @@ router.get(
   ah(async (req, res) => {
     seedProceduresSeVazio();
     res.json(listProcedures());
+  })
+);
+
+// Catálogo completo (incl. inativos), só para quem administra o cadastro.
+router.get(
+  "/procedures/all",
+  requireMaster,
+  ah(async (req, res) => {
+    seedProceduresSeVazio();
+    res.json(listAllProcedures());
+  })
+);
+
+router.post(
+  "/procedures",
+  requireMaster,
+  ah(async (req, res) => {
+    const { name, priceCents, durationMin } = req.body || {};
+    if (!(name || "").trim()) return res.status(400).json({ error: "Informe o nome do serviço", code: "PROCEDURE_NAME_REQUIRED" });
+    res.status(201).json(insertProcedure({ name: name.trim(), priceCents: Number(priceCents) || 0, durationMin: Number(durationMin) || 30 }));
+  })
+);
+
+router.patch(
+  "/procedures/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    const atualizado = updateProcedure(req.params.id, req.body || {});
+    if (!atualizado) return res.status(404).json({ error: "Serviço não encontrado", code: "PROCEDURE_NOT_FOUND" });
+    res.json(atualizado);
+  })
+);
+
+// ---------- Convênios ----------
+
+router.get(
+  "/insurance-plans",
+  requireMaster,
+  ah(async (req, res) => {
+    res.json(listInsurancePlans());
+  })
+);
+
+router.post(
+  "/insurance-plans",
+  requireMaster,
+  ah(async (req, res) => {
+    const { name } = req.body || {};
+    if (!(name || "").trim()) return res.status(400).json({ error: "Informe o nome do convênio", code: "INSURANCE_PLAN_NAME_REQUIRED" });
+    res.status(201).json(insertInsurancePlan({ name: name.trim() }));
+  })
+);
+
+router.patch(
+  "/insurance-plans/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    const atualizado = updateInsurancePlan(req.params.id, req.body || {});
+    if (!atualizado) return res.status(404).json({ error: "Convênio não encontrado", code: "INSURANCE_PLAN_NOT_FOUND" });
+    res.json(atualizado);
+  })
+);
+
+router.get(
+  "/insurance-plans/:id/prices",
+  requireMaster,
+  ah(async (req, res) => {
+    if (!getInsurancePlan(req.params.id)) return res.status(404).json({ error: "Convênio não encontrado", code: "INSURANCE_PLAN_NOT_FOUND" });
+    res.json(listPlanPrices(req.params.id));
+  })
+);
+
+router.put(
+  "/insurance-plans/:id/prices/:procedureId",
+  requireMaster,
+  ah(async (req, res) => {
+    if (!getInsurancePlan(req.params.id)) return res.status(404).json({ error: "Convênio não encontrado", code: "INSURANCE_PLAN_NOT_FOUND" });
+    const priceCents = Number(req.body?.priceCents);
+    if (!Number.isFinite(priceCents) || priceCents < 0) {
+      return res.status(400).json({ error: "Informe um preço válido", code: "INSURANCE_PLAN_PRICE_INVALID" });
+    }
+    res.json(setPlanPrice(req.params.id, req.params.procedureId, Math.round(priceCents)));
   })
 );
 

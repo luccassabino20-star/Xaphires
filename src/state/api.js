@@ -566,6 +566,16 @@ export async function scBaixarRelatorio(tipo, formato, filtros, lang) {
   URL.revokeObjectURL(url);
 }
 export const scListProcedures = () => request("/saude-clinicas/procedures");
+export const scListAllProcedures = () => request("/saude-clinicas/procedures/all");
+export const scCreateProcedure = (dados) => request("/saude-clinicas/procedures", { method: "POST", body: dados });
+export const scUpdateProcedure = (id, dados) => request(`/saude-clinicas/procedures/${id}`, { method: "PATCH", body: dados });
+
+export const scListInsurancePlans = () => request("/saude-clinicas/insurance-plans");
+export const scCreateInsurancePlan = (dados) => request("/saude-clinicas/insurance-plans", { method: "POST", body: dados });
+export const scUpdateInsurancePlan = (id, dados) => request(`/saude-clinicas/insurance-plans/${id}`, { method: "PATCH", body: dados });
+export const scListPlanPrices = (planId) => request(`/saude-clinicas/insurance-plans/${planId}/prices`);
+export const scSetPlanPrice = (planId, procedureId, priceCents) =>
+  request(`/saude-clinicas/insurance-plans/${planId}/prices/${procedureId}`, { method: "PUT", body: { priceCents } });
 export const scListAppointments = (from, to) => request(`/saude-clinicas/appointments?from=${from}&to=${to}`);
 export const scListPatientAppointments = (patientId) => request(`/saude-clinicas/patients/${patientId}/appointments`);
 export const scListAppointmentLogs = (appointmentId) => request(`/saude-clinicas/appointments/${appointmentId}/logs`);

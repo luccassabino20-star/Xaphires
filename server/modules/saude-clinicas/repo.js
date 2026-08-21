@@ -310,6 +310,11 @@ export function responderAnamnese(token, answers) {
 export function listProcedures() {
   return getDb().prepare("SELECT * FROM procedures WHERE active = 1 ORDER BY name COLLATE NOCASE").all();
 }
+// Inclui inativos - é a versão que alimenta a tela de gestão do catálogo
+// (precisa mostrar o que foi desativado, com a opção de reativar).
+export function listAllProcedures() {
+  return getDb().prepare("SELECT * FROM procedures ORDER BY active DESC, name COLLATE NOCASE").all();
+}
 export function countProcedures() {
   return getDb().prepare("SELECT COUNT(*) AS c FROM procedures").get().c;
 }
@@ -319,6 +324,82 @@ export function insertProcedure({ name, priceCents, durationMin }) {
     .prepare("INSERT INTO procedures (id, name, price_cents, duration_min, active, created_at) VALUES (?, ?, ?, ?, 1, ?)")
     .run(id, name, priceCents || 0, durationMin || 30, nowIso());
   return getDb().prepare("SELECT * FROM procedures WHERE id = ?").get(id);
+}
+export function getProcedure(id) {
+  return getDb().prepare("SELECT * FROM procedures WHERE id = ?").get(id);
+}
+// Edição não afeta agendamentos já lançados: procedures ali é snapshot
+// (nome/preço gravados soltos no próprio agendamento), então mudar o
+// catálogo agora não reescreve o passado - só vale para os próximos.
+export function updateProcedure(id, { name, priceCents, durationMin, active }) {
+  const atual = getProcedure(id);
+  if (!atual) return null;
+  getDb()
+    .prepare("UPDATE procedures SET name = ?, price_cents = ?, duration_min = ?, active = ? WHERE id = ?")
+    .run(
+      name !== undefined ? name : atual.name,
+      priceCents !== undefined ? priceCents : atual.price_cents,
+      durationMin !== undefined ? durationMin : atual.duration_min,
+      active !== undefined ? (active ? 1 : 0) : atual.active,
+      id
+    );
+  return getProcedure(id);
+}
+
+// ---------- Convênios ----------
+
+export function listInsurancePlans() {
+  return getDb().prepare("SELECT * FROM insurance_plans ORDER BY active DESC, name COLLATE NOCASE").all();
+}
+export function getInsurancePlan(id) {
+  return getDb().prepare("SELECT * FROM insurance_plans WHERE id = ?").get(id);
+}
+export function insertInsurancePlan({ name }) {
+  const id = uid();
+  getDb().prepare("INSERT INTO insurance_plans (id, name, active, created_at) VALUES (?, ?, 1, ?)").run(id, name, nowIso());
+  return getInsurancePlan(id);
+}
+export function updateInsurancePlan(id, { name, active }) {
+  const atual = getInsurancePlan(id);
+  if (!atual) return null;
+  getDb()
+    .prepare("UPDATE insurance_plans SET name = ?, active = ? WHERE id = ?")
+    .run(name !== undefined ? name : atual.name, active !== undefined ? (active ? 1 : 0) : atual.active, id);
+  return getInsurancePlan(id);
+}
+
+// Tabela de preços do convênio: uma linha por procedimento ATIVO, com o
+// preço negociado (null quando ainda não foi definido) - LEFT JOIN em vez
+// de só devolver o que já tem preço, pra tela sempre listar o catálogo
+// inteiro e não deixar procedimento novo invisível até alguém lembrar de
+// precificá-lo ali.
+export function listPlanPrices(planId) {
+  return getDb()
+    .prepare(
+      `SELECT p.id AS procedure_id, p.name AS procedure_name, p.price_cents AS base_price_cents,
+              pp.price_cents AS plan_price_cents
+         FROM procedures p
+         LEFT JOIN insurance_plan_prices pp ON pp.plan_id = ? AND pp.procedure_id = p.id
+        WHERE p.active = 1
+        ORDER BY p.name COLLATE NOCASE`
+    )
+    .all(planId);
+}
+export function setPlanPrice(planId, procedureId, priceCents) {
+  const db = getDb();
+  const existente = db.prepare("SELECT id FROM insurance_plan_prices WHERE plan_id = ? AND procedure_id = ?").get(planId, procedureId);
+  if (existente) {
+    db.prepare("UPDATE insurance_plan_prices SET price_cents = ? WHERE id = ?").run(priceCents, existente.id);
+  } else {
+    db.prepare("INSERT INTO insurance_plan_prices (id, plan_id, procedure_id, price_cents, created_at) VALUES (?, ?, ?, ?, ?)").run(
+      uid(),
+      planId,
+      procedureId,
+      priceCents,
+      nowIso()
+    );
+  }
+  return listPlanPrices(planId).find((r) => r.procedure_id === procedureId);
 }
 
 // ---------- Agenda: horários ocupados (helper de conflito) ----------

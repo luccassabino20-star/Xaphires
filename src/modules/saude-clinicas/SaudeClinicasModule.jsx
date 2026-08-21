@@ -15,6 +15,9 @@ import AgendaView from "./AgendaView.jsx";
 import BlockAgendaView from "./BlockAgendaView.jsx";
 import AvailabilityMatrixView from "./AvailabilityMatrixView.jsx";
 import ReportsView from "./ReportsView.jsx";
+import ServicosCatalogoView from "./ServicosCatalogoView.jsx";
+import ServicosDesempenhoView from "./ServicosDesempenhoView.jsx";
+import ServicosConveniosView from "./ServicosConveniosView.jsx";
 import ConfigView from "./ConfigView.jsx";
 import { cardsParaClinicType } from "./cardCatalog.js";
 import PatientsView from "./PatientsView.jsx";
@@ -128,6 +131,9 @@ export default function SaudeClinicasModule({ onExit }) {
           {section === "agenda-disponibilidade" && <AvailabilityMatrixView />}
           {section === "pacientes" && config && <PacientesSection clinicType={config.clinic_type} />}
           {section === "relatorios" && <ReportsView />}
+          {section === "servicos-catalogo" && <ServicosCatalogoView />}
+          {section === "servicos-desempenho" && <ServicosDesempenhoView />}
+          {section === "servicos-convenios" && <ServicosConveniosView />}
           {section === "config" && config && (
             <ConfigView
               clinicType={config.clinic_type}

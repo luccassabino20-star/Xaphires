@@ -28,7 +28,14 @@ const ITENS = [
   },
   { id: "pacientes", icon: "pacientes", real: true },
   { id: "relatorios", icon: "relatorios", real: true },
-  { id: "servicos", icon: "servicos", real: false },
+  {
+    id: "servicos", icon: "servicos", real: true, sectionPrefix: "servicos-",
+    children: [
+      { id: "servicos-catalogo", labelKey: "catalogoServicos" },
+      { id: "servicos-desempenho", labelKey: "desempenhoServicos" },
+      { id: "servicos-convenios", labelKey: "tabelasConvenios" },
+    ],
+  },
   { id: "usuarios", icon: "usuarios", real: true, modal: true },
   { id: "config", icon: "config", real: true },
 ];

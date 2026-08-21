@@ -7882,6 +7882,27 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   .sc-rel-nav { width: 100%; flex-direction: row; flex-wrap: wrap; }
 }
 
+/* ---------- Serviços & Procedimentos (catálogo, desempenho, convênios) ---------- */
+.sc-servicos-catalogo, .sc-servicos-desempenho, .sc-servicos-convenios { display: flex; flex-direction: column; gap: 14px; }
+.sc-servicos-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sc-servicos-form input {
+  padding: 8px 10px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-list);
+  border: 1px solid var(--border-subtle); border-radius: 8px;
+}
+.sc-servicos-form input[type="text"] { min-width: 180px; flex: 1; }
+.sc-servicos-form input[type="number"] { width: 110px; }
+.sc-servicos-status { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+.sc-servicos-status.ativo { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+.sc-servicos-status.inativo { color: var(--text-muted); background: var(--bg-list); }
+.sc-servicos-acoes { display: flex; gap: 6px; }
+.sc-servicos-catalogo .sc-table td input, .sc-servicos-catalogo .sc-table td select {
+  width: 100%; padding: 6px 8px; font-size: 13px; color: var(--text-primary); background: var(--bg-card);
+  border: 1px solid var(--border-subtle); border-radius: 6px;
+}
+
+.sc-convenio-modal { width: min(680px, 94vw); max-width: min(680px, 94vw); }
+.sc-convenio-modal .sc-table-wrap { max-height: 60vh; overflow-y: auto; }
+
 /* Nota de satisfação (5 estrelas) no detalhe do agendamento */
 .sc-detail-satisfacao { display: flex; align-items: center; gap: 10px; }
 .sc-detail-estrelas { display: flex; gap: 2px; }
