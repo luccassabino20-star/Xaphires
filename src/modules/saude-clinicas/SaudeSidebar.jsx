@@ -87,18 +87,19 @@ export default function SaudeSidebar({ collapsed, onToggleCollapsed, activeSecti
   // Grupo com submenu começa aberto se a seção ativa já pertence a ele (ex.:
   // primeira renderização já em "agenda-semana", que é o default do módulo) -
   // sem isso a pessoa abriria a Agenda e veria o próprio item ativo escondido
-  // dentro de um grupo fechado.
-  const [grupoAberto, setGrupoAberto] = useState(() =>
-    ITENS.filter((it) => it.children || it.categorias).map((it) => it.id).filter((id) =>
-      itensDoGrupo(ITENS.find((it) => it.id === id)).some((c) => c.id === activeSection)
-    )
-  );
+  // dentro de um grupo fechado. Só um grupo aberto por vez (acordeão, não
+  // array): o Financeiro sozinho já tem 11 itens em 4 categorias, e dois
+  // grupos abertos ao mesmo tempo estourava a altura da sidebar sem rolagem.
+  const [grupoAberto, setGrupoAberto] = useState(() => {
+    const grupo = ITENS.find((it) => (it.children || it.categorias) && itensDoGrupo(it).some((c) => c.id === activeSection));
+    return grupo ? grupo.id : null;
+  });
 
   function clicarItem(item) {
     if (!item.real) return;
     if (item.modal) return onAbrirEquipe();
     if (item.children || item.categorias) {
-      setGrupoAberto((atual) => (atual.includes(item.id) ? atual.filter((id) => id !== item.id) : [...atual, item.id]));
+      setGrupoAberto((atual) => (atual === item.id ? null : item.id));
       return;
     }
     onSelectSection(item.id);
@@ -131,7 +132,7 @@ export default function SaudeSidebar({ collapsed, onToggleCollapsed, activeSecti
         {ITENS.map((item) => {
           const temSubmenu = Boolean(item.children || item.categorias);
           const ehGrupoAtivo = itensDoGrupo(item).some((c) => c.id === activeSection);
-          const aberto = grupoAberto.includes(item.id);
+          const aberto = grupoAberto === item.id;
           return (
             <div key={item.id} className="sc-sidebar-group">
               <button
