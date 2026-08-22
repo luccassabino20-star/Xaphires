@@ -326,7 +326,11 @@
         "nome": "Name", "nomePlaceholder": "Name", "nomeObrigatorio": "Enter the name.",
         "banco": "Bank", "saldoInicial": "Starting balance", "semItens": "No items registered yet.",
         "semOutras": "No additional settings here yet.",
-        "semContasCadastradas": "Register an account in Finance > Settings > Bank accounts."
+        "semContasCadastradas": "Register an account in Finance > Settings > Bank accounts.",
+        "novaCategoria": "+ New category", "adicionarSubcategoria": "+ Add new subcategory",
+        "nomeSubcategoriaPlaceholder": "Subcategory name", "selecionadas": "{{count}} selected",
+        "ativarSelecionadas": "Activate selected", "desativarSelecionadas": "Deactivate selected",
+        "excluirSelecionadas": "Delete selected", "cancelarSelecao": "Cancel selection"
       }
     },
     "config": {

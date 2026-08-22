@@ -301,6 +301,19 @@ export function applySaudeClinicasSchema(companyDb) {
       created_at TEXT NOT NULL
     );
 
+    -- Subcategoria pertence a UMA categoria (herda o tipo dela, não tem tipo
+    -- próprio) - é só um segundo nível de detalhe dentro de Receita/Despesa,
+    -- não uma entidade paralela. Sem FK ON DELETE porque a categoria nunca é
+    -- excluída de verdade neste módulo, só desativada.
+    CREATE TABLE IF NOT EXISTS sc_fin_subcategorias (
+      id TEXT PRIMARY KEY,
+      categoria_id TEXT NOT NULL REFERENCES sc_fin_categorias(id),
+      nome TEXT NOT NULL,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_sc_fin_subcat_categoria ON sc_fin_subcategorias(categoria_id);
+
     CREATE TABLE IF NOT EXISTS sc_fin_centros_custo (
       id TEXT PRIMARY KEY,
       nome TEXT NOT NULL,

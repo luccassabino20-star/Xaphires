@@ -5,6 +5,16 @@ import * as api from "../../state/api.js";
 import { formatCents } from "../financeiro/dinheiro.js";
 import { mascararTelefone } from "./agendaUtils.js";
 
+// Cifrão discreto ao lado de cada procedimento já cobrado - reforça que a
+// linha é um item de valor, sem competir visualmente com o texto.
+function IconeCifrao() {
+  return (
+    <svg className="sc-agenda-proc-icone" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M16.5 6.8c0-1.7-2-2.8-4.5-2.8s-4.5 1.1-4.5 2.8c0 3.8 9 2.3 9 6 0 1.7-2 2.8-4.5 2.8s-4.5-1.1-4.5-2.8" />
+    </svg>
+  );
+}
+
 function parseProcedures(json) {
   try {
     const arr = typeof json === "string" ? JSON.parse(json) : json;
@@ -153,33 +163,35 @@ export default function AppointmentModal({
 
         {aba === "agendamento" || editando ? (
           <form className="sc-form sc-form-column" onSubmit={salvarAgendamento}>
-            {editando ? (
-              <select value={patientId} onChange={(e) => setPatientId(e.target.value)}>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            ) : (
-              <>
-                <select value={patientId} onChange={(e) => { setPatientId(e.target.value); if (e.target.value) setNovoPacienteNome(""); }}>
-                  <option value="">{t("saudeClinicas.agenda.novoPaciente")}</option>
+            <div className="sc-agenda-bloco">
+              {editando ? (
+                <select value={patientId} onChange={(e) => setPatientId(e.target.value)}>
                   {patients.map((p) => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
-                {!patientId && (
-                  <div className="sc-agenda-linha">
-                    <input type="text" placeholder={t("crm.contatos.nome")} value={novoPacienteNome} onChange={(e) => setNovoPacienteNome(e.target.value)} />
-                    <input
-                      type="text" placeholder={t("crm.contatos.telefone")} value={novoPacienteTelefone}
-                      onChange={(e) => setNovoPacienteTelefone(mascararTelefone(e.target.value))}
-                    />
-                  </div>
-                )}
-              </>
-            )}
+              ) : (
+                <>
+                  <select value={patientId} onChange={(e) => { setPatientId(e.target.value); if (e.target.value) setNovoPacienteNome(""); }}>
+                    <option value="">{t("saudeClinicas.agenda.novoPaciente")}</option>
+                    {patients.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                  {!patientId && (
+                    <div className="sc-agenda-linha">
+                      <input type="text" placeholder={t("crm.contatos.nome")} value={novoPacienteNome} onChange={(e) => setNovoPacienteNome(e.target.value)} />
+                      <input
+                        type="text" placeholder={t("crm.contatos.telefone")} value={novoPacienteTelefone}
+                        onChange={(e) => setNovoPacienteTelefone(mascararTelefone(e.target.value))}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
-            <div className="sc-agenda-linha">
+            <div className="sc-agenda-linha sc-agenda-bloco">
               <select value={professionalUserId} onChange={(e) => setProfessionalUserId(e.target.value)}>
                 <option value="">{t("saudeClinicas.agenda.semProfissional")}</option>
                 {professionals.map((u) => (
@@ -188,7 +200,7 @@ export default function AppointmentModal({
               </select>
             </div>
 
-            <div className="sc-agenda-linha">
+            <div className="sc-agenda-linha sc-agenda-bloco">
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               <input type="time" value={time} onChange={(e) => setTime(e.target.value)} step={900} />
               <input type="number" min={5} step={5} value={durationMin} onChange={(e) => setDurationMin(e.target.value)} title={t("saudeClinicas.agenda.duracaoMin")} />
@@ -198,6 +210,7 @@ export default function AppointmentModal({
             <div className="sc-procedimentos-lista">
               {itensProcedimento.map((it, i) => (
                 <div className="sc-agenda-linha" key={i}>
+                  <IconeCifrao />
                   {it.procedureId ? (
                     <select value={it.procedureId} onChange={(e) => atualizarProcedimento(i, { procedureId: e.target.value })}>
                       {procedures.map((p) => (
@@ -217,7 +230,7 @@ export default function AppointmentModal({
               {totalCents > 0 && <span className="sc-agenda-total">{t("saudeClinicas.agenda.total")}: {formatCents(totalCents, i18n.language)}</span>}
             </div>
 
-            <div className="sc-agenda-pagamento">
+            <div className="sc-agenda-pagamento sc-agenda-bloco">
               <div className="sc-toggle-group">
                 <button type="button" className={"sc-toggle-btn" + (paymentType === "particular" ? " active" : "")} onClick={() => setPaymentType("particular")}>
                   {t("saudeClinicas.agenda.particular")}
@@ -232,7 +245,9 @@ export default function AppointmentModal({
               </label>
             </div>
 
-            <textarea placeholder={t("saudeClinicas.pacientes.notas")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+            <div className="sc-agenda-bloco">
+              <textarea placeholder={t("saudeClinicas.pacientes.notas")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+            </div>
 
             <div className="sc-modal-acoes">
               <button type="submit" className="btn-primary" disabled={salvando || (!editando && !patientId && !novoPacienteNome.trim())}>

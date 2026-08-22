@@ -326,7 +326,11 @@
         "nome": "Nome", "nomePlaceholder": "Nome", "nomeObrigatorio": "Informe o nome.",
         "banco": "Banco", "saldoInicial": "Saldo inicial", "semItens": "Nenhum item cadastrado ainda.",
         "semOutras": "Nenhuma configuração adicional por aqui ainda.",
-        "semContasCadastradas": "Cadastre uma conta em Financeiro > Configurações > Contas bancárias."
+        "semContasCadastradas": "Cadastre uma conta em Financeiro > Configurações > Contas bancárias.",
+        "novaCategoria": "+ Nova categoria", "adicionarSubcategoria": "+ Adicionar nova subcategoria",
+        "nomeSubcategoriaPlaceholder": "Nome da subcategoria", "selecionadas": "{{count}} selecionada(s)",
+        "ativarSelecionadas": "Ativar selecionadas", "desativarSelecionadas": "Desativar selecionadas",
+        "excluirSelecionadas": "Excluir selecionadas", "cancelarSelecao": "Cancelar seleção"
       }
     },
     "config": {

@@ -64,6 +64,13 @@ import {
   listAllFinCategorias,
   insertFinCategoria,
   updateFinCategoria,
+  deleteFinCategoria,
+  getFinCategoria,
+  listAllFinSubcategorias,
+  insertFinSubcategoria,
+  updateFinSubcategoria,
+  updateManyFinSubcategoriasAtivo,
+  deleteManyFinSubcategorias,
   listFinCentrosCusto,
   listAllFinCentrosCusto,
   insertFinCentroCusto,
@@ -74,7 +81,7 @@ import {
   deleteFinLancamento,
   montarResumoFinanceiro,
 } from "./repo.js";
-import { seedAnamneseTemplatesSeVazio, seedProceduresSeVazio } from "./seed.js";
+import { seedAnamneseTemplatesSeVazio, seedProceduresSeVazio, seedCategoriasFinanceirasSeVazio } from "./seed.js";
 import { montarDashboard } from "./dashboard.js";
 import { montarRelatorio, TIPOS_RELATORIO } from "./reports.js";
 import { gerarCsvRelatorio, gerarPdfRelatorio } from "./reportsExport.js";
@@ -837,8 +844,14 @@ router.patch(
   })
 );
 
-router.get("/financeiro/categorias", ah(async (req, res) => res.json(listFinCategorias(req.query.tipo))));
-router.get("/financeiro/categorias/all", requireMaster, ah(async (req, res) => res.json(listAllFinCategorias())));
+router.get("/financeiro/categorias", ah(async (req, res) => {
+  seedCategoriasFinanceirasSeVazio();
+  res.json(listFinCategorias(req.query.tipo));
+}));
+router.get("/financeiro/categorias/all", requireMaster, ah(async (req, res) => {
+  seedCategoriasFinanceirasSeVazio();
+  res.json(listAllFinCategorias());
+}));
 router.post(
   "/financeiro/categorias",
   requireMaster,
@@ -855,6 +868,63 @@ router.patch(
   ah(async (req, res) => {
     const atualizado = updateFinCategoria(req.params.id, req.body || {});
     if (!atualizado) return res.status(404).json({ error: "Categoria não encontrada", code: "SC_FIN_CATEGORIA_NOT_FOUND" });
+    res.json(atualizado);
+  })
+);
+router.delete(
+  "/financeiro/categorias/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    if (!getFinCategoria(req.params.id)) return res.status(404).json({ error: "Categoria não encontrada", code: "SC_FIN_CATEGORIA_NOT_FOUND" });
+    deleteFinCategoria(req.params.id);
+    res.json({ ok: true });
+  })
+);
+
+// Subcategoria pertence a uma categoria (herda o tipo dela) - ver o
+// comentário em schema.js. A rota de lote vem ANTES da de :id, senão "lote"
+// seria lido como um id (mesma armadilha de reports/contagem vs :formato).
+router.get("/financeiro/subcategorias/all", requireMaster, ah(async (req, res) => res.json(listAllFinSubcategorias())));
+router.post(
+  "/financeiro/categorias/:categoriaId/subcategorias",
+  requireMaster,
+  ah(async (req, res) => {
+    const { nome } = req.body || {};
+    if (!(nome || "").trim()) return res.status(400).json({ error: "Informe o nome da subcategoria", code: "SC_FIN_SUBCATEGORIA_NOME_REQUIRED" });
+    const categoria = getFinCategoria(req.params.categoriaId);
+    if (!categoria) return res.status(404).json({ error: "Categoria não encontrada", code: "SC_FIN_CATEGORIA_NOT_FOUND" });
+    res.status(201).json(insertFinSubcategoria({ categoriaId: req.params.categoriaId, nome: nome.trim() }));
+  })
+);
+router.patch(
+  "/financeiro/subcategorias/lote",
+  requireMaster,
+  ah(async (req, res) => {
+    const { ids, ativo } = req.body || {};
+    if (!Array.isArray(ids) || !ids.length) {
+      return res.status(400).json({ error: "Selecione ao menos uma subcategoria", code: "SC_FIN_SUBCATEGORIA_LOTE_VAZIO" });
+    }
+    res.json(updateManyFinSubcategoriasAtivo(ids, ativo));
+  })
+);
+router.delete(
+  "/financeiro/subcategorias/lote",
+  requireMaster,
+  ah(async (req, res) => {
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || !ids.length) {
+      return res.status(400).json({ error: "Selecione ao menos uma subcategoria", code: "SC_FIN_SUBCATEGORIA_LOTE_VAZIO" });
+    }
+    deleteManyFinSubcategorias(ids);
+    res.json({ ok: true });
+  })
+);
+router.patch(
+  "/financeiro/subcategorias/:id",
+  requireMaster,
+  ah(async (req, res) => {
+    const atualizado = updateFinSubcategoria(req.params.id, req.body || {});
+    if (!atualizado) return res.status(404).json({ error: "Subcategoria não encontrada", code: "SC_FIN_SUBCATEGORIA_NOT_FOUND" });
     res.json(atualizado);
   })
 );

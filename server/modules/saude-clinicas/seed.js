@@ -4,7 +4,10 @@
 // conteúdo é só um ponto de partida editável pela própria clínica - não há
 // seleção de idioma no cadastro de anamnese, e o público-alvo do módulo é
 // nacional. Mesmo padrão idempotente: só semeia quando não há template nenhum.
-import { listAnamneseTemplates, insertAnamneseTemplate, countProcedures, insertProcedure } from "./repo.js";
+import {
+  listAnamneseTemplates, insertAnamneseTemplate, countProcedures, insertProcedure,
+  listAllFinCategorias, insertFinCategoria, insertFinSubcategoria,
+} from "./repo.js";
 
 const ALERGIA = { id: "alergias", label: "Possui alguma alergia conhecida?", type: "textarea", required: true, alert: true };
 
@@ -65,4 +68,62 @@ const PROCEDIMENTOS_PADRAO = [
 export function seedProceduresSeVazio() {
   if (countProcedures() > 0) return;
   for (const p of PROCEDIMENTOS_PADRAO) insertProcedure(p);
+}
+
+// Plano de contas ponto de partida (Financeiro > Configurações > Categorias
+// financeiras): 6 categorias e ~100 subcategorias, pedido explícito do
+// usuário com a lista exata extraída de um sistema de referência. Só em
+// pt: mesma justificativa do catálogo de procedimentos acima - ponto de
+// partida editável, não texto de interface.
+const CATEGORIAS_FINANCEIRAS_PADRAO = [
+  {
+    nome: "Atendimento", tipo: "receita",
+    subcategorias: ["Atendimento", "Consulta"],
+  },
+  {
+    nome: "Despesas", tipo: "despesa",
+    subcategorias: [
+      "Ajuste de caixa", "Aluguel", "Assessorias e Associações", "Cartório", "Combustível e translado",
+      "Comissão de vendedores", "Confraternizações", "Contabilidade", "Correios", "Cursos e treinamentos",
+      "Distribuição de lucros", "Empréstimos", "Energia elétrica e água", "Fornecedor",
+      "Licença ou aluguel de softwares", "Limpeza", "Manutenção de equipamentos", "Marketing e publicidade",
+      "Material de escritório", "Material de reforma", "Rescisões trabalhistas", "Segurança", "Supermercado",
+      "Taxas bancárias", "Telefone celular", "Telefone fixo", "Telefonia e Internet", "Translado",
+      "Transportadora", "Treinamentos", "Vale Alimentação", "Vale Transporte", "Viagens",
+    ],
+  },
+  {
+    nome: "Despesas Financeiras", tipo: "despesa",
+    subcategorias: ["Empréstimos", "Juros", "Tarifas bancárias"],
+  },
+  {
+    nome: "Funcionários", tipo: "despesa",
+    subcategorias: [
+      "13º salário", "Adiantamento", "Alimentação", "Assistência médica e odontológica",
+      "Exames pré e demissionais", "FGTS", "Horas Extras", "INSS", "Remuneração",
+      "Rescisões trabalhistas", "Vale transporte",
+    ],
+  },
+  {
+    nome: "Impostos", tipo: "despesa",
+    subcategorias: [
+      "Alvará", "Cofins", "CSLL", "GPS", "ICMS", "Imposto de Renda", "IOF", "IPI", "IPTU", "IPVA",
+      "IR", "IRPJ", "IRRF", "ISS", "Juros", "PIS", "Simples Nacional",
+    ],
+  },
+  {
+    nome: "Receitas", tipo: "receita",
+    subcategorias: [
+      "Adiantamento", "Ajuste de caixa", "Cobrança", "Comissão", "Depósito", "Empréstimo",
+      "Mensalidade", "Procedimento", "Rendimentos", "Transferência", "Vendas",
+    ],
+  },
+];
+
+export function seedCategoriasFinanceirasSeVazio() {
+  if (listAllFinCategorias().length > 0) return;
+  for (const cat of CATEGORIAS_FINANCEIRAS_PADRAO) {
+    const categoria = insertFinCategoria({ nome: cat.nome, tipo: cat.tipo });
+    for (const nome of cat.subcategorias) insertFinSubcategoria({ categoriaId: categoria.id, nome });
+  }
 }

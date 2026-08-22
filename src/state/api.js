@@ -587,6 +587,15 @@ export const scFinListCategorias = (tipo) => request(`/saude-clinicas/financeiro
 export const scFinListAllCategorias = () => request("/saude-clinicas/financeiro/categorias/all");
 export const scFinCreateCategoria = (dados) => request("/saude-clinicas/financeiro/categorias", { method: "POST", body: dados });
 export const scFinUpdateCategoria = (id, dados) => request(`/saude-clinicas/financeiro/categorias/${id}`, { method: "PATCH", body: dados });
+export const scFinDeleteCategoria = (id) => request(`/saude-clinicas/financeiro/categorias/${id}`, { method: "DELETE" });
+
+export const scFinListAllSubcategorias = () => request("/saude-clinicas/financeiro/subcategorias/all");
+export const scFinCreateSubcategoria = (categoriaId, dados) =>
+  request(`/saude-clinicas/financeiro/categorias/${categoriaId}/subcategorias`, { method: "POST", body: dados });
+export const scFinUpdateSubcategoriasLote = (ids, ativo) =>
+  request("/saude-clinicas/financeiro/subcategorias/lote", { method: "PATCH", body: { ids, ativo } });
+export const scFinDeleteSubcategoriasLote = (ids) =>
+  request("/saude-clinicas/financeiro/subcategorias/lote", { method: "DELETE", body: { ids } });
 
 export const scFinListCentrosCusto = () => request("/saude-clinicas/financeiro/centros-custo");
 export const scFinListAllCentrosCusto = () => request("/saude-clinicas/financeiro/centros-custo/all");

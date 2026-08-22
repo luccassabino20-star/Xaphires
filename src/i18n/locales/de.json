@@ -304,7 +304,11 @@
         "nome": "Name", "nomePlaceholder": "Name", "nomeObrigatorio": "Geben Sie den Namen an.",
         "banco": "Bank", "saldoInicial": "Anfangssaldo", "semItens": "Noch keine Einträge registriert.",
         "semOutras": "Noch keine weiteren Einstellungen hier.",
-        "semContasCadastradas": "Legen Sie ein Konto unter Finanzen > Einstellungen > Bankkonten an."
+        "semContasCadastradas": "Legen Sie ein Konto unter Finanzen > Einstellungen > Bankkonten an.",
+        "novaCategoria": "+ Neue Kategorie", "adicionarSubcategoria": "+ Neue Unterkategorie hinzufügen",
+        "nomeSubcategoriaPlaceholder": "Name der Unterkategorie", "selecionadas": "{{count}} ausgewählt",
+        "ativarSelecionadas": "Ausgewählte aktivieren", "desativarSelecionadas": "Ausgewählte deaktivieren",
+        "excluirSelecionadas": "Ausgewählte löschen", "cancelarSelecao": "Auswahl aufheben"
       }
     },
     "config": {

@@ -326,7 +326,11 @@
         "nome": "Nombre", "nomePlaceholder": "Nombre", "nomeObrigatorio": "Indica el nombre.",
         "banco": "Banco", "saldoInicial": "Saldo inicial", "semItens": "Aún no hay elementos registrados.",
         "semOutras": "Aún no hay configuraciones adicionales aquí.",
-        "semContasCadastradas": "Registra una cuenta en Finanzas > Configuración > Cuentas bancarias."
+        "semContasCadastradas": "Registra una cuenta en Finanzas > Configuración > Cuentas bancarias.",
+        "novaCategoria": "+ Nueva categoría", "adicionarSubcategoria": "+ Agregar nueva subcategoría",
+        "nomeSubcategoriaPlaceholder": "Nombre de la subcategoría", "selecionadas": "{{count}} seleccionada(s)",
+        "ativarSelecionadas": "Activar seleccionadas", "desativarSelecionadas": "Desactivar seleccionadas",
+        "excluirSelecionadas": "Eliminar seleccionadas", "cancelarSelecao": "Cancelar selección"
       }
     },
     "config": {

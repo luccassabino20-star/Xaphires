@@ -304,7 +304,11 @@
         "nome": "Nom", "nomePlaceholder": "Nom", "nomeObrigatorio": "Indiquez le nom.",
         "banco": "Banque", "saldoInicial": "Solde initial", "semItens": "Aucun élément enregistré pour le moment.",
         "semOutras": "Aucun autre paramètre pour le moment.",
-        "semContasCadastradas": "Créez un compte dans Finance > Paramètres > Comptes bancaires."
+        "semContasCadastradas": "Créez un compte dans Finance > Paramètres > Comptes bancaires.",
+        "novaCategoria": "+ Nouvelle catégorie", "adicionarSubcategoria": "+ Ajouter une sous-catégorie",
+        "nomeSubcategoriaPlaceholder": "Nom de la sous-catégorie", "selecionadas": "{{count}} sélectionnée(s)",
+        "ativarSelecionadas": "Activer la sélection", "desativarSelecionadas": "Désactiver la sélection",
+        "excluirSelecionadas": "Supprimer la sélection", "cancelarSelecao": "Annuler la sélection"
       }
     },
     "config": {

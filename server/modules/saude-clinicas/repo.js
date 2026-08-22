@@ -765,6 +765,59 @@ export function updateFinCategoria(id, { nome, tipo, ativo }) {
     .run(nome !== undefined ? nome : atual.nome, tipo !== undefined ? tipo : atual.tipo, ativo !== undefined ? (ativo ? 1 : 0) : atual.ativo, id);
   return getFinCategoria(id);
 }
+// Excluir de verdade (diferente de desativar): anula categoria_id nos
+// lançamentos que já apontavam pra ela (preserva o lançamento, mesmo padrão
+// do centro de custo no módulo Financeiro/ERP IRES) e remove as
+// subcategorias dela junto - subcategoria não sobrevive sem a categoria.
+export function deleteFinCategoria(id) {
+  const db = getDb();
+  db.prepare("UPDATE sc_fin_lancamentos SET categoria_id = NULL WHERE categoria_id = ?").run(id);
+  db.prepare("DELETE FROM sc_fin_subcategorias WHERE categoria_id = ?").run(id);
+  db.prepare("DELETE FROM sc_fin_categorias WHERE id = ?").run(id);
+}
+
+export function listAllFinSubcategorias() {
+  return getDb().prepare("SELECT * FROM sc_fin_subcategorias ORDER BY ativo DESC, nome COLLATE NOCASE").all();
+}
+export function listFinSubcategorias(categoriaId) {
+  return getDb()
+    .prepare("SELECT * FROM sc_fin_subcategorias WHERE categoria_id = ? AND ativo = 1 ORDER BY nome COLLATE NOCASE")
+    .all(categoriaId);
+}
+export function getFinSubcategoria(id) {
+  return getDb().prepare("SELECT * FROM sc_fin_subcategorias WHERE id = ?").get(id);
+}
+export function insertFinSubcategoria({ categoriaId, nome }) {
+  const id = uid();
+  getDb()
+    .prepare("INSERT INTO sc_fin_subcategorias (id, categoria_id, nome, ativo, created_at) VALUES (?, ?, ?, 1, ?)")
+    .run(id, categoriaId, nome, nowIso());
+  return getFinSubcategoria(id);
+}
+export function updateFinSubcategoria(id, { nome, ativo }) {
+  const atual = getFinSubcategoria(id);
+  if (!atual) return null;
+  getDb()
+    .prepare("UPDATE sc_fin_subcategorias SET nome = ?, ativo = ? WHERE id = ?")
+    .run(nome !== undefined ? nome : atual.nome, ativo !== undefined ? (ativo ? 1 : 0) : atual.ativo, id);
+  return getFinSubcategoria(id);
+}
+// Ação em lote (checkbox de seleção da tela de Categorias) - node:sqlite não
+// tem db.transaction() do better-sqlite3, então é um loop de UPDATE mesmo.
+export function updateManyFinSubcategoriasAtivo(ids, ativo) {
+  const db = getDb();
+  const stmt = db.prepare("UPDATE sc_fin_subcategorias SET ativo = ? WHERE id = ?");
+  for (const id of ids) stmt.run(ativo ? 1 : 0, id);
+  return ids.map(getFinSubcategoria).filter(Boolean);
+}
+// Subcategoria não é referenciada em nenhum outro lugar (o lançamento só
+// guarda categoria_id, não subcategoria_id) - excluir é sempre um DELETE
+// direto, sem órfão pra limpar.
+export function deleteManyFinSubcategorias(ids) {
+  const db = getDb();
+  const stmt = db.prepare("DELETE FROM sc_fin_subcategorias WHERE id = ?");
+  for (const id of ids) stmt.run(id);
+}
 
 export function listFinCentrosCusto() {
   return getDb().prepare("SELECT * FROM sc_fin_centros_custo WHERE ativo = 1 ORDER BY nome COLLATE NOCASE").all();
