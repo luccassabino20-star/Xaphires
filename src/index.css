@@ -7304,6 +7304,45 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
    .module-card do launcher) em vez de uma barra de abas fixa. */
 .sc { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--bg-column); color: var(--text-primary); }
 
+/* ---------- Visual "premium" (forma, não cor) ----------
+   Pedido do usuário: cantos mais arredondados, sombras suaves, respiro
+   maior e pilulas em vez de botão quadrado em TODO o módulo - mas usando a
+   cor de destaque que a clínica já escolheu (--accent, temas logo abaixo),
+   não uma paleta fixa nova (essa foi uma decisão à parte, só do modal de
+   Agendamento, que mantém a identidade própria dele).
+   Fica ANTES dos temas de cor e de qualquer override mais específico
+   (.sc-agenda-modal, .sc[data-sc-theme="escuro"] etc.) de propósito: são
+   todos a mesma especificidade (poucas classes), então quem vem depois no
+   arquivo vence o empate - a base genérica precisa nascer primeiro pra não
+   atropelar o que já foi desenhado sob medida pra uma tela específica. */
+.sc .modal { border-radius: 20px; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.3), var(--shadow-modal); }
+.sc .btn-primary, .sc .btn-secondary { border-radius: 999px; padding: 10px 20px; font-weight: 650; }
+.sc .btn-ghost { border-radius: 999px; }
+.sc .btn-small { border-radius: 999px; padding: 7px 14px; }
+.sc-toggle-group { border-radius: 999px; }
+.sc-body { padding: 32px 36px 60px; }
+.sc-config-card, .sc-table-wrap, .sc-agenda-grid-wrap, .sc-agenda-busca-resultados,
+.sc-waitlist-item, .sc-daypanel-item, .sc-dash-kpi, .sc-fin-donut-card {
+  border-radius: 16px;
+}
+.sc-table th, .sc-table td { padding: 12px 16px; }
+.sc-sidebar-item, .sc-sidebar-subitem, .sc-log-nav-item { border-radius: 10px; }
+.sc-tema-swatch-amostra { border-radius: 12px; }
+/* Campos de formulário do módulo inteiro - cada seletor repete a classe
+   exata da regra original (mesma especificidade dela), só pra não abrir
+   mão do controle fino de cada tela; um ".sc input" genérico bateria mais
+   forte que ".sc-agenda-filtro" (teria um seletor de tipo a mais) e
+   atropelaria a regra específica em vez de só arredondar. */
+.sc-clinictype-select, .sc-form input, .sc-form select,
+.sc-campo-row input[type="text"], .sc-campo-row select,
+.sc-pub-campo input[type="text"], .sc-pub-campo textarea,
+.sc-agenda-busca input, .sc-agenda-filtro, .sc-dash-header-datas input,
+.sc-rel-comissao-input, .sc-agenda-linha input, .sc-agenda-linha select,
+.sc-waitlist-form input, .sc-waitlist-form select, .sc-waitlist-form textarea,
+.sc-detail-status, .sc-detail-valor-campo input {
+  border-radius: 12px;
+}
+
 /* Aparência e Temas (Configurações do módulo): a clínica escolhe uma cor de
    destaque que vale só dentro do módulo Saúde & Clínicas, independente do
    claro/escuro do app inteiro (ThemeContext/data-theme, ver index.css raiz).
