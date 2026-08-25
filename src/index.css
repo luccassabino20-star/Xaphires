@@ -3366,7 +3366,7 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   inset: -20% -10% auto auto;
   width: 60%;
   height: 140%;
-  background: linear-gradient(135deg, rgba(148, 163, 184, 0.14), rgba(100, 116, 139, 0.04) 55%, transparent 70%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(59, 130, 246, 0.04) 55%, transparent 70%);
   filter: blur(60px);
   pointer-events: none;
 }
