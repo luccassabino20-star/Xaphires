@@ -30,6 +30,7 @@ import {
   getAnamneseResponse,
   criarRascunhoResposta,
   enviarResposta,
+  atualizarRespostaAnamnese,
   listProcedures,
   listAllProcedures,
   insertProcedure,
@@ -112,6 +113,21 @@ function parseFields(fields) {
 }
 function templateComFieldsParseados(t) {
   return t && { ...t, fields: parseFields(t.fields) };
+}
+// `answers` sai do banco como string (repo.js grava com JSON.stringify) - o
+// prontuário do paciente (ProntuarioView.jsx) precisa do objeto pra desenhar
+// os campos preenchidos. companyId vai junto pelo mesmo motivo do POST
+// .../enviar: é o cliente quem monta a URL pública (origin + /anamnese/
+// :companyId/:token) para "copiar link"/reenviar.
+function respostaComAnswersParseadas(r, companyId) {
+  if (!r) return r;
+  let answers = {};
+  try {
+    answers = typeof r.answers === "string" ? JSON.parse(r.answers) : r.answers || {};
+  } catch {
+    answers = {};
+  }
+  return { ...r, answers, companyId };
 }
 
 // ---------- Configuração da clínica ----------
@@ -551,7 +567,8 @@ router.patch(
 router.get(
   "/anamnesis-responses",
   ah(async (req, res) => {
-    res.json(listAnamneseResponses(req.query.patientId || null));
+    const linhas = listAnamneseResponses(req.query.patientId || null);
+    res.json(linhas.map((r) => respostaComAnswersParseadas(r, req.companyId)));
   })
 );
 
@@ -565,7 +582,8 @@ router.post(
     if (!patientId || !getPatient(patientId)) {
       return res.status(400).json({ error: "Paciente inválido", code: "PATIENT_NOT_FOUND" });
     }
-    res.status(201).json(criarRascunhoResposta({ templateId, patientId }, req.user.id));
+    const criado = criarRascunhoResposta({ templateId, patientId }, req.user.id);
+    res.status(201).json(respostaComAnswersParseadas(criado, req.companyId));
   })
 );
 
@@ -576,7 +594,19 @@ router.post(
   ah(async (req, res) => {
     const atualizado = enviarResposta(req.params.id);
     if (!atualizado) return res.status(404).json({ error: "Ficha não encontrada", code: "ANAMNESE_RESPONSE_NOT_FOUND" });
-    res.json({ ...atualizado, companyId: req.companyId });
+    res.json(respostaComAnswersParseadas(atualizado, req.companyId));
+  })
+);
+
+// A própria clínica preenchendo/corrigindo a ficha direto no prontuário do
+// paciente (ProntuarioView.jsx) - diferente de responder pelo link público
+// (server/routes/anamnesePublica.js), que não passa por sessão nenhuma.
+router.patch(
+  "/anamnesis-responses/:id",
+  ah(async (req, res) => {
+    const atualizado = atualizarRespostaAnamnese(req.params.id, req.body?.answers || {});
+    if (!atualizado) return res.status(404).json({ error: "Ficha não encontrada", code: "ANAMNESE_RESPONSE_NOT_FOUND" });
+    res.json(respostaComAnswersParseadas(atualizado, req.companyId));
   })
 );
 

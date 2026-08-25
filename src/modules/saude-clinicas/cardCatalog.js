@@ -20,7 +20,7 @@ export const CARDS = [
   { id: "rastreabilidade-lotes", icon: "lotes", areas: ["BIOMEDICINA_ESTETICA"], real: false },
   { id: "termos-legais", icon: "termos", areas: ["BIOMEDICINA_ESTETICA"], real: false },
 
-  { id: "prontuario-nutricional", icon: "prontuario", areas: ["NUTRICAO"], real: false },
+  { id: "prontuario-nutricional", icon: "prontuario", areas: ["NUTRICAO"], real: true, view: "prontuario-nutricional" },
   { id: "avaliacao-antropometrica", icon: "antropometria", areas: ["NUTRICAO"], real: false },
   { id: "gerador-plano-alimentar", icon: "plano-alimentar", areas: ["NUTRICAO"], real: false },
   { id: "prescritor-suplementos", icon: "suplementos", areas: ["NUTRICAO"], real: false },

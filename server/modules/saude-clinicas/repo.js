@@ -305,6 +305,24 @@ export function responderAnamnese(token, answers) {
   return getRespostaPorToken(token);
 }
 
+// Mesmo update de responderAnamnese, mas pelo id (rota autenticada, quando é
+// a própria clínica preenchendo a ficha no prontuário do paciente, não o
+// paciente pelo link). Só marca 'respondido'/responded_at na primeira vez -
+// reabrir uma ficha já respondida pra corrigir um campo não deveria mexer na
+// data em que o paciente de fato respondeu.
+export function atualizarRespostaAnamnese(id, answers) {
+  const a = getAnamneseResponse(id);
+  if (!a) return null;
+  if (a.status === "respondido") {
+    getDb().prepare("UPDATE anamnesis_responses SET answers = ? WHERE id = ?").run(JSON.stringify(answers || {}), id);
+  } else {
+    getDb()
+      .prepare("UPDATE anamnesis_responses SET answers = ?, status = 'respondido', responded_at = ? WHERE id = ?")
+      .run(JSON.stringify(answers || {}), nowIso(), id);
+  }
+  return getAnamneseResponse(id);
+}
+
 // ---------- Procedimentos ----------
 
 export function listProcedures() {

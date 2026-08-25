@@ -421,6 +421,16 @@
       "mensagemWhatsapp": "Olá! Por favor, preencha sua ficha de pré-anamnese antes da consulta: {{url}}",
       "status": { "rascunho": "Rascunho", "enviado": "Enviado", "respondido": "Respondido" }
     },
+    "prontuario": {
+      "semTemplate": "Nenhum template de Anamnese Nutricional cadastrado. Crie um em Fichas de Anamnese.",
+      "selecionePaciente": "Selecione um paciente para ver o prontuário nutricional.",
+      "carregando": "Carregando...",
+      "semRespostaAinda": "{{nome}} ainda não tem nenhuma ficha de anamnese nutricional.",
+      "criarFicha": "Criar ficha para este paciente",
+      "novaFicha": "Nova ficha",
+      "salvarRespostas": "Salvar respostas", "salvando": "Salvando...", "respostasSalvas": "Respostas salvas",
+      "copiarLink": "Copiar link", "linkCopiado": "Link copiado"
+    },
     "agenda": {
       "diaSemana": { "0": "Domingo", "1": "Segunda", "2": "Terça", "3": "Quarta", "4": "Quinta", "5": "Sexta", "6": "Sábado" },
       "mes": { "0": "Janeiro", "1": "Fevereiro", "2": "Março", "3": "Abril", "4": "Maio", "5": "Junho", "6": "Julho", "7": "Agosto", "8": "Setembro", "9": "Outubro", "10": "Novembro", "11": "Dezembro" },

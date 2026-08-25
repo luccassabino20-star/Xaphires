@@ -503,6 +503,8 @@ export const scListAnamneseResponses = (patientId) =>
 export const scCreateAnamneseResponse = (templateId, patientId) =>
   request("/saude-clinicas/anamnesis-responses", { method: "POST", body: { templateId, patientId } });
 export const scEnviarAnamneseResponse = (id) => request(`/saude-clinicas/anamnesis-responses/${id}/enviar`, { method: "POST" });
+export const scAtualizarAnamneseResposta = (id, answers) =>
+  request(`/saude-clinicas/anamnesis-responses/${id}`, { method: "PATCH", body: { answers } });
 
 // Formulário público (o paciente, sem sessão) - fora de /saude-clinicas, mora
 // em /public/anamnese no servidor (server/routes/anamnesePublica.js).

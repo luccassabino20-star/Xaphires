@@ -28,6 +28,7 @@ import ConfigView from "./ConfigView.jsx";
 import { cardsParaClinicType } from "./cardCatalog.js";
 import PatientsView from "./PatientsView.jsx";
 import AnamneseView from "./AnamneseView.jsx";
+import ProntuarioNutricionalView from "./ProntuarioNutricionalView.jsx";
 
 // Casca do módulo Saúde & Clínicas: menu lateral de administração (fixo à
 // esquerda, colapsável) + conteúdo principal à direita. A seção "Pacientes" é
@@ -190,6 +191,7 @@ function PacientesSection({ clinicType }) {
         </button>
         {view === "pacientes" && <PatientsView />}
         {view === "anamnese" && <AnamneseView />}
+        {view === "prontuario-nutricional" && <ProntuarioNutricionalView />}
       </div>
     );
   }
