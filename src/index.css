@@ -3683,23 +3683,33 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   padding: 24px;
+  /* Arredonda o banner (abaixo) junto com o card - ver .module-card-banner
+     reaproveitado aqui, mesmo tratamento do launcher (ModuleLauncher.jsx). */
+  overflow: hidden;
 }
 .landing-solution-card-custom { border: 1px dashed var(--border-strong); background: var(--bg-list); }
+/* Sangra o banner até a borda do card apesar do padding de 24px daqui - o
+   .module-card-banner de base usa a margem do launcher (16/18px), essa regra
+   só ajusta o valor pro padding maior deste card. */
+.landing-solution-card .module-card-banner { height: 100px; margin: -24px -24px 16px; }
 .landing-solution-soon {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  color: var(--text-muted);
-  background: var(--bg-list);
-  border: 1px solid var(--border-subtle);
+  /* Flutua sobre o banner escuro, não sobre o corpo branco do card - por isso
+     o tom claro translúcido em vez do par cinza claro/borda usado no resto do
+     site (que sumiria contra o fundo escuro). */
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.26);
   padding: 3px 8px;
   border-radius: 999px;
 }
-.landing-solution-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 10px; padding-right: 64px; }
+.landing-solution-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 10px; }
 .landing-solution-card p { font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 16px; }
 .landing-solution-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .landing-solution-tag {

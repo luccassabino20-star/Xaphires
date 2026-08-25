@@ -673,6 +673,7 @@
       "customCta": "Falar com nossa equipe",
       "items": [
         {
+          "icon": "vendas",
           "title": "Vendas & CRM",
           "text": "Leads, funil em Kanban, propostas, orçamentos e pedidos - do primeiro contato ao fechamento, num só lugar.",
           "tags": [
@@ -682,6 +683,7 @@
           ]
         },
         {
+          "icon": "layers",
           "title": "ERP IRES",
           "text": "Fluxo de caixa, contas a pagar e a receber, conciliação bancária e DRE - a espinha dorsal financeira da empresa.",
           "tags": [
@@ -691,6 +693,7 @@
           ]
         },
         {
+          "icon": "saude",
           "title": "Saúde & Clínicas",
           "text": "Prontuário, anamnese, agenda e gestão para clínicas de estética, biomedicina e nutrição.",
           "tags": [
@@ -700,6 +703,7 @@
           ]
         },
         {
+          "icon": "estoque",
           "title": "Compras & Estoque",
           "text": "Inventário, fornecedores, margem de produtos e ponto de reordem.",
           "tags": [
@@ -709,6 +713,7 @@
           "soon": true
         },
         {
+          "icon": "faturamento",
           "title": "Faturamento",
           "text": "Emissão de notas fiscais, boletos e links de pagamento.",
           "tags": [
@@ -718,6 +723,7 @@
           "soon": true
         },
         {
+          "icon": "bi",
           "title": "Relatórios & BI",
           "text": "Dashboards operacionais e financeiros consolidados, para decidir com dado real.",
           "tags": [
@@ -727,6 +733,7 @@
           "soon": true
         },
         {
+          "icon": "custom",
           "title": "Soluções Sob Medida",
           "text": "Não achou o que precisa nos módulos prontos? Desenvolvemos integrações de API, automações e módulos exclusivos para o seu negócio.",
           "tags": [

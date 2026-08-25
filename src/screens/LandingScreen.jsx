@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
+import ModuleIcon from "../modules/ModuleIcon.jsx";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 import xaphiresLogo from "../assets/xaphires-logo.png";
 
@@ -557,6 +558,11 @@ function SolutionsPage({ onNavigate }) {
       <section className="landing-solutions">
         {items.map((s) => (
           <div className={"landing-solution-card" + (s.custom ? " landing-solution-card-custom" : "")} key={s.title}>
+            <span className="module-card-banner">
+              <span className="module-card-banner-icon">
+                <ModuleIcon name={s.icon} size={26} />
+              </span>
+            </span>
             {s.soon && <span className="landing-solution-soon">{t("landing.solutions.soon")}</span>}
             <h3>{s.title}</h3>
             <p>{s.text}</p>

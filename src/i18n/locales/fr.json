@@ -637,6 +637,7 @@
       "customCta": "Parler à notre équipe",
       "items": [
         {
+          "icon": "vendas",
           "title": "Ventes & CRM",
           "text": "Prospects, pipeline Kanban, propositions, devis et commandes - du premier contact à la conclusion, en un seul endroit.",
           "tags": [
@@ -646,6 +647,7 @@
           ]
         },
         {
+          "icon": "layers",
           "title": "Finance",
           "text": "Trésorerie, comptes à payer et à recevoir, rapprochement bancaire et compte de résultat - l'épine dorsale financière de l'entreprise.",
           "tags": [
@@ -655,6 +657,7 @@
           ]
         },
         {
+          "icon": "estoque",
           "title": "Achats & Stocks",
           "text": "Inventaire, fournisseurs, marge produit et seuil de réapprovisionnement.",
           "tags": [
@@ -664,6 +667,7 @@
           "soon": true
         },
         {
+          "icon": "faturamento",
           "title": "Facturation",
           "text": "Émission de factures, bordereaux et liens de paiement.",
           "tags": [
@@ -673,6 +677,7 @@
           "soon": true
         },
         {
+          "icon": "bi",
           "title": "Rapports & BI",
           "text": "Tableaux de bord opérationnels et financiers consolidés, pour décider avec des données réelles.",
           "tags": [
@@ -682,6 +687,7 @@
           "soon": true
         },
         {
+          "icon": "custom",
           "title": "Solutions sur mesure",
           "text": "Vous n'avez pas trouvé ce qu'il vous faut dans les modules prêts à l'emploi ? Nous développons des intégrations API, des automatisations et des modules exclusifs pour votre entreprise.",
           "tags": [

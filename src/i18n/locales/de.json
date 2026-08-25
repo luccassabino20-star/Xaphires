@@ -575,12 +575,12 @@
       "soon": "Demnächst",
       "customCta": "Mit unserem Team sprechen",
       "items": [
-        { "title": "Vertrieb & CRM", "text": "Leads, Kanban-Pipeline, Angebote, Kostenvoranschläge und Bestellungen - vom ersten Kontakt bis zum Abschluss, an einem Ort.", "tags": ["Kanban-Board", "Angebote", "Kostenvoranschläge"] },
-        { "title": "Finanzen", "text": "Cashflow, Verbindlichkeiten und Forderungen, Kontenabgleich und GuV - das finanzielle Rückgrat des Unternehmens.", "tags": ["Cashflow", "Verbindlichkeiten/Forderungen", "GuV"] },
-        { "title": "Einkauf & Lager", "text": "Bestand, Lieferanten, Produktmargen und Meldebestand.", "tags": ["Bestand", "Lieferanten"], "soon": true },
-        { "title": "Rechnungsstellung", "text": "Ausstellung von Rechnungen, Zahlscheinen und Zahlungslinks.", "tags": ["Rechnungen", "Zahlscheine"], "soon": true },
-        { "title": "Berichte & BI", "text": "Konsolidierte operative und finanzielle Dashboards, um mit echten Daten zu entscheiden.", "tags": ["Dashboards", "Indikatoren"], "soon": true },
-        { "title": "Maßgeschneiderte Lösungen", "text": "Nicht gefunden, was Sie brauchen? Wir entwickeln API-Integrationen, Automatisierungen und exklusive Module für Ihr Unternehmen.", "tags": ["Integrationen", "Automatisierungen"], "custom": true }
+        { "icon": "vendas", "title": "Vertrieb & CRM", "text": "Leads, Kanban-Pipeline, Angebote, Kostenvoranschläge und Bestellungen - vom ersten Kontakt bis zum Abschluss, an einem Ort.", "tags": ["Kanban-Board", "Angebote", "Kostenvoranschläge"] },
+        { "icon": "layers", "title": "Finanzen", "text": "Cashflow, Verbindlichkeiten und Forderungen, Kontenabgleich und GuV - das finanzielle Rückgrat des Unternehmens.", "tags": ["Cashflow", "Verbindlichkeiten/Forderungen", "GuV"] },
+        { "icon": "estoque", "title": "Einkauf & Lager", "text": "Bestand, Lieferanten, Produktmargen und Meldebestand.", "tags": ["Bestand", "Lieferanten"], "soon": true },
+        { "icon": "faturamento", "title": "Rechnungsstellung", "text": "Ausstellung von Rechnungen, Zahlscheinen und Zahlungslinks.", "tags": ["Rechnungen", "Zahlscheine"], "soon": true },
+        { "icon": "bi", "title": "Berichte & BI", "text": "Konsolidierte operative und finanzielle Dashboards, um mit echten Daten zu entscheiden.", "tags": ["Dashboards", "Indikatoren"], "soon": true },
+        { "icon": "custom", "title": "Maßgeschneiderte Lösungen", "text": "Nicht gefunden, was Sie brauchen? Wir entwickeln API-Integrationen, Automatisierungen und exklusive Module für Ihr Unternehmen.", "tags": ["Integrationen", "Automatisierungen"], "custom": true }
       ],
       "learnMore": "Mehr erfahren"
     },

@@ -611,13 +611,13 @@
       "soon": "Coming soon",
       "customCta": "Talk to our team",
       "items": [
-        { "title": "Sales & CRM", "text": "Leads, Kanban pipeline, proposals, quotes and orders - from first contact to close, in one place.", "tags": ["Kanban board", "Proposals", "Quotes"] },
-        { "title": "ERP IRES", "text": "Cash flow, accounts payable and receivable, bank reconciliation and P&L - the financial backbone of the business.", "tags": ["Cash flow", "Payable/receivable", "P&L"] },
-        { "title": "Health & Clinics", "text": "Patient records, anamnesis, scheduling and management for aesthetics, biomedicine and nutrition clinics.", "tags": ["Digital anamnesis", "Patient records", "Scheduling"] },
-        { "title": "Purchasing & Inventory", "text": "Stock, suppliers, product margins and reorder points.", "tags": ["Stock", "Suppliers"], "soon": true },
-        { "title": "Invoicing", "text": "Tax invoice issuing, bank slips and payment links.", "tags": ["Tax invoices", "Bank slips"], "soon": true },
-        { "title": "Reports & BI", "text": "Consolidated operational and financial dashboards, to decide with real data.", "tags": ["Dashboards", "Indicators"], "soon": true },
-        { "title": "Custom Solutions", "text": "Didn't find what you need in the ready-made modules? We build API integrations, automations and exclusive modules for your business.", "tags": ["Integrations", "Automations"], "custom": true }
+        { "icon": "vendas", "title": "Sales & CRM", "text": "Leads, Kanban pipeline, proposals, quotes and orders - from first contact to close, in one place.", "tags": ["Kanban board", "Proposals", "Quotes"] },
+        { "icon": "layers", "title": "ERP IRES", "text": "Cash flow, accounts payable and receivable, bank reconciliation and P&L - the financial backbone of the business.", "tags": ["Cash flow", "Payable/receivable", "P&L"] },
+        { "icon": "saude", "title": "Health & Clinics", "text": "Patient records, anamnesis, scheduling and management for aesthetics, biomedicine and nutrition clinics.", "tags": ["Digital anamnesis", "Patient records", "Scheduling"] },
+        { "icon": "estoque", "title": "Purchasing & Inventory", "text": "Stock, suppliers, product margins and reorder points.", "tags": ["Stock", "Suppliers"], "soon": true },
+        { "icon": "faturamento", "title": "Invoicing", "text": "Tax invoice issuing, bank slips and payment links.", "tags": ["Tax invoices", "Bank slips"], "soon": true },
+        { "icon": "bi", "title": "Reports & BI", "text": "Consolidated operational and financial dashboards, to decide with real data.", "tags": ["Dashboards", "Indicators"], "soon": true },
+        { "icon": "custom", "title": "Custom Solutions", "text": "Didn't find what you need in the ready-made modules? We build API integrations, automations and exclusive modules for your business.", "tags": ["Integrations", "Automations"], "custom": true }
       ],
       "learnMore": "Learn more"
     },
