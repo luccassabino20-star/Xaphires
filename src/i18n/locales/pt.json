@@ -548,7 +548,6 @@
     "nav": {
       "brand": "Xaphires",
       "home": "Início",
-      "features": "Recursos",
       "solutions": "Soluções",
       "pricing": "Planos",
       "mentorias": "Mentorias",
@@ -626,12 +625,6 @@
       "exploreTitle": "Explore o Xaphires",
       "exploreLinks": [
         {
-          "page": "features",
-          "badge": "R",
-          "title": "Recursos",
-          "text": "Conheça as ferramentas do Xaphires: quadro, tabela, calendário, mapa e mais."
-        },
-        {
           "page": "solutions",
           "badge": "S",
           "title": "Soluções",
@@ -670,119 +663,6 @@
           }
         ]
       }
-    },
-    "features": {
-      "automationsTitle": "O que o Xaphires faz sozinho",
-      "automationsText": "Automações que trabalham em segundo plano, para você não precisar lembrar nem cobrar na mão.",
-      "automations": [
-        {
-          "badge": "R",
-          "title": "Arquivamento de cartões",
-          "text": "Tire o concluído do quadro sem apagar nada. Arquivado sai de todas as visões e volta para a coluna de origem quando você quiser."
-        },
-        {
-          "badge": "A",
-          "title": "Arquivamento automático",
-          "text": "Defina os dias e os cartões concluídos vão para o arquivo sozinhos. Disponível do plano Pro para cima."
-        },
-        {
-          "badge": "G",
-          "title": "Monitor de gargalos",
-          "text": "Marque o tempo aceitável de cada coluna e veja quais cartões passaram do prazo, com mensagem de cobrança pronta. Do Pro para cima."
-        },
-        {
-          "badge": "T",
-          "title": "Rotinas automáticas",
-          "text": "Tarefas fixas viram cartão sozinhas na data certa, com o checklist já preenchido. Do plano Pro para cima."
-        },
-        {
-          "badge": "L",
-          "title": "Letreiro de tarefas",
-          "text": "Uma faixa no topo do quadro passando o que está pendente, com destaque para o que já venceu. Disponível do plano Pro para cima."
-        },
-        {
-          "badge": "P",
-          "title": "Planejador pessoal",
-          "text": "Uma agenda fora dos quadros, só sua: calendário e lista de tarefas pessoais, com as concluídas arquivando sozinhas depois de 2 dias. Disponível do plano Pro para cima."
-        },
-        {
-          "badge": "X",
-          "title": "Anexos e links",
-          "text": "Contratos, plantas e fotos direto no cartão, além de links para o que mora fora do sistema."
-        },
-        {
-          "badge": "C",
-          "title": "Conclusão automática",
-          "text": "Marcou o cartão como concluído, ele já pula sozinho para a coluna de concluído do quadro - sem arrastar na mão."
-        }
-      ],
-      "headerTitle": "Tudo o que a sua equipe precisa",
-      "headerText": "Ferramentas integradas, para não depender de planilhas soltas ou de outro aplicativo por tarefa.",
-      "items": [
-        {
-          "badge": "Q",
-          "title": "Quadro Kanban",
-          "text": "Chega de tarefa perdida em print de conversa. Arraste e solte entre listas e veja o andamento real da equipe."
-        },
-        {
-          "badge": "T",
-          "title": "Tabela",
-          "text": "Todos os cartões em formato de planilha, com busca e filtro por membro, sem precisar de outra ferramenta."
-        },
-        {
-          "badge": "C",
-          "title": "Calendário",
-          "text": "Prazos e datas de início numa visão mensal, para nada passar despercebido."
-        },
-        {
-          "badge": "L",
-          "title": "Linha do tempo (Gantt)",
-          "text": "Crie e abra tarefas direto na linha do tempo, com o cronograma inteiro do projeto num só olhar, período a período. Disponível do plano Unlimited para cima."
-        },
-        {
-          "badge": "P",
-          "title": "Painel",
-          "text": "Métricas e indicadores prontos para mostrar o progresso sem montar planilha nenhuma. Disponível do plano Unlimited para cima."
-        },
-        {
-          "badge": "M",
-          "title": "Mapa",
-          "text": "Tarefas com endereço plotadas num mapa interativo. Ótimo para equipes em campo. Disponível do plano Unlimited para cima."
-        },
-        {
-          "badge": "E",
-          "title": "Matriz Eisenhower",
-          "text": "Priorize por urgência e importância e pare de trabalhar só no que grita mais alto. Disponível do plano Unlimited para cima."
-        }
-      ],
-      "ganttPreview": {
-        "title": "O Gantt em ação",
-        "text": "Cada tarefa vira uma barra no tempo, com a linha do dia de hoje sempre visível - crie e edite direto por aqui, sem precisar de outra ferramenta.",
-        "rows": [
-          { "title": "Planejamento", "status": "done" },
-          { "title": "Desenvolvimento", "status": "inProgress" },
-          { "title": "Testes", "status": "agency" },
-          { "title": "Revisão final", "child": true }
-        ]
-      },
-      "secondary": [
-        {
-          "title": "Quadros privados e compartilhados",
-          "text": "Separe o que é da equipe do que é só seu, com controle total de visibilidade."
-        },
-        {
-          "title": "Controle de usuários e papéis",
-          "text": "Defina quem é administrador (master) e quem é membro da equipe."
-        },
-        {
-          "title": "Bate-papo da empresa",
-          "text": "Um canal geral para todo mundo e conversas privadas entre colegas, sem sair do sistema para o WhatsApp."
-        },
-        {
-          "title": "Subtarefas com dono, prazo e prioridade",
-          "text": "Divida o cartão em etapas menores, cada uma com responsável, data e prioridade próprios - não é só uma lista de caixinhas."
-        }
-      ]
     },
     "solutions": {
       "headerTitle": "Soluções para cada área da sua empresa",

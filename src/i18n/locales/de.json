@@ -512,7 +512,6 @@
     "nav": {
       "brand": "Xaphires",
       "home": "Start",
-      "features": "Funktionen",
       "solutions": "Lösungen",
       "pricing": "Preise",
       "mentorias": "Mentoring",
@@ -557,7 +556,6 @@
       ],
       "exploreTitle": "Entdecken Sie Xaphires",
       "exploreLinks": [
-        { "page": "features", "badge": "F", "title": "Funktionen", "text": "Lernen Sie die Tools von Xaphires kennen: Board, Tabelle, Kalender, Karte und mehr." },
         { "page": "solutions", "badge": "S", "title": "Lösungen", "text": "Vertrieb & CRM, Finanzen und weitere Bereiche, bereit für Ihr Unternehmen, an einem Ort." },
         { "page": "pricing", "badge": "P", "title": "Preise", "text": "Vergleichen Sie die Pläne Free, Pro und Enterprise und wählen Sie den passenden für Ihr Team." }
       ],
@@ -568,43 +566,6 @@
         { "q": "Kann ich jederzeit kündigen?", "a": "Ja, ohne Vertragsstrafe. Bei einer Kündigung behalten Sie den vollen Zugriff bis zum Ende des bereits bezahlten Zeitraums; danach bleiben die Daten erhalten - um wieder bearbeiten zu können, wählen Sie einfach jederzeit den kostenlosen Plan." },
         { "q": "Muss ich mein Team schulen, um es zu nutzen?", "a": "In den meisten Fällen nicht. Wenn jemand in Ihrem Team schon einmal ein Kanban-Board genutzt hat, selbst auf Papier mit Haftnotizen, folgt Xaphires derselben Logik - das Erlernen dauert nur wenige Minuten." }
       ] }
-    },
-    "features": {
-      "automationsTitle": "Was Xaphires von allein erledigt",
-      "automationsText": "Automatisierungen, die im Hintergrund arbeiten, damit Sie nichts von Hand nachhalten oder anmahnen müssen.",
-      "automations": [
-        { "badge": "K", "title": "Kartenarchivierung", "text": "Entfernen Sie Erledigtes vom Board, ohne etwas zu löschen. Archivierte Karten verschwinden aus allen Ansichten und kehren bei Bedarf in die ursprüngliche Spalte zurück." },
-        { "badge": "A", "title": "Automatische Archivierung", "text": "Legen Sie die Anzahl der Tage fest, und erledigte Karten wandern von selbst ins Archiv. Verfügbar ab dem Plan Pro." },
-        { "badge": "E", "title": "Engpass-Monitor", "text": "Legen Sie die akzeptable Zeit für jede Spalte fest und sehen Sie, welche Karten die Frist überschritten haben, mit einer fertigen Nachfrage-Nachricht. Ab Pro." },
-        { "badge": "R", "title": "Automatische Routinen", "text": "Feste Aufgaben werden am richtigen Tag von selbst zu Karten, mit bereits ausgefüllter Checkliste. Ab dem Plan Pro." },
-        { "badge": "T", "title": "Aufgaben-Ticker", "text": "Ein Band oben im Board, das anzeigt, was noch offen ist, mit Hervorhebung von bereits Überfälligem. Verfügbar ab dem Plan Pro." },
-        { "badge": "P", "title": "Persönlicher Planer", "text": "Eine Agenda außerhalb der Boards, nur für Sie: Kalender und persönliche Aufgabenliste, wobei Erledigtes nach 2 Tagen von selbst archiviert wird. Verfügbar ab dem Plan Pro." },
-        { "badge": "L", "title": "Anhänge und Links", "text": "Verträge, Pläne und Fotos direkt an der Karte, dazu Links zu allem, was außerhalb des Systems liegt." },
-        { "badge": "V", "title": "Automatischer Abschluss", "text": "Karte als erledigt markiert, und sie springt von selbst in die Spalte Erledigt des Boards - kein manuelles Verschieben nötig." }
-      ],
-      "headerTitle": "Alles, was Ihr Team braucht",
-      "headerText": "Integrierte Tools, damit Sie nicht auf lose Tabellen oder eine weitere App pro Aufgabe angewiesen sind.",
-      "items": [
-        { "badge": "B", "title": "Kanban-Board", "text": "Schluss mit verlorenen Aufgaben in Chat-Screenshots. Ziehen Sie Karten zwischen Listen und sehen Sie den echten Fortschritt des Teams." },
-        { "badge": "T", "title": "Tabelle", "text": "Alle Karten in Tabellenform, mit Suche und Filter nach Mitglied, ohne ein weiteres Tool zu benötigen." },
-        { "badge": "K", "title": "Kalender", "text": "Fristen und Startdaten in einer Monatsansicht, damit nichts übersehen wird." },
-        { "badge": "Z", "title": "Zeitachse (Gantt)", "text": "Erstellen und öffnen Sie Aufgaben direkt in der Zeitachse, mit dem gesamten Projektzeitplan auf einen Blick, Zeitraum für Zeitraum. Verfügbar ab dem Plan Unlimited." },
-        { "badge": "D", "title": "Dashboard", "text": "Fertige Kennzahlen und Indikatoren, um den Fortschritt zu zeigen, ohne eine Tabelle zu erstellen. Verfügbar ab dem Plan Unlimited." },
-        { "badge": "M", "title": "Karte", "text": "Aufgaben mit Adresse auf einer interaktiven Karte dargestellt. Ideal für Außendienstteams. Verfügbar ab dem Plan Unlimited." },
-        { "badge": "E", "title": "Eisenhower-Matrix", "text": "Priorisieren Sie nach Dringlichkeit und Wichtigkeit und arbeiten Sie nicht mehr nur an dem, was am lautesten schreit. Verfügbar ab dem Plan Unlimited." }
-      ],
-      "ganttPreview": { "title": "Der Gantt in Aktion", "text": "Jede Aufgabe wird zu einem Balken auf der Zeitachse, mit der immer sichtbaren Linie für den heutigen Tag - erstellen und bearbeiten Sie direkt hier, ohne ein weiteres Tool.", "rows": [
-        { "title": "Planung", "status": "done" },
-        { "title": "Entwicklung", "status": "inProgress" },
-        { "title": "Tests", "status": "agency" },
-        { "title": "Abschlussprüfung", "child": true }
-      ] },
-      "secondary": [
-        { "title": "Private und geteilte Boards", "text": "Trennen Sie, was dem Team gehört, von dem, was nur Ihnen gehört, mit voller Kontrolle über die Sichtbarkeit." },
-        { "title": "Benutzer- und Rollenverwaltung", "text": "Legen Sie fest, wer Administrator (Master) und wer Teammitglied ist." },
-        { "title": "Unternehmens-Chat", "text": "Ein allgemeiner Kanal für alle und private Gespräche zwischen Kollegen, ohne das System für WhatsApp zu verlassen." },
-        { "title": "Unteraufgaben mit Verantwortlichem, Frist und Priorität", "text": "Teilen Sie die Karte in kleinere Schritte, jeweils mit eigenem Verantwortlichen, Datum und Priorität - nicht nur eine Liste von Kästchen." }
-      ]
     },
     "solutions": {
       "headerTitle": "Lösungen für jeden Bereich Ihres Unternehmens",

@@ -512,7 +512,6 @@
     "nav": {
       "brand": "Xaphires",
       "home": "Accueil",
-      "features": "Fonctionnalités",
       "solutions": "Solutions",
       "pricing": "Tarifs",
       "mentorias": "Mentorat",
@@ -590,12 +589,6 @@
       "exploreTitle": "Découvrez Xaphires",
       "exploreLinks": [
         {
-          "page": "features",
-          "badge": "R",
-          "title": "Fonctionnalités",
-          "text": "Découvrez les outils de Xaphires : tableau, tableur, calendrier, carte et plus encore."
-        },
-        {
           "page": "solutions",
           "badge": "S",
           "title": "Solutions",
@@ -634,119 +627,6 @@
           }
         ]
       }
-    },
-    "features": {
-      "automationsTitle": "Ce que Xaphires fait tout seul",
-      "automationsText": "Des automatisations qui travaillent en arrière-plan, pour que vous n'ayez pas à vous en souvenir ni à relancer à la main.",
-      "automations": [
-        {
-          "badge": "R",
-          "title": "Archivage des cartes",
-          "text": "Retirez les tâches terminées du tableau sans rien supprimer. Une carte archivée sort de toutes les vues et revient dans sa colonne d'origine quand vous le souhaitez."
-        },
-        {
-          "badge": "A",
-          "title": "Archivage automatique",
-          "text": "Définissez le nombre de jours et les cartes terminées partent seules à l'archive. Disponible à partir du plan Pro."
-        },
-        {
-          "badge": "G",
-          "title": "Moniteur de goulots d'étranglement",
-          "text": "Fixez le délai acceptable de chaque colonne et voyez quelles cartes ont dépassé le délai, avec un message de relance déjà prêt. À partir du plan Pro."
-        },
-        {
-          "badge": "T",
-          "title": "Routines automatiques",
-          "text": "Les tâches fixes se transforment seules en carte à la bonne date, avec la checklist déjà remplie. À partir du plan Pro."
-        },
-        {
-          "badge": "L",
-          "title": "Bandeau de tâches",
-          "text": "Un bandeau en haut du tableau qui affiche ce qui est en attente, avec une mise en avant de ce qui a déjà dépassé l'échéance. Disponible à partir du plan Pro."
-        },
-        {
-          "badge": "P",
-          "title": "Planificateur personnel",
-          "text": "Un agenda en dehors des tableaux, rien qu'à vous : calendrier et liste de tâches personnelles, avec archivage automatique des tâches terminées après 2 jours. Disponible à partir du plan Pro."
-        },
-        {
-          "badge": "X",
-          "title": "Pièces jointes et liens",
-          "text": "Contrats, plans et photos directement sur la carte, ainsi que des liens vers ce qui se trouve en dehors du système."
-        },
-        {
-          "badge": "C",
-          "title": "Conclusion automatique",
-          "text": "Une fois la carte marquée comme terminée, elle passe seule dans la colonne des tâches terminées du tableau - sans avoir à la glisser à la main."
-        }
-      ],
-      "headerTitle": "Tout ce dont votre équipe a besoin",
-      "headerText": "Des outils intégrés, pour ne plus dépendre de feuilles de calcul éparses ni d'une autre application par tâche.",
-      "items": [
-        {
-          "badge": "Q",
-          "title": "Tableau Kanban",
-          "text": "Fini les tâches perdues dans une capture d'écran de conversation. Glissez-déposez entre les listes et suivez l'avancement réel de l'équipe."
-        },
-        {
-          "badge": "T",
-          "title": "Tableur",
-          "text": "Toutes les cartes en format tableur, avec recherche et filtre par membre, sans avoir besoin d'un autre outil."
-        },
-        {
-          "badge": "C",
-          "title": "Calendrier",
-          "text": "Échéances et dates de début dans une vue mensuelle, pour que rien ne passe inaperçu."
-        },
-        {
-          "badge": "L",
-          "title": "Chronologie (Gantt)",
-          "text": "Créez et ouvrez des tâches directement sur la chronologie, avec le planning complet du projet en un coup d'œil, période par période. Disponible à partir du plan Unlimited."
-        },
-        {
-          "badge": "P",
-          "title": "Tableau de bord",
-          "text": "Des indicateurs prêts à l'emploi pour montrer la progression sans avoir à construire de feuille de calcul. Disponible à partir du plan Unlimited."
-        },
-        {
-          "badge": "M",
-          "title": "Carte",
-          "text": "Des tâches avec adresse placées sur une carte interactive. Idéal pour les équipes sur le terrain. Disponible à partir du plan Unlimited."
-        },
-        {
-          "badge": "E",
-          "title": "Matrice d'Eisenhower",
-          "text": "Priorisez selon l'urgence et l'importance et arrêtez de ne travailler que sur ce qui crie le plus fort. Disponible à partir du plan Unlimited."
-        }
-      ],
-      "ganttPreview": {
-        "title": "Le Gantt en action",
-        "text": "Chaque tâche devient une barre dans le temps, avec la ligne du jour actuel toujours visible - créez et modifiez directement ici, sans avoir besoin d'un autre outil.",
-        "rows": [
-          { "title": "Planification", "status": "done" },
-          { "title": "Développement", "status": "inProgress" },
-          { "title": "Tests", "status": "agency" },
-          { "title": "Révision finale", "child": true }
-        ]
-      },
-      "secondary": [
-        {
-          "title": "Tableaux privés et partagés",
-          "text": "Séparez ce qui appartient à l'équipe de ce qui vous est propre, avec un contrôle total de la visibilité."
-        },
-        {
-          "title": "Contrôle des utilisateurs et des rôles",
-          "text": "Définissez qui est administrateur (master) et qui est membre de l'équipe."
-        },
-        {
-          "title": "Messagerie de l'entreprise",
-          "text": "Un canal général pour tout le monde et des conversations privées entre collègues, sans quitter le système pour WhatsApp."
-        },
-        {
-          "title": "Sous-tâches avec responsable, échéance et priorité",
-          "text": "Divisez la carte en étapes plus petites, chacune avec son responsable, sa date et sa priorité propres - ce n'est pas qu'une simple liste de cases à cocher."
-        }
-      ]
     },
     "solutions": {
       "headerTitle": "Des solutions pour chaque service de votre entreprise",

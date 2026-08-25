@@ -5,7 +5,7 @@ import PromoPopup from "../components/PromoPopup.jsx";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 import xaphiresLogo from "../assets/xaphires-logo.png";
 
-const NAV_PAGES = ["home", "features", "solutions", "pricing"];
+const NAV_PAGES = ["home", "solutions", "pricing"];
 // Submenu do item "Início": mentoria e consultoria são serviços novos, sem
 // espaço próprio na barra principal - entram aqui, igual o dropdown que a
 // referência (viverdeia.ai) usa no primeiro item do menu.
@@ -146,82 +146,6 @@ function HeroBoardPreview() {
   );
 }
 
-// Dias do cabeçalho são só dígitos decorativos (sem mês/ano) - não precisam de
-// tradução, e propositalmente não usam a data real de hoje: um mockup "hoje"
-// fixo no dia 21 de outubro ficaria óbvio e datado assim que a página
-// envelhecesse um pouco. GANTT_TODAY_INDEX marca onde a linha "hoje" cai
-// dentro de GANTT_DAYS, e as barras (ver ganttPreview.rows no locale) usam
-// left/width em % desse mesmo intervalo de 10 dias.
-const GANTT_DAYS = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-const GANTT_TODAY_INDEX = 4;
-const GANTT_BAR_SPANS = [
-  { left: 0, width: 30 },
-  { left: 20, width: 40 },
-  { left: 50, width: 30 },
-  { left: 70, width: 20 },
-];
-
-// Segunda prova visual, mesma lógica da HeroBoardPreview: markup próprio (não
-// o GanttChart de verdade) que reaproveita a paleta real de status
-// (ganttStatus.js) e a linha "hoje" coral do Gantt de verdade, para não
-// desalinhar visualmente se aquela paleta mudar. A quarta linha usa o mesmo
-// tom pastel de .gnt-bar-child, para sugerir hierarquia (tarefa vs.
-// subtarefa) sem precisar simular o recolher/expandir de verdade.
-function GanttPreview() {
-  const { t } = useTranslation();
-  const rows = t("landing.features.ganttPreview.rows", { returnObjects: true });
-  const todayLeft = GANTT_TODAY_INDEX * 10;
-
-  // Sem .landing-reveal aqui de propósito: essa classe só ganha .is-visible
-  // pelo IntersectionObserver que useReveal() monta, e quem chama esta função
-  // é FeaturesPage, que nunca usa useReveal() (só HomePage usa, para o hero e
-  // afins) - com a classe, este bloco ficava preso em opacity:0 pra sempre,
-  // presente no DOM mas invisível. Foi assim que o preview "sumiu".
-  return (
-    <div className="landing-board-preview" aria-hidden="true">
-      <div className="landing-board-preview-chrome">
-        <span className="landing-board-preview-dot dot-a" />
-        <span className="landing-board-preview-dot dot-b" />
-        <span className="landing-board-preview-dot dot-c" />
-      </div>
-      <div className="landing-gantt-preview-body">
-        <div className="landing-gantt-preview-sidebar">
-          {rows.map((row) => (
-            <div className="landing-gantt-preview-sidebar-row" key={row.title}>
-              {row.title}
-            </div>
-          ))}
-        </div>
-        <div className="landing-gantt-preview-chart">
-          <div className="landing-gantt-preview-header">
-            {GANTT_DAYS.map((day, i) => (
-              <span key={i} className="landing-gantt-preview-day">
-                {day}
-              </span>
-            ))}
-            <span className="landing-gantt-preview-today-pill" style={{ left: todayLeft + "%" }}>
-              {t("datePicker.today")}
-            </span>
-          </div>
-          <div className="landing-gantt-preview-rows">
-            <span className="landing-gantt-preview-today-line" style={{ left: todayLeft + "%" }} />
-            {rows.map((row, i) => (
-              <div className="landing-gantt-preview-row" key={row.title}>
-                <span
-                  className={"landing-gantt-preview-bar" + (row.child ? " child" : " status-" + row.status)}
-                  style={{ left: GANTT_BAR_SPANS[i].left + "%", width: GANTT_BAR_SPANS[i].width + "%" }}
-                >
-                  {!row.child && row.title}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function LogoMarquee() {
   const { t } = useTranslation();
   const label = t("landing.logos.label");
@@ -342,10 +266,9 @@ function RotatorIcon({ itemKey }) {
   );
 }
 
-// Miniatura central do card, uma por item - mesma lógica de HeroBoardPreview/
-// GanttPreview: markup e cores reais do app (avatares, papéis de
-// board.share) em vez de barras genéricas, para a imagem condizer com o que
-// o texto descreve.
+// Miniatura central do card, uma por item - mesma lógica de HeroBoardPreview:
+// markup e cores reais do app (avatares, papéis de board.share) em vez de
+// barras genéricas, para a imagem condizer com o que o texto descreve.
 function RotatorVisual({ itemKey }) {
   const { t } = useTranslation();
 
@@ -617,70 +540,6 @@ function PricingPreview({ onEnter, onNavigate }) {
         {t("landing.home.pricingPreview.ctaAll")} →
       </button>
     </section>
-  );
-}
-
-function FeaturesPage() {
-  const { t } = useTranslation();
-  const items = t("landing.features.items", { returnObjects: true });
-  const automations = t("landing.features.automations", { returnObjects: true });
-  const secondary = t("landing.features.secondary", { returnObjects: true });
-  const gridRef = useFlashlight();
-  // Grade própria: o flashlight percorre os cards do container onde está montado.
-  const autoRef = useFlashlight();
-
-  return (
-    <>
-      <section className="landing-page-header">
-        <h1>{t("landing.features.headerTitle")}</h1>
-        <p>{t("landing.features.headerText")}</p>
-      </section>
-
-      <section className="landing-features">
-        <div className="landing-features-grid" ref={gridRef}>
-          {items.map((f) => (
-            <div className="landing-feature-card landing-flash" key={f.title}>
-              <div className="landing-flash-border" />
-              <span className="landing-feature-badge">{f.badge}</span>
-              <h3>{f.title}</h3>
-              <p>{f.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="landing-features">
-        <h2 className="landing-features-title">{t("landing.features.ganttPreview.title")}</h2>
-        <p className="landing-features-subtitle">{t("landing.features.ganttPreview.text")}</p>
-        <GanttPreview />
-      </section>
-
-      {/* As visões acima respondem "como eu olho o trabalho"; estas respondem
-          "o que o sistema faz sozinho". Separar deixa a diferença explícita. */}
-      <section className="landing-features">
-        <h2 className="landing-features-title">{t("landing.features.automationsTitle")}</h2>
-        <p className="landing-features-subtitle">{t("landing.features.automationsText")}</p>
-        <div className="landing-features-grid" ref={autoRef}>
-          {automations.map((f) => (
-            <div className="landing-feature-card landing-flash" key={f.title}>
-              <div className="landing-flash-border" />
-              <span className="landing-feature-badge">{f.badge}</span>
-              <h3>{f.title}</h3>
-              <p>{f.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="landing-secondary">
-        {secondary.map((s) => (
-          <div className="landing-secondary-item" key={s.title}>
-            <h3>{s.title}</h3>
-            <p>{s.text}</p>
-          </div>
-        ))}
-      </section>
-    </>
   );
 }
 
@@ -1110,7 +969,6 @@ export default function LandingScreen({ onEnter }) {
       </header>
 
       {page === "home" && <HomePage onEnter={onEnter} onNavigate={setPage} />}
-      {page === "features" && <FeaturesPage />}
       {page === "solutions" && <SolutionsPage onNavigate={setPage} />}
       {page === "mentorias" && <MentoriasPage />}
       {page === "consultorias" && <ConsultoriasPage />}
@@ -1136,7 +994,6 @@ export default function LandingScreen({ onEnter }) {
           </div>
           <div className="landing-footer-col">
             <h4>{t("landing.footer.columnProduct")}</h4>
-            <button type="button" onClick={() => setPage("features")}>{t("landing.nav.features")}</button>
             <button type="button" onClick={() => setPage("solutions")}>{t("landing.nav.solutions")}</button>
             <button type="button" onClick={() => setPage("pricing")}>{t("landing.nav.pricing")}</button>
           </div>
