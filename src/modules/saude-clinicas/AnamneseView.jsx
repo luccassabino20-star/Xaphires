@@ -5,7 +5,7 @@ import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { whatsappLink } from "../../utils/contact.js";
 
-const TIPOS_CAMPO = ["text", "textarea", "single_choice", "multi_choice", "boolean", "file"];
+const TIPOS_CAMPO = ["text", "textarea", "email", "tel", "date", "single_choice", "multi_choice", "boolean", "file", "section"];
 const AREAS_TEMPLATE = ["", "ESTETICA", "BIOMEDICINA_ESTETICA", "NUTRICAO"];
 
 // Fichas de Anamnese: duas seções internas - Templates (lista + construtor de
@@ -113,8 +113,13 @@ function SecaoTemplates({ templates, onCriado }) {
 
         <div className="sc-campos-builder">
           {campos.map((c, i) => (
-            <div className="sc-campo-row" key={c.id}>
-              <input type="text" placeholder={t("saudeClinicas.anamnese.perguntaLabel")} value={c.label} onChange={(e) => atualizarCampo(i, { label: e.target.value })} />
+            <div className={"sc-campo-row" + (c.type === "section" ? " sc-campo-row-section" : "")} key={c.id}>
+              <input
+                type="text"
+                placeholder={c.type === "section" ? t("saudeClinicas.anamnese.tituloSecaoPlaceholder") : t("saudeClinicas.anamnese.perguntaLabel")}
+                value={c.label}
+                onChange={(e) => atualizarCampo(i, { label: e.target.value })}
+              />
               <select value={c.type} onChange={(e) => atualizarCampo(i, { type: e.target.value })}>
                 {TIPOS_CAMPO.map((tp) => (
                   <option key={tp} value={tp}>{t(`saudeClinicas.anamnese.tipoCampo.${tp}`)}</option>
@@ -123,14 +128,20 @@ function SecaoTemplates({ templates, onCriado }) {
               {["single_choice", "multi_choice"].includes(c.type) && (
                 <input type="text" placeholder={t("saudeClinicas.anamnese.opcoesPlaceholder")} value={c.options} onChange={(e) => atualizarCampo(i, { options: e.target.value })} />
               )}
-              <label className="sc-checkbox">
-                <input type="checkbox" checked={c.required} onChange={(e) => atualizarCampo(i, { required: e.target.checked })} />
-                {t("saudeClinicas.anamnese.obrigatorio")}
-              </label>
-              <label className="sc-checkbox sc-checkbox-alert">
-                <input type="checkbox" checked={c.alert} onChange={(e) => atualizarCampo(i, { alert: e.target.checked })} />
-                {t("saudeClinicas.anamnese.alerta")}
-              </label>
+              {/* Seção é só um título entre perguntas - não tem resposta, então
+                  "obrigatório"/"alerta" não fazem sentido nela. */}
+              {c.type !== "section" && (
+                <>
+                  <label className="sc-checkbox">
+                    <input type="checkbox" checked={c.required} onChange={(e) => atualizarCampo(i, { required: e.target.checked })} />
+                    {t("saudeClinicas.anamnese.obrigatorio")}
+                  </label>
+                  <label className="sc-checkbox sc-checkbox-alert">
+                    <input type="checkbox" checked={c.alert} onChange={(e) => atualizarCampo(i, { alert: e.target.checked })} />
+                    {t("saudeClinicas.anamnese.alerta")}
+                  </label>
+                </>
+              )}
               <button type="button" className="btn-ghost btn-small" onClick={() => removerCampo(i)}>{t("common.remove")}</button>
             </div>
           ))}

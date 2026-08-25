@@ -56,6 +56,7 @@ router.get(
       res.json({
         patientName: paciente?.name || "",
         templateName: template?.name || "",
+        description: template?.description || "",
         fields: parseFields(template?.fields),
       });
     });

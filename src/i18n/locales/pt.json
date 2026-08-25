@@ -409,8 +409,10 @@
       "nPerguntas": "{{count}} pergunta", "nPerguntas_other": "{{count}} perguntas",
       "tipoCampo": {
         "text": "Texto curto", "textarea": "Texto longo", "single_choice": "Escolha única",
-        "multi_choice": "Múltipla escolha", "boolean": "Sim/Não", "file": "Upload de exame"
+        "multi_choice": "Múltipla escolha", "boolean": "Sim/Não", "file": "Upload de exame",
+        "date": "Data", "email": "E-mail", "tel": "Telefone", "section": "Título de seção"
       },
+      "tituloSecaoPlaceholder": "Título da seção (ex: Dados Pessoais)",
       "escolhaPaciente": "Escolha o paciente", "escolhaTemplate": "Escolha o template",
       "novaFichaEnviar": "Criar ficha e enviar por WhatsApp", "enviando": "Enviando...",
       "selecionePaciente": "Selecione um paciente para ver as fichas enviadas.",

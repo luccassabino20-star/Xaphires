@@ -409,8 +409,10 @@
       "nPerguntas": "{{count}} question", "nPerguntas_other": "{{count}} questions",
       "tipoCampo": {
         "text": "Short text", "textarea": "Long text", "single_choice": "Single choice",
-        "multi_choice": "Multiple choice", "boolean": "Yes/No", "file": "Exam upload"
+        "multi_choice": "Multiple choice", "boolean": "Yes/No", "file": "Exam upload",
+        "date": "Date", "email": "Email", "tel": "Phone", "section": "Section title"
       },
+      "tituloSecaoPlaceholder": "Section title (e.g. Personal Details)",
       "escolhaPaciente": "Choose the patient", "escolhaTemplate": "Choose the template",
       "novaFichaEnviar": "Create form and send via WhatsApp", "enviando": "Sending...",
       "selecionePaciente": "Select a patient to see the forms sent to them.",

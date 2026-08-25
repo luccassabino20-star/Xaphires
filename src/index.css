@@ -7565,6 +7565,9 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .sc-subtab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
 .sc-campos-builder { display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 10px; background: var(--bg-list); border-radius: 10px; }
 .sc-campo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+/* Seção (título entre perguntas, sem resposta) ganha um fundo leve pra se
+   destacar das perguntas de verdade na lista do construtor. */
+.sc-campo-row-section { background: var(--bg-list); border-radius: 8px; padding: 4px 8px; }
 .sc-campo-row input[type="text"] { flex: 1; min-width: 140px; padding: 6px 8px; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-primary); }
 .sc-campo-row select { padding: 6px 8px; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-primary); }
 .sc-checkbox { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; }
@@ -7587,11 +7590,26 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .sc-pub-obrigado { font-size: 15px; color: var(--success); }
 .sc-pub-campo { display: block; margin-bottom: 16px; }
 .sc-pub-label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
-.sc-pub-campo input[type="text"], .sc-pub-campo textarea { width: 100%; padding: 9px 11px; font-size: 14px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.sc-pub-campo input[type="text"], .sc-pub-campo textarea,
+.sc-pub-campo input[type="date"], .sc-pub-campo input[type="email"], .sc-pub-campo input[type="tel"] {
+  width: 100%; padding: 9px 11px; font-size: 14px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px;
+}
 .sc-pub-opcao { display: flex; align-items: center; gap: 6px; font-size: 13.5px; margin: 4px 0; }
 .sc-pub-checkbox { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
 .sc-pub-em-breve { font-size: 12.5px; color: var(--text-muted); margin: 0; }
 .sc-pub-card form > button { margin-top: 6px; }
+
+/* Assistente em etapas: uma "section" do template vira o título de uma
+   etapa (ver agruparEmEtapas em AnamnesePublicPage.jsx) - a barra mostra o
+   progresso e os botões avançam/voltam sem recarregar a página. */
+.sc-pub-progress { margin-bottom: 18px; }
+.sc-pub-progress-bar { height: 6px; background: var(--bg-list); border-radius: 999px; overflow: hidden; }
+.sc-pub-progress-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.25s ease; }
+.sc-pub-progress-label { display: block; font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.sc-pub-step-title { font-size: 16px; font-weight: 700; margin: 0 0 16px; }
+.sc-pub-nav { display: flex; gap: 10px; margin-top: 6px; }
+.sc-pub-nav .btn-primary { flex: 1; }
+.sc-pub-nav .btn-secondary { flex: 0 0 auto; }
 
 /* ---------- CRM ---------- */
 .crm-tabs { display: flex; gap: 4px; padding: 0 20px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-topbar); overflow-x: auto; }

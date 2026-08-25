@@ -409,8 +409,10 @@
       "nPerguntas": "{{count}} pregunta", "nPerguntas_other": "{{count}} preguntas",
       "tipoCampo": {
         "text": "Texto corto", "textarea": "Texto largo", "single_choice": "Opción única",
-        "multi_choice": "Opción múltiple", "boolean": "Sí/No", "file": "Carga de examen"
+        "multi_choice": "Opción múltiple", "boolean": "Sí/No", "file": "Carga de examen",
+        "date": "Fecha", "email": "Correo electrónico", "tel": "Teléfono", "section": "Título de sección"
       },
+      "tituloSecaoPlaceholder": "Título de la sección (ej: Datos Personales)",
       "escolhaPaciente": "Elija el paciente", "escolhaTemplate": "Elija la plantilla",
       "novaFichaEnviar": "Crear ficha y enviar por WhatsApp", "enviando": "Enviando...",
       "selecionePaciente": "Seleccione un paciente para ver las fichas enviadas.",
