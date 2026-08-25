@@ -1180,6 +1180,7 @@
       "cardArchivedToast": "Card archived",
       "untitled": "Untitled",
       "typeBadge": "Task",
+      "createdAt": "Created on {{data}}",
       "complete": "Complete",
       "markComplete": "Mark as complete",
       "status": "Status",

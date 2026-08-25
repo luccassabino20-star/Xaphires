@@ -1180,6 +1180,7 @@
       "cardArchivedToast": "Tarjeta archivada",
       "untitled": "Sin título",
       "typeBadge": "Tarea",
+      "createdAt": "Creado el {{data}}",
       "complete": "Completada",
       "markComplete": "Marcar como completada",
       "status": "Estado",

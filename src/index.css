@@ -2856,6 +2856,8 @@ img.avatar { object-fit: cover; padding: 0; }
   margin-bottom: 12px;
 }
 
+.card-detail-created-at { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+
 .card-detail-header { margin-bottom: 14px; padding-right: 0; }
 .card-detail-title {
   font-size: 28px;

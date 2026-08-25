@@ -106,7 +106,7 @@ function EditIcon() {
 }
 
 export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
   const { user } = useAuth();
@@ -396,6 +396,11 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
             </div>
 
             <span className="card-detail-type-badge">{t("board.cardModal.typeBadge")}</span>
+            {card.createdAt && (
+              <div className="card-detail-created-at">
+                {t("board.cardModal.createdAt", { data: new Date(card.createdAt).toLocaleString(i18n.language) })}
+              </div>
+            )}
 
             <div className="modal-header card-detail-header">
               <input

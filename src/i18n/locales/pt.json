@@ -1538,6 +1538,7 @@
       "cardArchivedToast": "Cartão arquivado",
       "untitled": "Sem título",
       "typeBadge": "Tarefa",
+      "createdAt": "Criado em {{data}}",
       "complete": "Concluído",
       "markComplete": "Marcar como concluído",
       "status": "Status",
