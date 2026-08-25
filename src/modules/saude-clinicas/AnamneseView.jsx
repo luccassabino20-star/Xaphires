@@ -67,8 +67,19 @@ function SecaoTemplates({ templates, onCriado }) {
 
   // Link fixo de captação (AnamneseCaptacaoPage.jsx): qualquer pessoa que
   // abra e envie cria o próprio cadastro de paciente - diferente do link de
-  // "Respostas" abaixo, que já parte de um paciente cadastrado.
+  // "Respostas" abaixo, que já parte de um paciente cadastrado. Sem um campo
+  // de nome, o servidor não tem como criar esse cadastro (mesma checagem de
+  // extrairDadosPaciente em anamnesePublica.js) - o botão avisa antes de
+  // gerar um link que vai travar na primeira pessoa que tentar enviar.
+  function templateSemNome(tpl) {
+    return !tpl.fields.some((f) => f.id === "nome_completo" || f.id === "nome");
+  }
+
   async function copiarLinkCaptacao(tpl) {
+    if (templateSemNome(tpl)) {
+      showToast(t("saudeClinicas.anamnese.templateSemNomeParaCaptacao"));
+      return;
+    }
     const url = `${window.location.origin}/anamnese-novo/${tpl.companyId}/${tpl.id}`;
     try {
       await navigator.clipboard.writeText(url);
@@ -177,7 +188,12 @@ function SecaoTemplates({ templates, onCriado }) {
               <span className="sc-template-nome">{tpl.name}</span>
               <span className="sc-badge">{tpl.clinic_area ? t(`saudeClinicas.clinicType.${tpl.clinic_area}`) : t("saudeClinicas.anamnese.universal")}</span>
               <span className="sc-template-campos">{t("saudeClinicas.anamnese.nPerguntas", { count: tpl.fields.length })}</span>
-              <button type="button" className="btn-ghost btn-small" onClick={() => copiarLinkCaptacao(tpl)}>
+              <button
+                type="button"
+                className="btn-ghost btn-small"
+                title={templateSemNome(tpl) ? t("saudeClinicas.anamnese.templateSemNomeParaCaptacao") : undefined}
+                onClick={() => copiarLinkCaptacao(tpl)}
+              >
                 {t("saudeClinicas.anamnese.copiarLinkCaptacao")}
               </button>
             </div>

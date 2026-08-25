@@ -419,6 +419,7 @@
       "colTemplate": "Template", "colStatus": "Situação", "vazioRespostas": "Nenhuma ficha enviada a este paciente ainda.",
       "enviarWhatsapp": "Enviar por WhatsApp",
       "copiarLinkCaptacao": "Copiar link de captação", "linkCaptacaoCopiado": "Link de captação copiado",
+      "templateSemNomeParaCaptacao": "Este template não tem um campo de nome completo - adicione um antes de usar o link de captação, senão ninguém consegue virar paciente por ele.",
       "mensagemWhatsapp": "Olá! Por favor, preencha sua ficha de pré-anamnese antes da consulta: {{url}}",
       "status": { "rascunho": "Rascunho", "enviado": "Enviado", "respondido": "Respondido" }
     },

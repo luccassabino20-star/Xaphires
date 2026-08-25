@@ -11,6 +11,21 @@ import {
 
 const ALERGIA = { id: "alergias", label: "Possui alguma alergia conhecida?", type: "textarea", required: true, alert: true };
 
+// Identificação básica, comum aos templates padrão que não tinham nenhum
+// campo de dado pessoal (Estética e Injetáveis nasceram pensados só pra
+// paciente já cadastrado, ficha anexada depois). Sem isto o link de
+// captação (server/routes/anamnesePublica.js, extrairDadosPaciente) não
+// tem como criar o cadastro - precisa achar nome_completo/telefone/email
+// pelos ids convencionais, e sem nome a rota recusa com 400. CPF fica
+// opcional, mesmo padrão da Anamnese Nutricional.
+const DADOS_IDENTIFICACAO = [
+  { id: "sec_dados_pessoais", label: "Dados Pessoais e Identificação", type: "section" },
+  { id: "nome_completo", label: "Nome completo", type: "text", required: true },
+  { id: "telefone", label: "Telefone / WhatsApp", type: "tel", required: true },
+  { id: "email", label: "E-mail", type: "email", required: true },
+  { id: "cpf", label: "CPF", type: "text" },
+];
+
 // Ficha de pré-consulta nutricional completa, pedida pelo usuário com o
 // conteúdo exato das 8 seções (a "Apresentação e boas-vindas" virou a
 // `description` do template, mostrada como texto de intro na primeira etapa
@@ -153,6 +168,7 @@ const TEMPLATES = [
     name: "Anamnese de Estética",
     description: "Ficha padrão para procedimentos estéticos faciais e corporais.",
     fields: [
+      ...DADOS_IDENTIFICACAO,
       { id: "queixa", label: "Queixa principal / objetivo com o tratamento", type: "textarea", required: true },
       { id: "fototipo", label: "Fototipo de pele (Fitzpatrick)", type: "single_choice", required: false, options: ["I", "II", "III", "IV", "V", "VI"] },
       { id: "gestante", label: "Está grávida ou amamentando?", type: "boolean", required: true, alert: true },
@@ -165,6 +181,7 @@ const TEMPLATES = [
     name: "Anamnese de Injetáveis & Harmonização",
     description: "Ficha para procedimentos com toxina botulínica, preenchedores e bioestimuladores.",
     fields: [
+      ...DADOS_IDENTIFICACAO,
       { id: "queixa", label: "Queixa principal / objetivo com o tratamento", type: "textarea", required: true },
       { id: "gestante", label: "Está grávida ou amamentando?", type: "boolean", required: true, alert: true },
       { id: "anticoagulante", label: "Usa algum anticoagulante ou tem distúrbio de coagulação?", type: "boolean", required: true, alert: true },

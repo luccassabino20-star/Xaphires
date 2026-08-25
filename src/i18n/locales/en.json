@@ -419,6 +419,7 @@
       "colTemplate": "Template", "colStatus": "Status", "vazioRespostas": "No form sent to this patient yet.",
       "enviarWhatsapp": "Send via WhatsApp",
       "copiarLinkCaptacao": "Copy intake link", "linkCaptacaoCopiado": "Intake link copied",
+      "templateSemNomeParaCaptacao": "This template has no full-name field - add one before using the intake link, or no one will be able to become a patient through it.",
       "mensagemWhatsapp": "Hello! Please fill out your intake form before your appointment: {{url}}",
       "status": { "rascunho": "Draft", "enviado": "Sent", "respondido": "Answered" }
     },
