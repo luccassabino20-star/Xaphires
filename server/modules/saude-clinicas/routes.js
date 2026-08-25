@@ -88,6 +88,7 @@ import { montarRelatorio, TIPOS_RELATORIO } from "./reports.js";
 import { gerarCsvRelatorio, gerarPdfRelatorio } from "./reportsExport.js";
 import { rotulos } from "./reportsLabels.js";
 import { getCompany } from "../../directory.js";
+import { getOuCriarSlugCaptacao } from "./captacaoStore.js";
 
 const router = Router();
 // Mesma camada tripla do Financeiro: requireAuth resolve o companyId/ALS;
@@ -111,11 +112,12 @@ function parseFields(fields) {
     return [];
   }
 }
-// companyId junto pelo mesmo motivo do respostaComAnswersParseadas abaixo: é
-// o cliente quem monta o link de captação (origin + /anamnese-novo/
-// :companyId/:templateId, ver AnamneseView.jsx).
+// captacaoSlug junto pra o cliente montar o link de captação (origin +
+// /anamnese-novo/:slug, ver AnamneseView.jsx) sem expor o id da empresa nem
+// o do template na URL - getOuCriarSlugCaptacao é idempotente (mesmo slug
+// sempre, uma vez criado).
 function templateComFieldsParseados(t, companyId) {
-  return t && { ...t, fields: parseFields(t.fields), companyId };
+  return t && { ...t, fields: parseFields(t.fields), captacaoSlug: getOuCriarSlugCaptacao(companyId, t.id) };
 }
 // `answers` sai do banco como string (repo.js grava com JSON.stringify) - o
 // prontuário do paciente (ProntuarioView.jsx) precisa do objeto pra desenhar

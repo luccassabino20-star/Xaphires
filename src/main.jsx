@@ -36,7 +36,7 @@ const path = window.location.pathname.replace(/\/+$/, "");
 const ehPainel = path === "/admin";
 const ehGanttDemo = path === "/gantt-demo";
 const anamnesePublicaMatch = path.match(/^\/anamnese\/([^/]+)\/([^/]+)$/);
-const anamneseCaptacaoMatch = path.match(/^\/anamnese-novo\/([^/]+)\/([^/]+)$/);
+const anamneseCaptacaoMatch = path.match(/^\/anamnese-novo\/([^/]+)$/);
 
 // Sem prefixo de idioma na URL (ex.: alguém chegou em "/" direto): alinha a
 // URL com o idioma que o i18next já resolveu em i18n/index.js (localStorage
@@ -77,7 +77,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     ) : anamneseCaptacaoMatch ? (
       <ThemeProvider>
         <Suspense fallback={null}>
-          <AnamneseCaptacaoPage companyId={anamneseCaptacaoMatch[1]} templateId={anamneseCaptacaoMatch[2]} />
+          <AnamneseCaptacaoPage slug={anamneseCaptacaoMatch[1]} />
         </Suspense>
       </ThemeProvider>
     ) : (

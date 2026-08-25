@@ -7,11 +7,11 @@ import AnamneseFormularioEtapas from "./AnamneseFormularioEtapas.jsx";
 // cadastro de paciente na hora (server/routes/anamnesePublica.js, rota
 // .../novo, extrai nome/telefone/e-mail/data de nascimento das respostas
 // pelos ids convencionados no template - ver extrairDadosPaciente lá).
-export default function AnamneseCaptacaoPage({ companyId, templateId }) {
+export default function AnamneseCaptacaoPage({ slug }) {
   return (
     <AnamneseFormularioEtapas
-      carregar={() => scGetAnamneseCaptacao(companyId, templateId)}
-      enviar={(respostas) => scResponderAnamneseCaptacao(companyId, templateId, respostas)}
+      carregar={() => scGetAnamneseCaptacao(slug)}
+      enviar={(respostas) => scResponderAnamneseCaptacao(slug, respostas)}
     />
   );
 }

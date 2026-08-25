@@ -80,7 +80,7 @@ function SecaoTemplates({ templates, onCriado }) {
       showToast(t("saudeClinicas.anamnese.templateSemNomeParaCaptacao"));
       return;
     }
-    const url = `${window.location.origin}/anamnese-novo/${tpl.companyId}/${tpl.id}`;
+    const url = `${window.location.origin}/anamnese-novo/${tpl.captacaoSlug}`;
     try {
       await navigator.clipboard.writeText(url);
       showToast(t("saudeClinicas.anamnese.linkCaptacaoCopiado"));
@@ -202,7 +202,7 @@ function SecaoTemplates({ templates, onCriado }) {
                 className="sc-prontuario-link-manual"
                 type="text"
                 readOnly
-                value={`${window.location.origin}/anamnese-novo/${tpl.companyId}/${tpl.id}`}
+                value={`${window.location.origin}/anamnese-novo/${tpl.captacaoSlug}`}
                 onFocus={(e) => e.target.select()}
               />
             )}
