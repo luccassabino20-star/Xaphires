@@ -809,6 +809,15 @@
           ]
         },
         {
+          "title": "Saúde & Clínicas",
+          "text": "Prontuário, anamnese, agenda e gestão para clínicas de estética, biomedicina e nutrição.",
+          "tags": [
+            "Anamnese digital",
+            "Prontuário",
+            "Agenda"
+          ]
+        },
+        {
           "title": "Compras & Estoque",
           "text": "Inventário, fornecedores, margem de produtos e ponto de reordem.",
           "tags": [

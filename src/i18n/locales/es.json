@@ -650,6 +650,7 @@
       "items": [
         { "title": "Ventas & CRM", "text": "Leads, embudo en Kanban, propuestas, presupuestos y pedidos - del primer contacto al cierre, en un solo lugar.", "tags": ["Tablero Kanban", "Propuestas", "Presupuestos"] },
         { "title": "Finanzas", "text": "Flujo de caja, cuentas por pagar y por cobrar, conciliación bancaria y ERE - la columna vertebral financiera de la empresa.", "tags": ["Flujo de caja", "Cuentas por pagar/cobrar", "ERE"] },
+        { "title": "Salud & Clínicas", "text": "Historia clínica, anamnesis, agenda y gestión para clínicas de estética, biomedicina y nutrición.", "tags": ["Anamnesis digital", "Historia clínica", "Agenda"] },
         { "title": "Compras & Inventario", "text": "Inventario, proveedores, margen de productos y punto de reorden.", "tags": ["Inventario", "Proveedores"], "soon": true },
         { "title": "Facturación", "text": "Emisión de facturas, boletos y enlaces de pago.", "tags": ["Facturas", "Boletos"], "soon": true },
         { "title": "Informes & BI", "text": "Paneles operativos y financieros consolidados, para decidir con datos reales.", "tags": ["Paneles", "Indicadores"], "soon": true },

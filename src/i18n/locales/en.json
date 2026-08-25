@@ -650,6 +650,7 @@
       "items": [
         { "title": "Sales & CRM", "text": "Leads, Kanban pipeline, proposals, quotes and orders - from first contact to close, in one place.", "tags": ["Kanban board", "Proposals", "Quotes"] },
         { "title": "Finance", "text": "Cash flow, accounts payable and receivable, bank reconciliation and P&L - the financial backbone of the business.", "tags": ["Cash flow", "Payable/receivable", "P&L"] },
+        { "title": "Health & Clinics", "text": "Patient records, anamnesis, scheduling and management for aesthetics, biomedicine and nutrition clinics.", "tags": ["Digital anamnesis", "Patient records", "Scheduling"] },
         { "title": "Purchasing & Inventory", "text": "Stock, suppliers, product margins and reorder points.", "tags": ["Stock", "Suppliers"], "soon": true },
         { "title": "Invoicing", "text": "Tax invoice issuing, bank slips and payment links.", "tags": ["Tax invoices", "Bank slips"], "soon": true },
         { "title": "Reports & BI", "text": "Consolidated operational and financial dashboards, to decide with real data.", "tags": ["Dashboards", "Indicators"], "soon": true },
