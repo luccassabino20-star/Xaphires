@@ -5083,15 +5083,15 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 /* No login o mesmo brasão vira só um selo pequeno acima da manchete, do
    tamanho da nav da landing - não o quadrado gigante que era ali antes. */
 .auth-brand .landing-nav-brand { font-size: 22px; gap: 12px; }
-.auth-brand .landing-nav-icon { width: 72px; height: 72px; font-size: 24px; border-radius: 11px; }
+.auth-brand .landing-nav-icon { width: 52px; height: 52px; font-size: 24px; border-radius: 9px; }
 /* O quadrado acompanha o corpo do nome: dimensionado para a Inter em 16px, ficava
    subdimensionado ao lado da marca em 24px. */
 .landing-nav-icon {
   font-family: "Playfair Display", Georgia, "Times New Roman", serif;
   font-weight: 700;
-  width: 64px;
-  height: 64px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   font-size: 22px;
 }
 
