@@ -195,6 +195,12 @@ input, textarea { font-family: inherit; }
   gap: 16px;
   overflow-y: auto;
   width: 100%;
+  /* Esmaece a borda inferior quando a lista de ícones rola (fade mask) - sinal
+     visual de "tem mais abaixo", sem depender de listener de scroll pra
+     ligar/desligar (aceito assim de propósito: efeito é decorativo, não
+     rastreia posição real do scroll). */
+  -webkit-mask-image: linear-gradient(to bottom, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 90%, transparent 100%);
 }
 .dsb-rail-item {
   display: flex;
@@ -212,12 +218,12 @@ input, textarea { font-family: inherit; }
   transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
 }
 .dsb-rail-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-/* Pill com gradiente + sombra, como o item ativo da referência - em vez do
-   preenchimento chapado que tinha antes. */
+/* Pílula âmbar com brilho (glow) no item ativo - estilo "dock" pedido, cor de
+   destaque própria desta barra (não é a marca, é um acento só do dock). */
 .dsb-rail-item.active {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
-  color: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #1a1006;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .dsb-rail-item:disabled { cursor: default; }
 .dsb-rail-item:disabled:hover { background: transparent; color: #a1a1a1; }
@@ -259,6 +265,10 @@ input, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  /* Mesmo fade mask do rail escuro (.dsb-rail-nav) na borda inferior, agora
+     sobre fundo branco - sinaliza que a árvore de quadros continua abaixo. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 94%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 94%, transparent 100%);
 }
 .dsb-panel::-webkit-scrollbar { width: 8px; }
 .dsb-panel::-webkit-scrollbar-thumb { background: #d8d8d8; border-radius: 8px; }
