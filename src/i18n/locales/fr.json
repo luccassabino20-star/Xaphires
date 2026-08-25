@@ -13,12 +13,14 @@
     "launcher": {
       "eyebrow": "Plateforme Xaphires",
       "title": "Bonjour, {{name}}",
+      "headingLink": "Parler à notre équipe",
       "subtitle": "Choisissez par où commencer. Chaque module s'occupe d'un pilier de votre entreprise.",
       "searchPlaceholder": "Recherchez par nom, outil ou domaine...",
       "noResults": "Aucun module trouvé pour \"{{query}}\".",
       "resultCount": "{{count}} module",
       "resultCount_other": "{{count}} modules",
       "moreFilters": "Plus de filtres",
+      "openCta": "Voir la solution",
       "sortLabel": "Trier",
       "categories": {
         "todas": "Toutes",

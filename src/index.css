@@ -6386,22 +6386,45 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .launcher-body::-webkit-scrollbar {
   display: none;
 }
+/* Cabeçalho premium (pedido do redesign do launcher): eyebrow discreto acima
+   de um título maior/mais denso, com o link auxiliar alinhado à direita na
+   mesma linha - mesmo padrão "seção em destaque" de SaaS enterprise. */
+.launcher-heading-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
 .launcher-eyebrow {
   display: inline-block;
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 6px;
+  color: var(--text-muted);
+  margin-bottom: 7px;
 }
 .launcher-title {
-  font-size: 26px;
+  font-size: 29px;
   line-height: 1.15;
-  font-weight: 750;
-  letter-spacing: -0.5px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
   margin: 0 0 5px;
 }
+.launcher-heading-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+.launcher-heading-link:hover { color: var(--text-primary); gap: 10px; }
+.launcher-heading-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 .launcher-subtitle {
   font-size: 14px;
   color: var(--text-secondary);
@@ -6506,30 +6529,74 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .launcher-no-results { color: var(--text-secondary); font-size: 14px; padding: 24px 0; }
 .launcher-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
-  margin-bottom: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
 }
-/* Card mais chapado, no espírito da referência (branco, contorno fino, sem
-   gradiente/brilho) - só a barrinha e o selo de ícone guardam a cor do módulo. */
+/* Card premium (SaaS enterprise): banner com gradiente navy no topo (a cor da
+   marca - accent é uniforme desde registry.js, então o gradiente sai igual em
+   todo card de propósito, não arco-íris), tag de categoria, título, descrição
+   cortada em 2 linhas e CTA com seta que abre no hover. Reaproveitado também
+   por SaudeClinicasModule.jsx (ver .launcher-grid lá) - esse uso continua sem
+   banner/tags, só com .module-card-icon abaixo, então os dois convivem sem
+   que um quebre o outro. */
 .module-card {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  padding: 16px 18px;
+  padding: 16px 18px 18px;
   text-align: left;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
+  border-radius: 20px;
+  overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 .module-card:not(.module-card-locked):hover {
   border-color: color-mix(in srgb, var(--module-accent) 55%, var(--border-strong));
   box-shadow: var(--shadow-card-hover);
+  transform: translateY(-3px);
 }
+/* Sangra até a borda do card apesar do padding do container (margem negativa
+   igual ao padding) - evita um wrapper de conteúdo só pra dar respiro
+   diferente ao banner. overflow:hidden acima arredonda os cantos do banner
+   junto com os do card. */
+.module-card-banner {
+  align-self: stretch;
+  height: 124px;
+  margin: -16px -18px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(130% 160% at 15% -20%, color-mix(in srgb, var(--module-accent) 60%, transparent), transparent 55%),
+    linear-gradient(155deg, color-mix(in srgb, var(--module-accent) 88%, #000 8%) 0%, color-mix(in srgb, var(--module-accent) 70%, #000 40%) 60%, #05070f 140%);
+  border-bottom: 1px solid color-mix(in srgb, var(--module-accent) 45%, #000 35%);
+}
+.module-card-banner-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+  color: #fff;
+  background: color-mix(in srgb, #ffffff 14%, transparent);
+  border: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
+}
+.module-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.module-card-tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-list);
+}
+/* Ícone inline sem banner - só o uso antigo de SaudeClinicasModule.jsx chega
+   aqui hoje (ver comentário no topo da seção). */
 .module-card-icon {
   display: inline-flex;
   align-items: center;
@@ -6539,29 +6606,40 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   border-radius: 10px;
   color: var(--module-accent);
   background: color-mix(in srgb, var(--module-accent) 14%, var(--bg-card));
+  margin-bottom: 8px;
 }
-.module-card-name { font-size: 15.5px; font-weight: 700; letter-spacing: -0.1px; }
+.module-card-name { font-size: 16px; font-weight: 700; letter-spacing: -0.15px; margin-bottom: 4px; }
 .module-card-desc {
   font-size: 12.5px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--text-secondary);
   flex: 1;
+  margin-bottom: 12px;
+  /* Corte em 2 linhas em vez de altura livre - card de banner precisa de
+     altura previsível pra alinhar entre colunas da grade. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-/* Rodapé do card, separado por linha - mesmo lugar onde a referência mostra
-   dificuldade/prévia; aqui é só "abrir" ou o selo de "Em breve". */
 .module-card-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   width: 100%;
-  padding-top: 10px;
-  margin-top: 2px;
-  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
 }
 .module-card-open {
   display: inline-flex;
-  color: var(--module-accent);
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: gap 0.2s ease;
 }
+.module-card-open svg { color: var(--module-accent); flex-shrink: 0; }
+.module-card:not(.module-card-locked):hover .module-card-open { gap: 9px; }
 /* Módulo ainda não liberado: apagado, sem clique, com o selo "Em breve". */
 .module-card-locked { cursor: default; opacity: 0.55; }
 .module-card-badge {
@@ -6571,9 +6649,10 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   letter-spacing: 0.04em;
   color: var(--text-muted);
 }
-/* Card de "soluções sob medida": mesmo molde do .module-card, com borda
-   tracejada na cor do serviço pra não ser confundido com um pilar comum -
-   é vitrine/CTA, não um módulo com plano por trás. */
+/* Card de "soluções sob medida": mesmo molde do .module-card (banner incluso,
+   pra não destoar de altura na grade), com borda tracejada na cor do serviço
+   pra não ser confundido com um pilar comum - é vitrine/CTA, não um módulo
+   com plano por trás. */
 .module-card-custom {
   /* É <a>, não <button> (ver comentário no JSX) - sem isso herda o sublinhado
      padrão do navegador em cima do nome e da descrição. */
@@ -6629,8 +6708,12 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   .launcher-sidebar-badge { display: none; }
   .launcher-sidebar-item { justify-content: center; }
 }
+@media (max-width: 960px) {
+  .launcher-grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 720px) {
   .launcher-body { padding: 24px 18px 40px; }
+  .launcher-heading-row { flex-wrap: wrap; }
   .launcher-title { font-size: 24px; }
   .launcher-grid { grid-template-columns: 1fr; }
   .launcher-search { max-width: none; }

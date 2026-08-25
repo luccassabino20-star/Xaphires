@@ -155,8 +155,22 @@ export default function ModuleLauncher({ modules, onOpen }) {
         </header>
 
         <div className="launcher-body">
-          <span className="launcher-eyebrow">{t("modules.launcher.eyebrow")}</span>
-          <h1 className="launcher-title">{t("modules.launcher.title", { name: user?.name || "" })}</h1>
+          <div className="launcher-heading-row">
+            <div>
+              <span className="launcher-eyebrow">{t("modules.launcher.eyebrow")}</span>
+              <h1 className="launcher-title">{t("modules.launcher.title", { name: user?.name || "" })}</h1>
+            </div>
+            {/* Mesmo destino de vendas do card/banner "sob medida" abaixo - não existe
+                página de documentação no produto, então o link auxiliar do canto
+                superior direito (pedido no redesign do launcher) aponta pra um
+                destino real em vez de uma "documentação" que não existe. */}
+            <a className="launcher-heading-link" href={WHATSAPP_VENDAS_URL} target="_blank" rel="noopener noreferrer">
+              {t("modules.launcher.headingLink")}
+              <svg viewBox="0 0 24 24" width="14" height="14">
+                <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          </div>
           <p className="launcher-subtitle">{t("modules.launcher.subtitle")}</p>
 
           <div className="launcher-toolbar">
@@ -241,6 +255,7 @@ export default function ModuleLauncher({ modules, onOpen }) {
               {modulesFiltrados.map((m) => {
                 const meta = metaFor(m.id);
                 const clickable = m.enabled;
+                const categoria = t(`modules.launcher.categories.${categoriaDaAba(meta.category)}`);
                 return (
                   <button
                     key={m.id}
@@ -250,14 +265,20 @@ export default function ModuleLauncher({ modules, onOpen }) {
                     disabled={!clickable}
                     title={clickable ? undefined : t("modules.comingSoon")}
                   >
-                    <span className="module-card-icon">
-                      <ModuleIcon name={meta.icon} size={22} />
+                    <span className="module-card-banner">
+                      <span className="module-card-banner-icon">
+                        <ModuleIcon name={meta.icon} size={30} />
+                      </span>
+                    </span>
+                    <span className="module-card-tags">
+                      <span className="module-card-tag">{categoria}</span>
                     </span>
                     <span className="module-card-name">{t(meta.labelKey)}</span>
                     <span className="module-card-desc">{t(meta.descKey)}</span>
                     <span className="module-card-footer">
                       {clickable ? (
                         <span className="module-card-open">
+                          {t("modules.launcher.openCta")}
                           <svg viewBox="0 0 24 24" width="15" height="15">
                             <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
                           </svg>
@@ -283,8 +304,10 @@ export default function ModuleLauncher({ modules, onOpen }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="module-card-icon">
-              <ModuleIcon name="custom" size={22} />
+            <span className="module-card-banner">
+              <span className="module-card-banner-icon">
+                <ModuleIcon name="custom" size={30} />
+              </span>
             </span>
             <span className="module-card-name">{t("modules.custom.name")}</span>
             <span className="module-card-desc">{t("modules.custom.desc")}</span>

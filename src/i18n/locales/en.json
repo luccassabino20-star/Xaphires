@@ -13,12 +13,14 @@
     "launcher": {
       "eyebrow": "Xaphires Platform",
       "title": "Hello, {{name}}",
+      "headingLink": "Talk to our team",
       "subtitle": "Choose where to start. Each module handles one pillar of your business.",
       "searchPlaceholder": "Search by name, tool or area...",
       "noResults": "No modules found for \"{{query}}\".",
       "resultCount": "{{count}} module",
       "resultCount_other": "{{count}} modules",
       "moreFilters": "More filters",
+      "openCta": "View solution",
       "sortLabel": "Sort",
       "categories": {
         "todas": "All",
