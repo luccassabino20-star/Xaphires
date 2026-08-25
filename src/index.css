@@ -7615,6 +7615,22 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .sc-pub-nav .btn-primary { flex: 1; }
 .sc-pub-nav .btn-secondary { flex: 0 0 auto; }
 
+/* Em PC/notebook o cartão de 560px sobrava vazio nos dois lados e cada
+   campo de uma linha só (nome, telefone, e-mail...) ocupava a largura
+   inteira sozinho - mais rolagem que o necessário numa tela que tem espaço
+   de sobra. Acima de 720px o cartão alarga e esses campos pareiam dois a
+   dois (.sc-pub-campo-curto, ver AnamneseFormularioEtapas.jsx); textarea,
+   escolha única/múltipla e sim/não continuam ocupando a linha inteira,
+   porque encolher opção de resposta pra caber ao lado de outra piora a
+   leitura. Abaixo de 720px (celular) fica tudo empilhado, como já era. */
+.sc-pub-etapa-grid { display: block; }
+@media (min-width: 720px) {
+  .sc-pub-card { max-width: 760px; }
+  .sc-pub-etapa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  .sc-pub-etapa-grid > .sc-pub-campo-curto { grid-column: span 1; }
+  .sc-pub-etapa-grid > .sc-pub-campo:not(.sc-pub-campo-curto) { grid-column: 1 / -1; }
+}
+
 /* Prontuário Nutricional (dentro de Pacientes): reaproveita os campos do
    formulário público (.sc-pub-campo etc.) para o mesmo Q&A ficar idêntico
    visualmente dos dois lados - o que o paciente vê e o que a clínica edita. */

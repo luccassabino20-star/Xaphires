@@ -138,9 +138,11 @@ export default function AnamneseFormularioEtapas({ carregar, enviar, tituloPadra
             {erro && <p className="sc-pub-erro">{erro}</p>}
 
             <form onSubmit={ultimaEtapa ? enviarFormulario : avancar}>
-              {etapas[etapaAtual].fields.map((f) => (
-                <CampoPublico key={f.id} field={f} valor={respostas[f.id]} onChange={(v) => setResposta(f.id, v)} />
-              ))}
+              <div className="sc-pub-etapa-grid">
+                {etapas[etapaAtual].fields.map((f) => (
+                  <CampoPublico key={f.id} field={f} valor={respostas[f.id]} onChange={(v) => setResposta(f.id, v)} />
+                ))}
+              </div>
 
               <div className="sc-pub-nav">
                 {etapaAtual > 0 && (
@@ -224,9 +226,14 @@ function CampoPublico({ field, valor, onChange }) {
   // date/email/tel só trocam o teclado e o tipo de input do celular - o valor
   // continua sendo string simples, igual devido do cartão do Kanban (ver
   // CLAUDE.md: <input type="date"> já produz AAAA-MM-DD sozinho).
+  //
+  // "-curto" é o que deixa esses quatro (junto do texto padrão logo abaixo)
+  // pareados dois-a-dois em tela larga (ver .sc-pub-etapa-grid no CSS) - um
+  // campo de uma linha só não precisa da largura inteira do cartão num
+  // notebook, e empilhado sozinho é só rolagem a mais sem motivo.
   if (field.type === "date") {
     return (
-      <label className="sc-pub-campo">
+      <label className="sc-pub-campo sc-pub-campo-curto">
         <span className="sc-pub-label">{label}</span>
         <input type="date" value={valor || ""} onChange={(e) => onChange(e.target.value)} />
       </label>
@@ -234,7 +241,7 @@ function CampoPublico({ field, valor, onChange }) {
   }
   if (field.type === "email") {
     return (
-      <label className="sc-pub-campo">
+      <label className="sc-pub-campo sc-pub-campo-curto">
         <span className="sc-pub-label">{label}</span>
         <input type="email" inputMode="email" autoCapitalize="off" value={valor || ""} onChange={(e) => onChange(e.target.value)} />
       </label>
@@ -242,14 +249,14 @@ function CampoPublico({ field, valor, onChange }) {
   }
   if (field.type === "tel") {
     return (
-      <label className="sc-pub-campo">
+      <label className="sc-pub-campo sc-pub-campo-curto">
         <span className="sc-pub-label">{label}</span>
         <input type="tel" inputMode="tel" value={valor || ""} onChange={(e) => onChange(e.target.value)} />
       </label>
     );
   }
   return (
-    <label className="sc-pub-campo">
+    <label className="sc-pub-campo sc-pub-campo-curto">
       <span className="sc-pub-label">{label}</span>
       <input type="text" value={valor || ""} onChange={(e) => onChange(e.target.value)} />
     </label>
