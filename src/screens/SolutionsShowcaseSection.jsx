@@ -329,15 +329,9 @@ export default function SolutionsShowcaseSection({ onEnter }) {
       <div className="landing-split-right landing-reveal">
         <div className="landing-showcase-browser landing-split-window">
           <div className="landing-showcase-browser-bar">
-            <span className="landing-showcase-traffic-group">
-              <span className="landing-showcase-traffic red" />
-              <span className="landing-showcase-traffic yellow" />
-              <span className="landing-showcase-traffic green" />
-            </span>
             <span className="landing-showcase-browser-title">
               {t("landing.showcase.windowTitle", { module: t(`landing.showcase.modules.${activeModule.key}`) })}
             </span>
-            <span className="landing-showcase-browser-spacer" aria-hidden="true" />
           </div>
           <div className="landing-showcase-screen landing-split-screen">
             <SystemShowcaseMock module={activeModule} />
