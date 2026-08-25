@@ -68,19 +68,23 @@
     "loadError": "Não foi possível carregar os módulos.",
     "quadro": {
       "name": "Quadro Kanban",
-      "desc": "Seu quadro de tarefas e fluxo de trabalho, livre para qualquer uso."
+      "desc": "Seu quadro de tarefas e fluxo de trabalho, livre para qualquer uso.",
+      "tag": "Produtividade"
     },
     "vendas-crm": {
       "name": "Vendas & CRM",
-      "desc": "Leads, funil em Kanban, propostas, orçamentos e pedidos."
+      "desc": "Leads, funil em Kanban, propostas, orçamentos e pedidos.",
+      "tag": "Vendas"
     },
     "financeiro": {
       "name": "ERP IRES",
-      "desc": "Plataforma completa para múltiplos segmentos. Automatize compras, estoque, frota, obras e financeiro com inteligência operacional."
+      "desc": "Plataforma completa para múltiplos segmentos. Automatize compras, estoque, frota, obras e financeiro com inteligência operacional.",
+      "tag": "Gestão ERP"
     },
     "saude-clinicas": {
       "name": "Saúde & Clínicas",
-      "desc": "Prontuário, anamnese, agenda e gestão para clínicas de estética, biomedicina e nutrição."
+      "desc": "Prontuário, anamnese, agenda e gestão para clínicas de estética, biomedicina e nutrição.",
+      "tag": "Saúde"
     },
     "compras-estoque": {
       "name": "Compras & Estoque",

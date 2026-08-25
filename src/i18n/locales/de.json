@@ -68,19 +68,23 @@
     "loadError": "Die Module konnten nicht geladen werden.",
     "quadro": {
       "name": "Kanban-Board",
-      "desc": "Ihr Aufgabenboard und Workflow, frei für jeden Einsatzzweck."
+      "desc": "Ihr Aufgabenboard und Workflow, frei für jeden Einsatzzweck.",
+      "tag": "Produktivität"
     },
     "vendas-crm": {
       "name": "Vertrieb & CRM",
-      "desc": "Leads, Kanban-Pipeline, Angebote, Kostenvoranschläge und Bestellungen."
+      "desc": "Leads, Kanban-Pipeline, Angebote, Kostenvoranschläge und Bestellungen.",
+      "tag": "Vertrieb"
     },
     "financeiro": {
       "name": "ERP IRES",
-      "desc": "Komplette Plattform für mehrere Branchen. Automatisieren Sie Einkauf, Lager, Fuhrpark, Bauprojekte und Finanzen mit operativer Intelligenz."
+      "desc": "Komplette Plattform für mehrere Branchen. Automatisieren Sie Einkauf, Lager, Fuhrpark, Bauprojekte und Finanzen mit operativer Intelligenz.",
+      "tag": "ERP-Verwaltung"
     },
     "saude-clinicas": {
       "name": "Gesundheit & Kliniken",
-      "desc": "Patientenakte, Anamnese, Terminplanung und Verwaltung für Ästhetik-, Biomedizin- und Ernährungskliniken."
+      "desc": "Patientenakte, Anamnese, Terminplanung und Verwaltung für Ästhetik-, Biomedizin- und Ernährungskliniken.",
+      "tag": "Gesundheit"
     },
     "compras-estoque": {
       "name": "Einkauf & Lager",

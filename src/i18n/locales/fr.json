@@ -68,19 +68,23 @@
     "loadError": "Impossible de charger les modules.",
     "quadro": {
       "name": "Tableau Kanban",
-      "desc": "Votre tableau de tâches et flux de travail, libre pour tout usage."
+      "desc": "Votre tableau de tâches et flux de travail, libre pour tout usage.",
+      "tag": "Productivité"
     },
     "vendas-crm": {
       "name": "Ventes & CRM",
-      "desc": "Prospects, pipeline Kanban, propositions, devis et commandes."
+      "desc": "Prospects, pipeline Kanban, propositions, devis et commandes.",
+      "tag": "Ventes"
     },
     "financeiro": {
       "name": "ERP IRES",
-      "desc": "Plateforme complète pour plusieurs secteurs. Automatisez achats, stocks, flotte, chantiers et finances avec intelligence opérationnelle."
+      "desc": "Plateforme complète pour plusieurs secteurs. Automatisez achats, stocks, flotte, chantiers et finances avec intelligence opérationnelle.",
+      "tag": "Gestion ERP"
     },
     "saude-clinicas": {
       "name": "Santé & Cliniques",
-      "desc": "Dossier patient, anamnèse, agenda et gestion pour cliniques d'esthétique, biomédecine et nutrition."
+      "desc": "Dossier patient, anamnèse, agenda et gestion pour cliniques d'esthétique, biomédecine et nutrition.",
+      "tag": "Santé"
     },
     "compras-estoque": {
       "name": "Achats & Stocks",

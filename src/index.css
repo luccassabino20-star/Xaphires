@@ -3686,6 +3686,12 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   /* Arredonda o banner (abaixo) junto com o card - ver .module-card-banner
      reaproveitado aqui, mesmo tratamento do launcher (ModuleLauncher.jsx). */
   overflow: hidden;
+  /* Coluna flex (mesmo truque do .module-card no launcher) pra "Saiba mais"
+     (.landing-solution-link, abaixo) ficar sempre colado no rodapé - sem
+     isso, um card com descrição de 1 linha e outro de 3 na mesma fileira da
+     grade (linhas de altura igual) deixavam o link em alturas diferentes. */
+  display: flex;
+  flex-direction: column;
 }
 .landing-solution-card-custom { border: 1px dashed var(--border-strong); background: var(--bg-list); }
 /* Sangra o banner até a borda do card apesar do padding de 24px daqui - o
@@ -3725,7 +3731,11 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-top: 16px;
+  /* margin-top:auto empurra pro rodapé do card (ver display:flex/column em
+     .landing-solution-card); align-self:flex-end alinha à direita sem
+     precisar de um wrapper de rodapé à parte, já que é o único elemento ali. */
+  margin-top: auto;
+  align-self: flex-end;
   border: none;
   background: transparent;
   color: var(--accent);
@@ -3733,7 +3743,7 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  padding: 0;
+  padding: 16px 0 0;
 }
 .landing-solution-link:hover { text-decoration: underline; }
 

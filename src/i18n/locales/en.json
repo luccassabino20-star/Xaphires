@@ -68,19 +68,23 @@
     "loadError": "Couldn't load the modules.",
     "quadro": {
       "name": "Kanban Board",
-      "desc": "Your task board and workflow, free for any use."
+      "desc": "Your task board and workflow, free for any use.",
+      "tag": "Productivity"
     },
     "vendas-crm": {
       "name": "Sales & CRM",
-      "desc": "Leads, Kanban pipeline, proposals, quotes and orders."
+      "desc": "Leads, Kanban pipeline, proposals, quotes and orders.",
+      "tag": "Sales"
     },
     "financeiro": {
       "name": "ERP IRES",
-      "desc": "A complete platform for multiple segments. Automate purchasing, inventory, fleet, projects and finance with operational intelligence."
+      "desc": "A complete platform for multiple segments. Automate purchasing, inventory, fleet, projects and finance with operational intelligence.",
+      "tag": "ERP Management"
     },
     "saude-clinicas": {
       "name": "Health & Clinics",
-      "desc": "Records, intake forms, scheduling and management for aesthetics, biomedicine and nutrition clinics."
+      "desc": "Records, intake forms, scheduling and management for aesthetics, biomedicine and nutrition clinics.",
+      "tag": "Health"
     },
     "compras-estoque": {
       "name": "Purchasing & Inventory",

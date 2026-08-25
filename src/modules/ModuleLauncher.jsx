@@ -255,7 +255,10 @@ export default function ModuleLauncher({ modules, onOpen }) {
               {modulesFiltrados.map((m) => {
                 const meta = metaFor(m.id);
                 const clickable = m.enabled;
-                const categoria = t(`modules.launcher.categories.${categoriaDaAba(meta.category)}`);
+                // tagKey é o rótulo específico do card (ver comentário em
+                // registry.js) - sem ele, cai no rótulo da própria categoria
+                // de filtro, como antes.
+                const categoria = meta.tagKey ? t(meta.tagKey) : t(`modules.launcher.categories.${categoriaDaAba(meta.category)}`);
                 return (
                   <button
                     key={m.id}

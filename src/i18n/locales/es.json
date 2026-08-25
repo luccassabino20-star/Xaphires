@@ -68,19 +68,23 @@
     "loadError": "No se pudieron cargar los módulos.",
     "quadro": {
       "name": "Tablero Kanban",
-      "desc": "Tu tablero de tareas y flujo de trabajo, libre para cualquier uso."
+      "desc": "Tu tablero de tareas y flujo de trabajo, libre para cualquier uso.",
+      "tag": "Productividad"
     },
     "vendas-crm": {
       "name": "Ventas & CRM",
-      "desc": "Leads, embudo en Kanban, propuestas, presupuestos y pedidos."
+      "desc": "Leads, embudo en Kanban, propuestas, presupuestos y pedidos.",
+      "tag": "Ventas"
     },
     "financeiro": {
       "name": "ERP IRES",
-      "desc": "Plataforma completa para múltiples segmentos. Automatice compras, inventario, flota, obras y finanzas con inteligencia operativa."
+      "desc": "Plataforma completa para múltiples segmentos. Automatice compras, inventario, flota, obras y finanzas con inteligencia operativa.",
+      "tag": "Gestión ERP"
     },
     "saude-clinicas": {
       "name": "Salud & Clínicas",
-      "desc": "Historia clínica, anamnesis, agenda y gestión para clínicas de estética, biomedicina y nutrición."
+      "desc": "Historia clínica, anamnesis, agenda y gestión para clínicas de estética, biomedicina y nutrición.",
+      "tag": "Salud"
     },
     "compras-estoque": {
       "name": "Compras & Inventario",

@@ -8,8 +8,14 @@
 // card no launcher. icon nomeia o desenho em ModuleIcon (abaixo). category
 // alimenta as abas de filtro do launcher (ver CATEGORIES em ModuleLauncher.jsx)
 // - só existem categorias com pelo menos um módulo real; o resto (Atendimento,
-// Saúde & Clínicas, RH, Modelos de IA) fica com o selo "Em breve" na aba,
-// porque hoje não haveria nada pra mostrar nelas.
+// Saúde & Clínicas, RH, Modelos de IA) fica com o selo "Em breve" na aba.
+//
+// tagKey é o texto da pill exibida no card (ver .module-card-tag em
+// ModuleLauncher.jsx) - independente de category de propósito. O quadro
+// Kanban mora na aba "Vendas" (compartilha filtro com Vendas & CRM, é onde o
+// time comercial mais usa), mas rotulado "Vendas" no card ficava errado: é
+// uma ferramenta genérica, não exclusiva de vendas. Sem tagKey, o card cai de
+// volta no rótulo da própria category (ver metaFor/categoriaDaAba).
 //
 // accent era um arco-íris (um tom por pilar, sem relação com a marca); agora é
 // o azul-marinho da marca (#101f47, o mesmo de .landing-shell/.auth-shell) em
@@ -17,14 +23,14 @@
 const BRAND = "#101f47";
 
 export const MODULE_META = {
-  quadro: { icon: "quadro", accent: BRAND, category: "vendas", labelKey: "modules.quadro.name", descKey: "modules.quadro.desc" },
-  "vendas-crm": { icon: "vendas", accent: BRAND, category: "vendas", labelKey: "modules.vendas-crm.name", descKey: "modules.vendas-crm.desc" },
+  quadro: { icon: "quadro", accent: BRAND, category: "vendas", tagKey: "modules.quadro.tag", labelKey: "modules.quadro.name", descKey: "modules.quadro.desc" },
+  "vendas-crm": { icon: "vendas", accent: BRAND, category: "vendas", tagKey: "modules.vendas-crm.tag", labelKey: "modules.vendas-crm.name", descKey: "modules.vendas-crm.desc" },
   // Ícone "layers" (não o cifrão) de propósito: o card representa o ERP IRES
   // inteiro (Financeiro, Compras & Estoque, Faturamento, Relatórios & BI - ver
   // FinanceiroModule.jsx), não só a parte financeira. O cifrão continua valendo
   // só para o grupo "Financeiro" de dentro da sidebar do módulo.
-  financeiro: { icon: "layers", accent: BRAND, category: "financeiro", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
-  "saude-clinicas": { icon: "saude", accent: BRAND, category: "saude", labelKey: "modules.saude-clinicas.name", descKey: "modules.saude-clinicas.desc" },
+  financeiro: { icon: "layers", accent: BRAND, category: "financeiro", tagKey: "modules.financeiro.tag", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
+  "saude-clinicas": { icon: "saude", accent: BRAND, category: "saude", tagKey: "modules.saude-clinicas.tag", labelKey: "modules.saude-clinicas.name", descKey: "modules.saude-clinicas.desc" },
   // Compras & Estoque, Faturamento e Relatórios & BI saíram daqui - viraram abas
   // "Em breve" dentro do ERP IRES (id "financeiro" acima), não cards próprios do
   // launcher. Os nomes (modules.<id>.name/.desc) continuam nos locales, agora
