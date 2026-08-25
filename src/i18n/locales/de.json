@@ -646,14 +646,13 @@
         { "name": "Enterprise", "price": "R$ 3.780,00", "period": "/Monat", "tagline": "Für Organisationen mit spezifischen Anforderungen", "cta": "Plattform kennenlernen", "note": "7 Tage kostenlos testen", "features": ["Alles aus Pro enthalten, plus:", "Dediziertes Onboarding", "Dedizierter Support", "Service-Level-Agreement (SLA)", "Entwicklung jeder maßgeschneiderten Funktion", "Wir erstellen jede individuelle Lösung, die Ihr Unternehmen braucht", "Offener Rahmen für exklusive Projekte und Anpassungen"] }
       ]
     },
-    "switcher": {
-      "title": "Ein Tool, das mit dem Arbeitstempo mithält",
-      "text": "Alles, was das Team erfasst, erscheint sofort für alle, mit der richtigen Zugriffsebene für jede Person.",
-      "items": [
-        { "key": "realtime", "mark": "S", "title": "Echtzeit-Synchronisierung", "text": "Karte geändert, für das ganze Team geändert, im selben Moment.", "statusLabel": "Synchronisierung", "statusValue": "Aktiv" },
-        { "key": "access", "mark": "A", "title": "Zugriff nach Rolle", "text": "Jede Person sieht und bearbeitet nur das, was zu ihrer Funktion passt.", "statusLabel": "Zugriffskontrolle", "statusValue": "Nach Rolle" },
-        { "key": "insights", "mark": "D", "title": "Fertige Kennzahlen", "text": "Das Dashboard zeigt den Fortschritt, ohne dass jemand einen Bericht erstellen muss.", "statusLabel": "Dashboard", "statusValue": "Aktuell" }
-      ]
+    "showcase": {
+      "title": "Werfen Sie einen Blick in die Oberfläche",
+      "subtitle": "Eine moderne, klare und intuitive Ansicht, entwickelt, um die Verwaltung Ihres Unternehmens zu beschleunigen.",
+      "placeholder": "Screenshot der Oberfläche Nr. {{n}}",
+      "prevSlide": "Vorheriger Screenshot",
+      "nextSlide": "Nächster Screenshot",
+      "goToSlide": "Zu Screenshot {{n}} wechseln"
     },
     "logos": {
       "label": "Alles an einem Ort",

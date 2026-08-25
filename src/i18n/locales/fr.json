@@ -865,35 +865,13 @@
         }
       ]
     },
-    "switcher": {
-      "title": "Un outil qui suit le rythme du chantier",
-      "text": "Tout ce que l'équipe enregistre apparaît immédiatement pour tout le monde, avec le niveau d'accès adapté à chaque personne.",
-      "items": [
-        {
-          "key": "realtime",
-          "mark": "S",
-          "title": "Synchronisation en temps réel",
-          "text": "La carte change, elle change pour toute l'équipe, au même instant.",
-          "statusLabel": "Synchronisation",
-          "statusValue": "Active"
-        },
-        {
-          "key": "access",
-          "mark": "A",
-          "title": "Accès par rôle",
-          "text": "Chaque personne voit et modifie uniquement ce qui correspond à sa fonction.",
-          "statusLabel": "Contrôle d'accès",
-          "statusValue": "Par rôle"
-        },
-        {
-          "key": "insights",
-          "mark": "P",
-          "title": "Indicateurs prêts à l'emploi",
-          "text": "Le tableau de bord affiche l'avancement sans que personne n'ait à préparer de rapport.",
-          "statusLabel": "Tableau de bord",
-          "statusValue": "Actualisé"
-        }
-      ]
+    "showcase": {
+      "title": "Découvrez l'interface de près",
+      "subtitle": "Une vue moderne, épurée et intuitive, conçue pour accélérer la gestion de votre entreprise.",
+      "placeholder": "Capture d'écran de l'interface n° {{n}}",
+      "prevSlide": "Capture précédente",
+      "nextSlide": "Capture suivante",
+      "goToSlide": "Aller à la capture {{n}}"
     },
     "logos": {
       "label": "Tout ça en un seul endroit",

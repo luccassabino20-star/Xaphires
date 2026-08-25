@@ -774,14 +774,13 @@
         }
       ]
     },
-    "switcher": {
-      "title": "Una herramienta que sigue el ritmo de la obra",
-      "text": "Todo lo que el equipo registra aparece al instante para todos, con el nivel de acceso adecuado para cada persona.",
-      "items": [
-        { "key": "realtime", "mark": "S", "title": "Sincronización en tiempo real", "text": "Cambias una tarjeta y todo el equipo lo ve en el mismo instante.", "statusLabel": "Sincronización", "statusValue": "Activa" },
-        { "key": "access", "mark": "A", "title": "Acceso por rol", "text": "Cada persona ve y edita solo lo que corresponde a su función.", "statusLabel": "Control de acceso", "statusValue": "Por rol" },
-        { "key": "insights", "mark": "P", "title": "Indicadores listos", "text": "El panel muestra el avance sin que nadie arme un informe.", "statusLabel": "Panel", "statusValue": "Actualizado" }
-      ]
+    "showcase": {
+      "title": "Conoce la interfaz por dentro",
+      "subtitle": "Una vista moderna, limpia e intuitiva, diseñada para acelerar la gestión de tu negocio.",
+      "placeholder": "Captura de la interfaz n.º {{n}}",
+      "prevSlide": "Captura anterior",
+      "nextSlide": "Siguiente captura",
+      "goToSlide": "Ir a la captura {{n}}"
     },
     "logos": {
       "label": "Todo esto en un solo lugar",

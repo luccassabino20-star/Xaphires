@@ -235,151 +235,93 @@ function Faq() {
   );
 }
 
-// Ícone por item do FeatureSwitcher: um pictograma coerente com a descrição
-// (sincronia, escudo de acesso, gráfico de painel) no lugar de uma letra
-// abstrata. Inline e sem lib de ícones, no mesmo espírito das outras provas
-// visuais desta página.
-function RotatorIcon({ itemKey }) {
-  if (itemKey === "access") {
-    return (
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" />
-        <path d="m9.5 12 1.8 1.8L14.8 10" />
-      </svg>
-    );
-  }
-  if (itemKey === "insights") {
-    return (
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 20V10" />
-        <path d="M10 20V4" />
-        <path d="M16 20v-7" />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12a9 9 0 0 1 15.3-6.4L21 8" />
-      <path d="M21 3v5h-5" />
-      <path d="M21 12a9 9 0 0 1-15.3 6.4L3 16" />
-      <path d="M3 21v-5h5" />
-    </svg>
-  );
-}
+// Prints da interface do sistema, carrossel da home (ver InterfaceShowcase,
+// abaixo). Preencha "src" com o caminho do arquivo (ex.: "/images/screenshot1.png",
+// dentro de public/) quando tiver os prints prontos - enquanto "src" estiver
+// vazio, o slide mostra um placeholder escuro numerado no lugar da imagem.
+const interfaceScreenshots = [
+  { key: "slide-1", src: "" },
+  { key: "slide-2", src: "" },
+  { key: "slide-3", src: "" },
+  { key: "slide-4", src: "" },
+];
 
-// Miniatura central do card, uma por item - mesma lógica de HeroBoardPreview:
-// markup e cores reais do app (avatares, papéis de board.share) em vez de
-// barras genéricas, para a imagem condizer com o que o texto descreve.
-function RotatorVisual({ itemKey }) {
+// Carrossel de prints da interface, substitui o antigo FeatureSwitcher (cards
+// giratórios com miniaturas desenhadas à mão). Nativo (sem Swiper/Embla,
+// mesmo hábito do resto do projeto de não trazer lib pra UI que dá pra
+// desenhar direto) - troca de slide é so a classe "active", igual ao padrão
+// que o próprio FeatureSwitcher já usava.
+function InterfaceShowcase() {
   const { t } = useTranslation();
-
-  if (itemKey === "access") {
-    const rows = [
-      { initials: "A", cls: "avatar-0", role: t("board.share.roleOwner") },
-      { initials: "B", cls: "avatar-1", role: t("board.share.roleEditor") },
-      { initials: "C", cls: "avatar-2", role: t("board.share.roleViewer") },
-    ];
-    return (
-      <div className="landing-rotator-visual access">
-        {rows.map((row) => (
-          <div className="landing-rotator-access-row" key={row.role}>
-            <span className={"landing-board-preview-avatar " + row.cls}>{row.initials}</span>
-            <span className="landing-rotator-access-name" />
-            <span className="landing-rotator-access-role">{row.role}</span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (itemKey === "insights") {
-    return (
-      <div className="landing-rotator-visual insights">
-        <div className="landing-rotator-chart">
-          {[38, 72, 54, 90].map((h, i) => (
-            <span key={i} className="landing-rotator-chart-bar" style={{ height: h + "%" }} />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="landing-rotator-visual sync">
-      <div className="landing-rotator-sync-card">
-        <span className="landing-rotator-sync-bar" />
-        <span className="landing-rotator-sync-bar short" />
-      </div>
-      <div className="landing-rotator-sync-avatars">
-        <span className="landing-board-preview-avatar avatar-0">A</span>
-        <span className="landing-board-preview-avatar avatar-1">B</span>
-        <span className="landing-rotator-sync-pulse" aria-hidden="true" />
-      </div>
-    </div>
-  );
-}
-
-function FeatureSwitcher() {
-  const { t } = useTranslation();
-  const title = t("landing.switcher.title");
-  const text = t("landing.switcher.text");
-  const items = t("landing.switcher.items", { returnObjects: true });
   const [active, setActive] = useState(0);
 
   // Reagenda a cada troca, então um clique manual também reinicia a contagem.
   useEffect(() => {
-    const id = setTimeout(() => setActive((a) => (a + 1) % items.length), 5000);
+    const id = setTimeout(() => setActive((a) => (a + 1) % interfaceScreenshots.length), 5000);
     return () => clearTimeout(id);
-  }, [active, items.length]);
+  }, [active]);
 
-  const go = (delta) => setActive((a) => (a + delta + items.length) % items.length);
+  const go = (delta) => setActive((a) => (a + delta + interfaceScreenshots.length) % interfaceScreenshots.length);
 
   return (
-    <section className="landing-switcher">
-      <div className="landing-switcher-intro landing-reveal">
-        <h2>{title}</h2>
-        <p>{text}</p>
-        <div className="landing-switcher-list">
-          {items.map((item, i) => (
-            <button
-              type="button"
-              key={item.key}
-              className={"landing-switcher-btn" + (i === active ? " active" : "")}
-              onClick={() => setActive(i)}
-              aria-pressed={i === active}
-            >
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </button>
-          ))}
-        </div>
+    <section className="landing-showcase">
+      <div className="landing-showcase-intro landing-reveal">
+        <h2>{t("landing.showcase.title")}</h2>
+        <p>{t("landing.showcase.subtitle")}</p>
       </div>
 
-      <div className="landing-rotator landing-reveal">
-        {items.map((item, i) => (
-          <div
-            key={item.key}
-            className={"landing-rotator-card" + (i === active ? " active" : "")}
-            aria-hidden={i === active ? undefined : "true"}
-          >
-            <div className="landing-rotator-mark">
-              <RotatorIcon itemKey={item.key} />
+      <div className="landing-showcase-carousel landing-reveal">
+        <button type="button" className="landing-showcase-arrow prev" onClick={() => go(-1)} aria-label={t("landing.showcase.prevSlide")}>
+          ‹
+        </button>
+
+        <div className="landing-showcase-frame">
+          {interfaceScreenshots.map((shot, i) => (
+            <div
+              key={shot.key}
+              className={"landing-showcase-slide" + (i === active ? " active" : "")}
+              aria-hidden={i === active ? undefined : "true"}
+            >
+              <div className="landing-showcase-browser">
+                <div className="landing-showcase-browser-bar">
+                  <span className="landing-showcase-traffic red" />
+                  <span className="landing-showcase-traffic yellow" />
+                  <span className="landing-showcase-traffic green" />
+                </div>
+                <div className="landing-showcase-screen">
+                  {shot.src ? (
+                    <img src={shot.src} alt={t("landing.showcase.placeholder", { n: i + 1 })} />
+                  ) : (
+                    <div className="landing-showcase-placeholder">
+                      <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
+                        <path fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v14H4zM4 15l4.5-4.5 3 3L16 9l4 4" />
+                        <circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none" />
+                      </svg>
+                      <span>{t("landing.showcase.placeholder", { n: i + 1 })}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-            <RotatorVisual itemKey={item.key} />
-            <div className="landing-rotator-status">
-              <span>{item.statusLabel}</span>
-              <span>{item.statusValue}</span>
-            </div>
-          </div>
-        ))}
-        <div className="landing-rotator-nav">
-          <button type="button" onClick={() => go(-1)} aria-label={t("common.previous", "Anterior")}>
-            ‹
-          </button>
-          <button type="button" onClick={() => go(1)} aria-label={t("common.next", "Próximo")}>
-            ›
-          </button>
+          ))}
         </div>
+
+        <button type="button" className="landing-showcase-arrow next" onClick={() => go(1)} aria-label={t("landing.showcase.nextSlide")}>
+          ›
+        </button>
+      </div>
+
+      <div className="landing-showcase-dots">
+        {interfaceScreenshots.map((shot, i) => (
+          <button
+            type="button"
+            key={shot.key}
+            className={"landing-showcase-dot" + (i === active ? " active" : "")}
+            onClick={() => setActive(i)}
+            aria-label={t("landing.showcase.goToSlide", { n: i + 1 })}
+            aria-current={i === active ? "true" : undefined}
+          />
+        ))}
       </div>
     </section>
   );
@@ -457,7 +399,7 @@ function HomePage({ onEnter, onNavigate }) {
 
       <LogoMarquee />
 
-      <FeatureSwitcher />
+      <InterfaceShowcase />
 
       <section className="landing-stats">
         {stats.map((s, i) => (

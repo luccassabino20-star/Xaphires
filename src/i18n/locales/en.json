@@ -774,14 +774,13 @@
         }
       ]
     },
-    "switcher": {
-      "title": "A tool that keeps up with the work",
-      "text": "Everything the team logs shows up instantly for everyone, with the right level of access for each person.",
-      "items": [
-        { "key": "realtime", "mark": "S", "title": "Real-time sync", "text": "Change a card and the whole team sees it in the same instant.", "statusLabel": "Sync", "statusValue": "Active" },
-        { "key": "access", "mark": "A", "title": "Role-based access", "text": "Each person sees and edits only what their role covers.", "statusLabel": "Access control", "statusValue": "By role" },
-        { "key": "insights", "mark": "D", "title": "Dashboards out of the box", "text": "Progress is visible without anyone building a report.", "statusLabel": "Dashboard", "statusValue": "Up to date" }
-      ]
+    "showcase": {
+      "title": "See the interface up close",
+      "subtitle": "A modern, clean and intuitive view, designed to speed up how you manage your business.",
+      "placeholder": "Interface screenshot #{{n}}",
+      "prevSlide": "Previous screenshot",
+      "nextSlide": "Next screenshot",
+      "goToSlide": "Go to screenshot {{n}}"
     },
     "logos": {
       "label": "All of it in one place",
