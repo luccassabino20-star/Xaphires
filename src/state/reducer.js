@@ -125,6 +125,10 @@ export function reducer(state, action) {
           urgent: false,
           important: false,
           attachments: [],
+          // Otimista: o servidor grava o mesmo instante em `created_at`, mas
+          // essa ação nunca aguarda a resposta dele (ver sync.js) - sem isso
+          // o cartão recém-criado ficava sem "Criado em" até o próximo reload.
+          createdAt: new Date().toISOString(),
         };
         return {
           ...b,
@@ -182,6 +186,9 @@ export function reducer(state, action) {
           archived: false,
           archivedAt: null,
           archivedFrom: null,
+          // O `...source` traria a criação do cartão original - a cópia nasce
+          // agora, não quando o cartão duplicado nasceu.
+          createdAt: new Date().toISOString(),
         };
         return {
           ...b,
