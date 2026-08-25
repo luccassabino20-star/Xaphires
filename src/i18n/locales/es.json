@@ -418,6 +418,7 @@
       "selecionePaciente": "Seleccione un paciente para ver las fichas enviadas.",
       "colTemplate": "Plantilla", "colStatus": "Estado", "vazioRespostas": "Ninguna ficha enviada a este paciente todavía.",
       "enviarWhatsapp": "Enviar por WhatsApp",
+      "copiarLinkCaptacao": "Copiar enlace de captación", "linkCaptacaoCopiado": "Enlace de captación copiado",
       "mensagemWhatsapp": "¡Hola! Por favor complete su ficha de preanamnesis antes de la consulta: {{url}}",
       "status": { "rascunho": "Borrador", "enviado": "Enviado", "respondido": "Respondido" }
     },

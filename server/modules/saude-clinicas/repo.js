@@ -305,6 +305,23 @@ export function responderAnamnese(token, answers) {
   return getRespostaPorToken(token);
 }
 
+// Formulário de CAPTAÇÃO (server/routes/anamnesePublica.js, rota .../novo):
+// quem preenche ainda não é paciente cadastrado - ela mesma cria o próprio
+// cadastro ao enviar. Paciente e resposta nascem juntos, a resposta já
+// "respondido" (não existe rascunho aqui, é preenchimento e envio na mesma
+// hora, sem token nem status intermediário).
+export function criarPacienteERespostaPublica({ templateId, dadosPaciente, answers }) {
+  const paciente = insertPatient(dadosPaciente, null);
+  const id = uid();
+  getDb()
+    .prepare(
+      `INSERT INTO anamnesis_responses (id, template_id, patient_id, answers, status, responded_at, created_at)
+       VALUES (?, ?, ?, ?, 'respondido', ?, ?)`
+    )
+    .run(id, templateId, paciente.id, JSON.stringify(answers || {}), nowIso(), nowIso());
+  return { patient: paciente, response: getAnamneseResponse(id) };
+}
+
 // Mesmo update de responderAnamnese, mas pelo id (rota autenticada, quando é
 // a própria clínica preenchendo a ficha no prontuário do paciente, não o
 // paciente pelo link). Só marca 'respondido'/responded_at na primeira vez -

@@ -28,11 +28,15 @@ const GanttChartDemo = React.lazy(() => import("./components/gantt/GanttChartDem
 // de WhatsApp - sem login, sem os providers do app (mesmo isolamento do
 // painel/demo acima). O componente extrai companyId/token do próprio path.
 const AnamnesePublicPage = React.lazy(() => import("./modules/saude-clinicas/AnamnesePublicPage.jsx"));
+// Link fixo de captação (mesmo isolamento acima): quem ainda não é paciente
+// preenche e cria o próprio cadastro ao enviar - ver AnamneseCaptacaoPage.jsx.
+const AnamneseCaptacaoPage = React.lazy(() => import("./modules/saude-clinicas/AnamneseCaptacaoPage.jsx"));
 
 const path = window.location.pathname.replace(/\/+$/, "");
 const ehPainel = path === "/admin";
 const ehGanttDemo = path === "/gantt-demo";
 const anamnesePublicaMatch = path.match(/^\/anamnese\/([^/]+)\/([^/]+)$/);
+const anamneseCaptacaoMatch = path.match(/^\/anamnese-novo\/([^/]+)\/([^/]+)$/);
 
 // Sem prefixo de idioma na URL (ex.: alguém chegou em "/" direto): alinha a
 // URL com o idioma que o i18next já resolveu em i18n/index.js (localStorage
@@ -41,7 +45,7 @@ const anamnesePublicaMatch = path.match(/^\/anamnese\/([^/]+)\/([^/]+)$/);
 // já decidiu. replaceState, não pushState, pra a detecção automática não
 // empurrar uma entrada a mais no histórico (o botão "voltar" não deveria
 // alternar idioma sozinho).
-if (!ehPainel && !ehGanttDemo && !anamnesePublicaMatch) {
+if (!ehPainel && !ehGanttDemo && !anamnesePublicaMatch && !anamneseCaptacaoMatch) {
   const { locale: urlLocale, rest } = parseLocaleFromPath(path);
   if (!urlLocale) {
     const resolved = normalizeLanguage(i18n.language);
@@ -68,6 +72,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ThemeProvider>
         <Suspense fallback={null}>
           <AnamnesePublicPage companyId={anamnesePublicaMatch[1]} token={anamnesePublicaMatch[2]} />
+        </Suspense>
+      </ThemeProvider>
+    ) : anamneseCaptacaoMatch ? (
+      <ThemeProvider>
+        <Suspense fallback={null}>
+          <AnamneseCaptacaoPage companyId={anamneseCaptacaoMatch[1]} templateId={anamneseCaptacaoMatch[2]} />
         </Suspense>
       </ThemeProvider>
     ) : (

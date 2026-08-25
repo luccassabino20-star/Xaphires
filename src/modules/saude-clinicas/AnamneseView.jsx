@@ -63,6 +63,23 @@ function SecaoTemplates({ templates, onCriado }) {
   const [description, setDescription] = useState("");
   const [clinicArea, setClinicArea] = useState("");
   const [campos, setCampos] = useState([]);
+  const [linkVisivelId, setLinkVisivelId] = useState(null);
+
+  // Link fixo de captação (AnamneseCaptacaoPage.jsx): qualquer pessoa que
+  // abra e envie cria o próprio cadastro de paciente - diferente do link de
+  // "Respostas" abaixo, que já parte de um paciente cadastrado.
+  async function copiarLinkCaptacao(tpl) {
+    const url = `${window.location.origin}/anamnese-novo/${tpl.companyId}/${tpl.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast(t("saudeClinicas.anamnese.linkCaptacaoCopiado"));
+      setLinkVisivelId(null);
+    } catch {
+      // clipboard exige contexto seguro (https) - sem ele, mostra o link
+      // pra copiar à mão em vez de falhar calado.
+      setLinkVisivelId(tpl.id);
+    }
+  }
 
   function adicionarCampo() {
     setCampos((c) => [...c, { id: `campo_${c.length + 1}_${Date.now()}`, label: "", type: "text", required: false, alert: false, options: "" }]);
@@ -155,10 +172,24 @@ function SecaoTemplates({ templates, onCriado }) {
 
       <ul className="sc-template-list">
         {templates.map((tpl) => (
-          <li key={tpl.id} className="sc-template-item">
-            <span className="sc-template-nome">{tpl.name}</span>
-            <span className="sc-badge">{tpl.clinic_area ? t(`saudeClinicas.clinicType.${tpl.clinic_area}`) : t("saudeClinicas.anamnese.universal")}</span>
-            <span className="sc-template-campos">{t("saudeClinicas.anamnese.nPerguntas", { count: tpl.fields.length })}</span>
+          <li key={tpl.id} className="sc-template-item sc-template-item-column">
+            <div className="sc-template-item-row">
+              <span className="sc-template-nome">{tpl.name}</span>
+              <span className="sc-badge">{tpl.clinic_area ? t(`saudeClinicas.clinicType.${tpl.clinic_area}`) : t("saudeClinicas.anamnese.universal")}</span>
+              <span className="sc-template-campos">{t("saudeClinicas.anamnese.nPerguntas", { count: tpl.fields.length })}</span>
+              <button type="button" className="btn-ghost btn-small" onClick={() => copiarLinkCaptacao(tpl)}>
+                {t("saudeClinicas.anamnese.copiarLinkCaptacao")}
+              </button>
+            </div>
+            {linkVisivelId === tpl.id && (
+              <input
+                className="sc-prontuario-link-manual"
+                type="text"
+                readOnly
+                value={`${window.location.origin}/anamnese-novo/${tpl.companyId}/${tpl.id}`}
+                onFocus={(e) => e.target.select()}
+              />
+            )}
           </li>
         ))}
       </ul>

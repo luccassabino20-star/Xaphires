@@ -418,6 +418,7 @@
       "selecionePaciente": "Select a patient to see the forms sent to them.",
       "colTemplate": "Template", "colStatus": "Status", "vazioRespostas": "No form sent to this patient yet.",
       "enviarWhatsapp": "Send via WhatsApp",
+      "copiarLinkCaptacao": "Copy intake link", "linkCaptacaoCopiado": "Intake link copied",
       "mensagemWhatsapp": "Hello! Please fill out your intake form before your appointment: {{url}}",
       "status": { "rascunho": "Draft", "enviado": "Sent", "respondido": "Answered" }
     },

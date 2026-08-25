@@ -111,8 +111,11 @@ function parseFields(fields) {
     return [];
   }
 }
-function templateComFieldsParseados(t) {
-  return t && { ...t, fields: parseFields(t.fields) };
+// companyId junto pelo mesmo motivo do respostaComAnswersParseadas abaixo: é
+// o cliente quem monta o link de captação (origin + /anamnese-novo/
+// :companyId/:templateId, ver AnamneseView.jsx).
+function templateComFieldsParseados(t, companyId) {
+  return t && { ...t, fields: parseFields(t.fields), companyId };
 }
 // `answers` sai do banco como string (repo.js grava com JSON.stringify) - o
 // prontuário do paciente (ProntuarioView.jsx) precisa do objeto pra desenhar
@@ -537,7 +540,7 @@ router.get(
   "/anamnesis-templates",
   ah(async (req, res) => {
     seedAnamneseTemplatesSeVazio();
-    res.json(listAnamneseTemplates().map(templateComFieldsParseados));
+    res.json(listAnamneseTemplates().map((t) => templateComFieldsParseados(t, req.companyId)));
   })
 );
 
@@ -549,7 +552,7 @@ router.post(
       return res.status(400).json({ error: "Informe o nome do template", code: "ANAMNESE_TEMPLATE_NAME_REQUIRED" });
     }
     const criado = insertAnamneseTemplate({ ...req.body, name: name.trim(), fields: fields || [] }, req.user.id, false);
-    res.status(201).json(templateComFieldsParseados(criado));
+    res.status(201).json(templateComFieldsParseados(criado, req.companyId));
   })
 );
 
@@ -558,7 +561,7 @@ router.patch(
   ah(async (req, res) => {
     const atualizado = updateAnamneseTemplate(req.params.id, req.body || {});
     if (!atualizado) return res.status(404).json({ error: "Template não encontrado", code: "ANAMNESE_TEMPLATE_NOT_FOUND" });
-    res.json(templateComFieldsParseados(atualizado));
+    res.json(templateComFieldsParseados(atualizado, req.companyId));
   })
 );
 

@@ -512,6 +512,12 @@ export const scGetAnamnesePublica = (companyId, token) => request(`/public/anamn
 export const scResponderAnamnesePublica = (companyId, token, answers) =>
   request(`/public/anamnese/${companyId}/${token}`, { method: "POST", body: { answers } });
 
+// Captação: link fixo por template, para quem ainda não é paciente (mesma
+// rota pública, mesmo servidor - ver server/routes/anamnesePublica.js).
+export const scGetAnamneseCaptacao = (companyId, templateId) => request(`/public/anamnese/novo/${companyId}/${templateId}`);
+export const scResponderAnamneseCaptacao = (companyId, templateId, answers) =>
+  request(`/public/anamnese/novo/${companyId}/${templateId}`, { method: "POST", body: { answers } });
+
 // ---------- Agenda (Saúde & Clínicas) ----------
 export const scGetDashboard = (from, to, professionalId) =>
   request(`/saude-clinicas/dashboard?from=${from}&to=${to}${professionalId ? `&professionalId=${professionalId}` : ""}`);

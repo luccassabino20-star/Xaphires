@@ -7574,6 +7574,10 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .sc-checkbox-alert { color: var(--danger); }
 .sc-template-list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .sc-template-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; }
+/* Com o link de captação exposto (clipboard bloqueado), o item vira coluna:
+   a linha de sempre em cima, o link pra copiar à mão embaixo. */
+.sc-template-item-column { flex-direction: column; align-items: stretch; }
+.sc-template-item-row { display: flex; align-items: center; gap: 10px; width: 100%; }
 .sc-template-nome { font-weight: 600; }
 .sc-template-campos { margin-left: auto; font-size: 12.5px; color: var(--text-muted); }
 .sc-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: var(--text-secondary); background: var(--bg-list); border: 1px solid var(--border-subtle); }
