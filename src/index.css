@@ -3366,7 +3366,7 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   inset: -20% -10% auto auto;
   width: 60%;
   height: 140%;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(59, 130, 246, 0.04) 55%, transparent 70%);
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.14), rgba(100, 116, 139, 0.04) 55%, transparent 70%);
   filter: blur(60px);
   pointer-events: none;
 }
@@ -6570,10 +6570,12 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Cinza neutro (slate), não a cor do módulo - accent é uniforme desde
+     registry.js mesmo assim, então isso só troca o tom, não muda a lógica. */
   background:
-    radial-gradient(130% 160% at 15% -20%, color-mix(in srgb, var(--module-accent) 60%, transparent), transparent 55%),
-    linear-gradient(155deg, color-mix(in srgb, var(--module-accent) 88%, #000 8%) 0%, color-mix(in srgb, var(--module-accent) 70%, #000 40%) 60%, #05070f 140%);
-  border-bottom: 1px solid color-mix(in srgb, var(--module-accent) 45%, #000 35%);
+    radial-gradient(130% 160% at 15% -20%, rgba(255,255,255,0.14), transparent 55%),
+    linear-gradient(155deg, #3f4654 0%, #232833 60%, #05070a 140%);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .module-card-banner-icon {
   display: inline-flex;
