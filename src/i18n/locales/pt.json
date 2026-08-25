@@ -917,7 +917,13 @@
       "placeholder": "Screenshot da interface #{{n}}",
       "prevSlide": "Print anterior",
       "nextSlide": "Próximo print",
-      "goToSlide": "Ir para o print {{n}}"
+      "goToSlide": "Ir para o print {{n}}",
+      "slides": {
+        "quadro": "Quadro Kanban — Xaphires",
+        "financeiro": "ERP IRES — Gestão Financeira",
+        "saude": "Saúde & Clínicas — Gestão Médica",
+        "vendas": "Vendas & CRM — Funil Comercial"
+      }
     },
     "logos": {
       "label": "Tudo isso num só lugar",

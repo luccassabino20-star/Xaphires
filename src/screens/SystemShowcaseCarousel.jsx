@@ -10,11 +10,14 @@ import ModuleIcon from "../modules/ModuleIcon.jsx";
 // SystemShowcaseMock, uma UI estática desenhada em JSX/CSS (sem rota, sem
 // estado real) só pra ilustrar a interface na landing enquanto não há print
 // de verdade - ver comentário na própria função, abaixo.
+// Chave de cada slide dobra de id de tradução do título na barra da janela
+// (ver landing.showcase.slides.<key> nos locales) - por isso os nomes batem
+// com os módulos reais que cada print vai mostrar, não "slide-1/2/3/4".
 const interfaceScreenshots = [
-  { key: "slide-1", src: "", mock: true },
-  { key: "slide-2", src: "" },
-  { key: "slide-3", src: "" },
-  { key: "slide-4", src: "" },
+  { key: "quadro", src: "", mock: true },
+  { key: "financeiro", src: "" },
+  { key: "saude", src: "" },
+  { key: "vendas", src: "" },
 ];
 
 // UI demonstrativa estática (dummy component): reproduz o "estilo dock"
@@ -167,16 +170,25 @@ export default function InterfaceShowcase() {
               aria-hidden={i === active ? undefined : "true"}
             >
               <div className="landing-showcase-browser">
+                {/* Window header: pontinhos à esquerda, título do módulo
+                    centralizado, e um "espaçador" invisible à direita do
+                    mesmo tamanho dos pontinhos - é o que mantém o título
+                    realmente centralizado no meio da barra, não só entre os
+                    pontinhos e a borda direita. */}
                 <div className="landing-showcase-browser-bar">
-                  <span className="landing-showcase-traffic red" />
-                  <span className="landing-showcase-traffic yellow" />
-                  <span className="landing-showcase-traffic green" />
+                  <span className="landing-showcase-traffic-group">
+                    <span className="landing-showcase-traffic red" />
+                    <span className="landing-showcase-traffic yellow" />
+                    <span className="landing-showcase-traffic green" />
+                  </span>
+                  <span className="landing-showcase-browser-title">{t(`landing.showcase.slides.${shot.key}`)}</span>
+                  <span className="landing-showcase-browser-spacer" aria-hidden="true" />
                 </div>
                 <div className="landing-showcase-screen">
                   {shot.mock ? (
                     <SystemShowcaseMock />
                   ) : shot.src ? (
-                    <img src={shot.src} alt={t("landing.showcase.placeholder", { n: i + 1 })} />
+                    <img src={shot.src} alt={t(`landing.showcase.slides.${shot.key}`)} />
                   ) : (
                     <div className="landing-showcase-placeholder">
                       <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">

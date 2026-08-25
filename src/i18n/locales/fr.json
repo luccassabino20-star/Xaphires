@@ -871,7 +871,13 @@
       "placeholder": "Capture d'écran de l'interface n° {{n}}",
       "prevSlide": "Capture précédente",
       "nextSlide": "Capture suivante",
-      "goToSlide": "Aller à la capture {{n}}"
+      "goToSlide": "Aller à la capture {{n}}",
+      "slides": {
+        "quadro": "Tableau Kanban — Xaphires",
+        "financeiro": "ERP IRES — Gestion Financière",
+        "saude": "Santé & Cliniques — Gestion Médicale",
+        "vendas": "Ventes & CRM — Pipeline Commercial"
+      }
     },
     "logos": {
       "label": "Tout ça en un seul endroit",

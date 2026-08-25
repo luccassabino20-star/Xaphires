@@ -652,7 +652,13 @@
       "placeholder": "Screenshot der Oberfläche Nr. {{n}}",
       "prevSlide": "Vorheriger Screenshot",
       "nextSlide": "Nächster Screenshot",
-      "goToSlide": "Zu Screenshot {{n}} wechseln"
+      "goToSlide": "Zu Screenshot {{n}} wechseln",
+      "slides": {
+        "quadro": "Kanban-Board — Xaphires",
+        "financeiro": "ERP IRES — Finanzverwaltung",
+        "saude": "Gesundheit & Kliniken — Medizinische Verwaltung",
+        "vendas": "Vertrieb & CRM — Vertriebstrichter"
+      }
     },
     "logos": {
       "label": "Alles an einem Ort",

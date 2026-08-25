@@ -780,7 +780,13 @@
       "placeholder": "Interface screenshot #{{n}}",
       "prevSlide": "Previous screenshot",
       "nextSlide": "Next screenshot",
-      "goToSlide": "Go to screenshot {{n}}"
+      "goToSlide": "Go to screenshot {{n}}",
+      "slides": {
+        "quadro": "Kanban Board — Xaphires",
+        "financeiro": "ERP IRES — Financial Management",
+        "saude": "Health & Clinics — Medical Management",
+        "vendas": "Sales & CRM — Sales Pipeline"
+      }
     },
     "logos": {
       "label": "All of it in one place",

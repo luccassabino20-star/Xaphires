@@ -4776,18 +4776,38 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   box-shadow: 0 20px 60px rgba(2, 6, 23, 0.35), 0 4px 16px rgba(2, 6, 23, 0.2);
   background: #020617;
 }
+/* Window header completo: pontinhos à esquerda, título do módulo no centro
+   de verdade (não só entre os pontinhos e a borda) - .landing-showcase-
+   browser-spacer copia a largura de .landing-showcase-traffic-group só pra
+   isso, sem conteúdo nenhum dentro. */
 .landing-showcase-browser-bar {
+  height: 36px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 7px;
-  padding: 12px 16px;
-  background: #0f172a;
-  border-bottom: 1px solid #1e293b;
+  padding: 0 16px;
+  background: #020617;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.6);
 }
+.landing-showcase-traffic-group,
+.landing-showcase-browser-spacer { flex-shrink: 0; width: 47px; display: flex; align-items: center; gap: 7px; }
 .landing-showcase-traffic { width: 11px; height: 11px; border-radius: 50%; }
 .landing-showcase-traffic.red { background: #ef4444; }
 .landing-showcase-traffic.yellow { background: #eab308; }
 .landing-showcase-traffic.green { background: #22c55e; }
+.landing-showcase-browser-title {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .landing-showcase-screen {
   aspect-ratio: 16 / 9;
   height: 400px;
