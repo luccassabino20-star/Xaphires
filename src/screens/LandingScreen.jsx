@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
 import ModuleIcon from "../modules/ModuleIcon.jsx";
+import InterfaceShowcase from "./SystemShowcaseCarousel.jsx";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 import xaphiresLogo from "../assets/xaphires-logo.png";
 
@@ -239,94 +240,6 @@ function Faq() {
 // abaixo). Preencha "src" com o caminho do arquivo (ex.: "/images/screenshot1.png",
 // dentro de public/) quando tiver os prints prontos - enquanto "src" estiver
 // vazio, o slide mostra um placeholder escuro numerado no lugar da imagem.
-const interfaceScreenshots = [
-  { key: "slide-1", src: "" },
-  { key: "slide-2", src: "" },
-  { key: "slide-3", src: "" },
-  { key: "slide-4", src: "" },
-];
-
-// Carrossel de prints da interface, substitui o antigo FeatureSwitcher (cards
-// giratórios com miniaturas desenhadas à mão). Nativo (sem Swiper/Embla,
-// mesmo hábito do resto do projeto de não trazer lib pra UI que dá pra
-// desenhar direto) - troca de slide é so a classe "active", igual ao padrão
-// que o próprio FeatureSwitcher já usava.
-function InterfaceShowcase() {
-  const { t } = useTranslation();
-  const [active, setActive] = useState(0);
-
-  // Reagenda a cada troca, então um clique manual também reinicia a contagem.
-  useEffect(() => {
-    const id = setTimeout(() => setActive((a) => (a + 1) % interfaceScreenshots.length), 5000);
-    return () => clearTimeout(id);
-  }, [active]);
-
-  const go = (delta) => setActive((a) => (a + delta + interfaceScreenshots.length) % interfaceScreenshots.length);
-
-  return (
-    <section className="landing-showcase">
-      <div className="landing-showcase-intro landing-reveal">
-        <h2>{t("landing.showcase.title")}</h2>
-        <p>{t("landing.showcase.subtitle")}</p>
-      </div>
-
-      <div className="landing-showcase-carousel landing-reveal">
-        <button type="button" className="landing-showcase-arrow prev" onClick={() => go(-1)} aria-label={t("landing.showcase.prevSlide")}>
-          ‹
-        </button>
-
-        <div className="landing-showcase-frame">
-          {interfaceScreenshots.map((shot, i) => (
-            <div
-              key={shot.key}
-              className={"landing-showcase-slide" + (i === active ? " active" : "")}
-              aria-hidden={i === active ? undefined : "true"}
-            >
-              <div className="landing-showcase-browser">
-                <div className="landing-showcase-browser-bar">
-                  <span className="landing-showcase-traffic red" />
-                  <span className="landing-showcase-traffic yellow" />
-                  <span className="landing-showcase-traffic green" />
-                </div>
-                <div className="landing-showcase-screen">
-                  {shot.src ? (
-                    <img src={shot.src} alt={t("landing.showcase.placeholder", { n: i + 1 })} />
-                  ) : (
-                    <div className="landing-showcase-placeholder">
-                      <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
-                        <path fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v14H4zM4 15l4.5-4.5 3 3L16 9l4 4" />
-                        <circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none" />
-                      </svg>
-                      <span>{t("landing.showcase.placeholder", { n: i + 1 })}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button type="button" className="landing-showcase-arrow next" onClick={() => go(1)} aria-label={t("landing.showcase.nextSlide")}>
-          ›
-        </button>
-      </div>
-
-      <div className="landing-showcase-dots">
-        {interfaceScreenshots.map((shot, i) => (
-          <button
-            type="button"
-            key={shot.key}
-            className={"landing-showcase-dot" + (i === active ? " active" : "")}
-            onClick={() => setActive(i)}
-            aria-label={t("landing.showcase.goToSlide", { n: i + 1 })}
-            aria-current={i === active ? "true" : undefined}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function StatCard({ value, label, desc }) {
   const ref = useRef(null);
 
