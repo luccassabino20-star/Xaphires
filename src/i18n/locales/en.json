@@ -775,18 +775,25 @@
       ]
     },
     "showcase": {
-      "title": "See the interface up close",
-      "subtitle": "A modern, clean and intuitive view, designed to speed up how you manage your business.",
-      "placeholder": "Interface screenshot #{{n}}",
-      "prevSlide": "Previous screenshot",
-      "nextSlide": "Next screenshot",
-      "goToSlide": "Go to screenshot {{n}}",
-      "slides": {
-        "quadro": "Kanban Board — Xaphires",
-        "financeiro": "ERP IRES — Financial Management",
-        "saude": "Health & Clinics — Medical Management",
-        "vendas": "Sales & CRM — Sales Pipeline"
-      }
+      "eyebrow": "The intelligence that connects everything ⚡",
+      "title": "One platform to replace all the others",
+      "benefits": [
+        { "title": "Centralize your operation.", "text": "Management, sales, finance and customers in the same ecosystem." },
+        { "title": "Save time.", "text": "Integrated processes and smart automations without switching tabs." },
+        { "title": "Increase your margin.", "text": "Cut the patchwork of subscriptions from multiple tools." }
+      ],
+      "cta": "Get started",
+      "ctaNote": "Instant access • No credit card required",
+      "pillsEyebrow": "Do 10x more • Integrated modules",
+      "modules": {
+        "quadro": "Kanban Board",
+        "vendas": "Sales & CRM",
+        "financeiro": "ERP & Finance",
+        "saude": "Health & Clinics",
+        "automacoes": "Automations",
+        "relatorios": "Reports"
+      },
+      "windowTitle": "Xaphires — {{module}}"
     },
     "logos": {
       "label": "All of it in one place",

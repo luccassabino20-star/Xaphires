@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
 import ModuleIcon from "../modules/ModuleIcon.jsx";
-import InterfaceShowcase from "./SystemShowcaseCarousel.jsx";
+import SolutionsShowcaseSection from "./SolutionsShowcaseSection.jsx";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 import xaphiresLogo from "../assets/xaphires-logo.png";
 
@@ -312,7 +312,7 @@ function HomePage({ onEnter, onNavigate }) {
 
       <LogoMarquee />
 
-      <InterfaceShowcase />
+      <SolutionsShowcaseSection onEnter={onEnter} />
 
       <section className="landing-stats">
         {stats.map((s, i) => (

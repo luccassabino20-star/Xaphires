@@ -647,18 +647,25 @@
       ]
     },
     "showcase": {
-      "title": "Werfen Sie einen Blick in die Oberfläche",
-      "subtitle": "Eine moderne, klare und intuitive Ansicht, entwickelt, um die Verwaltung Ihres Unternehmens zu beschleunigen.",
-      "placeholder": "Screenshot der Oberfläche Nr. {{n}}",
-      "prevSlide": "Vorheriger Screenshot",
-      "nextSlide": "Nächster Screenshot",
-      "goToSlide": "Zu Screenshot {{n}} wechseln",
-      "slides": {
-        "quadro": "Kanban-Board — Xaphires",
-        "financeiro": "ERP IRES — Finanzverwaltung",
-        "saude": "Gesundheit & Kliniken — Medizinische Verwaltung",
-        "vendas": "Vertrieb & CRM — Vertriebstrichter"
-      }
+      "eyebrow": "Die Intelligenz, die alles verbindet ⚡",
+      "title": "Eine einzige Plattform, die alle anderen ersetzt",
+      "benefits": [
+        { "title": "Zentralisieren Sie Ihren Betrieb.", "text": "Verwaltung, Vertrieb, Finanzen und Kunden in einem Ökosystem." },
+        { "title": "Sparen Sie Zeit.", "text": "Integrierte Prozesse und intelligente Automatisierungen ohne Tab-Wechsel." },
+        { "title": "Steigern Sie Ihre Marge.", "text": "Schluss mit verstreuten Abos für mehrere Tools." }
+      ],
+      "cta": "Jetzt starten",
+      "ctaNote": "Sofortiger Zugriff • Keine Kreditkarte nötig",
+      "pillsEyebrow": "10x mehr erreichen • Integrierte Module",
+      "modules": {
+        "quadro": "Kanban-Board",
+        "vendas": "Vertrieb & CRM",
+        "financeiro": "ERP & Finanzen",
+        "saude": "Gesundheit & Kliniken",
+        "automacoes": "Automatisierungen",
+        "relatorios": "Berichte"
+      },
+      "windowTitle": "Xaphires — {{module}}"
     },
     "logos": {
       "label": "Alles an einem Ort",

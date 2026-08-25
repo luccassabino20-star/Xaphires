@@ -775,18 +775,25 @@
       ]
     },
     "showcase": {
-      "title": "Conoce la interfaz por dentro",
-      "subtitle": "Una vista moderna, limpia e intuitiva, diseñada para acelerar la gestión de tu negocio.",
-      "placeholder": "Captura de la interfaz n.º {{n}}",
-      "prevSlide": "Captura anterior",
-      "nextSlide": "Siguiente captura",
-      "goToSlide": "Ir a la captura {{n}}",
-      "slides": {
-        "quadro": "Tablero Kanban — Xaphires",
-        "financeiro": "ERP IRES — Gestión Financiera",
-        "saude": "Salud & Clínicas — Gestión Médica",
-        "vendas": "Ventas & CRM — Embudo Comercial"
-      }
+      "eyebrow": "La inteligencia que lo conecta todo ⚡",
+      "title": "Una única plataforma para reemplazar todas las demás",
+      "benefits": [
+        { "title": "Centraliza tu operación.", "text": "Gestión, ventas, finanzas y clientes en un mismo ecosistema." },
+        { "title": "Ahorra tiempo.", "text": "Procesos integrados y automatizaciones inteligentes sin cambiar de pestaña." },
+        { "title": "Aumenta tu margen.", "text": "Elimina las suscripciones sueltas de varios programas." }
+      ],
+      "cta": "Empezar ahora",
+      "ctaNote": "Acceso inmediato • Sin tarjeta de crédito",
+      "pillsEyebrow": "Haz 10 veces más • Módulos integrados",
+      "modules": {
+        "quadro": "Tablero Kanban",
+        "vendas": "Ventas & CRM",
+        "financeiro": "ERP y Financiero",
+        "saude": "Salud & Clínicas",
+        "automacoes": "Automatizaciones",
+        "relatorios": "Informes"
+      },
+      "windowTitle": "Xaphires — {{module}}"
     },
     "logos": {
       "label": "Todo esto en un solo lugar",
