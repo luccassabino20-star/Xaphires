@@ -7585,7 +7585,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .sc-badge-enviado { color: #fff; background: var(--accent); border-color: transparent; }
 .sc-badge-respondido { color: #fff; background: var(--success); border-color: transparent; }
 
-/* Formulário público de pré-anamnese (paciente sem login, sem casca do app) */
+/* Formulário público de pré-anamnese (paciente sem login, sem casca do app).
+   body.sc-pub-body desliga o "overflow: hidden" que o app inteiro usa no
+   body (ver a regra em html,body,#root acima) - sem isso, uma etapa com
+   muitas perguntas passa da altura da janela e fica cortada, sem rolagem
+   nenhuma pra alcançar o botão Avançar/Enviar. A classe é aplicada só
+   enquanto AnamneseFormularioEtapas.jsx está montado (ver o useEffect lá). */
+body.sc-pub-body { overflow: auto; }
 .sc-pub { min-height: 100vh; display: flex; justify-content: center; padding: 32px 16px; background: var(--bg-column); color: var(--text-primary); }
 .sc-pub-card { width: 100%; max-width: 560px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 28px 26px; height: fit-content; }
 .sc-pub-title { font-size: 20px; font-weight: 700; margin: 0 0 6px; }

@@ -38,6 +38,19 @@ export default function AnamneseFormularioEtapas({ carregar, enviar, tituloPadra
   const [respostas, setRespostas] = useState({});
   const [etapaAtual, setEtapaAtual] = useState(0);
 
+  // O app inteiro usa `body { overflow: hidden }` (cada tela rola dentro de
+  // si mesma, ver index.css) - mas esta página não é uma tela do app, é
+  // standalone (sem AuthProvider, sem app-shell). Sem desligar essa regra
+  // aqui, uma etapa mais cheia de perguntas (ex: "Histórico de Saúde e
+  // Familiar") passa da altura da janela e fica cortada, sem como rolar até
+  // o botão Avançar/Enviar - a classe some no cleanup pra não vazar pro
+  // resto do app na eventualidade de alguém navegar entre as duas telas
+  // sem recarregar a página.
+  useEffect(() => {
+    document.body.classList.add("sc-pub-body");
+    return () => document.body.classList.remove("sc-pub-body");
+  }, []);
+
   useEffect(() => {
     carregar()
       .then((d) => {
