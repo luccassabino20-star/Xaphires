@@ -31,10 +31,15 @@ const AnamnesePublicPage = React.lazy(() => import("./modules/saude-clinicas/Ana
 // Link fixo de captação (mesmo isolamento acima): quem ainda não é paciente
 // preenche e cria o próprio cadastro ao enviar - ver AnamneseCaptacaoPage.jsx.
 const AnamneseCaptacaoPage = React.lazy(() => import("./modules/saude-clinicas/AnamneseCaptacaoPage.jsx"));
+// Protótipo visual "Xaphires Beauty" (produto separado do Xaphires real -
+// ver comentário no topo de prototypes/xaphiresBeauty/featuresConfig.js).
+// Mesmo isolamento do GanttChartDemo: sem login, sem dado real por trás.
+const XaphiresBeautyPrototype = React.lazy(() => import("./prototypes/xaphiresBeauty/XaphiresBeautyPrototype.jsx"));
 
 const path = window.location.pathname.replace(/\/+$/, "");
 const ehPainel = path === "/admin";
 const ehGanttDemo = path === "/gantt-demo";
+const ehXaphiresBeauty = path === "/xaphires-beauty";
 const anamnesePublicaMatch = path.match(/^\/anamnese\/([^/]+)\/([^/]+)$/);
 const anamneseCaptacaoMatch = path.match(/^\/anamnese-novo\/([^/]+)$/);
 
@@ -45,7 +50,7 @@ const anamneseCaptacaoMatch = path.match(/^\/anamnese-novo\/([^/]+)$/);
 // já decidiu. replaceState, não pushState, pra a detecção automática não
 // empurrar uma entrada a mais no histórico (o botão "voltar" não deveria
 // alternar idioma sozinho).
-if (!ehPainel && !ehGanttDemo && !anamnesePublicaMatch && !anamneseCaptacaoMatch) {
+if (!ehPainel && !ehGanttDemo && !ehXaphiresBeauty && !anamnesePublicaMatch && !anamneseCaptacaoMatch) {
   const { locale: urlLocale, rest } = parseLocaleFromPath(path);
   if (!urlLocale) {
     const resolved = normalizeLanguage(i18n.language);
@@ -66,6 +71,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ThemeProvider>
         <Suspense fallback={null}>
           <GanttChartDemo />
+        </Suspense>
+      </ThemeProvider>
+    ) : ehXaphiresBeauty ? (
+      <ThemeProvider>
+        <Suspense fallback={null}>
+          <XaphiresBeautyPrototype />
         </Suspense>
       </ThemeProvider>
     ) : anamnesePublicaMatch ? (

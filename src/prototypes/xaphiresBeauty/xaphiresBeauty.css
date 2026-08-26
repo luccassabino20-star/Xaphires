@@ -1,0 +1,195 @@
+/* Estilos do protótipo "Xaphires Beauty" - autocontidos de propósito (não
+   entram em src/index.css): é um produto separado do Xaphires real, sem
+   relação com as classes dsb- ou landing- do app principal. Variáveis
+   próprias (--xb-*) em vez de reaproveitar --bg-card/--text-primary etc.,
+   pra não herdar sem querer nenhuma regra do app real. */
+.xb-page {
+  --xb-bg: #f7f7fb;
+  --xb-card-bg: #ffffff;
+  --xb-border: #e7e7f0;
+  --xb-text: #1e1b2e;
+  --xb-text-secondary: #6b6880;
+  --xb-text-muted: #9895ab;
+  --xb-accent: #7c3aed;
+  --xb-green-bg: #dcfce7;
+  --xb-green-text: #15803d;
+  --xb-lilac-bg: #f1e6fd;
+  --xb-lilac-text: #7c3aed;
+  --xb-blue-bg: #dbeafe;
+  --xb-blue-text: #1d4ed8;
+  min-height: 100vh;
+  background: var(--xb-bg);
+  color: var(--xb-text);
+  font-family: "Inter", system-ui, sans-serif;
+  padding: 48px 24px 80px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .xb-page {
+    --xb-bg: #15131f;
+    --xb-card-bg: #1e1b2e;
+    --xb-border: #322d47;
+    --xb-text: #f2f1f7;
+    --xb-text-secondary: #b2aec4;
+    --xb-text-muted: #83809a;
+    --xb-green-bg: #113322;
+    --xb-green-text: #4ade80;
+    --xb-lilac-bg: #2c1f47;
+    --xb-lilac-text: #c4b5fd;
+    --xb-blue-bg: #122c4d;
+    --xb-blue-text: #93c5fd;
+  }
+}
+:root[data-theme="dark"] .xb-page {
+  --xb-bg: #15131f;
+  --xb-card-bg: #1e1b2e;
+  --xb-border: #322d47;
+  --xb-text: #f2f1f7;
+  --xb-text-secondary: #b2aec4;
+  --xb-text-muted: #83809a;
+  --xb-green-bg: #113322;
+  --xb-green-text: #4ade80;
+  --xb-lilac-bg: #2c1f47;
+  --xb-lilac-text: #c4b5fd;
+  --xb-blue-bg: #122c4d;
+  --xb-blue-text: #93c5fd;
+}
+
+.xb-header { max-width: 640px; margin: 0 auto 40px; text-align: center; }
+.xb-eyebrow {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--xb-accent);
+  margin-bottom: 10px;
+}
+.xb-header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px; }
+.xb-header p { font-size: 14.5px; line-height: 1.6; color: var(--xb-text-secondary); margin: 0 0 24px; }
+
+.xb-plan-switcher { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; }
+.xb-plan-switcher-label { font-size: 12px; font-weight: 600; color: var(--xb-text-muted); }
+.xb-plan-switcher-pills {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--xb-card-bg);
+  border: 1px solid var(--xb-border);
+  border-radius: 999px;
+}
+.xb-plan-switcher-pill {
+  border: none;
+  background: transparent;
+  color: var(--xb-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.xb-plan-switcher-pill.active { background: var(--xb-accent); color: #fff; }
+
+.xb-category { max-width: 1080px; margin: 0 auto 40px; }
+.xb-category-title { font-size: 18px; font-weight: 800; margin: 0 0 16px; }
+.xb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+
+.xb-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--xb-card-bg);
+  border: 1px solid var(--xb-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 1px 2px rgba(20, 16, 40, 0.04), 0 6px 16px rgba(20, 16, 40, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.xb-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.xb-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--xb-lilac-bg);
+  color: var(--xb-lilac-text);
+  flex-shrink: 0;
+}
+.xb-card-title { font-size: 14.5px; font-weight: 700; margin: 0; }
+.xb-card-desc { font-size: 12.5px; line-height: 1.5; color: var(--xb-text-secondary); margin: 0; flex: 1; }
+
+/* Selos de plano - fundo pastel suave + texto na mesma família de cor, como
+   pedido: verde (Grátis), lilás (Premium), azul (Profissional). */
+.xb-badge {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.xb-badge-gratis { background: var(--xb-green-bg); color: var(--xb-green-text); }
+.xb-badge-premium { background: var(--xb-lilac-bg); color: var(--xb-lilac-text); }
+.xb-badge-profissional { background: var(--xb-blue-bg); color: var(--xb-blue-text); }
+
+.xb-card-locked {
+  cursor: pointer;
+  opacity: 0.8;
+}
+.xb-card-locked:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(20, 16, 40, 0.08), 0 12px 24px rgba(20, 16, 40, 0.08); }
+.xb-card-lock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--xb-text-muted);
+  padding-top: 8px;
+  border-top: 1px dashed var(--xb-border);
+}
+
+.xb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 12, 30, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+.xb-modal {
+  width: 100%;
+  max-width: 380px;
+  background: var(--xb-card-bg);
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: 0 24px 60px rgba(15, 12, 30, 0.3);
+}
+.xb-modal h3 { font-size: 17px; font-weight: 800; margin: 12px 0 8px; color: var(--xb-text); }
+.xb-modal p { font-size: 13.5px; line-height: 1.55; color: var(--xb-text-secondary); margin: 0 0 22px; }
+.xb-modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.xb-btn-ghost {
+  border: none;
+  background: transparent;
+  color: var(--xb-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.xb-btn-ghost:hover { background: var(--xb-bg); }
+.xb-btn-primary {
+  border: none;
+  background: var(--xb-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.xb-btn-primary:hover { filter: brightness(1.08); }
