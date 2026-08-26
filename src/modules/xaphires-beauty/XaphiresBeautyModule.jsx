@@ -4,6 +4,7 @@ import * as api from "../../state/api.js";
 import AccountMenu from "../../components/AccountMenu.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import ModuleIcon from "../ModuleIcon.jsx";
+import BeautyIcon from "./BeautyIcon.jsx";
 import BeautyAgendaView from "./BeautyAgendaView.jsx";
 import BeautyClientsView from "./BeautyClientsView.jsx";
 import BeautyServicesView from "./BeautyServicesView.jsx";
@@ -11,13 +12,13 @@ import BeautyFinanceView from "./BeautyFinanceView.jsx";
 import BeautyStaffView from "./BeautyStaffView.jsx";
 import BeautyBookingLinkView from "./BeautyBookingLinkView.jsx";
 
-// Casca do módulo com abas reais (Fases 1-4 do plano) - mesmo molde de
-// CrmModule.jsx (cabeçalho + nav de abas, sem sidebar). O direito de plano
-// (GET /api/plan) é buscado uma vez aqui e passado às abas que ele gate:
+// Sidebar fixa à esquerda (marca + voltar no topo, navegação no meio, idioma/
+// conta no rodapé) no lugar da barra horizontal de abas + cabeçalho de topo
+// herdados do molde do CRM - pedido de redesenho para um visual premium,
+// mais alinhado ao público de estética/beleza. O direito de plano (GET
+// /api/plan) é buscado uma vez aqui e passado às abas que ele gate:
 // financeiro/equipe (Premium+) e agendamento online (Profissional+). O
-// núcleo (agenda/clientes/serviços) não depende de plano - é o produto
-// vendido em todo tier, mesmo espírito do "arquivamento manual em todos os
-// planos, só a automação é paga" em plans.js.
+// núcleo (agenda/clientes/serviços) não depende de plano.
 const ABAS = ["agenda", "clientes", "servicos", "financeiro", "equipe", "online"];
 
 export default function XaphiresBeautyModule({ onExit }) {
@@ -34,43 +35,47 @@ export default function XaphiresBeautyModule({ onExit }) {
 
   return (
     <div className="beauty-shell">
-      <header className="beauty-top">
-        <div className="beauty-top-left">
-          <button className="icon-btn" onClick={onExit} title={t("modules.backToLauncher")} aria-label={t("modules.backToLauncher")}>
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <path fill="currentColor" d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z" />
-            </svg>
-          </button>
-          <span className="beauty-brand">
-            <ModuleIcon name="beauty" size={20} />
-            {t("modules.xaphires-beauty.name")}
-          </span>
-        </div>
-        <div className="beauty-top-actions">
-          <LanguageSwitcher />
-          <AccountMenu />
-        </div>
-      </header>
-
-      <nav className="crm-tabs">
-        {ABAS.map((id) => {
-          const bloqueada = (id === "financeiro" && !canUseFinance) || (id === "equipe" && !canUseFinance) || (id === "online" && !canUseOnlineBooking);
-          return (
-            <button key={id} type="button" className={"crm-tab" + (aba === id ? " active" : "")} onClick={() => setAba(id)}>
-              {t(`modules.xaphiresBeauty.tabs.${id}`)}
-              {bloqueada && plano && <span className="crm-tab-badge">{t(`plan.names.${id === "online" ? "professional" : "intermediate"}`)}</span>}
+      <div className="beauty-main">
+        <aside className="beauty-sidebar">
+          <div className="beauty-sidebar-top">
+            <button className="beauty-sidebar-back" onClick={onExit} title={t("modules.backToLauncher")} aria-label={t("modules.backToLauncher")}>
+              <svg viewBox="0 0 24 24" width="17" height="17">
+                <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M15 6l-6 6 6 6" />
+              </svg>
             </button>
-          );
-        })}
-      </nav>
+            <span className="beauty-sidebar-brand">
+              <ModuleIcon name="beauty" size={19} />
+              {t("modules.xaphires-beauty.name")}
+            </span>
+          </div>
 
-      <div className="sc-body">
-        {aba === "agenda" && <BeautyAgendaView />}
-        {aba === "clientes" && <BeautyClientsView />}
-        {aba === "servicos" && <BeautyServicesView />}
-        {aba === "financeiro" && plano && <BeautyFinanceView canUse={canUseFinance} />}
-        {aba === "equipe" && plano && (canUseFinance ? <BeautyStaffView /> : <div className="sc-empty" style={{ padding: 40 }}>{t("modules.xaphiresBeauty.equipe.bloqueado", { plano: t("plan.names.intermediate") })}</div>)}
-        {aba === "online" && plano && <BeautyBookingLinkView canUse={canUseOnlineBooking} />}
+          <nav className="beauty-nav">
+            {ABAS.map((id) => {
+              const bloqueada = (id === "financeiro" && !canUseFinance) || (id === "equipe" && !canUseFinance) || (id === "online" && !canUseOnlineBooking);
+              return (
+                <button key={id} type="button" className={"beauty-nav-item" + (aba === id ? " active" : "")} onClick={() => setAba(id)}>
+                  <BeautyIcon name={id === "online" ? "online" : id} size={17} />
+                  {t(`modules.xaphiresBeauty.tabs.${id}`)}
+                  {bloqueada && plano && <span className="beauty-nav-item-badge">{t(`plan.names.${id === "online" ? "professional" : "intermediate"}`)}</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="beauty-sidebar-footer">
+            <LanguageSwitcher />
+            <AccountMenu />
+          </div>
+        </aside>
+
+        <div className="beauty-content">
+          {aba === "agenda" && <BeautyAgendaView />}
+          {aba === "clientes" && <BeautyClientsView />}
+          {aba === "servicos" && <BeautyServicesView />}
+          {aba === "financeiro" && plano && <BeautyFinanceView canUse={canUseFinance} />}
+          {aba === "equipe" && plano && <BeautyStaffView canUse={canUseFinance} />}
+          {aba === "online" && plano && <BeautyBookingLinkView canUse={canUseOnlineBooking} />}
+        </div>
       </div>
     </div>
   );

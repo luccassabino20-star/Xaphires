@@ -144,6 +144,7 @@
         "colProfissional": "Profesional",
         "situacao": "Estado",
         "vazio": "Ninguna cita en este día.",
+        "vazioDica": "Toca en \"Nueva cita\" para reservar el primer horario del día.",
         "online": "En línea",
         "concluir": "Completar",
         "cancelar": "Cancelar",

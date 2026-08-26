@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
+import BeautyEmptyState from "./BeautyEmptyState.jsx";
 
 const VAZIO = { name: "", durationMinutes: "30", price: "" };
 
@@ -72,61 +73,60 @@ export default function BeautyServicesView() {
   }
 
   return (
-    <div className="sc-cad-secao">
-      <form className="sc-form" onSubmit={salvar}>
-        <input type="text" placeholder={t("modules.xaphiresBeauty.servicos.nome")} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
-        <input
-          type="number"
-          min="1"
-          placeholder={t("modules.xaphiresBeauty.servicos.duracao")}
-          value={f.durationMinutes}
-          onChange={(e) => setF({ ...f, durationMinutes: e.target.value })}
-          style={{ maxWidth: 110 }}
-        />
-        <input
-          type="text"
-          inputMode="decimal"
-          placeholder={t("modules.xaphiresBeauty.servicos.preco")}
-          value={f.price}
-          onChange={(e) => setF({ ...f, price: e.target.value })}
-          style={{ maxWidth: 110 }}
-        />
-        <button type="submit" className="btn-primary btn-small">{editandoId ? t("common.save") : t("common.add")}</button>
-        {editandoId && <button type="button" className="btn-ghost btn-small" onClick={cancelar}>{t("common.cancel")}</button>}
-      </form>
+    <div>
+      <div className="beauty-page-head">
+        <h2 className="beauty-page-title">{t("modules.xaphiresBeauty.tabs.servicos")}</h2>
+      </div>
 
-      {erro && <div className="sc-error">{erro}</div>}
+      <div className="beauty-card" style={{ marginBottom: 18 }}>
+        <form className="beauty-form" onSubmit={salvar}>
+          <input type="text" placeholder={t("modules.xaphiresBeauty.servicos.nome")} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} style={{ flex: 1, minWidth: 160 }} />
+          <input
+            type="number"
+            min="1"
+            placeholder={t("modules.xaphiresBeauty.servicos.duracao")}
+            value={f.durationMinutes}
+            onChange={(e) => setF({ ...f, durationMinutes: e.target.value })}
+            style={{ maxWidth: 130 }}
+          />
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder={t("modules.xaphiresBeauty.servicos.preco")}
+            value={f.price}
+            onChange={(e) => setF({ ...f, price: e.target.value })}
+            style={{ maxWidth: 130 }}
+          />
+          <button type="submit" className="btn-primary">{editandoId ? t("common.save") : t("common.add")}</button>
+          {editandoId && <button type="button" className="btn-ghost" onClick={cancelar}>{t("common.cancel")}</button>}
+        </form>
+      </div>
 
-      <div className="sc-table-wrap">
-        <table className="sc-table">
-          <thead>
-            <tr>
-              <th>{t("modules.xaphiresBeauty.servicos.nome")}</th>
-              <th>{t("modules.xaphiresBeauty.servicos.duracao")}</th>
-              <th>{t("modules.xaphiresBeauty.servicos.preco")}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {servicos.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="sc-empty">{t("modules.xaphiresBeauty.servicos.vazio")}</td>
-              </tr>
-            ) : (
-              servicos.map((s) => (
-                <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td>{t("modules.xaphiresBeauty.servicos.minutos", { count: s.duration_minutes })}</td>
-                  <td>{formatarValor(s.price_cents, i18n.language)}</td>
-                  <td className="sc-row-actions">
-                    <button type="button" className="btn-ghost btn-small" onClick={() => editar(s)}>{t("financeiro.cad.editar")}</button>
-                    <button type="button" className="btn-ghost btn-small" onClick={() => remover(s)}>{t("common.remove")}</button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {erro && <div className="beauty-error">{erro}</div>}
+
+      <div className="beauty-card">
+        {servicos.length === 0 ? (
+          <BeautyEmptyState title={t("modules.xaphiresBeauty.servicos.vazio")} />
+        ) : (
+          <div className="beauty-list">
+            <div className="beauty-list-head">
+              <span style={{ flex: 1.4 }}>{t("modules.xaphiresBeauty.servicos.nome")}</span>
+              <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.servicos.duracao")}</span>
+              <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.servicos.preco")}</span>
+            </div>
+            {servicos.map((s) => (
+              <div className="beauty-list-row" key={s.id}>
+                <span className="beauty-cell-primary" style={{ flex: 1.4 }}>{s.name}</span>
+                <span className="beauty-cell-muted" style={{ flex: 1 }}>{t("modules.xaphiresBeauty.servicos.minutos", { count: s.duration_minutes })}</span>
+                <span className="beauty-cell-muted" style={{ flex: 1 }}>{formatarValor(s.price_cents, i18n.language)}</span>
+                <span className="beauty-col-actions">
+                  <button type="button" className="btn-ghost" onClick={() => editar(s)}>{t("financeiro.cad.editar")}</button>
+                  <button type="button" className="btn-ghost" onClick={() => remover(s)}>{t("common.remove")}</button>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

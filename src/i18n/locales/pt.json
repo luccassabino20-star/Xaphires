@@ -144,6 +144,7 @@
         "colProfissional": "Profissional",
         "situacao": "Situação",
         "vazio": "Nenhum agendamento neste dia.",
+        "vazioDica": "Toque em \"Novo agendamento\" para marcar o primeiro horário do dia.",
         "online": "Online",
         "concluir": "Concluir",
         "cancelar": "Cancelar",

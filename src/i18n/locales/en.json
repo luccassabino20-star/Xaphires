@@ -144,6 +144,7 @@
         "colProfissional": "Professional",
         "situacao": "Status",
         "vazio": "No appointments on this day.",
+        "vazioDica": "Tap \"New appointment\" to book the first slot of the day.",
         "online": "Online",
         "concluir": "Complete",
         "cancelar": "Cancel",

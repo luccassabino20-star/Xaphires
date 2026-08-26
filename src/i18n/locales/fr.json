@@ -144,6 +144,7 @@
         "colProfissional": "Professionnel",
         "situacao": "Statut",
         "vazio": "Aucun rendez-vous ce jour-là.",
+        "vazioDica": "Appuyez sur \"Nouveau rendez-vous\" pour réserver le premier créneau du jour.",
         "online": "En ligne",
         "concluir": "Terminer",
         "cancelar": "Annuler",

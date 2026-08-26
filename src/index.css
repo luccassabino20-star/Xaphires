@@ -8681,24 +8681,183 @@ body.sc-pub-body { overflow: auto; }
 }
 
 /* ---------- Xaphires Beauty ---------- */
-.beauty-shell { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--bg-column); color: var(--text-primary); }
-.beauty-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-topbar);
+/* Paleta própria do módulo (rosa chá/dusty rose), escopada em .beauty-shell -
+   não mexe em nenhuma variável global, então CRM/Saúde & Clínicas/resto do
+   app continuam exatamente como estavam. Claro e escuro definidos aqui, no
+   mesmo espírito dos três blocos do :root no topo do arquivo (base, media
+   query de preferência do sistema, escolha explícita via data-theme). */
+.beauty-shell {
+  --beauty-bg: #FAF9F6;
+  --beauty-card: #FFFFFF;
+  --beauty-border: #EFE7E3;
+  --beauty-accent: #B76E79;
+  --beauty-accent-strong: #9C5661;
+  --beauty-accent-soft: #F7E9EA;
+  --beauty-text: #2B2326;
+  --beauty-text-soft: #8A7A7D;
+  --beauty-shadow: 0 4px 20px rgba(60, 30, 35, 0.05);
+  --beauty-shadow-hover: 0 8px 28px rgba(60, 30, 35, 0.08);
 }
-.beauty-top-left { display: flex; align-items: center; gap: 12px; }
-.beauty-top-actions { display: flex; align-items: center; gap: 12px; }
-.beauty-brand { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: var(--accent); }
-/* Subtítulo de subseção dentro de uma aba (ex.: "Pagamentos"/"Comissão por
-   profissional" em BeautyFinanceView.jsx) - genérico o bastante para outras
-   abas reaproveitarem, por isso sem prefixo beauty-. */
-.sc-subtitle { font-size: 14px; font-weight: 700; margin: 22px 0 10px; color: var(--text-primary); }
-.sc-subtitle:first-of-type { margin-top: 4px; }
-.xb-online-intro { font-size: 13.5px; color: var(--text-secondary); max-width: 480px; margin: 0 0 4px; }
+@media (prefers-color-scheme: dark) {
+  .beauty-shell {
+    --beauty-bg: var(--bg-column);
+    --beauty-card: var(--bg-card);
+    --beauty-border: var(--border-subtle);
+    --beauty-accent: #E39AA3;
+    --beauty-accent-strong: #EFB3BA;
+    --beauty-accent-soft: color-mix(in srgb, #E39AA3 16%, transparent);
+    --beauty-text: var(--text-primary);
+    --beauty-text-soft: var(--text-secondary);
+    --beauty-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
+    --beauty-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+}
+:root[data-theme="dark"] .beauty-shell {
+  --beauty-bg: var(--bg-column);
+  --beauty-card: var(--bg-card);
+  --beauty-border: var(--border-subtle);
+  --beauty-accent: #E39AA3;
+  --beauty-accent-strong: #EFB3BA;
+  --beauty-accent-soft: color-mix(in srgb, #E39AA3 16%, transparent);
+  --beauty-text: var(--text-primary);
+  --beauty-text-soft: var(--text-secondary);
+  --beauty-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
+  --beauty-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.beauty-shell { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--beauty-bg); color: var(--beauty-text); font-family: var(--font); }
+.beauty-main { flex: 1; min-height: 0; display: flex; }
+
+/* Sidebar: marca + voltar no topo, navegação no meio, idioma/conta no
+   rodapé - substitui a barra horizontal de abas de antes (crm-tabs) e o
+   cabeçalho de topo (beauty-top), que existiam só porque todo módulo
+   herdava o mesmo molde do CRM. Aqui a marca e as ações de conta moram
+   dentro da própria sidebar, padrão comum de SaaS premium (Notion/Linear). */
+.beauty-sidebar {
+  flex-shrink: 0;
+  width: 248px;
+  display: flex;
+  flex-direction: column;
+  background: var(--beauty-card);
+  border-right: 1px solid var(--beauty-border);
+  padding: 18px 14px;
+}
+.beauty-sidebar-top { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+.beauty-sidebar-back {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 30px; height: 30px; color: var(--beauty-text-soft); background: none; border: none;
+  border-radius: 10px; cursor: pointer;
+}
+.beauty-sidebar-back:hover { background: var(--beauty-accent-soft); color: var(--beauty-accent-strong); }
+.beauty-sidebar-brand { display: flex; align-items: center; gap: 9px; font-size: 15.5px; font-weight: 700; letter-spacing: -0.01em; color: var(--beauty-text); }
+.beauty-sidebar-brand svg { color: var(--beauty-accent); }
+
+.beauty-nav { display: flex; flex-direction: column; gap: 3px; }
+.beauty-nav-item {
+  position: relative;
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px 10px 16px;
+  font-size: 13.5px; font-weight: 550; color: var(--beauty-text-soft);
+  background: none; border: none; border-radius: 14px; cursor: pointer; text-align: left;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.beauty-nav-item:hover { background: color-mix(in srgb, var(--beauty-accent) 6%, transparent); color: var(--beauty-text); }
+.beauty-nav-item.active { background: var(--beauty-accent-soft); color: var(--beauty-accent-strong); font-weight: 650; }
+/* Indicador delicado de seleção: um traço fino, não uma barra grossa. */
+.beauty-nav-item.active::before {
+  content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 16px; border-radius: 999px; background: var(--beauty-accent);
+}
+.beauty-nav-item svg { flex-shrink: 0; }
+.beauty-nav-item-badge {
+  margin-left: auto; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  padding: 2px 7px; border-radius: 999px; color: var(--beauty-accent-strong);
+  background: var(--beauty-accent-soft); border: 1px solid color-mix(in srgb, var(--beauty-accent) 30%, transparent);
+}
+
+.beauty-sidebar-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 14px; border-top: 1px solid var(--beauty-border); }
+
+/* Área principal: fundo off-white quente, conteúdo rolável. */
+.beauty-content { flex: 1; min-width: 0; overflow-y: auto; padding: 32px 40px 60px; }
+.beauty-page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.beauty-page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--beauty-text); }
+
+/* Cartão base: fundo branco puro, sombra extremamente suave, cantos bem
+   arredondados - a unidade visual repetida em toda a tela (toolbar, forms,
+   listas, estado vazio). */
+.beauty-card { background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 20px; box-shadow: var(--beauty-shadow); }
+
+.beauty-date-input {
+  padding: 9px 14px; font-size: 13.5px; font-weight: 550; color: var(--beauty-text);
+  background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 999px;
+}
+.beauty-month-input { padding: 9px 14px; font-size: 13.5px; font-weight: 550; color: var(--beauty-text); background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 999px; }
+
+/* Botão pílula, tom rosa chá - substitui o bloco escuro/quadrado padrão do
+   resto do app só dentro do módulo (escopado em .beauty-shell, então
+   .btn-primary continua preto em todo o resto da plataforma). */
+.beauty-shell .btn-primary {
+  background: var(--beauty-accent); color: #fff; border: none; border-radius: 999px;
+  padding: 9px 20px; font-size: 13.5px; font-weight: 600; box-shadow: 0 2px 10px color-mix(in srgb, var(--beauty-accent) 35%, transparent);
+}
+.beauty-shell .btn-primary:hover { background: var(--beauty-accent-strong); }
+.beauty-shell .btn-ghost {
+  background: none; color: var(--beauty-text-soft); border: 1px solid var(--beauty-border); border-radius: 999px;
+  padding: 7px 14px; font-size: 12.5px; font-weight: 550;
+}
+.beauty-shell .btn-ghost:hover { color: var(--beauty-accent-strong); border-color: var(--beauty-accent); background: var(--beauty-accent-soft); }
+
+/* Formulário: mesma pílula suave dos botões, sem o quadrado seco do resto
+   do app. */
+.beauty-form { display: flex; flex-wrap: wrap; gap: 10px; padding: 18px 20px; }
+.beauty-form input, .beauty-form select {
+  padding: 9px 14px; font-size: 13.5px; color: var(--beauty-text); background: var(--beauty-bg);
+  border: 1px solid var(--beauty-border); border-radius: 14px;
+}
+.beauty-form input[type="text"] { flex: 1; min-width: 160px; }
+.beauty-form input:focus, .beauty-form select:focus { outline: none; border-color: var(--beauty-accent); }
+
+/* Lista em cards/linhas limpas, no lugar da tabela de cabeçalho cinza-frio. */
+.beauty-list { display: flex; flex-direction: column; }
+.beauty-list-head {
+  display: flex; align-items: center; gap: 14px; padding: 0 20px 10px;
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--beauty-text-soft);
+}
+.beauty-list-row {
+  display: flex; align-items: center; gap: 14px; padding: 14px 20px;
+  border-top: 1px solid var(--beauty-border); font-size: 13.5px; color: var(--beauty-text);
+}
+.beauty-list-row:hover { background: color-mix(in srgb, var(--beauty-accent) 4%, transparent); }
+.beauty-col { min-width: 0; }
+.beauty-col-actions { margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; }
+.beauty-cell-primary { font-weight: 600; }
+.beauty-cell-muted { color: var(--beauty-text-soft); font-size: 12.5px; }
+
+/* Selo de situação (agendado/concluído/cancelado) em tom pastel, sem
+   cor "de sistema" (vermelho/verde genérico) - a mesma paleta rosa em
+   variação de intensidade, mais condizente com o resto da UI. */
+.beauty-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+.beauty-badge-agendado { color: var(--beauty-accent-strong); background: var(--beauty-accent-soft); }
+.beauty-badge-concluido { color: #4B7A5E; background: #E7F1EA; }
+.beauty-badge-cancelado { color: var(--beauty-text-soft); background: var(--beauty-bg); text-decoration: line-through; }
+:root[data-theme="dark"] .beauty-shell .beauty-badge-concluido, .beauty-shell .beauty-badge-concluido {
+  color: #8FCBA5; background: color-mix(in srgb, #8FCBA5 16%, transparent);
+}
+.beauty-badge-online { color: var(--beauty-accent-strong); background: var(--beauty-accent-soft); border: 1px dashed color-mix(in srgb, var(--beauty-accent) 45%, transparent); }
+
+/* Estado vazio: ilustração leve (linha fina, sem preenchimento pesado) +
+   texto acolhedor, centralizado dentro do próprio cartão. */
+.beauty-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 56px 24px; text-align: center; }
+.beauty-empty-state svg { color: var(--beauty-accent); opacity: 0.8; }
+.beauty-empty-state-title { font-size: 14.5px; font-weight: 650; color: var(--beauty-text); margin: 0; }
+.beauty-empty-state-text { font-size: 12.5px; color: var(--beauty-text-soft); margin: 0; max-width: 280px; }
+
+.beauty-error { color: var(--danger); padding: 4px 20px 14px; font-size: 13px; }
+.beauty-section-title { font-size: 13.5px; font-weight: 700; margin: 28px 0 12px 4px; color: var(--beauty-text); }
+.beauty-section-title:first-of-type { margin-top: 4px; }
+.beauty-lock-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 56px 24px; text-align: center; color: var(--beauty-text-soft); font-size: 13.5px; }
+.beauty-lock-card svg { color: var(--beauty-accent); }
+.xb-online-intro { font-size: 13.5px; color: var(--beauty-text-soft); max-width: 420px; margin: 0 0 4px; }
 /* select/time dentro do formulário público (.sc-pub-campo) - a regra
    original em ContatosView/AnamneseFormularioEtapas só cobria os tipos de
    input que a anamnese usa; o agendamento público também precisa de

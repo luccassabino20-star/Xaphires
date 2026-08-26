@@ -144,6 +144,7 @@
         "colProfissional": "Fachkraft",
         "situacao": "Status",
         "vazio": "Keine Termine an diesem Tag.",
+        "vazioDica": "Tippen Sie auf \"Neuer Termin\", um den ersten Termin des Tages zu buchen.",
         "online": "Online",
         "concluir": "Abschließen",
         "cancelar": "Stornieren",
