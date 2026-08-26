@@ -108,7 +108,19 @@
         "vazio": "Nenhum cliente cadastrado ainda.",
         "salvo": "Cliente salvo",
         "removido": "Cliente removido",
-        "confirmarRemover": "Remover o cliente \"{{nome}}\"?"
+        "confirmarRemover": "Remover o cliente \"{{nome}}\"?",
+        "verDetalhes": "Ver detalhes",
+        "editarFoto": "Trocar foto",
+        "aniversario": "Aniversário",
+        "historico": "Histórico de atendimentos",
+        "semHistorico": "Nenhum atendimento registrado ainda.",
+        "clienteFrequente": "Cliente frequente",
+        "maiorFaturamento": "Maior faturamento",
+        "resumoRanking": "{{visitas}} atendimentos concluídos - {{total}} no período",
+        "metricaTotal": "Clientes cadastrados",
+        "metricaAniversariantes": "Aniversariantes em 30 dias",
+        "metricaTopCliente": "Maior faturamento: {{nome}}",
+        "metricaSemDados": "Sem pagamentos no período"
       },
       "servicos": {
         "nome": "Nome",

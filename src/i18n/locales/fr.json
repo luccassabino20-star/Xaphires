@@ -108,7 +108,19 @@
         "vazio": "Aucun client enregistré pour l'instant.",
         "salvo": "Client enregistré",
         "removido": "Client supprimé",
-        "confirmarRemover": "Supprimer le client \"{{nome}}\" ?"
+        "confirmarRemover": "Supprimer le client \"{{nome}}\" ?",
+        "verDetalhes": "Voir les détails",
+        "editarFoto": "Changer la photo",
+        "aniversario": "Anniversaire",
+        "historico": "Historique des rendez-vous",
+        "semHistorico": "Aucun rendez-vous enregistré pour l'instant.",
+        "clienteFrequente": "Client fidèle",
+        "maiorFaturamento": "Meilleur chiffre d'affaires",
+        "resumoRanking": "{{visitas}} rendez-vous terminés - {{total}} sur la période",
+        "metricaTotal": "Clients enregistrés",
+        "metricaAniversariantes": "Anniversaires dans 30 jours",
+        "metricaTopCliente": "Meilleur chiffre d'affaires : {{nome}}",
+        "metricaSemDados": "Aucun paiement sur la période"
       },
       "servicos": {
         "nome": "Nom",

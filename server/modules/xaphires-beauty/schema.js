@@ -92,4 +92,12 @@ export function applyXaphiresBeautySchema(companyDb) {
   `);
 
   addColumnIfMissing(companyDb, "beauty_appointments", "from_public_link", "from_public_link INTEGER NOT NULL DEFAULT 0");
+
+  // Fase 5: ficha rica do cliente. avatar_path/avatar_mime no mesmo desenho
+  // de patients.avatar_path em Saúde & Clínicas (e de users.avatar_path) -
+  // arquivo em companies/<id>/uploads/beauty-clients/, nomeado pelo id
+  // gerado no upload, nunca pelo nome original.
+  addColumnIfMissing(companyDb, "beauty_clients", "birth_date", "birth_date TEXT");
+  addColumnIfMissing(companyDb, "beauty_clients", "avatar_path", "avatar_path TEXT");
+  addColumnIfMissing(companyDb, "beauty_clients", "avatar_mime", "avatar_mime TEXT");
 }

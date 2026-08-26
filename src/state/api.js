@@ -819,6 +819,34 @@ export const xbGetClients = () => request("/xaphires-beauty/clients");
 export const xbCreateClient = (data) => request("/xaphires-beauty/clients", { method: "POST", body: data });
 export const xbUpdateClient = (id, data) => request(`/xaphires-beauty/clients/${id}`, { method: "PATCH", body: data });
 export const xbDeleteClient = (id) => request(`/xaphires-beauty/clients/${id}`, { method: "DELETE" });
+export const xbGetClientRanking = (from, to) => request(`/xaphires-beauty/clients/ranking?from=${from}&to=${to}`);
+export const xbGetUpcomingBirthdays = (days) => request(`/xaphires-beauty/clients/birthdays?days=${days}`);
+export const xbGetClientAppointments = (id) => request(`/xaphires-beauty/clients/${id}/appointments`);
+
+// Upload não passa pelo request() (corpo multipart) - mesmo desenho de scUploadPatientPhoto.
+export async function xbUploadClientPhoto(clientId, file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/xaphires-beauty/clients/${clientId}/photo`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 
 // Serviços
 export const xbGetServices = () => request("/xaphires-beauty/services");

@@ -108,7 +108,19 @@
         "vazio": "No clients registered yet.",
         "salvo": "Client saved",
         "removido": "Client removed",
-        "confirmarRemover": "Remove client \"{{nome}}\"?"
+        "confirmarRemover": "Remove client \"{{nome}}\"?",
+        "verDetalhes": "View details",
+        "editarFoto": "Change photo",
+        "aniversario": "Birthday",
+        "historico": "Appointment history",
+        "semHistorico": "No appointments logged yet.",
+        "clienteFrequente": "Frequent client",
+        "maiorFaturamento": "Top spender",
+        "resumoRanking": "{{visitas}} completed appointments - {{total}} in the period",
+        "metricaTotal": "Registered clients",
+        "metricaAniversariantes": "Birthdays in 30 days",
+        "metricaTopCliente": "Top spender: {{nome}}",
+        "metricaSemDados": "No payments in the period"
       },
       "servicos": {
         "nome": "Name",

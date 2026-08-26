@@ -108,7 +108,19 @@
         "vazio": "Noch keine Kunden erfasst.",
         "salvo": "Kunde gespeichert",
         "removido": "Kunde entfernt",
-        "confirmarRemover": "Kunde \"{{nome}}\" entfernen?"
+        "confirmarRemover": "Kunde \"{{nome}}\" entfernen?",
+        "verDetalhes": "Details ansehen",
+        "editarFoto": "Foto ändern",
+        "aniversario": "Geburtstag",
+        "historico": "Terminverlauf",
+        "semHistorico": "Noch keine Termine erfasst.",
+        "clienteFrequente": "Stammkunde",
+        "maiorFaturamento": "Bester Umsatz",
+        "resumoRanking": "{{visitas}} abgeschlossene Termine - {{total}} im Zeitraum",
+        "metricaTotal": "Erfasste Kunden",
+        "metricaAniversariantes": "Geburtstage in 30 Tagen",
+        "metricaTopCliente": "Bester Umsatz: {{nome}}",
+        "metricaSemDados": "Keine Zahlungen im Zeitraum"
       },
       "servicos": {
         "nome": "Name",

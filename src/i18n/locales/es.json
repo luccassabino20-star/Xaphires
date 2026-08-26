@@ -108,7 +108,19 @@
         "vazio": "Ningún cliente registrado todavía.",
         "salvo": "Cliente guardado",
         "removido": "Cliente eliminado",
-        "confirmarRemover": "¿Eliminar al cliente \"{{nome}}\"?"
+        "confirmarRemover": "¿Eliminar al cliente \"{{nome}}\"?",
+        "verDetalhes": "Ver detalles",
+        "editarFoto": "Cambiar foto",
+        "aniversario": "Cumpleaños",
+        "historico": "Historial de citas",
+        "semHistorico": "Ninguna cita registrada todavía.",
+        "clienteFrequente": "Cliente frecuente",
+        "maiorFaturamento": "Mayor facturación",
+        "resumoRanking": "{{visitas}} citas completadas - {{total}} en el período",
+        "metricaTotal": "Clientes registrados",
+        "metricaAniversariantes": "Cumpleaños en 30 días",
+        "metricaTopCliente": "Mayor facturación: {{nome}}",
+        "metricaSemDados": "Sin pagos en el período"
       },
       "servicos": {
         "nome": "Nombre",

@@ -8858,6 +8858,28 @@ body.sc-pub-body { overflow: auto; }
 .beauty-lock-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 56px 24px; text-align: center; color: var(--beauty-text-soft); font-size: 13.5px; }
 .beauty-lock-card svg { color: var(--beauty-accent); }
 .xb-online-intro { font-size: 13.5px; color: var(--beauty-text-soft); max-width: 420px; margin: 0 0 4px; }
+
+/* Métricas rápidas do topo (Fase 5, Clientes) - mesmo cartão/sombra do
+   resto do módulo, só em grade. */
+.beauty-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.beauty-metric-card { background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 16px; box-shadow: var(--beauty-shadow); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+.beauty-metric-value { font-size: 22px; font-weight: 700; color: var(--beauty-accent-strong); letter-spacing: -0.01em; }
+.beauty-metric-label { font-size: 12px; color: var(--beauty-text-soft); }
+
+/* Painel de detalhe do cliente (BeautyClientDetailModal.jsx) - usa o
+   .modal/.modal-overlay padrão do app, só o conteúdo segue a paleta do
+   módulo. */
+.beauty-detail-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; padding-right: 24px; }
+.beauty-detail-avatar { position: relative; flex-shrink: 0; }
+.beauty-avatar-edit {
+  position: absolute; right: -2px; bottom: -2px; display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; color: #fff; background: var(--beauty-accent); border: 2px solid var(--beauty-card);
+  border-radius: 50%; cursor: pointer;
+}
+.beauty-avatar-edit:hover { background: var(--beauty-accent-strong); }
+.beauty-detail-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 6px; }
+.beauty-detail-field { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; }
+.beauty-detail-historico { max-height: 260px; overflow-y: auto; border: 1px solid var(--beauty-border); border-radius: 16px; }
 /* select/time dentro do formulário público (.sc-pub-campo) - a regra
    original em ContatosView/AnamneseFormularioEtapas só cobria os tipos de
    input que a anamnese usa; o agendamento público também precisa de

@@ -3,8 +3,11 @@
 // do companyId) - só funciona dentro de um runWithCompany, que requireAuth já
 // garante nas rotas autenticadas (e a rota pública de agendamento, na Fase 4,
 // reentra na mão, igual anamnesePublica.js).
-import { getDb } from "../../db.js";
+import fs from "node:fs";
+import path from "node:path";
+import { getDb, companiesDir } from "../../db.js";
 import { uid } from "../../repo.js";
+import { getCurrentCompanyId } from "../../context.js";
 
 function nowIso() {
   return new Date().toISOString();
@@ -40,23 +43,115 @@ export function listClients() {
 export function getClient(id) {
   return getDb().prepare("SELECT * FROM beauty_clients WHERE id = ?").get(id) || null;
 }
-export function insertClient({ name, phone, doc, notes }, userId) {
+export function insertClient({ name, phone, doc, notes, birthDate }, userId) {
   const id = uid();
   getDb()
     .prepare(
-      `INSERT INTO beauty_clients (id, name, phone, doc, notes, created_at, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO beauty_clients (id, name, phone, doc, notes, birth_date, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(id, name, phone || "", doc || "", notes || "", nowIso(), userId || null);
+    .run(id, name, phone || "", doc || "", notes || "", birthDate || null, nowIso(), userId || null);
   return getClient(id);
 }
 export function updateClient(id, c) {
   const a = getClient(id);
   if (!a) return null;
   getDb()
-    .prepare("UPDATE beauty_clients SET name = ?, phone = ?, doc = ?, notes = ? WHERE id = ?")
-    .run(c.name ?? a.name, c.phone ?? a.phone, c.doc ?? a.doc, c.notes ?? a.notes, id);
+    .prepare("UPDATE beauty_clients SET name = ?, phone = ?, doc = ?, notes = ?, birth_date = ? WHERE id = ?")
+    .run(c.name ?? a.name, c.phone ?? a.phone, c.doc ?? a.doc, c.notes ?? a.notes, c.birthDate ?? a.birth_date, id);
   return getClient(id);
+}
+
+// ---------- Foto do cliente (Fase 5) ----------
+// Mesmo desenho de avatar de paciente em Saúde & Clínicas (por sua vez
+// espelhado de server/repo.js: newAvatarTarget/setUserAvatar/getAvatarFile/
+// discardAvatarFile) - pasta própria pra não misturar com anexo de cartão.
+function clientAvatarsDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "beauty-clients");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+export function newClientAvatarTarget() {
+  const id = uid();
+  return { id, path: path.join(clientAvatarsDir(), id) };
+}
+export function setClientAvatar(clientId, { id, mimeType }) {
+  const atual = getClient(clientId);
+  getDb().prepare("UPDATE beauty_clients SET avatar_path = ?, avatar_mime = ? WHERE id = ?").run(id, mimeType, clientId);
+  if (atual?.avatar_path) {
+    try {
+      fs.unlinkSync(path.join(clientAvatarsDir(), atual.avatar_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
+  return getClient(clientId);
+}
+export function getClientAvatarFile(clientId) {
+  const c = getClient(clientId);
+  if (!c?.avatar_path) return null;
+  const filePath = path.join(clientAvatarsDir(), c.avatar_path);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, mimeType: c.avatar_mime || "application/octet-stream" };
+}
+export function discardClientAvatarFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* já pode ter sumido */
+  }
+}
+
+// Histórico completo de um cliente (sem limite de período - é a ficha
+// inteira dele), mais recente primeiro.
+export function listAppointmentsForClient(clientId) {
+  return getDb()
+    .prepare(`${SELECT_APPT} WHERE a.client_id = ? ORDER BY a.starts_at DESC`)
+    .all(clientId);
+}
+
+// Ranking de clientes por frequência e faturamento no período - mesmo
+// espírito de reports.js em Saúde & Clínicas (agregação no servidor, a
+// tela só desenha). "Frequência" conta agendamentos concluídos; "maior
+// faturamento" soma os pagamentos - os dois no mesmo período, porque
+// misturar um "sempre" com um "do mês" confundiria o que está sendo
+// comparado.
+export function getClientRanking(from, to) {
+  return getDb()
+    .prepare(
+      `SELECT c.id AS client_id, c.name,
+              COUNT(DISTINCT CASE WHEN a.status = 'concluido' AND a.starts_at >= ? AND a.starts_at < ? THEN a.id END) AS visits,
+              COALESCE(SUM(CASE WHEN p.paid_at >= ? AND p.paid_at < ? THEN p.amount_cents END), 0) AS total_cents
+         FROM beauty_clients c
+         LEFT JOIN beauty_appointments a ON a.client_id = c.id
+         LEFT JOIN beauty_payments p ON p.appointment_id = a.id
+        WHERE c.active = 1
+        GROUP BY c.id
+       HAVING visits > 0 OR total_cents > 0
+        ORDER BY total_cents DESC, visits DESC`
+    )
+    .all(from, to, from, to);
+}
+
+// Aniversariantes nos próximos N dias (incluindo hoje) - vira do ano em
+// dezembro/janeiro, então o cálculo é feito aqui, não em SQL puro (SQLite
+// não tem um jeito direto de comparar "dia do ano, com virada" numa
+// cláusula WHERE). Volume de clientes de um salão é baixo o bastante pra
+// isso não pesar.
+export function listUpcomingBirthdays(days) {
+  const clientes = getDb().prepare("SELECT id, name, phone, birth_date FROM beauty_clients WHERE active = 1 AND birth_date IS NOT NULL").all();
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  return clientes
+    .map((c) => {
+      const [, mes, dia] = c.birth_date.split("-").map(Number);
+      let proximo = new Date(hoje.getFullYear(), mes - 1, dia);
+      if (proximo < hoje) proximo = new Date(hoje.getFullYear() + 1, mes - 1, dia);
+      const diasAte = Math.round((proximo - hoje) / 86400000);
+      return { ...c, diasAte };
+    })
+    .filter((c) => c.diasAte <= days)
+    .sort((a, b) => a.diasAte - b.diasAte);
 }
 // Usado pelo link público de agendamento (Fase 4): quem já marcou horário
 // antes, pelo mesmo telefone, reaproveita o próprio cadastro em vez de
