@@ -18,15 +18,17 @@ import BeautyOverviewView from "./BeautyOverviewView.jsx";
 import BeautyBlocksView from "./BeautyBlocksView.jsx";
 import BeautyBirthdaysView from "./BeautyBirthdaysView.jsx";
 import BeautyComingSoonView from "./BeautyComingSoonView.jsx";
+import ExpensesView from "./ExpensesView.jsx";
 
 // Sidebar fixa à esquerda no lugar da barra horizontal de abas + cabeçalho
 // de topo herdados do molde do CRM. Redesenho pedido pelo cliente
 // (referência de imagem): banner de notificação no topo do conteúdo, card
 // de perfil retrátil, e o menu agrupado em três blocos - o item principal
 // (Agendamentos) fora de grupo, e os demais em VISÃO GERAL/OPERAÇÃO/
-// FINANCEIRO-CONFIG. Alguns itens do pedido (Fichas de anamnese, Despesas,
-// Minha assinatura, Configurações) ainda não têm tela própria - aparecem
-// como "Em breve" (BeautyComingSoonView), não como link morto. Os itens que
+// FINANCEIRO-CONFIG. Alguns itens do pedido (Fichas de anamnese, Minha
+// assinatura, Configurações) ainda não têm tela própria - aparecem como
+// "Em breve" (BeautyComingSoonView), não como link morto. Despesas ganhou
+// tela real na Fase 11 (ExpensesView.jsx). Os itens que
 // JÁ existiam antes deste redesenho (Financeiro, Equipe, Agendamento
 // online) foram mantidos dentro do grupo Financeiro/Config, mesmo não
 // estando na lista original do pedido - removê-los do menu tornaria essas
@@ -70,6 +72,11 @@ export default function XaphiresBeautyModule({ onExit }) {
   const [plano, setPlano] = useState(null);
   const [bannerVisivel, setBannerVisivel] = useState(true);
   const [perfilAberto, setPerfilAberto] = useState(false);
+  // Diferente do Kanban/ERP IRES/Saúde & Clínicas, esta sidebar nunca teve
+  // estado de recolher (sempre 248px fixos) - nasce agora só pro celular:
+  // aberta no desktop, fora da tela por padrão no celular (mesmo critério de
+  // largura dos outros três, ver @media 720px em index.css).
+  const [sidebarAberta, setSidebarAberta] = useState(() => window.innerWidth > 720);
 
   useEffect(() => {
     api.getPlan().then(setPlano).catch(() => setPlano({ canUseBeautyFinance: false, canUseBeautyOnlineBooking: false }));
@@ -93,10 +100,17 @@ export default function XaphiresBeautyModule({ onExit }) {
     setBannerVisivel(false);
   }
 
+  function selecionarAba(id) {
+    setAba(id);
+    // No celular a sidebar é um painel por cima do conteúdo - trocar de aba
+    // deveria fechá-la (mesmo critério do ERP IRES/Saúde & Clínicas).
+    if (window.innerWidth <= 720) setSidebarAberta(false);
+  }
+
   function renderItem({ id, icon, tKey, gate }) {
     const bloqueada = gate && plano && !podeUsar(gate);
     return (
-      <button key={id} type="button" className={"beauty-nav-item" + (aba === id ? " active" : "")} onClick={() => setAba(id)}>
+      <button key={id} type="button" className={"beauty-nav-item" + (aba === id ? " active" : "")} onClick={() => selecionarAba(id)}>
         <BeautyIcon name={icon} size={17} />
         {t(`modules.xaphiresBeauty.tabs.${tKey}`)}
         {bloqueada && <span className="beauty-nav-item-badge">{t(`plan.names.${gate === "online" ? "professional" : "intermediate"}`)}</span>}
@@ -118,8 +132,29 @@ export default function XaphiresBeautyModule({ onExit }) {
         </div>
       )}
 
+      {/* Só existe ≤720px (ver .beauty-mobile-topbar em index.css) - diferente
+          do Kanban/ERP IRES/Saúde & Clínicas, este módulo nunca teve uma barra
+          de topo própria (o botão de voltar mora dentro da sidebar, ver
+          .beauty-sidebar-top logo abaixo) - sem esta barra, fechar a sidebar
+          no celular não deixaria nenhum jeito de reabri-la. */}
+      <div className="beauty-mobile-topbar">
+        <button
+          type="button"
+          className="beauty-mobile-menu-btn"
+          onClick={() => setSidebarAberta(true)}
+          title={t("app.topbar.toggleSidebar")}
+          aria-label={t("app.topbar.menu")}
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" /></svg>
+        </button>
+        <span className="beauty-mobile-topbar-brand">
+          <ModuleIcon name="beauty" size={18} />
+          {t("modules.xaphires-beauty.name")}
+        </span>
+      </div>
+
       <div className="beauty-main">
-        <aside className="beauty-sidebar">
+        <aside className={"beauty-sidebar" + (sidebarAberta ? "" : " beauty-sidebar-collapsed")}>
           <div className="beauty-sidebar-top">
             <button className="beauty-sidebar-back" onClick={onExit} title={t("modules.backToLauncher")} aria-label={t("modules.backToLauncher")}>
               <svg viewBox="0 0 24 24" width="17" height="17">
@@ -159,17 +194,18 @@ export default function XaphiresBeautyModule({ onExit }) {
             <AccountMenu />
           </div>
         </aside>
+        {sidebarAberta && <div className="sidebar-backdrop" onClick={() => setSidebarAberta(false)} />}
 
         <div className="beauty-content">
           {aba === "agenda" && <BeautyAgendaView />}
-          {aba === "visao-geral" && <BeautyOverviewView onNavigate={setAba} />}
+          {aba === "visao-geral" && <BeautyOverviewView onNavigate={selecionarAba} />}
           {aba === "cadastros" && <BeautyClientsView />}
           {aba === "catalogo" && <BeautyServicesView />}
           {aba === "bloqueio-horarios" && <BeautyBlocksView />}
           {aba === "fichas-anamnese" && <BeautyComingSoonView titleKey="modules.xaphiresBeauty.tabs.fichasAnamnese" />}
           {aba === "aniversariantes" && <BeautyBirthdaysView />}
           {aba === "financeiro" && plano && <BeautyFinanceView canUse={canUseFinance} />}
-          {aba === "despesas" && <BeautyComingSoonView titleKey="modules.xaphiresBeauty.tabs.despesas" />}
+          {aba === "despesas" && <ExpensesView />}
           {aba === "equipe" && plano && <BeautyStaffView canUse={canUseFinance} />}
           {aba === "minha-assinatura" && <BeautyComingSoonView titleKey="modules.xaphiresBeauty.tabs.minhaAssinatura" />}
           {aba === "online" && plano && <BeautyBookingLinkView canUse={canUseOnlineBooking} />}

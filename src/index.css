@@ -6963,6 +6963,23 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-sidebar-separador { margin: 10px 4px 2px; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
 .fin-sidebar-separador-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
 
+/* Botão de menu do cabeçalho (.fin-top-left) que reabre a sidebar no
+   celular - só existe ali porque o botão que já mora dentro da sidebar
+   (.fin-sidebar-toggle) sai da tela junto com ela quando ela está fechada. */
+.fin-mobile-menu-btn { display: none; }
+@media (max-width: 720px) {
+  .fin-mobile-menu-btn { display: inline-flex; }
+  /* Mesma técnica do .dsb-shell do Kanban (ver @media 720px lá): "recolhida"
+     deixa de significar "faixa estreita de ícones" (80px, o modo desktop) e
+     passa a significar "fora da tela" - a sidebar vira um painel flutuante
+     por cima do conteúdo, largura cheia, que desliza pra dentro/fora. */
+  .fin-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 300;
+    width: 256px; min-width: 256px; box-shadow: var(--shadow-modal);
+    transform: translateX(0); transition: transform 0.2s ease;
+  }
+  .fin-sidebar-collapsed { width: 256px; min-width: 256px; transform: translateX(-100%); pointer-events: none; }
+}
 
 /* Popover dos itens "Em breve" - portalado pra document.body (a sidebar tem
    overflow-y:auto, que cortaria um position:absolute que vazasse dela pros
@@ -7659,6 +7676,18 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .sc-sidebar-categoria { display: flex; flex-direction: column; gap: 1px; }
 .sc-sidebar-categoria-titulo { padding: 4px 10px 2px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
 
+/* Botão de menu do cabeçalho (.sc-top-left) que reabre a sidebar no celular -
+   mesmo motivo/técnica do .fin-mobile-menu-btn do ERP IRES. */
+.sc-mobile-menu-btn { display: none; }
+@media (max-width: 720px) {
+  .sc-mobile-menu-btn { display: inline-flex; }
+  .sc-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 300;
+    width: 268px; min-width: 268px; box-shadow: var(--shadow-modal);
+    transform: translateX(0); transition: transform 0.2s ease;
+  }
+  .sc-sidebar-collapsed { width: 268px; min-width: 268px; transform: translateX(-100%); pointer-events: none; }
+}
 
 /* Aviso de recurso ainda não construído dentro de uma seção real (ex.:
    Dashboard, que já tem KPIs de verdade mas não os de agenda/financeiro). */
@@ -9053,3 +9082,32 @@ body.sc-pub-body { overflow: auto; }
 .beauty-switch input:checked + .beauty-switch-track::after { transform: translateX(16px); }
 .beauty-switch-label { margin-left: 10px; font-size: 13px; color: var(--beauty-text); }
 .beauty-switch-dica { font-size: 11.5px; color: var(--beauty-text-soft); margin: 8px 0 0 48px; }
+
+/* Barra de topo só do celular - este módulo nunca teve uma (o botão de
+   voltar/marca sempre morou dentro da própria sidebar, .beauty-sidebar-top),
+   então sem ela fechar a sidebar no celular não deixaria nenhum jeito de
+   reabri-la. Mesma técnica de fora-da-tela dos outros três módulos
+   (ERP IRES/Saúde & Clínicas/Kanban), só que aqui "aberta" já nasce como
+   nome de estado (sidebarAberta), sem precisar inverter o sentido de uma
+   variável de "recolhida" que já existia. */
+.beauty-mobile-topbar { display: none; }
+@media (max-width: 720px) {
+  .beauty-mobile-topbar {
+    display: flex; align-items: center; gap: 12px; height: 52px; flex-shrink: 0;
+    padding: 0 16px; background: var(--beauty-card); border-bottom: 1px solid var(--beauty-border);
+  }
+  .beauty-mobile-menu-btn {
+    display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+    flex-shrink: 0; border: none; background: none; color: var(--beauty-text); cursor: pointer; border-radius: 8px;
+  }
+  .beauty-mobile-menu-btn:hover { background: var(--beauty-accent-soft); color: var(--beauty-accent-strong); }
+  .beauty-mobile-topbar-brand { display: flex; align-items: center; gap: 7px; font-size: 14.5px; font-weight: 700; color: var(--beauty-text); }
+  .beauty-mobile-topbar-brand svg { color: var(--beauty-accent); }
+
+  .beauty-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 300;
+    width: 248px; min-width: 248px; box-shadow: var(--beauty-shadow-hover);
+    transform: translateX(0); transition: transform 0.2s ease;
+  }
+  .beauty-sidebar-collapsed { transform: translateX(-100%); pointer-events: none; }
+}

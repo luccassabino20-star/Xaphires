@@ -42,7 +42,10 @@ export default function SaudeClinicasModule({ onExit }) {
   const [config, setConfig] = useState(null);
   const [erro, setErro] = useState("");
   const [section, setSection] = useState("dashboard");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Mesmo critério do ERP IRES (FinanceiroModule.jsx): no celular a sidebar
+  // nasce fora da tela, e o CSS troca o que "collapsed" desenha ≤720px (faixa
+  // estreita de ícones no desktop vira "fora da tela" no celular).
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.innerWidth <= 720);
   const [equipeAberta, setEquipeAberta] = useState(false);
 
   useEffect(() => {
@@ -93,6 +96,13 @@ export default function SaudeClinicasModule({ onExit }) {
     }
   }
 
+  function selecionarSecao(id) {
+    setSection(id);
+    // No celular a sidebar é um painel por cima do conteúdo (ver @media em
+    // index.css) - trocar de seção deveria fechá-la.
+    if (window.innerWidth <= 720) setSidebarCollapsed(true);
+  }
+
   const isMaster = user?.role === "master";
   // "v" força o navegador a buscar a imagem de novo quando a logo é trocada -
   // sem isso, a URL fica idêntica (o path do arquivo não muda de nome) e o
@@ -108,6 +118,18 @@ export default function SaudeClinicasModule({ onExit }) {
               <path fill="currentColor" d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z" />
             </svg>
           </button>
+          {/* Só existe ≤720px - a sidebar fica fora da tela por padrão nesse
+              tamanho, e o botão de recolher que já mora dentro dela
+              (.sc-sidebar-toggle) some junto quando ela sai da tela. */}
+          <button
+            type="button"
+            className="icon-btn sc-mobile-menu-btn"
+            onClick={() => setSidebarCollapsed(false)}
+            title={t("app.topbar.toggleSidebar")}
+            aria-label={t("app.topbar.menu")}
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" /></svg>
+          </button>
           <SaudeBrand nome={config?.clinic_name} logoUrl={logoUrl} nomeModulo={t("modules.saude-clinicas.name")} />
         </div>
         <div className="sc-top-actions">
@@ -121,12 +143,13 @@ export default function SaudeClinicasModule({ onExit }) {
           collapsed={sidebarCollapsed}
           onToggleCollapsed={() => setSidebarCollapsed((v) => !v)}
           activeSection={section}
-          onSelectSection={setSection}
+          onSelectSection={selecionarSecao}
           clinicType={config?.clinic_type}
           isMaster={isMaster}
           onClinicTypeChange={trocarClinicType}
           onAbrirEquipe={() => setEquipeAberta(true)}
         />
+        {!sidebarCollapsed && <div className="sidebar-backdrop" onClick={() => setSidebarCollapsed(true)} />}
 
         <div className="sc-body">
           {erro && <div className="sc-error">{erro}</div>}

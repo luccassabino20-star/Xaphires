@@ -29,7 +29,14 @@ const POPOVER_LARGURA = 300;
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
   const [aba, setAba] = useState("lancamentos");
-  const [sidebarRecolhida, setSidebarRecolhida] = useState(false);
+  // Fora do celular a sidebar nasce expandida (o modo ícone-só é escolha do
+  // usuário, ver .fin-sidebar-toggle em IresSidebar.jsx); no celular ela
+  // nasce fora da tela - mesmo critério de largura do Kanban (AuthenticatedApp.jsx,
+  // sidebarOpen), aqui invertido porque "recolhida" já significa o oposto de
+  // "aberta". Em telas ≤720px o CSS troca o que "recolhida" desenha (ver
+  // @media em index.css): deixa de ser a faixa estreita de ícones e vira
+  // "fora da tela" via translateX.
+  const [sidebarRecolhida, setSidebarRecolhida] = useState(() => window.innerWidth <= 720);
   const [popoverId, setPopoverId] = useState(null);
   const [popoverPos, setPopoverPos] = useState(null); // { top, left, caretLeft }
   // O botão que abriu o popover pode ficar dentro da sidebar (overflow-y:auto
@@ -66,6 +73,10 @@ export default function FinanceiroModule({ onExit }) {
   function selecionarAba(id) {
     setPopoverId(null);
     setAba(id);
+    // No celular a sidebar é um painel por cima do conteúdo (ver @media em
+    // index.css) - escolher uma aba deveria fechá-la, senão ela continua
+    // tapando a tela inteira até alguém tocar fora dela.
+    if (window.innerWidth <= 720) setSidebarRecolhida(true);
   }
 
   return (
@@ -76,6 +87,20 @@ export default function FinanceiroModule({ onExit }) {
             <svg viewBox="0 0 24 24" width="18" height="18">
               <path fill="currentColor" d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z" />
             </svg>
+          </button>
+          {/* Só existe ≤720px (ver .fin-mobile-menu-btn em index.css) - a
+              sidebar fica fora da tela por padrão nesse tamanho, e o botão de
+              recolher que já mora dentro dela (.fin-sidebar-toggle) some
+              junto quando ela sai da tela, então precisa de um jeito de
+              trazê-la de volta que fique de fora dela. */}
+          <button
+            type="button"
+            className="icon-btn fin-mobile-menu-btn"
+            onClick={() => setSidebarRecolhida(false)}
+            title={t("app.topbar.toggleSidebar")}
+            aria-label={t("app.topbar.menu")}
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" /></svg>
           </button>
           <h1 className="fin-title">{t("modules.financeiro.name")}</h1>
         </div>
@@ -93,6 +118,7 @@ export default function FinanceiroModule({ onExit }) {
           onSelectAba={selecionarAba}
           onAbrirFuturo={abrirFuturo}
         />
+        {!sidebarRecolhida && <div className="sidebar-backdrop" onClick={() => setSidebarRecolhida(true)} />}
 
         <div className="fin-body">
           {aba === "lancamentos" && <LancamentosView />}
