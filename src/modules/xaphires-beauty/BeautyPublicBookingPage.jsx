@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import * as api from "../../state/api.js";
+import BeautyMiniMap from "./BeautyMiniMap.jsx";
 
 function hojeCivil() {
   const d = new Date();
@@ -83,11 +84,17 @@ export default function BeautyPublicBookingPage({ slug }) {
     );
   }
 
+  const capaUrl = dados.hasCover ? `/api/public/xaphires-beauty/${slug}/photo/cover` : null;
+  const logoUrl = dados.hasLogo ? `/api/public/xaphires-beauty/${slug}/photo/logo` : null;
+
   return (
     <div className="sc-pub">
       <div className="sc-pub-card">
+        {capaUrl && <img src={capaUrl} alt="" className="xb-pub-cover" />}
+        {logoUrl && <img src={logoUrl} alt="" className="xb-pub-logo" />}
         <h1 className="sc-pub-title">Agendar horário</h1>
         <p className="sc-pub-sub">{dados.companyName}</p>
+        {dados.address && <p className="xb-pub-address">{dados.address}</p>}
         {erro && <p className="sc-pub-erro">{erro}</p>}
         <form onSubmit={enviar}>
           <label className="sc-pub-campo">
@@ -130,6 +137,8 @@ export default function BeautyPublicBookingPage({ slug }) {
             {estado === "enviando" ? "Enviando..." : "Confirmar agendamento"}
           </button>
         </form>
+        {dados.lat != null && dados.lng != null && <BeautyMiniMap lat={dados.lat} lng={dados.lng} />}
+        {dados.bookingRulesText && <p className="sc-pub-em-breve" style={{ marginTop: 14 }}>{dados.bookingRulesText}</p>}
       </div>
     </div>
   );

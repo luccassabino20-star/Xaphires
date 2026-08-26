@@ -241,7 +241,20 @@
         "bloqueado": "Online booking is available from the {{plano}} plan onward.",
         "explicacao": "Share this link so anyone can book a slot directly on your schedule, without calling ahead.",
         "copiarLink": "Copy booking link",
-        "copiado": "Link copied"
+        "copiado": "Link copied",
+        "qrCode": "Booking link QR Code",
+        "baixarQrCode": "Download QR Code",
+        "personalizarPagina": "Customize public page",
+        "semCapa": "No cover",
+        "trocarCapa": "Change cover",
+        "semLogo": "No logo",
+        "trocarLogo": "Change logo",
+        "cep": "ZIP code",
+        "buscarCep": "Look up ZIP",
+        "endereco": "Address",
+        "buscarNoMapa": "Find on map",
+        "regrasAgendamento": "Booking rules (optional)",
+        "configSalva": "Settings saved"
       }
     },
     "compras-estoque": {

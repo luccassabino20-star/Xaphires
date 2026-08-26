@@ -917,6 +917,35 @@ export const xbGetMonthlySummary = (year) => request(`/xaphires-beauty/monthly-s
 // Link público de agendamento (Profissional+)
 export const xbGetBookingLink = () => request("/xaphires-beauty/booking-link");
 
+// Personalização da página pública (Profissional+, Fase 10)
+export const xbGetPageConfig = () => request("/xaphires-beauty/page-config");
+export const xbSetPageConfig = (data) => request("/xaphires-beauty/page-config", { method: "PUT", body: data });
+
+// Upload não passa pelo request() (corpo multipart) - mesmo desenho de xbUploadClientPhoto.
+export async function xbUploadPageImage(campo, file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/xaphires-beauty/page-config/${campo}/photo`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
 // Formulário público (sem sessão) - visitante marcando o próprio horário.
 export const xbPublicGetBooking = (slug) => request(`/public/xaphires-beauty/${slug}`);
 export const xbPublicCreateBooking = (slug, data) => request(`/public/xaphires-beauty/${slug}`, { method: "POST", body: data });

@@ -58,6 +58,12 @@ import {
   insertBlock,
   deleteBlock,
   somarOcorrencia,
+  getPageConfig,
+  updatePageConfig,
+  newPageImageTarget,
+  setPageImage,
+  getPageImageFile,
+  discardPageImageFile,
 } from "./repo.js";
 import { getOuCriarSlugAgendamento } from "./agendaSlugStore.js";
 import { getOuCriarSlugLembrete } from "./reminderSlugStore.js";
@@ -740,6 +746,140 @@ router.get(
   exigeBeautyOnlineBooking,
   ah(async (req, res) => {
     res.json({ slug: getOuCriarSlugAgendamento(req.companyId) });
+  })
+);
+
+// ---------- Personalização da página pública (Fase 10, Profissional+) ----------
+
+router.get(
+  "/page-config",
+  exigeBeautyOnlineBooking,
+  ah(async (req, res) => {
+    res.json(getPageConfig());
+  })
+);
+router.put(
+  "/page-config",
+  exigeBeautyOnlineBooking,
+  ah(async (req, res) => {
+    const { address, lat, lng, bookingRulesText } = req.body || {};
+    res.json(updatePageConfig({ address, lat: lat ?? null, lng: lng ?? null, bookingRulesText }));
+  })
+);
+
+const CAMPOS_IMAGEM_PAGINA = new Set(["cover", "logo"]);
+const PAGE_IMAGE_MAX_BYTES = 4 * 1024 * 1024;
+
+// Upload de capa/logo - clone do de POST /clients/:id/photo (mesmo motivo do
+// runWithCompany manual, ver comentário lá), parametrizado por :campo.
+router.post("/page-config/:campo/photo", exigeBeautyOnlineBooking, (req, res) => {
+  const campo = req.params.campo;
+  if (!CAMPOS_IMAGEM_PAGINA.has(campo)) {
+    return res.status(400).json({ error: "Campo inválido", code: "BEAUTY_PAGE_FIELD_INVALID" });
+  }
+  const alvo = newPageImageTarget();
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: PAGE_IMAGE_MAX_BYTES } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let tipo = "";
+  let bytes = 0;
+  let excedeu = false;
+  let tipoInvalido = false;
+  let respondido = false;
+  let saida = null;
+  let descartar = false;
+
+  function apagarQuandoPuder() {
+    descartar = true;
+    if (!saida || saida.destroyed) discardPageImageFile(alvo.path);
+  }
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    tipo = info.mimeType || "";
+    if (!TIPOS_IMAGEM_ACEITOS.has(tipo)) {
+      tipoInvalido = true;
+      stream.resume();
+      return falhar(400, { error: "Envie uma imagem PNG, JPEG, WEBP ou GIF", code: "INVALID_IMAGE_TYPE" });
+    }
+    saida = fs.createWriteStream(alvo.path);
+    saida.on("error", () => falhar(500, { error: "Erro ao gravar o arquivo", code: "UPLOAD_FAILED" }));
+    saida.on("close", () => {
+      if (descartar) discardPageImageFile(alvo.path);
+    });
+    stream.on("data", (chunk) => {
+      bytes += chunk.length;
+    });
+    stream.on("limit", () => {
+      excedeu = true;
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, { error: `A imagem deve ter até ${Math.round(PAGE_IMAGE_MAX_BYTES / 1024 / 1024)} MB`, code: "PHOTO_TOO_LARGE" });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+
+  function registrar() {
+    if (respondido || excedeu || tipoInvalido) return;
+    try {
+      const atualizado = runWithCompany(req.companyId, () => setPageImage(campo, { id: alvo.id, mimeType: tipo }));
+      respondido = true;
+      res.status(201).json(atualizado);
+    } catch (err) {
+      console.error("Falha ao salvar a imagem da página:", err);
+      falhar(500, { error: "Erro ao salvar a imagem", code: "PHOTO_SAVE_FAILED" });
+    }
+  }
+
+  bb.on("close", () => {
+    if (respondido || excedeu || tipoInvalido) return;
+    if (bytes === 0) return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  req.on("aborted", () => {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    saida?.destroy();
+  });
+
+  req.pipe(bb);
+});
+
+router.get(
+  "/page-config/:campo/photo",
+  exigeBeautyOnlineBooking,
+  ah(async (req, res) => {
+    const campo = req.params.campo;
+    if (!CAMPOS_IMAGEM_PAGINA.has(campo)) {
+      return res.status(400).json({ error: "Campo inválido", code: "BEAUTY_PAGE_FIELD_INVALID" });
+    }
+    const file = getPageImageFile(campo);
+    if (!file) return res.status(404).json({ error: "Imagem não encontrada", code: "PHOTO_NOT_FOUND" });
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", file.mimeType);
+    res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
+    res.sendFile(file.path);
   })
 );
 

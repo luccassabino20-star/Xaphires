@@ -573,3 +573,68 @@ export function getMonthlyFinanceSummary(year) {
   }
   return porMes;
 }
+
+// ---------- Personalização da página pública (Fase 10) ----------
+
+function garantirLinhaPageConfig() {
+  getDb().prepare("INSERT OR IGNORE INTO beauty_page_config (id, address, booking_rules_text) VALUES (1, '', '')").run();
+}
+export function getPageConfig() {
+  garantirLinhaPageConfig();
+  return getDb().prepare("SELECT * FROM beauty_page_config WHERE id = 1").get();
+}
+export function updatePageConfig({ address, lat, lng, bookingRulesText }) {
+  garantirLinhaPageConfig();
+  const atual = getPageConfig();
+  getDb()
+    .prepare("UPDATE beauty_page_config SET address = ?, lat = ?, lng = ?, booking_rules_text = ? WHERE id = 1")
+    .run(address ?? atual.address, lat ?? null, lng ?? null, bookingRulesText ?? atual.booking_rules_text);
+  return getPageConfig();
+}
+
+// Cover e logo no mesmo desenho de avatar (Fase 5/6), num campo comum
+// parametrizado por "campo" ('cover'|'logo') - as duas colunas têm formato
+// idêntico (path+mime), então uma função só evita repetir quatro vezes o
+// mesmo par de funções. "campo" chega já validado pela rota (whitelist
+// fixa), nunca interpolado a partir de entrada livre.
+function pageAssetsDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "beauty-page");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+export function newPageImageTarget() {
+  const id = uid();
+  return { id, path: path.join(pageAssetsDir(), id) };
+}
+export function setPageImage(campo, { id, mimeType }) {
+  garantirLinhaPageConfig();
+  const atual = getPageConfig();
+  const pathCol = campo === "cover" ? "cover_path" : "logo_path";
+  const mimeCol = campo === "cover" ? "cover_mime" : "logo_mime";
+  getDb().prepare(`UPDATE beauty_page_config SET ${pathCol} = ?, ${mimeCol} = ? WHERE id = 1`).run(id, mimeType);
+  const antigo = campo === "cover" ? atual.cover_path : atual.logo_path;
+  if (antigo) {
+    try {
+      fs.unlinkSync(path.join(pageAssetsDir(), antigo));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
+  return getPageConfig();
+}
+export function getPageImageFile(campo) {
+  const atual = getPageConfig();
+  const p = campo === "cover" ? atual.cover_path : atual.logo_path;
+  const mime = campo === "cover" ? atual.cover_mime : atual.logo_mime;
+  if (!p) return null;
+  const filePath = path.join(pageAssetsDir(), p);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, mimeType: mime || "application/octet-stream" };
+}
+export function discardPageImageFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* já pode ter sumido */
+  }
+}

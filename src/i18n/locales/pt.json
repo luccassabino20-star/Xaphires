@@ -241,7 +241,20 @@
         "bloqueado": "O agendamento online está disponível a partir do plano {{plano}}.",
         "explicacao": "Compartilhe este link para que qualquer pessoa marque um horário direto na sua agenda, sem precisar te chamar antes.",
         "copiarLink": "Copiar link de agendamento",
-        "copiado": "Link copiado"
+        "copiado": "Link copiado",
+        "qrCode": "QR Code do link de agendamento",
+        "baixarQrCode": "Baixar QR Code",
+        "personalizarPagina": "Personalizar página pública",
+        "semCapa": "Sem capa",
+        "trocarCapa": "Trocar capa",
+        "semLogo": "Sem logo",
+        "trocarLogo": "Trocar logo",
+        "cep": "CEP",
+        "buscarCep": "Buscar CEP",
+        "endereco": "Endereço",
+        "buscarNoMapa": "Buscar no mapa",
+        "regrasAgendamento": "Regras de agendamento (opcional)",
+        "configSalva": "Configuração salva"
       }
     },
     "compras-estoque": {

@@ -163,4 +163,26 @@ export function applyXaphiresBeautySchema(companyDb) {
     );
     CREATE INDEX IF NOT EXISTS idx_beauty_blocks_starts ON beauty_schedule_blocks(starts_at);
   `);
+
+  // Fase 10: personalização da página pública de agendamento - uma linha só
+  // por empresa (CHECK id=1, mesmo padrão de singleton). cover_path/logo_path
+  // no mesmo desenho de avatar (Fase 5/6), em pasta própria
+  // (companies/<id>/uploads/beauty-page/). address/lat/lng é o endereço já
+  // geocodificado (server/routes/geocode.js), igual location de card do
+  // Kanban - não uma tabela de endereço estruturada, o salão tem um endereço
+  // só. booking_rules_text é o texto livre que a página pública mostra
+  // (ex.: política de cancelamento).
+  companyDb.exec(`
+    CREATE TABLE IF NOT EXISTS beauty_page_config (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      cover_path TEXT,
+      cover_mime TEXT,
+      logo_path TEXT,
+      logo_mime TEXT,
+      address TEXT NOT NULL DEFAULT '',
+      lat REAL,
+      lng REAL,
+      booking_rules_text TEXT NOT NULL DEFAULT ''
+    );
+  `);
 }

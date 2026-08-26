@@ -21,6 +21,8 @@ import {
   insertAppointment,
   hasOverlap,
   somarMinutosLocal,
+  getPageConfig,
+  getPageImageFile,
 } from "../modules/xaphires-beauty/repo.js";
 import { getAgendamentoPorSlug } from "../modules/xaphires-beauty/agendaSlugStore.js";
 import { rateLimit } from "../rateLimit.js";
@@ -58,11 +60,42 @@ router.get(
     const companyId = resolverEmpresa(req, res);
     if (!companyId) return;
     runWithCompany(companyId, () => {
+      const config = getPageConfig();
       res.json({
         companyName: getCompany(companyId)?.name || "",
         services: listServices().map((s) => ({ id: s.id, name: s.name, durationMinutes: s.duration_minutes, priceCents: s.price_cents })),
         staff: listStaff().map((s) => ({ id: s.id, name: s.name, role: s.role })),
+        address: config.address,
+        lat: config.lat,
+        lng: config.lng,
+        bookingRulesText: config.booking_rules_text,
+        hasCover: !!config.cover_path,
+        hasLogo: !!config.logo_path,
       });
+    });
+  })
+);
+
+// Capa/logo personalizados (Fase 10) - mesma resolução de empresa por slug,
+// sem sessão. Servida à parte da rota principal porque é imagem (Content-
+// Type próprio), não JSON.
+router.get(
+  "/:slug/photo/:campo",
+  limitePublico,
+  ah(async (req, res) => {
+    const companyId = resolverEmpresa(req, res);
+    if (!companyId) return;
+    const campo = req.params.campo;
+    if (!["cover", "logo"].includes(campo)) {
+      return res.status(400).json({ error: "Campo inválido", code: "BEAUTY_PAGE_FIELD_INVALID" });
+    }
+    runWithCompany(companyId, () => {
+      const file = getPageImageFile(campo);
+      if (!file) return res.status(404).json({ error: "Imagem não encontrada", code: "PHOTO_NOT_FOUND" });
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Content-Type", file.mimeType);
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.sendFile(file.path);
     });
   })
 );

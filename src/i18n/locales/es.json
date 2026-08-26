@@ -241,7 +241,20 @@
         "bloqueado": "La reserva en línea está disponible a partir del plan {{plano}}.",
         "explicacao": "Comparte este enlace para que cualquiera reserve un horario directamente en tu agenda, sin necesidad de llamar antes.",
         "copiarLink": "Copiar enlace de reserva",
-        "copiado": "Enlace copiado"
+        "copiado": "Enlace copiado",
+        "qrCode": "Código QR del enlace de reserva",
+        "baixarQrCode": "Descargar código QR",
+        "personalizarPagina": "Personalizar página pública",
+        "semCapa": "Sin portada",
+        "trocarCapa": "Cambiar portada",
+        "semLogo": "Sin logo",
+        "trocarLogo": "Cambiar logo",
+        "cep": "Código postal",
+        "buscarCep": "Buscar código postal",
+        "endereco": "Dirección",
+        "buscarNoMapa": "Buscar en el mapa",
+        "regrasAgendamento": "Reglas de reserva (opcional)",
+        "configSalva": "Configuración guardada"
       }
     },
     "compras-estoque": {
