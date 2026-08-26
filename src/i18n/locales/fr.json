@@ -2091,5 +2091,44 @@
       "dismiss": "Pas maintenant",
       "close": "Fermer"
     }
+  },
+  "dashboard": {
+    "saudacao": "Bon retour, {{nome}} 👋",
+    "subtitulo": "Voici le résumé consolidé de vos opérations aujourd'hui.",
+    "acoes": {
+      "novoAgendamento": "+ Nouveau rendez-vous",
+      "lancarVenda": "+ Enregistrer une vente",
+      "novaTarefa": "+ Nouvelle tâche Kanban"
+    },
+    "kpis": {
+      "faturamentoMes": "Chiffre d'affaires du mois",
+      "faturamentoSemDado": "Activez Finance ou Xaphires Beauty",
+      "atendimentosHoje": "Rendez-vous aujourd'hui",
+      "atendimentosSemDado": "Activez Xaphires Beauty",
+      "tarefasPendentes": "Tâches en attente",
+      "vsMesAnterior": "vs. mois dernier",
+      "ocupacaoSemana": "Taux d'occupation hebdomadaire",
+      "ocupacaoSemDado": "Renseignez les horaires de l'équipe"
+    },
+    "agendamentos": {
+      "titulo": "Prochains rendez-vous du jour",
+      "subtitulo": "Xaphires Beauty",
+      "vazio": "Aucun rendez-vous en attente aujourd'hui.",
+      "semModulo": "Activez Xaphires Beauty pour voir l'agenda du jour ici."
+    },
+    "solucoes": {
+      "titulo": "État des solutions souscrites",
+      "entrar": "Ouvrir le module",
+      "emBreve": "Bientôt disponible"
+    },
+    "atividades": {
+      "titulo": "Activité récente",
+      "vazio": "Aucune activité récente.",
+      "clienteNovo": "Nouveau client enregistré : {{nome}}",
+      "agendamentoConfirmado": "Rendez-vous confirmé : {{nome}}",
+      "despesaLancada": "Dépense enregistrée : {{descricao}}",
+      "vendaLancada": "Vente enregistrée : {{descricao}}",
+      "tarefaCriada": "Nouvelle tâche sur le tableau : {{titulo}}"
+    }
   }
 }

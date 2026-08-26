@@ -20,6 +20,7 @@ import { router as cnpjRouter } from "./routes/cnpj.js";
 import { router as chatRouter } from "./routes/chat.js";
 import { router as planRouter } from "./routes/plan.js";
 import { router as modulesRouter } from "./routes/modules.js";
+import { router as dashboardRouter } from "./routes/dashboard.js";
 import { router as financeiroRouter } from "./modules/financeiro/routes.js";
 import { router as saudeClinicasRouter } from "./modules/saude-clinicas/routes.js";
 import { router as crmRouter } from "./modules/crm/routes.js";
@@ -116,6 +117,10 @@ app.use("/api/plan", planRouter);
 // Catálogo de módulos da plataforma. Fora do requireWritablePlan, como /api/plan:
 // empresa vencida precisa ver os módulos para navegar e voltar a pagar.
 app.use("/api/modules", modulesRouter);
+// Resumo do Dashboard central (Hub) - também fora do requireWritablePlan,
+// mesmo motivo do /api/modules acima: é só leitura, e empresa vencida
+// continua enxergando o próprio resumo.
+app.use("/api/dashboard", dashboardRouter);
 // Pop-up promocional da landing: público de propósito, ninguém logou ainda nesse
 // ponto da visita. Só GET, então não precisa de verifyOrigin nem de rate limit.
 app.use("/api/popup", popupRouter);

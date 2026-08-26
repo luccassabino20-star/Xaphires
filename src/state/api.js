@@ -219,6 +219,13 @@ export const markChatRead = (conversationId, lastMessageId) =>
 // para saber quais módulos abrir e quais mostrar como "Em breve".
 export const getModules = () => request("/modules");
 
+// ---------- Dashboard central (Hub) ----------
+// Resumo cross-módulo do "Dashboard" da sidebar principal - agregação
+// pronta do servidor, mesmo princípio de /api/plan: o cliente só desenha o
+// que veio, cada métrica já vem calculada (ou null quando o módulo dono do
+// dado não está habilitado para a empresa/usuário).
+export const getDashboardResumo = () => request("/dashboard/resumo");
+
 // ---------- Módulo Financeiro ----------
 // Passa o locale para o servidor semear as categorias padrão na 1ª leitura (a
 // empresa não guarda idioma, mesmo caso do quadro inicial).

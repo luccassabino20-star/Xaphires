@@ -6982,6 +6982,141 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   .pwa-install-btn { order: 2; margin-left: 48px; }
 }
 
+/* ---------- Dashboard central (Hub) ---------- */
+/* Mesma moldura do .launcher-body (max-width/padding) - as duas vistas
+   trocam de lugar no mesmo espaço, então herdam a mesma respiração. */
+.dash-root {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 30px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.dash-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.dash-greeting {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0 0 4px;
+  color: var(--text-primary);
+}
+.dash-subtitle { font-size: 13.5px; color: var(--text-secondary); margin: 0; }
+.dash-quick-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.dash-pill-btn {
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #16265c, #2f4ea3);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px -4px rgba(22, 38, 92, 0.4);
+}
+.dash-pill-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px -4px rgba(22, 38, 92, 0.5); }
+.dash-pill-btn:disabled { background: var(--bg-list); color: var(--text-muted); cursor: default; box-shadow: none; }
+
+.dash-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.dash-kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+}
+.dash-kpi-label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.dash-kpi-value { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.4px; }
+.dash-kpi-trend { font-size: 11.5px; font-weight: 600; color: var(--success); }
+.dash-kpi-trend-down { color: var(--danger); }
+.dash-kpi-empty { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+.dash-panels {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+.dash-panel {
+  grid-column: span 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+}
+/* Feed de atividades ocupa as duas colunas (é o mais comprido dos três) - os
+   dois primeiros ficam lado a lado acima dele. */
+.dash-panel:last-child { grid-column: 1 / -1; }
+.dash-panel-title { font-size: 14.5px; font-weight: 700; margin: 0; color: var(--text-primary); }
+.dash-panel-subtitle { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-left: 6px; }
+.dash-panel-empty { font-size: 12.5px; color: var(--text-muted); margin: 0; }
+
+.dash-appt-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.dash-appt-item { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border-subtle); }
+.dash-appt-item:first-child { border-top: none; }
+.dash-appt-time { font-size: 12.5px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; width: 44px; }
+.dash-appt-info { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.dash-appt-info strong { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.dash-appt-info span { font-size: 11.5px; color: var(--text-secondary); }
+.dash-appt-status {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+  padding: 3px 9px; border-radius: 999px; flex-shrink: 0;
+  background: var(--bg-list); color: var(--text-secondary);
+}
+.dash-appt-status-concluido { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+.dash-appt-status-cancelado { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+
+.dash-modules-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.dash-module-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border-subtle); }
+.dash-module-item:first-child { border-top: none; }
+.dash-module-icon {
+  width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; background: linear-gradient(135deg, #16265c, #2f4ea3);
+}
+.dash-module-icon-locked { background: var(--bg-list); color: var(--text-muted); }
+.dash-module-name { font-size: 13px; font-weight: 600; color: var(--text-primary); flex: 1; }
+.dash-module-open { font-size: 12px; font-weight: 700; color: var(--accent); background: none; border: none; cursor: pointer; flex-shrink: 0; }
+.dash-module-soon { font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+
+.dash-activity-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.dash-activity-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border-subtle); }
+.dash-activity-item:first-child { border-top: none; }
+.dash-activity-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--module-accent, #2f4ea3); flex-shrink: 0; }
+.dash-activity-text { font-size: 12.5px; color: var(--text-primary); flex: 1; }
+.dash-activity-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+
+@media (max-width: 960px) {
+  .dash-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-panels { grid-template-columns: 1fr; }
+  .dash-panel:last-child { grid-column: auto; }
+}
+@media (max-width: 720px) {
+  .dash-root { padding: 24px 18px 40px; }
+  .dash-kpi-grid { grid-template-columns: 1fr; }
+  .dash-header { flex-direction: column; }
+}
+
 /* ---------- Módulo Financeiro ---------- */
 /* Par de cores das séries do fluxo (entradas azul / saídas laranja), validado
    para daltonismo pela skill dataviz. */

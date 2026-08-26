@@ -1847,5 +1847,44 @@
       "dismiss": "Nicht jetzt",
       "close": "Schließen"
     }
+  },
+  "dashboard": {
+    "saudacao": "Willkommen zurück, {{nome}} 👋",
+    "subtitulo": "Hier ist die konsolidierte Übersicht Ihrer heutigen Geschäfte.",
+    "acoes": {
+      "novoAgendamento": "+ Neuer Termin",
+      "lancarVenda": "+ Verkauf erfassen",
+      "novaTarefa": "+ Neue Kanban-Aufgabe"
+    },
+    "kpis": {
+      "faturamentoMes": "Umsatz diesen Monat",
+      "faturamentoSemDado": "Aktivieren Sie Finanzen oder Xaphires Beauty",
+      "atendimentosHoje": "Termine heute",
+      "atendimentosSemDado": "Aktivieren Sie Xaphires Beauty",
+      "tarefasPendentes": "Offene Aufgaben",
+      "vsMesAnterior": "ggü. Vormonat",
+      "ocupacaoSemana": "Wöchentliche Auslastung",
+      "ocupacaoSemDado": "Arbeitszeiten des Teams eintragen"
+    },
+    "agendamentos": {
+      "titulo": "Nächste Termine heute",
+      "subtitulo": "Xaphires Beauty",
+      "vazio": "Keine offenen Termine für heute.",
+      "semModulo": "Aktivieren Sie Xaphires Beauty, um den heutigen Terminplan hier zu sehen."
+    },
+    "solucoes": {
+      "titulo": "Status der gebuchten Lösungen",
+      "entrar": "Modul öffnen",
+      "emBreve": "Demnächst"
+    },
+    "atividades": {
+      "titulo": "Letzte Aktivitäten",
+      "vazio": "Keine aktuellen Aktivitäten.",
+      "clienteNovo": "Neuer Kunde registriert: {{nome}}",
+      "agendamentoConfirmado": "Termin bestätigt: {{nome}}",
+      "despesaLancada": "Ausgabe erfasst: {{descricao}}",
+      "vendaLancada": "Verkauf erfasst: {{descricao}}",
+      "tarefaCriada": "Neue Aufgabe im Board: {{titulo}}"
+    }
   }
 }

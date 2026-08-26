@@ -2416,5 +2416,44 @@
       "dismiss": "Agora não",
       "close": "Fechar"
     }
+  },
+  "dashboard": {
+    "saudacao": "Bem-vindo de volta, {{nome}} 👋",
+    "subtitulo": "Aqui está o resumo consolidado das suas operações hoje.",
+    "acoes": {
+      "novoAgendamento": "+ Novo Agendamento",
+      "lancarVenda": "+ Lançar Venda",
+      "novaTarefa": "+ Nova Tarefa Kanban"
+    },
+    "kpis": {
+      "faturamentoMes": "Faturamento do Mês",
+      "faturamentoSemDado": "Ative o Financeiro ou o Xaphires Beauty",
+      "atendimentosHoje": "Atendimentos Hoje",
+      "atendimentosSemDado": "Ative o Xaphires Beauty",
+      "tarefasPendentes": "Tarefas Pendentes",
+      "vsMesAnterior": "vs. mês anterior",
+      "ocupacaoSemana": "Ocupação da Semana",
+      "ocupacaoSemDado": "Cadastre o expediente da equipe"
+    },
+    "agendamentos": {
+      "titulo": "Próximos agendamentos do dia",
+      "subtitulo": "Xaphires Beauty",
+      "vazio": "Nenhum agendamento pendente para hoje.",
+      "semModulo": "Ative o Xaphires Beauty para ver a agenda do dia aqui."
+    },
+    "solucoes": {
+      "titulo": "Status das soluções contratadas",
+      "entrar": "Entrar no módulo",
+      "emBreve": "Em breve"
+    },
+    "atividades": {
+      "titulo": "Atividades recentes",
+      "vazio": "Nenhuma atividade recente.",
+      "clienteNovo": "Novo cliente cadastrado: {{nome}}",
+      "agendamentoConfirmado": "Agendamento confirmado: {{nome}}",
+      "despesaLancada": "Despesa lançada: {{descricao}}",
+      "vendaLancada": "Venda lançada: {{descricao}}",
+      "tarefaCriada": "Nova tarefa no quadro: {{titulo}}"
+    }
   }
 }

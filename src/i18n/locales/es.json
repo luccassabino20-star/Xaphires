@@ -2126,5 +2126,44 @@
       "dismiss": "Ahora no",
       "close": "Cerrar"
     }
+  },
+  "dashboard": {
+    "saudacao": "Bienvenido de nuevo, {{nome}} 👋",
+    "subtitulo": "Aquí está el resumen consolidado de tus operaciones hoy.",
+    "acoes": {
+      "novoAgendamento": "+ Nueva Cita",
+      "lancarVenda": "+ Registrar Venta",
+      "novaTarefa": "+ Nueva Tarea Kanban"
+    },
+    "kpis": {
+      "faturamentoMes": "Facturación del Mes",
+      "faturamentoSemDado": "Activa Financiero o Xaphires Beauty",
+      "atendimentosHoje": "Citas de Hoy",
+      "atendimentosSemDado": "Activa Xaphires Beauty",
+      "tarefasPendentes": "Tareas Pendientes",
+      "vsMesAnterior": "vs. mes anterior",
+      "ocupacaoSemana": "Ocupación de la Semana",
+      "ocupacaoSemDado": "Registra el horario del equipo"
+    },
+    "agendamentos": {
+      "titulo": "Próximas citas del día",
+      "subtitulo": "Xaphires Beauty",
+      "vazio": "No hay citas pendientes para hoy.",
+      "semModulo": "Activa Xaphires Beauty para ver la agenda del día aquí."
+    },
+    "solucoes": {
+      "titulo": "Estado de las soluciones contratadas",
+      "entrar": "Entrar al módulo",
+      "emBreve": "Próximamente"
+    },
+    "atividades": {
+      "titulo": "Actividad reciente",
+      "vazio": "Sin actividad reciente.",
+      "clienteNovo": "Nuevo cliente registrado: {{nome}}",
+      "agendamentoConfirmado": "Cita confirmada: {{nome}}",
+      "despesaLancada": "Gasto registrado: {{descricao}}",
+      "vendaLancada": "Venta registrada: {{descricao}}",
+      "tarefaCriada": "Nueva tarea en el tablero: {{titulo}}"
+    }
   }
 }

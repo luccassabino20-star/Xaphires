@@ -35,6 +35,58 @@ export function getSummary() {
   return { clients, services, appointments };
 }
 
+// Capacidade semanal em minutos (Dashboard central) - soma do expediente
+// cadastrado em beauty_staff_hours, só de profissionais ativos. Base do
+// denominador da "taxa de ocupação": zero quando ninguém preencheu o próprio
+// horário ainda, e o dashboard trata esse caso como "sem dado" (não como 0%
+// de ocupação - seria inventar uma taxa que não existe). start_time/end_time
+// são "HH:MM" (validados por HORA_RE nas rotas), daí o substr em vez de
+// função de data - são strings de hora, não datas.
+export function getWeeklyCapacityMinutes() {
+  return getDb()
+    .prepare(
+      `SELECT COALESCE(SUM(
+         (CAST(substr(h.end_time,1,2) AS INTEGER) * 60 + CAST(substr(h.end_time,4,2) AS INTEGER)) -
+         (CAST(substr(h.start_time,1,2) AS INTEGER) * 60 + CAST(substr(h.start_time,4,2) AS INTEGER))
+       ), 0) AS minutos
+         FROM beauty_staff_hours h
+         JOIN beauty_staff st ON st.id = h.staff_id
+        WHERE st.active = 1`
+    )
+    .get().minutos;
+}
+
+// Soma de beauty_payments por paid_at (Dashboard central) - direto na tabela
+// de pagamento, sem passar pelo agendamento: um pagamento pertence ao mês em
+// que foi recebido, não ao mês do atendimento.
+export function somarPagamentosNoPeriodo(de, ate) {
+  return getDb().prepare("SELECT COALESCE(SUM(amount_cents), 0) AS total FROM beauty_payments WHERE paid_at >= ? AND paid_at < ?").get(de, ate).total;
+}
+
+// Feed de atividade do Dashboard central: só fontes com carimbo de data real
+// (mesmo princípio da linha do tempo de AppointmentDetailView - nunca
+// inventar/backfillar uma data). Cada lista é mesclada e ordenada no
+// dashboard.js, não aqui, porque cada uma tem forma própria.
+export function listRecentClients(limit) {
+  return getDb().prepare("SELECT id, name, created_at FROM beauty_clients WHERE active = 1 ORDER BY created_at DESC LIMIT ?").all(limit);
+}
+export function listRecentConfirmations(limit) {
+  return getDb()
+    .prepare(
+      `SELECT a.id, a.confirmed_at, c.name AS client_name
+         FROM beauty_appointments a
+         JOIN beauty_clients c ON c.id = a.client_id
+        WHERE a.confirmed_at IS NOT NULL
+        ORDER BY a.confirmed_at DESC LIMIT ?`
+    )
+    .all(limit);
+}
+export function listRecentExpenses(limit) {
+  return getDb()
+    .prepare("SELECT id, description, amount_cents, created_at FROM beauty_expenses WHERE is_template = 0 ORDER BY created_at DESC LIMIT ?")
+    .all(limit);
+}
+
 // ---------- Clientes ----------
 
 // notes_count alimenta a pílula "ficha preenchida" da listagem (Fase 13) -

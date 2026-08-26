@@ -6,20 +6,36 @@ import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import ProfileModal from "../components/ProfileModal.jsx";
 import ModuleIcon from "./ModuleIcon.jsx";
 import LauncherSidebarIcon from "./LauncherSidebarIcon.jsx";
+import MainDashboardView from "./MainDashboardView.jsx";
 import { metaFor } from "./registry.js";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 import xaphiresLogo from "../assets/xaphires-logo.png";
 
 // Estrutura da sidebar pedida pelo cliente, replicando a referência (Viver de
-// IA) item a item. Só "solucoes" (a grade de módulos, abaixo) e "perfil" (o
-// modal que já existe no AccountMenu) apontam pra algo real hoje - o resto é
-// vitrine "Em breve", mesmo padrão que o rail do Sidebar.jsx já usa para
-// atalhos ainda não construídos. Ligar um item novo é trocar seu "action".
+// IA) item a item. "dashboard" e "solucoes" são as duas VISTAS reais da tela
+// principal (ver estado `vista` abaixo, e VISTAS_REAIS); "perfil" abre o
+// modal que já existe no AccountMenu. O resto é vitrine "Em breve", mesmo
+// padrão que o rail do Sidebar.jsx já usa para atalhos ainda não construídos.
+// Formação/Mentorias/Certificados saíram da lista (pedido do cliente: menu
+// principal só com o que tem alguma chance de virar link nos próximos passos
+// do produto, não vitrine indefinida) - ver ehItemReal() para o que decide
+// título de grupo escondido.
 const SIDEBAR_GROUPS = [
-  { key: "learn", items: ["dashboard", "consultor", "solucoes", "formacao", "mentorias"] },
-  { key: "tools", items: ["builder", "ferramentas", "certificados"] },
+  { key: "learn", items: ["dashboard", "consultor", "solucoes"] },
+  { key: "tools", items: ["builder", "ferramentas"] },
   { key: "account", items: ["metricas", "perfil", "atualizacoes"] },
 ];
+
+// "dashboard" e "solucoes" trocam o conteúdo principal (ver `vista`); "perfil"
+// abre modal por cima, sem trocar vista nenhuma.
+const VISTAS_REAIS = ["dashboard", "solucoes"];
+
+// Único ponto que decide "item real" (clicável) vs. vitrine "Em breve" - usado
+// tanto para desenhar o botão quanto para decidir se o título do grupo
+// aparece (grupo sem nenhum item real esconde o título, ver JSX abaixo).
+function ehItemReal(item) {
+  return VISTAS_REAIS.includes(item) || item === "perfil";
+}
 
 // Abas de categoria da barra de Soluções, na mesma ordem da referência. Só
 // entram como filtro clicável as que têm pelo menos um módulo real hoje
@@ -79,6 +95,10 @@ export default function ModuleLauncher({ modules, onOpen }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("todas");
   const [sortBy, setSortBy] = useState("recentes");
+  // Vista principal do Hub: "dashboard" (resumo executivo) ou "solucoes" (a
+  // grade de módulos, comportamento de sempre). Nasce em "dashboard" - é o
+  // item do topo do menu, e agora é uma tela real, não só vitrine.
+  const [vista, setVista] = useState("dashboard");
 
   // Módulos vindos do servidor + os pilares sem módulo real (Marketing,
   // Jurídico) que ainda assim precisam de cartão - ver PILARES_PLACEHOLDER.
@@ -108,8 +128,9 @@ export default function ModuleLauncher({ modules, onOpen }) {
 
   function abrirItemSidebar(id) {
     if (id === "perfil") setProfileOpen(true);
-    // "solucoes" já é a própria tela (sem navegação); os demais itens ainda
-    // não têm destino - o botão fica desabilitado com o selo "Em breve".
+    else if (VISTAS_REAIS.includes(id)) setVista(id);
+    // os demais itens ainda não têm destino - o botão fica desabilitado com
+    // o selo "Em breve".
   }
 
   return (
@@ -120,12 +141,16 @@ export default function ModuleLauncher({ modules, onOpen }) {
           <span>{t("auth.brandTitle")}</span>
         </div>
         <nav className="launcher-sidebar-nav">
-          {SIDEBAR_GROUPS.map((group) => (
+          {SIDEBAR_GROUPS.map((group) => {
+            const temItemReal = group.items.some(ehItemReal);
+            return (
             <div className="launcher-sidebar-group" key={group.key}>
-              <span className="launcher-sidebar-group-title">{t(`modules.launcher.sidebar.groups.${group.key}`)}</span>
+              {temItemReal && (
+                <span className="launcher-sidebar-group-title">{t(`modules.launcher.sidebar.groups.${group.key}`)}</span>
+              )}
               {group.items.map((item) => {
-                const active = item === "solucoes";
-                const real = active || item === "perfil";
+                const active = item === vista;
+                const real = ehItemReal(item);
                 return (
                   <button
                     type="button"
@@ -142,7 +167,8 @@ export default function ModuleLauncher({ modules, onOpen }) {
                 );
               })}
             </div>
-          ))}
+            );
+          })}
         </nav>
       </aside>
 
@@ -154,6 +180,9 @@ export default function ModuleLauncher({ modules, onOpen }) {
           </div>
         </header>
 
+        {vista === "dashboard" && <MainDashboardView modules={modules} onOpenModule={onOpen} />}
+
+        {vista === "solucoes" && (
         <div className="launcher-body">
           <div className="launcher-heading-row">
             <div>
@@ -331,6 +360,7 @@ export default function ModuleLauncher({ modules, onOpen }) {
             </a>
           </div>
         </div>
+        )}
       </div>
 
       {profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}

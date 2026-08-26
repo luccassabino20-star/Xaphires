@@ -2126,5 +2126,44 @@
       "dismiss": "Not now",
       "close": "Close"
     }
+  },
+  "dashboard": {
+    "saudacao": "Welcome back, {{nome}} 👋",
+    "subtitulo": "Here's the consolidated summary of your operations today.",
+    "acoes": {
+      "novoAgendamento": "+ New Appointment",
+      "lancarVenda": "+ Log a Sale",
+      "novaTarefa": "+ New Kanban Task"
+    },
+    "kpis": {
+      "faturamentoMes": "Revenue This Month",
+      "faturamentoSemDado": "Enable Financials or Xaphires Beauty",
+      "atendimentosHoje": "Appointments Today",
+      "atendimentosSemDado": "Enable Xaphires Beauty",
+      "tarefasPendentes": "Pending Tasks",
+      "vsMesAnterior": "vs. last month",
+      "ocupacaoSemana": "Weekly Occupancy",
+      "ocupacaoSemDado": "Set up your team's working hours"
+    },
+    "agendamentos": {
+      "titulo": "Today's upcoming appointments",
+      "subtitulo": "Xaphires Beauty",
+      "vazio": "No pending appointments for today.",
+      "semModulo": "Enable Xaphires Beauty to see today's schedule here."
+    },
+    "solucoes": {
+      "titulo": "Status of contracted solutions",
+      "entrar": "Open module",
+      "emBreve": "Coming soon"
+    },
+    "atividades": {
+      "titulo": "Recent activity",
+      "vazio": "No recent activity.",
+      "clienteNovo": "New client registered: {{nome}}",
+      "agendamentoConfirmado": "Appointment confirmed: {{nome}}",
+      "despesaLancada": "Expense logged: {{descricao}}",
+      "vendaLancada": "Sale logged: {{descricao}}",
+      "tarefaCriada": "New task on the board: {{titulo}}"
+    }
   }
 }
