@@ -94,11 +94,58 @@
     "xaphiresBeauty": {
       "tabs": {
         "agenda": "Schedule",
+        "agendamentos": "Appointments",
+        "visaoGeral": "Overview",
+        "cadastros": "Records",
+        "catalogo": "Catalog",
+        "bloqueioHorarios": "Time blocks",
+        "fichasAnamnese": "Intake forms",
+        "aniversariantes": "Birthdays",
+        "despesas": "Expenses",
+        "minhaAssinatura": "My subscription",
+        "configuracoes": "Settings",
         "clientes": "Clients",
         "servicos": "Services",
         "financeiro": "Finance",
         "equipe": "Team",
         "online": "Online booking"
+      },
+      "grupos": {
+        "visaoGeral": "Overview",
+        "operacao": "Operations",
+        "financeiroConfig": "Finance/Config"
+      },
+      "banner": {
+        "texto": "Turn on browser notifications to know as soon as a booking comes in.",
+        "ativar": "Enable notifications",
+        "semSuporte": "Your browser doesn't support notifications.",
+        "ativado": "Notifications enabled",
+        "recusado": "Notifications not authorized"
+      },
+      "perfil": {
+        "proprietario": "Owner",
+        "equipe": "Staff"
+      },
+      "emBreve": {
+        "titulo": "Coming soon",
+        "texto": "This screen is still being built."
+      },
+      "visaoGeral": {
+        "agendamentosHoje": "Appointments today",
+        "faturamentoHoje": "Revenue today",
+        "clientesAtivos": "Active clients",
+        "servicosCadastrados": "Registered services"
+      },
+      "bloqueios": {
+        "vazio": "No blocks in the next 30 days."
+      },
+      "aniversariantes": {
+        "proximos": "Next {{count}} days",
+        "vazio": "No birthdays in the period.",
+        "faltam": "Time left",
+        "hoje": "Today",
+        "emDias": "In {{count}} day",
+        "emDias_other": "In {{count}} days"
       },
       "clientes": {
         "nome": "Name",
@@ -203,7 +250,20 @@
         "ate": "to",
         "bloqueio": "Block",
         "bloqueioCriado": "Block created",
-        "confirmarRemoverBloqueio": "Remove this block?"
+        "confirmarRemoverBloqueio": "Remove this block?",
+        "hoje": "Today",
+        "buscarCliente": "Search client",
+        "exportar": "Export",
+        "profissionais": "Professionals",
+        "semProfissional": "No professional",
+        "semProfissionalSelecionado": "No professional selected",
+        "resumoDoDia": "Day summary",
+        "faturamentoPrevisto": "Expected revenue",
+        "taxaOcupacao": "Occupancy rate",
+        "resumoProfissionais": "{{count}} professional",
+        "resumoProfissionais_other": "{{count}} professionals",
+        "resumoAgendamentos": "{{count}} appointment",
+        "resumoAgendamentos_other": "{{count}} appointments"
       },
       "financeiro": {
         "bloqueado": "Finance is available from the {{plano}} plan onward.",

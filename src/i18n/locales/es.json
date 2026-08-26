@@ -94,11 +94,58 @@
     "xaphiresBeauty": {
       "tabs": {
         "agenda": "Agenda",
+        "agendamentos": "Citas",
+        "visaoGeral": "Resumen",
+        "cadastros": "Registros",
+        "catalogo": "Catálogo",
+        "bloqueioHorarios": "Bloqueos de horario",
+        "fichasAnamnese": "Fichas de anamnesis",
+        "aniversariantes": "Cumpleaños",
+        "despesas": "Gastos",
+        "minhaAssinatura": "Mi suscripción",
+        "configuracoes": "Configuración",
         "clientes": "Clientes",
         "servicos": "Servicios",
         "financeiro": "Finanzas",
         "equipe": "Equipo",
         "online": "Reserva en línea"
+      },
+      "grupos": {
+        "visaoGeral": "Resumen",
+        "operacao": "Operación",
+        "financeiroConfig": "Finanzas/Config"
+      },
+      "banner": {
+        "texto": "Activa las notificaciones del navegador para saber apenas llegue una cita.",
+        "ativar": "Activar notificaciones",
+        "semSuporte": "Tu navegador no admite notificaciones.",
+        "ativado": "Notificaciones activadas",
+        "recusado": "Notificaciones no autorizadas"
+      },
+      "perfil": {
+        "proprietario": "Propietario",
+        "equipe": "Equipo"
+      },
+      "emBreve": {
+        "titulo": "Próximamente",
+        "texto": "Esta pantalla todavía está en construcción."
+      },
+      "visaoGeral": {
+        "agendamentosHoje": "Citas hoy",
+        "faturamentoHoje": "Facturación hoy",
+        "clientesAtivos": "Clientes activos",
+        "servicosCadastrados": "Servicios registrados"
+      },
+      "bloqueios": {
+        "vazio": "Ningún bloqueo en los próximos 30 días."
+      },
+      "aniversariantes": {
+        "proximos": "Próximos {{count}} días",
+        "vazio": "Ningún cumpleaños en el período.",
+        "faltam": "Faltan",
+        "hoje": "Hoy",
+        "emDias": "En {{count}} día",
+        "emDias_other": "En {{count}} días"
       },
       "clientes": {
         "nome": "Nombre",
@@ -203,7 +250,20 @@
         "ate": "hasta",
         "bloqueio": "Bloqueo",
         "bloqueioCriado": "Bloqueo creado",
-        "confirmarRemoverBloqueio": "¿Eliminar este bloqueo?"
+        "confirmarRemoverBloqueio": "¿Eliminar este bloqueo?",
+        "hoje": "Hoy",
+        "buscarCliente": "Buscar cliente",
+        "exportar": "Exportar",
+        "profissionais": "Profesionales",
+        "semProfissional": "Sin profesional",
+        "semProfissionalSelecionado": "Ningún profesional seleccionado",
+        "resumoDoDia": "Resumen del día",
+        "faturamentoPrevisto": "Facturación prevista",
+        "taxaOcupacao": "Tasa de ocupación",
+        "resumoProfissionais": "{{count}} profesional",
+        "resumoProfissionais_other": "{{count}} profesionales",
+        "resumoAgendamentos": "{{count}} cita",
+        "resumoAgendamentos_other": "{{count}} citas"
       },
       "financeiro": {
         "bloqueado": "Las finanzas están disponibles a partir del plan {{plano}}.",

@@ -4,6 +4,7 @@ import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import BeautyEmptyState from "./BeautyEmptyState.jsx";
+import Avatar from "../../components/Avatar.jsx";
 
 function hojeCivil() {
   const d = new Date();
@@ -24,6 +25,11 @@ function adicionarDias(s, n) {
   d.setDate(d.getDate() + n);
   return paraCivil(d);
 }
+function adicionarMeses(s, n) {
+  const d = parseDataCivil(s);
+  d.setMonth(d.getMonth() + n, 1);
+  return paraCivil(d);
+}
 function segundaDaSemana(s) {
   const d = parseDataCivil(s);
   const diaSemana = d.getDay();
@@ -39,35 +45,62 @@ function formatarDiaCurto(s, lang) {
   const rotulo = new Intl.DateTimeFormat(lang, { weekday: "short", day: "2-digit", month: "2-digit" }).format(d);
   return rotulo.replace(".", "");
 }
+function formatarDiaPorExtenso(s, lang) {
+  const d = parseDataCivil(s);
+  const rotulo = new Intl.DateTimeFormat(lang, { weekday: "long", day: "numeric", month: "long" }).format(d);
+  return rotulo.charAt(0).toUpperCase() + rotulo.slice(1);
+}
+function formatarValor(cents, locale) {
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "BRL" }).format((cents || 0) / 100);
+}
+
+// Grade de horário (Dia): 08:00-20:00, 1px por minuto (60px/hora) - simples o
+// bastante pra não precisar de raias por sobreposição, porque o servidor já
+// impede dois agendamentos do MESMO profissional se cruzarem (hasOverlap).
+// Só a coluna "sem profissional" pode, em tese, ter itens sobrepostos (sem
+// profissional atribuído não é checado) - aceitável, mesmo espírito de "não
+// resolver o caso raro" do resto do módulo.
+const HORA_INICIO = 8 * 60;
+const HORA_FIM = 20 * 60;
+const SEM_PROFISSIONAL = "__sem__";
 
 const FORM_VAZIO = { clientId: "", serviceId: "", staffId: "", date: hojeCivil(), time: "09:00", notes: "", repeatFrequency: "none", repeatOccurrences: "4" };
 const BLOCK_VAZIO = { staffId: "", date: hojeCivil(), startTime: "12:00", endTime: "13:00", reason: "" };
 const BADGE_POR_STATUS = { agendado: "beauty-badge-agendado", concluido: "beauty-badge-concluido", cancelado: "beauty-badge-cancelado" };
 
-// Agenda (Fase 9): visão Dia (lista, como sempre foi) e visão Semana (7
-// colunas), com filtro por profissional nas duas. starts_at é sempre
-// data/hora civil "ingênua" (sem Z) - a hora do relógio de quem agenda,
-// nunca UTC (mesma convenção desde a Fase 0). "Repetir" gera N ocorrências
-// de uma vez na criação (sem motor de recorrência automática, não é o
-// runRecurrences() do quadro Kanban); "Duplicar" só pré-preenche o
-// formulário com os dados de um agendamento existente, sem tocar em nada
-// até o usuário confirmar salvar.
+// Agenda: visão Dia (grade com uma coluna por profissional, mini-calendário e
+// resumo do dia - redesenho pedido pelo cliente) e visão Semana (7 colunas,
+// como a Fase 9 entregou), com filtro por profissional nas duas. starts_at é
+// sempre data/hora civil "ingênua" (sem Z) - a hora do relógio de quem
+// agenda, nunca UTC. "Repetir" gera N ocorrências de uma vez na criação
+// (sem motor de recorrência automática); "Duplicar" só pré-preenche o
+// formulário com os dados de um agendamento existente.
 export default function BeautyAgendaView() {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const [visao, setVisao] = useState("dia"); // dia | semana
   const [date, setDate] = useState(hojeCivil());
-  const [filtroStaff, setFiltroStaff] = useState("");
+  const [mesCalendario, setMesCalendario] = useState(() => paraCivil(new Date(parseDataCivil(hojeCivil()).getFullYear(), parseDataCivil(hojeCivil()).getMonth(), 1)));
+  const [staffSelecionados, setStaffSelecionados] = useState(null); // null até a equipe carregar (então vira o Set com todo mundo)
+  const [buscaCliente, setBuscaCliente] = useState("");
   const [agendamentos, setAgendamentos] = useState([]);
   const [bloqueios, setBloqueios] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [servicos, setServicos] = useState([]);
   const [equipe, setEquipe] = useState([]);
+  const [horariosPorStaff, setHorariosPorStaff] = useState({});
   const [erro, setErro] = useState("");
   const [f, setF] = useState(FORM_VAZIO);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [fBlock, setFBlock] = useState(BLOCK_VAZIO);
   const [mostrarBlockForm, setMostrarBlockForm] = useState(false);
+  const [selecionado, setSelecionado] = useState(null); // agendamento em destaque na barra inferior (visão Dia)
+  const [agora, setAgora] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setAgora(new Date()), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   async function carregarBase() {
     try {
@@ -75,6 +108,14 @@ export default function BeautyAgendaView() {
       setClientes(c);
       setServicos(s);
       setEquipe(eq);
+      setStaffSelecionados(new Set([...eq.map((s2) => s2.id), SEM_PROFISSIONAL]));
+      const horarios = {};
+      await Promise.all(
+        eq.map(async (s2) => {
+          horarios[s2.id] = await api.xbGetStaffHours(s2.id).catch(() => []);
+        })
+      );
+      setHorariosPorStaff(horarios);
     } catch (e) {
       setErro(translateError(e, t));
     }
@@ -103,20 +144,37 @@ export default function BeautyAgendaView() {
     // eslint-disable-next-line
   }, [date, visao]);
 
+  function staffMarcado(chave) {
+    return !staffSelecionados || staffSelecionados.has(chave);
+  }
+  function alternarStaff(chave) {
+    setStaffSelecionados((atual) => {
+      const novo = new Set(atual);
+      if (novo.has(chave)) novo.delete(chave);
+      else novo.add(chave);
+      return novo;
+    });
+  }
+  const todosMarcados = staffSelecionados && staffSelecionados.size === equipe.length + 1;
+  function alternarTodos() {
+    setStaffSelecionados(todosMarcados ? new Set() : new Set([...equipe.map((s) => s.id), SEM_PROFISSIONAL]));
+  }
+
   function itensDoDia(dia) {
     const ags = agendamentos
       .filter((a) => a.starts_at.slice(0, 10) === dia)
-      .filter((a) => !filtroStaff || a.staff_id === filtroStaff)
+      .filter((a) => staffMarcado(a.staff_id || SEM_PROFISSIONAL))
+      .filter((a) => !buscaCliente.trim() || a.client_name.toLowerCase().includes(buscaCliente.trim().toLowerCase()))
       .map((a) => ({ tipo: "agendamento", horario: a.starts_at.slice(11, 16), dado: a }));
     const bls = bloqueios
       .filter((b) => b.starts_at.slice(0, 10) === dia)
-      .filter((b) => !filtroStaff || !b.staff_id || b.staff_id === filtroStaff)
+      .filter((b) => !b.staff_id || staffMarcado(b.staff_id))
       .map((b) => ({ tipo: "bloqueio", horario: b.starts_at.slice(11, 16), dado: b }));
     return [...ags, ...bls].sort((x, y) => x.horario.localeCompare(y.horario));
   }
 
-  function abrirNovo(diaPreset) {
-    setF({ ...FORM_VAZIO, date: diaPreset || date });
+  function abrirNovo(diaPreset, staffPreset, timePreset) {
+    setF({ ...FORM_VAZIO, date: diaPreset || date, staffId: staffPreset || "", time: timePreset || "09:00" });
     setMostrarForm(true);
   }
   function duplicar(a) {
@@ -164,6 +222,7 @@ export default function BeautyAgendaView() {
   async function mudarStatus(id, status) {
     try {
       await api.xbSetAppointmentStatus(id, status);
+      setSelecionado(null);
       await carregarAgenda();
     } catch (err) {
       showToast(translateError(err, t));
@@ -254,19 +313,79 @@ export default function BeautyAgendaView() {
     );
   }
 
-  const itensDoDiaAtual = visao === "dia" ? itensDoDia(date) : [];
+  const itensDoDiaAtual = itensDoDia(date);
+
+  // Colunas da grade (visão Dia): um profissional selecionado por coluna, e
+  // "sem profissional" só quando marcado E existe algo pra mostrar - senão
+  // uma coluna vazia por padrão só polui a grade de quem nem usa esse caso.
+  const staffDaGrade = equipe.filter((s) => staffMarcado(s.id));
+  const temSemProfissional = staffMarcado(SEM_PROFISSIONAL) && itensDoDiaAtual.some((it) => it.tipo === "agendamento" && !it.dado.staff_id);
+  const colunas = [...staffDaGrade.map((s) => ({ id: s.id, nome: s.name, cor: s.color })), ...(temSemProfissional ? [{ id: SEM_PROFISSIONAL, nome: t("modules.xaphiresBeauty.agenda.semProfissional"), cor: "#8A7A7D" }] : [])];
+
+  const ehHoje = date === hojeCivil();
+  const minutosAgora = agora.getHours() * 60 + agora.getMinutes();
+  const horaAgoraLabel = `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
+
+  const horasDoEixo = useMemo(() => {
+    const lista = [];
+    for (let m = HORA_INICIO; m <= HORA_FIM; m += 60) lista.push(m);
+    return lista;
+  }, []);
+
+  // RESUMO DO DIA: faturamento previsto (soma do preço do serviço dos
+  // agendamentos não cancelados do dia) e taxa de ocupação (minutos
+  // ocupados / minutos disponíveis dos profissionais selecionados). Quem
+  // não tem horário de trabalho cadastrado (Fase 8 é opcional) conta a
+  // grade inteira exibida como disponível, em vez de zero - senão a taxa
+  // ficaria sempre 0% pra quem nunca configurou horário.
+  const resumoDoDia = useMemo(() => {
+    const ags = agendamentos.filter((a) => a.starts_at.slice(0, 10) === date && a.status !== "cancelado");
+    const faturamentoPrevisto = ags.reduce((s, a) => s + (a.price_cents || 0), 0);
+    const weekday = parseDataCivil(date).getDay();
+    let disponivel = 0;
+    let ocupado = 0;
+    for (const s of staffDaGrade) {
+      const horarios = horariosPorStaff[s.id] || [];
+      if (horarios.length === 0) {
+        disponivel += HORA_FIM - HORA_INICIO;
+      } else {
+        const doDia = horarios.find((h) => h.weekday === weekday);
+        if (doDia) {
+          const [h1, m1] = doDia.start_time.split(":").map(Number);
+          const [h2, m2] = doDia.end_time.split(":").map(Number);
+          disponivel += h2 * 60 + m2 - (h1 * 60 + m1);
+        }
+      }
+      ocupado += ags.filter((a) => a.staff_id === s.id).reduce((s2, a) => s2 + (a.duration_minutes || 0), 0);
+    }
+    const taxaOcupacao = disponivel > 0 ? Math.min(100, Math.round((ocupado / disponivel) * 100)) : null;
+    return { faturamentoPrevisto, taxaOcupacao };
+  }, [agendamentos, date, staffDaGrade, horariosPorStaff]);
 
   return (
     <div>
       <div className="beauty-page-head">
-        <h2 className="beauty-page-title">{t("modules.xaphiresBeauty.tabs.agenda")}</h2>
+        <div>
+          <h2 className="beauty-page-title">{visao === "dia" ? formatarDiaPorExtenso(date, i18n.language) : t("modules.xaphiresBeauty.tabs.agenda")}</h2>
+          {visao === "dia" && (
+            <p className="beauty-cell-muted" style={{ margin: "2px 0 0" }}>
+              {t("modules.xaphiresBeauty.agenda.resumoProfissionais", { count: colunas.length })}
+              {" • "}
+              {t("modules.xaphiresBeauty.agenda.resumoAgendamentos", { count: itensDoDiaAtual.filter((it) => it.tipo === "agendamento").length })}
+            </p>
+          )}
+        </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <div className="beauty-view-toggle">
             <button type="button" className={visao === "dia" ? "active" : ""} onClick={() => setVisao("dia")}>{t("modules.xaphiresBeauty.agenda.visaoDia")}</button>
             <button type="button" className={visao === "semana" ? "active" : ""} onClick={() => setVisao("semana")}>{t("modules.xaphiresBeauty.agenda.visaoSemana")}</button>
           </div>
           {visao === "dia" ? (
-            <input className="beauty-date-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <button type="button" className="btn-ghost" onClick={() => setDate(adicionarDias(date, -1))}>‹</button>
+              <button type="button" className="btn-ghost" onClick={() => setDate(hojeCivil())}>{t("modules.xaphiresBeauty.agenda.hoje")}</button>
+              <button type="button" className="btn-ghost" onClick={() => setDate(adicionarDias(date, 1))}>›</button>
+            </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <button type="button" className="btn-ghost" onClick={() => setDate(adicionarDias(date, -7))}>‹</button>
@@ -274,14 +393,9 @@ export default function BeautyAgendaView() {
               <button type="button" className="btn-ghost" onClick={() => setDate(adicionarDias(date, 7))}>›</button>
             </div>
           )}
-          <select value={filtroStaff} onChange={(e) => setFiltroStaff(e.target.value)}>
-            <option value="">{t("modules.xaphiresBeauty.agenda.todosProfissionais")}</option>
-            {equipe.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
-          <button type="button" className="btn-ghost" onClick={() => setMostrarBlockForm((v) => !v)}>
-            {mostrarBlockForm ? t("common.cancel") : t("modules.xaphiresBeauty.agenda.novoBloqueio")}
+          <input type="text" placeholder={t("modules.xaphiresBeauty.agenda.buscarCliente")} value={buscaCliente} onChange={(e) => setBuscaCliente(e.target.value)} style={{ maxWidth: 160 }} />
+          <button type="button" className="icon-btn" title={t("modules.xaphiresBeauty.agenda.exportar")} onClick={() => window.print()}>
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
           </button>
           <button type="button" className="btn-primary" onClick={() => (mostrarForm ? setMostrarForm(false) : abrirNovo())}>
             {mostrarForm ? t("common.cancel") : t("modules.xaphiresBeauty.agenda.novo")}
@@ -304,6 +418,7 @@ export default function BeautyAgendaView() {
             <input type="time" value={fBlock.endTime} onChange={(e) => setFBlock({ ...fBlock, endTime: e.target.value })} />
             <input type="text" placeholder={t("modules.xaphiresBeauty.agenda.motivoBloqueio")} value={fBlock.reason} onChange={(e) => setFBlock({ ...fBlock, reason: e.target.value })} />
             <button type="submit" className="btn-primary">{t("common.save")}</button>
+            <button type="button" className="btn-ghost" onClick={() => setMostrarBlockForm(false)}>{t("common.cancel")}</button>
           </form>
         </div>
       )}
@@ -356,21 +471,119 @@ export default function BeautyAgendaView() {
       {erro && <div className="beauty-error">{erro}</div>}
 
       {visao === "dia" ? (
-        <div className="beauty-card">
-          {itensDoDiaAtual.length === 0 ? (
-            <BeautyEmptyState title={t("modules.xaphiresBeauty.agenda.vazio")} text={t("modules.xaphiresBeauty.agenda.vazioDica")} />
-          ) : (
-            <div className="beauty-list">
-              <div className="beauty-list-head">
-                <span style={{ width: 56 }}>{t("modules.xaphiresBeauty.agenda.horario")}</span>
-                <span style={{ flex: 1.4 }}>{t("modules.xaphiresBeauty.agenda.colCliente")}</span>
-                <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.agenda.colServico")}</span>
-                <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.agenda.colProfissional")}</span>
-                <span style={{ width: 100 }}>{t("modules.xaphiresBeauty.agenda.situacao")}</span>
-              </div>
-              {itensDoDiaAtual.map((item) => (item.tipo === "agendamento" ? linhaAgendamento(item.dado) : linhaBloqueio(item.dado)))}
+        <div className="beauty-agenda-layout">
+          <aside className="beauty-agenda-side">
+            <BeautyMiniCalendario mes={mesCalendario} selecionado={date} onMudarMes={setMesCalendario} onSelecionar={setDate} lang={i18n.language} />
+
+            <div className="beauty-agenda-side-section">
+              <h4 className="beauty-agenda-side-title">{t("modules.xaphiresBeauty.agenda.profissionais")}</h4>
+              <label className="beauty-agenda-check">
+                <input type="checkbox" checked={!!todosMarcados} onChange={alternarTodos} />
+                {t("modules.xaphiresBeauty.agenda.todosProfissionais")}
+              </label>
+              {equipe.map((s) => (
+                <label className="beauty-agenda-check" key={s.id}>
+                  <input type="checkbox" checked={staffMarcado(s.id)} onChange={() => alternarStaff(s.id)} />
+                  <span className="beauty-agenda-check-dot" style={{ background: s.color || "#B76E79" }} />
+                  {s.name}
+                </label>
+              ))}
+              <button type="button" className="btn-ghost" style={{ marginTop: 8 }} onClick={() => setMostrarBlockForm((v) => !v)}>
+                {mostrarBlockForm ? t("common.cancel") : t("modules.xaphiresBeauty.agenda.novoBloqueio")}
+              </button>
             </div>
-          )}
+
+            <div className="beauty-agenda-resumo">
+              <h4 className="beauty-agenda-side-title">{t("modules.xaphiresBeauty.agenda.resumoDoDia")}</h4>
+              <div className="beauty-agenda-resumo-item">
+                <span className="beauty-cell-muted">{t("modules.xaphiresBeauty.agenda.faturamentoPrevisto")}</span>
+                <strong>{formatarValor(resumoDoDia.faturamentoPrevisto, i18n.language)}</strong>
+              </div>
+              <div className="beauty-agenda-resumo-item">
+                <span className="beauty-cell-muted">{t("modules.xaphiresBeauty.agenda.taxaOcupacao")}</span>
+                <strong>{resumoDoDia.taxaOcupacao == null ? "—" : `${resumoDoDia.taxaOcupacao}%`}</strong>
+              </div>
+            </div>
+          </aside>
+
+          <div className="beauty-agenda-grid-wrap">
+            {colunas.length === 0 ? (
+              <div className="beauty-card"><BeautyEmptyState title={t("modules.xaphiresBeauty.agenda.semProfissionalSelecionado")} /></div>
+            ) : (
+              <div className="beauty-agenda-grid" style={{ "--beauty-agenda-cols": colunas.length }}>
+                <div className="beauty-agenda-gutter">
+                  <div className="beauty-agenda-gutter-head" />
+                  <div className="beauty-agenda-gutter-track" style={{ height: HORA_FIM - HORA_INICIO }}>
+                    {horasDoEixo.map((m) => (
+                      <div key={m} className="beauty-agenda-gutter-hora" style={{ top: m - HORA_INICIO }}>
+                        {String(Math.floor(m / 60)).padStart(2, "0")}:00
+                      </div>
+                    ))}
+                    {ehHoje && minutosAgora >= HORA_INICIO && minutosAgora <= HORA_FIM && (
+                      <div className="beauty-agenda-now-label" style={{ top: minutosAgora - HORA_INICIO }}>{horaAgoraLabel}</div>
+                    )}
+                  </div>
+                </div>
+                <div className="beauty-agenda-cols">
+                  {colunas.map((col) => (
+                    <div key={col.id} className="beauty-agenda-col">
+                      <div className="beauty-agenda-col-head">
+                        <Avatar id={col.id} name={col.nome} style={{ background: col.cor }} />
+                        <span>{col.nome}</span>
+                      </div>
+                      <div
+                        className="beauty-agenda-col-body"
+                        style={{ height: HORA_FIM - HORA_INICIO }}
+                        onClick={(e) => {
+                          if (e.target !== e.currentTarget) return;
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const min = Math.max(HORA_INICIO, Math.min(HORA_FIM, HORA_INICIO + Math.round((e.clientY - rect.top) / 30) * 30));
+                          const hora = `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
+                          abrirNovo(date, col.id === SEM_PROFISSIONAL ? "" : col.id, hora);
+                        }}
+                      >
+                        {horasDoEixo.map((m) => (
+                          <div key={m} className="beauty-agenda-hline" style={{ top: m - HORA_INICIO }} />
+                        ))}
+                        {ehHoje && minutosAgora >= HORA_INICIO && minutosAgora <= HORA_FIM && (
+                          <div className="beauty-agenda-now-line" style={{ top: minutosAgora - HORA_INICIO }} />
+                        )}
+                        {itensDoDiaAtual
+                          .filter((it) => (it.tipo === "bloqueio" ? (!it.dado.staff_id || it.dado.staff_id === col.id) : (it.dado.staff_id || SEM_PROFISSIONAL) === col.id))
+                          .map((it) => {
+                            const inicioMin = parseInt(it.dado.starts_at.slice(11, 13), 10) * 60 + parseInt(it.dado.starts_at.slice(14, 16), 10);
+                            const fimMin = it.tipo === "bloqueio"
+                              ? parseInt(it.dado.ends_at.slice(11, 13), 10) * 60 + parseInt(it.dado.ends_at.slice(14, 16), 10)
+                              : inicioMin + (it.dado.duration_minutes || 30);
+                            const estilo = { top: Math.max(0, inicioMin - HORA_INICIO), height: Math.max(18, fimMin - inicioMin) };
+                            if (it.tipo === "bloqueio") {
+                              return (
+                                <div key={"b" + it.dado.id} className="beauty-agenda-card beauty-agenda-card-bloqueio" style={estilo} title={it.dado.reason}>
+                                  {t("modules.xaphiresBeauty.agenda.bloqueio")}{it.dado.reason ? `: ${it.dado.reason}` : ""}
+                                </div>
+                              );
+                            }
+                            const a = it.dado;
+                            return (
+                              <button
+                                type="button"
+                                key={a.id}
+                                className={"beauty-agenda-card beauty-agenda-card-" + a.status}
+                                style={estilo}
+                                onClick={(e) => { e.stopPropagation(); setSelecionado(a); }}
+                              >
+                                <strong>{it.horario}</strong> {a.client_name}
+                                <div className="beauty-agenda-card-sub">{a.service_name}</div>
+                              </button>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="beauty-week-grid">
@@ -406,6 +619,82 @@ export default function BeautyAgendaView() {
           })}
         </div>
       )}
+
+      {visao === "dia" && itensDoDiaAtual.length > 0 && (
+        <div className="beauty-card" style={{ marginTop: 18 }}>
+          <div className="beauty-list">
+            <div className="beauty-list-head">
+              <span style={{ width: 56 }}>{t("modules.xaphiresBeauty.agenda.horario")}</span>
+              <span style={{ flex: 1.4 }}>{t("modules.xaphiresBeauty.agenda.colCliente")}</span>
+              <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.agenda.colServico")}</span>
+              <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.agenda.colProfissional")}</span>
+              <span style={{ width: 100 }}>{t("modules.xaphiresBeauty.agenda.situacao")}</span>
+            </div>
+            {itensDoDiaAtual.map((item) => (item.tipo === "agendamento" ? linhaAgendamento(item.dado) : linhaBloqueio(item.dado)))}
+          </div>
+        </div>
+      )}
+
+      {selecionado && (
+        <div className="beauty-agenda-detalhe-overlay" onClick={(e) => { if (e.target === e.currentTarget) setSelecionado(null); }}>
+          <div className="beauty-agenda-detalhe">
+            <div>
+              <strong>{selecionado.client_name}</strong>
+              <div className="beauty-cell-muted">{selecionado.starts_at.slice(11, 16)} - {selecionado.service_name}{selecionado.staff_name ? ` - ${selecionado.staff_name}` : ""}</div>
+            </div>
+            <div className="beauty-col-actions">
+              {selecionado.status === "agendado" && (
+                <>
+                  <button type="button" className="btn-ghost" onClick={() => mudarStatus(selecionado.id, "concluido")}>{t("modules.xaphiresBeauty.agenda.concluir")}</button>
+                  <button type="button" className="btn-ghost" onClick={() => mudarStatus(selecionado.id, "cancelado")}>{t("modules.xaphiresBeauty.agenda.cancelar")}</button>
+                </>
+              )}
+              <button type="button" className="btn-ghost" onClick={() => { duplicar(selecionado); setSelecionado(null); }}>{t("modules.xaphiresBeauty.agenda.duplicar")}</button>
+              <button type="button" className="btn-ghost" onClick={() => copiarLinkLembrete(selecionado.id)}>{t("modules.xaphiresBeauty.agenda.linkLembrete")}</button>
+              <button type="button" className="btn-ghost" onClick={() => setSelecionado(null)}>{t("common.close")}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Mini calendário mensal (redesenho): clicar num dia muda o `date` da agenda
+// sem esperar navegar mês a mês igual a ele - a navegação de mês (‹ ›) é só
+// pra ver outro período, não muda o dia selecionado sozinha.
+function BeautyMiniCalendario({ mes, selecionado, onMudarMes, onSelecionar, lang }) {
+  const primeiroDiaSemana = parseDataCivil(mes).getDay();
+  const diasNoMes = new Date(parseDataCivil(mes).getFullYear(), parseDataCivil(mes).getMonth() + 1, 0).getDate();
+  const celulas = [...Array(primeiroDiaSemana).fill(null), ...Array.from({ length: diasNoMes }, (_, i) => i + 1)];
+  const rotuloMes = new Intl.DateTimeFormat(lang, { month: "long", year: "numeric" }).format(parseDataCivil(mes));
+  const hoje = hojeCivil();
+
+  return (
+    <div className="beauty-minical">
+      <div className="beauty-minical-head">
+        <button type="button" className="btn-ghost" onClick={() => onMudarMes(adicionarMeses(mes, -1))}>‹</button>
+        <span>{rotuloMes.charAt(0).toUpperCase() + rotuloMes.slice(1)}</span>
+        <button type="button" className="btn-ghost" onClick={() => onMudarMes(adicionarMeses(mes, 1))}>›</button>
+      </div>
+      <div className="beauty-minical-grid">
+        {celulas.map((dia, i) => {
+          if (!dia) return <span key={i} />;
+          const civil = `${mes.slice(0, 8)}${String(dia).padStart(2, "0")}`;
+          const ehSelecionado = civil === selecionado;
+          const ehHoje = civil === hoje;
+          return (
+            <button
+              type="button"
+              key={i}
+              className={"beauty-minical-day" + (ehSelecionado ? " selected" : "") + (ehHoje && !ehSelecionado ? " today" : "")}
+              onClick={() => onSelecionar(civil)}
+            >
+              {dia}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
