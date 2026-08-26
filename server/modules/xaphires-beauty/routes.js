@@ -23,12 +23,14 @@ import {
   deactivateStaff,
   listAppointments,
   insertAppointment,
+  updateAppointment,
   getAppointment,
   getClient,
   getService,
   getStaffMember,
   setAppointmentStatus,
   listPayments,
+  listPaymentsForAppointment,
   insertPayment,
   getCommissionsSummary,
   hasOverlap,
@@ -497,6 +499,38 @@ router.post(
     res.status(201).json(repeatSummary ? { ...primeiro, repeatSummary } : primeiro);
   })
 );
+// Edição (Fase 12, tela de detalhe do atendimento) - mesma validação da
+// criação (POST acima), com uma diferença: o conflito de horário
+// (hasOverlap) precisa ignorar o próprio agendamento, senão editar sem
+// mudar nada já voltaria "ocupado". Não aceita "repeat" aqui - reeditar uma
+// série inteira de uma vez não foi pedido, e mudaria o escopo de "editar
+// este atendimento" para "editar a série".
+router.patch(
+  "/appointments/:id",
+  ah(async (req, res) => {
+    const existente = getAppointment(req.params.id);
+    if (!existente) return res.status(404).json({ error: "Agendamento não encontrado", code: "BEAUTY_APPOINTMENT_NOT_FOUND" });
+    const { clientId, serviceId, startsAt, notes } = req.body || {};
+    if (!clientId || !getClient(clientId)) {
+      return res.status(400).json({ error: "Cliente inválido", code: "BEAUTY_CLIENT_REQUIRED" });
+    }
+    const servico = serviceId && getService(serviceId);
+    if (!servico) {
+      return res.status(400).json({ error: "Serviço inválido", code: "BEAUTY_SERVICE_REQUIRED" });
+    }
+    if (req.body.staffId && !getStaffMember(req.body.staffId)) {
+      return res.status(400).json({ error: "Profissional inválido", code: "BEAUTY_STAFF_NOT_FOUND" });
+    }
+    if (!startsAt || Number.isNaN(new Date(startsAt).getTime())) {
+      return res.status(400).json({ error: "Informe a data e hora do agendamento", code: "BEAUTY_STARTS_AT_REQUIRED" });
+    }
+    const endsAt = somarMinutosLocal(startsAt, servico.duration_minutes);
+    if (hasOverlap(req.body.staffId, startsAt, endsAt, req.params.id)) {
+      return res.status(409).json({ error: "Este profissional já tem outro atendimento nesse horário", code: "BEAUTY_APPOINTMENT_CONFLICT" });
+    }
+    res.json(updateAppointment(req.params.id, { clientId, serviceId, staffId: req.body.staffId, startsAt, endsAt, notes }));
+  })
+);
 router.patch(
   "/appointments/:id/status",
   ah(async (req, res) => {
@@ -518,6 +552,17 @@ router.get(
   ah(async (req, res) => {
     if (!getAppointment(req.params.id)) return res.status(404).json({ error: "Agendamento não encontrado", code: "BEAUTY_APPOINTMENT_NOT_FOUND" });
     res.json({ slug: getOuCriarSlugLembrete(req.companyId, req.params.id) });
+  })
+);
+
+// Pagamentos de um atendimento (Fase 12, linha do tempo da tela de detalhe) -
+// mesmo gate de /payments (dado financeiro).
+router.get(
+  "/appointments/:id/payments",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    if (!getAppointment(req.params.id)) return res.status(404).json({ error: "Agendamento não encontrado", code: "BEAUTY_APPOINTMENT_NOT_FOUND" });
+    res.json(listPaymentsForAppointment(req.params.id));
   })
 );
 

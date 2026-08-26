@@ -9,7 +9,7 @@ import { Router } from "express";
 import { ah } from "../asyncHandler.js";
 import { getCompany } from "../directory.js";
 import { runWithCompany } from "../context.js";
-import { getAppointment } from "../modules/xaphires-beauty/repo.js";
+import { getAppointment, confirmAppointment } from "../modules/xaphires-beauty/repo.js";
 import { getLembretePorSlug } from "../modules/xaphires-beauty/reminderSlugStore.js";
 import { rateLimit } from "../rateLimit.js";
 
@@ -44,7 +44,36 @@ router.get(
         staffName: agendamento.staff_name,
         startsAt: agendamento.starts_at,
         status: agendamento.status,
+        confirmedAt: agendamento.confirmed_at,
       });
+    });
+  })
+);
+
+// Confirmação de presença (Fase 12) - único escrito que este arquivo faz;
+// tudo o mais aqui é leitura. Mesmo isolamento de sempre: sem sessão, e
+// dentro de runWithCompany manual porque a rota nasce fora de requireAuth.
+// Aceita reconfirmar (idempotente o bastante: só atualiza o carimbo) -
+// não é erro a pessoa clicar de novo.
+router.post(
+  "/:slug/confirm",
+  limitePublico,
+  ah(async (req, res) => {
+    const alvo = getLembretePorSlug(req.params.slug);
+    const company = alvo && getCompany(alvo.company_id);
+    if (!alvo || !company) {
+      return res.status(404).json({ error: "Link inválido", code: "BEAUTY_REMINDER_LINK_INVALIDO" });
+    }
+    runWithCompany(alvo.company_id, () => {
+      const agendamento = getAppointment(alvo.appointment_id);
+      if (!agendamento) {
+        return res.status(404).json({ error: "Link inválido", code: "BEAUTY_REMINDER_LINK_INVALIDO" });
+      }
+      if (agendamento.status !== "agendado") {
+        return res.status(409).json({ error: "Este atendimento não está mais em aberto", code: "BEAUTY_APPOINTMENT_NOT_OPEN" });
+      }
+      const atualizado = confirmAppointment(alvo.appointment_id);
+      res.json({ confirmedAt: atualizado.confirmed_at });
     });
   })
 );

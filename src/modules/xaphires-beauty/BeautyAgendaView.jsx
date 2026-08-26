@@ -5,6 +5,7 @@ import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import BeautyEmptyState from "./BeautyEmptyState.jsx";
 import Avatar from "../../components/Avatar.jsx";
+import AppointmentDetailView from "./AppointmentDetailView.jsx";
 
 function hojeCivil() {
   const d = new Date();
@@ -636,25 +637,15 @@ export default function BeautyAgendaView() {
       )}
 
       {selecionado && (
-        <div className="beauty-agenda-detalhe-overlay" onClick={(e) => { if (e.target === e.currentTarget) setSelecionado(null); }}>
-          <div className="beauty-agenda-detalhe">
-            <div>
-              <strong>{selecionado.client_name}</strong>
-              <div className="beauty-cell-muted">{selecionado.starts_at.slice(11, 16)} - {selecionado.service_name}{selecionado.staff_name ? ` - ${selecionado.staff_name}` : ""}</div>
-            </div>
-            <div className="beauty-col-actions">
-              {selecionado.status === "agendado" && (
-                <>
-                  <button type="button" className="btn-ghost" onClick={() => mudarStatus(selecionado.id, "concluido")}>{t("modules.xaphiresBeauty.agenda.concluir")}</button>
-                  <button type="button" className="btn-ghost" onClick={() => mudarStatus(selecionado.id, "cancelado")}>{t("modules.xaphiresBeauty.agenda.cancelar")}</button>
-                </>
-              )}
-              <button type="button" className="btn-ghost" onClick={() => { duplicar(selecionado); setSelecionado(null); }}>{t("modules.xaphiresBeauty.agenda.duplicar")}</button>
-              <button type="button" className="btn-ghost" onClick={() => copiarLinkLembrete(selecionado.id)}>{t("modules.xaphiresBeauty.agenda.linkLembrete")}</button>
-              <button type="button" className="btn-ghost" onClick={() => setSelecionado(null)}>{t("common.close")}</button>
-            </div>
-          </div>
-        </div>
+        <AppointmentDetailView
+          appointment={selecionado}
+          clientes={clientes}
+          servicos={servicos}
+          equipe={equipe}
+          onClose={() => setSelecionado(null)}
+          onChanged={carregarAgenda}
+          onDuplicate={duplicar}
+        />
       )}
     </div>
   );

@@ -11,6 +11,7 @@ export default function BeautyReminderPage({ slug }) {
   const [estado, setEstado] = useState("carregando"); // carregando | pronto | erro
   const [dados, setDados] = useState(null);
   const [erro, setErro] = useState("");
+  const [confirmando, setConfirmando] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("sc-pub-body");
@@ -29,6 +30,18 @@ export default function BeautyReminderPage({ slug }) {
         setEstado("erro");
       });
   }, [slug]);
+
+  async function confirmarPresenca() {
+    setConfirmando(true);
+    try {
+      const r = await api.xbPublicConfirmReminder(slug);
+      setDados((d) => ({ ...d, confirmedAt: r.confirmedAt }));
+    } catch (e) {
+      setErro(e.message || "Não foi possível confirmar");
+    } finally {
+      setConfirmando(false);
+    }
+  }
 
   if (estado === "carregando") {
     return (
@@ -73,6 +86,15 @@ export default function BeautyReminderPage({ slug }) {
           <span className="sc-pub-label">Situação</span>
           <p style={{ margin: 0 }}>{STATUS_TEXTO[dados.status] || dados.status}</p>
         </div>
+        {erro && <p className="sc-pub-erro">{erro}</p>}
+        {dados.status === "agendado" &&
+          (dados.confirmedAt ? (
+            <p className="sc-pub-obrigado">Presença confirmada.</p>
+          ) : (
+            <button type="button" className="btn-primary" disabled={confirmando} onClick={confirmarPresenca}>
+              {confirmando ? "Confirmando..." : "Confirmar presença"}
+            </button>
+          ))}
       </div>
     </div>
   );

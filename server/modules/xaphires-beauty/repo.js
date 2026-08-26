@@ -355,16 +355,20 @@ export function getAppointment(id) {
 // feriado do salão) vale pra qualquer atendimento, mesmo sem profissional
 // atribuído - só um bloqueio de uma pessoa ESPECÍFICA é que só afeta quem
 // tem aquele staffId.
-export function hasOverlap(staffId, startsAt, endsAt) {
+// excludeId (Fase 12, edição de agendamento): sem ele, reabrir o próprio
+// atendimento pra editar (mesmo staff, mesmo horário) sempre acharia
+// conflito consigo mesmo. Só a checagem de AGENDAMENTO exclui - a de
+// bloqueio não precisa (bloqueio não tem id de agendamento pra comparar).
+export function hasOverlap(staffId, startsAt, endsAt, excludeId) {
   const db = getDb();
   if (staffId) {
     const conflitoAgendamento = db
       .prepare(
         `SELECT 1 FROM beauty_appointments
-          WHERE staff_id = ? AND status <> 'cancelado' AND starts_at < ? AND ends_at > ?
+          WHERE staff_id = ? AND status <> 'cancelado' AND starts_at < ? AND ends_at > ? AND id <> ?
           LIMIT 1`
       )
-      .get(staffId, endsAt, startsAt);
+      .get(staffId, endsAt, startsAt, excludeId || "");
     if (conflitoAgendamento) return true;
   }
   const conflitoBloqueio = db
@@ -429,10 +433,45 @@ export function insertAppointment({ clientId, serviceId, staffId, startsAt, ends
     .run(id, clientId, serviceId, staffId || null, startsAt, endsAt, notes || "", fromPublicLink ? 1 : 0, nowIso(), userId || null);
   return getAppointment(id);
 }
+// Edição de campos essenciais (Fase 12) - mesma forma de updateClient/
+// updateService/updateStaff, mas sem endsAt na assinatura: quem chama já
+// recalculou a partir da duração do serviço (ver PATCH /appointments/:id),
+// então esta função só grava, não decide duração.
+export function updateAppointment(id, { clientId, serviceId, staffId, startsAt, endsAt, notes }) {
+  const a = getAppointment(id);
+  if (!a) return null;
+  getDb()
+    .prepare(
+      `UPDATE beauty_appointments
+          SET client_id = ?, service_id = ?, staff_id = ?, starts_at = ?, ends_at = ?, notes = ?
+        WHERE id = ?`
+    )
+    .run(clientId, serviceId, staffId || null, startsAt, endsAt, notes || "", id);
+  return getAppointment(id);
+}
+// Carimba o momento real da transição (completed_at/cancelled_at) - antes
+// desta função só trocava o texto do status, sem deixar rastro de quando
+// aconteceu (ver comentário da Fase 12 em schema.js). "agendado" não tem
+// carimbo próprio (reabrir um atendimento não é uma transição que a tela
+// de detalhe narra) - só grava status, como antes.
 export function setAppointmentStatus(id, status) {
   const a = getAppointment(id);
   if (!a) return null;
-  getDb().prepare("UPDATE beauty_appointments SET status = ? WHERE id = ?").run(status, id);
+  const campo = status === "concluido" ? "completed_at" : status === "cancelado" ? "cancelled_at" : null;
+  if (campo) {
+    getDb().prepare(`UPDATE beauty_appointments SET status = ?, ${campo} = ? WHERE id = ?`).run(status, nowIso(), id);
+  } else {
+    getDb().prepare("UPDATE beauty_appointments SET status = ? WHERE id = ?").run(status, id);
+  }
+  return getAppointment(id);
+}
+// Confirmação de presença pelo CLIENTE (Fase 12) - só quem chama isso é a
+// rota pública do link de lembrete (server/routes/xaphiresBeautyLembrete.js),
+// sem sessão nenhuma. Reconfirmar apenas atualiza o carimbo, não é um erro.
+export function confirmAppointment(id) {
+  const a = getAppointment(id);
+  if (!a) return null;
+  getDb().prepare("UPDATE beauty_appointments SET confirmed_at = ? WHERE id = ?").run(nowIso(), id);
   return getAppointment(id);
 }
 
@@ -449,6 +488,12 @@ export function listPayments(from, to) {
         ORDER BY p.paid_at DESC`
     )
     .all(from, to);
+}
+// Pagamentos de UM atendimento (Fase 12) - alimenta a linha do tempo "O que
+// aconteceu" da tela de detalhe. listPayments acima filtra por período; aqui
+// é por appointment_id direto, sem precisar adivinhar um intervalo de datas.
+export function listPaymentsForAppointment(appointmentId) {
+  return getDb().prepare("SELECT * FROM beauty_payments WHERE appointment_id = ? ORDER BY paid_at").all(appointmentId);
 }
 export function insertPayment({ appointmentId, method, amountCents, paidAt }, userId) {
   const id = uid();

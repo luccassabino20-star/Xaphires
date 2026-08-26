@@ -883,9 +883,11 @@ export async function xbUploadServicePhoto(serviceId, file) {
 // Agenda
 export const xbGetAppointments = (from, to) => request(`/xaphires-beauty/appointments?from=${from}&to=${to}`);
 export const xbCreateAppointment = (data) => request("/xaphires-beauty/appointments", { method: "POST", body: data });
+export const xbUpdateAppointment = (id, data) => request(`/xaphires-beauty/appointments/${id}`, { method: "PATCH", body: data });
 export const xbSetAppointmentStatus = (id, status) =>
   request(`/xaphires-beauty/appointments/${id}/status`, { method: "PATCH", body: { status } });
 export const xbGetReminderLink = (id) => request(`/xaphires-beauty/appointments/${id}/reminder-link`);
+export const xbGetAppointmentPayments = (id) => request(`/xaphires-beauty/appointments/${id}/payments`);
 
 // Bloqueio de horário
 export const xbGetBlocks = (from, to) => request(`/xaphires-beauty/schedule-blocks?from=${from}&to=${to}`);
@@ -957,3 +959,4 @@ export const xbPublicCreateBooking = (slug, data) => request(`/public/xaphires-b
 
 // Link de lembrete (sem sessão) - o cliente conferindo o próprio agendamento.
 export const xbPublicGetReminder = (slug) => request(`/public/xaphires-beauty-lembrete/${slug}`);
+export const xbPublicConfirmReminder = (slug) => request(`/public/xaphires-beauty-lembrete/${slug}/confirm`, { method: "POST" });

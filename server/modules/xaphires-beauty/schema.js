@@ -211,4 +211,18 @@ export function applyXaphiresBeautySchema(companyDb) {
     );
     CREATE INDEX IF NOT EXISTS idx_beauty_expenses_due ON beauty_expenses(due_date);
   `);
+
+  // Fase 12: tela de detalhe do atendimento. Três carimbos de data/hora que
+  // beauty_appointments nunca teve (só existia created_at) - completed_at e
+  // cancelled_at nascem em setAppointmentStatus, quando a transição
+  // acontece de verdade; confirmed_at nasce na página pública do link de
+  // lembrete (server/routes/xaphiresBeautyLembrete.js), quando o CLIENTE
+  // confirma presença - é o único dos três que o próprio cliente grava, sem
+  // login. Todos nascem NULL pra quem já existia: sem isso, um agendamento
+  // concluído antes desta fase mostraria "concluído em <criado em>" na
+  // linha do tempo, o que seria inventar uma data que não aconteceu -
+  // melhor não mostrar o evento do que mostrar um errado.
+  addColumnIfMissing(companyDb, "beauty_appointments", "confirmed_at", "confirmed_at TEXT");
+  addColumnIfMissing(companyDb, "beauty_appointments", "completed_at", "completed_at TEXT");
+  addColumnIfMissing(companyDb, "beauty_appointments", "cancelled_at", "cancelled_at TEXT");
 }
