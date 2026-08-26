@@ -853,6 +853,32 @@ export const xbGetServices = () => request("/xaphires-beauty/services");
 export const xbCreateService = (data) => request("/xaphires-beauty/services", { method: "POST", body: data });
 export const xbUpdateService = (id, data) => request(`/xaphires-beauty/services/${id}`, { method: "PATCH", body: data });
 export const xbDeleteService = (id) => request(`/xaphires-beauty/services/${id}`, { method: "DELETE" });
+export const xbGetServiceRanking = (from, to) => request(`/xaphires-beauty/services/ranking?from=${from}&to=${to}`);
+
+// Upload não passa pelo request() (corpo multipart) - mesmo desenho de xbUploadClientPhoto.
+export async function xbUploadServicePhoto(serviceId, file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/xaphires-beauty/services/${serviceId}/photo`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 
 // Agenda
 export const xbGetAppointments = (from, to) => request(`/xaphires-beauty/appointments?from=${from}&to=${to}`);

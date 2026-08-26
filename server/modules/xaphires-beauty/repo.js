@@ -177,22 +177,22 @@ export function listServices() {
 export function getService(id) {
   return getDb().prepare("SELECT * FROM beauty_services WHERE id = ?").get(id) || null;
 }
-export function insertService({ name, durationMinutes, priceCents }) {
+export function insertService({ name, durationMinutes, priceCents, category }) {
   const id = uid();
   getDb()
     .prepare(
-      `INSERT INTO beauty_services (id, name, duration_minutes, price_cents, created_at)
-       VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO beauty_services (id, name, duration_minutes, price_cents, category, created_at)
+       VALUES (?, ?, ?, ?, ?, ?)`
     )
-    .run(id, name, durationMinutes || 30, priceCents || 0, nowIso());
+    .run(id, name, durationMinutes || 30, priceCents || 0, category || "", nowIso());
   return getService(id);
 }
 export function updateService(id, s) {
   const a = getService(id);
   if (!a) return null;
   getDb()
-    .prepare("UPDATE beauty_services SET name = ?, duration_minutes = ?, price_cents = ? WHERE id = ?")
-    .run(s.name ?? a.name, s.durationMinutes ?? a.duration_minutes, s.priceCents ?? a.price_cents, id);
+    .prepare("UPDATE beauty_services SET name = ?, duration_minutes = ?, price_cents = ?, category = ? WHERE id = ?")
+    .run(s.name ?? a.name, s.durationMinutes ?? a.duration_minutes, s.priceCents ?? a.price_cents, s.category ?? a.category, id);
   return getService(id);
 }
 export function deactivateService(id) {
@@ -200,6 +200,64 @@ export function deactivateService(id) {
   if (!a) return null;
   getDb().prepare("UPDATE beauty_services SET active = 0 WHERE id = ?").run(id);
   return true;
+}
+
+// ---------- Foto do serviço (Fase 6) ----------
+// Mesmo desenho da foto de cliente (Fase 5) - pasta própria pra não misturar
+// com o avatar de cliente nem com anexo de cartão.
+function serviceAvatarsDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "beauty-services");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+export function newServiceAvatarTarget() {
+  const id = uid();
+  return { id, path: path.join(serviceAvatarsDir(), id) };
+}
+export function setServiceAvatar(serviceId, { id, mimeType }) {
+  const atual = getService(serviceId);
+  getDb().prepare("UPDATE beauty_services SET avatar_path = ?, avatar_mime = ? WHERE id = ?").run(id, mimeType, serviceId);
+  if (atual?.avatar_path) {
+    try {
+      fs.unlinkSync(path.join(serviceAvatarsDir(), atual.avatar_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
+  return getService(serviceId);
+}
+export function getServiceAvatarFile(serviceId) {
+  const s = getService(serviceId);
+  if (!s?.avatar_path) return null;
+  const filePath = path.join(serviceAvatarsDir(), s.avatar_path);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, mimeType: s.avatar_mime || "application/octet-stream" };
+}
+export function discardServiceAvatarFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* já pode ter sumido */
+  }
+}
+
+// Ranking de serviços por popularidade e faturamento no período - mesma
+// forma de getClientRanking, só trocando o agrupamento para service_id.
+export function getServiceRanking(from, to) {
+  return getDb()
+    .prepare(
+      `SELECT s.id AS service_id, s.name, s.category,
+              COUNT(DISTINCT CASE WHEN a.status = 'concluido' AND a.starts_at >= ? AND a.starts_at < ? THEN a.id END) AS visits,
+              COALESCE(SUM(CASE WHEN p.paid_at >= ? AND p.paid_at < ? THEN p.amount_cents END), 0) AS total_cents
+         FROM beauty_services s
+         LEFT JOIN beauty_appointments a ON a.service_id = s.id
+         LEFT JOIN beauty_payments p ON p.appointment_id = a.id
+        WHERE s.active = 1
+        GROUP BY s.id
+       HAVING visits > 0 OR total_cents > 0
+        ORDER BY total_cents DESC, visits DESC`
+    )
+    .all(from, to, from, to);
 }
 
 // ---------- Profissionais (Fase 2 - registro interno, sem login) ----------

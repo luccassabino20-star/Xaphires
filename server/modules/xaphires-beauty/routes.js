@@ -40,11 +40,17 @@ import {
   listAppointmentsForClient,
   getClientRanking,
   listUpcomingBirthdays,
+  newServiceAvatarTarget,
+  setServiceAvatar,
+  getServiceAvatarFile,
+  discardServiceAvatarFile,
+  getServiceRanking,
 } from "./repo.js";
 import { getOuCriarSlugAgendamento } from "./agendaSlugStore.js";
 
 const TIPOS_IMAGEM_ACEITOS = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 const CLIENT_PHOTO_MAX_BYTES = 3 * 1024 * 1024;
+const SERVICE_PHOTO_MAX_BYTES = 3 * 1024 * 1024;
 
 const router = Router();
 // Mesma camada tripla dos outros módulos add-on (ver saude-clinicas/
@@ -289,6 +295,123 @@ router.delete(
     const ok = deactivateService(req.params.id);
     if (!ok) return res.status(404).json({ error: "Serviço não encontrado", code: "BEAUTY_SERVICE_NOT_FOUND" });
     res.json({ ok: true });
+  })
+);
+
+// Ranking de serviços (Fase 6) - nome fixo, não colide com nenhum :id.
+router.get(
+  "/services/ranking",
+  ah(async (req, res) => {
+    const { from, to } = req.query;
+    if (!from || !to) {
+      return res.status(400).json({ error: "Informe o período (from/to)", code: "BEAUTY_PERIOD_REQUIRED" });
+    }
+    res.json(getServiceRanking(from, to));
+  })
+);
+
+// Upload de foto do serviço (Fase 6) - clone do de POST /clients/:id/photo,
+// mesmo motivo do runWithCompany manual (ver comentário lá).
+router.post("/services/:id/photo", (req, res) => {
+  if (!getService(req.params.id)) return res.status(404).json({ error: "Serviço não encontrado", code: "BEAUTY_SERVICE_NOT_FOUND" });
+  const alvo = newServiceAvatarTarget();
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: SERVICE_PHOTO_MAX_BYTES } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let tipo = "";
+  let bytes = 0;
+  let excedeu = false;
+  let tipoInvalido = false;
+  let respondido = false;
+  let saida = null;
+  let descartar = false;
+
+  function apagarQuandoPuder() {
+    descartar = true;
+    if (!saida || saida.destroyed) discardServiceAvatarFile(alvo.path);
+  }
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    tipo = info.mimeType || "";
+    if (!TIPOS_IMAGEM_ACEITOS.has(tipo)) {
+      tipoInvalido = true;
+      stream.resume();
+      return falhar(400, { error: "Envie uma imagem PNG, JPEG, WEBP ou GIF", code: "INVALID_IMAGE_TYPE" });
+    }
+    saida = fs.createWriteStream(alvo.path);
+    saida.on("error", () => falhar(500, { error: "Erro ao gravar o arquivo", code: "UPLOAD_FAILED" }));
+    saida.on("close", () => {
+      if (descartar) discardServiceAvatarFile(alvo.path);
+    });
+    stream.on("data", (chunk) => {
+      bytes += chunk.length;
+    });
+    stream.on("limit", () => {
+      excedeu = true;
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, { error: `A foto deve ter até ${Math.round(SERVICE_PHOTO_MAX_BYTES / 1024 / 1024)} MB`, code: "PHOTO_TOO_LARGE" });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+
+  function registrar() {
+    if (respondido || excedeu || tipoInvalido) return;
+    try {
+      const atualizado = runWithCompany(req.companyId, () => setServiceAvatar(req.params.id, { id: alvo.id, mimeType: tipo }));
+      respondido = true;
+      res.status(201).json(atualizado);
+    } catch (err) {
+      console.error("Falha ao salvar a foto do serviço:", err);
+      falhar(500, { error: "Erro ao salvar a foto", code: "PHOTO_SAVE_FAILED" });
+    }
+  }
+
+  bb.on("close", () => {
+    if (respondido || excedeu || tipoInvalido) return;
+    if (bytes === 0) return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  req.on("aborted", () => {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    saida?.destroy();
+  });
+
+  req.pipe(bb);
+});
+
+router.get(
+  "/services/:id/photo",
+  ah(async (req, res) => {
+    const file = getServiceAvatarFile(req.params.id);
+    if (!file) return res.status(404).json({ error: "Foto não encontrada", code: "PHOTO_NOT_FOUND" });
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", file.mimeType);
+    res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
+    res.sendFile(file.path);
   })
 );
 

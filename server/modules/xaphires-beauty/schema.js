@@ -100,4 +100,12 @@ export function applyXaphiresBeautySchema(companyDb) {
   addColumnIfMissing(companyDb, "beauty_clients", "birth_date", "birth_date TEXT");
   addColumnIfMissing(companyDb, "beauty_clients", "avatar_path", "avatar_path TEXT");
   addColumnIfMissing(companyDb, "beauty_clients", "avatar_mime", "avatar_mime TEXT");
+
+  // Fase 6: catálogo rico de serviço. category é texto livre (o salão decide
+  // as próprias categorias, sem tabela de apoio - mesmo espírito de "role" em
+  // beauty_staff); avatar_path/avatar_mime no mesmo desenho da Fase 5
+  // (companies/<id>/uploads/beauty-services/).
+  addColumnIfMissing(companyDb, "beauty_services", "category", "category TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_services", "avatar_path", "avatar_path TEXT");
+  addColumnIfMissing(companyDb, "beauty_services", "avatar_mime", "avatar_mime TEXT");
 }

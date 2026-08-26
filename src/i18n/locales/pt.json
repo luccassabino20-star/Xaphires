@@ -126,12 +126,18 @@
         "nome": "Nome",
         "duracao": "Duração (min)",
         "preco": "Preço (R$)",
+        "categoria": "Categoria",
+        "semCategoria": "Sem categoria",
+        "editarFoto": "Trocar foto",
         "vazio": "Nenhum serviço cadastrado ainda.",
         "minutos": "{{count}} minuto",
         "minutos_other": "{{count}} minutos",
         "salvo": "Serviço salvo",
         "removido": "Serviço removido",
-        "confirmarRemover": "Remover o serviço \"{{nome}}\"?"
+        "confirmarRemover": "Remover o serviço \"{{nome}}\"?",
+        "ranking": "Ranking de serviços",
+        "rankingVazio": "Nenhum serviço com atendimento no período.",
+        "rankingResumo": "{{visitas}} atendimentos concluídos - {{total}} no período"
       },
       "equipe": {
         "nome": "Nome",

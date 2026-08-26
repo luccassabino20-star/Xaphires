@@ -126,12 +126,18 @@
         "nome": "Name",
         "duracao": "Duration (min)",
         "preco": "Price",
+        "categoria": "Category",
+        "semCategoria": "No category",
+        "editarFoto": "Change photo",
         "vazio": "No services registered yet.",
         "minutos": "{{count}} minute",
         "minutos_other": "{{count}} minutes",
         "salvo": "Service saved",
         "removido": "Service removed",
-        "confirmarRemover": "Remove service \"{{nome}}\"?"
+        "confirmarRemover": "Remove service \"{{nome}}\"?",
+        "ranking": "Service ranking",
+        "rankingVazio": "No services with appointments in the period.",
+        "rankingResumo": "{{visitas}} completed appointments - {{total}} in the period"
       },
       "equipe": {
         "nome": "Name",
