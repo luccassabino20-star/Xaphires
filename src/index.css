@@ -6684,24 +6684,29 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .launcher-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 20px;
 }
-/* Card premium (SaaS enterprise): banner com gradiente navy no topo (a cor da
-   marca - accent é uniforme desde registry.js, então o gradiente sai igual em
-   todo card de propósito, não arco-íris), tag de categoria, título, descrição
-   cortada em 2 linhas e CTA com seta que abre no hover. Reaproveitado também
-   por SaudeClinicasModule.jsx (ver .launcher-grid lá) - esse uso continua sem
-   banner/tags, só com .module-card-icon abaixo, então os dois convivem sem
-   que um quebre o outro. */
+@media (min-width: 1400px) {
+  .launcher-grid { grid-template-columns: repeat(4, 1fr); }
+}
+/* Card compacto (Fase de redesenho "App Hub"): ícone com gradiente + glow no
+   canto superior esquerdo, pílula de categoria no canto oposto, título,
+   descrição cortada em 2 linhas e CTA com seta que abre no hover - trocou o
+   banner escuro de 124px (que sobrevive só em .module-card-banner, ainda
+   usado pela landing - ver comentário dela abaixo) por um cabeçalho enxuto.
+   Reaproveitado também por SaudeClinicasModule.jsx (ver .launcher-grid lá) -
+   esse uso continua com .module-card-icon (o ícone pequeno sem gradiente,
+   mais antigo), então os dois convivem sem que um quebre o outro. */
 .module-card {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 16px 18px 18px;
+  padding: 16px 18px;
   text-align: left;
-  background: var(--bg-card);
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
   overflow: hidden;
@@ -6713,10 +6718,29 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   box-shadow: var(--shadow-card-hover);
   transform: translateY(-3px);
 }
+/* Cabeçalho do card compacto: ícone à esquerda, pílula de categoria à
+   direita - substitui o banner só no launcher (ver .module-card-head no
+   JSX de ModuleLauncher.jsx). */
+.module-card-head { display: flex; align-items: flex-start; justify-content: space-between; width: 100%; margin-bottom: 14px; }
+.hub-card-icon {
+  width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff;
+  /* Gradiente derivado do azul-marinho da marca (registry.js BRAND) - não é
+     arco-íris por módulo, o mesmo motivo do banner antigo. */
+  background: linear-gradient(135deg, #16265c, #2f4ea3);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--module-accent) 55%, transparent);
+}
+.module-card-locked .hub-card-icon {
+  background: var(--bg-list);
+  box-shadow: none;
+  color: var(--text-muted);
+}
 /* Sangra até a borda do card apesar do padding do container (margem negativa
    igual ao padding) - evita um wrapper de conteúdo só pra dar respiro
    diferente ao banner. overflow:hidden acima arredonda os cantos do banner
-   junto com os do card. */
+   junto com os do card. Só a landing (.landing-solution-card) ainda usa este
+   par - o launcher trocou pelo .hub-card-icon acima. */
 .module-card-banner {
   align-self: stretch;
   height: 124px;
@@ -6742,14 +6766,23 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   background: color-mix(in srgb, #ffffff 14%, transparent);
   border: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
 }
-.module-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.module-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .module-card-tag {
   padding: 3px 10px;
   border-radius: 999px;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--module-accent);
+  background: color-mix(in srgb, var(--module-accent) 10%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--module-accent) 18%, transparent);
+  white-space: nowrap;
+}
+.module-card-locked .module-card-tag {
+  color: var(--text-muted);
   background: var(--bg-list);
+  border-color: var(--border-subtle);
 }
 /* Ícone inline sem banner - só o uso antigo de SaudeClinicasModule.jsx chega
    aqui hoje (ver comentário no topo da seção). */
@@ -6764,14 +6797,14 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   background: color-mix(in srgb, var(--module-accent) 14%, var(--bg-card));
   margin-bottom: 8px;
 }
-.module-card-name { font-size: 16px; font-weight: 700; letter-spacing: -0.15px; margin-bottom: 4px; }
+.module-card-name { font-size: 15.5px; font-weight: 700; letter-spacing: -0.15px; margin-bottom: 4px; }
 .module-card-desc {
   font-size: 12.5px;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--text-secondary);
   flex: 1;
   margin-bottom: 12px;
-  /* Corte em 2 linhas em vez de altura livre - card de banner precisa de
+  /* Corte em 2 linhas em vez de altura livre - card compacto precisa de
      altura previsível pra alinhar entre colunas da grade. */
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -6791,13 +6824,21 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   gap: 5px;
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--module-accent);
   transition: gap 0.2s ease;
 }
 .module-card-open svg { color: var(--module-accent); flex-shrink: 0; }
 .module-card:not(.module-card-locked):hover .module-card-open { gap: 9px; }
-/* Módulo ainda não liberado: apagado, sem clique, com o selo "Em breve". */
-.module-card-locked { cursor: default; opacity: 0.55; }
+/* Módulo ainda não liberado: apagado e dessaturado, sem clique, com o selo
+   "Em breve" - volta a cor no hover só como affordance visual (o clique
+   continua desabilitado, ver disabled no JSX). */
+.module-card-locked {
+  cursor: default;
+  opacity: 0.6;
+  filter: grayscale(1);
+  transition: filter 0.25s ease, opacity 0.25s ease;
+}
+.module-card-locked:hover { filter: grayscale(0.3); opacity: 0.8; }
 .module-card-badge {
   font-size: 10px;
   font-weight: 600;
@@ -8787,7 +8828,7 @@ body.sc-pub-body { overflow: auto; }
 .beauty-empty-state-text { font-size: 12.5px; color: var(--beauty-text-soft); margin: 0; max-width: 280px; }
 
 .beauty-error { color: var(--danger); padding: 4px 20px 14px; font-size: 13px; }
-.beauty-section-title { font-size: 13.5px; font-weight: 700; margin: 28px 0 12px 4px; color: var(--beauty-text); }
+.beauty-section-title { font-size: 13.5px; font-weight: 700; margin: 28px 0 12px 20px; color: var(--beauty-text); }
 .beauty-section-title:first-of-type { margin-top: 4px; }
 .beauty-lock-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 56px 24px; text-align: center; color: var(--beauty-text-soft); font-size: 13.5px; }
 .beauty-lock-card svg { color: var(--beauty-accent); }

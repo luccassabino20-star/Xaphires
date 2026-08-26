@@ -268,13 +268,13 @@ export default function ModuleLauncher({ modules, onOpen }) {
                     disabled={!clickable}
                     title={clickable ? undefined : t("modules.comingSoon")}
                   >
-                    <span className="module-card-banner">
-                      <span className="module-card-banner-icon">
-                        <ModuleIcon name={meta.icon} size={30} />
+                    <span className="module-card-head">
+                      <span className="hub-card-icon">
+                        <ModuleIcon name={meta.icon} size={22} />
                       </span>
-                    </span>
-                    <span className="module-card-tags">
-                      <span className="module-card-tag">{categoria}</span>
+                      <span className="module-card-tags">
+                        <span className="module-card-tag">{categoria}</span>
+                      </span>
                     </span>
                     <span className="module-card-name">{t(meta.labelKey)}</span>
                     <span className="module-card-desc">{t(meta.descKey)}</span>
@@ -307,9 +307,9 @@ export default function ModuleLauncher({ modules, onOpen }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="module-card-banner">
-              <span className="module-card-banner-icon">
-                <ModuleIcon name="custom" size={30} />
+            <span className="module-card-head">
+              <span className="hub-card-icon">
+                <ModuleIcon name="custom" size={22} />
               </span>
             </span>
             <span className="module-card-name">{t("modules.custom.name")}</span>
