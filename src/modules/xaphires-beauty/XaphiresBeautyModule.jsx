@@ -162,7 +162,7 @@ export default function XaphiresBeautyModule({ onExit }) {
 
         <div className="beauty-content">
           {aba === "agenda" && <BeautyAgendaView />}
-          {aba === "visao-geral" && <BeautyOverviewView />}
+          {aba === "visao-geral" && <BeautyOverviewView onNavigate={setAba} />}
           {aba === "cadastros" && <BeautyClientsView />}
           {aba === "catalogo" && <BeautyServicesView />}
           {aba === "bloqueio-horarios" && <BeautyBlocksView />}

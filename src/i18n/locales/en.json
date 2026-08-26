@@ -131,10 +131,48 @@
         "texto": "This screen is still being built."
       },
       "visaoGeral": {
-        "agendamentosHoje": "Appointments today",
-        "faturamentoHoje": "Revenue today",
-        "clientesAtivos": "Active clients",
-        "servicosCadastrados": "Registered services"
+        "saudacao": {
+          "bomDia": "Good morning, {{nome}}",
+          "boaTarde": "Good afternoon, {{nome}}",
+          "boaNoite": "Good evening, {{nome}}"
+        },
+        "resumoDia": "{{data}} • {{count}} appointment today",
+        "resumoDia_other": "{{data}} • {{count}} appointments today",
+        "periodo": {
+          "hoje": "Today",
+          "semana": "Week",
+          "mes": "Month"
+        },
+        "mostrarValores": "Show values",
+        "ocultarValores": "Hide values",
+        "receitaTitulo": {
+          "hoje": "Today's revenue",
+          "semana": "This week's revenue",
+          "mes": "This month's revenue"
+        },
+        "semBase": "no baseline",
+        "contraAnterior": "vs {{valor}} in the previous period",
+        "vazioReceita": "No payments recorded in this period.",
+        "agendaHoje": "Today's schedule",
+        "verTodos": "See all",
+        "semAgendamentosHoje": "No appointments today.",
+        "semEquipeCadastrada": "No staff registered.",
+        "kpiAgendamentos": "Appointments",
+        "kpiSubFinalizados": "{{count}} completed",
+        "kpiSubFinalizados_other": "{{count}} completed",
+        "kpiNovosClientes": "New clients",
+        "kpiSubUltimos7Dias": "{{count}} in the last 7 days",
+        "kpiCancelamentos": "Cancellations",
+        "kpiSubPercentualTotal": "{{pct}}% of total",
+        "kpiAReceber": "Receivables",
+        "kpiSubCobrancasAbertas": "{{count}} open charge",
+        "kpiSubCobrancasAbertas_other": "{{count}} open charges",
+        "kpiIndisponivel": "Not available on your plan",
+        "verRelatorio": "See full report",
+        "equipeResumo": "{{count}} appointment • {{valor}}",
+        "equipeResumo_other": "{{count}} appointments • {{valor}}",
+        "equipeVazio": "No appointments in this period.",
+        "equipeConvide": "Invite more staff to compare performance."
       },
       "bloqueios": {
         "vazio": "No blocks in the next 30 days."

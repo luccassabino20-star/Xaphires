@@ -131,10 +131,48 @@
         "texto": "Esta tela ainda está sendo construída."
       },
       "visaoGeral": {
-        "agendamentosHoje": "Agendamentos hoje",
-        "faturamentoHoje": "Faturamento hoje",
-        "clientesAtivos": "Clientes ativos",
-        "servicosCadastrados": "Serviços cadastrados"
+        "saudacao": {
+          "bomDia": "Bom dia, {{nome}}",
+          "boaTarde": "Boa tarde, {{nome}}",
+          "boaNoite": "Boa noite, {{nome}}"
+        },
+        "resumoDia": "{{data}} • {{count}} agendamento hoje",
+        "resumoDia_other": "{{data}} • {{count}} agendamentos hoje",
+        "periodo": {
+          "hoje": "Hoje",
+          "semana": "Semana",
+          "mes": "Mês"
+        },
+        "mostrarValores": "Mostrar valores",
+        "ocultarValores": "Ocultar valores",
+        "receitaTitulo": {
+          "hoje": "Receita de hoje",
+          "semana": "Receita da semana",
+          "mes": "Receita do mês"
+        },
+        "semBase": "sem base",
+        "contraAnterior": "contra {{valor}} no período anterior",
+        "vazioReceita": "Sem pagamentos registrados no período.",
+        "agendaHoje": "Agenda de hoje",
+        "verTodos": "Ver todos",
+        "semAgendamentosHoje": "Nenhum agendamento hoje.",
+        "semEquipeCadastrada": "Nenhum profissional cadastrado.",
+        "kpiAgendamentos": "Agendamentos",
+        "kpiSubFinalizados": "{{count}} finalizado",
+        "kpiSubFinalizados_other": "{{count}} finalizados",
+        "kpiNovosClientes": "Novos clientes",
+        "kpiSubUltimos7Dias": "{{count}} nos últimos 7 dias",
+        "kpiCancelamentos": "Cancelamentos",
+        "kpiSubPercentualTotal": "{{pct}}% do total",
+        "kpiAReceber": "A receber",
+        "kpiSubCobrancasAbertas": "{{count}} cobrança em aberto",
+        "kpiSubCobrancasAbertas_other": "{{count}} cobranças em aberto",
+        "kpiIndisponivel": "Não disponível no seu plano",
+        "verRelatorio": "Ver relatório completo",
+        "equipeResumo": "{{count}} atendimento • {{valor}}",
+        "equipeResumo_other": "{{count}} atendimentos • {{valor}}",
+        "equipeVazio": "Nenhum atendimento no período.",
+        "equipeConvide": "Convide mais profissionais para comparar o desempenho."
       },
       "bloqueios": {
         "vazio": "Nenhum bloqueio nos próximos 30 dias."

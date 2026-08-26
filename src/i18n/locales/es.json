@@ -131,10 +131,48 @@
         "texto": "Esta pantalla todavía está en construcción."
       },
       "visaoGeral": {
-        "agendamentosHoje": "Citas hoy",
-        "faturamentoHoje": "Facturación hoy",
-        "clientesAtivos": "Clientes activos",
-        "servicosCadastrados": "Servicios registrados"
+        "saudacao": {
+          "bomDia": "Buenos días, {{nome}}",
+          "boaTarde": "Buenas tardes, {{nome}}",
+          "boaNoite": "Buenas noches, {{nome}}"
+        },
+        "resumoDia": "{{data}} • {{count}} cita hoy",
+        "resumoDia_other": "{{data}} • {{count}} citas hoy",
+        "periodo": {
+          "hoje": "Hoy",
+          "semana": "Semana",
+          "mes": "Mes"
+        },
+        "mostrarValores": "Mostrar valores",
+        "ocultarValores": "Ocultar valores",
+        "receitaTitulo": {
+          "hoje": "Ingresos de hoy",
+          "semana": "Ingresos de la semana",
+          "mes": "Ingresos del mes"
+        },
+        "semBase": "sin base",
+        "contraAnterior": "frente a {{valor}} en el período anterior",
+        "vazioReceita": "Sin pagos registrados en el período.",
+        "agendaHoje": "Agenda de hoy",
+        "verTodos": "Ver todos",
+        "semAgendamentosHoje": "Ninguna cita hoy.",
+        "semEquipeCadastrada": "Ningún profesional registrado.",
+        "kpiAgendamentos": "Citas",
+        "kpiSubFinalizados": "{{count}} finalizada",
+        "kpiSubFinalizados_other": "{{count}} finalizadas",
+        "kpiNovosClientes": "Nuevos clientes",
+        "kpiSubUltimos7Dias": "{{count}} en los últimos 7 días",
+        "kpiCancelamentos": "Cancelaciones",
+        "kpiSubPercentualTotal": "{{pct}}% del total",
+        "kpiAReceber": "Por cobrar",
+        "kpiSubCobrancasAbertas": "{{count}} cobro pendiente",
+        "kpiSubCobrancasAbertas_other": "{{count}} cobros pendientes",
+        "kpiIndisponivel": "No disponible en tu plan",
+        "verRelatorio": "Ver informe completo",
+        "equipeResumo": "{{count}} cita • {{valor}}",
+        "equipeResumo_other": "{{count}} citas • {{valor}}",
+        "equipeVazio": "Ninguna cita en el período.",
+        "equipeConvide": "Invita a más profesionales para comparar el desempeño."
       },
       "bloqueios": {
         "vazio": "Ningún bloqueo en los próximos 30 días."
