@@ -914,6 +914,11 @@ export const xbDeleteCommissionOverride = (staffId, serviceId) =>
 export const xbGetRevenueByMethod = (from, to) => request(`/xaphires-beauty/revenue-by-method?from=${from}&to=${to}`);
 export const xbGetMonthlySummary = (year) => request(`/xaphires-beauty/monthly-summary?year=${year}`);
 
+// Despesas (Fase 11)
+export const xbGetExpenses = (from, to) => request(`/xaphires-beauty/expenses?from=${from}&to=${to}`);
+export const xbCreateExpense = (data) => request("/xaphires-beauty/expenses", { method: "POST", body: data });
+export const xbDeleteExpense = (id) => request(`/xaphires-beauty/expenses/${id}`, { method: "DELETE" });
+
 // Link público de agendamento (Profissional+)
 export const xbGetBookingLink = () => request("/xaphires-beauty/booking-link");
 

@@ -638,3 +638,84 @@ export function discardPageImageFile(filePath) {
     /* já pode ter sumido */
   }
 }
+
+// ---------- Despesas (Fase 11) ----------
+
+const CATEGORIAS_DESPESA = ["custos", "marketing", "comissoes", "pacotes", "reembolso_pacote", "adiantamento", "investimentos", "treinamentos", "outros"];
+export function categoriasDespesaValidas() {
+  return CATEGORIAS_DESPESA;
+}
+
+function hojeCivilServidor() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function ultimoDiaDoMes(ano, mes) {
+  return new Date(ano, mes, 0).getDate(); // mes em 1-12, dia 0 do mês seguinte = último dia deste
+}
+
+// Gera, se ainda não existe, a ocorrência do mês pedido para cada modelo
+// recorrente (is_template=1) criado até esse mês - mesma ideia de
+// recurrence.js no Kanban ("a automação roda na leitura, não por cron"), só
+// que aqui o "período devido" é sempre o mês inteiro, não uma data exata. A
+// primeira ocorrência nasce junto com o modelo (insertExpense), por isso o
+// mês de criação do modelo é pulado aqui. Só gera até o mês civil atual do
+// servidor - não popula meses futuros que ninguém navegou até ainda (mesmo
+// espírito de "não adiantar automação" do resto do módulo).
+// Limitação aceita: apagar uma ocorrência gerada não impede que ela volte a
+// ser gerada na próxima leitura do mesmo mês, porque não há "lápide" de
+// exclusão - aceitável no volume de um salão (o dono percebe e desliga o
+// modelo em vez de apagar ocorrência a ocorrência).
+function gerarOcorrenciasDoMes(primeiroDiaDoMes) {
+  const mesAlvo = primeiroDiaDoMes.slice(0, 7);
+  if (mesAlvo > hojeCivilServidor().slice(0, 7)) return;
+  const db = getDb();
+  const templates = db.prepare("SELECT * FROM beauty_expenses WHERE is_template = 1").all().filter((tpl) => tpl.due_date.slice(0, 7) <= mesAlvo);
+  for (const tpl of templates) {
+    if (tpl.due_date.slice(0, 7) === mesAlvo) continue;
+    const jaExiste = db.prepare("SELECT 1 FROM beauty_expenses WHERE recurring_source_id = ? AND due_date LIKE ?").get(tpl.id, `${mesAlvo}%`);
+    if (jaExiste) continue;
+    const [ano, mes] = mesAlvo.split("-").map(Number);
+    const dia = Math.min(Number(tpl.due_date.slice(8, 10)), ultimoDiaDoMes(ano, mes));
+    const dueDate = `${mesAlvo}-${String(dia).padStart(2, "0")}`;
+    db.prepare(
+      `INSERT INTO beauty_expenses (id, amount_cents, description, category, due_date, paid, notes, is_template, recurring_source_id, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, 0, ?, 0, ?, ?, ?)`
+    ).run(uid(), tpl.amount_cents, tpl.description, tpl.category, dueDate, tpl.notes, tpl.id, nowIso(), tpl.created_by);
+  }
+}
+
+export function listExpenses(from, to) {
+  gerarOcorrenciasDoMes(from);
+  return getDb()
+    .prepare("SELECT * FROM beauty_expenses WHERE is_template = 0 AND due_date >= ? AND due_date <= ? ORDER BY due_date, created_at")
+    .all(from, to);
+}
+export function getExpense(id) {
+  return getDb().prepare("SELECT * FROM beauty_expenses WHERE id = ?").get(id) || null;
+}
+export function insertExpense({ amountCents, description, category, dueDate, paid, notes, recurring }, userId) {
+  const id = uid();
+  getDb()
+    .prepare(
+      `INSERT INTO beauty_expenses (id, amount_cents, description, category, due_date, paid, notes, is_template, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`
+    )
+    .run(id, amountCents, description, category, dueDate, paid ? 1 : 0, notes || "", nowIso(), userId || null);
+  // O modelo recorrente é uma segunda linha (is_template=1, mesmo due_date) -
+  // a ocorrência real do mês de criação é a linha acima, que já fica
+  // visível na lista imediatamente; o modelo só serve para as próximas.
+  if (recurring) {
+    getDb()
+      .prepare(
+        `INSERT INTO beauty_expenses (id, amount_cents, description, category, due_date, paid, notes, is_template, created_at, created_by)
+         VALUES (?, ?, ?, ?, ?, 0, ?, 1, ?, ?)`
+      )
+      .run(uid(), amountCents, description, category, dueDate, notes || "", nowIso(), userId || null);
+  }
+  return getExpense(id);
+}
+export function deleteExpense(id) {
+  const info = getDb().prepare("DELETE FROM beauty_expenses WHERE id = ? AND is_template = 0").run(id);
+  return info.changes > 0;
+}

@@ -64,6 +64,10 @@ import {
   setPageImage,
   getPageImageFile,
   discardPageImageFile,
+  categoriasDespesaValidas,
+  listExpenses,
+  insertExpense,
+  deleteExpense,
 } from "./repo.js";
 import { getOuCriarSlugAgendamento } from "./agendaSlugStore.js";
 import { getOuCriarSlugLembrete } from "./reminderSlugStore.js";
@@ -884,6 +888,51 @@ router.get(
     res.setHeader("Content-Type", file.mimeType);
     res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
     res.sendFile(file.path);
+  })
+);
+
+// ---------- Despesas (Fase 11) ----------
+// Sem exigeBeautyFinance de propósito: é lançamento simples de despesa, não
+// o financeiro avançado (comissão/pagamento por atendimento) que já é
+// Premium - decisão do cliente, ver conversa da Fase 11.
+const CATEGORIAS_DESPESA_VALIDAS = new Set(categoriasDespesaValidas());
+const DATA_CIVIL_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+router.get(
+  "/expenses",
+  ah(async (req, res) => {
+    const { from, to } = req.query;
+    if (!from || !to) {
+      return res.status(400).json({ error: "Informe o período (from/to)", code: "BEAUTY_PERIOD_REQUIRED" });
+    }
+    res.json(listExpenses(from, to));
+  })
+);
+router.post(
+  "/expenses",
+  ah(async (req, res) => {
+    const { amountCents, description, category, dueDate, paid, notes, recurring } = req.body || {};
+    if (!Number.isInteger(amountCents) || amountCents <= 0) {
+      return res.status(400).json({ error: "Informe o valor da despesa", code: "BEAUTY_AMOUNT_REQUIRED" });
+    }
+    if (!description || !description.trim()) {
+      return res.status(400).json({ error: "Informe a descrição", code: "BEAUTY_EXPENSE_DESCRIPTION_REQUIRED" });
+    }
+    if (!CATEGORIAS_DESPESA_VALIDAS.has(category)) {
+      return res.status(400).json({ error: "Categoria inválida", code: "BEAUTY_EXPENSE_CATEGORY_INVALID" });
+    }
+    if (!DATA_CIVIL_RE.test(dueDate || "")) {
+      return res.status(400).json({ error: "Data inválida", code: "BEAUTY_EXPENSE_DATE_INVALID" });
+    }
+    res.status(201).json(insertExpense({ amountCents, description: description.trim(), category, dueDate, paid: !!paid, notes, recurring: !!recurring }, req.user.id));
+  })
+);
+router.delete(
+  "/expenses/:id",
+  ah(async (req, res) => {
+    const ok = deleteExpense(req.params.id);
+    if (!ok) return res.status(404).json({ error: "Despesa não encontrada", code: "BEAUTY_EXPENSE_NOT_FOUND" });
+    res.json({ ok: true });
   })
 );
 

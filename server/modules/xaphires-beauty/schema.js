@@ -185,4 +185,30 @@ export function applyXaphiresBeautySchema(companyDb) {
       booking_rules_text TEXT NOT NULL DEFAULT ''
     );
   `);
+
+  // Despesas (Fase 11). due_date é data civil (YYYY-MM-DD), mesma convenção
+  // do resto do módulo - "quando" a despesa vence/aconteceu, não um instante.
+  // is_template=1 é o modelo de uma despesa recorrente: nunca aparece na
+  // listagem (listExpenses filtra is_template=0), só existe para
+  // gerarOcorrenciasDoMes (repo.js) gerar a ocorrência real de cada mês -
+  // mesmo espírito de recurrence.js no Kanban, só que a automação roda na
+  // leitura de /expenses (ver comentário em runExpenseRecurrences), não por
+  // cron. recurring_source_id aponta a ocorrência de volta pro modelo que a
+  // gerou, só para o dedupe (não gerar duas vezes o mesmo mês).
+  companyDb.exec(`
+    CREATE TABLE IF NOT EXISTS beauty_expenses (
+      id TEXT PRIMARY KEY,
+      amount_cents INTEGER NOT NULL,
+      description TEXT NOT NULL,
+      category TEXT NOT NULL,
+      due_date TEXT NOT NULL,
+      paid INTEGER NOT NULL DEFAULT 0,
+      notes TEXT NOT NULL DEFAULT '',
+      is_template INTEGER NOT NULL DEFAULT 0,
+      recurring_source_id TEXT REFERENCES beauty_expenses(id),
+      created_at TEXT NOT NULL,
+      created_by TEXT REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_beauty_expenses_due ON beauty_expenses(due_date);
+  `);
 }
