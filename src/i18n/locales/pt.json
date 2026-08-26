@@ -183,7 +183,27 @@
           "agendado": "Agendado",
           "concluido": "Concluído",
           "cancelado": "Cancelado"
-        }
+        },
+        "visaoDia": "Dia",
+        "visaoSemana": "Semana",
+        "todosProfissionais": "Todos os profissionais",
+        "duplicar": "Duplicar",
+        "linkLembrete": "Link de lembrete",
+        "linkCopiado": "Link copiado",
+        "repetir": "Repetir",
+        "repetirNenhuma": "Não repetir",
+        "repetirSemanal": "Semanalmente",
+        "repetirMensal": "Mensalmente",
+        "ocorrencias": "Ocorrências",
+        "repetidoResumo": "{{criadas}} de {{total}} agendamentos criados",
+        "data": "Data",
+        "novoBloqueio": "Novo bloqueio",
+        "motivoBloqueio": "Motivo (opcional)",
+        "todaEquipe": "Toda a equipe",
+        "ate": "até",
+        "bloqueio": "Bloqueio",
+        "bloqueioCriado": "Bloqueio criado",
+        "confirmarRemoverBloqueio": "Remover este bloqueio?"
       },
       "financeiro": {
         "bloqueado": "O financeiro está disponível a partir do plano {{plano}}.",

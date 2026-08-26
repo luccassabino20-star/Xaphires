@@ -8911,6 +8911,33 @@ body.sc-pub-body { overflow: auto; }
 .beauty-fin-donut-swatch { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 .beauty-fin-donut-nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--beauty-text-soft); }
 .beauty-fin-donut-pct { color: var(--beauty-text-soft); font-variant-numeric: tabular-nums; }
+
+/* Agenda (Fase 9): alternância Dia/Semana e a grade de 7 colunas da visão
+   Semana - lista compacta por dia, sem grade de horário/drag-and-drop (ver
+   decisão no plano: overengineering pro volume de um salão pequeno). Linha
+   de bloqueio usa a mesma cor de "saída" do dashboard financeiro (Fase 7) -
+   ambas comunicam "indisponível/não é receita", não precisa de uma terceira
+   cor só pra isso. */
+.beauty-view-toggle { display: inline-flex; border: 1px solid var(--beauty-border); border-radius: 999px; padding: 3px; gap: 2px; }
+.beauty-view-toggle button {
+  padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--beauty-text-soft);
+  background: none; border: none; border-radius: 999px; cursor: pointer;
+}
+.beauty-view-toggle button.active { background: var(--beauty-accent); color: #fff; }
+.beauty-week-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
+.beauty-week-col { background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 16px; padding: 10px; min-height: 160px; }
+.beauty-week-col-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.beauty-week-col-title { background: none; border: none; padding: 0; font-size: 12.5px; font-weight: 700; color: var(--beauty-text); cursor: pointer; text-align: left; }
+.beauty-week-col-title:hover { color: var(--beauty-accent-strong); }
+.beauty-week-col-add {
+  width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--beauty-border); background: none;
+  color: var(--beauty-text-soft); font-size: 14px; line-height: 1; cursor: pointer;
+}
+.beauty-week-col-add:hover { color: var(--beauty-accent-strong); border-color: var(--beauty-accent); }
+.beauty-week-item { font-size: 12.5px; padding: 6px 0; border-top: 1px solid var(--beauty-border); }
+.beauty-week-item:first-of-type { border-top: none; }
+.beauty-block-row { opacity: 0.85; }
+.beauty-block-row strong { color: #D9A441; }
 /* select/time dentro do formulário público (.sc-pub-campo) - a regra
    original em ContatosView/AnamneseFormularioEtapas só cobria os tipos de
    input que a anamnese usa; o agendamento público também precisa de

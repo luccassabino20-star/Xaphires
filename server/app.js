@@ -26,6 +26,7 @@ import { router as crmRouter } from "./modules/crm/routes.js";
 import { router as xaphiresBeautyRouter } from "./modules/xaphires-beauty/routes.js";
 import { router as anamnesePublicaRouter } from "./routes/anamnesePublica.js";
 import { router as xaphiresBeautyPublicaRouter } from "./routes/xaphiresBeautyPublica.js";
+import { router as xaphiresBeautyLembreteRouter } from "./routes/xaphiresBeautyLembrete.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as personalTasksRouter } from "./routes/personalTasks.js";
 import { router as billingRouter } from "./routes/billing.js";
@@ -96,6 +97,10 @@ app.use("/api/public/anamnese", anamnesePublicaRouter);
 // Formulário público de agendamento do Xaphires Beauty (Fase 4): mesmo
 // motivo acima - visitante sem sessão, sem Origin/Referer garantido.
 app.use("/api/public/xaphires-beauty", xaphiresBeautyPublicaRouter);
+// Link de lembrete por agendamento (Fase 9) - só GET, não precisaria vir
+// antes do verifyOrigin (SAFE_METHODS já libera), mas fica junto dos outros
+// públicos por organização.
+app.use("/api/public/xaphires-beauty-lembrete", xaphiresBeautyLembreteRouter);
 
 app.use("/api", verifyOrigin);
 

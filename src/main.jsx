@@ -34,6 +34,9 @@ const AnamneseCaptacaoPage = React.lazy(() => import("./modules/saude-clinicas/A
 // Link fixo de agendamento online do Xaphires Beauty (Fase 4, mesmo
 // isolamento acima): o visitante marca o próprio horário sem login.
 const BeautyPublicBookingPage = React.lazy(() => import("./modules/xaphires-beauty/BeautyPublicBookingPage.jsx"));
+// Link de lembrete por agendamento (Fase 9, mesmo isolamento acima): o
+// cliente confere data/hora/serviço do próprio atendimento, sem login.
+const BeautyReminderPage = React.lazy(() => import("./modules/xaphires-beauty/BeautyReminderPage.jsx"));
 // Protótipo visual "Xaphires Beauty" (produto separado do Xaphires real -
 // ver comentário no topo de prototypes/xaphiresBeauty/featuresConfig.js).
 // Mesmo isolamento do GanttChartDemo: sem login, sem dado real por trás.
@@ -46,6 +49,7 @@ const ehXaphiresBeauty = path === "/xaphires-beauty";
 const anamnesePublicaMatch = path.match(/^\/anamnese\/([^/]+)\/([^/]+)$/);
 const anamneseCaptacaoMatch = path.match(/^\/anamnese-novo\/([^/]+)$/);
 const beautyAgendarMatch = path.match(/^\/beauty-agendar\/([^/]+)$/);
+const beautyLembreteMatch = path.match(/^\/beauty-lembrete\/([^/]+)$/);
 
 // Sem prefixo de idioma na URL (ex.: alguém chegou em "/" direto): alinha a
 // URL com o idioma que o i18next já resolveu em i18n/index.js (localStorage
@@ -54,7 +58,7 @@ const beautyAgendarMatch = path.match(/^\/beauty-agendar\/([^/]+)$/);
 // já decidiu. replaceState, não pushState, pra a detecção automática não
 // empurrar uma entrada a mais no histórico (o botão "voltar" não deveria
 // alternar idioma sozinho).
-if (!ehPainel && !ehGanttDemo && !ehXaphiresBeauty && !anamnesePublicaMatch && !anamneseCaptacaoMatch && !beautyAgendarMatch) {
+if (!ehPainel && !ehGanttDemo && !ehXaphiresBeauty && !anamnesePublicaMatch && !anamneseCaptacaoMatch && !beautyAgendarMatch && !beautyLembreteMatch) {
   const { locale: urlLocale, rest } = parseLocaleFromPath(path);
   if (!urlLocale) {
     const resolved = normalizeLanguage(i18n.language);
@@ -99,6 +103,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ThemeProvider>
         <Suspense fallback={null}>
           <BeautyPublicBookingPage slug={beautyAgendarMatch[1]} />
+        </Suspense>
+      </ThemeProvider>
+    ) : beautyLembreteMatch ? (
+      <ThemeProvider>
+        <Suspense fallback={null}>
+          <BeautyReminderPage slug={beautyLembreteMatch[1]} />
         </Suspense>
       </ThemeProvider>
     ) : (

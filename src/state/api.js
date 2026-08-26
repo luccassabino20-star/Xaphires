@@ -885,6 +885,12 @@ export const xbGetAppointments = (from, to) => request(`/xaphires-beauty/appoint
 export const xbCreateAppointment = (data) => request("/xaphires-beauty/appointments", { method: "POST", body: data });
 export const xbSetAppointmentStatus = (id, status) =>
   request(`/xaphires-beauty/appointments/${id}/status`, { method: "PATCH", body: { status } });
+export const xbGetReminderLink = (id) => request(`/xaphires-beauty/appointments/${id}/reminder-link`);
+
+// Bloqueio de horário
+export const xbGetBlocks = (from, to) => request(`/xaphires-beauty/schedule-blocks?from=${from}&to=${to}`);
+export const xbCreateBlock = (data) => request("/xaphires-beauty/schedule-blocks", { method: "POST", body: data });
+export const xbDeleteBlock = (id) => request(`/xaphires-beauty/schedule-blocks/${id}`, { method: "DELETE" });
 
 // Profissionais + financeiro (Premium+)
 export const xbGetStaff = () => request("/xaphires-beauty/staff");
@@ -914,3 +920,6 @@ export const xbGetBookingLink = () => request("/xaphires-beauty/booking-link");
 // Formulário público (sem sessão) - visitante marcando o próprio horário.
 export const xbPublicGetBooking = (slug) => request(`/public/xaphires-beauty/${slug}`);
 export const xbPublicCreateBooking = (slug, data) => request(`/public/xaphires-beauty/${slug}`, { method: "POST", body: data });
+
+// Link de lembrete (sem sessão) - o cliente conferindo o próprio agendamento.
+export const xbPublicGetReminder = (slug) => request(`/public/xaphires-beauty-lembrete/${slug}`);

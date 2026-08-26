@@ -54,8 +54,13 @@ import {
   setStaffServices,
   listStaffHours,
   setStaffHours,
+  listBlocks,
+  insertBlock,
+  deleteBlock,
+  somarOcorrencia,
 } from "./repo.js";
 import { getOuCriarSlugAgendamento } from "./agendaSlugStore.js";
+import { getOuCriarSlugLembrete } from "./reminderSlugStore.js";
 
 const TIPOS_IMAGEM_ACEITOS = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 const CLIENT_PHOTO_MAX_BYTES = 3 * 1024 * 1024;
@@ -457,7 +462,29 @@ router.post(
     if (hasOverlap(req.body.staffId, startsAt, endsAt)) {
       return res.status(409).json({ error: "Este profissional já tem outro atendimento nesse horário", code: "BEAUTY_APPOINTMENT_CONFLICT" });
     }
-    res.status(201).json(insertAppointment({ ...req.body, endsAt }, req.user.id));
+    const primeiro = insertAppointment({ ...req.body, endsAt }, req.user.id);
+
+    // "Repetir" (Fase 9): gera as ocorrências seguintes de uma vez, na
+    // criação - não é um motor de recorrência automática como o
+    // runRecurrences() do quadro Kanban, é só um atalho pra não recadastrar
+    // o mesmo agendamento semana a semana. Ocorrência que colide com algo
+    // (outro agendamento, um bloqueio) é pulada, não trava a série inteira.
+    const { repeat } = req.body || {};
+    let repeatSummary;
+    if (repeat && ["weekly", "monthly"].includes(repeat.frequency)) {
+      const ocorrencias = Math.min(12, Math.max(2, Number(repeat.occurrences) || 2));
+      let criadas = 1;
+      for (let i = 1; i < ocorrencias; i++) {
+        const startsAtOcorrencia = somarOcorrencia(startsAt, i, repeat.frequency);
+        const endsAtOcorrencia = somarMinutosLocal(startsAtOcorrencia, servico.duration_minutes);
+        if (hasOverlap(req.body.staffId, startsAtOcorrencia, endsAtOcorrencia)) continue;
+        insertAppointment({ ...req.body, startsAt: startsAtOcorrencia, endsAt: endsAtOcorrencia }, req.user.id);
+        criadas++;
+      }
+      repeatSummary = { criadas, puladas: ocorrencias - criadas };
+    }
+
+    res.status(201).json(repeatSummary ? { ...primeiro, repeatSummary } : primeiro);
   })
 );
 router.patch(
@@ -470,6 +497,54 @@ router.patch(
     const atualizado = setAppointmentStatus(req.params.id, status);
     if (!atualizado) return res.status(404).json({ error: "Agendamento não encontrado", code: "BEAUTY_APPOINTMENT_NOT_FOUND" });
     res.json(atualizado);
+  })
+);
+
+// Link de lembrete (Fase 9) - slug próprio por agendamento, mesma forma do
+// booking-link (por empresa) mas em beauty/reminderSlugStore.js. A rota que
+// o CLIENTE usa é pública (server/routes/xaphiresBeautyLembrete.js).
+router.get(
+  "/appointments/:id/reminder-link",
+  ah(async (req, res) => {
+    if (!getAppointment(req.params.id)) return res.status(404).json({ error: "Agendamento não encontrado", code: "BEAUTY_APPOINTMENT_NOT_FOUND" });
+    res.json({ slug: getOuCriarSlugLembrete(req.companyId, req.params.id) });
+  })
+);
+
+// ---------- Bloqueio de horário (Fase 9) ----------
+
+router.get(
+  "/schedule-blocks",
+  ah(async (req, res) => {
+    const { from, to } = req.query;
+    if (!from || !to) {
+      return res.status(400).json({ error: "Informe o período (from/to)", code: "BEAUTY_PERIOD_REQUIRED" });
+    }
+    res.json(listBlocks(from, to));
+  })
+);
+router.post(
+  "/schedule-blocks",
+  ah(async (req, res) => {
+    const { staffId, startsAt, endsAt } = req.body || {};
+    if (staffId && !getStaffMember(staffId)) {
+      return res.status(400).json({ error: "Profissional inválido", code: "BEAUTY_STAFF_NOT_FOUND" });
+    }
+    if (!startsAt || !endsAt || Number.isNaN(new Date(startsAt).getTime()) || Number.isNaN(new Date(endsAt).getTime()) || startsAt >= endsAt) {
+      return res.status(400).json({ error: "Informe início e fim válidos", code: "BEAUTY_BLOCK_PERIOD_INVALID" });
+    }
+    if (hasOverlap(staffId, startsAt, endsAt)) {
+      return res.status(409).json({ error: "Já existe um agendamento ou bloqueio nesse horário", code: "BEAUTY_APPOINTMENT_CONFLICT" });
+    }
+    res.status(201).json(insertBlock(req.body, req.user.id));
+  })
+);
+router.delete(
+  "/schedule-blocks/:id",
+  ah(async (req, res) => {
+    const ok = deleteBlock(req.params.id);
+    if (!ok) return res.status(404).json({ error: "Bloqueio não encontrado", code: "BEAUTY_BLOCK_NOT_FOUND" });
+    res.json({ ok: true });
   })
 );
 

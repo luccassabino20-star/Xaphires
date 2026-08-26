@@ -183,7 +183,27 @@
           "agendado": "Scheduled",
           "concluido": "Completed",
           "cancelado": "Canceled"
-        }
+        },
+        "visaoDia": "Day",
+        "visaoSemana": "Week",
+        "todosProfissionais": "All professionals",
+        "duplicar": "Duplicate",
+        "linkLembrete": "Reminder link",
+        "linkCopiado": "Link copied",
+        "repetir": "Repeat",
+        "repetirNenhuma": "Don't repeat",
+        "repetirSemanal": "Weekly",
+        "repetirMensal": "Monthly",
+        "ocorrencias": "Occurrences",
+        "repetidoResumo": "{{criadas}} of {{total}} appointments created",
+        "data": "Date",
+        "novoBloqueio": "New block",
+        "motivoBloqueio": "Reason (optional)",
+        "todaEquipe": "Whole team",
+        "ate": "to",
+        "bloqueio": "Block",
+        "bloqueioCriado": "Block created",
+        "confirmarRemoverBloqueio": "Remove this block?"
       },
       "financeiro": {
         "bloqueado": "Finance is available from the {{plano}} plan onward.",

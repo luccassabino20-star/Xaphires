@@ -346,21 +346,76 @@ export function listAppointments(from, to) {
 export function getAppointment(id) {
   return getDb().prepare(`${SELECT_APPT} WHERE a.id = ?`).get(id) || null;
 }
-// Só checa conflito quando há profissional atribuído: sem staffId a agenda
-// não sabe quantas "cadeiras" o salão tem, então bloquear globalmente
-// impediria atendimentos simultâneos legítimos. Usado pelo link público
-// (Fase 4), onde ninguém supervisiona o choque de horário em tempo real -
-// no formulário interno, quem agenda vê a agenda do dia e decide.
+// Só checa conflito de AGENDAMENTO quando há profissional atribuído: sem
+// staffId a agenda não sabe quantas "cadeiras" o salão tem, então bloquear
+// globalmente impediria atendimentos simultâneos legítimos. Usado pelo link
+// público (Fase 4), onde ninguém supervisiona o choque de horário em tempo
+// real - no formulário interno, quem agenda vê a agenda do dia e decide.
+// Bloqueio (Fase 9) é diferente: um bloqueio GLOBAL (staff_id NULL, ex.:
+// feriado do salão) vale pra qualquer atendimento, mesmo sem profissional
+// atribuído - só um bloqueio de uma pessoa ESPECÍFICA é que só afeta quem
+// tem aquele staffId.
 export function hasOverlap(staffId, startsAt, endsAt) {
-  if (!staffId) return false;
-  const conflito = getDb()
+  const db = getDb();
+  if (staffId) {
+    const conflitoAgendamento = db
+      .prepare(
+        `SELECT 1 FROM beauty_appointments
+          WHERE staff_id = ? AND status <> 'cancelado' AND starts_at < ? AND ends_at > ?
+          LIMIT 1`
+      )
+      .get(staffId, endsAt, startsAt);
+    if (conflitoAgendamento) return true;
+  }
+  const conflitoBloqueio = db
     .prepare(
-      `SELECT 1 FROM beauty_appointments
-        WHERE staff_id = ? AND status <> 'cancelado' AND starts_at < ? AND ends_at > ?
+      `SELECT 1 FROM beauty_schedule_blocks
+        WHERE starts_at < ? AND ends_at > ? AND (staff_id IS NULL OR staff_id = ?)
         LIMIT 1`
     )
-    .get(staffId, endsAt, startsAt);
-  return !!conflito;
+    .get(endsAt, startsAt, staffId || null);
+  return !!conflitoBloqueio;
+}
+
+// ---------- Bloqueio de horário (Fase 9) ----------
+
+export function listBlocks(from, to) {
+  return getDb()
+    .prepare(
+      `SELECT b.*, st.name AS staff_name
+         FROM beauty_schedule_blocks b
+         LEFT JOIN beauty_staff st ON st.id = b.staff_id
+        WHERE b.starts_at < ? AND b.ends_at > ?
+        ORDER BY b.starts_at`
+    )
+    .all(to, from);
+}
+export function insertBlock({ staffId, startsAt, endsAt, reason }, userId) {
+  const id = uid();
+  getDb()
+    .prepare(
+      `INSERT INTO beauty_schedule_blocks (id, staff_id, starts_at, ends_at, reason, created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    )
+    .run(id, staffId || null, startsAt, endsAt, reason || "", nowIso(), userId || null);
+  return getDb().prepare("SELECT * FROM beauty_schedule_blocks WHERE id = ?").get(id);
+}
+export function deleteBlock(id) {
+  const info = getDb().prepare("DELETE FROM beauty_schedule_blocks WHERE id = ?").run(id);
+  return info.changes > 0;
+}
+
+// Ocorrência N de uma série "repetir" (Fase 9) - soma N semanas ou N meses à
+// data/hora ingênua de origem, preservando hora/minuto. Mesma convenção de
+// somarMinutosLocal: sem "Z", a hora é do relógio de quem agendou, o mês
+// soma pelo calendário civil (dia 31 num mês de 30 dias vira o último dia
+// dele, comportamento padrão de Date.setMonth - aceitável pro caso raro).
+export function somarOcorrencia(dataHoraCivil, indice, frequencia) {
+  const d = new Date(dataHoraCivil);
+  if (frequencia === "monthly") d.setMonth(d.getMonth() + indice);
+  else d.setDate(d.getDate() + 7 * indice);
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
 export function insertAppointment({ clientId, serviceId, staffId, startsAt, endsAt, notes, fromPublicLink }, userId) {

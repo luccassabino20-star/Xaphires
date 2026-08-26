@@ -144,4 +144,23 @@ export function applyXaphiresBeautySchema(companyDb) {
       PRIMARY KEY (staff_id, weekday)
     );
   `);
+
+  // Fase 9: bloqueio de horário (mesma forma de schedule_blocks em Saúde &
+  // Clínicas, mas em datetime civil ingênuo - starts_at/ends_at, igual
+  // beauty_appointments - em vez de date+time+duration_min, pra entrar na
+  // MESMA consulta de hasOverlap sem converter formato). staff_id NULL =
+  // bloqueio da agenda inteira (ex.: feriado do salão); com staff_id, só
+  // aquela pessoa fica indisponível (ex.: almoço).
+  companyDb.exec(`
+    CREATE TABLE IF NOT EXISTS beauty_schedule_blocks (
+      id TEXT PRIMARY KEY,
+      staff_id TEXT REFERENCES beauty_staff(id),
+      starts_at TEXT NOT NULL,
+      ends_at TEXT NOT NULL,
+      reason TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      created_by TEXT REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_beauty_blocks_starts ON beauty_schedule_blocks(starts_at);
+  `);
 }
