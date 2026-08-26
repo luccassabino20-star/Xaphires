@@ -9391,6 +9391,10 @@ body.sc-pub-body { overflow: auto; }
 @media (max-width: 600px) { .beauty-apt-grid { grid-template-columns: 1fr; } }
 .beauty-apt-label { display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--beauty-text-soft); margin-bottom: 6px; }
 .beauty-apt-value-primary { font-size: 14.5px; font-weight: 650; color: var(--beauty-text); }
+/* Cliente clicável (abre a ficha completa - Geral/Ficha Técnica/Histórico) -
+   reseta a aparência de <button> pra ficar idêntico ao texto que substitui. */
+.beauty-apt-value-link { background: none; border: none; padding: 0; text-align: left; cursor: pointer; }
+.beauty-apt-value-link:hover { color: var(--beauty-accent-strong); text-decoration: underline; }
 .beauty-apt-whatsapp { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; font-size: 12.5px; color: var(--beauty-accent-strong); text-decoration: none; }
 .beauty-apt-whatsapp:hover { text-decoration: underline; }
 .beauty-apt-staff { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--beauty-text); }

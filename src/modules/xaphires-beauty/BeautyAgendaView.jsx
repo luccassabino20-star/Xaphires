@@ -6,6 +6,7 @@ import * as api from "../../state/api.js";
 import BeautyEmptyState from "./BeautyEmptyState.jsx";
 import Avatar from "../../components/Avatar.jsx";
 import AppointmentDetailView from "./AppointmentDetailView.jsx";
+import BeautyClientDetailModal from "./BeautyClientDetailModal.jsx";
 
 function hojeCivil() {
   const d = new Date();
@@ -95,6 +96,7 @@ export default function BeautyAgendaView() {
   const [fBlock, setFBlock] = useState(BLOCK_VAZIO);
   const [mostrarBlockForm, setMostrarBlockForm] = useState(false);
   const [selecionado, setSelecionado] = useState(null); // agendamento em destaque na barra inferior (visão Dia)
+  const [clienteDetalheId, setClienteDetalheId] = useState(null); // ficha completa aberta a partir do agendamento
   const [agora, setAgora] = useState(() => new Date());
 
   useEffect(() => {
@@ -285,6 +287,8 @@ export default function BeautyAgendaView() {
     const taxaOcupacao = disponivel > 0 ? Math.min(100, Math.round((ocupado / disponivel) * 100)) : null;
     return { faturamentoPrevisto, taxaOcupacao };
   }, [agendamentos, date, staffDaGrade, horariosPorStaff]);
+
+  const clienteDetalhe = clienteDetalheId ? clientes.find((c) => c.id === clienteDetalheId) : null;
 
   return (
     <div>
@@ -553,6 +557,20 @@ export default function BeautyAgendaView() {
           onClose={() => setSelecionado(null)}
           onChanged={carregarAgenda}
           onDuplicate={duplicar}
+          onOpenClient={setClienteDetalheId}
+        />
+      )}
+
+      {/* Mesma ficha completa (Geral/Ficha Técnica/Histórico) que Cadastros/
+          Clientes abre - clicar no nome do cliente dentro do agendamento leva
+          ao mesmo lugar, em vez de uma segunda tela reduzida só de leitura. */}
+      {clienteDetalhe && (
+        <BeautyClientDetailModal
+          client={clienteDetalhe}
+          rankingEntry={null}
+          posicao={null}
+          onClose={() => setClienteDetalheId(null)}
+          onUpdated={(atualizado) => setClientes((cs) => cs.map((c) => (c.id === atualizado.id ? atualizado : c)))}
         />
       )}
     </div>

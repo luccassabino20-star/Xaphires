@@ -35,7 +35,7 @@ function IconeEvento({ tipo }) {
 // vêm já carregados de BeautyAgendaView (evita rebuscar pra montar os
 // selects de edição); onChanged() é o carregarAgenda() de lá, chamado depois
 // de qualquer mutação bem-sucedida pra manter a grade sincronizada.
-export default function AppointmentDetailView({ appointment, clientes, servicos, equipe, onClose, onChanged, onDuplicate }) {
+export default function AppointmentDetailView({ appointment, clientes, servicos, equipe, onClose, onChanged, onDuplicate, onOpenClient }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const [atual, setAtual] = useState(appointment);
@@ -217,7 +217,13 @@ export default function AppointmentDetailView({ appointment, clientes, servicos,
                 <div className="beauty-apt-grid">
                   <div>
                     <span className="beauty-apt-label">{t("modules.xaphiresBeauty.atendimento.cliente")}</span>
-                    <div className="beauty-apt-value-primary">{atual.client_name}</div>
+                    {onOpenClient ? (
+                      <button type="button" className="beauty-apt-value-primary beauty-apt-value-link" onClick={() => onOpenClient(atual.client_id)}>
+                        {atual.client_name}
+                      </button>
+                    ) : (
+                      <div className="beauty-apt-value-primary">{atual.client_name}</div>
+                    )}
                     {atual.client_phone && (
                       <a className="beauty-apt-whatsapp" href={whatsappLink(atual.client_phone, "")} target="_blank" rel="noopener noreferrer">
                         {atual.client_phone} · {t("modules.xaphiresBeauty.atendimento.whatsapp")}
