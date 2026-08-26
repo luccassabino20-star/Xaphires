@@ -3123,7 +3123,7 @@ img.avatar { object-fit: cover; padding: 0; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 40px;
+  padding: 9px 40px;
   border-bottom: 1px solid transparent;
   position: sticky;
   top: 0;
@@ -5280,6 +5280,10 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   border-radius: 8px;
   font-size: 22px;
 }
+/* Só na navbar da landing (não no launcher nem no login, que reaproveitam a
+   mesma classe) - é o ícone que dita a altura da barra, e 46px deixava a
+   navbar mais alta do que o resto do site usa. */
+.landing-nav .landing-nav-icon { width: 34px; height: 34px; }
 
 /* ---------- Modal de cartões arquivados ---------- */
 .archive-modal { max-width: 620px; }
