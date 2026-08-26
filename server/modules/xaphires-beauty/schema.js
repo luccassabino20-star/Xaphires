@@ -122,4 +122,26 @@ export function applyXaphiresBeautySchema(companyDb) {
       PRIMARY KEY (staff_id, service_id)
     );
   `);
+
+  // Fase 8: especialidades (quais serviços a pessoa realiza - usado na Fase 9
+  // pra filtrar o seletor de profissional pelo serviço escolhido), cor (chip
+  // na agenda, também Fase 9) e horário de trabalho (só cadastro/exibição
+  // por ora - validar contra ele na hora de agendar fica pra depois). Uma
+  // linha por dia da semana em beauty_staff_hours: quem não trabalha naquele
+  // dia simplesmente não tem linha, em vez de guardar um "folga" explícito.
+  addColumnIfMissing(companyDb, "beauty_staff", "color", "color TEXT NOT NULL DEFAULT '#B76E79'");
+  companyDb.exec(`
+    CREATE TABLE IF NOT EXISTS beauty_staff_services (
+      staff_id TEXT NOT NULL REFERENCES beauty_staff(id),
+      service_id TEXT NOT NULL REFERENCES beauty_services(id),
+      PRIMARY KEY (staff_id, service_id)
+    );
+    CREATE TABLE IF NOT EXISTS beauty_staff_hours (
+      staff_id TEXT NOT NULL REFERENCES beauty_staff(id),
+      weekday INTEGER NOT NULL,
+      start_time TEXT NOT NULL,
+      end_time TEXT NOT NULL,
+      PRIMARY KEY (staff_id, weekday)
+    );
+  `);
 }

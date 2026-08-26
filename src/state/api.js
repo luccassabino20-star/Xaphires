@@ -891,6 +891,10 @@ export const xbGetStaff = () => request("/xaphires-beauty/staff");
 export const xbCreateStaff = (data) => request("/xaphires-beauty/staff", { method: "POST", body: data });
 export const xbUpdateStaff = (id, data) => request(`/xaphires-beauty/staff/${id}`, { method: "PATCH", body: data });
 export const xbDeleteStaff = (id) => request(`/xaphires-beauty/staff/${id}`, { method: "DELETE" });
+export const xbGetStaffServices = (id) => request(`/xaphires-beauty/staff/${id}/services`);
+export const xbSetStaffServices = (id, serviceIds) => request(`/xaphires-beauty/staff/${id}/services`, { method: "PUT", body: { serviceIds } });
+export const xbGetStaffHours = (id) => request(`/xaphires-beauty/staff/${id}/hours`);
+export const xbSetStaffHours = (id, hours) => request(`/xaphires-beauty/staff/${id}/hours`, { method: "PUT", body: { hours } });
 
 export const xbGetPayments = (from, to) => request(`/xaphires-beauty/payments?from=${from}&to=${to}`);
 export const xbCreatePayment = (data) => request("/xaphires-beauty/payments", { method: "POST", body: data });

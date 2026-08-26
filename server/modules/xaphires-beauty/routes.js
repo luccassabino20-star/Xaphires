@@ -50,6 +50,10 @@ import {
   removeCommissionOverride,
   getRevenueByMethod,
   getMonthlyFinanceSummary,
+  listStaffServiceIds,
+  setStaffServices,
+  listStaffHours,
+  setStaffHours,
 } from "./repo.js";
 import { getOuCriarSlugAgendamento } from "./agendaSlugStore.js";
 
@@ -499,6 +503,57 @@ router.delete(
     const ok = deactivateStaff(req.params.id);
     if (!ok) return res.status(404).json({ error: "Profissional não encontrado", code: "BEAUTY_STAFF_NOT_FOUND" });
     res.json({ ok: true });
+  })
+);
+
+// Especialidades (quais serviços a pessoa realiza) e horário de trabalho
+// (Fase 8) - substituição total da lista a cada PUT, ver comentário em
+// repo.setStaffServices/setStaffHours.
+router.get(
+  "/staff/:id/services",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    if (!getStaffMember(req.params.id)) return res.status(404).json({ error: "Profissional não encontrado", code: "BEAUTY_STAFF_NOT_FOUND" });
+    res.json(listStaffServiceIds(req.params.id));
+  })
+);
+router.put(
+  "/staff/:id/services",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    if (!getStaffMember(req.params.id)) return res.status(404).json({ error: "Profissional não encontrado", code: "BEAUTY_STAFF_NOT_FOUND" });
+    const serviceIds = Array.isArray(req.body?.serviceIds) ? req.body.serviceIds : [];
+    for (const id of serviceIds) {
+      if (!getService(id)) return res.status(400).json({ error: "Serviço inválido", code: "BEAUTY_SERVICE_NOT_FOUND" });
+    }
+    res.json(setStaffServices(req.params.id, serviceIds));
+  })
+);
+
+const HORA_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+router.get(
+  "/staff/:id/hours",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    if (!getStaffMember(req.params.id)) return res.status(404).json({ error: "Profissional não encontrado", code: "BEAUTY_STAFF_NOT_FOUND" });
+    res.json(listStaffHours(req.params.id));
+  })
+);
+router.put(
+  "/staff/:id/hours",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    if (!getStaffMember(req.params.id)) return res.status(404).json({ error: "Profissional não encontrado", code: "BEAUTY_STAFF_NOT_FOUND" });
+    const horarios = Array.isArray(req.body?.hours) ? req.body.hours : [];
+    for (const h of horarios) {
+      if (!Number.isInteger(h.weekday) || h.weekday < 0 || h.weekday > 6) {
+        return res.status(400).json({ error: "Dia da semana inválido", code: "BEAUTY_WEEKDAY_INVALID" });
+      }
+      if (!HORA_RE.test(h.startTime) || !HORA_RE.test(h.endTime) || h.startTime >= h.endTime) {
+        return res.status(400).json({ error: "Horário inválido", code: "BEAUTY_STAFF_HOURS_INVALID" });
+      }
+    }
+    res.json(setStaffHours(req.params.id, horarios));
   })
 );
 

@@ -268,22 +268,22 @@ export function listStaff() {
 export function getStaffMember(id) {
   return getDb().prepare("SELECT * FROM beauty_staff WHERE id = ?").get(id) || null;
 }
-export function insertStaff({ name, role, commissionRate }) {
+export function insertStaff({ name, role, commissionRate, color }) {
   const id = uid();
   getDb()
     .prepare(
-      `INSERT INTO beauty_staff (id, name, role, commission_rate, created_at)
-       VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO beauty_staff (id, name, role, commission_rate, color, created_at)
+       VALUES (?, ?, ?, ?, ?, ?)`
     )
-    .run(id, name, role || "", commissionRate || 0, nowIso());
+    .run(id, name, role || "", commissionRate || 0, color || "#B76E79", nowIso());
   return getStaffMember(id);
 }
 export function updateStaff(id, s) {
   const a = getStaffMember(id);
   if (!a) return null;
   getDb()
-    .prepare("UPDATE beauty_staff SET name = ?, role = ?, commission_rate = ? WHERE id = ?")
-    .run(s.name ?? a.name, s.role ?? a.role, s.commissionRate ?? a.commission_rate, id);
+    .prepare("UPDATE beauty_staff SET name = ?, role = ?, commission_rate = ?, color = ? WHERE id = ?")
+    .run(s.name ?? a.name, s.role ?? a.role, s.commissionRate ?? a.commission_rate, s.color ?? a.color, id);
   return getStaffMember(id);
 }
 export function deactivateStaff(id) {
@@ -291,6 +291,36 @@ export function deactivateStaff(id) {
   if (!a) return null;
   getDb().prepare("UPDATE beauty_staff SET active = 0 WHERE id = ?").run(id);
   return true;
+}
+
+// ---------- Especialidades e horário (Fase 8) ----------
+// Substituição total da lista a cada save (delete+insert dentro do mesmo
+// staff_id) - o volume por profissional é baixo (poucos serviços, no máximo
+// 7 dias de horário), então não vale a pena calcular diff.
+export function listStaffServiceIds(staffId) {
+  return getDb()
+    .prepare("SELECT service_id FROM beauty_staff_services WHERE staff_id = ?")
+    .all(staffId)
+    .map((r) => r.service_id);
+}
+export function setStaffServices(staffId, serviceIds) {
+  const db = getDb();
+  db.prepare("DELETE FROM beauty_staff_services WHERE staff_id = ?").run(staffId);
+  const inserir = db.prepare("INSERT INTO beauty_staff_services (staff_id, service_id) VALUES (?, ?)");
+  for (const serviceId of serviceIds) inserir.run(staffId, serviceId);
+  return listStaffServiceIds(staffId);
+}
+export function listStaffHours(staffId) {
+  return getDb()
+    .prepare("SELECT weekday, start_time, end_time FROM beauty_staff_hours WHERE staff_id = ? ORDER BY weekday")
+    .all(staffId);
+}
+export function setStaffHours(staffId, horarios) {
+  const db = getDb();
+  db.prepare("DELETE FROM beauty_staff_hours WHERE staff_id = ?").run(staffId);
+  const inserir = db.prepare("INSERT INTO beauty_staff_hours (staff_id, weekday, start_time, end_time) VALUES (?, ?, ?, ?)");
+  for (const h of horarios) inserir.run(staffId, h.weekday, h.startTime, h.endTime);
+  return listStaffHours(staffId);
 }
 
 // ---------- Agendamentos ----------
