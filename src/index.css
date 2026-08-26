@@ -5275,8 +5275,8 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .landing-nav-icon {
   font-family: "Playfair Display", Georgia, "Times New Roman", serif;
   font-weight: 700;
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   border-radius: 8px;
   font-size: 22px;
 }
