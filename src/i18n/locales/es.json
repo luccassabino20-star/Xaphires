@@ -92,14 +92,92 @@
       "tag": "Belleza y Estética"
     },
     "xaphiresBeauty": {
-      "comingSoonTitle": "En construcción",
-      "comingSoonText": "La agenda, los clientes y el financiero de este módulo llegan en las próximas actualizaciones.",
-      "statClients": "{{count}} cliente registrado",
-      "statClients_other": "{{count}} clientes registrados",
-      "statServices": "{{count}} servicio registrado",
-      "statServices_other": "{{count}} servicios registrados",
-      "statAppointments": "{{count}} cita registrada",
-      "statAppointments_other": "{{count}} citas registradas"
+      "tabs": {
+        "agenda": "Agenda",
+        "clientes": "Clientes",
+        "servicos": "Servicios",
+        "financeiro": "Finanzas",
+        "equipe": "Equipo",
+        "online": "Reserva en línea"
+      },
+      "clientes": {
+        "nome": "Nombre",
+        "telefone": "Teléfono",
+        "doc": "CPF/CNPJ",
+        "notas": "Notas",
+        "vazio": "Ningún cliente registrado todavía.",
+        "salvo": "Cliente guardado",
+        "removido": "Cliente eliminado",
+        "confirmarRemover": "¿Eliminar al cliente \"{{nome}}\"?"
+      },
+      "servicos": {
+        "nome": "Nombre",
+        "duracao": "Duración (min)",
+        "preco": "Precio",
+        "vazio": "Ningún servicio registrado todavía.",
+        "minutos": "{{count}} minuto",
+        "minutos_other": "{{count}} minutos",
+        "salvo": "Servicio guardado",
+        "removido": "Servicio eliminado",
+        "confirmarRemover": "¿Eliminar el servicio \"{{nome}}\"?"
+      },
+      "equipe": {
+        "nome": "Nombre",
+        "cargo": "Cargo",
+        "comissao": "Comisión (%)",
+        "vazio": "Ningún profesional registrado todavía.",
+        "salvo": "Profesional guardado",
+        "removido": "Profesional eliminado",
+        "confirmarRemover": "¿Eliminar al profesional \"{{nome}}\"?",
+        "bloqueado": "La gestión de equipo está disponible a partir del plan {{plano}}."
+      },
+      "agenda": {
+        "novo": "Nueva cita",
+        "escolherCliente": "Elige el cliente",
+        "escolherServico": "Elige el servicio",
+        "semPreferencia": "Sin preferencia de profesional",
+        "notas": "Notas",
+        "salvo": "Cita creada",
+        "horario": "Hora",
+        "colCliente": "Cliente",
+        "colServico": "Servicio",
+        "colProfissional": "Profesional",
+        "situacao": "Estado",
+        "vazio": "Ninguna cita en este día.",
+        "online": "En línea",
+        "concluir": "Completar",
+        "cancelar": "Cancelar",
+        "status": {
+          "agendado": "Agendada",
+          "concluido": "Completada",
+          "cancelado": "Cancelada"
+        }
+      },
+      "financeiro": {
+        "bloqueado": "Las finanzas están disponibles a partir del plan {{plano}}.",
+        "novoPagamento": "Registrar pago",
+        "escolherAtendimento": "Elige la cita",
+        "valor": "Valor",
+        "metodos": {
+          "dinheiro": "Efectivo",
+          "pix": "Pix",
+          "cartao": "Tarjeta"
+        },
+        "salvo": "Pago registrado",
+        "pagamentos": "Pagos",
+        "data": "Fecha",
+        "metodo": "Método",
+        "vazio": "Nada en este período.",
+        "comissoes": "Comisión por profesional",
+        "totalAtendido": "Total atendido",
+        "comissao": "Comisión"
+      },
+      "online": {
+        "bloqueado": "La reserva en línea está disponible a partir del plan {{plano}}.",
+        "explicacao": "Comparte este enlace para que cualquiera reserve un horario directamente en tu agenda, sin necesidad de llamar antes.",
+        "copiarLink": "Copiar enlace de reserva",
+        "copiado": "Enlace copiado"
+      }
     },
     "compras-estoque": {
       "name": "Compras & Inventario",

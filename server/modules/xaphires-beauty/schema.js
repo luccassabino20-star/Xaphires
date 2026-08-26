@@ -7,10 +7,12 @@
 // tabela só nasce na primeira requisição autenticada da empresa que abrir
 // o módulo, não no arranque do servidor.
 //
-// Fase 0 (casca): as quatro tabelas do núcleo entram todas de uma vez, no
-// mesmo espírito da "casca completa" de Saúde & Clínicas - evita alterar
-// schema de novo na Fase 1, quando repo.js/routes.js ganham CRUD de
-// verdade por cima. Nenhuma tela ainda lê/escreve aqui.
+// Fase 0 criou as quatro tabelas do núcleo de uma vez, no mesmo espírito da
+// "casca completa" de Saúde & Clínicas. Fase 2 acrescentou beauty_payments
+// (CREATE TABLE IF NOT EXISTS cobre empresa nova e antiga) e a coluna
+// from_public_link em beauty_appointments - essa por addColumnIfMissing,
+// porque empresas que já tinham aberto o módulo na Fase 0 já têm a tabela
+// sem ela.
 function addColumnIfMissing(companyDb, table, name, ddl) {
   const columns = companyDb.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
   if (!columns.includes(name)) companyDb.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
@@ -64,9 +66,30 @@ export function applyXaphiresBeautySchema(companyDb) {
       -- 'agendado' | 'concluido' | 'cancelado'
       status TEXT NOT NULL DEFAULT 'agendado',
       notes TEXT NOT NULL DEFAULT '',
+      -- 1 quando veio do link público de agendamento (Fase 4) - a agenda
+      -- destaca esses de origem, mesmo espírito de "referralSource" em
+      -- Saúde & Clínicas.
+      from_public_link INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL,
       created_by TEXT REFERENCES users(id)
     );
     CREATE INDEX IF NOT EXISTS idx_beauty_appt_starts ON beauty_appointments(starts_at);
+
+    -- Ledger manual de pagamento (Fase 2) - NÃO é cobrança real, só registro de
+    -- que o cliente pagou por fora (pix/dinheiro/cartão na maquininha própria
+    -- do salão). Sem gateway aqui: ver o "Fora de escopo" do plano.
+    CREATE TABLE IF NOT EXISTS beauty_payments (
+      id TEXT PRIMARY KEY,
+      appointment_id TEXT NOT NULL REFERENCES beauty_appointments(id),
+      -- 'dinheiro' | 'pix' | 'cartao'
+      method TEXT NOT NULL DEFAULT 'dinheiro',
+      amount_cents INTEGER NOT NULL,
+      paid_at TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      created_by TEXT REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_beauty_payments_paid_at ON beauty_payments(paid_at);
   `);
+
+  addColumnIfMissing(companyDb, "beauty_appointments", "from_public_link", "from_public_link INTEGER NOT NULL DEFAULT 0");
 }

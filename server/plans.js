@@ -27,11 +27,17 @@ export const ALL_VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "m
 // Profissional para cima - o Intermediário fica só com teto maior de usuário/
 // anexo, quadros ilimitados e as 7 visões. recurringCards já era exclusivo do
 // Profissional antes disso; agora os cinco sobem juntos no mesmo degrau.
+//
+// beautyFinance (financeiro/comissão do módulo Xaphires Beauty) e
+// beautyOnlineBooking (link público de agendamento) seguem o mesmo desenho
+// de degrau dos campos acima, mapeados 1:1 nas fases do módulo: o núcleo
+// (clientes/serviços/agenda) é grátis em todo plano - só financeiro/equipe
+// (Fase 2) e agendamento online (Fase 4) são pagos.
 const DEFINICOES = {
-  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false },
-  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 53000, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false },
-  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 185000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true }, // null = ilimitado
-  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: 378000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true },
+  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false, beautyFinance: false, beautyOnlineBooking: false },
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 53000, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false, beautyFinance: true, beautyOnlineBooking: false },
+  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 185000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true }, // null = ilimitado
+  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: 378000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true },
 };
 
 // price derivado de priceCents num único lugar, para os dois nunca discordarem.
@@ -218,6 +224,22 @@ export function canUseTaskTicker(planId) {
 // arquivamento automático e do monitor de gargalos - a partir do Profissional.
 export function canUsePersonalPlanner(planId) {
   return getPlan(planId).personalPlanner === true;
+}
+
+// Direito ao financeiro (ledger de pagamento + comissão) e à gestão de
+// equipe do módulo Xaphires Beauty. A partir do Premium (intermediate) -
+// diferente dos direitos acima, que começam no Profissional: o núcleo do
+// Beauty (agenda) já é o produto vendido, financeiro é só o primeiro degrau
+// pago dele, não o topo.
+export function canUseBeautyFinance(planId) {
+  return getPlan(planId).beautyFinance === true;
+}
+
+// Direito ao link público de agendamento (Fase 4 do módulo) - a partir do
+// Profissional, mesmo degrau de autoArchive/recurringCards: é o recurso que
+// expõe a agenda para fora da empresa, faz sentido no topo da régua.
+export function canUseBeautyOnlineBooking(planId) {
+  return getPlan(planId).beautyOnlineBooking === true;
 }
 
 // Teto de anexo efetivo, em bytes. O gratuito fica com 10 MB e os pagos com 50; a

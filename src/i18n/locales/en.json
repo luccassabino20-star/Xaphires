@@ -92,14 +92,92 @@
       "tag": "Beauty & Aesthetics"
     },
     "xaphiresBeauty": {
-      "comingSoonTitle": "Under construction",
-      "comingSoonText": "Agenda, clients and finance for this module are coming in the next updates.",
-      "statClients": "{{count}} client registered",
-      "statClients_other": "{{count}} clients registered",
-      "statServices": "{{count}} service registered",
-      "statServices_other": "{{count}} services registered",
-      "statAppointments": "{{count}} appointment logged",
-      "statAppointments_other": "{{count}} appointments logged"
+      "tabs": {
+        "agenda": "Schedule",
+        "clientes": "Clients",
+        "servicos": "Services",
+        "financeiro": "Finance",
+        "equipe": "Team",
+        "online": "Online booking"
+      },
+      "clientes": {
+        "nome": "Name",
+        "telefone": "Phone",
+        "doc": "Tax ID",
+        "notas": "Notes",
+        "vazio": "No clients registered yet.",
+        "salvo": "Client saved",
+        "removido": "Client removed",
+        "confirmarRemover": "Remove client \"{{nome}}\"?"
+      },
+      "servicos": {
+        "nome": "Name",
+        "duracao": "Duration (min)",
+        "preco": "Price",
+        "vazio": "No services registered yet.",
+        "minutos": "{{count}} minute",
+        "minutos_other": "{{count}} minutes",
+        "salvo": "Service saved",
+        "removido": "Service removed",
+        "confirmarRemover": "Remove service \"{{nome}}\"?"
+      },
+      "equipe": {
+        "nome": "Name",
+        "cargo": "Role",
+        "comissao": "Commission (%)",
+        "vazio": "No team members registered yet.",
+        "salvo": "Team member saved",
+        "removido": "Team member removed",
+        "confirmarRemover": "Remove team member \"{{nome}}\"?",
+        "bloqueado": "Team management is available from the {{plano}} plan onward."
+      },
+      "agenda": {
+        "novo": "New appointment",
+        "escolherCliente": "Choose the client",
+        "escolherServico": "Choose the service",
+        "semPreferencia": "No professional preference",
+        "notas": "Notes",
+        "salvo": "Appointment created",
+        "horario": "Time",
+        "colCliente": "Client",
+        "colServico": "Service",
+        "colProfissional": "Professional",
+        "situacao": "Status",
+        "vazio": "No appointments on this day.",
+        "online": "Online",
+        "concluir": "Complete",
+        "cancelar": "Cancel",
+        "status": {
+          "agendado": "Scheduled",
+          "concluido": "Completed",
+          "cancelado": "Canceled"
+        }
+      },
+      "financeiro": {
+        "bloqueado": "Finance is available from the {{plano}} plan onward.",
+        "novoPagamento": "Log payment",
+        "escolherAtendimento": "Choose the appointment",
+        "valor": "Amount",
+        "metodos": {
+          "dinheiro": "Cash",
+          "pix": "Pix",
+          "cartao": "Card"
+        },
+        "salvo": "Payment logged",
+        "pagamentos": "Payments",
+        "data": "Date",
+        "metodo": "Method",
+        "vazio": "Nothing in this period.",
+        "comissoes": "Commission by professional",
+        "totalAtendido": "Total served",
+        "comissao": "Commission"
+      },
+      "online": {
+        "bloqueado": "Online booking is available from the {{plano}} plan onward.",
+        "explicacao": "Share this link so anyone can book a slot directly on your schedule, without calling ahead.",
+        "copiarLink": "Copy booking link",
+        "copiado": "Link copied"
+      }
     },
     "compras-estoque": {
       "name": "Purchasing & Inventory",

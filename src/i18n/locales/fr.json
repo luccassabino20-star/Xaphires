@@ -92,14 +92,92 @@
       "tag": "Beauté & Esthétique"
     },
     "xaphiresBeauty": {
-      "comingSoonTitle": "En construction",
-      "comingSoonText": "L'agenda, les clients et les finances de ce module arrivent dans les prochaines mises à jour.",
-      "statClients": "{{count}} client enregistré",
-      "statClients_other": "{{count}} clients enregistrés",
-      "statServices": "{{count}} service enregistré",
-      "statServices_other": "{{count}} services enregistrés",
-      "statAppointments": "{{count}} rendez-vous enregistré",
-      "statAppointments_other": "{{count}} rendez-vous enregistrés"
+      "tabs": {
+        "agenda": "Agenda",
+        "clientes": "Clients",
+        "servicos": "Services",
+        "financeiro": "Finances",
+        "equipe": "Équipe",
+        "online": "Réservation en ligne"
+      },
+      "clientes": {
+        "nome": "Nom",
+        "telefone": "Téléphone",
+        "doc": "N° fiscal",
+        "notas": "Notes",
+        "vazio": "Aucun client enregistré pour l'instant.",
+        "salvo": "Client enregistré",
+        "removido": "Client supprimé",
+        "confirmarRemover": "Supprimer le client \"{{nome}}\" ?"
+      },
+      "servicos": {
+        "nome": "Nom",
+        "duracao": "Durée (min)",
+        "preco": "Prix",
+        "vazio": "Aucun service enregistré pour l'instant.",
+        "minutos": "{{count}} minute",
+        "minutos_other": "{{count}} minutes",
+        "salvo": "Service enregistré",
+        "removido": "Service supprimé",
+        "confirmarRemover": "Supprimer le service \"{{nome}}\" ?"
+      },
+      "equipe": {
+        "nome": "Nom",
+        "cargo": "Fonction",
+        "comissao": "Commission (%)",
+        "vazio": "Aucun professionnel enregistré pour l'instant.",
+        "salvo": "Professionnel enregistré",
+        "removido": "Professionnel supprimé",
+        "confirmarRemover": "Supprimer le professionnel \"{{nome}}\" ?",
+        "bloqueado": "La gestion d'équipe est disponible à partir du forfait {{plano}}."
+      },
+      "agenda": {
+        "novo": "Nouveau rendez-vous",
+        "escolherCliente": "Choisir le client",
+        "escolherServico": "Choisir le service",
+        "semPreferencia": "Aucune préférence de professionnel",
+        "notas": "Notes",
+        "salvo": "Rendez-vous créé",
+        "horario": "Heure",
+        "colCliente": "Client",
+        "colServico": "Service",
+        "colProfissional": "Professionnel",
+        "situacao": "Statut",
+        "vazio": "Aucun rendez-vous ce jour-là.",
+        "online": "En ligne",
+        "concluir": "Terminer",
+        "cancelar": "Annuler",
+        "status": {
+          "agendado": "Planifié",
+          "concluido": "Terminé",
+          "cancelado": "Annulé"
+        }
+      },
+      "financeiro": {
+        "bloqueado": "Les finances sont disponibles à partir du forfait {{plano}}.",
+        "novoPagamento": "Enregistrer un paiement",
+        "escolherAtendimento": "Choisir le rendez-vous",
+        "valor": "Montant",
+        "metodos": {
+          "dinheiro": "Espèces",
+          "pix": "Pix",
+          "cartao": "Carte"
+        },
+        "salvo": "Paiement enregistré",
+        "pagamentos": "Paiements",
+        "data": "Date",
+        "metodo": "Méthode",
+        "vazio": "Rien sur cette période.",
+        "comissoes": "Commission par professionnel",
+        "totalAtendido": "Total encaissé",
+        "comissao": "Commission"
+      },
+      "online": {
+        "bloqueado": "La réservation en ligne est disponible à partir du forfait {{plano}}.",
+        "explicacao": "Partagez ce lien pour que n'importe qui puisse réserver un créneau directement dans votre agenda, sans avoir à appeler d'abord.",
+        "copiarLink": "Copier le lien de réservation",
+        "copiado": "Lien copié"
+      }
     },
     "compras-estoque": {
       "name": "Achats & Stocks",

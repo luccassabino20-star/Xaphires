@@ -14,6 +14,8 @@ import {
   canUseBottleneckMonitor,
   canUseTaskTicker,
   canUsePersonalPlanner,
+  canUseBeautyFinance,
+  canUseBeautyOnlineBooking,
   attachmentLimitFor,
   maxUsersFor,
   maxBoardsFor,
@@ -70,6 +72,8 @@ function resumo(companyId) {
     canUseBottleneckMonitor: canUseBottleneckMonitor(company?.plan),
     canUseTaskTicker: canUseTaskTicker(company?.plan),
     canUsePersonalPlanner: canUsePersonalPlanner(company?.plan),
+    canUseBeautyFinance: canUseBeautyFinance(company?.plan),
+    canUseBeautyOnlineBooking: canUseBeautyOnlineBooking(company?.plan),
     maxAttachmentBytes: attachmentLimitFor(company),
     // Catálogo com a decisão de autoatendimento já resolvida no servidor, para o
     // cliente não reimplementar a regra e as duas pontas discordarem. price aqui

@@ -1,35 +1,36 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "../../state/ToastContext.jsx";
-import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import AccountMenu from "../../components/AccountMenu.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import ModuleIcon from "../ModuleIcon.jsx";
+import BeautyAgendaView from "./BeautyAgendaView.jsx";
+import BeautyClientsView from "./BeautyClientsView.jsx";
+import BeautyServicesView from "./BeautyServicesView.jsx";
+import BeautyFinanceView from "./BeautyFinanceView.jsx";
+import BeautyStaffView from "./BeautyStaffView.jsx";
+import BeautyBookingLinkView from "./BeautyBookingLinkView.jsx";
 
-// Casca do módulo Xaphires Beauty (Fase 0 do plano) - mesma estrutura de
-// cabeçalho de SaudeClinicasModule.jsx (botão de voltar + marca + idioma/
-// conta), mas sem sidebar/seções ainda: não há CRUD real por trás até a
-// Fase 1 (clientes/serviços/agenda). O resumo que aparece abaixo vem da
-// rota real (GET /api/xaphires-beauty/config -> repo.js -> tabelas
-// criadas em schema.js), só pra provar que o caminho inteiro (banco ->
-// rota -> tela) já funciona - não é dado de mentira.
+// Casca do módulo com abas reais (Fases 1-4 do plano) - mesmo molde de
+// CrmModule.jsx (cabeçalho + nav de abas, sem sidebar). O direito de plano
+// (GET /api/plan) é buscado uma vez aqui e passado às abas que ele gate:
+// financeiro/equipe (Premium+) e agendamento online (Profissional+). O
+// núcleo (agenda/clientes/serviços) não depende de plano - é o produto
+// vendido em todo tier, mesmo espírito do "arquivamento manual em todos os
+// planos, só a automação é paga" em plans.js.
+const ABAS = ["agenda", "clientes", "servicos", "financeiro", "equipe", "online"];
+
 export default function XaphiresBeautyModule({ onExit }) {
   const { t } = useTranslation();
-  const showToast = useToast();
-  const [summary, setSummary] = useState(null);
+  const [aba, setAba] = useState("agenda");
+  const [plano, setPlano] = useState(null);
 
   useEffect(() => {
-    let vivo = true;
-    api
-      .xbGetConfig()
-      .then((data) => vivo && setSummary(data))
-      .catch((err) => showToast(translateError(err, t)));
-    return () => {
-      vivo = false;
-    };
-    // eslint-disable-next-line
+    api.getPlan().then(setPlano).catch(() => setPlano({ canUseBeautyFinance: false, canUseBeautyOnlineBooking: false }));
   }, []);
+
+  const canUseFinance = !!plano?.canUseBeautyFinance;
+  const canUseOnlineBooking = !!plano?.canUseBeautyOnlineBooking;
 
   return (
     <div className="beauty-shell">
@@ -51,17 +52,25 @@ export default function XaphiresBeautyModule({ onExit }) {
         </div>
       </header>
 
-      <div className="beauty-empty">
-        <ModuleIcon name="beauty" size={40} />
-        <h2>{t("modules.xaphiresBeauty.comingSoonTitle")}</h2>
-        <p>{t("modules.xaphiresBeauty.comingSoonText")}</p>
-        {summary && (
-          <div className="beauty-empty-stats">
-            <span>{t("modules.xaphiresBeauty.statClients", { count: summary.clients })}</span>
-            <span>{t("modules.xaphiresBeauty.statServices", { count: summary.services })}</span>
-            <span>{t("modules.xaphiresBeauty.statAppointments", { count: summary.appointments })}</span>
-          </div>
-        )}
+      <nav className="crm-tabs">
+        {ABAS.map((id) => {
+          const bloqueada = (id === "financeiro" && !canUseFinance) || (id === "equipe" && !canUseFinance) || (id === "online" && !canUseOnlineBooking);
+          return (
+            <button key={id} type="button" className={"crm-tab" + (aba === id ? " active" : "")} onClick={() => setAba(id)}>
+              {t(`modules.xaphiresBeauty.tabs.${id}`)}
+              {bloqueada && plano && <span className="crm-tab-badge">{t(`plan.names.${id === "online" ? "professional" : "intermediate"}`)}</span>}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="sc-body">
+        {aba === "agenda" && <BeautyAgendaView />}
+        {aba === "clientes" && <BeautyClientsView />}
+        {aba === "servicos" && <BeautyServicesView />}
+        {aba === "financeiro" && plano && <BeautyFinanceView canUse={canUseFinance} />}
+        {aba === "equipe" && plano && (canUseFinance ? <BeautyStaffView /> : <div className="sc-empty" style={{ padding: 40 }}>{t("modules.xaphiresBeauty.equipe.bloqueado", { plano: t("plan.names.intermediate") })}</div>)}
+        {aba === "online" && plano && <BeautyBookingLinkView canUse={canUseOnlineBooking} />}
       </div>
     </div>
   );

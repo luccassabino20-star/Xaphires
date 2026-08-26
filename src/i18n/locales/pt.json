@@ -92,14 +92,92 @@
       "tag": "Beleza & Estética"
     },
     "xaphiresBeauty": {
-      "comingSoonTitle": "Em construção",
-      "comingSoonText": "A agenda, os clientes e o financeiro deste módulo chegam nas próximas atualizações.",
-      "statClients": "{{count}} cliente cadastrado",
-      "statClients_other": "{{count}} clientes cadastrados",
-      "statServices": "{{count}} serviço cadastrado",
-      "statServices_other": "{{count}} serviços cadastrados",
-      "statAppointments": "{{count}} agendamento registrado",
-      "statAppointments_other": "{{count}} agendamentos registrados"
+      "tabs": {
+        "agenda": "Agenda",
+        "clientes": "Clientes",
+        "servicos": "Serviços",
+        "financeiro": "Financeiro",
+        "equipe": "Equipe",
+        "online": "Agendamento online"
+      },
+      "clientes": {
+        "nome": "Nome",
+        "telefone": "Telefone",
+        "doc": "CPF/CNPJ",
+        "notas": "Notas",
+        "vazio": "Nenhum cliente cadastrado ainda.",
+        "salvo": "Cliente salvo",
+        "removido": "Cliente removido",
+        "confirmarRemover": "Remover o cliente \"{{nome}}\"?"
+      },
+      "servicos": {
+        "nome": "Nome",
+        "duracao": "Duração (min)",
+        "preco": "Preço (R$)",
+        "vazio": "Nenhum serviço cadastrado ainda.",
+        "minutos": "{{count}} minuto",
+        "minutos_other": "{{count}} minutos",
+        "salvo": "Serviço salvo",
+        "removido": "Serviço removido",
+        "confirmarRemover": "Remover o serviço \"{{nome}}\"?"
+      },
+      "equipe": {
+        "nome": "Nome",
+        "cargo": "Cargo",
+        "comissao": "Comissão (%)",
+        "vazio": "Nenhum profissional cadastrado ainda.",
+        "salvo": "Profissional salvo",
+        "removido": "Profissional removido",
+        "confirmarRemover": "Remover o profissional \"{{nome}}\"?",
+        "bloqueado": "A gestão de equipe está disponível a partir do plano {{plano}}."
+      },
+      "agenda": {
+        "novo": "Novo agendamento",
+        "escolherCliente": "Escolha o cliente",
+        "escolherServico": "Escolha o serviço",
+        "semPreferencia": "Sem preferência de profissional",
+        "notas": "Notas",
+        "salvo": "Agendamento criado",
+        "horario": "Horário",
+        "colCliente": "Cliente",
+        "colServico": "Serviço",
+        "colProfissional": "Profissional",
+        "situacao": "Situação",
+        "vazio": "Nenhum agendamento neste dia.",
+        "online": "Online",
+        "concluir": "Concluir",
+        "cancelar": "Cancelar",
+        "status": {
+          "agendado": "Agendado",
+          "concluido": "Concluído",
+          "cancelado": "Cancelado"
+        }
+      },
+      "financeiro": {
+        "bloqueado": "O financeiro está disponível a partir do plano {{plano}}.",
+        "novoPagamento": "Registrar pagamento",
+        "escolherAtendimento": "Escolha o atendimento",
+        "valor": "Valor (R$)",
+        "metodos": {
+          "dinheiro": "Dinheiro",
+          "pix": "Pix",
+          "cartao": "Cartão"
+        },
+        "salvo": "Pagamento registrado",
+        "pagamentos": "Pagamentos",
+        "data": "Data",
+        "metodo": "Método",
+        "vazio": "Nada neste período.",
+        "comissoes": "Comissão por profissional",
+        "totalAtendido": "Total atendido",
+        "comissao": "Comissão"
+      },
+      "online": {
+        "bloqueado": "O agendamento online está disponível a partir do plano {{plano}}.",
+        "explicacao": "Compartilhe este link para que qualquer pessoa marque um horário direto na sua agenda, sem precisar te chamar antes.",
+        "copiarLink": "Copiar link de agendamento",
+        "copiado": "Link copiado"
+      }
     },
     "compras-estoque": {
       "name": "Compras & Estoque",

@@ -92,14 +92,92 @@
       "tag": "Beauty & Ästhetik"
     },
     "xaphiresBeauty": {
-      "comingSoonTitle": "Im Aufbau",
-      "comingSoonText": "Terminplanung, Kunden und Finanzen für dieses Modul kommen in den nächsten Updates.",
-      "statClients": "{{count}} Kunde erfasst",
-      "statClients_other": "{{count}} Kunden erfasst",
-      "statServices": "{{count}} Leistung erfasst",
-      "statServices_other": "{{count}} Leistungen erfasst",
-      "statAppointments": "{{count}} Termin erfasst",
-      "statAppointments_other": "{{count}} Termine erfasst"
+      "tabs": {
+        "agenda": "Terminplan",
+        "clientes": "Kunden",
+        "servicos": "Leistungen",
+        "financeiro": "Finanzen",
+        "equipe": "Team",
+        "online": "Online-Buchung"
+      },
+      "clientes": {
+        "nome": "Name",
+        "telefone": "Telefon",
+        "doc": "Steuer-ID",
+        "notas": "Notizen",
+        "vazio": "Noch keine Kunden erfasst.",
+        "salvo": "Kunde gespeichert",
+        "removido": "Kunde entfernt",
+        "confirmarRemover": "Kunde \"{{nome}}\" entfernen?"
+      },
+      "servicos": {
+        "nome": "Name",
+        "duracao": "Dauer (Min.)",
+        "preco": "Preis",
+        "vazio": "Noch keine Leistungen erfasst.",
+        "minutos": "{{count}} Minute",
+        "minutos_other": "{{count}} Minuten",
+        "salvo": "Leistung gespeichert",
+        "removido": "Leistung entfernt",
+        "confirmarRemover": "Leistung \"{{nome}}\" entfernen?"
+      },
+      "equipe": {
+        "nome": "Name",
+        "cargo": "Funktion",
+        "comissao": "Provision (%)",
+        "vazio": "Noch keine Teammitglieder erfasst.",
+        "salvo": "Teammitglied gespeichert",
+        "removido": "Teammitglied entfernt",
+        "confirmarRemover": "Teammitglied \"{{nome}}\" entfernen?",
+        "bloqueado": "Die Teamverwaltung ist ab dem Tarif {{plano}} verfügbar."
+      },
+      "agenda": {
+        "novo": "Neuer Termin",
+        "escolherCliente": "Kunde auswählen",
+        "escolherServico": "Leistung auswählen",
+        "semPreferencia": "Keine Präferenz für Fachkraft",
+        "notas": "Notizen",
+        "salvo": "Termin erstellt",
+        "horario": "Uhrzeit",
+        "colCliente": "Kunde",
+        "colServico": "Leistung",
+        "colProfissional": "Fachkraft",
+        "situacao": "Status",
+        "vazio": "Keine Termine an diesem Tag.",
+        "online": "Online",
+        "concluir": "Abschließen",
+        "cancelar": "Stornieren",
+        "status": {
+          "agendado": "Geplant",
+          "concluido": "Abgeschlossen",
+          "cancelado": "Storniert"
+        }
+      },
+      "financeiro": {
+        "bloqueado": "Finanzen sind ab dem Tarif {{plano}} verfügbar.",
+        "novoPagamento": "Zahlung erfassen",
+        "escolherAtendimento": "Termin auswählen",
+        "valor": "Betrag",
+        "metodos": {
+          "dinheiro": "Bar",
+          "pix": "Pix",
+          "cartao": "Karte"
+        },
+        "salvo": "Zahlung erfasst",
+        "pagamentos": "Zahlungen",
+        "data": "Datum",
+        "metodo": "Methode",
+        "vazio": "In diesem Zeitraum nichts vorhanden.",
+        "comissoes": "Provision je Fachkraft",
+        "totalAtendido": "Gesamtumsatz",
+        "comissao": "Provision"
+      },
+      "online": {
+        "bloqueado": "Die Online-Buchung ist ab dem Tarif {{plano}} verfügbar.",
+        "explicacao": "Teilen Sie diesen Link, damit jeder direkt in Ihrem Terminplan einen Termin buchen kann, ohne vorher anzurufen.",
+        "copiarLink": "Buchungslink kopieren",
+        "copiado": "Link kopiert"
+      }
     },
     "compras-estoque": {
       "name": "Einkauf & Lager",

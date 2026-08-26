@@ -25,6 +25,7 @@ import { router as saudeClinicasRouter } from "./modules/saude-clinicas/routes.j
 import { router as crmRouter } from "./modules/crm/routes.js";
 import { router as xaphiresBeautyRouter } from "./modules/xaphires-beauty/routes.js";
 import { router as anamnesePublicaRouter } from "./routes/anamnesePublica.js";
+import { router as xaphiresBeautyPublicaRouter } from "./routes/xaphiresBeautyPublica.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as personalTasksRouter } from "./routes/personalTasks.js";
 import { router as billingRouter } from "./routes/billing.js";
@@ -91,6 +92,10 @@ app.use("/api/billing/webhook", billingWebhookRouter);
 // WhatsApp pode não mandar Origin/Referer, e não há cookie de sessão para o
 // verifyOrigin proteger aqui. Ver o comentário no topo do arquivo da rota.
 app.use("/api/public/anamnese", anamnesePublicaRouter);
+
+// Formulário público de agendamento do Xaphires Beauty (Fase 4): mesmo
+// motivo acima - visitante sem sessão, sem Origin/Referer garantido.
+app.use("/api/public/xaphires-beauty", xaphiresBeautyPublicaRouter);
 
 app.use("/api", verifyOrigin);
 

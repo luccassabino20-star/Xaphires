@@ -8680,7 +8680,7 @@ body.sc-pub-body { overflow: auto; }
   .sc-patient-grid { grid-template-columns: 1fr; }
 }
 
-/* ---------- Xaphires Beauty (Fase 0: só a casca) ---------- */
+/* ---------- Xaphires Beauty ---------- */
 .beauty-shell { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--bg-column); color: var(--text-primary); }
 .beauty-top {
   display: flex;
@@ -8693,27 +8693,16 @@ body.sc-pub-body { overflow: auto; }
 .beauty-top-left { display: flex; align-items: center; gap: 12px; }
 .beauty-top-actions { display: flex; align-items: center; gap: 12px; }
 .beauty-brand { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: var(--accent); }
-.beauty-empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 40px 24px;
-  text-align: center;
-  color: var(--text-muted);
-}
-.beauty-empty svg { color: var(--accent); }
-.beauty-empty h2 { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 6px 0 0; }
-.beauty-empty p { font-size: 13.5px; max-width: 380px; margin: 0; }
-.beauty-empty-stats { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; justify-content: center; }
-.beauty-empty-stats span {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 999px;
-  padding: 6px 14px;
+/* Subtítulo de subseção dentro de uma aba (ex.: "Pagamentos"/"Comissão por
+   profissional" em BeautyFinanceView.jsx) - genérico o bastante para outras
+   abas reaproveitarem, por isso sem prefixo beauty-. */
+.sc-subtitle { font-size: 14px; font-weight: 700; margin: 22px 0 10px; color: var(--text-primary); }
+.sc-subtitle:first-of-type { margin-top: 4px; }
+.xb-online-intro { font-size: 13.5px; color: var(--text-secondary); max-width: 480px; margin: 0 0 4px; }
+/* select/time dentro do formulário público (.sc-pub-campo) - a regra
+   original em ContatosView/AnamneseFormularioEtapas só cobria os tipos de
+   input que a anamnese usa; o agendamento público também precisa de
+   <select> (serviço/profissional) e de hora. */
+.sc-pub-campo select, .sc-pub-campo input[type="time"] {
+  width: 100%; padding: 9px 11px; font-size: 14px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px;
 }

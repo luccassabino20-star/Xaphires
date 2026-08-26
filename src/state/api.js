@@ -811,7 +811,41 @@ export async function baixarRelatorio({ formato, lang, ...filtros }) {
 }
 
 // ---------- Xaphires Beauty ----------
-// Prefixo xb*, mesmo padrão do sc* de Saúde & Clínicas. Fase 0: só a casca
-// (contagens do resumo) - CRUD de clientes/serviços/agendamentos chega na
-// Fase 1.
+// Prefixo xb*, mesmo padrão do sc* de Saúde & Clínicas.
 export const xbGetConfig = () => request("/xaphires-beauty/config");
+
+// Clientes
+export const xbGetClients = () => request("/xaphires-beauty/clients");
+export const xbCreateClient = (data) => request("/xaphires-beauty/clients", { method: "POST", body: data });
+export const xbUpdateClient = (id, data) => request(`/xaphires-beauty/clients/${id}`, { method: "PATCH", body: data });
+export const xbDeleteClient = (id) => request(`/xaphires-beauty/clients/${id}`, { method: "DELETE" });
+
+// Serviços
+export const xbGetServices = () => request("/xaphires-beauty/services");
+export const xbCreateService = (data) => request("/xaphires-beauty/services", { method: "POST", body: data });
+export const xbUpdateService = (id, data) => request(`/xaphires-beauty/services/${id}`, { method: "PATCH", body: data });
+export const xbDeleteService = (id) => request(`/xaphires-beauty/services/${id}`, { method: "DELETE" });
+
+// Agenda
+export const xbGetAppointments = (from, to) => request(`/xaphires-beauty/appointments?from=${from}&to=${to}`);
+export const xbCreateAppointment = (data) => request("/xaphires-beauty/appointments", { method: "POST", body: data });
+export const xbSetAppointmentStatus = (id, status) =>
+  request(`/xaphires-beauty/appointments/${id}/status`, { method: "PATCH", body: { status } });
+
+// Profissionais + financeiro (Premium+)
+export const xbGetStaff = () => request("/xaphires-beauty/staff");
+export const xbCreateStaff = (data) => request("/xaphires-beauty/staff", { method: "POST", body: data });
+export const xbUpdateStaff = (id, data) => request(`/xaphires-beauty/staff/${id}`, { method: "PATCH", body: data });
+export const xbDeleteStaff = (id) => request(`/xaphires-beauty/staff/${id}`, { method: "DELETE" });
+
+export const xbGetPayments = (from, to) => request(`/xaphires-beauty/payments?from=${from}&to=${to}`);
+export const xbCreatePayment = (data) => request("/xaphires-beauty/payments", { method: "POST", body: data });
+
+export const xbGetCommissions = (from, to) => request(`/xaphires-beauty/commissions?from=${from}&to=${to}`);
+
+// Link público de agendamento (Profissional+)
+export const xbGetBookingLink = () => request("/xaphires-beauty/booking-link");
+
+// Formulário público (sem sessão) - visitante marcando o próprio horário.
+export const xbPublicGetBooking = (slug) => request(`/public/xaphires-beauty/${slug}`);
+export const xbPublicCreateBooking = (slug, data) => request(`/public/xaphires-beauty/${slug}`, { method: "POST", body: data });
