@@ -12,7 +12,6 @@ import TeamPanel from "./TeamPanel.jsx";
 import PersonalPlanner from "./PersonalPlanner.jsx";
 import PlanModal from "./PlanModal.jsx";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
-import ThemeToggle from "./ThemeToggle.jsx";
 import AccountMenu from "./AccountMenu.jsx";
 import ArchiveModal from "./ArchiveModal.jsx";
 import BottlenecksModal from "./BottlenecksModal.jsx";
@@ -502,7 +501,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
           >
             <div className="dsb-more-utilities">
               <LanguageSwitcher className="dsb-utility-btn" />
-              <ThemeToggle className="dsb-utility-btn" />
             </div>
             <div className="dropdown-divider" />
             <div

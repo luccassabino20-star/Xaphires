@@ -1,44 +1,18 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
 
-const STORAGE_KEY = "kanban-theme";
 const ThemeContext = createContext(null);
 
-// Sem escolha salva, o padrão do app é o branco - não "system". Landing e login
-// não têm toggle e ignoram esse valor por completo (são sempre brancos, CSS
-// próprio em .landing-shell/.auth-shell, sem bloco guardado por data-theme) -
-// só o app autenticado (ThemeToggle, na Sidebar) lê e grava aqui.
-function getStoredTheme() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "light" || stored === "dark" || stored === "system") return stored;
-  } catch {
-    /* localStorage unavailable */
-  }
-  return "light";
-}
-
+// A plataforma é só clara (decisão do cliente: sem tema escuro). O provider
+// continua existindo só para não precisar tocar nos vários pontos da árvore
+// que envolvem a página com <ThemeProvider> (App autenticado, GanttChartDemo,
+// as páginas públicas) - ele grava data-theme="light" uma vez e pronto, sem
+// estado, sem localStorage, sem opção de trocar. Ver o comentário no topo de
+// index.css sobre a remoção dos blocos de tema escuro.
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(getStoredTheme);
-
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "system") {
-      root.removeAttribute("data-theme");
-    } else {
-      root.setAttribute("data-theme", theme);
-    }
-  }, [theme]);
-
-  function setTheme(next) {
-    setThemeState(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      /* localStorage unavailable */
-    }
-  }
-
-  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
+    document.documentElement.setAttribute("data-theme", "light");
+  }, []);
+  return <ThemeContext.Provider value={{ theme: "light" }}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

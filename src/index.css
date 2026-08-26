@@ -14,9 +14,6 @@
   --accent-hover: #26262c;
   --danger: #b3444a;
   --danger-hover: #9c3a40;
-  /* Verde de "concluído/ok": checkbox do cartão, barra de checklist, painel.
-     Tem valor por tema porque um verde que brilha no fundo preto fica lavado no
-     branco — no claro o tom precisa ser mais fechado para manter contraste. */
   --success: #16a34a;
   --shadow-card: 0 1px 1px rgba(20,22,30,0.03), 0 2px 5px rgba(20,22,30,0.06);
   --shadow-card-hover: 0 2px 4px rgba(20,22,30,0.05), 0 8px 18px rgba(20,22,30,0.10);
@@ -36,90 +33,6 @@
   --status-pill-bg: #f0f1f3;
   --status-pill-text: #616161;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-/* O dark do app usa a mesma base quase-preta da landing e do login, para não haver
-   salto de tom ao entrar. Os degraus entre app > lista > cartão são mais curtos que
-   os da landing de propósito: lá --bg-list e --bg-card podem ser iguais porque são
-   superfícies isoladas, aqui um cartão fica DENTRO de uma lista e precisa se separar
-   dela. Qualquer alteração aqui precisa ser repetida no bloco :root[data-theme="dark"]
-   logo abaixo — os dois definem o mesmo tema, um para o sistema e outro para a
-   escolha explícita do usuário. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-app: #050505;
-    --bg-topbar: #0d0d0d;
-    --bg-list: #131313;
-    --bg-column: #131313;
-    --bg-card: #1e1e1e;
-    --bg-card-hover: #2a2a2a;
-    --border-subtle: #262626;
-    --border-strong: #3d3d3d;
-    --text-primary: #f0f0f0;
-    --text-secondary: #a3a3a3;
-    --text-muted: #737373;
-    --accent: #e5e5e5;
-    --accent-hover: #ffffff;
-    --success: #22c55e;
-    --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.25);
-    --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
-    --shadow-list: 0 1px 3px rgba(0,0,0,0.2);
-    --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
-    --list-border: #262626;
-    --card-border: #2e2e2e;
-    --status-pill-bg: #2a2a2a;
-    --status-pill-text: #a3a3a3;
-  }
-}
-
-/* Explicit user choice always wins over the OS preference above */
-:root[data-theme="dark"] {
-  --bg-app: #050505;
-  --bg-topbar: #0d0d0d;
-  --bg-list: #131313;
-  --bg-column: #131313;
-  --bg-card: #1e1e1e;
-  --bg-card-hover: #2a2a2a;
-  --border-subtle: #262626;
-  --border-strong: #3d3d3d;
-  --text-primary: #f0f0f0;
-  --text-secondary: #a3a3a3;
-  --text-muted: #737373;
-  --accent: #e5e5e5;
-  --accent-hover: #ffffff;
-  --success: #22c55e;
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.25);
-  --shadow-card-hover: 0 4px 10px rgba(0,0,0,0.35), 0 10px 22px rgba(0,0,0,0.3);
-  --shadow-list: 0 1px 3px rgba(0,0,0,0.2);
-  --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
-  --list-border: #262626;
-  --card-border: #2e2e2e;
-  --status-pill-bg: #2a2a2a;
-  --status-pill-text: #a3a3a3;
-}
-:root[data-theme="light"] {
-  --bg-app: #dee2e8;
-  --bg-topbar: #ffffff;
-  --bg-list: #e6e9ed;
-  --bg-column: #f7f8f9;
-  --bg-card: #ffffff;
-  --bg-card-hover: #ffffff;
-  --border-subtle: #ced3da;
-  --border-strong: #b7bdc7;
-  --text-primary: #1c1e26;
-  --text-secondary: #666b76;
-  --text-muted: #969ba5;
-  --accent: #3d3d46;
-  --accent-hover: #26262c;
-  --success: #16a34a;
-  --shadow-card: 0 1px 1px rgba(20,22,30,0.03), 0 2px 5px rgba(20,22,30,0.06);
-  --shadow-card-hover: 0 2px 4px rgba(20,22,30,0.05), 0 8px 18px rgba(20,22,30,0.10);
-  --shadow-list: 0 1px 2px rgba(20,22,30,0.04);
-  --shadow-modal: 0 20px 50px rgba(0,0,0,0.25);
-  --list-border: #eaeaea;
-  --card-border: #e0e0e0;
-  --status-pill-bg: #f0f1f3;
-  --status-pill-text: #616161;
 }
 
 * { box-sizing: border-box; }
@@ -299,10 +212,8 @@ input, textarea { font-family: inherit; }
    dentro do flyout do "Mais" (ver .dsb-more-dropdown, mais abaixo, e o botão
    em Sidebar.jsx) - a conta virou o próprio topo do rail escuro (ver
    .dsb-rail-top .account-menu-btn). Cor fixa pra funcionar em cima do fundo
-   sempre branco do flyout, independente do tema claro/escuro do resto do
-   app (LanguageSwitcher/ThemeToggle usam .icon-btn, que segue
-   var(--text-secondary) por padrão - no tema escuro isso ficaria claro
-   demais pra ler num fundo sempre branco). */
+   sempre branco do flyout (LanguageSwitcher usa .icon-btn, que segue
+   var(--text-secondary) por padrão). */
 .dsb-utility-btn {
   position: relative;
   width: 28px;
@@ -319,10 +230,10 @@ input, textarea { font-family: inherit; }
 .dsb-utility-btn:hover { background: #f5f5f5; color: #1a1a1a; }
 .dsb-utility-badge { position: absolute; top: 1px; right: 1px; min-width: 14px; height: 14px; padding: 0 3px; font-size: 9px; }
 
-/* Flyout do botão "Mais" do rail (bate-papo/idioma/tema, e o painel da
+/* Flyout do botão "Mais" do rail (bate-papo/idioma, e o painel da
    plataforma para quem administra). Duas classes de propósito (especifi-
-   cidade 0,2,0) pra vencer .dropdown/.theme-dropdown/.language-dropdown sem
-   depender de ordem no arquivo - mesmo truque de .dsb-panel-utilities antes.
+   cidade 0,2,0) pra vencer .dropdown/.language-dropdown sem depender de
+   ordem no arquivo - mesmo truque de .dsb-panel-utilities antes.
    Fundo sempre branco (não var(--bg-topbar)): o flyout carrega os mesmos
    controles do painel, que são sempre claros, mas ele mesmo é portado pra
    document.body e herdaria a cor do tema do resto do app se não fosse fixo. */
@@ -1646,12 +1557,6 @@ input, textarea { font-family: inherit; }
   box-shadow: var(--shadow-card);
 }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--bg-topbar); color: var(--text-primary); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .map-view-canvas .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9); }
-  :root:not([data-theme="light"]) .beauty-minimap .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9); }
-}
-:root[data-theme="dark"] .map-view-canvas .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9); }
-:root[data-theme="dark"] .beauty-minimap .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9); }
 
 .empty-state {
   flex: 1;
@@ -2066,7 +1971,6 @@ img.avatar { object-fit: cover; padding: 0; }
   transition: background 0.12s ease, color 0.12s ease;
 }
 .add-card-btn:hover { background: var(--list-accent-bg, rgba(0,0,0,0.06)); }
-@media (prefers-color-scheme: dark) { .add-card-btn:hover { background: var(--list-accent-bg, rgba(255,255,255,0.08)); } }
 
 .add-list-btn {
   background: var(--bg-card);
@@ -2180,12 +2084,8 @@ img.avatar { object-fit: cover; padding: 0; }
 .data-menu-back { font-weight: 700; color: var(--text-primary); }
 .data-menu-back svg { flex-shrink: 0; }
 
-/* ---------- Theme toggle ---------- */
-.theme-toggle { position: relative; }
-.theme-dropdown { right: 0; left: auto; min-width: 160px; }
 .language-switcher { position: relative; }
 .language-dropdown { right: 0; left: auto; min-width: 150px; }
-.theme-check { margin-left: auto; color: var(--accent); }
 .auth-theme-toggle { position: absolute; top: 20px; right: 20px; z-index: 10; }
 .auth-toolbar { display: flex; align-items: center; gap: 8px; }
 .auth-back-btn {
@@ -4479,15 +4379,12 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   justify-content: center;
 }
 
-/* ---------- Landing e login: sempre claro, sem opção de escuro ---------- */
-/* Landing e tela de login são sempre branco neve, independente do
-   data-theme="dark" que o toggle do app (Sidebar/ThemeToggle) grava em <html> -
-   por isso as variáveis aqui NÃO têm bloco :root[data-theme="dark"] guardado
-   como o resto do app tem. Sem essa independência, alguém que escolhesse escuro
-   dentro do app e depois saísse (ou visse a tela de login) ficaria preso no
-   escuro na landing, sem toggle nenhum ali pra desfazer. Branco neve é decisão
-   de marca (pedido do cliente, referência viverdeia.ai), não é o padrão do
-   sistema operacional - por isso color-scheme fica travado em "light" também. */
+/* ---------- Landing e login: sempre claro ---------- */
+/* Landing e tela de login são sempre branco neve - decisão de marca (pedido
+   do cliente, referência viverdeia.ai). A plataforma inteira só tem o tema
+   claro (ver ThemeContext.jsx), então esse branco neve é hoje o mesmo em
+   toda parte - color-scheme fica travado em "light" mesmo assim, por ser
+   uma decisão de marca e não um reflexo de configuração de tema. */
 .landing-shell,
 .auth-shell {
   --bg-app: #f7f8fa;
@@ -5228,13 +5125,12 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .promo-popup { padding-bottom: 18px; }
 
 /* ---------- Login: superfícies e fundo blueprint ---------- */
-/* A paleta da landing serve para uma página de leitura, onde --bg-list e --bg-card
-   são ambos #171717 (dark) ou #ffffff (claro). O login tem componentes empilhados
-   (card > trilho de abas > aba ativa > input) e precisa de uma escala com degraus
-   distintos, senão a aba ativa some contra o trilho. Estes valores redefinem só
-   esses degraus; o resto da paleta continua vindo da regra compartilhada com a
-   landing. Sem guarda de data-theme="dark": a tela de login não tem opção de
-   escuro (ver o comentário da landing, mais acima), então só existe este valor. */
+/* A paleta da landing serve para uma página de leitura, onde --bg-list e
+   --bg-card são ambos #ffffff. O login tem componentes empilhados (card >
+   trilho de abas > aba ativa > input) e precisa de uma escala com degraus
+   distintos, senão a aba ativa some contra o trilho. Estes valores redefinem
+   só esses degraus; o resto da paleta continua vindo da regra compartilhada
+   com a landing. */
 .auth-shell {
   --bg-topbar: #ffffff;   /* card do formulário, um passo acima da página */
   --bg-list: #f1f2f4;     /* trilho das abas, recuado dentro do card */
@@ -6981,14 +6877,8 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 
 /* ---------- Módulo Financeiro ---------- */
 /* Par de cores das séries do fluxo (entradas azul / saídas laranja), validado
-   para daltonismo pela skill dataviz. Definido nos quatro blocos de tema como o
-   resto: base claro, dark do sistema, e as duas escolhas explícitas. */
+   para daltonismo pela skill dataviz. */
 :root { --fin-entrada: #2a78d6; --fin-saida: #eb6834; }
-@media (prefers-color-scheme: dark) {
-  :root { --fin-entrada: #3987e5; --fin-saida: #d95926; }
-}
-:root[data-theme="dark"] { --fin-entrada: #3987e5; --fin-saida: #d95926; }
-:root[data-theme="light"] { --fin-entrada: #2a78d6; --fin-saida: #eb6834; }
 
 .fin {
   /* Altura fixa da viewport, não min-height: o app é body:overflow-hidden (cada
@@ -7640,19 +7530,17 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   --bg-topbar: #faf7fe; --bg-list: #efe6fb; --bg-column: #f6f2fd; --bg-card: #ffffff; --bg-card-hover: #f8f3ff;
   --border-subtle: #e4d4f7; --border-strong: #cfb0ee;
 }
-/* "Modo Escuro" do módulo é independente da preferência de tema do app (uma
-   pessoa pode estar no app claro e ainda assim ter a clínica configurada
-   pra escuro, ou vice-versa) - por isso é uma paleta própria, cópia dos
-   mesmos tons de :root[data-theme="dark"] (ver topo do arquivo), não um
-   "seguir o tema do app". */
+/* "Modo Escuro" do módulo é uma escolha de marca por clínica (a plataforma
+   em si só tem o tema claro - ver ThemeContext.jsx), então é uma paleta
+   própria e autocontida, não algo derivado de um tema global. */
 .sc[data-sc-theme="escuro"] {
   /* --bg-app entra aqui só porque .btn-primary usa var(--bg-app) como cor do
-     texto (contraste garantido contra --accent nos dois temas do app - ver
-     a regra em .btn-primary) - sem isso o botão ficava com texto quase
-     branco em cima de um destaque quase branco. Diferente do dark mode
-     genérico do app (cinza neutro): este tem cor de assinatura própria
-     (índigo) - senão os cinco temas "premium" viravam quatro coloridos e um
-     cinza sem graça, o único que não parece ter identidade escolhida. */
+     texto (contraste garantido contra --accent - ver a regra em
+     .btn-primary) - sem isso o botão ficava com texto quase branco em cima
+     de um destaque quase branco. Cor de assinatura própria (índigo), não um
+     cinza neutro genérico - senão os cinco temas "premium" viravam quatro
+     coloridos e um cinza sem graça, o único que não parece ter identidade
+     escolhida. */
   --bg-app: #050505;
   --bg-topbar: #0d0d0d; --bg-list: #131313; --bg-column: #131313; --bg-card: #1e1e1e; --bg-card-hover: #2a2a2a;
   --border-subtle: #262626; --border-strong: #3d3d3d;
@@ -8685,9 +8573,7 @@ body.sc-pub-body { overflow: auto; }
 /* ---------- Xaphires Beauty ---------- */
 /* Paleta própria do módulo (rosa chá/dusty rose), escopada em .beauty-shell -
    não mexe em nenhuma variável global, então CRM/Saúde & Clínicas/resto do
-   app continuam exatamente como estavam. Claro e escuro definidos aqui, no
-   mesmo espírito dos três blocos do :root no topo do arquivo (base, media
-   query de preferência do sistema, escolha explícita via data-theme). */
+   app continuam exatamente como estavam. */
 .beauty-shell {
   --beauty-bg: #FAF9F6;
   --beauty-card: #FFFFFF;
@@ -8699,32 +8585,6 @@ body.sc-pub-body { overflow: auto; }
   --beauty-text-soft: #8A7A7D;
   --beauty-shadow: 0 4px 20px rgba(60, 30, 35, 0.05);
   --beauty-shadow-hover: 0 8px 28px rgba(60, 30, 35, 0.08);
-}
-@media (prefers-color-scheme: dark) {
-  .beauty-shell {
-    --beauty-bg: var(--bg-column);
-    --beauty-card: var(--bg-card);
-    --beauty-border: var(--border-subtle);
-    --beauty-accent: #E39AA3;
-    --beauty-accent-strong: #EFB3BA;
-    --beauty-accent-soft: color-mix(in srgb, #E39AA3 16%, transparent);
-    --beauty-text: var(--text-primary);
-    --beauty-text-soft: var(--text-secondary);
-    --beauty-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
-    --beauty-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.35);
-  }
-}
-:root[data-theme="dark"] .beauty-shell {
-  --beauty-bg: var(--bg-column);
-  --beauty-card: var(--bg-card);
-  --beauty-border: var(--border-subtle);
-  --beauty-accent: #E39AA3;
-  --beauty-accent-strong: #EFB3BA;
-  --beauty-accent-soft: color-mix(in srgb, #E39AA3 16%, transparent);
-  --beauty-text: var(--text-primary);
-  --beauty-text-soft: var(--text-secondary);
-  --beauty-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
-  --beauty-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 .beauty-shell { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--beauty-bg); color: var(--beauty-text); font-family: var(--font); }
@@ -8847,9 +8707,6 @@ body.sc-pub-body { overflow: auto; }
 .beauty-badge-agendado { color: var(--beauty-accent-strong); background: var(--beauty-accent-soft); }
 .beauty-badge-concluido { color: #4B7A5E; background: #E7F1EA; }
 .beauty-badge-cancelado { color: var(--beauty-text-soft); background: var(--beauty-bg); text-decoration: line-through; }
-:root[data-theme="dark"] .beauty-shell .beauty-badge-concluido, .beauty-shell .beauty-badge-concluido {
-  color: #8FCBA5; background: color-mix(in srgb, #8FCBA5 16%, transparent);
-}
 .beauty-badge-online { color: var(--beauty-accent-strong); background: var(--beauty-accent-soft); border: 1px dashed color-mix(in srgb, var(--beauty-accent) 45%, transparent); }
 
 /* Estado vazio: ilustração leve (linha fina, sem preenchimento pesado) +
