@@ -86,6 +86,21 @@
       "desc": "Historia clínica, anamnesis, agenda y gestión para clínicas de estética, biomedicina y nutrición.",
       "tag": "Salud"
     },
+    "xaphires-beauty": {
+      "name": "Xaphires Beauty",
+      "desc": "Gestión completa para profesionales y clínicas de belleza: citas, clientes y finanzas.",
+      "tag": "Belleza y Estética"
+    },
+    "xaphiresBeauty": {
+      "comingSoonTitle": "En construcción",
+      "comingSoonText": "La agenda, los clientes y el financiero de este módulo llegan en las próximas actualizaciones.",
+      "statClients": "{{count}} cliente registrado",
+      "statClients_other": "{{count}} clientes registrados",
+      "statServices": "{{count}} servicio registrado",
+      "statServices_other": "{{count}} servicios registrados",
+      "statAppointments": "{{count}} cita registrada",
+      "statAppointments_other": "{{count}} citas registradas"
+    },
     "compras-estoque": {
       "name": "Compras & Inventario",
       "desc": "Inventario, proveedores, margen de productos y punto de reorden."

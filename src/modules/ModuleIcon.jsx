@@ -26,11 +26,13 @@ const PATHS = {
   marketing: "M3 11v2a2 2 0 0 0 2 2h1l2 6h2l-1.5-6H10l9 4V5l-9 4H5a2 2 0 0 0-2 2z",
   // Balança da justiça - contratos e compliance
   juridico: "M12 3v18M5 21h14M12 3 5 8m7-5 7 5M3 8h4l-2 6a2 2 0 0 1-4 0zm14 0h4l-2 6a2 2 0 0 1-4 0z",
+  // Brilho/sparkle - Xaphires Beauty (estética suave, mesmo traço do resto)
+  beauty: "M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z",
 };
 
 export default function ModuleIcon({ name, size = 26 }) {
   const d = PATHS[name] || PATHS.vendas;
-  const filled = name === "vendas";
+  const filled = name === "vendas" || name === "beauty";
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
       <path

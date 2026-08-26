@@ -86,6 +86,21 @@
       "desc": "Records, intake forms, scheduling and management for aesthetics, biomedicine and nutrition clinics.",
       "tag": "Health"
     },
+    "xaphires-beauty": {
+      "name": "Xaphires Beauty",
+      "desc": "Complete management for beauty professionals and clinics: appointments, clients and finance.",
+      "tag": "Beauty & Aesthetics"
+    },
+    "xaphiresBeauty": {
+      "comingSoonTitle": "Under construction",
+      "comingSoonText": "Agenda, clients and finance for this module are coming in the next updates.",
+      "statClients": "{{count}} client registered",
+      "statClients_other": "{{count}} clients registered",
+      "statServices": "{{count}} service registered",
+      "statServices_other": "{{count}} services registered",
+      "statAppointments": "{{count}} appointment logged",
+      "statAppointments_other": "{{count}} appointments logged"
+    },
     "compras-estoque": {
       "name": "Purchasing & Inventory",
       "desc": "Stock, suppliers, product margins and reorder points."

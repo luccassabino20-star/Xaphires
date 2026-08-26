@@ -10,6 +10,8 @@ const FinanceiroModule = lazy(() => import("./modules/financeiro/FinanceiroModul
 const SaudeClinicasModule = lazy(() => import("./modules/saude-clinicas/SaudeClinicasModule.jsx"));
 // Idem, para o CRM (o "vendas-crm" de verdade, separado do quadro genérico).
 const CrmModule = lazy(() => import("./modules/crm/CrmModule.jsx"));
+// Idem, para o Xaphires Beauty.
+const XaphiresBeautyModule = lazy(() => import("./modules/xaphires-beauty/XaphiresBeautyModule.jsx"));
 
 // A casca da plataforma: decide entre o launcher (grid de pilares) e o módulo
 // aberto. Fica ABAIXO dos providers do app (Board/Users/Chat, montados em
@@ -29,6 +31,7 @@ const COMPONENTES = {
   "vendas-crm": ({ onExit }) => <CrmModule onExit={onExit} />,
   financeiro: ({ onExit }) => <FinanceiroModule onExit={onExit} />,
   "saude-clinicas": ({ onExit }) => <SaudeClinicasModule onExit={onExit} />,
+  "xaphires-beauty": ({ onExit }) => <XaphiresBeautyModule onExit={onExit} />,
 };
 
 export default function PlatformShell() {

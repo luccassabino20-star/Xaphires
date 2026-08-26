@@ -809,3 +809,9 @@ export async function baixarRelatorio({ formato, lang, ...filtros }) {
   a.remove();
   URL.revokeObjectURL(url);
 }
+
+// ---------- Xaphires Beauty ----------
+// Prefixo xb*, mesmo padrão do sc* de Saúde & Clínicas. Fase 0: só a casca
+// (contagens do resumo) - CRUD de clientes/serviços/agendamentos chega na
+// Fase 1.
+export const xbGetConfig = () => request("/xaphires-beauty/config");

@@ -86,6 +86,21 @@
       "desc": "Patientenakte, Anamnese, Terminplanung und Verwaltung für Ästhetik-, Biomedizin- und Ernährungskliniken.",
       "tag": "Gesundheit"
     },
+    "xaphires-beauty": {
+      "name": "Xaphires Beauty",
+      "desc": "Komplette Verwaltung für Beauty-Fachkräfte und -Kliniken: Termine, Kunden und Finanzen.",
+      "tag": "Beauty & Ästhetik"
+    },
+    "xaphiresBeauty": {
+      "comingSoonTitle": "Im Aufbau",
+      "comingSoonText": "Terminplanung, Kunden und Finanzen für dieses Modul kommen in den nächsten Updates.",
+      "statClients": "{{count}} Kunde erfasst",
+      "statClients_other": "{{count}} Kunden erfasst",
+      "statServices": "{{count}} Leistung erfasst",
+      "statServices_other": "{{count}} Leistungen erfasst",
+      "statAppointments": "{{count}} Termin erfasst",
+      "statAppointments_other": "{{count}} Termine erfasst"
+    },
     "compras-estoque": {
       "name": "Einkauf & Lager",
       "desc": "Bestand, Lieferanten, Produktmargen und Meldebestand."

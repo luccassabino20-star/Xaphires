@@ -23,6 +23,7 @@ import { router as modulesRouter } from "./routes/modules.js";
 import { router as financeiroRouter } from "./modules/financeiro/routes.js";
 import { router as saudeClinicasRouter } from "./modules/saude-clinicas/routes.js";
 import { router as crmRouter } from "./modules/crm/routes.js";
+import { router as xaphiresBeautyRouter } from "./modules/xaphires-beauty/routes.js";
 import { router as anamnesePublicaRouter } from "./routes/anamnesePublica.js";
 import { router as recurrencesRouter } from "./routes/recurrences.js";
 import { router as personalTasksRouter } from "./routes/personalTasks.js";
@@ -133,6 +134,8 @@ app.use("/api/saude-clinicas", saudeClinicasRouter);
 // Módulo CRM, mesmo desenho: o router já aplica requireAuth/
 // requireWritablePlan/requireModule("vendas-crm") internamente.
 app.use("/api/crm", crmRouter);
+// requireAuth/requireWritablePlan/requireModule("xaphires-beauty") internamente.
+app.use("/api/xaphires-beauty", xaphiresBeautyRouter);
 // Relatório é leitura, e requireWritablePlan já libera GET - fica no mesmo grupo por
 // coerência, e empresa vencida continua conseguindo exportar os próprios dados.
 app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);

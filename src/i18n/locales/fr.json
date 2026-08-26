@@ -86,6 +86,21 @@
       "desc": "Dossier patient, anamnèse, agenda et gestion pour cliniques d'esthétique, biomédecine et nutrition.",
       "tag": "Santé"
     },
+    "xaphires-beauty": {
+      "name": "Xaphires Beauty",
+      "desc": "Gestion complète pour les professionnels et cliniques de beauté : rendez-vous, clients et finances.",
+      "tag": "Beauté & Esthétique"
+    },
+    "xaphiresBeauty": {
+      "comingSoonTitle": "En construction",
+      "comingSoonText": "L'agenda, les clients et les finances de ce module arrivent dans les prochaines mises à jour.",
+      "statClients": "{{count}} client enregistré",
+      "statClients_other": "{{count}} clients enregistrés",
+      "statServices": "{{count}} service enregistré",
+      "statServices_other": "{{count}} services enregistrés",
+      "statAppointments": "{{count}} rendez-vous enregistré",
+      "statAppointments_other": "{{count}} rendez-vous enregistrés"
+    },
     "compras-estoque": {
       "name": "Achats & Stocks",
       "desc": "Inventaire, fournisseurs, marge produit et seuil de réapprovisionnement."

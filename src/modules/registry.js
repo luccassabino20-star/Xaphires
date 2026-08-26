@@ -31,6 +31,11 @@ export const MODULE_META = {
   // só para o grupo "Financeiro" de dentro da sidebar do módulo.
   financeiro: { icon: "layers", accent: BRAND, category: "financeiro", tagKey: "modules.financeiro.tag", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
   "saude-clinicas": { icon: "saude", accent: BRAND, category: "saude", tagKey: "modules.saude-clinicas.tag", labelKey: "modules.saude-clinicas.name", descKey: "modules.saude-clinicas.desc" },
+  // Vertical separada pra salões/clínicas de estética - categoria "saude"
+  // reaproveitada (mesma aba de filtro de Saúde & Clínicas) em vez de criar
+  // uma aba "Beleza" própria: a barra de categorias não pode crescer sem
+  // limite (ver comentário de CATEGORIES em ModuleLauncher.jsx).
+  "xaphires-beauty": { icon: "beauty", accent: BRAND, category: "saude", tagKey: "modules.xaphires-beauty.tag", labelKey: "modules.xaphires-beauty.name", descKey: "modules.xaphires-beauty.desc" },
   // Compras & Estoque, Faturamento e Relatórios & BI saíram daqui - viraram abas
   // "Em breve" dentro do ERP IRES (id "financeiro" acima), não cards próprios do
   // launcher. Os nomes (modules.<id>.name/.desc) continuam nos locales, agora

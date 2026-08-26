@@ -5,6 +5,7 @@ import { getCurrentCompanyId } from "./context.js";
 import { applyFinanceiroSchema } from "./modules/financeiro/schema.js";
 import { applySaudeClinicasSchema } from "./modules/saude-clinicas/schema.js";
 import { applyCrmSchema } from "./modules/crm/schema.js";
+import { applyXaphiresBeautySchema } from "./modules/xaphires-beauty/schema.js";
 
 const dataDir = process.env.KANBAN_DATA_DIR || path.join(process.cwd(), "server", "data");
 fs.mkdirSync(dataDir, { recursive: true });
@@ -308,6 +309,9 @@ function applySchema(companyDb) {
 
   // Schema do módulo CRM, mesmo ponto preguiçoso.
   applyCrmSchema(companyDb);
+
+  // Schema do módulo Xaphires Beauty, mesmo ponto preguiçoso.
+  applyXaphiresBeautySchema(companyDb);
 }
 
 const cache = new Map();

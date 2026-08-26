@@ -61,6 +61,17 @@ const DEFINICOES = [
     available: true,
     icon: "saude",
   },
+  {
+    id: "xaphires-beauty",
+    // Vertical separada para salões/clínicas de estética (agenda, clientes,
+    // financeiro, equipe) — schema e rotas próprios, sem reaproveitar
+    // saude-clinicas apesar da sobreposição óbvia (decisão do produto).
+    // Fase 0 (casca): módulo aparece e abre, sem CRUD ainda. Add-on, sem
+    // restrição por usuário, mesmo perfil de saude-clinicas.
+    core: false,
+    available: true,
+    icon: "beauty",
+  },
   // Compras & Estoque, Faturamento e Relatórios & BI deixaram de ser cards
   // próprios do launcher - viraram abas "Em breve" dentro do ERP IRES (id
   // "financeiro" acima; ver ABAS em src/modules/financeiro/FinanceiroModule.jsx).
