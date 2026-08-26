@@ -113,6 +113,7 @@ export default function XaphiresBeautyModule({ onExit }) {
       <button key={id} type="button" className={"beauty-nav-item" + (aba === id ? " active" : "")} onClick={() => selecionarAba(id)}>
         <BeautyIcon name={icon} size={17} />
         {t(`modules.xaphiresBeauty.tabs.${tKey}`)}
+        {aba === id && <span className="beauty-nav-item-dot" />}
         {bloqueada && <span className="beauty-nav-item-badge">{t(`plan.names.${gate === "online" ? "professional" : "intermediate"}`)}</span>}
       </button>
     );
@@ -168,7 +169,12 @@ export default function XaphiresBeautyModule({ onExit }) {
           </div>
 
           <div className="beauty-profile-card" onClick={() => setPerfilAberto((v) => !v)}>
-            <Avatar id={user?.id} name={user?.name} avatarUrl={user?.avatarUrl} />
+            <Avatar
+              id={user?.id}
+              name={user?.name}
+              avatarUrl={user?.avatarUrl}
+              style={{ background: "linear-gradient(135deg, var(--beauty-accent), var(--beauty-accent-strong))" }}
+            />
             <div className="beauty-profile-card-info">
               <div className="beauty-profile-card-nome">{user?.name}</div>
               <div className="beauty-profile-card-papel">{t(user?.role === "master" ? "modules.xaphiresBeauty.perfil.proprietario" : "modules.xaphiresBeauty.perfil.equipe")}</div>

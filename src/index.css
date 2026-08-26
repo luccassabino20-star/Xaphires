@@ -8602,20 +8602,28 @@ body.sc-pub-body { overflow: auto; }
 }
 
 /* ---------- Xaphires Beauty ---------- */
-/* Paleta própria do módulo (rosa chá/dusty rose), escopada em .beauty-shell -
-   não mexe em nenhuma variável global, então CRM/Saúde & Clínicas/resto do
-   app continuam exatamente como estavam. */
+/* Paleta própria do módulo (rosa pink vívido + esmeralda como acento
+   secundário - redesenho "soft luxury" pedido pelo cliente, trocando o rosa
+   chá antigo por um rosa mais vivo), escopada em .beauty-shell - não mexe em
+   nenhuma variável global, então CRM/Saúde & Clínicas/resto do app continuam
+   exatamente como estavam. Esmeralda é só acento SECUNDÁRIO (estado
+   "concluído", confirmações) - o rosa continua sendo a cor de marca em
+   botões/navegação/gráficos, pra não misturar rosa+verde em tudo e parecer
+   confuso em vez de elegante. */
 .beauty-shell {
   --beauty-bg: #FAF9F6;
   --beauty-card: #FFFFFF;
-  --beauty-border: #EFE7E3;
-  --beauty-accent: #B76E79;
-  --beauty-accent-strong: #9C5661;
-  --beauty-accent-soft: #F7E9EA;
+  --beauty-border: #F3E1E9;
+  --beauty-accent: #E5417F;
+  --beauty-accent-strong: #C22568;
+  --beauty-accent-soft: #FCE7F1;
+  --beauty-emerald: #10B981;
+  --beauty-emerald-strong: #047857;
+  --beauty-emerald-soft: #D1FAE5;
   --beauty-text: #2B2326;
   --beauty-text-soft: #8A7A7D;
-  --beauty-shadow: 0 4px 20px rgba(60, 30, 35, 0.05);
-  --beauty-shadow-hover: 0 8px 28px rgba(60, 30, 35, 0.08);
+  --beauty-shadow: 0 4px 24px rgba(226, 64, 130, 0.06);
+  --beauty-shadow-hover: 0 10px 32px rgba(226, 64, 130, 0.12);
 }
 
 .beauty-shell { height: 100vh; min-height: 0; display: flex; flex-direction: column; background: var(--beauty-bg); color: var(--beauty-text); font-family: var(--font); }
@@ -8660,13 +8668,24 @@ body.sc-pub-body { overflow: auto; }
   transition: background 0.12s ease, color 0.12s ease;
 }
 .beauty-nav-item:hover { background: color-mix(in srgb, var(--beauty-accent) 6%, transparent); color: var(--beauty-text); }
-.beauty-nav-item.active { background: var(--beauty-accent-soft); color: var(--beauty-accent-strong); font-weight: 650; }
+.beauty-nav-item.active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--beauty-accent) 16%, var(--beauty-card)), color-mix(in srgb, var(--beauty-accent) 6%, var(--beauty-card)));
+  color: var(--beauty-accent-strong); font-weight: 650;
+}
 /* Indicador delicado de seleção: um traço fino, não uma barra grossa. */
 .beauty-nav-item.active::before {
   content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
   width: 3px; height: 16px; border-radius: 999px; background: var(--beauty-accent);
 }
 .beauty-nav-item svg { flex-shrink: 0; }
+/* Ponto/brilho ao lado do nome do item ativo (pedido do redesenho) - some
+   quando o item ganha o badge de plano bloqueado (margin-left:auto na
+   badge já empurra ela pro fim da linha; o ponto fica logo após o texto,
+   não disputa espaço com ela). */
+.beauty-nav-item-dot {
+  display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; flex-shrink: 0;
+  background: var(--beauty-accent); box-shadow: 0 0 6px color-mix(in srgb, var(--beauty-accent) 70%, transparent);
+}
 .beauty-nav-item-badge {
   margin-left: auto; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
   padding: 2px 7px; border-radius: 999px; color: var(--beauty-accent-strong);
@@ -8678,7 +8697,11 @@ body.sc-pub-body { overflow: auto; }
 /* Área principal: fundo off-white quente, conteúdo rolável. */
 .beauty-content { flex: 1; min-width: 0; overflow-y: auto; padding: 32px 40px 60px; }
 .beauty-page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-.beauty-page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--beauty-text); }
+/* Serifada só nos títulos/saudações (redesenho "soft luxury") - Playfair
+   Display já é carregada globalmente pro logotipo (ver index.html), então
+   reaproveitar aqui não pede fonte nova nenhuma. Textos operacionais (menu,
+   botões, tabelas) continuam na --font sans-serif de sempre. */
+.beauty-page-title { font-family: "Playfair Display", serif; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--beauty-text); }
 
 /* Cartão base: fundo branco puro, sombra extremamente suave, cantos bem
    arredondados - a unidade visual repetida em toda a tela (toolbar, forms,
@@ -8691,14 +8714,21 @@ body.sc-pub-body { overflow: auto; }
 }
 .beauty-month-input { padding: 9px 14px; font-size: 13.5px; font-weight: 550; color: var(--beauty-text); background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 999px; }
 
-/* Botão pílula, tom rosa chá - substitui o bloco escuro/quadrado padrão do
-   resto do app só dentro do módulo (escopado em .beauty-shell, então
-   .btn-primary continua preto em todo o resto da plataforma). */
+/* Botão pílula em gradiente rosa - substitui o bloco escuro/quadrado padrão
+   do resto do app só dentro do módulo (escopado em .beauty-shell, então
+   .btn-primary continua preto em todo o resto da plataforma). Levanta
+   levemente no hover (mesmo espírito "glow" do redesenho luxury pedido). */
 .beauty-shell .btn-primary {
-  background: var(--beauty-accent); color: #fff; border: none; border-radius: 999px;
-  padding: 9px 20px; font-size: 13.5px; font-weight: 600; box-shadow: 0 2px 10px color-mix(in srgb, var(--beauty-accent) 35%, transparent);
+  background: linear-gradient(135deg, var(--beauty-accent), var(--beauty-accent-strong));
+  color: #fff; border: none; border-radius: 999px;
+  padding: 9px 20px; font-size: 13.5px; font-weight: 600;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--beauty-accent) 35%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.beauty-shell .btn-primary:hover { background: var(--beauty-accent-strong); }
+.beauty-shell .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--beauty-accent) 45%, transparent);
+}
 .beauty-shell .btn-ghost {
   background: none; color: var(--beauty-text-soft); border: 1px solid var(--beauty-border); border-radius: 999px;
   padding: 7px 14px; font-size: 12.5px; font-weight: 550;
@@ -8736,7 +8766,11 @@ body.sc-pub-body { overflow: auto; }
    variação de intensidade, mais condizente com o resto da UI. */
 .beauty-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
 .beauty-badge-agendado { color: var(--beauty-accent-strong); background: var(--beauty-accent-soft); }
-.beauty-badge-concluido { color: #4B7A5E; background: #E7F1EA; }
+/* Esmeralda como acento secundário (redesenho): "concluído" era um verde
+   fixo independente da marca (mesma razão de --fin-entrada/saida) - agora
+   usa as variáveis --beauty-emerald-*, que É a marca (par oficial do rosa),
+   então troca de tom se a paleta mudar de novo, diferente do financeiro. */
+.beauty-badge-concluido { color: var(--beauty-emerald-strong); background: var(--beauty-emerald-soft); }
 .beauty-badge-cancelado { color: var(--beauty-text-soft); background: var(--beauty-bg); text-decoration: line-through; }
 .beauty-badge-online { color: var(--beauty-accent-strong); background: var(--beauty-accent-soft); border: 1px dashed color-mix(in srgb, var(--beauty-accent) 45%, transparent); }
 
@@ -8767,7 +8801,7 @@ body.sc-pub-body { overflow: auto; }
    duas colunas (receita+agenda de hoje à esquerda, KPIs+equipe à direita,
    mesma proporção 1.6/1 do dashboard financeiro) e os widgets próprios. */
 .beauty-ov-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
-.beauty-ov-greeting { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--beauty-text); }
+.beauty-ov-greeting { font-family: "Playfair Display", serif; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--beauty-text); }
 .beauty-ov-sub { margin: 4px 0 0; font-size: 13px; color: var(--beauty-text-soft); }
 .beauty-ov-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .beauty-ov-eye-btn {
@@ -8790,7 +8824,7 @@ body.sc-pub-body { overflow: auto; }
 .beauty-ov-card-link:hover { text-decoration: underline; }
 
 .beauty-ov-revenue-row { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin: 6px 0 2px; }
-.beauty-ov-revenue-value { font-size: 32px; font-weight: 700; letter-spacing: -0.01em; color: var(--beauty-text); }
+.beauty-ov-revenue-value { font-family: "Playfair Display", serif; font-size: 34px; font-weight: 700; letter-spacing: -0.01em; color: var(--beauty-text); }
 .beauty-ov-revenue-compare { font-size: 12.5px; color: var(--beauty-text-soft); margin: 6px 0 14px; }
 .beauty-ov-pill { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; margin-right: 6px; }
 .beauty-ov-pill-up { color: #2E7D4F; background: #E3F2E8; }
@@ -8943,9 +8977,15 @@ body.sc-pub-body { overflow: auto; }
 .beauty-banner-fechar { background: none; border: none; color: inherit; opacity: 0.7; cursor: pointer; padding: 2px; display: inline-flex; }
 .beauty-banner-fechar:hover { opacity: 1; }
 
+/* Vidro fosco (glass) - fundo semitransparente + blur, por cima do
+   --beauty-bg em vez de --beauty-card sólido, com o toque "soft luxury"
+   pedido. backdrop-filter com prefixo -webkit- pro Safari. */
 .beauty-profile-card {
   display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 14px;
-  border: 1px solid var(--beauty-border); border-radius: 14px; background: var(--beauty-bg);
+  border: 1px solid color-mix(in srgb, var(--beauty-accent) 12%, var(--beauty-border));
+  border-radius: 16px; background: color-mix(in srgb, var(--beauty-card) 80%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: var(--beauty-shadow);
   cursor: pointer;
 }
 .beauty-profile-card-info { flex: 1; min-width: 0; }
@@ -9001,13 +9041,31 @@ body.sc-pub-body { overflow: auto; }
 .beauty-agenda-col-body { position: relative; cursor: pointer; }
 .beauty-agenda-hline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--beauty-border); }
 .beauty-agenda-now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--beauty-accent); z-index: 2; }
-.beauty-agenda-now-line::before { content: ""; position: absolute; left: -4px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; background: var(--beauty-accent); }
+/* Marcador pulsante (redesenho luxury) - o anel que "respira" é um ::after
+   por cima do ponto sólido (::before), porque animar o próprio ponto com
+   scale mudaria o tamanho que o :before usa pra se centralizar na linha. */
+.beauty-agenda-now-line::before {
+  content: ""; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--beauty-accent); z-index: 1;
+}
+.beauty-agenda-now-line::after {
+  content: ""; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--beauty-accent);
+  animation: beauty-pulso 1.8s ease-out infinite;
+}
+@keyframes beauty-pulso {
+  0% { opacity: 0.55; transform: translateY(-50%) scale(1); }
+  100% { opacity: 0; transform: translateY(-50%) scale(2.4); }
+}
 .beauty-agenda-card {
   position: absolute; left: 4px; right: 4px; overflow: hidden;
-  padding: 4px 8px; border-radius: 8px; font-size: 11.5px; text-align: left; cursor: pointer;
-  background: var(--beauty-accent-soft); color: var(--beauty-accent-strong); border: 1px solid color-mix(in srgb, var(--beauty-accent) 35%, transparent);
+  padding: 4px 8px; border-radius: 12px; font-size: 11.5px; text-align: left; cursor: pointer;
+  background: linear-gradient(135deg, var(--beauty-accent-soft), color-mix(in srgb, var(--beauty-accent-soft) 60%, var(--beauty-card)));
+  color: var(--beauty-accent-strong); border: 1px solid color-mix(in srgb, var(--beauty-accent) 35%, transparent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 1;
 }
+.beauty-agenda-card:hover { transform: translateY(-1px); box-shadow: var(--beauty-shadow-hover); z-index: 3; }
 .beauty-agenda-card strong { display: block; font-size: 11px; }
 .beauty-agenda-card-sub { color: var(--beauty-text-soft); font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .beauty-agenda-card-concluido { opacity: 0.6; text-decoration: line-through; }
@@ -9020,7 +9078,7 @@ body.sc-pub-body { overflow: auto; }
    mesma infraestrutura já reaproveitada por BeautyClientDetailModal.jsx). */
 .beauty-appointment-modal { background: var(--beauty-bg); color: var(--beauty-text); }
 .beauty-apt-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-right: 30px; margin-bottom: 2px; }
-.beauty-apt-title { font-size: 22px; font-weight: 700; margin: 0; color: var(--beauty-text); }
+.beauty-apt-title { font-family: "Playfair Display", serif; font-size: 23px; font-weight: 700; margin: 0; color: var(--beauty-text); }
 .beauty-apt-subtitle { margin: 4px 0 0; font-size: 13px; color: var(--beauty-text-soft); }
 .beauty-apt-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
@@ -9049,6 +9107,7 @@ body.sc-pub-body { overflow: auto; }
 .beauty-apt-staff { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--beauty-text); }
 .beauty-apt-footer-meta { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--beauty-border); font-size: 12px; color: var(--beauty-text-soft); }
 .beauty-apt-footer-meta strong { color: var(--beauty-text); font-weight: 650; }
+.beauty-apt-footer-meta strong.beauty-texto-confirmado { color: var(--beauty-emerald-strong); }
 
 .beauty-apt-section-title { font-size: 13px; font-weight: 700; color: var(--beauty-text); margin: 0 0 10px; display: flex; align-items: center; gap: 6px; }
 

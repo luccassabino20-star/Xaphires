@@ -132,9 +132,9 @@
       },
       "visaoGeral": {
         "saudacao": {
-          "bomDia": "Good morning, {{nome}}",
-          "boaTarde": "Good afternoon, {{nome}}",
-          "boaNoite": "Good evening, {{nome}}"
+          "bomDia": "Good morning, {{nome}} ✨",
+          "boaTarde": "Good afternoon, {{nome}} ✨",
+          "boaNoite": "Good evening, {{nome}} ✨"
         },
         "resumoDia": "{{data}} • {{count}} appointment today",
         "resumoDia_other": "{{data}} • {{count}} appointments today",

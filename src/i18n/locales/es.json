@@ -132,9 +132,9 @@
       },
       "visaoGeral": {
         "saudacao": {
-          "bomDia": "Buenos días, {{nome}}",
-          "boaTarde": "Buenas tardes, {{nome}}",
-          "boaNoite": "Buenas noches, {{nome}}"
+          "bomDia": "Buenos días, {{nome}} ✨",
+          "boaTarde": "Buenas tardes, {{nome}} ✨",
+          "boaNoite": "Buenas noches, {{nome}} ✨"
         },
         "resumoDia": "{{data}} • {{count}} cita hoy",
         "resumoDia_other": "{{data}} • {{count}} citas hoy",

@@ -44,7 +44,7 @@ export default function BeautyMiniMap({ lat, lng }) {
       markerRef.current = null;
     }
     if (lat != null && lng != null) {
-      markerRef.current = L.circleMarker([lat, lng], { radius: 9, weight: 2, color: "#ffffff", fillColor: "#B76E79", fillOpacity: 1 }).addTo(map);
+      markerRef.current = L.circleMarker([lat, lng], { radius: 9, weight: 2, color: "#ffffff", fillColor: "#E5417F", fillOpacity: 1 }).addTo(map);
       map.setView([lat, lng], 15);
     } else {
       map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);

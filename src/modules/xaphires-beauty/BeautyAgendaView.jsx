@@ -408,7 +408,7 @@ export default function BeautyAgendaView() {
               {equipe.map((s) => (
                 <label className="beauty-agenda-check" key={s.id}>
                   <input type="checkbox" checked={staffMarcado(s.id)} onChange={() => alternarStaff(s.id)} />
-                  <span className="beauty-agenda-check-dot" style={{ background: s.color || "#B76E79" }} />
+                  <span className="beauty-agenda-check-dot" style={{ background: s.color || "#E5417F" }} />
                   {s.name}
                 </label>
               ))}

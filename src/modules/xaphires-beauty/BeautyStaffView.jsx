@@ -6,7 +6,7 @@ import * as api from "../../state/api.js";
 import BeautyEmptyState from "./BeautyEmptyState.jsx";
 import BeautyIcon from "./BeautyIcon.jsx";
 
-const VAZIO = { name: "", role: "", commissionPct: "0", color: "#B76E79" };
+const VAZIO = { name: "", role: "", commissionPct: "0", color: "#E5417F" };
 // Ordem de semana de trabalho (segunda primeiro, domingo por último) - mais
 // natural pra cadastrar horário de salão do que a ordem 0=domingo do banco
 // (mesma convenção de weekday que a recorrência do Kanban já usa).
@@ -54,7 +54,7 @@ export default function BeautyStaffView({ canUse }) {
 
   async function editar(s) {
     setEditandoId(s.id);
-    setF({ name: s.name, role: s.role || "", commissionPct: String(Math.round(s.commission_rate * 100)), color: s.color || "#B76E79" });
+    setF({ name: s.name, role: s.role || "", commissionPct: String(Math.round(s.commission_rate * 100)), color: s.color || "#E5417F" });
     try {
       const [ids, hrs] = await Promise.all([api.xbGetStaffServices(s.id), api.xbGetStaffHours(s.id)]);
       setEspecialidades(new Set(ids));
@@ -210,7 +210,7 @@ export default function BeautyStaffView({ canUse }) {
             {equipe.map((s) => (
               <div className="beauty-list-row" key={s.id}>
                 <span className="beauty-cell-primary" style={{ flex: 1.4, display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: s.color || "#B76E79", flexShrink: 0 }} />
+                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: s.color || "#E5417F", flexShrink: 0 }} />
                   {s.name}
                 </span>
                 <span className="beauty-cell-muted" style={{ flex: 1 }}>{s.role || "—"}</span>

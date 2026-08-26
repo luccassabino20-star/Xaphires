@@ -240,7 +240,9 @@ export default function AppointmentDetailView({ appointment, clientes, servicos,
                   <span>{t("modules.xaphiresBeauty.atendimento.agendamentoOnline")}: <strong>{t(`modules.xaphiresBeauty.atendimento.${atual.from_public_link ? "sim" : "nao"}`)}</strong></span>
                   <span>
                     {t("modules.xaphiresBeauty.atendimento.confirmadoPeloCliente")}:{" "}
-                    <strong>{atual.confirmed_at ? formatarDataHora(atual.confirmed_at, i18n.language) : t("modules.xaphiresBeauty.atendimento.pendente")}</strong>
+                    <strong className={atual.confirmed_at ? "beauty-texto-confirmado" : ""}>
+                      {atual.confirmed_at ? formatarDataHora(atual.confirmed_at, i18n.language) : t("modules.xaphiresBeauty.atendimento.pendente")}
+                    </strong>
                   </span>
                 </div>
               </div>
