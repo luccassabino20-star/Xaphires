@@ -171,11 +171,11 @@ export default function AppointmentDetailView({ appointment, clientes, servicos,
           </div>
         )}
 
-        <div className="beauty-apt-tabs">
-          <button type="button" className={"beauty-apt-tab" + (aba === "detalhes" ? " active" : "")} onClick={() => setAba("detalhes")}>
+        <div className="beauty-tabs">
+          <button type="button" className={"beauty-tab" + (aba === "detalhes" ? " active" : "")} onClick={() => setAba("detalhes")}>
             {t("modules.xaphiresBeauty.atendimento.abaDetalhes")}
           </button>
-          <button type="button" className={"beauty-apt-tab" + (aba === "anamnese" ? " active" : "")} onClick={() => setAba("anamnese")}>
+          <button type="button" className={"beauty-tab" + (aba === "anamnese" ? " active" : "")} onClick={() => setAba("anamnese")}>
             {t("modules.xaphiresBeauty.atendimento.abaAnamnese")}
           </button>
         </div>

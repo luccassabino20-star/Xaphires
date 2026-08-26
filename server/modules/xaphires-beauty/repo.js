@@ -37,29 +37,66 @@ export function getSummary() {
 
 // ---------- Clientes ----------
 
+// notes_count alimenta a pílula "ficha preenchida" da listagem (Fase 13) -
+// subquery em vez de JOIN porque é 0 ou 1 linha por cliente, não uma junção
+// que multiplica linha (evita ter que agrupar).
 export function listClients() {
-  return getDb().prepare("SELECT * FROM beauty_clients WHERE active = 1 ORDER BY name COLLATE NOCASE").all();
+  return getDb()
+    .prepare(
+      `SELECT c.*, (SELECT COUNT(*) FROM beauty_client_notes n WHERE n.client_id = c.id) AS notes_count
+         FROM beauty_clients c WHERE c.active = 1 ORDER BY c.name COLLATE NOCASE`
+    )
+    .all();
 }
 export function getClient(id) {
   return getDb().prepare("SELECT * FROM beauty_clients WHERE id = ?").get(id) || null;
 }
-export function insertClient({ name, phone, doc, notes, birthDate }, userId) {
+// Campos da ficha técnica (Fase 13) - todos opcionais, texto livre.
+const CAMPOS_FICHA_TECNICA = ["nailsShape", "nailsSize", "nailsColor", "lashMapping", "lashCurvature", "lashThickness", "lashStyle", "hairTone", "hairChemicalHistory", "hairSensitivity"];
+function coluna(campoCamelCase) {
+  return campoCamelCase.replace(/[A-Z]/g, (l) => "_" + l.toLowerCase());
+}
+export function insertClient({ name, phone, doc, notes, birthDate, ...resto }, userId) {
   const id = uid();
   getDb()
     .prepare(
-      `INSERT INTO beauty_clients (id, name, phone, doc, notes, birth_date, created_at, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO beauty_clients
+         (id, name, phone, doc, notes, birth_date, nails_shape, nails_size, nails_color,
+          lash_mapping, lash_curvature, lash_thickness, lash_style, hair_tone, hair_chemical_history, hair_sensitivity,
+          created_at, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(id, name, phone || "", doc || "", notes || "", birthDate || null, nowIso(), userId || null);
+    .run(
+      id, name, phone || "", doc || "", notes || "", birthDate || null,
+      ...CAMPOS_FICHA_TECNICA.map((campo) => resto[campo] || ""),
+      nowIso(), userId || null
+    );
   return getClient(id);
 }
 export function updateClient(id, c) {
   const a = getClient(id);
   if (!a) return null;
-  getDb()
-    .prepare("UPDATE beauty_clients SET name = ?, phone = ?, doc = ?, notes = ?, birth_date = ? WHERE id = ?")
-    .run(c.name ?? a.name, c.phone ?? a.phone, c.doc ?? a.doc, c.notes ?? a.notes, c.birthDate ?? a.birth_date, id);
+  const sets = ["name = ?", "phone = ?", "doc = ?", "notes = ?", "birth_date = ?", ...CAMPOS_FICHA_TECNICA.map((campo) => `${coluna(campo)} = ?`)];
+  const valores = [
+    c.name ?? a.name, c.phone ?? a.phone, c.doc ?? a.doc, c.notes ?? a.notes, c.birthDate ?? a.birth_date,
+    ...CAMPOS_FICHA_TECNICA.map((campo) => c[campo] ?? a[coluna(campo)]),
+  ];
+  getDb().prepare(`UPDATE beauty_clients SET ${sets.join(", ")} WHERE id = ?`).run(...valores, id);
   return getClient(id);
+}
+
+// Histórico de observações datadas (Fase 13) - diário do cliente, uma linha
+// por relato, nunca sobrescrito (ver comentário do schema). Mais recente
+// primeiro, mesmo critério de listPayments/listClientNotes de outras telas.
+export function listClientNotes(clientId) {
+  return getDb().prepare("SELECT * FROM beauty_client_notes WHERE client_id = ? ORDER BY created_at DESC").all(clientId);
+}
+export function insertClientNote(clientId, texto, userId) {
+  const id = uid();
+  getDb()
+    .prepare("INSERT INTO beauty_client_notes (id, client_id, text, created_at, created_by) VALUES (?, ?, ?, ?, ?)")
+    .run(id, clientId, texto, nowIso(), userId || null);
+  return getDb().prepare("SELECT * FROM beauty_client_notes WHERE id = ?").get(id);
 }
 
 // ---------- Foto do cliente (Fase 5) ----------

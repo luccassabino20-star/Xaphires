@@ -225,4 +225,41 @@ export function applyXaphiresBeautySchema(companyDb) {
   addColumnIfMissing(companyDb, "beauty_appointments", "confirmed_at", "confirmed_at TEXT");
   addColumnIfMissing(companyDb, "beauty_appointments", "completed_at", "completed_at TEXT");
   addColumnIfMissing(companyDb, "beauty_appointments", "cancelled_at", "cancelled_at TEXT");
+
+  // Fase 13: ficha técnica do cliente (unhas/cílios/cabelo) - texto livre em
+  // vez de enum fechado, mesmo espírito de category em beauty_services (o
+  // salão decide os próprios termos - "Fox Eye"/"Almond" variam de salão
+  // pra salão, uma lista fixa engessaria). O campo "notes" que já existia
+  // continua sendo o texto único do cadastro rápido (renomeado na tela pra
+  // "Observações Técnicas/Alergias") - é ele que a aba Geral do detalhe
+  // destaca como alerta quando não está vazio, não um campo novo: um cadastro
+  // rápido com dois campos de texto livre pra "alergia" só confundiria qual
+  // preencher.
+  addColumnIfMissing(companyDb, "beauty_clients", "nails_shape", "nails_shape TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "nails_size", "nails_size TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "nails_color", "nails_color TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "lash_mapping", "lash_mapping TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "lash_curvature", "lash_curvature TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "lash_thickness", "lash_thickness TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "lash_style", "lash_style TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "hair_tone", "hair_tone TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "hair_chemical_history", "hair_chemical_history TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(companyDb, "beauty_clients", "hair_sensitivity", "hair_sensitivity TEXT NOT NULL DEFAULT ''");
+
+  // Histórico de observações datadas (Fase 13) - diferente de "notes" (um
+  // valor só, sobrescrito a cada edição), aqui cada relato do atendimento
+  // vira uma linha própria, com a própria data - "cliente relatou que a
+  // retenção durou 25 dias" não some quando alguém edita o cadastro depois.
+  // Append-only por natureza (sem função de update/delete no repo) - é
+  // literalmente um diário, não um campo de cadastro.
+  companyDb.exec(`
+    CREATE TABLE IF NOT EXISTS beauty_client_notes (
+      id TEXT PRIMARY KEY,
+      client_id TEXT NOT NULL REFERENCES beauty_clients(id),
+      text TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      created_by TEXT REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_beauty_client_notes_client ON beauty_client_notes(client_id);
+  `);
 }

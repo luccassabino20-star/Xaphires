@@ -822,6 +822,8 @@ export const xbDeleteClient = (id) => request(`/xaphires-beauty/clients/${id}`, 
 export const xbGetClientRanking = (from, to) => request(`/xaphires-beauty/clients/ranking?from=${from}&to=${to}`);
 export const xbGetUpcomingBirthdays = (days) => request(`/xaphires-beauty/clients/birthdays?days=${days}`);
 export const xbGetClientAppointments = (id) => request(`/xaphires-beauty/clients/${id}/appointments`);
+export const xbGetClientNotes = (id) => request(`/xaphires-beauty/clients/${id}/notes`);
+export const xbCreateClientNote = (id, text) => request(`/xaphires-beauty/clients/${id}/notes`, { method: "POST", body: { text } });
 
 // Upload não passa pelo request() (corpo multipart) - mesmo desenho de scUploadPatientPhoto.
 export async function xbUploadClientPhoto(clientId, file) {

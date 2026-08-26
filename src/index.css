@@ -8773,6 +8773,11 @@ body.sc-pub-body { overflow: auto; }
 .beauty-badge-concluido { color: var(--beauty-emerald-strong); background: var(--beauty-emerald-soft); }
 .beauty-badge-cancelado { color: var(--beauty-text-soft); background: var(--beauty-bg); text-decoration: line-through; }
 .beauty-badge-online { color: var(--beauty-accent-strong); background: var(--beauty-accent-soft); border: 1px dashed color-mix(in srgb, var(--beauty-accent) 45%, transparent); }
+/* Pílulas da linha do cliente (Fase 13) - alerta é cor FIXA (mesmo motivo do
+   .beauty-alert-box: aviso de segurança, não destaque de marca); ficha
+   preenchida é neutra/rosa suave (informativa, não é aviso). */
+.beauty-badge-alerta-cliente { color: #9F1239; background: #FFE4E6; font-size: 10.5px; }
+.beauty-badge-ficha { color: var(--beauty-text-soft); background: var(--beauty-bg); border: 1px solid var(--beauty-border); font-size: 10.5px; }
 
 /* Estado vazio: ilustração leve (linha fina, sem preenchimento pesado) +
    texto acolhedor, centralizado dentro do próprio cartão. */
@@ -8867,6 +8872,44 @@ body.sc-pub-body { overflow: auto; }
 .beauty-detail-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 6px; }
 .beauty-detail-field { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; }
 .beauty-detail-historico { max-height: 260px; overflow-y: auto; border: 1px solid var(--beauty-border); border-radius: 16px; }
+
+/* Ficha técnica do cliente (Fase 13). Alerta de alergia/restrição é cor FIXA
+   (não segue --beauty-accent) de propósito - é um aviso de segurança, não
+   um destaque de marca: precisa continuar lendo como "atenção" mesmo se a
+   paleta do módulo mudar de novo (mesmo motivo de --fin-entrada/saida). */
+.beauty-alert-box {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-bottom: 18px;
+  background: #FFF1F2; border: 1px solid #FECDD3; border-radius: 14px; color: #9F1239; font-size: 13px; line-height: 1.5;
+}
+.beauty-alert-box svg { flex-shrink: 0; margin-top: 1px; }
+.beauty-tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 760px) { .beauty-tech-grid { grid-template-columns: 1fr; } }
+.beauty-tech-block { display: flex; flex-direction: column; gap: 10px; }
+.beauty-tech-block-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--beauty-accent-strong);
+  margin: 0; padding-bottom: 8px; border-bottom: 1px solid var(--beauty-border);
+}
+.beauty-tech-block input {
+  padding: 8px 12px; font-size: 13px; color: var(--beauty-text); background: var(--beauty-bg);
+  border: 1px solid var(--beauty-border); border-radius: 10px;
+}
+.beauty-tech-block input:focus { outline: none; border-color: var(--beauty-accent); }
+
+/* Histórico de observações - "bloco de notas" com o textarea de novo
+   registro sempre no topo e o diário (mais recente primeiro) embaixo. */
+.beauty-notes-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.beauty-notes-form textarea {
+  padding: 12px 14px; font-size: 13.5px; color: var(--beauty-text); background: var(--beauty-card);
+  border: 1px solid var(--beauty-border); border-radius: 14px; min-height: 70px; resize: vertical; font-family: inherit;
+  box-shadow: var(--beauty-shadow);
+}
+.beauty-notes-form textarea:focus { outline: none; border-color: var(--beauty-accent); }
+.beauty-notes-form button { align-self: flex-end; }
+.beauty-notes-timeline { display: flex; flex-direction: column; }
+.beauty-notes-timeline-item { padding: 12px 0; border-top: 1px solid var(--beauty-border); }
+.beauty-notes-timeline-item:first-child { border-top: none; }
+.beauty-notes-timeline-date { display: block; font-size: 11px; font-weight: 700; color: var(--beauty-accent-strong); margin-bottom: 3px; }
+.beauty-notes-timeline-text { margin: 0; font-size: 13px; color: var(--beauty-text); line-height: 1.5; white-space: pre-wrap; }
 
 /* Dashboard financeiro (Fase 7): donut por método de pagamento e balanço
    mensal (entrada/saída), clones das classes sc-fin-donut/sc-fin-chart na
@@ -9088,12 +9131,16 @@ body.sc-pub-body { overflow: auto; }
 .beauty-apt-quick-actions .beauty-apt-cancelar { color: var(--danger); }
 .beauty-apt-quick-actions .beauty-apt-cancelar:hover { color: var(--danger); }
 
-.beauty-apt-tabs { display: flex; border-bottom: 1px solid var(--beauty-border); margin: 14px 0 18px; }
-.beauty-apt-tab {
+/* Abas com indicador inferior - genérico o bastante pra qualquer tela com
+   abas dentro do módulo (batizado .beauty-tabs, não .beauty-apt-tabs,
+   porque a tela de Atendimento não é mais a única a usar isto - ver
+   BeautyClientDetailModal.jsx). */
+.beauty-tabs { display: flex; border-bottom: 1px solid var(--beauty-border); margin: 14px 0 18px; }
+.beauty-tab {
   padding: 9px 4px; margin-right: 22px; font-size: 13.5px; font-weight: 600; color: var(--beauty-text-soft);
   background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px;
 }
-.beauty-apt-tab.active { color: var(--beauty-accent-strong); border-bottom-color: var(--beauty-accent); }
+.beauty-tab.active { color: var(--beauty-accent-strong); border-bottom-color: var(--beauty-accent); }
 
 .beauty-apt-card { background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 16px; padding: 20px 22px; margin-bottom: 22px; }
 .beauty-apt-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }

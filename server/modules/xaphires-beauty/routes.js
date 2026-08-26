@@ -13,6 +13,8 @@ import {
   insertClient,
   updateClient,
   deactivateClient,
+  listClientNotes,
+  insertClientNote,
   listServices,
   insertService,
   updateService,
@@ -177,6 +179,24 @@ router.get(
   ah(async (req, res) => {
     if (!getClient(req.params.id)) return res.status(404).json({ error: "Cliente não encontrado", code: "BEAUTY_CLIENT_NOT_FOUND" });
     res.json(listAppointmentsForClient(req.params.id));
+  })
+);
+
+// Histórico de observações datadas (Fase 13) - diário do cliente, append-only.
+router.get(
+  "/clients/:id/notes",
+  ah(async (req, res) => {
+    if (!getClient(req.params.id)) return res.status(404).json({ error: "Cliente não encontrado", code: "BEAUTY_CLIENT_NOT_FOUND" });
+    res.json(listClientNotes(req.params.id));
+  })
+);
+router.post(
+  "/clients/:id/notes",
+  ah(async (req, res) => {
+    if (!getClient(req.params.id)) return res.status(404).json({ error: "Cliente não encontrado", code: "BEAUTY_CLIENT_NOT_FOUND" });
+    const texto = (req.body?.text || "").trim();
+    if (!texto) return res.status(400).json({ error: "Escreva uma observação", code: "BEAUTY_CLIENT_NOTE_REQUIRED" });
+    res.status(201).json(insertClientNote(req.params.id, texto, req.user.id));
   })
 );
 
