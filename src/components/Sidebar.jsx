@@ -106,7 +106,9 @@ function RailItem({ icon, label, active, onClick, title }) {
 function ShortcutRow({ icon, label, badge, onClick, title }) {
   return (
     <button type="button" className="dsb-shortcut-row" onClick={onClick} disabled={!onClick} title={title}>
-      <span className="dsb-shortcut-icon">{icon}</span>
+      {/* Só entra o span do ícone quando há ícone - senão o gap da linha
+          (dsb-shortcut-row) empurrava o texto mesmo sem nada pra mostrar. */}
+      {icon && <span className="dsb-shortcut-icon">{icon}</span>}
       <span className="dsb-shortcut-label">{label}</span>
       {badge != null && <span className="dsb-badge-pink">{badge}</span>}
     </button>
@@ -292,15 +294,15 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
   }
 
   // Nível "espaço" da árvore - um grupo real dos três que o quadro já tinha
-  // (compartilhados / meus privados / compartilhados comigo), só reembalado
-  // no visual de pasta colorida + lista que a referência usa em vez do
-  // cabeçalho de texto que existia antes.
-  function renderSpaceGroup(key, label, boards, colorClass) {
+  // (compartilhados / meus privados / compartilhados comigo), reembalado no
+  // visual de pasta + lista que a referência usa em vez do cabeçalho de
+  // texto que existia antes. Sem o selo colorido com a inicial (pedido do
+  // cliente) - só o título.
+  function renderSpaceGroup(key, label, boards) {
     if (boards.length === 0 && key !== "shared") return null;
     return (
       <div className="dsb-space-group" key={key}>
         <div className="dsb-space-header">
-          <span className={"dsb-space-swatch " + colorClass}>{label.charAt(0)}</span>
           <span className="dsb-space-title">{label}</span>
         </div>
         <div className="dsb-tree-folder">
@@ -435,12 +437,13 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
           </div>
 
           {/* PLACEHOLDER: não existe uma visão que junte tarefas de todos os
-              quadros num só lugar. */}
-          <ShortcutRow icon={<IconSparkle size={14} />} label={t("app.sidebar.shortcuts.allTasks")} />
+              quadros num só lugar. Sem ícone de propósito (pedido do
+              cliente) - só o texto. */}
+          <ShortcutRow label={t("app.sidebar.shortcuts.allTasks")} />
 
-          {renderSpaceGroup("shared", t("app.sidebar.sharedBoards"), sharedBoards, "dsb-swatch-a")}
-          {renderSpaceGroup("private", t("app.sidebar.myPrivateBoards"), privateBoards, "dsb-swatch-b")}
-          {renderSpaceGroup("sharedWithMe", t("app.sidebar.sharedWithMe"), sharedWithMe, "dsb-swatch-c")}
+          {renderSpaceGroup("shared", t("app.sidebar.sharedBoards"), sharedBoards)}
+          {renderSpaceGroup("private", t("app.sidebar.myPrivateBoards"), privateBoards)}
+          {renderSpaceGroup("sharedWithMe", t("app.sidebar.sharedWithMe"), sharedWithMe)}
 
           {adding ? (
             <div className="dsb-add-form">
@@ -479,8 +482,9 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
               </div>
             </div>
           ) : (
+            // Sem ícone de propósito (pedido do cliente) - o "+" já vem no
+            // próprio texto (t("app.sidebar.newBoard") = "+ Novo quadro").
             <button type="button" className="dsb-new-space-btn" onClick={startAdding}>
-              <IconPlus size={13} />
               {t("app.sidebar.newBoard")}
             </button>
           )}
