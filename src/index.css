@@ -8880,6 +8880,37 @@ body.sc-pub-body { overflow: auto; }
 .beauty-detail-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 6px; }
 .beauty-detail-field { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; }
 .beauty-detail-historico { max-height: 260px; overflow-y: auto; border: 1px solid var(--beauty-border); border-radius: 16px; }
+
+/* Dashboard financeiro (Fase 7): donut por método de pagamento e balanço
+   mensal (entrada/saída), clones das classes sc-fin-donut/sc-fin-chart na
+   paleta do módulo. Entrada/saída são cores FIXAS (não seguem --beauty-
+   accent) pelo mesmo motivo do --sc-fin-receita/despesa em Saúde &
+   Clínicas: a leitura do gráfico não pode depender de combinar com a marca. */
+.beauty-fin-dashboard { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-bottom: 18px; }
+@media (max-width: 900px) { .beauty-fin-dashboard { grid-template-columns: 1fr; } }
+.beauty-fin-entrada-bg { fill: #B76E79; background: #B76E79; }
+.beauty-fin-saida-bg { fill: #D9A441; background: #D9A441; }
+.beauty-fin-chart { display: flex; flex-direction: column; gap: 10px; }
+.beauty-fin-chart-empty { padding: 40px 0; text-align: center; }
+.beauty-fin-legend { display: flex; gap: 16px; }
+.beauty-fin-legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--beauty-text-soft); }
+.beauty-fin-legend-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.beauty-fin-chart-svg { width: 100%; height: auto; }
+.beauty-fin-grid { stroke: var(--beauty-border); stroke-width: 1; }
+.beauty-fin-axis-label { font-size: 9.5px; fill: var(--beauty-text-soft); }
+.beauty-fin-tip-bg { fill: var(--beauty-text); opacity: 0.9; }
+.beauty-fin-tip-text { font-size: 10.5px; fill: var(--beauty-card); font-weight: 600; }
+.beauty-fin-donut-card { padding: 16px 18px; background: var(--beauty-card); border: 1px solid var(--beauty-border); border-radius: 20px; box-shadow: var(--beauty-shadow); }
+.beauty-fin-donut-titulo { margin: 0 0 12px; font-size: 13px; font-weight: 650; color: var(--beauty-text-soft); }
+.beauty-fin-donut-body { display: flex; align-items: center; gap: 18px; }
+.beauty-fin-donut-svg { flex-shrink: 0; }
+.beauty-fin-donut-total { font-size: 12px; font-weight: 700; fill: var(--beauty-text); }
+.beauty-fin-donut-vazio { padding: 30px 0; text-align: center; }
+.beauty-fin-donut-legenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.beauty-fin-donut-legenda li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.beauty-fin-donut-swatch { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.beauty-fin-donut-nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--beauty-text-soft); }
+.beauty-fin-donut-pct { color: var(--beauty-text-soft); font-variant-numeric: tabular-nums; }
 /* select/time dentro do formulário público (.sc-pub-campo) - a regra
    original em ContatosView/AnamneseFormularioEtapas só cobria os tipos de
    input que a anamnese usa; o agendamento público também precisa de

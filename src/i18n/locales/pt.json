@@ -189,7 +189,20 @@
         "vazio": "Nada neste período.",
         "comissoes": "Comissão por profissional",
         "totalAtendido": "Total atendido",
-        "comissao": "Comissão"
+        "comissao": "Comissão",
+        "entradas": "Entradas",
+        "saidas": "Saídas",
+        "balancoMensal": "Balanço mensal",
+        "faturamentoPorMetodo": "Faturamento por método",
+        "comissaoPorServico": "Comissão por serviço",
+        "profissional": "Profissional",
+        "servico": "Serviço",
+        "escolherProfissional": "Escolha o profissional",
+        "escolherServico": "Escolha o serviço",
+        "comissaoSalva": "Comissão salva",
+        "comissaoRemovida": "Comissão removida",
+        "semOverrides": "Nenhuma comissão específica configurada.",
+        "confirmarRemoverComissao": "Remover a comissão de \"{{profissional}}\" para \"{{servico}}\"?"
       },
       "online": {
         "bloqueado": "O agendamento online está disponível a partir do plano {{plano}}.",

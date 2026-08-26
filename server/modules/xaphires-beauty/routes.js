@@ -45,6 +45,11 @@ import {
   getServiceAvatarFile,
   discardServiceAvatarFile,
   getServiceRanking,
+  listCommissionOverrides,
+  setCommissionOverride,
+  removeCommissionOverride,
+  getRevenueByMethod,
+  getMonthlyFinanceSummary,
 } from "./repo.js";
 import { getOuCriarSlugAgendamento } from "./agendaSlugStore.js";
 
@@ -532,6 +537,66 @@ router.get(
       return res.status(400).json({ error: "Informe o período (from/to)", code: "BEAUTY_PERIOD_REQUIRED" });
     }
     res.json(getCommissionsSummary(from, to));
+  })
+);
+
+// Comissão por serviço (Fase 7) - override opcional por cima do padrão do
+// profissional. Rota fixa "/commissions/overrides", não colide com
+// GET /commissions acima (caminho diferente, não é parâmetro).
+router.get(
+  "/commissions/overrides",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    res.json(listCommissionOverrides());
+  })
+);
+router.put(
+  "/commissions/overrides",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    const { staffId, serviceId, commissionRate } = req.body || {};
+    if (!staffId || !getStaffMember(staffId)) {
+      return res.status(400).json({ error: "Profissional inválido", code: "BEAUTY_STAFF_NOT_FOUND" });
+    }
+    if (!serviceId || !getService(serviceId)) {
+      return res.status(400).json({ error: "Serviço inválido", code: "BEAUTY_SERVICE_NOT_FOUND" });
+    }
+    if (typeof commissionRate !== "number" || commissionRate < 0 || commissionRate > 1) {
+      return res.status(400).json({ error: "Informe uma comissão entre 0% e 100%", code: "BEAUTY_COMMISSION_RATE_INVALID" });
+    }
+    setCommissionOverride(staffId, serviceId, commissionRate);
+    res.status(201).json(listCommissionOverrides());
+  })
+);
+router.delete(
+  "/commissions/overrides/:staffId/:serviceId",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    const ok = removeCommissionOverride(req.params.staffId, req.params.serviceId);
+    if (!ok) return res.status(404).json({ error: "Comissão não encontrada", code: "BEAUTY_COMMISSION_OVERRIDE_NOT_FOUND" });
+    res.json({ ok: true });
+  })
+);
+
+// Dashboard financeiro (Fase 7): donut por método de pagamento e balanço
+// mensal (faturamento x comissão devida) no ano inteiro.
+router.get(
+  "/revenue-by-method",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    const { from, to } = req.query;
+    if (!from || !to) {
+      return res.status(400).json({ error: "Informe o período (from/to)", code: "BEAUTY_PERIOD_REQUIRED" });
+    }
+    res.json(getRevenueByMethod(from, to));
+  })
+);
+router.get(
+  "/monthly-summary",
+  exigeBeautyFinance,
+  ah(async (req, res) => {
+    const ano = Number(req.query.year) || new Date().getFullYear();
+    res.json(getMonthlyFinanceSummary(ano));
   })
 );
 

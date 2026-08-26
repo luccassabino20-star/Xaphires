@@ -189,7 +189,20 @@
         "vazio": "Nothing in this period.",
         "comissoes": "Commission by professional",
         "totalAtendido": "Total served",
-        "comissao": "Commission"
+        "comissao": "Commission",
+        "entradas": "Income",
+        "saidas": "Payouts",
+        "balancoMensal": "Monthly balance",
+        "faturamentoPorMetodo": "Revenue by method",
+        "comissaoPorServico": "Commission by service",
+        "profissional": "Professional",
+        "servico": "Service",
+        "escolherProfissional": "Choose the professional",
+        "escolherServico": "Choose the service",
+        "comissaoSalva": "Commission saved",
+        "comissaoRemovida": "Commission removed",
+        "semOverrides": "No specific commission configured yet.",
+        "confirmarRemoverComissao": "Remove the commission for \"{{profissional}}\" on \"{{servico}}\"?"
       },
       "online": {
         "bloqueado": "Online booking is available from the {{plano}} plan onward.",

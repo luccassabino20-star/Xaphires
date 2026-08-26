@@ -108,4 +108,18 @@ export function applyXaphiresBeautySchema(companyDb) {
   addColumnIfMissing(companyDb, "beauty_services", "category", "category TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing(companyDb, "beauty_services", "avatar_path", "avatar_path TEXT");
   addColumnIfMissing(companyDb, "beauty_services", "avatar_mime", "avatar_mime TEXT");
+
+  // Fase 7: comissão configurável por serviço - opcional, por cima do
+  // commission_rate padrão do profissional (beauty_staff). Chave composta
+  // (não precisa de id próprio: no máximo uma linha por par staff+serviço) -
+  // getCommissionsSummary cai no padrão do profissional quando não há linha
+  // aqui para o par em questão.
+  companyDb.exec(`
+    CREATE TABLE IF NOT EXISTS beauty_staff_service_commission (
+      staff_id TEXT NOT NULL REFERENCES beauty_staff(id),
+      service_id TEXT NOT NULL REFERENCES beauty_services(id),
+      commission_rate REAL NOT NULL,
+      PRIMARY KEY (staff_id, service_id)
+    );
+  `);
 }

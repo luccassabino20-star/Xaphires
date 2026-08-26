@@ -189,7 +189,20 @@
         "vazio": "Nada en este período.",
         "comissoes": "Comisión por profesional",
         "totalAtendido": "Total atendido",
-        "comissao": "Comisión"
+        "comissao": "Comisión",
+        "entradas": "Entradas",
+        "saidas": "Salidas",
+        "balancoMensal": "Balance mensual",
+        "faturamentoPorMetodo": "Facturación por método",
+        "comissaoPorServico": "Comisión por servicio",
+        "profissional": "Profesional",
+        "servico": "Servicio",
+        "escolherProfissional": "Elige el profesional",
+        "escolherServico": "Elige el servicio",
+        "comissaoSalva": "Comisión guardada",
+        "comissaoRemovida": "Comisión eliminada",
+        "semOverrides": "Ninguna comisión específica configurada todavía.",
+        "confirmarRemoverComissao": "¿Eliminar la comisión de \"{{profissional}}\" para \"{{servico}}\"?"
       },
       "online": {
         "bloqueado": "La reserva en línea está disponible a partir del plan {{plano}}.",

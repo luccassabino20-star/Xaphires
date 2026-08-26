@@ -376,29 +376,115 @@ export function insertPayment({ appointmentId, method, amountCents, paidAt }, us
   return getDb().prepare("SELECT * FROM beauty_payments WHERE id = ?").get(id);
 }
 
-// Comissão = valor pago * fração do profissional atribuído ao agendamento -
-// quem não tem staff_id (atendimento sem profissional atribuído) não entra
-// na soma de ninguém. Calculada na hora a partir do ledger, sem tabela
-// própria: no volume de um salão (dezenas de pagamentos por período), somar
-// de novo a cada consulta sai mais barato que manter uma segunda fonte de
-// verdade sincronizada com beauty_payments.
+// ---------- Comissão por serviço (Fase 7, opcional) ----------
+// Sobrepõe o commission_rate padrão do profissional só para o par
+// staff+serviço em questão - quem não tem linha aqui usa o padrão dele.
+export function listCommissionOverrides() {
+  return getDb()
+    .prepare(
+      `SELECT c.staff_id, c.service_id, c.commission_rate, st.name AS staff_name, s.name AS service_name
+         FROM beauty_staff_service_commission c
+         JOIN beauty_staff st ON st.id = c.staff_id
+         JOIN beauty_services s ON s.id = c.service_id
+        ORDER BY st.name COLLATE NOCASE, s.name COLLATE NOCASE`
+    )
+    .all();
+}
+export function setCommissionOverride(staffId, serviceId, commissionRate) {
+  getDb()
+    .prepare(
+      `INSERT INTO beauty_staff_service_commission (staff_id, service_id, commission_rate)
+       VALUES (?, ?, ?)
+       ON CONFLICT(staff_id, service_id) DO UPDATE SET commission_rate = excluded.commission_rate`
+    )
+    .run(staffId, serviceId, commissionRate);
+}
+export function removeCommissionOverride(staffId, serviceId) {
+  const info = getDb()
+    .prepare("DELETE FROM beauty_staff_service_commission WHERE staff_id = ? AND service_id = ?")
+    .run(staffId, serviceId);
+  return info.changes > 0;
+}
+function mapaDeComissoes() {
+  const linhas = getDb().prepare("SELECT staff_id, service_id, commission_rate FROM beauty_staff_service_commission").all();
+  return new Map(linhas.map((l) => [`${l.staff_id}:${l.service_id}`, l.commission_rate]));
+}
+function taxaEfetiva(overrides, staffId, serviceId, taxaPadrao) {
+  const chave = `${staffId}:${serviceId}`;
+  return overrides.has(chave) ? overrides.get(chave) : taxaPadrao || 0;
+}
+
+// Comissão = valor pago * fração efetiva do profissional atribuído ao
+// agendamento (override do serviço, senão o padrão dele) - quem não tem
+// staff_id (atendimento sem profissional atribuído) não entra na soma de
+// ninguém. Calculada na hora a partir do ledger, sem tabela própria: no
+// volume de um salão (dezenas de pagamentos por período), somar de novo a
+// cada consulta sai mais barato que manter uma segunda fonte de verdade
+// sincronizada com beauty_payments.
 export function getCommissionsSummary(from, to) {
   const pagamentos = getDb()
     .prepare(
-      `SELECT p.amount_cents, a.staff_id
+      `SELECT p.amount_cents, a.staff_id, a.service_id
          FROM beauty_payments p
          JOIN beauty_appointments a ON a.id = p.appointment_id
         WHERE p.paid_at >= ? AND p.paid_at < ? AND a.staff_id IS NOT NULL`
     )
     .all(from, to);
   const staff = listStaff();
+  const overrides = mapaDeComissoes();
   const porProfissional = new Map(staff.map((s) => [s.id, { staffId: s.id, name: s.name, totalCents: 0, commissionCents: 0 }]));
   for (const p of pagamentos) {
     const linha = porProfissional.get(p.staff_id);
     if (!linha) continue; // profissional desativado depois do pagamento - não gera comissão fantasma
     const s = staff.find((x) => x.id === p.staff_id);
+    const taxa = taxaEfetiva(overrides, p.staff_id, p.service_id, s?.commission_rate);
     linha.totalCents += p.amount_cents;
-    linha.commissionCents += Math.round(p.amount_cents * (s?.commission_rate || 0));
+    linha.commissionCents += Math.round(p.amount_cents * taxa);
   }
   return [...porProfissional.values()].filter((l) => l.totalCents > 0);
+}
+
+// ---------- Dashboard financeiro (Fase 7) ----------
+
+// Faturamento por método de pagamento no período - alimenta o donut do
+// dashboard (mesmo desenho de agregação "GROUP BY" de reports.js em Saúde &
+// Clínicas).
+export function getRevenueByMethod(from, to) {
+  return getDb()
+    .prepare(
+      `SELECT method, SUM(amount_cents) AS total
+         FROM beauty_payments
+        WHERE paid_at >= ? AND paid_at < ?
+        GROUP BY method
+       HAVING total > 0`
+    )
+    .all(from, to);
+}
+
+// Faturamento (entrada) x comissão devida (saída) por mês, no ano inteiro -
+// mesmo recorte "ano civil completo" do Fluxo de Caixa de Saúde & Clínicas
+// (BalancoChart), calculado aqui em vez de no cliente porque a comissão
+// depende do override por serviço.
+export function getMonthlyFinanceSummary(year) {
+  const staff = listStaff();
+  const staffMap = new Map(staff.map((s) => [s.id, s]));
+  const overrides = mapaDeComissoes();
+  const pagamentos = getDb()
+    .prepare(
+      `SELECT p.amount_cents, p.paid_at, a.staff_id, a.service_id
+         FROM beauty_payments p
+         JOIN beauty_appointments a ON a.id = p.appointment_id
+        WHERE p.paid_at >= ? AND p.paid_at < ?`
+    )
+    .all(`${year}-01-01T00:00:00`, `${year + 1}-01-01T00:00:00`);
+  const porMes = Array.from({ length: 12 }, (_, i) => ({ mes: i + 1, receitas: 0, despesas: 0 }));
+  for (const p of pagamentos) {
+    const linha = porMes[Number(p.paid_at.slice(5, 7)) - 1];
+    linha.receitas += p.amount_cents;
+    if (p.staff_id) {
+      const taxa = taxaEfetiva(overrides, p.staff_id, p.service_id, staffMap.get(p.staff_id)?.commission_rate);
+      linha.despesas += Math.round(p.amount_cents * taxa);
+    }
+  }
+  return porMes;
 }

@@ -896,6 +896,13 @@ export const xbGetPayments = (from, to) => request(`/xaphires-beauty/payments?fr
 export const xbCreatePayment = (data) => request("/xaphires-beauty/payments", { method: "POST", body: data });
 
 export const xbGetCommissions = (from, to) => request(`/xaphires-beauty/commissions?from=${from}&to=${to}`);
+export const xbGetCommissionOverrides = () => request("/xaphires-beauty/commissions/overrides");
+export const xbSetCommissionOverride = (staffId, serviceId, commissionRate) =>
+  request("/xaphires-beauty/commissions/overrides", { method: "PUT", body: { staffId, serviceId, commissionRate } });
+export const xbDeleteCommissionOverride = (staffId, serviceId) =>
+  request(`/xaphires-beauty/commissions/overrides/${staffId}/${serviceId}`, { method: "DELETE" });
+export const xbGetRevenueByMethod = (from, to) => request(`/xaphires-beauty/revenue-by-method?from=${from}&to=${to}`);
+export const xbGetMonthlySummary = (year) => request(`/xaphires-beauty/monthly-summary?year=${year}`);
 
 // Link público de agendamento (Profissional+)
 export const xbGetBookingLink = () => request("/xaphires-beauty/booking-link");
