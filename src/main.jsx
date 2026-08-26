@@ -42,6 +42,17 @@ const BeautyReminderPage = React.lazy(() => import("./modules/xaphires-beauty/Be
 // Mesmo isolamento do GanttChartDemo: sem login, sem dado real por trás.
 const XaphiresBeautyPrototype = React.lazy(() => import("./prototypes/xaphiresBeauty/XaphiresBeautyPrototype.jsx"));
 
+// Service Worker do PWA: só em produção (import.meta.env.PROD) - em dev o
+// Vite já reescreve os módulos a cada save, e um SW cacheando por cima
+// confundiria "não pegou minha mudança" com "servidor fora do ar" (ver
+// CLAUDE.md sobre o Express não recarregar sozinho - aqui seria o mesmo
+// problema, só que no cliente).
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
+
 const path = window.location.pathname.replace(/\/+$/, "");
 const ehPainel = path === "/admin";
 const ehGanttDemo = path === "/gantt-demo";

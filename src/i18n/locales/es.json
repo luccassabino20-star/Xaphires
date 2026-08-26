@@ -2114,5 +2114,17 @@
     "PAYMENT_NOT_FOUND": "Cobro no encontrado.",
     "NO_SUBSCRIPTION": "No hay suscripción activa.",
     "BILLING_PROVIDER_NOT_CONFIGURED": "El medio de pago aún no está configurado. Contacta al soporte."
+  },
+  "pwa": {
+    "install": {
+      "title": "Instala Xaphires",
+      "androidDesc": "Agrégalo a la pantalla de inicio y ábrelo como una app, sin necesitar el navegador.",
+      "installBtn": "Instalar",
+      "iosTitle": "Agregar a la pantalla de inicio",
+      "iosStep1": "Toca el ícono de compartir en Safari",
+      "iosStep2": "Elige \"Agregar a la pantalla de inicio\"",
+      "dismiss": "Ahora no",
+      "close": "Cerrar"
+    }
   }
 }

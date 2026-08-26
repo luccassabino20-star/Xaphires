@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getModules } from "./state/api.js";
 import ModuleLauncher from "./modules/ModuleLauncher.jsx";
 import AuthenticatedApp from "./AuthenticatedApp.jsx";
+import InstallPwaBanner from "./components/InstallPwaBanner.jsx";
 // Lazy: o Financeiro (com exceljs/pdf-parse na cauda) não deve pesar no pacote que
 // todo cliente baixa - só é buscado quando alguém abre o módulo.
 const FinanceiroModule = lazy(() => import("./modules/financeiro/FinanceiroModule.jsx"));
@@ -86,11 +87,19 @@ export default function PlatformShell() {
   if (ativo && Componente) {
     // Suspense cobre o carregamento do chunk lazy do módulo (Financeiro).
     return (
-      <Suspense fallback={<div className="app-loading">{t("common.loading")}</div>}>
-        <Componente onExit={voltar} />
-      </Suspense>
+      <>
+        <Suspense fallback={<div className="app-loading">{t("common.loading")}</div>}>
+          <Componente onExit={voltar} />
+        </Suspense>
+        <InstallPwaBanner />
+      </>
     );
   }
 
-  return <ModuleLauncher modules={modules} onOpen={abrir} />;
+  return (
+    <>
+      <ModuleLauncher modules={modules} onOpen={abrir} />
+      <InstallPwaBanner />
+    </>
+  );
 }

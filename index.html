@@ -33,6 +33,15 @@
   <meta property="og:image:height" content="570" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <!-- PWA: manifest + tema, e o trio que o iOS Safari exige à parte (não lê
+       manifest.json para instalação "Adicionar à Tela de Início" antes do
+       iOS 16.4, e mesmo depois o apple-touch-icon continua sendo o usado). -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#101f47" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Xaphires" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Playfair Display entra só para o logotipo "Xaphires"; a interface segue na Inter.

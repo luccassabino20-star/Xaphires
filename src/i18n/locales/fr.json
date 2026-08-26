@@ -2079,5 +2079,17 @@
     "PAYMENT_NOT_FOUND": "Facture introuvable.",
     "NO_SUBSCRIPTION": "Aucun abonnement actif.",
     "BILLING_PROVIDER_NOT_CONFIGURED": "Le moyen de paiement n'est pas encore configuré. Contactez le support."
+  },
+  "pwa": {
+    "install": {
+      "title": "Installer Xaphires",
+      "androidDesc": "Ajoutez-le à l'écran d'accueil et ouvrez-le comme une application, sans navigateur.",
+      "installBtn": "Installer",
+      "iosTitle": "Ajouter à l'écran d'accueil",
+      "iosStep1": "Appuyez sur l'icône de partage de Safari",
+      "iosStep2": "Choisissez \"Sur l'écran d'accueil\"",
+      "dismiss": "Pas maintenant",
+      "close": "Fermer"
+    }
   }
 }

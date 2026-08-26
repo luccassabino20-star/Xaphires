@@ -2114,5 +2114,17 @@
     "PAYMENT_NOT_FOUND": "Charge not found.",
     "NO_SUBSCRIPTION": "There is no active subscription.",
     "BILLING_PROVIDER_NOT_CONFIGURED": "The payment method is not configured yet. Contact support."
+  },
+  "pwa": {
+    "install": {
+      "title": "Install Xaphires",
+      "androidDesc": "Add it to your home screen and open it like an app, no browser needed.",
+      "installBtn": "Install",
+      "iosTitle": "Add to Home Screen",
+      "iosStep1": "Tap the Share icon in Safari",
+      "iosStep2": "Choose \"Add to Home Screen\"",
+      "dismiss": "Not now",
+      "close": "Close"
+    }
   }
 }

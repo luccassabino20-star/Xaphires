@@ -1835,5 +1835,17 @@
     "PAYMENT_NOT_FOUND": "Rechnung nicht gefunden.",
     "NO_SUBSCRIPTION": "Es gibt kein aktives Abonnement.",
     "BILLING_PROVIDER_NOT_CONFIGURED": "Die Zahlungsart ist noch nicht konfiguriert. Wenden Sie sich an den Support."
+  },
+  "pwa": {
+    "install": {
+      "title": "Xaphires installieren",
+      "androidDesc": "Zum Startbildschirm hinzufügen und wie eine App öffnen, ganz ohne Browser.",
+      "installBtn": "Installieren",
+      "iosTitle": "Zum Startbildschirm hinzufügen",
+      "iosStep1": "Tippen Sie auf das Teilen-Symbol in Safari",
+      "iosStep2": "Wählen Sie \"Zum Home-Bildschirm\"",
+      "dismiss": "Nicht jetzt",
+      "close": "Schließen"
+    }
   }
 }
