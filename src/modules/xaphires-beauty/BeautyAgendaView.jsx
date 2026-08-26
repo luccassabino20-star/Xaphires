@@ -67,7 +67,6 @@ const SEM_PROFISSIONAL = "__sem__";
 
 const FORM_VAZIO = { clientId: "", serviceId: "", staffId: "", date: hojeCivil(), time: "09:00", notes: "", repeatFrequency: "none", repeatOccurrences: "4" };
 const BLOCK_VAZIO = { staffId: "", date: hojeCivil(), startTime: "12:00", endTime: "13:00", reason: "" };
-const BADGE_POR_STATUS = { agendado: "beauty-badge-agendado", concluido: "beauty-badge-concluido", cancelado: "beauty-badge-cancelado" };
 
 // Agenda: visão Dia (grade com uma coluna por profissional, mini-calendário e
 // resumo do dia - redesenho pedido pelo cliente) e visão Semana (7 colunas,
@@ -220,31 +219,6 @@ export default function BeautyAgendaView() {
     }
   }
 
-  async function mudarStatus(id, status) {
-    try {
-      await api.xbSetAppointmentStatus(id, status);
-      setSelecionado(null);
-      await carregarAgenda();
-    } catch (err) {
-      showToast(translateError(err, t));
-    }
-  }
-
-  async function copiarLinkLembrete(id) {
-    try {
-      const { slug } = await api.xbGetReminderLink(id);
-      const url = `${window.location.origin}/beauty-lembrete/${slug}`;
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast(t("modules.xaphiresBeauty.agenda.linkCopiado"));
-      } catch {
-        window.prompt(t("modules.xaphiresBeauty.agenda.linkLembrete"), url);
-      }
-    } catch (err) {
-      showToast(translateError(err, t));
-    }
-  }
-
   async function salvarBloqueio(e) {
     e.preventDefault();
     if (!fBlock.startTime || !fBlock.endTime || !fBlock.date) return;
@@ -263,57 +237,6 @@ export default function BeautyAgendaView() {
       showToast(translateError(err, t));
     }
   }
-  async function removerBloqueio(id) {
-    if (!window.confirm(t("modules.xaphiresBeauty.agenda.confirmarRemoverBloqueio"))) return;
-    try {
-      await api.xbDeleteBlock(id);
-      await carregarAgenda();
-    } catch (err) {
-      showToast(translateError(err, t));
-    }
-  }
-
-  function linhaAgendamento(a) {
-    return (
-      <div className="beauty-list-row" key={a.id}>
-        <span className="beauty-cell-primary" style={{ width: 56 }}>{a.starts_at.slice(11, 16)}</span>
-        <span style={{ flex: 1.4, display: "flex", alignItems: "center", gap: 8 }}>
-          {a.client_name}
-          {!!a.from_public_link && <span className="beauty-badge beauty-badge-online">{t("modules.xaphiresBeauty.agenda.online")}</span>}
-        </span>
-        <span className="beauty-cell-muted" style={{ flex: 1 }}>{a.service_name}</span>
-        <span className="beauty-cell-muted" style={{ flex: 1 }}>{a.staff_name || "—"}</span>
-        <span style={{ width: 100 }}>
-          <span className={"beauty-badge " + BADGE_POR_STATUS[a.status]}>{t(`modules.xaphiresBeauty.agenda.status.${a.status}`)}</span>
-        </span>
-        <span className="beauty-col-actions">
-          {a.status === "agendado" && (
-            <>
-              <button type="button" className="btn-ghost" onClick={() => mudarStatus(a.id, "concluido")}>{t("modules.xaphiresBeauty.agenda.concluir")}</button>
-              <button type="button" className="btn-ghost" onClick={() => mudarStatus(a.id, "cancelado")}>{t("modules.xaphiresBeauty.agenda.cancelar")}</button>
-            </>
-          )}
-          <button type="button" className="btn-ghost" onClick={() => duplicar(a)}>{t("modules.xaphiresBeauty.agenda.duplicar")}</button>
-          <button type="button" className="btn-ghost" onClick={() => copiarLinkLembrete(a.id)}>{t("modules.xaphiresBeauty.agenda.linkLembrete")}</button>
-        </span>
-      </div>
-    );
-  }
-  function linhaBloqueio(b) {
-    return (
-      <div className="beauty-list-row beauty-block-row" key={b.id}>
-        <span className="beauty-cell-primary" style={{ width: 56 }}>{b.starts_at.slice(11, 16)}</span>
-        <span style={{ flex: 1.4 }}>{t("modules.xaphiresBeauty.agenda.bloqueio")}{b.reason ? ` - ${b.reason}` : ""}</span>
-        <span className="beauty-cell-muted" style={{ flex: 1 }}></span>
-        <span className="beauty-cell-muted" style={{ flex: 1 }}>{b.staff_name || t("modules.xaphiresBeauty.agenda.todaEquipe")}</span>
-        <span style={{ width: 100 }} />
-        <span className="beauty-col-actions">
-          <button type="button" className="btn-ghost" onClick={() => removerBloqueio(b.id)}>{t("common.remove")}</button>
-        </span>
-      </div>
-    );
-  }
-
   const itensDoDiaAtual = itensDoDia(date);
 
   // Colunas da grade (visão Dia): um profissional selecionado por coluna, e
@@ -618,21 +541,6 @@ export default function BeautyAgendaView() {
               </div>
             );
           })}
-        </div>
-      )}
-
-      {visao === "dia" && itensDoDiaAtual.length > 0 && (
-        <div className="beauty-card" style={{ marginTop: 18 }}>
-          <div className="beauty-list">
-            <div className="beauty-list-head">
-              <span style={{ width: 56 }}>{t("modules.xaphiresBeauty.agenda.horario")}</span>
-              <span style={{ flex: 1.4 }}>{t("modules.xaphiresBeauty.agenda.colCliente")}</span>
-              <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.agenda.colServico")}</span>
-              <span style={{ flex: 1 }}>{t("modules.xaphiresBeauty.agenda.colProfissional")}</span>
-              <span style={{ width: 100 }}>{t("modules.xaphiresBeauty.agenda.situacao")}</span>
-            </div>
-            {itensDoDiaAtual.map((item) => (item.tipo === "agendamento" ? linhaAgendamento(item.dado) : linhaBloqueio(item.dado)))}
-          </div>
         </div>
       )}
 
