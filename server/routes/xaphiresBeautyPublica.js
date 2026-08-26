@@ -69,8 +69,12 @@ router.get(
         lat: config.lat,
         lng: config.lng,
         bookingRulesText: config.booking_rules_text,
-        hasCover: !!config.cover_path,
-        hasLogo: !!config.logo_path,
+        // O path em si (não um booleano) - o cliente usa como cache-bust na
+        // URL da foto (?v=<path>), mesmo truque de avatar_path em clientes/
+        // serviços: sem isso, trocar a capa não invalida o cache de quem já
+        // abriu a página (Cache-Control é immutable de propósito).
+        coverPath: config.cover_path,
+        logoPath: config.logo_path,
       });
     });
   })

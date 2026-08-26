@@ -768,7 +768,11 @@ router.put(
 );
 
 const CAMPOS_IMAGEM_PAGINA = new Set(["cover", "logo"]);
-const PAGE_IMAGE_MAX_BYTES = 4 * 1024 * 1024;
+// Mesmo teto de 3MB do avatar de cliente/serviço - não 4MB: o code
+// PHOTO_TOO_LARGE é compartilhado, e a tradução fixa "3 MB" nos três
+// locales (errors.PHOTO_TOO_LARGE) mostraria o número errado se o limite
+// daqui divergisse.
+const PAGE_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
 
 // Upload de capa/logo - clone do de POST /clients/:id/photo (mesmo motivo do
 // runWithCompany manual, ver comentário lá), parametrizado por :campo.

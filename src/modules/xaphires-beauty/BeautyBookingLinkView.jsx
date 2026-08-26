@@ -15,7 +15,7 @@ import BeautyMiniMap from "./BeautyMiniMap.jsx";
 // página pública (Fase 10): capa, logo, endereço (CEP + geocode, os mesmos
 // endpoints genéricos que o Kanban já usa) e regras de agendamento.
 export default function BeautyBookingLinkView({ canUse }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const showToast = useToast();
   const [slug, setSlug] = useState(null);
   const [erro, setErro] = useState("");
@@ -113,7 +113,13 @@ export default function BeautyBookingLinkView({ canUse }) {
     setEnviando(true);
     try {
       const atualizado = await api.xbUploadPageImage(campo, file);
-      setConfig(atualizado);
+      // Só os campos da própria imagem - o upload não sabe de edições de
+      // endereço/regras ainda não salvas no formulário, e sobrescrever o
+      // config inteiro com o que já está no banco jogaria fora o que a
+      // pessoa digitou e não clicou em "Salvar" ainda.
+      const campoPath = campo === "cover" ? "cover_path" : "logo_path";
+      const campoMime = campo === "cover" ? "cover_mime" : "logo_mime";
+      setConfig((c) => ({ ...c, [campoPath]: atualizado[campoPath], [campoMime]: atualizado[campoMime] }));
     } catch (err) {
       showToast(translateError(err, t));
     } finally {

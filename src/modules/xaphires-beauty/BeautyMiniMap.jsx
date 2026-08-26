@@ -8,7 +8,10 @@ const DEFAULT_ZOOM = 4;
 // Mini-mapa de um ponto só (endereço do salão) - clone simplificado de
 // src/components/views/MapView.jsx (mesmo padrão L.map/tileLayer direto,
 // sem react-leaflet), sem os múltiplos marcadores/enquadramento por
-// conjunto: aqui é sempre um marcador, ou nenhum.
+// conjunto: aqui é sempre um marcador, ou nenhum. circleMarker, não
+// L.marker: o ícone padrão do Leaflet resolve o caminho do PNG relativo ao
+// próprio pacote, e o bundle do Vite quebra essa resolução - é o mesmo
+// motivo pelo qual MapView.jsx usa circleMarker em vez do pino padrão.
 export default function BeautyMiniMap({ lat, lng }) {
   const mapElRef = useRef(null);
   const mapRef = useRef(null);
@@ -41,7 +44,7 @@ export default function BeautyMiniMap({ lat, lng }) {
       markerRef.current = null;
     }
     if (lat != null && lng != null) {
-      markerRef.current = L.marker([lat, lng]).addTo(map);
+      markerRef.current = L.circleMarker([lat, lng], { radius: 9, weight: 2, color: "#ffffff", fillColor: "#B76E79", fillOpacity: 1 }).addTo(map);
       map.setView([lat, lng], 15);
     } else {
       map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);

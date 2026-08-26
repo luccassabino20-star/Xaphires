@@ -84,8 +84,8 @@ export default function BeautyPublicBookingPage({ slug }) {
     );
   }
 
-  const capaUrl = dados.hasCover ? `/api/public/xaphires-beauty/${slug}/photo/cover` : null;
-  const logoUrl = dados.hasLogo ? `/api/public/xaphires-beauty/${slug}/photo/logo` : null;
+  const capaUrl = dados.coverPath ? `/api/public/xaphires-beauty/${slug}/photo/cover?v=${dados.coverPath}` : null;
+  const logoUrl = dados.logoPath ? `/api/public/xaphires-beauty/${slug}/photo/logo?v=${dados.logoPath}` : null;
 
   return (
     <div className="sc-pub">
