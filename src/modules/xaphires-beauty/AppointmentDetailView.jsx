@@ -5,7 +5,7 @@ import { translateError } from "../../utils/errors.js";
 import { whatsappLink } from "../../utils/contact.js";
 import * as api from "../../state/api.js";
 import Avatar from "../../components/Avatar.jsx";
-import BeautyEmptyState from "./BeautyEmptyState.jsx";
+import BeautyClientProfileTabs from "./BeautyClientProfileTabs.jsx";
 
 const BADGE_POR_STATUS = { agendado: "beauty-badge-agendado", concluido: "beauty-badge-concluido", cancelado: "beauty-badge-cancelado" };
 
@@ -17,6 +17,14 @@ function formatarDataHora(iso, lang) {
   const data = new Intl.DateTimeFormat(lang, { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
   const hora = iso.slice(11, 16);
   return `${data} ${hora}`;
+}
+function limitesDoMes() {
+  const d = new Date();
+  const ano = d.getFullYear();
+  const mes = d.getMonth() + 1;
+  const de = `${ano}-${String(mes).padStart(2, "0")}-01T00:00:00`;
+  const proximo = mes === 12 ? `${ano + 1}-01` : `${ano}-${String(mes + 1).padStart(2, "0")}`;
+  return { from: de, to: `${proximo}-01T00:00:00` };
 }
 
 // Ícones da linha do tempo - traço fino, no mesmo espírito de BeautyIcon.jsx,
@@ -35,7 +43,14 @@ function IconeEvento({ tipo }) {
 // vêm já carregados de BeautyAgendaView (evita rebuscar pra montar os
 // selects de edição); onChanged() é o carregarAgenda() de lá, chamado depois
 // de qualquer mutação bem-sucedida pra manter a grade sincronizada.
-export default function AppointmentDetailView({ appointment, clientes, servicos, equipe, onClose, onChanged, onDuplicate, onOpenClient }) {
+//
+// Fase 14: as abas Geral/Ficha Técnica/Histórico da cliente (mesmo conteúdo
+// de BeautyClientDetailModal, via BeautyClientProfileTabs.jsx) entram direto
+// aqui - pedido do cliente foi ver o perfil completo sem precisar abrir um
+// segundo modal por cima ao clicar no agendamento. onClientUpdated propaga
+// uma edição feita numa dessas abas (ex.: ficha técnica salva) de volta pro
+// cache de `clientes` que BeautyAgendaView mantém.
+export default function AppointmentDetailView({ appointment, clientes, servicos, equipe, onClose, onChanged, onDuplicate, onClientUpdated }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const [atual, setAtual] = useState(appointment);
@@ -43,6 +58,7 @@ export default function AppointmentDetailView({ appointment, clientes, servicos,
   const [modoEdicao, setModoEdicao] = useState(false);
   const [fEdit, setFEdit] = useState(null);
   const [pagamentos, setPagamentos] = useState([]);
+  const [ranking, setRanking] = useState([]);
   const [confirmandoCancelar, setConfirmandoCancelar] = useState(false);
   const [salvando, setSalvando] = useState(false);
 
@@ -51,7 +67,16 @@ export default function AppointmentDetailView({ appointment, clientes, servicos,
     // eslint-disable-next-line
   }, [atual.id]);
 
+  useEffect(() => {
+    const { from, to } = limitesDoMes();
+    api.xbGetClientRanking(from, to).then(setRanking).catch(() => setRanking([]));
+  }, []);
+
   const staffAtual = equipe.find((s) => s.id === atual.staff_id);
+  const cliente = clientes.find((c) => c.id === atual.client_id);
+  const rankingIdx = ranking.findIndex((r) => r.client_id === atual.client_id);
+  const rankingEntry = rankingIdx === -1 ? null : ranking[rankingIdx];
+  const posicaoRanking = rankingIdx === -1 ? null : rankingIdx + 1;
 
   function entrarEdicao() {
     setFEdit({
@@ -175,14 +200,24 @@ export default function AppointmentDetailView({ appointment, clientes, servicos,
           <button type="button" className={"beauty-tab" + (aba === "detalhes" ? " active" : "")} onClick={() => setAba("detalhes")}>
             {t("modules.xaphiresBeauty.atendimento.abaDetalhes")}
           </button>
-          <button type="button" className={"beauty-tab" + (aba === "anamnese" ? " active" : "")} onClick={() => setAba("anamnese")}>
-            {t("modules.xaphiresBeauty.atendimento.abaAnamnese")}
+          <button type="button" className={"beauty-tab" + (aba === "geral" ? " active" : "")} onClick={() => setAba("geral")}>
+            {t("modules.xaphiresBeauty.clientes.abaGeral")}
+          </button>
+          <button type="button" className={"beauty-tab" + (aba === "ficha" ? " active" : "")} onClick={() => setAba("ficha")}>
+            {t("modules.xaphiresBeauty.clientes.abaFichaTecnica")}
+          </button>
+          <button type="button" className={"beauty-tab" + (aba === "historico" ? " active" : "")} onClick={() => setAba("historico")}>
+            {t("modules.xaphiresBeauty.clientes.abaHistorico")}
           </button>
         </div>
 
         <div className="modal-body">
-          {aba === "anamnese" ? (
-            <BeautyEmptyState title={t("modules.xaphiresBeauty.emBreve.titulo")} text={t("modules.xaphiresBeauty.emBreve.texto")} />
+          {aba === "geral" || aba === "ficha" || aba === "historico" ? (
+            cliente ? (
+              <BeautyClientProfileTabs client={cliente} rankingEntry={rankingEntry} posicao={posicaoRanking} aba={aba} onUpdated={onClientUpdated} />
+            ) : (
+              <p className="beauty-cell-muted">{t("common.loading")}</p>
+            )
           ) : modoEdicao ? (
             <form className="beauty-form" onSubmit={salvarEdicao} style={{ padding: "18px 0" }}>
               <select value={fEdit.clientId} onChange={(e) => setFEdit({ ...fEdit, clientId: e.target.value })}>
@@ -217,13 +252,7 @@ export default function AppointmentDetailView({ appointment, clientes, servicos,
                 <div className="beauty-apt-grid">
                   <div>
                     <span className="beauty-apt-label">{t("modules.xaphiresBeauty.atendimento.cliente")}</span>
-                    {onOpenClient ? (
-                      <button type="button" className="beauty-apt-value-primary beauty-apt-value-link" onClick={() => onOpenClient(atual.client_id)}>
-                        {atual.client_name}
-                      </button>
-                    ) : (
-                      <div className="beauty-apt-value-primary">{atual.client_name}</div>
-                    )}
+                    <div className="beauty-apt-value-primary">{atual.client_name}</div>
                     {atual.client_phone && (
                       <a className="beauty-apt-whatsapp" href={whatsappLink(atual.client_phone, "")} target="_blank" rel="noopener noreferrer">
                         {atual.client_phone} · {t("modules.xaphiresBeauty.atendimento.whatsapp")}
