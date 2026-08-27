@@ -14,12 +14,19 @@ import MatrixView from "./components/views/MatrixView.jsx";
 import CardModal from "./components/CardModal.jsx";
 import { useBoardState } from "./state/BoardContext.jsx";
 import { useUsers } from "./state/UsersContext.jsx";
+import { useAuth } from "./state/AuthContext.jsx";
 import PlanBanner from "./components/PlanBanner.jsx";
+
+// Mesmo conjunto de ids que os `view ===` do render mais abaixo aceitam -
+// preferência salva com uma versão antiga do app (ou editada na mão) não vira
+// tela em branco por apontar pra uma view que não existe mais.
+const VIEWS_VALIDAS = new Set(["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"]);
 
 export default function AuthenticatedApp({ onExitModule }) {
   const { t } = useTranslation();
   const state = useBoardState();
   const { users } = useUsers();
+  const { user } = useAuth();
   const [activeBoardId, setActiveBoardId] = useState(null);
   const [activeCardId, setActiveCardId] = useState(null);
   // Intent além do id: a barra de ações rápidas do card ("+" de subtarefa)
@@ -36,7 +43,13 @@ export default function AuthenticatedApp({ onExitModule }) {
   // por cima do quadro na primeira visita seria uma surpresa - só em telas largas
   // ele começa aberto, empurrando o layout como sempre foi.
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 720);
-  const [view, setView] = useState("board");
+  // "Exibição padrão" da Central de Perfil (KanbanProfileModal.jsx) - só lida
+  // uma vez, no primeiro render: trocar de aba depois é ação da pessoa
+  // naquela sessão, não deveria saltar de volta pro padrão salvo.
+  const [view, setView] = useState(() => {
+    const pref = user?.prefs?.defaultView;
+    return pref && VIEWS_VALIDAS.has(pref) ? pref : "board";
+  });
 
   useEffect(() => {
     if (!state.hydrated) return;

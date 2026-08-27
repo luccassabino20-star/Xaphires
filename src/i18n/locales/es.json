@@ -1343,6 +1343,58 @@
       "uploadPhoto": "Cambiar foto",
       "removePhoto": "Quitar foto"
     },
+    "profileHub": {
+      "title": "Central de Perfil",
+      "online": "En línea",
+      "roleMaster": "Administrador",
+      "roleMember": "Miembro",
+      "tabs": {
+        "geral": "General",
+        "metricas": "Mis Tareas y Métricas",
+        "preferencias": "Preferencias del Tablero",
+        "seguranca": "Seguridad"
+      },
+      "geral": {
+        "nickname": "Apodo en el tablero",
+        "nicknamePlaceholder": "Cómo te llama el equipo",
+        "badgeColor": "Color de tu insignia",
+        "badgeColorNote": "Se usa en tu avatar y en el menú de la cuenta - todavía no aparece en las tarjetas del tablero, eso es un próximo paso."
+      },
+      "metricas": {
+        "total": "Tarjetas asignadas a mí",
+        "concluidas": "Completadas",
+        "andamento": "En curso",
+        "atrasadas": "Atrasadas",
+        "atividadeTitulo": "Actividad reciente en tus tarjetas",
+        "atividadeVazia": "Sin actividad reciente.",
+        "eventoCriado": "Creada",
+        "eventoMovido": "Entró en \"{{lista}}\"",
+        "eventoConcluido": "Completada"
+      },
+      "preferencias": {
+        "exibicaoPadrao": "Vista predeterminada al abrir un tablero",
+        "viewBoard": "Tablero Kanban",
+        "viewTable": "Lista",
+        "viewCalendar": "Calendario",
+        "viewGantt": "Gantt",
+        "viewDashboard": "Panel",
+        "viewMap": "Mapa",
+        "viewMatrix": "Matriz",
+        "avisosTitulo": "Avisos",
+        "avisosNota": "Esta preferencia se guarda de verdad - el envío de avisos para estos eventos aún no existe en el producto.",
+        "avisoMencao": "Me mencionaron en una tarjeta",
+        "avisoAtribuicao": "Me asignaron una tarjeta",
+        "avisoPrazo": "Un plazo que sigo está por vencer",
+        "corQuadro": "Color de fondo sugerido para tableros nuevos",
+        "corQuadroNota": "Guarda la preferencia; todavía no se aplica automáticamente al crear un tablero.",
+        "salvar": "Guardar preferencias",
+        "salvo": "Preferencias guardadas"
+      },
+      "seguranca": {
+        "sessoesTitulo": "Sesiones activas",
+        "sessoesIndisponivel": "Esta función todavía no existe - el inicio de sesión no registra sesiones ni historial de acceso hoy."
+      }
+    },
     "taskTicker": {
       "pending": "Pendientes ({{count}})"
     }

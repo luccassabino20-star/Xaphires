@@ -1046,6 +1046,58 @@
       "uploadPhoto": "Foto ändern",
       "removePhoto": "Foto entfernen"
     },
+    "profileHub": {
+      "title": "Profil-Zentrale",
+      "online": "Online",
+      "roleMaster": "Administrator",
+      "roleMember": "Mitglied",
+      "tabs": {
+        "geral": "Allgemein",
+        "metricas": "Meine Aufgaben & Kennzahlen",
+        "preferencias": "Board-Einstellungen",
+        "seguranca": "Sicherheit"
+      },
+      "geral": {
+        "nickname": "Spitzname im Board",
+        "nicknamePlaceholder": "Wie das Team Sie nennt",
+        "badgeColor": "Ihre Badge-Farbe",
+        "badgeColorNote": "Wird für Ihren Avatar und das Kontomenü verwendet - erscheint noch nicht auf Board-Karten, das ist ein nächster Schritt."
+      },
+      "metricas": {
+        "total": "Mir zugewiesene Karten",
+        "concluidas": "Abgeschlossen",
+        "andamento": "In Bearbeitung",
+        "atrasadas": "Überfällig",
+        "atividadeTitulo": "Letzte Aktivität auf Ihren Karten",
+        "atividadeVazia": "Keine aktuellen Aktivitäten.",
+        "eventoCriado": "Erstellt",
+        "eventoMovido": "In \"{{lista}}\" verschoben",
+        "eventoConcluido": "Abgeschlossen"
+      },
+      "preferencias": {
+        "exibicaoPadrao": "Standardansicht beim Öffnen eines Boards",
+        "viewBoard": "Kanban-Board",
+        "viewTable": "Liste",
+        "viewCalendar": "Kalender",
+        "viewGantt": "Gantt",
+        "viewDashboard": "Dashboard",
+        "viewMap": "Karte",
+        "viewMatrix": "Matrix",
+        "avisosTitulo": "Benachrichtigungen",
+        "avisosNota": "Diese Einstellung wird wirklich gespeichert - der tatsächliche Versand von Benachrichtigungen für diese Ereignisse existiert im Produkt noch nicht.",
+        "avisoMencao": "Ich wurde in einer Karte erwähnt",
+        "avisoAtribuicao": "Mir wurde eine Karte zugewiesen",
+        "avisoPrazo": "Eine von mir verfolgte Frist läuft bald ab",
+        "corQuadro": "Vorgeschlagene Hintergrundfarbe für neue Boards",
+        "corQuadroNota": "Speichert die Einstellung; sie wird beim Erstellen eines Boards noch nicht automatisch angewendet.",
+        "salvar": "Einstellungen speichern",
+        "salvo": "Einstellungen gespeichert"
+      },
+      "seguranca": {
+        "sessoesTitulo": "Aktive Sitzungen",
+        "sessoesIndisponivel": "Diese Funktion gibt es noch nicht - die Anmeldung zeichnet heute weder Sitzungen noch den Zugriffsverlauf auf."
+      }
+    },
     "taskTicker": {
       "pending": "Ausstehend ({{count}})"
     }

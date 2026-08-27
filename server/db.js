@@ -201,6 +201,13 @@ function applySchema(companyDb) {
   // tipo pela extensão, que o arquivo no disco não tem.
   addColumnIfMissing(companyDb, "users", "avatar_path", "avatar_path TEXT");
   addColumnIfMissing(companyDb, "users", "avatar_mime", "avatar_mime TEXT");
+  // Central de Perfil do Kanban (apelido, cor do badge, exibição padrão,
+  // avisos, cor de fundo padrão de quadro novo) - um JSON só em vez de uma
+  // coluna por campo, mesmo padrão de cards.labels/checklist: é preferência
+  // solta do próprio usuário, não dado relacional que precise de índice ou
+  // JOIN. repo.updateProfilePrefs() faz merge parcial, nunca sobrescreve o
+  // que não veio no PATCH.
+  addColumnIfMissing(companyDb, "users", "prefs", "prefs TEXT NOT NULL DEFAULT '{}'");
 
   addColumnIfMissing(companyDb, "cards", "completed", "completed INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing(companyDb, "cards", "start_date", "start_date TEXT");

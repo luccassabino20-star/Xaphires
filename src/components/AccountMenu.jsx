@@ -13,7 +13,12 @@ const PlataformaModal = lazy(() => import("./PlataformaModal.jsx"));
 import * as api from "../state/api.js";
 import { initials, colorForUser } from "../utils/members.js";
 
-export default function AccountMenu() {
+// ProfileComponent: só o Kanban (Sidebar.jsx) passa a Central de Perfil
+// premium (KanbanProfileModal.jsx) - os outros módulos (CRM, Financeiro,
+// Saúde & Clínicas, Xaphires Beauty, Hub) continuam com o ProfileModal
+// simples de sempre, sem precisar saber que a variante existe. Mesmo
+// contrato (só `onClose`), então é uma troca de componente, não de lógica.
+export default function AccountMenu({ ProfileComponent = ProfileModal }) {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const showToast = useToast();
@@ -72,7 +77,7 @@ export default function AccountMenu() {
     <div className="account-menu" ref={ref}>
       <button
         className="avatar account-menu-btn"
-        style={user.avatarUrl ? undefined : { background: colorForUser(user.id) }}
+        style={user.avatarUrl ? undefined : { background: user.prefs?.badgeColor || colorForUser(user.id) }}
         onClick={() => setOpen((o) => !o)}
       >
         {user.avatarUrl ? <img className="avatar-img-fill" src={user.avatarUrl} alt="" /> : initials(user.name)}
@@ -141,7 +146,11 @@ export default function AccountMenu() {
           )}
         </div>
       )}
-      {profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
+      {profileOpen && (
+        <Suspense fallback={null}>
+          <ProfileComponent onClose={() => setProfileOpen(false)} />
+        </Suspense>
+      )}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
       {plataformaOpen && (
         <Suspense fallback={null}>

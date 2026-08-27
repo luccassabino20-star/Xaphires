@@ -4149,6 +4149,56 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 .profile-bio-input:focus { box-shadow: inset 0 0 0 2px var(--accent); }
 
+/* ---------- Central de Perfil do Kanban (KanbanProfileModal.jsx) ---------- */
+/* Variáveis globais (--text-*/--border-*/--bg-card/--accent), nunca
+   --beauty-* - este modal abre de dentro do Kanban, fora de qualquer
+   .beauty-shell, e variável CSS inexistente derruba a declaração inteira em
+   silêncio (ver nota do projeto sobre isso). .beauty-tab/.beauty-section-
+   title etc. não servem aqui por esse motivo - classes próprias abaixo. */
+.profile-hub-head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
+.profile-hub-avatar { position: relative; flex-shrink: 0; }
+.profile-hub-online-dot {
+  position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--success); border: 2px solid var(--bg-topbar);
+}
+.profile-hub-avatar-edit {
+  position: absolute; top: -2px; right: -2px; width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--accent); color: #fff; border: 2px solid var(--bg-topbar);
+  cursor: pointer;
+}
+.profile-hub-avatar-edit:hover { background: var(--accent-hover); }
+.profile-hub-name { font-size: 19px; font-weight: 700; margin: 0 0 2px; color: var(--text-primary); }
+.profile-hub-role-badge {
+  display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 999px;
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+}
+.profile-hub-muted { color: var(--text-muted); font-size: 12.5px; }
+.profile-hub-tabs { display: flex; border-bottom: 1px solid var(--border-subtle); margin: 14px 0 18px; gap: 4px; }
+.profile-hub-tab {
+  padding: 9px 4px; margin-right: 18px; font-size: 13.5px; font-weight: 600; color: var(--text-secondary);
+  background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px;
+}
+.profile-hub-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.profile-hub-section-title { font-size: 13.5px; font-weight: 700; margin: 22px 0 12px; color: var(--text-primary); }
+.profile-hub-section-title:first-of-type { margin-top: 4px; }
+.profile-hub-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.profile-hub-swatch {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer;
+  padding: 0; transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.profile-hub-swatch:hover { transform: scale(1.1); }
+.profile-hub-swatch.active { border-color: var(--text-primary); }
+.profile-hub-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 4px 0 0; }
+.profile-hub-checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); margin-bottom: 8px; }
+.profile-hub-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (max-width: 560px) { .profile-hub-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+.profile-hub-kpi-card {
+  display: flex; flex-direction: column; gap: 4px; padding: 14px 16px;
+  background: var(--bg-list); border-radius: 14px;
+}
+
 .auth-join-intro { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 4px; }
 .auth-join-found { color: var(--text-primary); font-weight: 600; }
 .auth-join-change-cnpj {

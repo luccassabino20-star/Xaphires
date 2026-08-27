@@ -1614,6 +1614,58 @@
       "uploadPhoto": "Alterar foto",
       "removePhoto": "Remover foto"
     },
+    "profileHub": {
+      "title": "Central de Perfil",
+      "online": "Online",
+      "roleMaster": "Administrador",
+      "roleMember": "Membro",
+      "tabs": {
+        "geral": "Geral",
+        "metricas": "Minhas Tarefas & Métricas",
+        "preferencias": "Preferências do Quadro",
+        "seguranca": "Segurança"
+      },
+      "geral": {
+        "nickname": "Apelido no quadro",
+        "nicknamePlaceholder": "Como te chamam no time",
+        "badgeColor": "Cor do seu badge",
+        "badgeColorNote": "Usada no seu avatar e no menu da conta - ainda não aparece nos cartões dos quadros, isso é um próximo passo."
+      },
+      "metricas": {
+        "total": "Cartões atribuídos a mim",
+        "concluidas": "Concluídas",
+        "andamento": "Em andamento",
+        "atrasadas": "Atrasadas",
+        "atividadeTitulo": "Atividade recente nos seus cartões",
+        "atividadeVazia": "Nenhuma atividade recente.",
+        "eventoCriado": "Criado",
+        "eventoMovido": "Entrou em \"{{lista}}\"",
+        "eventoConcluido": "Concluído"
+      },
+      "preferencias": {
+        "exibicaoPadrao": "Exibição padrão ao abrir um quadro",
+        "viewBoard": "Quadro Kanban",
+        "viewTable": "Lista",
+        "viewCalendar": "Calendário",
+        "viewGantt": "Gantt",
+        "viewDashboard": "Dashboard",
+        "viewMap": "Mapa",
+        "viewMatrix": "Matriz",
+        "avisosTitulo": "Avisos",
+        "avisosNota": "Preferência salva de verdade - o envio por notificação para estes eventos ainda não existe no produto.",
+        "avisoMencao": "Fui mencionado num cartão",
+        "avisoAtribuicao": "Fui atribuído a um cartão",
+        "avisoPrazo": "Um prazo que acompanho está vencendo",
+        "corQuadro": "Cor de fundo sugerida para quadros novos",
+        "corQuadroNota": "Salva a preferência; ainda não é aplicada automaticamente ao criar um quadro.",
+        "salvar": "Salvar preferências",
+        "salvo": "Preferências salvas"
+      },
+      "seguranca": {
+        "sessoesTitulo": "Sessões ativas",
+        "sessoesIndisponivel": "Este recurso ainda não existe - o login não grava sessão nem histórico de acesso hoje."
+      }
+    },
     "taskTicker": {
       "pending": "Pendentes ({{count}})"
     }

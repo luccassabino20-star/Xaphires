@@ -27,6 +27,32 @@ router.patch(
   })
 );
 
+// Preferências da Central de Perfil do Kanban (KanbanProfileModal.jsx):
+// apelido, cor do badge, exibição padrão do quadro, avisos e cor de fundo
+// sugerida para quadro novo. Allowlist explícita - impede gravar qualquer
+// chave arbitrária no JSON (ver comentário de updateProfilePrefs em repo.js).
+const CAMPOS_PREFS_VALIDOS = new Set([
+  "nickname",
+  "badgeColor",
+  "defaultView",
+  "notifyMention",
+  "notifyAssignment",
+  "notifyDeadline",
+  "defaultBoardBackground",
+]);
+router.patch(
+  "/prefs",
+  ah(async (req, res) => {
+    const corpo = req.body || {};
+    const patch = {};
+    for (const campo of CAMPOS_PREFS_VALIDOS) {
+      if (campo in corpo) patch[campo] = corpo[campo];
+    }
+    const updated = repo.updateProfilePrefs(req.user.id, patch);
+    res.json(repo.publicUser(updated));
+  })
+);
+
 // Upload em streaming, mesmo desenho do anexo de cartão (ver o comentário
 // grande em routes/cards.js: grava no disco aos poucos, conferindo o limite
 // DURANTE a transferência, nunca com o arquivo inteiro em memória). Diferente

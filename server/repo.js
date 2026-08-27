@@ -79,6 +79,17 @@ export function deletePrivateBoardsByOwner(userId) {
   removeAttachmentFilesOf(cardIdsOfBoards(ids));
   getDb().prepare("DELETE FROM boards WHERE owner_id = ? AND visibility = 'private'").run(userId);
 }
+// JSON solto (users.prefs) - nunca deixa o parse quebrar a resposta inteira
+// por um valor corrompido/editado na mão.
+function parsePrefs(raw) {
+  try {
+    const obj = JSON.parse(raw || "{}");
+    return obj && typeof obj === "object" && !Array.isArray(obj) ? obj : {};
+  } catch {
+    return {};
+  }
+}
+
 export function publicUser(u) {
   if (!u) return null;
   return {
@@ -96,6 +107,7 @@ export function publicUser(u) {
     // ficaria presa no cache com a foto antiga depois de trocar.
     avatarUrl: u.avatar_path ? `/api/profile/${u.id}/avatar?v=${u.avatar_path}` : null,
     createdAt: u.created_at,
+    prefs: parsePrefs(u.prefs),
   };
 }
 
@@ -109,6 +121,18 @@ export function updateProfile(userId, { name, bio }) {
   getDb()
     .prepare("UPDATE users SET name = ?, bio = ? WHERE id = ?")
     .run(name ?? atual.name, bio === undefined ? atual.bio || "" : bio, userId);
+  return getUserById(userId);
+}
+
+// Só os campos conhecidos (validados na rota) chegam em `patch` - merge
+// parcial no JSON existente, nunca substitui o objeto inteiro. Sem isso,
+// salvar só o apelido na aba Geral apagaria a preferência de notificação
+// salva minutos antes na aba Preferências.
+export function updateProfilePrefs(userId, patch) {
+  const atual = getUserById(userId);
+  if (!atual) return null;
+  const novos = { ...parsePrefs(atual.prefs), ...patch };
+  getDb().prepare("UPDATE users SET prefs = ? WHERE id = ?").run(JSON.stringify(novos), userId);
   return getUserById(userId);
 }
 

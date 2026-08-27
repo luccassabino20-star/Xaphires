@@ -13,6 +13,11 @@ import PersonalPlanner from "./PersonalPlanner.jsx";
 import PlanModal from "./PlanModal.jsx";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import AccountMenu from "./AccountMenu.jsx";
+// Central de Perfil premium (métricas/preferências/segurança) só do Kanban -
+// lazy porque é bem maior que o ProfileModal simples que os outros módulos
+// usam, e só quem abre o quadro paga por ela (mesmo padrão do PlataformaModal
+// em AccountMenu.jsx).
+const KanbanProfileModal = lazy(() => import("./KanbanProfileModal.jsx"));
 import ArchiveModal from "./ArchiveModal.jsx";
 import BottlenecksModal from "./BottlenecksModal.jsx";
 import RecurrencesModal from "./RecurrencesModal.jsx";
@@ -321,7 +326,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
           {/* Real: menu da conta de verdade (nome/e-mail, plano, trocar
               senha, sair) - antes ficava no painel branco, agora mora aqui
               no topo do rail escuro, no lugar do logo genérico do ClickUp. */}
-          <AccountMenu />
+          <AccountMenu ProfileComponent={KanbanProfileModal} />
         </div>
 
         <div className="dsb-rail-nav">

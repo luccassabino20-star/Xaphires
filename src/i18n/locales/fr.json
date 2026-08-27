@@ -1290,6 +1290,58 @@
       "uploadPhoto": "Changer la photo",
       "removePhoto": "Retirer la photo"
     },
+    "profileHub": {
+      "title": "Centre de profil",
+      "online": "En ligne",
+      "roleMaster": "Administrateur",
+      "roleMember": "Membre",
+      "tabs": {
+        "geral": "Général",
+        "metricas": "Mes tâches et statistiques",
+        "preferencias": "Préférences du tableau",
+        "seguranca": "Sécurité"
+      },
+      "geral": {
+        "nickname": "Surnom sur le tableau",
+        "nicknamePlaceholder": "Comment l'équipe vous appelle",
+        "badgeColor": "Couleur de votre badge",
+        "badgeColorNote": "Utilisée sur votre avatar et le menu du compte - n'apparaît pas encore sur les cartes des tableaux, ce sera une prochaine étape."
+      },
+      "metricas": {
+        "total": "Cartes qui me sont assignées",
+        "concluidas": "Terminées",
+        "andamento": "En cours",
+        "atrasadas": "En retard",
+        "atividadeTitulo": "Activité récente sur vos cartes",
+        "atividadeVazia": "Aucune activité récente.",
+        "eventoCriado": "Créée",
+        "eventoMovido": "Entrée dans \"{{lista}}\"",
+        "eventoConcluido": "Terminée"
+      },
+      "preferencias": {
+        "exibicaoPadrao": "Vue par défaut à l'ouverture d'un tableau",
+        "viewBoard": "Tableau Kanban",
+        "viewTable": "Liste",
+        "viewCalendar": "Calendrier",
+        "viewGantt": "Gantt",
+        "viewDashboard": "Tableau de bord",
+        "viewMap": "Carte",
+        "viewMatrix": "Matrice",
+        "avisosTitulo": "Notifications",
+        "avisosNota": "Cette préférence est vraiment enregistrée - l'envoi de notifications pour ces événements n'existe pas encore dans le produit.",
+        "avisoMencao": "J'ai été mentionné sur une carte",
+        "avisoAtribuicao": "Une carte m'a été assignée",
+        "avisoPrazo": "Une échéance que je suis arrive à terme",
+        "corQuadro": "Couleur de fond suggérée pour les nouveaux tableaux",
+        "corQuadroNota": "Enregistre la préférence ; elle n'est pas encore appliquée automatiquement à la création d'un tableau.",
+        "salvar": "Enregistrer les préférences",
+        "salvo": "Préférences enregistrées"
+      },
+      "seguranca": {
+        "sessoesTitulo": "Sessions actives",
+        "sessoesIndisponivel": "Cette fonctionnalité n'existe pas encore - la connexion n'enregistre ni sessions ni historique d'accès aujourd'hui."
+      }
+    },
     "taskTicker": {
       "pending": "En attente ({{count}})"
     }

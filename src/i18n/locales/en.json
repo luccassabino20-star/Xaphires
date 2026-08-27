@@ -1343,6 +1343,58 @@
       "uploadPhoto": "Change photo",
       "removePhoto": "Remove photo"
     },
+    "profileHub": {
+      "title": "Profile Hub",
+      "online": "Online",
+      "roleMaster": "Admin",
+      "roleMember": "Member",
+      "tabs": {
+        "geral": "General",
+        "metricas": "My Tasks & Metrics",
+        "preferencias": "Board Preferences",
+        "seguranca": "Security"
+      },
+      "geral": {
+        "nickname": "Board nickname",
+        "nicknamePlaceholder": "What the team calls you",
+        "badgeColor": "Your badge color",
+        "badgeColorNote": "Used on your avatar and the account menu - it doesn't show up on board cards yet, that's a next step."
+      },
+      "metricas": {
+        "total": "Cards assigned to me",
+        "concluidas": "Completed",
+        "andamento": "In progress",
+        "atrasadas": "Overdue",
+        "atividadeTitulo": "Recent activity on your cards",
+        "atividadeVazia": "No recent activity.",
+        "eventoCriado": "Created",
+        "eventoMovido": "Entered \"{{lista}}\"",
+        "eventoConcluido": "Completed"
+      },
+      "preferencias": {
+        "exibicaoPadrao": "Default view when opening a board",
+        "viewBoard": "Kanban board",
+        "viewTable": "List",
+        "viewCalendar": "Calendar",
+        "viewGantt": "Gantt",
+        "viewDashboard": "Dashboard",
+        "viewMap": "Map",
+        "viewMatrix": "Matrix",
+        "avisosTitulo": "Notifications",
+        "avisosNota": "This preference is really saved - actually sending notifications for these events doesn't exist in the product yet.",
+        "avisoMencao": "I was mentioned on a card",
+        "avisoAtribuicao": "I was assigned to a card",
+        "avisoPrazo": "A deadline I'm tracking is coming due",
+        "corQuadro": "Suggested background color for new boards",
+        "corQuadroNota": "Saves the preference; it isn't applied automatically when creating a board yet.",
+        "salvar": "Save preferences",
+        "salvo": "Preferences saved"
+      },
+      "seguranca": {
+        "sessoesTitulo": "Active sessions",
+        "sessoesIndisponivel": "This feature doesn't exist yet - login doesn't record sessions or access history today."
+      }
+    },
     "taskTicker": {
       "pending": "Pending ({{count}})"
     }

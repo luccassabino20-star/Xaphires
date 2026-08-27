@@ -88,6 +88,9 @@ export const rejectJoinRequest = (id) => request(`/users/join-requests/${id}/rej
 // digitar além disso, a autoridade continua sendo a validação do lado de lá.
 export const MAX_BIO_LENGTH = 280;
 export const updateMyProfile = (data) => request("/profile", { method: "PATCH", body: data });
+// Preferências da Central de Perfil do Kanban - merge parcial no servidor,
+// então basta mandar os campos que essa aba conhece.
+export const updateMyProfilePrefs = (patch) => request("/profile/prefs", { method: "PATCH", body: patch });
 export const removeMyAvatar = () => request("/profile/avatar", { method: "DELETE" });
 // Upload não passa pelo request(): o corpo é multipart, montado pelo próprio
 // navegador com o boundary correto - mesmo desenho de addFileAttachment.
