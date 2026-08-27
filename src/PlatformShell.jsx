@@ -15,6 +15,8 @@ const CrmModule = lazy(() => import("./modules/crm/CrmModule.jsx"));
 const XaphiresBeautyModule = lazy(() => import("./modules/xaphires-beauty/XaphiresBeautyModule.jsx"));
 // Idem, para o Time & Tracking.
 const TimeTrackingModule = lazy(() => import("./modules/time-tracking/TimeTrackingModule.jsx"));
+// Idem, para o Finance & BPO.
+const XaphiresFinanceView = lazy(() => import("./modules/finance-bpo/XaphiresFinanceView.jsx"));
 
 // A casca da plataforma: decide entre o launcher (grid de pilares) e o módulo
 // aberto. Fica ABAIXO dos providers do app (Board/Users/Chat, montados em
@@ -33,6 +35,7 @@ const COMPONENTES = {
   quadro: ({ onExit }) => <AuthenticatedApp onExitModule={onExit} />,
   "vendas-crm": ({ onExit }) => <CrmModule onExit={onExit} />,
   financeiro: ({ onExit }) => <FinanceiroModule onExit={onExit} />,
+  "finance-bpo": ({ onExit }) => <XaphiresFinanceView onExit={onExit} />,
   "saude-clinicas": ({ onExit }) => <SaudeClinicasModule onExit={onExit} />,
   "xaphires-beauty": ({ onExit }) => <XaphiresBeautyModule onExit={onExit} />,
   "time-tracking": ({ onExit }) => <TimeTrackingModule onExit={onExit} />,

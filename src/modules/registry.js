@@ -30,6 +30,11 @@ export const MODULE_META = {
   // FinanceiroModule.jsx), não só a parte financeira. O cifrão continua valendo
   // só para o grupo "Financeiro" de dentro da sidebar do módulo.
   financeiro: { icon: "layers", accent: BRAND, category: "financeiro", tagKey: "modules.financeiro.tag", labelKey: "modules.financeiro.name", descKey: "modules.financeiro.desc" },
+  // Mesma categoria "financeiro" do ERP IRES acima, de propósito: os dois
+  // concorrem pelo mesmo trabalho (ver server/modules.js), então precisam
+  // aparecer lado a lado na mesma aba do launcher para dar pra comparar, não
+  // escondidos em abas diferentes.
+  "finance-bpo": { icon: "bi", accent: BRAND, category: "financeiro", tagKey: "modules.finance-bpo.tag", labelKey: "modules.finance-bpo.name", descKey: "modules.finance-bpo.desc" },
   "saude-clinicas": { icon: "saude", accent: BRAND, category: "saude", tagKey: "modules.saude-clinicas.tag", labelKey: "modules.saude-clinicas.name", descKey: "modules.saude-clinicas.desc" },
   // Vertical separada pra salões/clínicas de estética - categoria "saude"
   // reaproveitada (mesma aba de filtro de Saúde & Clínicas) em vez de criar

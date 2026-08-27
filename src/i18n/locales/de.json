@@ -81,6 +81,11 @@
       "desc": "Komplette Plattform für mehrere Branchen. Automatisieren Sie Einkauf, Lager, Fuhrpark, Bauprojekte und Finanzen mit operativer Intelligenz.",
       "tag": "ERP-Verwaltung"
     },
+    "finance-bpo": {
+      "name": "Xaphires Finance & BPO",
+      "desc": "Executive-Finanzzentrale: Multibanking, DRE nach Bauprojekt/Kostenstelle, Bankabgleich und Rechnungslesung in einem Dashboard.",
+      "tag": "Executive BI"
+    },
     "saude-clinicas": {
       "name": "Gesundheit & Kliniken",
       "desc": "Patientenakte, Anamnese, Terminplanung und Verwaltung für Ästhetik-, Biomedizin- und Ernährungskliniken.",
@@ -1575,7 +1580,7 @@
     "colFinance": "Finanzen",
     "financeAlways": "Immer",
     "financeAccessLabel": "Zugriff",
-    "financeAccessHint": "Erlaubt, das Modul Finanzen einzusehen und zu buchen",
+    "financeAccessHint": "Erlaubt Einsicht und Buchung in den Finanzmodulen (ERP IRES und Finance & BPO)",
     "roleMaster": "Master",
     "roleMember": "Mitglied",
     "makeMaster": "Zum Master machen",

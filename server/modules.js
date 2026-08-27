@@ -52,6 +52,22 @@ const DEFINICOES = [
     restricted: true,
   },
   {
+    id: "finance-bpo",
+    // Central financeira executiva (multibancário, DRE por centro de custo,
+    // conciliação, dashboard estilo BI) - nasceu para competir com o
+    // "financeiro" acima e, se o cliente decidir, substituí-lo mais adiante
+    // (decisão registrada na conversa). Ainda todo em dado simulado (ver
+    // XaphiresFinanceView.jsx) - "available" aqui é sobre o módulo abrir,
+    // não sobre o dado ser real. Mesma restrição do financeiro: dado
+    // financeiro é sensível mesmo quando o dado em si é mock, e os dois
+    // módulos precisam continuar liberados pela mesma regra pra fazer
+    // sentido lado a lado no launcher.
+    core: false,
+    available: true,
+    icon: "bi",
+    restricted: true,
+  },
+  {
     id: "saude-clinicas",
     // Fase 2: vertical de gestão para clínicas de estética, biomedicina
     // estética, nutrição e multidisciplinares. Add-on (não é core), e sem
@@ -103,12 +119,18 @@ export function getModule(id) {
 // Financeiro restringe: master sempre; membro só com a concessão. Aceita tanto a
 // linha crua do banco (finance_access 0/1) quanto o publicUser (financeAccess
 // boolean), porque os dois formatos circulam.
+//
+// "finance-bpo" usa a MESMA concessão (finance_access) - são dois módulos
+// financeiros concorrentes (ver comentário na definição dele acima), não dois
+// tipos de dado sensível diferentes; quem já autorizou alguém a ver dinheiro
+// da empresa não deveria precisar conceder de novo pra cada um.
+const MODULOS_FINANCEIROS = new Set(["financeiro", "finance-bpo"]);
 export function usuarioAutorizado(user, moduleId) {
   const mod = getModule(moduleId);
   if (!mod || !mod.restricted) return true;
   if (!user) return false;
   if (user.role === "master") return true;
-  if (moduleId === "financeiro") return user.finance_access === 1 || user.financeAccess === true;
+  if (MODULOS_FINANCEIROS.has(moduleId)) return user.finance_access === 1 || user.financeAccess === true;
   return false;
 }
 

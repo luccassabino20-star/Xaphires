@@ -81,6 +81,11 @@
       "desc": "Plateforme complète pour plusieurs secteurs. Automatisez achats, stocks, flotte, chantiers et finances avec intelligence opérationnelle.",
       "tag": "Gestion ERP"
     },
+    "finance-bpo": {
+      "name": "Xaphires Finance & BPO",
+      "desc": "Centrale financière exécutive : multibancaire, DRE par chantier/centre de coût, rapprochement bancaire et lecture de factures en un seul tableau de bord.",
+      "tag": "BI Exécutif"
+    },
     "saude-clinicas": {
       "name": "Santé & Cliniques",
       "desc": "Dossier patient, anamnèse, agenda et gestion pour cliniques d'esthétique, biomédecine et nutrition.",
@@ -1819,7 +1824,7 @@
     "colFinance": "Finance",
     "financeAlways": "Toujours",
     "financeAccessLabel": "Accès",
-    "financeAccessHint": "Permet de consulter et de saisir dans le module Finance",
+    "financeAccessHint": "Permet de consulter et de saisir dans les modules financiers (ERP IRES et Finance & BPO)",
     "roleMaster": "Master",
     "roleMember": "Membre",
     "makeMaster": "Nommer master",

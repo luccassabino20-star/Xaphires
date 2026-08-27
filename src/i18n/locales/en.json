@@ -81,6 +81,11 @@
       "desc": "A complete platform for multiple segments. Automate purchasing, inventory, fleet, projects and finance with operational intelligence.",
       "tag": "ERP Management"
     },
+    "finance-bpo": {
+      "name": "Xaphires Finance & BPO",
+      "desc": "Executive finance hub: multi-bank view, DRE by project/cost center, bank reconciliation and invoice reading in one dashboard.",
+      "tag": "Executive BI"
+    },
     "saude-clinicas": {
       "name": "Health & Clinics",
       "desc": "Records, intake forms, scheduling and management for aesthetics, biomedicine and nutrition clinics.",
@@ -1854,7 +1859,7 @@
     "colFinance": "Finance",
     "financeAlways": "Always",
     "financeAccessLabel": "Access",
-    "financeAccessHint": "Lets this user view and post in the Finance module",
+    "financeAccessHint": "Lets this user view and post in the finance modules (ERP IRES and Finance & BPO)",
     "roleMaster": "Master",
     "roleMember": "Member",
     "makeMaster": "Make master",
