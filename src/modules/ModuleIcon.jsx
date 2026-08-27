@@ -28,6 +28,8 @@ const PATHS = {
   juridico: "M12 3v18M5 21h14M12 3 5 8m7-5 7 5M3 8h4l-2 6a2 2 0 0 1-4 0zm14 0h4l-2 6a2 2 0 0 1-4 0z",
   // Brilho/sparkle - Xaphires Beauty (estética suave, mesmo traço do resto)
   beauty: "M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z",
+  // Relógio - Xaphires Time & Tracking
+  tempo: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l4 2",
 };
 
 export default function ModuleIcon({ name, size = 26 }) {

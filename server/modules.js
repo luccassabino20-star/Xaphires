@@ -77,6 +77,18 @@ const DEFINICOES = [
   // "financeiro" acima; ver ABAS em src/modules/financeiro/FinanceiroModule.jsx).
   // Não há mais entitlement separado pra eles: quem tem acesso ao ERP IRES já
   // "tem" as três, mesmo enquanto seguem sem tela.
+  {
+    id: "time-tracking",
+    // Apontamento de horas (tarefas/projetos próprios do módulo, cronômetro,
+    // grade semanal, aprovação). Fase 1: sem vínculo com cartão do Kanban,
+    // cliente do Beauty ou lançamento do Financeiro - "tarefa" é um catálogo
+    // próprio (tt_tasks), decisão tomada pra não escolher errado qual desses
+    // três catálogos de "cliente" a plataforma tem. Add-on, sem restrição por
+    // usuário, mesmo perfil de saude-clinicas/xaphires-beauty.
+    core: false,
+    available: true,
+    icon: "tempo",
+  },
 ];
 
 export const MODULES = DEFINICOES;

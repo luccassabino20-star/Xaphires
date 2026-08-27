@@ -25,6 +25,7 @@ import { router as financeiroRouter } from "./modules/financeiro/routes.js";
 import { router as saudeClinicasRouter } from "./modules/saude-clinicas/routes.js";
 import { router as crmRouter } from "./modules/crm/routes.js";
 import { router as xaphiresBeautyRouter } from "./modules/xaphires-beauty/routes.js";
+import { router as timeTrackingRouter } from "./modules/time-tracking/routes.js";
 import { router as anamnesePublicaRouter } from "./routes/anamnesePublica.js";
 import { router as xaphiresBeautyPublicaRouter } from "./routes/xaphiresBeautyPublica.js";
 import { router as xaphiresBeautyLembreteRouter } from "./routes/xaphiresBeautyLembrete.js";
@@ -151,6 +152,8 @@ app.use("/api/saude-clinicas", saudeClinicasRouter);
 app.use("/api/crm", crmRouter);
 // requireAuth/requireWritablePlan/requireModule("xaphires-beauty") internamente.
 app.use("/api/xaphires-beauty", xaphiresBeautyRouter);
+// requireAuth/requireWritablePlan/requireModule("time-tracking") internamente.
+app.use("/api/time-tracking", timeTrackingRouter);
 // Relatório é leitura, e requireWritablePlan já libera GET - fica no mesmo grupo por
 // coerência, e empresa vencida continua conseguindo exportar os próprios dados.
 app.use("/api/reports", requireAuth, requireWritablePlan, reportsRouter);

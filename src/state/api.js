@@ -972,3 +972,24 @@ export const xbPublicCreateBooking = (slug, data) => request(`/public/xaphires-b
 // Link de lembrete (sem sessão) - o cliente conferindo o próprio agendamento.
 export const xbPublicGetReminder = (slug) => request(`/public/xaphires-beauty-lembrete/${slug}`);
 export const xbPublicConfirmReminder = (slug) => request(`/public/xaphires-beauty-lembrete/${slug}/confirm`, { method: "POST" });
+
+// ---------- Módulo Time & Tracking ----------
+export const ttGetTasks = () => request("/time-tracking/tasks");
+export const ttCreateTask = (data) => request("/time-tracking/tasks", { method: "POST", body: data });
+export const ttDeactivateTask = (id) => request(`/time-tracking/tasks/${id}`, { method: "DELETE" });
+
+export const ttGetRunningEntry = () => request("/time-tracking/entries/running");
+export const ttStartTimer = (data) => request("/time-tracking/entries/start", { method: "POST", body: data });
+export const ttStopTimer = (id) => request(`/time-tracking/entries/${id}/stop`, { method: "POST" });
+
+export const ttGetTodayEntries = () => request("/time-tracking/entries/today");
+export const ttCreateEntry = (data) => request("/time-tracking/entries", { method: "POST", body: data });
+export const ttUpdateEntry = (id, data) => request(`/time-tracking/entries/${id}`, { method: "PATCH", body: data });
+export const ttDeleteEntry = (id) => request(`/time-tracking/entries/${id}`, { method: "DELETE" });
+
+export const ttGetWeekly = (date) => request(`/time-tracking/timesheets/weekly?date=${date}`);
+export const ttGetAllWeekly = (date) => request(`/time-tracking/timesheets/all?date=${date}`);
+export const ttSubmitTimesheet = (id) => request(`/time-tracking/timesheets/${id}/submit`, { method: "PATCH" });
+export const ttGetApprovals = () => request("/time-tracking/timesheets/approvals");
+export const ttApproveTimesheet = (id) => request(`/time-tracking/timesheets/${id}/approve`, { method: "PATCH" });
+export const ttRejectTimesheet = (id) => request(`/time-tracking/timesheets/${id}/reject`, { method: "PATCH" });

@@ -47,6 +47,10 @@ export const MODULE_META = {
   // lista de módulos com enabled:false antes de filtrar por categoria).
   marketing: { icon: "marketing", accent: BRAND, category: "outros", labelKey: "modules.marketing.name", descKey: "modules.marketing.desc" },
   juridico: { icon: "juridico", accent: BRAND, category: "outros", labelKey: "modules.juridico.name", descKey: "modules.juridico.desc" },
+  // Apontamento de horas - ferramenta transversal (qualquer empresa usa,
+  // independente do ramo), sem pilar próprio na barra de filtro; cai em
+  // "outros" como marketing/jurídico acima.
+  "time-tracking": { icon: "tempo", accent: BRAND, category: "outros", labelKey: "modules.time-tracking.name", descKey: "modules.time-tracking.desc" },
 };
 
 export function metaFor(id) {
