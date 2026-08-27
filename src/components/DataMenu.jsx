@@ -5,7 +5,7 @@ import { useUsers } from "../state/UsersContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import { exportAll, exportBoard, parseImportFile } from "../utils/importExport.js";
-import { BACKGROUND_COLORS, BACKGROUND_GRADIENTS, monochromaticGradient } from "../utils/backgrounds.js";
+import { BACKGROUND_COLORS, BACKGROUND_GRADIENTS, BACKGROUND_WALLPAPERS, monochromaticGradient } from "../utils/backgrounds.js";
 import * as api from "../state/api.js";
 import ExportReportModal from "./ExportReportModal.jsx";
 
@@ -44,9 +44,11 @@ export default function DataMenu({ board, onSelectBoard }) {
   const [importing, setImporting] = useState(false);
   const [customColor, setCustomColor] = useState("#4d7ea8");
   const [monoColor, setMonoColor] = useState("#4d7ea8");
+  const [uploadingBg, setUploadingBg] = useState(false);
   const ref = useRef(null);
   const btnRef = useRef(null);
   const fileInputRef = useRef(null);
+  const bgImageInputRef = useRef(null);
 
   // Convidado como leitor não personaliza o quadro, não restaura arquivado e não
   // mexe nas rotinas. Exportar e importar continuam: exportar é leitura, e importar
@@ -85,6 +87,32 @@ export default function DataMenu({ board, onSelectBoard }) {
   function applyBackground(css) {
     if (!board) return;
     dispatch({ type: "SET_BOARD_BACKGROUND", boardId: board.id, background: css });
+  }
+
+  function handleUploadClick() {
+    bgImageInputRef.current?.click();
+  }
+  // NÃO passa por applyBackground/SET_BOARD_BACKGROUND: o servidor já gravou a
+  // foto e o `background` (overlay + url()) direto no quadro (setBoardBackgroundImage,
+  // ver routes/boards.js) - despachar SET_BOARD_BACKGROUND aqui disparia um PATCH
+  // redundante pelo sync.js, e o setBoardBackground genérico do outro lado apaga
+  // bg_image_path/bg_image_mime incondicionalmente (é o que permite trocar de
+  // "minha foto" para uma cor sem deixar arquivo órfão, ver repo.js) - a foto que
+  // acabou de subir seria apagada pelo próprio PATCH que a acabou de aplicar.
+  // Um refetch do workspace traz o estado real sem esse conflito.
+  async function handleBackgroundImageChange(e) {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file || !board) return;
+    setUploadingBg(true);
+    try {
+      await api.uploadBoardBackgroundImage(board.id, file);
+      await refetchBoards();
+    } catch (err) {
+      showToast(translateError(err, t));
+    } finally {
+      setUploadingBg(false);
+    }
   }
 
   async function handleFileChange(e) {
@@ -207,6 +235,21 @@ export default function DataMenu({ board, onSelectBoard }) {
                 ))}
               </div>
 
+              <div className="board-bg-section-label">{t("app.dataMenu.wallpapers")}</div>
+              <div className="board-bg-wallpaper-grid">
+                {BACKGROUND_WALLPAPERS.map((w) => (
+                  <button
+                    key={w.id}
+                    type="button"
+                    className={"board-bg-wallpaper-tile" + (board?.background === w.css ? " active" : "")}
+                    onClick={() => applyBackground(w.css)}
+                  >
+                    <span className="board-bg-wallpaper-preview" style={{ background: w.css }} />
+                    <span className="board-bg-wallpaper-label">{w.label}</span>
+                  </button>
+                ))}
+              </div>
+
               <div className="board-bg-section-label">{t("app.dataMenu.monoGradientTitle")}</div>
               <div className="board-bg-mono-row">
                 <input type="color" value={monoColor} onChange={(e) => setMonoColor(e.target.value)} />
@@ -225,6 +268,12 @@ export default function DataMenu({ board, onSelectBoard }) {
                 </button>
               </div>
 
+              <div className="board-bg-section-label">{t("app.dataMenu.uploadPhotoTitle")}</div>
+              <button type="button" className="board-bg-upload-btn" onClick={handleUploadClick} disabled={uploadingBg}>
+                {uploadingBg ? t("app.dataMenu.uploadingPhoto") : t("app.dataMenu.uploadPhotoBtn")}
+              </button>
+              <p className="board-bg-mono-hint">{t("app.dataMenu.uploadPhotoHint")}</p>
+
               <div className="dropdown-divider" />
               <div className="dropdown-item" onClick={() => applyBackground(null)}>
                 {t("app.dataMenu.noBackground")}
@@ -233,6 +282,13 @@ export default function DataMenu({ board, onSelectBoard }) {
           )}
         </div>
       )}
+      <input
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        ref={bgImageInputRef}
+        style={{ display: "none" }}
+        onChange={handleBackgroundImageChange}
+      />
       <input
         type="file"
         accept="application/json"

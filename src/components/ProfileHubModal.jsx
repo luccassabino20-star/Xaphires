@@ -10,7 +10,7 @@ import Avatar from "./Avatar.jsx";
 import { MEMBER_COLORS, colorForUser } from "../utils/members.js";
 import { BACKGROUND_COLORS } from "../utils/backgrounds.js";
 
-const VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"];
+const VIEWS = ["board", "table", "calendar", "dashboard", "map", "matrix"];
 
 function hojeCivil() {
   const d = new Date();

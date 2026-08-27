@@ -179,10 +179,6 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
 
   useEffect(() => {
     titleRef.current?.focus();
-    // Cartão recém-criado pelo Gantt (ver BoardGanttView.jsx) nasce com um
-    // título provisório - selecionar em vez de só focar faz a pessoa digitar
-    // por cima em vez de emendar no que já estava lá.
-    if (initialFocus === "title") titleRef.current?.select();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

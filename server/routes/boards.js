@@ -1,13 +1,29 @@
 import { Router } from "express";
+import fs from "node:fs";
+import Busboy from "busboy";
 import { requireAuth, requireBoardAccess, requireBoardOwner } from "../middleware.js";
 import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
 import { getCompany } from "../directory.js";
 import { canUseAutoArchive, canUseRecurringCards, canAddBoard } from "../plans.js";
 import { varrerCobranca } from "../billing/lifecycle.js";
+import { runWithCompany } from "../context.js";
 
 const router = Router();
 router.use(requireAuth);
+
+// Fixo, não é recurso de plano - mesmo espírito de AVATAR_MAX_BYTES em
+// routes/profile.js. Mais generoso que o avatar (foto de fundo em tela cheia
+// pede mais resolução que um círculo de 64px).
+const BOARD_BACKGROUND_MAX_BYTES = 8 * 1024 * 1024;
+const TIPOS_ACEITOS_FUNDO = new Set(["image/png", "image/jpeg", "image/webp"]);
+
+// Mesma função de src/utils/backgrounds.js (withOverlay), duplicada em vez de
+// importada: servidor não builda (ESM puro, ver CLAUDE.md) e src/ é território
+// do cliente - preferível repetir 1 linha a acoplar as duas árvores.
+function withOverlay(css) {
+  return `linear-gradient(rgba(12,12,16,0.32), rgba(12,12,16,0.32)), ${css}`;
+}
 
 router.get(
   "/",
@@ -94,6 +110,140 @@ router.patch(
       await repo.setBoardAutoArchiveDays(req.params.id, dias);
     }
     res.json({ ok: true });
+  })
+);
+
+// Upload em streaming, mesmo desenho do avatar (ver o comentário grande em
+// routes/profile.js POST /avatar): grava no disco aos poucos, conferindo o
+// limite DURANTE a transferência, nunca com o arquivo inteiro em memória.
+// requireBoardAccess já recusa leitor (403 fora daqui, papel só de leitura
+// não escreve fundo) antes deste handler começar a ler o corpo.
+router.post("/:id/background-image", requireBoardAccess((req) => req.params.id), (req, res) => {
+  const boardId = req.params.id;
+  const alvo = repo.newBoardBackgroundImageTarget();
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: BOARD_BACKGROUND_MAX_BYTES } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let tipo = "";
+  let bytes = 0;
+  let excedeu = false;
+  let tipoInvalido = false;
+  let respondido = false;
+  let saida = null;
+  let descartar = false;
+
+  // O arquivo parcial só é apagado depois que o stream fecha - no Windows,
+  // remover enquanto há escrita em voo falha silenciosamente e deixa lixo.
+  function apagarQuandoPuder() {
+    descartar = true;
+    if (!saida || saida.destroyed) repo.discardBoardBackgroundImageFile(alvo.path);
+  }
+
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    tipo = info.mimeType || "";
+    if (!TIPOS_ACEITOS_FUNDO.has(tipo)) {
+      tipoInvalido = true;
+      stream.resume(); // drena sem gravar - senão o upload trava esperando alguém ler
+      return falhar(400, { error: "Envie uma imagem PNG, JPEG ou WEBP", code: "INVALID_BACKGROUND_IMAGE_TYPE" });
+    }
+    saida = fs.createWriteStream(alvo.path);
+
+    saida.on("error", () => falhar(500, { error: "Erro ao gravar o arquivo", code: "UPLOAD_FAILED" }));
+    saida.on("close", () => {
+      if (descartar) repo.discardBoardBackgroundImageFile(alvo.path);
+    });
+
+    stream.on("data", (chunk) => {
+      bytes += chunk.length;
+    });
+    // Emitido pelo busboy ao passar de limits.fileSize.
+    stream.on("limit", () => {
+      excedeu = true;
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, {
+        error: `A imagem deve ter até ${Math.round(BOARD_BACKGROUND_MAX_BYTES / 1024 / 1024)} MB`,
+        code: "BACKGROUND_IMAGE_TOO_LARGE",
+        maxBytes: BOARD_BACKGROUND_MAX_BYTES,
+      });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+
+  // Os eventos do busboy nascem do socket, que existe desde antes do
+  // requireAuth entrar no contexto da empresa - o AsyncLocalStorage não
+  // alcança aqui. Sem reentrar, getDb() não sabe qual banco abrir.
+  function registrar() {
+    if (respondido || excedeu || tipoInvalido) return;
+    try {
+      const background = withOverlay(`url("/api/boards/${boardId}/background-image?v=${alvo.id}") center / cover no-repeat`);
+      runWithCompany(req.companyId, () =>
+        repo.setBoardBackgroundImage(boardId, { id: alvo.id, mimeType: tipo, background })
+      );
+      respondido = true;
+      res.status(201).json({ background });
+    } catch (err) {
+      console.error("Falha ao salvar o fundo do quadro:", err);
+      falhar(500, { error: "Erro ao salvar a imagem", code: "BACKGROUND_IMAGE_SAVE_FAILED" });
+    }
+  }
+
+  bb.on("close", () => {
+    if (respondido || excedeu || tipoInvalido) return;
+    if (bytes === 0) return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    // O busboy fecha quando terminou de LER o corpo, mas a gravação em disco
+    // pode ainda estar em voo - responder aqui anunciaria um fundo que uma
+    // exibição imediata podia pegar truncado.
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  // Cliente que desiste no meio (aba fechada, rede caiu) não deixa arquivo
+  // parcial virando fundo de quadro nem lixo no disco.
+  req.on("aborted", () => {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    saida?.destroy();
+  });
+
+  req.pipe(bb);
+});
+
+// Servida como a foto de perfil (GET /api/profile/:id/avatar): rota autenticada
+// com requireBoardAccess, não express.static - o fundo pode pertencer a um
+// quadro privado, e um caminho estático não checaria isso. ?v= é o id da
+// imagem (novo a cada troca), então cache longo é seguro.
+router.get(
+  "/:id/background-image",
+  requireBoardAccess((req) => req.params.id),
+  ah(async (req, res) => {
+    const file = await repo.getBoardBackgroundImageFile(req.params.id);
+    if (!file) return res.status(404).json({ error: "Imagem não encontrada", code: "BACKGROUND_IMAGE_NOT_FOUND" });
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", file.mimeType);
+    res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
+    res.sendFile(file.path);
   })
 );
 

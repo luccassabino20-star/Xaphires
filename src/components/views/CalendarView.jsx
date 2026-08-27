@@ -97,10 +97,9 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
   }
 
   // Cartão pertence a uma lista, e o "+" do dia não sabe de qual - cai sempre
-  // na primeira do quadro, mesmo fallback do botão "Novo" da Gantt. Diferente
-  // dela, aqui não abre o cartão de verdade: o "+" é para criar rápido, título
-  // e data já bastam, e quem quiser editar o resto clica no chip como
-  // qualquer outro cartão do calendário.
+  // na primeira do quadro. Não abre o cartão de verdade: o "+" é para criar
+  // rápido, título e data já bastam, e quem quiser editar o resto clica no
+  // chip como qualquer outro cartão do calendário.
   function handleQuickAdd(iso) {
     const titulo = draftTitle.trim();
     setDraftTitle("");

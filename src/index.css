@@ -1156,12 +1156,12 @@ input, textarea { font-family: inherit; }
 }
 
 /* ---------- Gantt chart genérico (src/components/gantt) ----------
-   Usado pela visão Gantt do quadro (BoardGanttView, no lugar onde a Linha do
-   Tempo ficava no ViewSwitcher) e pela demo isolada (/gantt-demo) - prefixo
-   próprio "gnt-" porque é um componente à parte, desacoplado de qualquer
-   entidade real. Cores de status são hex fixo (mesmo padrão de LABEL_COLORS
-   em utils/labels.js), não var(--accent) - precisam parecer iguais nos dois
-   temas. */
+   Sem consumidor real hoje - o quadro Kanban removeu a visão Gantt do
+   ViewSwitcher (ver decisão registrada na conversa); o que resta é a demo
+   isolada (/gantt-demo). Prefixo próprio "gnt-" porque é um componente à
+   parte, desacoplado de qualquer entidade real. Cores de status são hex fixo
+   (mesmo padrão de LABEL_COLORS em utils/labels.js), não var(--accent) -
+   precisam parecer iguais nos dois temas. */
 /* body é overflow:hidden no app inteiro (cada tela rola dentro de si mesma,
    ver .view-scroll) - esta página precisa da própria rolagem, "min-height:
    100vh" sozinho ficaria cortado sem barra nenhuma pra descer. */
@@ -4564,6 +4564,58 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   line-height: 1.4;
   margin: 0 6px 10px;
 }
+
+/* Grade de "papéis de parede" (BACKGROUND_WALLPAPERS, utils/backgrounds.js) -
+   tiles maiores que .board-bg-swatch, com legenda: são padrões abstratos em
+   CSS puro (ver comentário lá do porquê de não serem fotos de banco de
+   imagens), e sem o nome escrito por baixo "Espaço/Galáxia" e "Abstrato 3D"
+   ficam indistinguíveis um do outro numa amostra pequena. */
+.board-bg-wallpaper-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 0 6px; margin-bottom: 6px; }
+.board-bg-wallpaper-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.board-bg-wallpaper-preview {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.5;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-size: cover;
+}
+.board-bg-wallpaper-tile:hover .board-bg-wallpaper-preview { filter: brightness(1.08); }
+.board-bg-wallpaper-tile.active .board-bg-wallpaper-preview {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--bg-topbar) inset;
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}
+.board-bg-wallpaper-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); padding: 0 1px; }
+
+.board-bg-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 12px);
+  margin: 0 6px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 10px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.board-bg-upload-btn:hover { background: var(--bg-list); color: var(--text-primary); border-color: var(--accent); }
+.board-bg-upload-btn:disabled { cursor: default; opacity: 0.6; }
 
 /* ---------- List color picker ---------- */
 .list-color-swatch-icon {

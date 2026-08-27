@@ -21,7 +21,7 @@ export const TRIAL_DAYS = 7;
 // - as duas listas precisam continuar em sincronia na mão, porque o cliente não
 // importa este arquivo (bundle separado). maxBoards e views null significam "sem
 // teto"/"todas liberadas", mesmo espírito do maxUsers null = ilimitado.
-export const ALL_VIEWS = ["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"];
+export const ALL_VIEWS = ["board", "table", "calendar", "dashboard", "map", "matrix"];
 
 // autoArchive/bottleneckMonitor/taskTicker/personalPlanner só entram no
 // Profissional para cima - o Intermediário fica só com teto maior de usuário/

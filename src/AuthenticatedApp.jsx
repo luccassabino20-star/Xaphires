@@ -7,7 +7,6 @@ import ViewSwitcher from "./components/ViewSwitcher.jsx";
 import BoardView from "./components/BoardView.jsx";
 import TableView from "./components/views/TableView.jsx";
 import CalendarView from "./components/views/CalendarView.jsx";
-import BoardGanttView from "./components/views/BoardGanttView.jsx";
 import DashboardView from "./components/views/DashboardView.jsx";
 import MapView from "./components/views/MapView.jsx";
 import MatrixView from "./components/views/MatrixView.jsx";
@@ -20,7 +19,7 @@ import PlanBanner from "./components/PlanBanner.jsx";
 // Mesmo conjunto de ids que os `view ===` do render mais abaixo aceitam -
 // preferência salva com uma versão antiga do app (ou editada na mão) não vira
 // tela em branco por apontar pra uma view que não existe mais.
-const VIEWS_VALIDAS = new Set(["board", "table", "calendar", "gantt", "dashboard", "map", "matrix"]);
+const VIEWS_VALIDAS = new Set(["board", "table", "calendar", "dashboard", "map", "matrix"]);
 
 export default function AuthenticatedApp({ onExitModule }) {
   const { t } = useTranslation();
@@ -100,7 +99,6 @@ export default function AuthenticatedApp({ onExitModule }) {
             )}
             {view === "table" && <TableView {...viewProps} />}
             {view === "calendar" && <CalendarView {...viewProps} />}
-            {view === "gantt" && <BoardGanttView {...viewProps} />}
             {view === "dashboard" && <DashboardView {...viewProps} />}
             {view === "map" && <MapView {...viewProps} />}
             {view === "matrix" && <MatrixView {...viewProps} />}

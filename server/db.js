@@ -242,6 +242,13 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "lists", "stuck_hours", "stuck_hours INTEGER");
   // Dias até arquivar um concluído. NULL = regra desligada, que é o padrão.
   addColumnIfMissing(companyDb, "boards", "auto_archive_days", "auto_archive_days INTEGER");
+  // Foto de fundo do quadro (upload próprio, popover de personalização). Mesmo
+  // par path/mime do avatar (avatar_path/avatar_mime, acima): NULL = sem foto,
+  // `background` continua sendo a fonte visual (guarda a camada de overlay +
+  // url() prontas) - estas duas colunas só existem para saber QUAL arquivo
+  // apagar quando a foto é trocada ou o quadro é excluído.
+  addColumnIfMissing(companyDb, "boards", "bg_image_path", "bg_image_path TEXT");
+  addColumnIfMissing(companyDb, "boards", "bg_image_mime", "bg_image_mime TEXT");
   // Segundo dia do mês opcional para rotina mensal, para a mesma rotina nascer
   // duas vezes por mês (ex: fechar balancete no dia 5 e no dia 20) sem precisar
   // de duas regras separadas. NULL = só o dia único de `monthday`, que continua

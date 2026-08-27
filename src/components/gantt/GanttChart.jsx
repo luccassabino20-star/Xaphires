@@ -20,10 +20,10 @@ function normalizar(texto) {
 // Componente desacoplado de propósito - não lê cartão nem nenhuma outra
 // entidade real do app diretamente (ver decisão registrada na conversa).
 // groups/meta têm os dados de exemplo como default só para dar pra abrir e ver
-// funcionando; quem integra de verdade (ver BoardGanttView) passa os próprios
-// dados por prop, e opcionalmente onTaskClick pra abrir algo real em vez do
-// "peek" interno, e legendStatusKeys/legendIconKeys pra legenda não listar
-// cor/ícone que aquele contexto nunca usa.
+// funcionando (GanttChartDemo.jsx, /gantt-demo); quem integrasse de verdade
+// passaria os próprios dados por prop, e opcionalmente onTaskClick pra abrir
+// algo real em vez do "peek" interno, e legendStatusKeys/legendIconKeys pra
+// legenda não listar cor/ícone que aquele contexto nunca usa.
 //
 // onSave/onNew/onOpenSelected são os três pontos que dependem de quem integra
 // (persistir uma tarefa arrastada, criar algo novo, abrir a "tarefa"

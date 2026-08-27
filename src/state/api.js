@@ -123,6 +123,32 @@ export const getWorkspace = () => request("/boards");
 export const createBoard = (data) => request("/boards", { method: "POST", body: data });
 export const renameBoard = (id, title) => request(`/boards/${id}`, { method: "PATCH", body: { title } });
 export const setBoardBackground = (id, background) => request(`/boards/${id}`, { method: "PATCH", body: { background } });
+// Mesmo desenho de uploadMyAvatar: multipart, fora do request(). O servidor já
+// devolve o `background` pronto (overlay + url()) - quem chama só precisa
+// aplicá-lo, sem montar CSS nenhum aqui.
+export async function uploadBoardBackgroundImage(boardId, file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/boards/${boardId}/background-image`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
 export const setAutoArchiveDays = (id, autoArchiveDays) =>
   request(`/boards/${id}`, { method: "PATCH", body: { autoArchiveDays } });
 export const deleteBoard = (id) => request(`/boards/${id}`, { method: "DELETE" });

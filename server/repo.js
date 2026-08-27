@@ -236,11 +236,75 @@ export function createBoard({ id, title, ownerId, visibility }) {
 export function renameBoard(id, title) {
   getDb().prepare("UPDATE boards SET title = ? WHERE id = ?").run(title, id);
 }
+// Escolher uma cor/degradê/papel de parede pronto sempre passa por aqui, então
+// é o único lugar que precisa saber apagar uma foto de fundo enviada antes -
+// sem isso, trocar de "minha foto" para uma cor da paleta deixava o arquivo
+// órfão no disco para sempre (mesmo problema que setUserAvatar já resolve
+// para avatar, ver ali).
 export function setBoardBackground(id, background) {
-  getDb().prepare("UPDATE boards SET background = ? WHERE id = ?").run(background || null, id);
+  const atual = getDb().prepare("SELECT bg_image_path FROM boards WHERE id = ?").get(id);
+  getDb()
+    .prepare("UPDATE boards SET background = ?, bg_image_path = NULL, bg_image_mime = NULL WHERE id = ?")
+    .run(background || null, id);
+  if (atual?.bg_image_path) {
+    try {
+      fs.unlinkSync(path.join(boardBackgroundImagesDir(), atual.bg_image_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
+}
+
+function boardBackgroundImagesDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "board-backgrounds");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+export function newBoardBackgroundImageTarget() {
+  const id = uid();
+  return { id, path: path.join(boardBackgroundImagesDir(), id) };
+}
+export function discardBoardBackgroundImageFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* já pode ter sumido */
+  }
+}
+// `background` já vem pronto do chamador (overlay + url(), ver routes/boards.js)
+// - aqui só grava e, como em setBoardBackground, apaga o arquivo anterior.
+export function setBoardBackgroundImage(boardId, { id, mimeType, background }) {
+  const atual = getDb().prepare("SELECT bg_image_path FROM boards WHERE id = ?").get(boardId);
+  getDb()
+    .prepare("UPDATE boards SET background = ?, bg_image_path = ?, bg_image_mime = ? WHERE id = ?")
+    .run(background, id, mimeType, boardId);
+  if (atual?.bg_image_path) {
+    try {
+      fs.unlinkSync(path.join(boardBackgroundImagesDir(), atual.bg_image_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
+}
+export function getBoardBackgroundImageFile(boardId) {
+  const row = getDb().prepare("SELECT bg_image_path, bg_image_mime FROM boards WHERE id = ?").get(boardId);
+  if (!row?.bg_image_path) return null;
+  const filePath = path.join(boardBackgroundImagesDir(), row.bg_image_path);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, mimeType: row.bg_image_mime || "application/octet-stream" };
 }
 export function deleteBoard(id) {
   removeAttachmentFilesOf(cardIdsOfBoards([id]));
+  // Mesmo motivo do unlink em setBoardBackground: o quadro some da tabela, mas
+  // o arquivo no disco não sai sozinho.
+  const atual = getDb().prepare("SELECT bg_image_path FROM boards WHERE id = ?").get(id);
+  if (atual?.bg_image_path) {
+    try {
+      fs.unlinkSync(path.join(boardBackgroundImagesDir(), atual.bg_image_path));
+    } catch {
+      /* já pode ter sumido */
+    }
+  }
   getDb().prepare("DELETE FROM boards WHERE id = ?").run(id);
 }
 // IDs de cartão que `userId` pode excluir dentre as listas dadas - próprios e
