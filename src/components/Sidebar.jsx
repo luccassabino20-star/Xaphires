@@ -6,6 +6,7 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { useChat } from "../state/ChatContext.jsx";
 import { uid } from "../utils/id.js";
+import { isDarkBackground } from "../utils/contrast.js";
 import * as api from "../state/api.js";
 import UsersPanel from "./UsersPanel.jsx";
 import TeamPanel from "./TeamPanel.jsx";
@@ -82,6 +83,59 @@ function IconList(p) {
 function IconLock(p) {
   return <Svg {...p} d="M12 2a4 4 0 0 1 4 4v3h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h1V6a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v3h4V6a2 2 0 0 0-2-2z" />;
 }
+function IconPalette(p) {
+  return (
+    <Svg
+      {...p}
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.51-.2-.98-.52-1.32-.3-.32-.48-.76-.48-1.18 0-1.1.9-2 2-2h2.5c2.76 0 5-2.24 5-5C22 6.14 17.5 2 12 2zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 8 6.5 8 8 8.67 8 9.5 7.33 11 6.5 11zm3-4C8.67 7 8 6.33 8 5.5S8.67 4 9.5 4s1.5.67 1.5 1.5S10.33 7 9.5 7zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4 14.5 4s1.5.67 1.5 1.5S15.33 7 14.5 7zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 8 17.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+    />
+  );
+}
+
+// Painel lateral (.dsb-panel, branco por padrão) - ver seção "Personalização
+// da barra lateral" em index.css para o restante do sistema. Isolado do fundo
+// do quadro (SET_BOARD_BACKGROUND/DataMenu.jsx): estados diferentes,
+// persistências diferentes (localStorage aqui, banco lá), só a opção
+// "Harmonizar com o Quadro" lê o valor do outro de propósito.
+const SIDEBAR_STYLE_STORAGE_KEY = "kanban_sidebar_style";
+const DEFAULT_SIDEBAR_STYLE = { mode: "system", color: null };
+// Mesmo valor do default de .view-content-area em index.css - repetido aqui
+// (não importado dali, é CSS) só para a pré-visualização de "Harmonizar" bater
+// com o que a pessoa realmente vê no quadro quando ele não tem cor própria.
+const DEFAULT_WORKSPACE_BG = "linear-gradient(180deg, #f8fafc 0%, #f4f5f7 100%)";
+
+function loadSidebarStyle() {
+  try {
+    const raw = localStorage.getItem(SIDEBAR_STYLE_STORAGE_KEY);
+    if (!raw) return DEFAULT_SIDEBAR_STYLE;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.mode !== "string") return DEFAULT_SIDEBAR_STYLE;
+    return parsed;
+  } catch {
+    return DEFAULT_SIDEBAR_STYLE;
+  }
+}
+
+function resolveHarmonizeBackground(board) {
+  return board?.background || DEFAULT_WORKSPACE_BG;
+}
+
+const STYLE_MODES = [
+  { id: "system", labelKey: "app.sidebar.styleMenu.system", descKey: "app.sidebar.styleMenu.systemDesc" },
+  { id: "glass", labelKey: "app.sidebar.styleMenu.glass", descKey: "app.sidebar.styleMenu.glassDesc" },
+  { id: "harmonize", labelKey: "app.sidebar.styleMenu.harmonize", descKey: "app.sidebar.styleMenu.harmonizeDesc" },
+];
+
+// Nomes fixos (não passam por i18n) - mesmo precedente de BACKGROUND_COLORS/
+// BACKGROUND_GRADIENTS em DataMenu.jsx, cujas amostras usam o id cru como
+// title. São nomes próprios da paleta da marca, pedidos assim.
+const SIDEBAR_PALETTE = [
+  { id: "xaphiresPurple", label: "Roxo Xaphires", css: "#6D28D9" },
+  { id: "softLilac", label: "Lilás Suave", css: "#EDE9FE" },
+  { id: "midnightBlue", label: "Azul Noturno", css: "#0F172A" },
+  { id: "graphite", label: "Grafite / Dark Mode", css: "#1E293B" },
+  { id: "magentaPink", label: "Rosa / Magenta", css: "#9333EA" },
+];
 // Uma linha do rail primário. `active`/`onClick` reais quando a seção existe
 // de verdade no Xaphires; sem onClick é decoração da referência do ClickUp
 // (ver decisão registrada na conversa) - fica no visual, não faz nada.
@@ -164,6 +218,86 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
   const [gargalosOpen, setGargalosOpen] = useState(false);
   const [rotinasOpen, setRotinasOpen] = useState(false);
   const [mapaMentalOpen, setMapaMentalOpen] = useState(false);
+
+  // Personalização isolada do painel lateral - estado próprio (sidebarStyle),
+  // persistido no localStorage do navegador, sem relação com board.background
+  // (que é por quadro e mora no servidor). "harmonize" é a única ponte
+  // deliberada entre os dois: lê o valor do outro sem escrever nele.
+  const [sidebarStyle, setSidebarStyle] = useState(loadSidebarStyle);
+  const [styleMenuOpen, setStyleMenuOpen] = useState(false);
+  const [styleMenuCoords, setStyleMenuCoords] = useState(null);
+  const [customHex, setCustomHex] = useState(
+    sidebarStyle.mode === "custom" && sidebarStyle.color ? sidebarStyle.color : "#6D28D9"
+  );
+  const styleBtnRef = useRef(null);
+  const styleMenuRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_STYLE_STORAGE_KEY, JSON.stringify(sidebarStyle));
+    } catch {
+      // Modo privado/quota do navegador: a preferência só não sobrevive ao
+      // recarregar, não é motivo pra quebrar a barra lateral.
+    }
+  }, [sidebarStyle]);
+
+  // Mesmo par posicionamento/clique-fora do flyout "Mais" (moreOpen, acima) -
+  // portal em document.body pelo mesmo motivo: .dsb-panel tem overflow-y:auto
+  // e um popover relativo ao botão cortaria ao rolar a árvore de quadros.
+  useLayoutEffect(() => {
+    if (!styleMenuOpen) return;
+    const rect = styleBtnRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const ESTIMATED_HEIGHT = 420;
+    setStyleMenuCoords({
+      top: Math.min(rect.bottom + 6, window.innerHeight - ESTIMATED_HEIGHT - 12),
+      left: Math.min(rect.left, window.innerWidth - 264 - 12),
+    });
+  }, [styleMenuOpen]);
+
+  useEffect(() => {
+    if (!styleMenuOpen) return;
+    function onDocClick(e) {
+      if (styleBtnRef.current?.contains(e.target)) return;
+      if (styleMenuRef.current?.contains(e.target)) return;
+      setStyleMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [styleMenuOpen]);
+
+  function applyStyleMode(mode) {
+    setSidebarStyle({ mode, color: null });
+  }
+  function applyCustomColor(hex) {
+    setCustomHex(hex);
+    setSidebarStyle({ mode: "custom", color: hex });
+  }
+
+  function modePreviewBackground(modeId) {
+    if (modeId === "glass") return "linear-gradient(135deg, rgba(255,255,255,0.55), rgba(203,213,225,0.85))";
+    if (modeId === "harmonize") return resolveHarmonizeBackground(activeBoard);
+    return "#ffffff";
+  }
+
+  // Ajuste automático de contraste (item 3 do pedido): "system" é sempre
+  // branco/claro, então nunca precisa de texto claro. "glass" também - é
+  // translúcido sobre um fundo claro por trás (ver .dsb-panel-glass em
+  // index.css), então o texto escuro padrão continua legível. Só
+  // "harmonize"/"custom" podem resultar numa cor escura de verdade.
+  let panelStyle;
+  let panelGlass = false;
+  let panelDark = false;
+  if (sidebarStyle.mode === "glass") {
+    panelGlass = true;
+  } else if (sidebarStyle.mode === "harmonize") {
+    const bg = resolveHarmonizeBackground(activeBoard);
+    panelStyle = { background: bg };
+    panelDark = isDarkBackground(bg);
+  } else if (sidebarStyle.mode === "custom" && sidebarStyle.color) {
+    panelStyle = { background: sidebarStyle.color };
+    panelDark = isDarkBackground(sidebarStyle.color);
+  }
 
   // Flyout do "Mais": bate-papo/idioma/tema moraram na fileira sempre visível
   // do painel branco antes; agora só aparecem aqui, sob demanda. Portal +
@@ -377,16 +511,32 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
         </div>
       </nav>
 
-      {/* ---------- Painel secundário (branco, conteúdo do workspace) ---------- */}
-      <aside className="dsb-panel">
+      {/* ---------- Painel secundário (branco por padrão, conteúdo do workspace) ----------
+          Cor/estilo isolados do fundo do quadro - ver sidebarStyle acima. */}
+      <aside
+        className={"dsb-panel" + (panelGlass ? " dsb-panel-glass" : "") + (panelDark ? " dsb-panel-on-dark" : "")}
+        style={panelStyle}
+      >
         <div className="dsb-panel-header">
-          {/* Real: nome de quem está logado. Sem seletor de múltiplos
-              workspaces no Xaphires (uma empresa por login) - o "v" fica só
-              de enfeite, clicar não abre nada (PLACEHOLDER). */}
-          <button type="button" className="dsb-workspace-btn" disabled>
-            <span className="dsb-workspace-title">{t("app.sidebar.workspaceLabel", { name: user.name })}</span>
-            <IconChevronDown size={13} />
-          </button>
+          <div className="dsb-panel-header-row">
+            {/* Real: nome de quem está logado. Sem seletor de múltiplos
+                workspaces no Xaphires (uma empresa por login) - o "v" fica só
+                de enfeite, clicar não abre nada (PLACEHOLDER). */}
+            <button type="button" className="dsb-workspace-btn" disabled>
+              <span className="dsb-workspace-title">{t("app.sidebar.workspaceLabel", { name: user.name })}</span>
+              <IconChevronDown size={13} />
+            </button>
+            <button
+              type="button"
+              ref={styleBtnRef}
+              className={"dsb-icon-btn dsb-style-trigger" + (styleMenuOpen ? " active" : "")}
+              onClick={() => setStyleMenuOpen((o) => !o)}
+              title={t("app.sidebar.styleMenu.trigger")}
+              aria-label={t("app.sidebar.styleMenu.trigger")}
+            >
+              <IconPalette size={14} />
+            </button>
+          </div>
         </div>
 
         <div className="dsb-panel-titlebar">
@@ -561,6 +711,59 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
                 </div>
               </>
             )}
+          </div>,
+          document.body
+        )}
+
+      {styleMenuOpen &&
+        styleMenuCoords &&
+        createPortal(
+          <div
+            className="dropdown dsb-style-menu"
+            ref={styleMenuRef}
+            style={{ position: "fixed", top: styleMenuCoords.top, left: styleMenuCoords.left }}
+          >
+            <div className="dsb-style-menu-title">{t("app.sidebar.styleMenu.title")}</div>
+            <div className="dsb-style-mode-list">
+              {STYLE_MODES.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  className={"dsb-style-mode-btn" + (sidebarStyle.mode === m.id ? " active" : "")}
+                  onClick={() => applyStyleMode(m.id)}
+                >
+                  <span className="dsb-style-mode-swatch" style={{ background: modePreviewBackground(m.id) }} />
+                  <span className="dsb-style-mode-text">
+                    <span className="dsb-style-mode-label">{t(m.labelKey)}</span>
+                    <span className="dsb-style-mode-desc">{t(m.descKey)}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="dropdown-divider" />
+            <div className="board-bg-section-label">{t("app.sidebar.styleMenu.paletteTitle")}</div>
+            <div className="board-bg-swatch-grid">
+              {SIDEBAR_PALETTE.map((c) => (
+                <button
+                  key={c.id}
+                  className={
+                    "board-bg-swatch" + (sidebarStyle.mode === "custom" && sidebarStyle.color === c.css ? " active" : "")
+                  }
+                  style={{ background: c.css }}
+                  onClick={() => applyCustomColor(c.css)}
+                  title={c.label}
+                />
+              ))}
+            </div>
+
+            <div className="board-bg-section-label">{t("app.sidebar.styleMenu.customTitle")}</div>
+            <div className="board-bg-custom-row">
+              <input type="color" value={customHex} onChange={(e) => setCustomHex(e.target.value)} />
+              <button className="btn-primary btn-small" onClick={() => applyCustomColor(customHex)}>
+                {t("app.sidebar.styleMenu.customApply")}
+              </button>
+            </div>
           </div>,
           document.body
         )}

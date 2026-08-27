@@ -192,6 +192,57 @@
         "copiado": "Lien copié"
       }
     },
+    "timeTracking": {
+      "tabs": {
+        "meus": "Mes feuilles de temps",
+        "todos": "Toutes les feuilles",
+        "aprovacoes": "Approbations"
+      },
+      "tracker": {
+        "trackTime": "Track Time",
+        "tarefa": "Tâche",
+        "semTarefa": "Sans tâche",
+        "novaTarefa": "+ Nouvelle tâche",
+        "nomeTarefa": "Nom de la tâche",
+        "nomeProjeto": "Projet (facultatif)",
+        "novoApontamento": "New time entry",
+        "data": "Date",
+        "inicio": "Début",
+        "fim": "Fin",
+        "tags": "Étiquettes",
+        "addTags": "Ajouter des étiquettes",
+        "billable": "Facturable",
+        "lancar": "Enregistrer",
+        "hojeData": "Aujourd'hui, {{data}}",
+        "semLancamentosHoje": "Aucun temps enregistré aujourd'hui.",
+        "emAndamento": "En cours...",
+        "parado": "Chronomètre arrêté",
+        "lancado": "Temps enregistré",
+        "duracaoInvalida": "Durée non reconnue - essayez \"1h 30m\" ou \"1.5\""
+      },
+      "grade": {
+        "tarefa": "Tâche",
+        "pessoa": "Personne",
+        "total": "Total",
+        "semLancamentos": "Aucun temps enregistré cette semaine.",
+        "enviarSemana": "Soumettre la semaine",
+        "semanaEnviada": "Semaine soumise pour approbation",
+        "status": {
+          "draft": "Brouillon",
+          "submitted": "Soumise",
+          "approved": "Approuvée",
+          "rejected": "Rejetée"
+        }
+      },
+      "aprovacoes": {
+        "titulo": "Feuilles de temps en attente",
+        "vazio": "Aucune feuille de temps en attente d'approbation.",
+        "aprovar": "Approuver",
+        "rejeitar": "Rejeter",
+        "aprovado": "Feuille de temps approuvée",
+        "rejeitado": "Feuille de temps rejetée"
+      }
+    },
     "compras-estoque": {
       "name": "Achats & Stocks",
       "desc": "Inventaire, fournisseurs, marge produit et seuil de réapprovisionnement."
@@ -211,6 +262,10 @@
     "juridico": {
       "name": "Juridique",
       "desc": "Contrats, délais et conformité documentaire de l'entreprise."
+    },
+    "time-tracking": {
+      "name": "Xaphires Time & Tracking",
+      "desc": "Chronomètre, saisie des heures et approbation des feuilles de temps."
     },
     "custom": {
       "seal": "Sur mesure",
@@ -1214,6 +1269,19 @@
       "workspaceLabel": "Espace de travail de {{name}}",
       "spacesTitle": "Espaces",
       "boardsFolder": "Projets",
+      "styleMenu": {
+        "trigger": "Personnaliser la barre latérale",
+        "title": "Style de la barre latérale",
+        "system": "Par défaut du système",
+        "systemDesc": "Blanc / épuré",
+        "glass": "Verre dépoli",
+        "glassDesc": "Translucide, avec flou",
+        "harmonize": "Assortir au tableau",
+        "harmonizeDesc": "Utilise le fond actuel du tableau",
+        "paletteTitle": "Palette de couleurs Kanban",
+        "customTitle": "Couleur personnalisée",
+        "customApply": "Appliquer"
+      },
       "rail": {
         "home": "Accueil",
         "planner": "Planificateur",

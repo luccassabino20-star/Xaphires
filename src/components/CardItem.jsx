@@ -277,7 +277,15 @@ export default function CardItem({
           {card.labels.map((labelId) => {
             const meta = LABEL_COLORS.find((l) => l.id === labelId);
             if (!meta) return null;
-            return <span key={labelId} className="card-label" style={{ background: meta.color }} />;
+            // Pastel, não a cor cheia: color-mix aclara o tom saturado de LABEL_COLORS
+            // (pensado para o dot do seletor) até virar uma tarja suave no card.
+            return (
+              <span
+                key={labelId}
+                className="card-label"
+                style={{ background: `color-mix(in srgb, ${meta.color} 55%, white)` }}
+              />
+            );
           })}
         </div>
       )}

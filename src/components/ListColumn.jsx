@@ -77,9 +77,11 @@ export default function ListColumn({
   // --list-accent/--list-accent-bg alimentam a pill do título e o botão de
   // adicionar tarefa (ver index.css) - sem cor própria, os dois caem no par
   // neutro --status-pill-bg/--status-pill-text definido em :root.
+  // O mix vai contra "transparent" (não mais var(--bg-column) sólido) para a
+  // coluna colorida continuar em vidro fosco como as demais - ver .list.
   const listStyle = listColor
     ? {
-        background: `color-mix(in srgb, ${listColor} 16%, var(--bg-column))`,
+        background: `color-mix(in srgb, ${listColor} 14%, transparent)`,
         borderTop: `3px solid ${listColor}`,
         "--list-accent": listColor,
         "--list-accent-bg": `color-mix(in srgb, ${listColor} 20%, var(--bg-card))`,
@@ -110,13 +112,31 @@ export default function ListColumn({
           }}
         />
         <span className="list-count">{list.cardIds.length}</span>
-        {/* O menu da coluna é só ação de escrita (cor, prazo de gargalo, limpar, excluir). */}
         {!readOnly && (
-          <button ref={menuBtnRef} className="list-menu-btn" onClick={() => setMenuOpen((o) => !o)}>
-            <svg viewBox="0 0 24 24" width="16" height="16">
-              <path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-            </svg>
-          </button>
+          <div className="list-header-actions">
+            {/* Atalho para o mesmo composer do rodapé (setAddingCard) - o pedido de
+                design queria um "+" rápido no cabeçalho, sem duplicar o fluxo de
+                criação que já existe em .add-card-btn. */}
+            <button
+              type="button"
+              className="list-quick-add-btn"
+              title={t("board.listColumn.addCard")}
+              onClick={(e) => {
+                e.stopPropagation();
+                setAddingCard(true);
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15">
+                <path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" />
+              </svg>
+            </button>
+            {/* O menu da coluna é só ação de escrita (cor, prazo de gargalo, limpar, excluir). */}
+            <button ref={menuBtnRef} className="list-menu-btn" onClick={() => setMenuOpen((o) => !o)}>
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+              </svg>
+            </button>
+          </div>
         )}
         {menuOpen && <ListMenu board={board} list={list} onClose={() => setMenuOpen(false)} anchorRef={menuBtnRef} />}
       </div>

@@ -470,6 +470,57 @@
         "configSalva": "Configuración guardada"
       }
     },
+    "timeTracking": {
+      "tabs": {
+        "meus": "Mis Partes de Horas",
+        "todos": "Todos los Partes",
+        "aprovacoes": "Aprobaciones"
+      },
+      "tracker": {
+        "trackTime": "Track Time",
+        "tarefa": "Tarea",
+        "semTarefa": "Sin tarea",
+        "novaTarefa": "+ Nueva tarea",
+        "nomeTarefa": "Nombre de la tarea",
+        "nomeProjeto": "Proyecto (opcional)",
+        "novoApontamento": "New time entry",
+        "data": "Fecha",
+        "inicio": "Inicio",
+        "fim": "Fin",
+        "tags": "Etiquetas",
+        "addTags": "Agregar etiquetas",
+        "billable": "Facturable",
+        "lancar": "Registrar",
+        "hojeData": "Hoy, {{data}}",
+        "semLancamentosHoje": "Aún no hay registros hoy.",
+        "emAndamento": "En curso...",
+        "parado": "Cronómetro detenido",
+        "lancado": "Registro guardado",
+        "duracaoInvalida": "No entendí esa duración - prueba \"1h 30m\" o \"1.5\""
+      },
+      "grade": {
+        "tarefa": "Tarea",
+        "pessoa": "Persona",
+        "total": "Total",
+        "semLancamentos": "Sin registros esta semana.",
+        "enviarSemana": "Enviar semana",
+        "semanaEnviada": "Semana enviada para aprobación",
+        "status": {
+          "draft": "Borrador",
+          "submitted": "Enviada",
+          "approved": "Aprobada",
+          "rejected": "Rechazada"
+        }
+      },
+      "aprovacoes": {
+        "titulo": "Partes de horas pendientes",
+        "vazio": "Ningún parte de horas esperando aprobación.",
+        "aprovar": "Aprobar",
+        "rejeitar": "Rechazar",
+        "aprovado": "Parte de horas aprobado",
+        "rejeitado": "Parte de horas rechazado"
+      }
+    },
     "compras-estoque": {
       "name": "Compras & Inventario",
       "desc": "Inventario, proveedores, margen de productos y punto de reorden."
@@ -489,6 +540,10 @@
     "juridico": {
       "name": "Legal",
       "desc": "Contratos, plazos y cumplimiento documental de la empresa."
+    },
+    "time-tracking": {
+      "name": "Xaphires Time & Tracking",
+      "desc": "Cronómetro, registro de horas y aprobación de partes de horas."
     },
     "custom": {
       "seal": "A medida",
@@ -1267,6 +1322,19 @@
       "workspaceLabel": "Workspace de {{name}}",
       "spacesTitle": "Espacios",
       "boardsFolder": "Proyectos",
+      "styleMenu": {
+        "trigger": "Personalizar barra lateral",
+        "title": "Estilo de la barra lateral",
+        "system": "Predeterminado del sistema",
+        "systemDesc": "Blanco / clean",
+        "glass": "Vidrio esmerilado",
+        "glassDesc": "Translúcido, con desenfoque",
+        "harmonize": "Combinar con el tablero",
+        "harmonizeDesc": "Usa el fondo actual del tablero",
+        "paletteTitle": "Paleta de colores de Kanban",
+        "customTitle": "Color personalizado",
+        "customApply": "Aplicar"
+      },
       "rail": {
         "home": "Inicio",
         "planner": "Planificador",

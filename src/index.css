@@ -32,6 +32,11 @@
      calculadas ali por color-mix a partir da cor escolhida. */
   --status-pill-bg: #f0f1f3;
   --status-pill-text: #616161;
+  /* Realce roxo/índigo do redesign "luxury glass" do quadro Kanban (hover de
+     card, foco de botão fantasma) - escopado como variável própria porque
+     --accent do resto do app é neutro (cinza-escuro) e não deve virar roxo. */
+  --accent-glow: #7c3aed;
+  --accent-glow-soft: rgba(124, 58, 237, 0.14);
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -433,6 +438,120 @@ input, textarea { font-family: inherit; }
 .dsb-add-private-toggle { display: flex; align-items: center; gap: 6px; padding: 2px; font-size: 12px; color: #616161; cursor: pointer; }
 .dsb-add-private-toggle input { width: 14px; height: 14px; cursor: pointer; }
 
+/* ---------- Personalização da barra lateral do Kanban (Sidebar.jsx) ----------
+   Isolada de propósito do fundo do quadro (ver "Board background menu", mais
+   abaixo): .dsb-panel troca de cor/estilo pelo sidebarStyle salvo no
+   localStorage da pessoa, nunca pelo board.background do quadro (só o modo
+   "harmonize" lê o valor do outro, sem escrever nele). */
+.dsb-panel-header-row { display: flex; align-items: center; gap: 6px; }
+.dsb-panel-header-row .dsb-workspace-btn { flex: 1; min-width: 0; }
+.dsb-style-trigger.active { background: #f0f0f0; color: #1a1a1a; }
+
+/* Modo "Vidro Fosco": o branco sólido de .dsb-panel vira translúcido com blur.
+   Sem sobreposição real com o quadro no layout de desktop (painel e área do
+   quadro são irmãos lado a lado, não empilhados) - o que aparece por trás é o
+   fundo neutro do app-shell (--bg-app), não literalmente o quadro; "refletindo
+   o fundo" aqui é o efeito de vidro em si, não uma câmera do conteúdo atrás. */
+.dsb-panel-glass {
+  background: color-mix(in srgb, #ffffff 55%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Contraste automático (item 3 do pedido): soma quando sidebarStyle resolve
+   numa cor escura (ver isDarkBackground em utils/contrast.js, chamado em
+   Sidebar.jsx). Reescreve os tons fixos usados no painel branco (#1a1a1a,
+   #616161, #8c8c8c...) - eles não seguem var(--text-*) porque .dsb-panel é
+   sempre branco por padrão (ver comentário no topo do arquivo, seção da
+   barra lateral dupla), então um `data-theme` normal não bastaria aqui. */
+.dsb-panel.dsb-panel-on-dark .dsb-workspace-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f1f5f9;
+}
+.dsb-panel.dsb-panel-on-dark .dsb-workspace-btn svg { color: #cbd5e1; }
+.dsb-panel.dsb-panel-on-dark .dsb-panel-title,
+.dsb-panel.dsb-panel-on-dark .dsb-space-title,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-item.active .dsb-tree-title {
+  color: #f1f5f9;
+}
+.dsb-panel.dsb-panel-on-dark .dsb-shortcut-row,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-btn,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-rename-input,
+.dsb-panel.dsb-panel-on-dark .dsb-add-form input {
+  color: #e2e8f0;
+}
+.dsb-panel.dsb-panel-on-dark .dsb-shortcut-icon,
+.dsb-panel.dsb-panel-on-dark .dsb-section-title,
+.dsb-panel.dsb-panel-on-dark .dsb-icon-btn,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-folder,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-list-icon,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-lock,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-delete,
+.dsb-panel.dsb-panel-on-dark .dsb-new-space-btn {
+  color: #94a3b8;
+}
+.dsb-panel.dsb-panel-on-dark .dsb-tree-count {
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.14);
+}
+.dsb-panel.dsb-panel-on-dark .dsb-shortcut-row:hover,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-item:hover,
+.dsb-panel.dsb-panel-on-dark .dsb-icon-btn:hover,
+.dsb-panel.dsb-panel-on-dark .dsb-space-header:hover,
+.dsb-panel.dsb-panel-on-dark .dsb-new-space-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.dsb-panel.dsb-panel-on-dark .dsb-icon-btn:hover,
+.dsb-panel.dsb-panel-on-dark .dsb-style-trigger.active {
+  color: #f1f5f9;
+}
+.dsb-panel.dsb-panel-on-dark .dsb-style-trigger.active { background: rgba(255, 255, 255, 0.16); }
+.dsb-panel.dsb-panel-on-dark .dsb-tree-item.active {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+}
+.dsb-panel.dsb-panel-on-dark .dsb-divider { background: rgba(255, 255, 255, 0.16); }
+.dsb-panel.dsb-panel-on-dark .dsb-add-form input,
+.dsb-panel.dsb-panel-on-dark .dsb-tree-rename-input {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.dsb-panel.dsb-panel-on-dark::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.28); }
+
+/* Popover de personalização em si (portal em document.body, mesmo motivo do
+   .dsb-more-dropdown: .dsb-panel tem overflow-y:auto e cortaria um popover
+   relativo ao botão ao rolar a árvore de quadros). Sempre claro, como o
+   .dsb-more-dropdown - não segue sidebarStyle, escolhe a cor do painel, não é
+   o painel. */
+.dsb-style-menu.dropdown { background: #fff; border-color: #eaeaea; min-width: 240px; max-width: 264px; }
+.dsb-style-menu-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8c8c8c;
+  padding: 4px 6px 8px;
+}
+.dsb-style-mode-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 4px; }
+.dsb-style-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+.dsb-style-mode-btn:hover { background: #f5f5f5; }
+.dsb-style-mode-btn.active { background: #f0f0f0; }
+.dsb-style-mode-swatch { flex-shrink: 0; width: 26px; height: 26px; border-radius: 8px; border: 1px solid #e0e0e0; }
+.dsb-style-mode-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.dsb-style-mode-label { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+.dsb-style-mode-desc { font-size: 11px; color: #8c8c8c; }
+
 /* ---------- Main area / Topbar ---------- */
 .main-area {
   flex: 1;
@@ -447,6 +566,12 @@ input, textarea { font-family: inherit; }
   min-height: 0;
   display: flex;
   flex-direction: column;
+  /* Tom off-white padrão da área de trabalho do quadro. Fica aqui (não em
+     .board-wrapper) de propósito: o estilo inline board.background
+     (AuthenticatedApp.jsx) é aplicado neste mesmo elemento, então o valor
+     escolhido pela pessoa em Personalizar > Fundo do quadro (DataMenu.jsx)
+     sobrepõe este default em vez de ficar escondido atrás do filho. */
+  background: linear-gradient(180deg, #f8fafc 0%, #f4f5f7 100%);
   background-size: cover;
   transition: background 0.15s;
 }
@@ -618,11 +743,15 @@ input, textarea { font-family: inherit; }
 .view-tabs {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 0 16px;
-  height: 42px;
-  min-height: 42px;
-  background: var(--bg-topbar);
+  gap: 3px;
+  padding: 6px 16px;
+  height: 46px;
+  min-height: 46px;
+  /* Barra em vidro: translúcida sobre o fundo, com blur por trás - a mesma
+     receita das colunas do quadro logo abaixo (ver .list). */
+  background: color-mix(in srgb, var(--bg-topbar) 85%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-subtle);
   overflow-x: auto;
 }
@@ -632,19 +761,31 @@ input, textarea { font-family: inherit; }
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
-  padding: 8px 12px;
-  border-radius: 6px 6px 0 0;
+  padding: 7px 14px;
+  border-radius: 10px;
   cursor: pointer;
   white-space: nowrap;
   position: relative;
-  top: 1px;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .view-tab:hover { color: var(--text-primary); background: var(--bg-list); }
-.view-tab.active { color: var(--text-primary); box-shadow: inset 0 -2px 0 var(--accent); }
+.view-tab.active {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  box-shadow: 0 1px 2px rgba(20,22,30,0.05), 0 3px 8px rgba(20,22,30,0.07), inset 0 0 0 1px var(--border-subtle);
+}
 
 /* ---------- Board ---------- */
-.board-wrapper { flex: 1; overflow-x: auto; overflow-y: hidden; }
-.board { display: flex; align-items: flex-start; gap: 16px; padding: 18px 20px; height: 100%; min-height: 100%; }
+.board-wrapper {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Sem background próprio de propósito: deixa transparecer .view-content-area,
+     que carrega o tom padrão OU o board.background escolhido pela pessoa - ver
+     comentário lá. Um background opaco aqui escondia o fundo do quadro atrás
+     das colunas em vez de só atrás dos vãos entre elas. */
+}
+.board { display: flex; align-items: flex-start; gap: 16px; padding: 20px 22px; height: 100%; min-height: 100%; }
 
 /* ---------- Generic view container ---------- */
 .view-scroll { flex: 1; overflow: auto; padding: 20px; }
@@ -1569,27 +1710,34 @@ input, textarea { font-family: inherit; }
 
 /* ---------- List ---------- */
 .list {
-  background: var(--bg-column);
-  border: 1px solid var(--list-border);
+  /* Card de vidro: fundo translúcido + blur no que passa atrás, em vez do
+     bloco cinza opaco de antes (redesign "luxury glass" do quadro). Raio
+     maior que --radius-list (usado em vários outros lugares do app - ver
+     grep antes de tocar na variável) só aqui, hardcoded de propósito. */
+  background: color-mix(in srgb, var(--bg-column) 55%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, var(--list-border) 70%, transparent);
   box-shadow: var(--shadow-list);
-  border-radius: var(--radius-list);
-  width: 276px;
-  min-width: 276px;
+  border-radius: 20px;
+  width: 280px;
+  min-width: 280px;
   max-height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 10px 8px;
+  padding: 12px 10px;
 }
 
 .list-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 6px 12px 6px;
-  gap: 6px;
+  padding: 2px 4px 12px 6px;
+  gap: 4px;
   cursor: grab;
   position: relative;
 }
+.list-header-actions { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
 
 /* Pill de status: bg/texto pastel vindos de --list-accent-bg/--list-accent quando a
    lista tem cor própria (ver listStyle em ListColumn.jsx); sem cor, cai no par
@@ -1598,9 +1746,9 @@ input, textarea { font-family: inherit; }
    em vez de esticar; sem suporte (fora do Chrome/Edge recentes) ele só volta a
    ocupar a largura padrão do input, sem quebrar a edição. */
 .list-title {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   background: var(--list-accent-bg, var(--status-pill-bg));
   color: var(--list-accent, var(--status-pill-text));
@@ -1611,28 +1759,30 @@ input, textarea { font-family: inherit; }
   min-width: 0;
   max-width: 100%;
   field-sizing: content;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--list-accent, var(--border-subtle)) 22%, transparent);
 }
 .list-title:focus { box-shadow: inset 0 0 0 2px var(--list-accent, var(--border-strong)); }
 
 .list-count {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  padding: 1px 4px;
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent);
+  border-radius: 9999px;
+  padding: 2px 7px;
   margin-left: 2px;
   flex-shrink: 0;
 }
 
-.list-menu-btn {
+.list-menu-btn, .list-quick-add-btn {
   border: none;
   background: transparent;
   color: var(--text-muted);
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1640,7 +1790,7 @@ input, textarea { font-family: inherit; }
   flex-shrink: 0;
   transition: background 0.12s ease, color 0.12s ease;
 }
-.list-menu-btn:hover { background: var(--bg-card); color: var(--text-primary); }
+.list-menu-btn:hover, .list-quick-add-btn:hover { background: var(--bg-card); color: var(--accent-glow); }
 
 .cards-container {
   flex: 1;
@@ -1659,18 +1809,20 @@ input, textarea { font-family: inherit; }
 .card {
   background: var(--bg-card);
   border: 1px solid var(--card-border);
-  border-radius: var(--radius-card);
-  padding: 10px 12px;
+  /* Raio maior que --radius-card (usado em outras telas - ver grep antes de
+     tocar na variável) só aqui, hardcoded, redesign "luxury glass". */
+  border-radius: 14px;
+  padding: 11px 13px;
   box-shadow: var(--shadow-card);
   cursor: grab;
   position: relative;
-  transition: box-shadow 0.14s ease, transform 0.14s ease, border-color 0.14s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 .card:hover {
   background: var(--bg-card-hover);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent-glow) 45%, var(--card-border));
+  box-shadow: 0 2px 4px rgba(20,22,30,0.05), 0 14px 28px -8px var(--accent-glow-soft);
+  transform: translateY(-2px);
 }
 .card:active { cursor: grabbing; transform: translateY(0); }
 .card.dimmed { opacity: 0.25; pointer-events: none; }
@@ -1858,8 +2010,8 @@ input, textarea { font-family: inherit; }
   box-shadow: var(--shadow-modal);
 }
 
-.card-labels { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
-.card-label { height: 7px; width: 34px; border-radius: 4px; }
+.card-labels { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 7px; }
+.card-label { height: 6px; width: 28px; border-radius: 9999px; }
 
 .card-title-row { display: flex; align-items: flex-start; gap: 8px; }
 
@@ -1909,7 +2061,13 @@ input, textarea { font-family: inherit; }
 .card-meta { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 11.5px; font-weight: 500; }
 .card-meta-item { display: flex; align-items: center; gap: 3px; }
 .card-meta-item svg { display: block; }
-.card-meta-item.due-overdue { color: var(--danger); font-weight: 600; }
+.card-meta-item.due-overdue {
+  color: var(--danger);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  padding: 1px 6px;
+  border-radius: 9999px;
+}
 .card-meta-item.due-done { color: var(--success); font-weight: 600; }
 
 .card-avatars { display: flex; align-items: center; }
@@ -1937,7 +2095,7 @@ img.avatar { object-fit: cover; padding: 0; }
 /* account-menu-btn é um <button>, não pode virar <img> - a foto entra como
    filho preenchendo o círculo por dentro (ver AccountMenu.jsx). */
 .avatar-img-fill { width: 100%; height: 100%; object-fit: cover; display: block; }
-.avatar-small { width: 20px; height: 20px; font-size: 9.5px; margin-left: -6px; }
+.avatar-small { width: 20px; height: 20px; font-size: 9.5px; margin-left: -6px; box-shadow: 0 0 0 2px var(--bg-card); }
 .avatar-small:first-child { margin-left: 0; }
 .avatar-large { width: 64px; height: 64px; font-size: 24px; }
 .avatar-add {
@@ -1956,35 +2114,47 @@ img.avatar { object-fit: cover; padding: 0; }
   align-items: center;
   gap: 6px;
   /* Cor temática: acompanha --list-accent quando a lista tem cor própria (ver
-     ListColumn.jsx), senão cai no cinza padrão - é o mesmo par usado na pill do
-     título logo acima, para o botão ler como parte daquela coluna. */
+     ListColumn.jsx), senão cai no roxo do redesign - é o mesmo par usado na
+     pill do título logo acima, para o botão ler como parte daquela coluna. */
   color: var(--list-accent, var(--text-secondary));
   font-weight: 600;
   background: transparent;
-  border: none;
-  border-radius: 8px;
+  border: 1px dashed transparent;
+  border-radius: 10px;
   padding: 8px 8px;
   font-size: 13.5px;
   cursor: pointer;
   text-align: left;
   width: 100%;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.add-card-btn:hover { background: var(--list-accent-bg, rgba(0,0,0,0.06)); }
+.add-card-btn:hover {
+  background: var(--list-accent-bg, var(--accent-glow-soft));
+  color: var(--list-accent, var(--accent-glow));
+  border-color: color-mix(in srgb, var(--list-accent, var(--accent-glow)) 45%, transparent);
+}
 
 .add-list-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-list);
+  background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px dashed var(--border-subtle);
+  box-shadow: none;
   font-weight: 600;
   color: var(--text-secondary);
 }
-.add-list-btn:hover { background: var(--bg-list); color: var(--text-primary); }
+.add-list-btn:hover {
+  background: var(--accent-glow-soft);
+  color: var(--accent-glow);
+  border-color: color-mix(in srgb, var(--accent-glow) 45%, transparent);
+}
 
-.list-composer-wrap { width: 276px; min-width: 276px; flex-shrink: 0; }
+.list-composer-wrap { width: 280px; min-width: 280px; flex-shrink: 0; }
 .list-composer {
-  background: var(--bg-column);
-  border-radius: var(--radius-list);
+  background: color-mix(in srgb, var(--bg-column) 55%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 20px;
   padding: 6px;
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-list);
@@ -9554,4 +9724,180 @@ body.sc-pub-body { overflow: auto; }
     transform: translateX(0); transition: transform 0.2s ease;
   }
   .beauty-sidebar-collapsed { transform: translateX(-100%); pointer-events: none; }
+}
+
+/* ---------- Xaphires Time & Tracking ---------- */
+/* Variáveis globais (--text-*/--bg-*/--border-*/--accent), como o resto do
+   app - este módulo não tem tema próprio isolado tipo .beauty-shell, então
+   usa o mesmo mecanismo de tema (claro/escuro) que já existe na plataforma.
+   O gradiente navy do ícone/cronômetro é o mesmo já usado no Hub/Dashboard
+   central/Central de Perfil - identidade visual "premium" consistente entre
+   os módulos novos desta fase, não uma paleta nova só deste módulo. */
+.tt-shell { height: 100vh; display: flex; flex-direction: column; background: var(--bg-column); color: var(--text-primary); }
+.tt-header {
+  display: flex; align-items: center; gap: 24px; padding: 14px 24px;
+  background: var(--bg-topbar); border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+.tt-header-left { display: flex; align-items: center; gap: 10px; }
+.tt-back {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-subtle);
+  background: none; color: var(--text-secondary); cursor: pointer;
+}
+.tt-back:hover { background: var(--bg-list); color: var(--text-primary); }
+.tt-brand-icon {
+  width: 32px; height: 32px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; background: linear-gradient(135deg, #16265c, #2f4ea3);
+}
+.tt-title { font-size: 16.5px; font-weight: 700; margin: 0; letter-spacing: -0.2px; }
+.tt-tabs { display: flex; gap: 22px; margin: 0 auto; align-self: stretch; align-items: flex-end; }
+/* Sublinhado simples (pedido do cliente) em vez da pílula preenchida
+   anterior - mesmo espírito de .beauty-tab/.profile-hub-tab, mas com
+   variáveis globais (--accent), não --beauty-*. */
+.tt-tab {
+  padding: 10px 2px; margin-bottom: -1px; font-size: 13.5px; font-weight: 600;
+  color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.tt-tab:hover { color: var(--text-primary); }
+.tt-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tt-header-right { display: flex; align-items: center; gap: 10px; }
+
+.tt-body { flex: 1; overflow: auto; padding: 24px; }
+/* Grade primeiro (maior espaço, centro/esquerda), painel "Track Time"
+   depois (barra lateral fixa à direita) - inversão pedida pelo cliente. */
+.tt-content { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .tt-content { grid-template-columns: 1fr; } }
+
+.tt-tracker {
+  display: flex; flex-direction: column; gap: 12px; padding: 22px 20px;
+  background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 22px;
+  box-shadow: var(--shadow-card);
+}
+.tt-tracker-title { font-size: 15px; font-weight: 700; margin: 0; color: var(--text-primary); }
+
+/* Input único ("New time entry") + confirmação (só some quando o texto é
+   uma duração pura) + play/pause, tudo numa linha só. */
+.tt-quick-row { display: flex; align-items: center; gap: 6px; }
+.tt-quick-input {
+  flex: 1; min-width: 0; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-subtle);
+  background: var(--bg-list); color: var(--text-primary); font-size: 13.5px;
+}
+.tt-quick-input:focus { outline: none; border-color: var(--accent); background: var(--bg-card); }
+.tt-quick-confirm {
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success);
+}
+.tt-tracker-play {
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; color: #fff;
+  background: linear-gradient(135deg, #16265c, #2f4ea3);
+  box-shadow: 0 6px 16px -6px rgba(22, 38, 92, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tt-tracker-play:hover { transform: scale(1.07); }
+.tt-tracker-play.running { background: linear-gradient(135deg, #b3444a, #7a2c30); animation: tt-pulso 1.8s ease-in-out infinite; }
+@keyframes tt-pulso {
+  0%, 100% { box-shadow: 0 6px 16px -6px rgba(179, 68, 74, 0.5); }
+  50% { box-shadow: 0 6px 22px -4px rgba(179, 68, 74, 0.7); }
+}
+.tt-tracker-clock {
+  font-family: "Geist Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 22px; font-weight: 700; text-align: center; letter-spacing: 0.5px; color: var(--danger);
+}
+.tt-tracker-field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+.tt-tracker-field select, .tt-tracker-field input {
+  padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card);
+  color: var(--text-primary); font-size: 13.5px;
+}
+.tt-link-btn { align-self: flex-start; background: none; border: none; color: var(--accent); font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 0; }
+.tt-inline-form { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--bg-list); border-radius: 12px; }
+.tt-inline-form input { padding: 7px 9px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); }
+.tt-inline-form-actions { display: flex; gap: 8px; }
+
+.tt-datetime-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.tt-datetime-row .tt-tracker-field input { padding: 7px 6px; font-size: 12.5px; }
+
+.tt-tags-input {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 8px;
+  border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card);
+}
+.tt-tags-input input { flex: 1; min-width: 60px; border: none; background: none; padding: 4px 2px; font-size: 13px; color: var(--text-primary); }
+.tt-tags-input input:focus { outline: none; }
+.tt-tag-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-size: 11.5px; font-weight: 600;
+}
+.tt-tag-chip button { background: none; border: none; color: inherit; cursor: pointer; font-size: 13px; line-height: 1; padding: 0; }
+
+.tt-switch-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-primary); padding: 2px 0; }
+.tt-switch {
+  position: relative; width: 38px; height: 22px; border-radius: 999px; border: none; cursor: pointer;
+  background: var(--bg-list); transition: background 0.2s ease; flex-shrink: 0;
+}
+.tt-switch.on { background: var(--accent); }
+.tt-switch-knob {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.2s ease;
+}
+.tt-switch.on .tt-switch-knob { transform: translateX(16px); }
+.tt-switch:disabled { opacity: 0.6; cursor: default; }
+
+.tt-section-title { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin: 6px 0 2px; }
+.tt-muted { color: var(--text-muted); font-size: 12.5px; }
+.tt-today-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.tt-today-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border-subtle); font-size: 12.5px; }
+.tt-today-item:first-child { border-top: none; }
+.tt-today-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.tt-today-task { color: var(--text-primary); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-today-range { color: var(--text-muted); font-size: 11px; }
+.tt-today-duration { color: var(--text-secondary); flex-shrink: 0; font-weight: 600; }
+.tt-today-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; line-height: 1; flex-shrink: 0; }
+.tt-today-remove:hover { color: var(--danger); }
+
+.tt-grid-panel, .tt-all-panel, .tt-approvals-panel {
+  display: flex; flex-direction: column; gap: 14px; padding: 20px;
+  background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 22px;
+  box-shadow: var(--shadow-card);
+}
+.tt-grid-toolbar { display: flex; align-items: center; gap: 10px; }
+.tt-grid-week-label { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+.tt-status-badge { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; padding: 4px 10px; border-radius: 999px; background: var(--bg-list); color: var(--text-secondary); }
+.tt-status-submitted { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.tt-status-approved { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+.tt-status-rejected { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+
+.tt-grid-scroll { overflow-x: auto; }
+.tt-grid-table { width: 100%; border-collapse: collapse; }
+.tt-grid-task-col { text-align: left; padding: 8px 10px; font-size: 12.5px; color: var(--text-secondary); min-width: 160px; }
+.tt-grid-day-col {
+  padding: 8px 10px; text-align: center; min-width: 84px;
+  display: table-cell; vertical-align: top;
+}
+.tt-grid-day-col.today, .tt-grid-cell.today { background: color-mix(in srgb, var(--accent) 5%, transparent); border-radius: 10px; }
+.tt-grid-day-label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+.tt-grid-day-total { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin: 3px 0; }
+.tt-grid-day-bar { display: block; height: 4px; border-radius: 999px; background: var(--bg-list); overflow: hidden; }
+.tt-grid-day-bar-fill { display: block; height: 100%; background: linear-gradient(90deg, #2f4ea3, #16265c); border-radius: 999px; transition: width 0.3s ease; }
+/* Só divisor horizontal (linha fina entre tarefas) - sem grade vertical
+   pesada entre os dias, visual mais limpo/clean pedido pelo cliente. */
+.tt-grid-cell { padding: 4px; text-align: center; border-top: 1px solid var(--border-subtle); font-size: 13px; }
+.tt-grid-cell-btn {
+  width: 100%; padding: 8px 4px; border-radius: 8px; border: none; background: none; color: var(--text-primary);
+  cursor: pointer; font-size: 13px; font-weight: 600; min-height: 30px;
+}
+.tt-grid-cell-btn:hover { background: var(--bg-list); }
+.tt-grid-cell-input { width: 100%; padding: 6px 4px; border-radius: 8px; border: 1px solid var(--accent); text-align: center; font-size: 13px; }
+
+.tt-approvals-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.tt-approvals-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 4px; border-top: 1px solid var(--border-subtle); font-size: 13px; }
+.tt-approvals-item:first-child { border-top: none; }
+.tt-approvals-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+@media (max-width: 720px) {
+  .tt-header { gap: 12px; padding: 12px 16px; }
+  .tt-tabs { order: 3; width: 100%; margin: 0; overflow-x: auto; }
+  .tt-body { padding: 16px; }
 }

@@ -192,6 +192,57 @@
         "copiado": "Link kopiert"
       }
     },
+    "timeTracking": {
+      "tabs": {
+        "meus": "Meine Zeiterfassung",
+        "todos": "Alle Zeiterfassungen",
+        "aprovacoes": "Genehmigungen"
+      },
+      "tracker": {
+        "trackTime": "Track Time",
+        "tarefa": "Aufgabe",
+        "semTarefa": "Keine Aufgabe",
+        "novaTarefa": "+ Neue Aufgabe",
+        "nomeTarefa": "Aufgabenname",
+        "nomeProjeto": "Projekt (optional)",
+        "novoApontamento": "New time entry",
+        "data": "Datum",
+        "inicio": "Start",
+        "fim": "Ende",
+        "tags": "Tags",
+        "addTags": "Tags hinzufügen",
+        "billable": "Abrechenbar",
+        "lancar": "Erfassen",
+        "hojeData": "Heute, {{data}}",
+        "semLancamentosHoje": "Heute noch keine Zeit erfasst.",
+        "emAndamento": "Läuft...",
+        "parado": "Timer gestoppt",
+        "lancado": "Zeiteintrag erfasst",
+        "duracaoInvalida": "Dauer nicht erkannt - versuchen Sie \"1h 30m\" oder \"1.5\""
+      },
+      "grade": {
+        "tarefa": "Aufgabe",
+        "pessoa": "Person",
+        "total": "Gesamt",
+        "semLancamentos": "Diese Woche wurde keine Zeit erfasst.",
+        "enviarSemana": "Woche einreichen",
+        "semanaEnviada": "Woche zur Genehmigung eingereicht",
+        "status": {
+          "draft": "Entwurf",
+          "submitted": "Eingereicht",
+          "approved": "Genehmigt",
+          "rejected": "Abgelehnt"
+        }
+      },
+      "aprovacoes": {
+        "titulo": "Ausstehende Zeiterfassungen",
+        "vazio": "Keine Zeiterfassung wartet auf Genehmigung.",
+        "aprovar": "Genehmigen",
+        "rejeitar": "Ablehnen",
+        "aprovado": "Zeiterfassung genehmigt",
+        "rejeitado": "Zeiterfassung abgelehnt"
+      }
+    },
     "compras-estoque": {
       "name": "Einkauf & Lager",
       "desc": "Bestand, Lieferanten, Produktmargen und Meldebestand."
@@ -211,6 +262,10 @@
     "juridico": {
       "name": "Recht",
       "desc": "Verträge, Fristen und Dokumentenkonformität des Unternehmens."
+    },
+    "time-tracking": {
+      "name": "Xaphires Time & Tracking",
+      "desc": "Timer, Zeiterfassung und Genehmigung von Stundenzetteln."
     },
     "custom": {
       "seal": "Maßgeschneidert",
@@ -970,6 +1025,19 @@
       "workspaceLabel": "Arbeitsbereich von {{name}}",
       "spacesTitle": "Bereiche",
       "boardsFolder": "Projekte",
+      "styleMenu": {
+        "trigger": "Seitenleiste anpassen",
+        "title": "Stil der Seitenleiste",
+        "system": "Systemstandard",
+        "systemDesc": "Weiß / klar",
+        "glass": "Mattglas",
+        "glassDesc": "Transluzent, mit Weichzeichner",
+        "harmonize": "An das Board anpassen",
+        "harmonizeDesc": "Verwendet den aktuellen Board-Hintergrund",
+        "paletteTitle": "Kanban-Farbpalette",
+        "customTitle": "Eigene Farbe",
+        "customApply": "Anwenden"
+      },
       "rail": {
         "home": "Start",
         "planner": "Planer",

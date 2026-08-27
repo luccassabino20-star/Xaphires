@@ -470,6 +470,57 @@
         "configSalva": "Settings saved"
       }
     },
+    "timeTracking": {
+      "tabs": {
+        "meus": "My Timesheets",
+        "todos": "All Timesheets",
+        "aprovacoes": "Approvals"
+      },
+      "tracker": {
+        "trackTime": "Track Time",
+        "tarefa": "Task",
+        "semTarefa": "No task",
+        "novaTarefa": "+ New task",
+        "nomeTarefa": "Task name",
+        "nomeProjeto": "Project (optional)",
+        "novoApontamento": "New time entry",
+        "data": "Date",
+        "inicio": "Start",
+        "fim": "End",
+        "tags": "Tags",
+        "addTags": "Add tags",
+        "billable": "Billable",
+        "lancar": "Log time",
+        "hojeData": "Today, {{data}}",
+        "semLancamentosHoje": "No time logged yet today.",
+        "emAndamento": "Running...",
+        "parado": "Timer stopped",
+        "lancado": "Time entry logged",
+        "duracaoInvalida": "Couldn't parse that duration - try \"1h 30m\" or \"1.5\""
+      },
+      "grade": {
+        "tarefa": "Task",
+        "pessoa": "Person",
+        "total": "Total",
+        "semLancamentos": "No time logged this week.",
+        "enviarSemana": "Submit week",
+        "semanaEnviada": "Week submitted for approval",
+        "status": {
+          "draft": "Draft",
+          "submitted": "Submitted",
+          "approved": "Approved",
+          "rejected": "Rejected"
+        }
+      },
+      "aprovacoes": {
+        "titulo": "Pending timesheets",
+        "vazio": "No timesheets awaiting approval.",
+        "aprovar": "Approve",
+        "rejeitar": "Reject",
+        "aprovado": "Timesheet approved",
+        "rejeitado": "Timesheet rejected"
+      }
+    },
     "compras-estoque": {
       "name": "Purchasing & Inventory",
       "desc": "Stock, suppliers, product margins and reorder points."
@@ -489,6 +540,10 @@
     "juridico": {
       "name": "Legal",
       "desc": "Contracts, deadlines and document compliance for the company."
+    },
+    "time-tracking": {
+      "name": "Xaphires Time & Tracking",
+      "desc": "Timer, hour logging and timesheet approval."
     },
     "custom": {
       "seal": "Custom-built",
@@ -1267,6 +1322,19 @@
       "workspaceLabel": "{{name}}'s Workspace",
       "spacesTitle": "Spaces",
       "boardsFolder": "Projects",
+      "styleMenu": {
+        "trigger": "Customize sidebar",
+        "title": "Sidebar style",
+        "system": "System Default",
+        "systemDesc": "White / clean",
+        "glass": "Frosted Glass",
+        "glassDesc": "Translucent, with blur",
+        "harmonize": "Match the Board",
+        "harmonizeDesc": "Uses the current board's background",
+        "paletteTitle": "Kanban color palette",
+        "customTitle": "Custom color",
+        "customApply": "Apply"
+      },
       "rail": {
         "home": "Home",
         "planner": "Planner",
