@@ -183,10 +183,15 @@ input, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  /* Mesmo fade mask do rail escuro (.dsb-rail-nav) na borda inferior, agora
-     sobre fundo branco - sinaliza que a árvore de quadros continua abaixo. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 94%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 94%, transparent 100%);
+  /* Sem fade mask no rodapé (tinha um, como .dsb-rail-nav) de propósito: o
+     mask-image revela o que está ATRÁS do elemento, não uma cor própria - com
+     .dsb-panel sempre branco isso passava despercebido, mas desde a
+     personalização de cor (sidebarStyle, ver Sidebar.jsx) o fundo escolhido
+     (escuro, vidro, harmonizado) desbotava para o --bg-app cinza-claro do
+     app-shell por trás, criando um corte visível no fim da barra. O
+     scrollbar (.dsb-panel::-webkit-scrollbar, abaixo) já sinaliza "tem mais
+     abaixo" sem esse efeito.
+  */
 }
 .dsb-panel::-webkit-scrollbar { width: 8px; }
 .dsb-panel::-webkit-scrollbar-thumb { background: #d8d8d8; border-radius: 8px; }
