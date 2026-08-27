@@ -2218,7 +2218,7 @@
     }
   },
   "dashboard": {
-    "saudacao": "Bon retour, {{nome}} 👋",
+    "saudacao": "Bon retour, {{nome}}",
     "subtitulo": "Voici le résumé consolidé de vos opérations aujourd'hui.",
     "acoes": {
       "novoAgendamento": "+ Nouveau rendez-vous",

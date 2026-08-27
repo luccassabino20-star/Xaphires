@@ -6748,25 +6748,42 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   white-space: nowrap;
 }
 
+/* Idioma voltou pro rodapé da sidebar do launcher (saiu do header de cima,
+   removido - ver decisão registrada na conversa). margin-top:auto empurra
+   pro fim do flex column de .launcher-sidebar; o dropdown abre pra CIMA
+   (bottom:100% em vez do top:100% padrão de .dropdown) porque a sidebar tem
+   overflow-y:auto e um popover abrindo pra baixo a partir do rodapé cortaria
+   as opções de idioma pela borda inferior - mesma classe de problema que
+   .dsb-panel do Kanban já resolveu (lá, com portal; aqui bastou inverter a
+   direção, porque o gatilho já nasce colado no fim). */
+.launcher-sidebar-footer {
+  margin-top: auto;
+  padding: 14px 8px 4px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* left:0/right:auto também - o gatilho nasce na ponta ESQUERDA da tela agora
+   (era a ponta direita no header removido, de onde .language-dropdown{right:0}
+   veio); sem isto o dropdown abria pra fora da janela pela esquerda. */
+.launcher-sidebar-footer .dropdown { top: auto; bottom: 100%; left: 0; right: auto; margin-top: 0; margin-bottom: 4px; }
+.launcher-sidebar-lang.language-switcher { display: flex; }
+.launcher-sidebar-lang .icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+}
+.launcher-sidebar-lang .icon-btn:hover { background: var(--bg-list); color: var(--text-primary); }
+.launcher-sidebar-lang-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+
 .launcher-main {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-/* Cabeçalho com a busca: fica colado no topo e desfoca o que passa por trás. */
-.launcher-top {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  padding: 14px 30px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: color-mix(in srgb, var(--bg-column) 72%, transparent);
-  backdrop-filter: saturate(1.3) blur(12px);
-  -webkit-backdrop-filter: saturate(1.3) blur(12px);
 }
 .launcher-search {
   flex: 1;
@@ -6790,11 +6807,6 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   font-family: inherit;
   color: var(--text-primary);
   outline: none;
-}
-.launcher-top-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 /* height (não min-height) + overflow-y:auto de propósito, mesmo padrão do
    .landing-shell: o body do app é overflow:hidden global (o resto do app rola

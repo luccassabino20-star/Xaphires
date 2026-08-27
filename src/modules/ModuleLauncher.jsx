@@ -1,7 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
-import AccountMenu from "../components/AccountMenu.jsx";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 // Mesma Central de Perfil que AccountMenu.jsx usa em todo o resto do app -
 // lazy pelo mesmo motivo de lá (métricas/preferências pesam mais que o modal
@@ -173,15 +172,14 @@ export default function ModuleLauncher({ modules, onOpen }) {
             );
           })}
         </nav>
+
+        <div className="launcher-sidebar-footer">
+          <LanguageSwitcher className="launcher-sidebar-lang" />
+          <span className="launcher-sidebar-lang-label">{t("language.title")}</span>
+        </div>
       </aside>
 
       <div className="launcher-main">
-        <header className="launcher-top">
-          <div className="launcher-top-actions">
-            <LanguageSwitcher />
-            <AccountMenu />
-          </div>
-        </header>
 
         {vista === "dashboard" && <MainDashboardView modules={modules} onOpenModule={onOpen} />}
 

@@ -2543,7 +2543,7 @@
     }
   },
   "dashboard": {
-    "saudacao": "Bem-vindo de volta, {{nome}} 👋",
+    "saudacao": "Bem-vindo de volta, {{nome}}",
     "subtitulo": "Aqui está o resumo consolidado das suas operações hoje.",
     "acoes": {
       "novoAgendamento": "+ Novo Agendamento",

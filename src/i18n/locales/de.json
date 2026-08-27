@@ -1974,7 +1974,7 @@
     }
   },
   "dashboard": {
-    "saudacao": "Willkommen zurück, {{nome}} 👋",
+    "saudacao": "Willkommen zurück, {{nome}}",
     "subtitulo": "Hier ist die konsolidierte Übersicht Ihrer heutigen Geschäfte.",
     "acoes": {
       "novoAgendamento": "+ Neuer Termin",

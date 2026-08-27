@@ -2253,7 +2253,7 @@
     }
   },
   "dashboard": {
-    "saudacao": "Welcome back, {{nome}} 👋",
+    "saudacao": "Welcome back, {{nome}}",
     "subtitulo": "Here's the consolidated summary of your operations today.",
     "acoes": {
       "novoAgendamento": "+ New Appointment",

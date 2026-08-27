@@ -2253,7 +2253,7 @@
     }
   },
   "dashboard": {
-    "saudacao": "Bienvenido de nuevo, {{nome}} 👋",
+    "saudacao": "Bienvenido de nuevo, {{nome}}",
     "subtitulo": "Aquí está el resumen consolidado de tus operaciones hoy.",
     "acoes": {
       "novoAgendamento": "+ Nueva Cita",
