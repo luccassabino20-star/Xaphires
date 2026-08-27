@@ -43,7 +43,7 @@ export default function AuthenticatedApp({ onExitModule }) {
   // por cima do quadro na primeira visita seria uma surpresa - só em telas largas
   // ele começa aberto, empurrando o layout como sempre foi.
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 720);
-  // "Exibição padrão" da Central de Perfil (KanbanProfileModal.jsx) - só lida
+  // "Exibição padrão" da Central de Perfil (ProfileHubModal.jsx) - só lida
   // uma vez, no primeiro render: trocar de aba depois é ação da pessoa
   // naquela sessão, não deveria saltar de volta pro padrão salvo.
   const [view, setView] = useState(() => {

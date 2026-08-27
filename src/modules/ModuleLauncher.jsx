@@ -1,9 +1,12 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
 import AccountMenu from "../components/AccountMenu.jsx";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
-import ProfileModal from "../components/ProfileModal.jsx";
+// Mesma Central de Perfil que AccountMenu.jsx usa em todo o resto do app -
+// lazy pelo mesmo motivo de lá (métricas/preferências pesam mais que o modal
+// simples que ela substituiu).
+const ProfileHubModal = lazy(() => import("../components/ProfileHubModal.jsx"));
 import ModuleIcon from "./ModuleIcon.jsx";
 import LauncherSidebarIcon from "./LauncherSidebarIcon.jsx";
 import MainDashboardView from "./MainDashboardView.jsx";
@@ -363,7 +366,11 @@ export default function ModuleLauncher({ modules, onOpen }) {
         )}
       </div>
 
-      {profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
+      {profileOpen && (
+        <Suspense fallback={null}>
+          <ProfileHubModal onClose={() => setProfileOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }

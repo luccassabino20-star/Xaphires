@@ -17,14 +17,22 @@ function hojeCivil() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-// Central de Perfil do Kanban - versão premium do ProfileModal.jsx simples
-// que os outros módulos continuam usando (ver comentário em
-// components/AccountMenu.jsx). Métricas/atividade vêm do próprio
-// BoardContext já carregado (sem requisição nova); apelido/cor/preferências
-// de quadro moram em users.prefs (ver server/repo.js updateProfilePrefs) -
-// um JSON por usuário, não uma tabela nova, porque é preferência solta, sem
-// relação com nada além de quem é dono dela.
-export default function KanbanProfileModal({ onClose }) {
+// Central de Perfil - substitui o antigo ProfileModal.jsx simples (nome/foto/
+// bio) em TODOS os módulos: AccountMenu.jsx usa este componente sozinho
+// agora, e é o mesmo que ModuleLauncher.jsx abre pelo item "Perfil" da
+// sidebar do Hub. Nasceu dentro do Kanban (ver histórico), mas "Minhas
+// Tarefas & Métricas"/"Preferências do Quadro" continuam fazendo sentido
+// vistas de qualquer módulo: BoardProvider (App.jsx) envolve a plataforma
+// inteira, não só o Kanban, então useBoardState() já tinha os cartões da
+// pessoa carregados de qualquer tela - "Quadro" aqui sempre significa o
+// Kanban, único módulo com esse conceito, então o rótulo não confunde
+// ninguém mesmo aberto de dentro do ERP IRES ou do Xaphires Beauty.
+// Métricas/atividade vêm do próprio BoardContext já carregado (sem
+// requisição nova); apelido/cor/preferências de quadro moram em users.prefs
+// (ver server/repo.js updateProfilePrefs) - um JSON por usuário, não uma
+// tabela nova, porque é preferência solta, sem relação com nada além de
+// quem é dono dela.
+export default function ProfileHubModal({ onClose }) {
   const { t } = useTranslation();
   const { user, applyProfileUpdate } = useAuth();
   const { refresh: refreshUsers } = useUsers();

@@ -4,21 +4,17 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import PlanModal from "./PlanModal.jsx";
-import ProfileModal from "./ProfileModal.jsx";
 
-// Carregado sob demanda: o painel arrasta junto os quatro componentes de
-// administração, e importá-lo direto colocava ~22 kB de ferramenta interna no
-// pacote que TODO cliente baixa. Assim ele só é buscado por quem abre o painel.
+// Carregados sob demanda: o painel arrasta junto os quatro componentes de
+// administração, e a Central de Perfil tem métricas/preferências que pesam
+// mais que um modal simples - importar os dois direto colocaria esse peso no
+// pacote que TODO cliente baixa, mesmo quem nunca abre nenhum dos dois.
 const PlataformaModal = lazy(() => import("./PlataformaModal.jsx"));
+const ProfileHubModal = lazy(() => import("./ProfileHubModal.jsx"));
 import * as api from "../state/api.js";
 import { initials, colorForUser } from "../utils/members.js";
 
-// ProfileComponent: só o Kanban (Sidebar.jsx) passa a Central de Perfil
-// premium (KanbanProfileModal.jsx) - os outros módulos (CRM, Financeiro,
-// Saúde & Clínicas, Xaphires Beauty, Hub) continuam com o ProfileModal
-// simples de sempre, sem precisar saber que a variante existe. Mesmo
-// contrato (só `onClose`), então é uma troca de componente, não de lógica.
-export default function AccountMenu({ ProfileComponent = ProfileModal }) {
+export default function AccountMenu() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const showToast = useToast();
@@ -148,7 +144,7 @@ export default function AccountMenu({ ProfileComponent = ProfileModal }) {
       )}
       {profileOpen && (
         <Suspense fallback={null}>
-          <ProfileComponent onClose={() => setProfileOpen(false)} />
+          <ProfileHubModal onClose={() => setProfileOpen(false)} />
         </Suspense>
       )}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}

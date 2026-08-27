@@ -4149,12 +4149,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 .profile-bio-input:focus { box-shadow: inset 0 0 0 2px var(--accent); }
 
-/* ---------- Central de Perfil do Kanban (KanbanProfileModal.jsx) ---------- */
+/* ---------- Central de Perfil (ProfileHubModal.jsx) ---------- */
 /* Variáveis globais (--text-primary, --border-subtle, --bg-card, --accent), nunca
-   --beauty-* - este modal abre de dentro do Kanban, fora de qualquer
-   .beauty-shell, e variável CSS inexistente derruba a declaração inteira em
-   silêncio (ver nota do projeto sobre isso). .beauty-tab/.beauty-section-
-   title etc. não servem aqui por esse motivo - classes próprias abaixo. */
+   --beauty-* - este modal abre de qualquer módulo (AccountMenu.jsx é
+   compartilhado), inclusive de fora de qualquer .beauty-shell, e variável CSS
+   inexistente derruba a declaração inteira em silêncio (ver nota do projeto
+   sobre isso). .beauty-tab/.beauty-section-title etc. não servem aqui por
+   esse motivo - classes próprias abaixo. */
 .profile-hub-head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
 .profile-hub-avatar { position: relative; flex-shrink: 0; }
 .profile-hub-online-dot {
