@@ -1,67 +1,40 @@
 import { useMemo, useState } from "react";
-import "./xaphiresFinance.css";
 import {
   BANKS,
   COST_CENTERS,
-  TRANSACOES,
   DOCUMENTOS,
   formatBRL,
   filtrarTransacoes,
-  resumoPorCentro,
   fluxoMensal,
   projecaoSaldo,
   composicaoTributaria,
   dreWaterfall,
   serieTendencia,
+  montarVariaveisFormula,
 } from "./financeMockData.js";
+import { avaliarFormula, formatarValorMetrica } from "./formulaEngine.js";
 import FinanceSparkline from "./FinanceSparkline.jsx";
 import FinanceWaterfallChart from "./FinanceWaterfallChart.jsx";
 import FinanceDonutChart from "./FinanceDonutChart.jsx";
 import FinanceCashFlowChart from "./FinanceCashFlowChart.jsx";
-import FinanceUploadPanel from "./FinanceUploadPanel.jsx";
-import FinanceCostCenterPanel from "./FinanceCostCenterPanel.jsx";
-import FinanceReconciliationTable from "./FinanceReconciliationTable.jsx";
 
-// Módulo "Xaphires Finance & BPO" - pilar registrado de verdade (id
-// "finance-bpo" em server/modules.js e src/modules/registry.js, plugado em
-// PlatformShell.jsx), lado a lado com "financeiro" (ERP IRES) na mesma aba
-// "Financeiro" do launcher de propósito: nasceu para competir com aquele
-// módulo e, se o cliente decidir, substituí-lo mais adiante - ver decisão
-// registrada na conversa. Começou como protótipo isolado
-// (prototypes/xaphiresFinance), promovido pra cá sem mudar o código por
-// dentro, só o registro.
-//
-// Todo dado ainda é simulado (financeMockData.js, gerado na carga, sem
-// rede) - "aparecer no launcher" não é "estar pronto pra dado real"; o badge
-// "Protótipo · dados simulados" no topo continua de propósito. Em especial,
-// a leitura de NF (FinanceUploadPanel.jsx) NÃO faz OCR nem parse de XML de
-// verdade - sorteia um documento já pronto. NFSe não tem schema nacional
-// único (cada município define o próprio), então mesmo a versão "de
-// verdade" deste pilar não dá pra generalizar sem escolher integrações
-// município a município ou um serviço de OCR pago - decisão de produto que
-// este módulo não toma sozinho.
-export default function XaphiresFinanceView({ onExit }) {
+// Pilar "Central Executiva" do menu lateral - dashboard estilo BI: saldos
+// bancários, slicers, KPIs com sparkline, DRE em cascata, composição
+// tributária e fluxo de caixa com projeção. `transacoes` e `formulas` vêm de
+// FinanceModuleLayout (estado compartilhado com Base de Dados e Fórmulas &
+// Métricas - ver comentário lá) - qualquer lançamento novo ou fórmula
+// alterada nas outras telas recalcula tudo aqui pelas mesmas dependências de
+// useMemo, sem precisar de nenhum "refresh" manual.
+export default function FinanceCentralExecutiva({ transacoes, formulas }) {
   const [periodo, setPeriodo] = useState("trimestre");
   const [bancoId, setBancoId] = useState(null);
   const [centroId, setCentroId] = useState(null);
   const [diasProjecao, setDiasProjecao] = useState(90);
 
-  // Cross-filter real: bancoId/centroId/periodo são o único estado de
-  // filtro do módulo inteiro - clicar num card de banco, numa linha de
-  // centro de custo ou nos seletores do topo escreve nas mesmas três
-  // variáveis, e tudo abaixo recalcula a partir delas.
   const transacoesFiltradas = useMemo(
-    () => filtrarTransacoes(TRANSACOES, { bancoId, centroId, periodo }),
-    [bancoId, centroId, periodo]
+    () => filtrarTransacoes(transacoes, { bancoId, centroId, periodo }),
+    [transacoes, bancoId, centroId, periodo]
   );
-  // Painel de centro de custo não filtra por centro (é ele quem define o
-  // filtro) - senão selecionar uma obra colapsaria a própria tabela a uma
-  // linha só.
-  const transacoesParaCentros = useMemo(
-    () => filtrarTransacoes(TRANSACOES, { bancoId, periodo }),
-    [bancoId, periodo]
-  );
-  const resumoCentros = useMemo(() => resumoPorCentro(transacoesParaCentros), [transacoesParaCentros]);
 
   const documentosFiltrados = useMemo(
     () => (centroId ? DOCUMENTOS.filter((d) => d.centroId === centroId) : DOCUMENTOS),
@@ -69,7 +42,10 @@ export default function XaphiresFinanceView({ onExit }) {
   );
   const tributos = useMemo(() => composicaoTributaria(documentosFiltrados), [documentosFiltrados]);
   const totalImpostos = useMemo(() => tributos.reduce((s, t) => s + t.total, 0), [tributos]);
-  const waterfall = useMemo(() => dreWaterfall(transacoesFiltradas, totalImpostos), [transacoesFiltradas, totalImpostos]);
+  const waterfall = useMemo(
+    () => dreWaterfall(transacoesFiltradas, totalImpostos, formulas),
+    [transacoesFiltradas, totalImpostos, formulas]
+  );
   const mensal = useMemo(() => fluxoMensal(transacoesFiltradas), [transacoesFiltradas]);
 
   const saldoConsolidado = useMemo(() => {
@@ -78,39 +54,33 @@ export default function XaphiresFinanceView({ onExit }) {
   }, [bancoId]);
 
   const projecao = useMemo(
-    () => projecaoSaldo(transacoesFiltradas, saldoConsolidado, diasProjecao),
-    [transacoesFiltradas, saldoConsolidado, diasProjecao]
+    () => projecaoSaldo(transacoesFiltradas, saldoConsolidado, diasProjecao, formulas.runwayJanelaDias),
+    [transacoesFiltradas, saldoConsolidado, diasProjecao, formulas.runwayJanelaDias]
   );
 
-  const kpis = useMemo(() => buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolidado, projecao), [
-    transacoesFiltradas,
-    waterfall,
-    totalImpostos,
-    saldoConsolidado,
-    projecao,
-  ]);
+  const kpis = useMemo(
+    () => buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolidado, projecao, formulas),
+    [transacoesFiltradas, waterfall, totalImpostos, saldoConsolidado, projecao, formulas]
+  );
+
+  // Variáveis que uma métrica customizada (Fórmulas & Métricas) enxerga como
+  // [Nome] - calculadas em cima do MESMO recorte já filtrado por banco/
+  // centro/período que os 4 KPIs padrão usam, pra uma métrica nova respeitar
+  // os mesmos slicers em vez de sempre olhar o quadro inteiro.
+  const variaveisFormula = useMemo(
+    () => montarVariaveisFormula(waterfall, totalImpostos, saldoConsolidado),
+    [waterfall, totalImpostos, saldoConsolidado]
+  );
+  const kpisFinal = useMemo(
+    () => aplicarMetricasCustomizadas(kpis, formulas.metricas || [], variaveisFormula),
+    [kpis, formulas.metricas, variaveisFormula]
+  );
 
   const bancoAtivo = BANKS.find((b) => b.id === bancoId);
   const centroAtivo = COST_CENTERS.find((c) => c.id === centroId);
 
   return (
-    <div className="xf-page">
-      <header className="xf-topbar">
-        <div className="xf-topbar-title">
-          <span className="xf-eyebrow">Xaphires Finance &amp; BPO</span>
-          <h1>Central Financeira Executiva</h1>
-        </div>
-        <div className="xf-topbar-actions">
-          <span className="xf-badge-sim">Protótipo · dados simulados</span>
-          {onExit && (
-            <button type="button" className="xf-btn-secondary" onClick={onExit}>
-              Sair
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* ---------- 1. Header multibancário ---------- */}
+    <div className="xf-view">
       <section className="xf-banks-row">
         <button
           type="button"
@@ -136,7 +106,6 @@ export default function XaphiresFinanceView({ onExit }) {
         ))}
       </section>
 
-      {/* ---------- 4. Slicers superiores ---------- */}
       <section className="xf-slicers">
         <div className="xf-slicer-group">
           <span className="xf-slicer-label">Período</span>
@@ -191,15 +160,17 @@ export default function XaphiresFinanceView({ onExit }) {
         )}
       </section>
 
-      {/* ---------- 4. KPIs executivos ---------- */}
       <section className="xf-kpis">
-        {kpis.map((k) => (
-          <div key={k.titulo} className="xf-kpi-card">
+        {kpisFinal.map((k) => (
+          <div key={k.slot} className="xf-kpi-card">
             <div className="xf-kpi-card-top">
               <span className="xf-kpi-titulo">{k.titulo}</span>
-              <span className={"xf-kpi-mom" + (k.pct >= 0 ? " xf-positivo" : " xf-negativo")}>
-                {k.pct >= 0 ? "▲" : "▼"} {Math.abs(k.pct).toFixed(1)}% MoM
-              </span>
+              {!k.semVariacao && (
+                <span className={"xf-kpi-mom" + (k.pct >= 0 ? " xf-positivo" : " xf-negativo")}>
+                  {k.pct >= 0 ? "▲" : "▼"} {Math.abs(k.pct).toFixed(1)}% MoM
+                </span>
+              )}
+              {k.semVariacao && <span className="xf-kpi-custom-badge">Customizado</span>}
             </div>
             <span className="xf-kpi-valor">{k.valorFormatado}</span>
             <FinanceSparkline pontos={k.serie} cor={k.cor} />
@@ -207,7 +178,6 @@ export default function XaphiresFinanceView({ onExit }) {
         ))}
       </section>
 
-      {/* ---------- 4. Gráficos: waterfall / donut / fluxo de caixa ---------- */}
       <section className="xf-charts-grid">
         <div className="xf-panel xf-panel-waterfall">
           <div className="xf-panel-header">
@@ -245,26 +215,16 @@ export default function XaphiresFinanceView({ onExit }) {
         </div>
         <FinanceCashFlowChart mensal={mensal} projecao={projecao} />
       </section>
-
-      {/* ---------- 2. Upload / leitura de NF ---------- */}
-      <FinanceUploadPanel documentosDisponiveis={DOCUMENTOS} />
-
-      {/* ---------- 3. Centro de Custo / Obras ---------- */}
-      <FinanceCostCenterPanel resumo={resumoCentros} centroSelecionado={centroId} onSelecionarCentro={setCentroId} />
-
-      {/* ---------- 5. Conciliação bancária ---------- */}
-      <FinanceReconciliationTable transacoes={transacoesFiltradas} documentos={documentosFiltrados} />
     </div>
   );
 }
 
-// Receita Bruta / EBITDA / Impostos / Runway - cada um com sparkline própria
-// (série de 14 pontos gerada em torno do valor atual, ver serieTendencia) e
-// um %MoM calculado de verdade comparando os últimos 30 dias contra os 30
-// anteriores dentro do recorte já filtrado (não é o mesmo período do slicer
-// "Período" de cima, que decide o que entra no total - o MoM sempre compara
-// mês a mês, senão "Hoje" nunca teria o que comparar).
-function buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolidado, projecao) {
+// Receita Bruta / EBITDA-ou-Lucro-Líquido / Impostos / Runway - cada um com
+// sparkline própria e %MoM calculado comparando os últimos 30 dias contra os
+// 30 anteriores dentro do recorte já filtrado. formulas.ebitdaExcluirImpostos
+// decide se o segundo card soma os impostos de volta (aproximação de
+// EBITDA) ou mostra o Lucro Líquido puro - ver DEFAULT_FORMULAS.
+function buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolidado, projecao, formulas) {
   const agora = Date.now();
   const dias = (t) => (agora - new Date(t.data).getTime()) / 86_400_000;
   const janela = (min, max, tipo) =>
@@ -280,10 +240,13 @@ function buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolida
 
   const receitaBruta = waterfall[0].valor;
   const lucroLiquido = waterfall[waterfall.length - 1].valor;
-  const runwayDias = projecao.saidaMediaDia > 0 ? Math.round(saldoConsolidado / projecao.saidaMediaDia) : 999;
+  const segundoCardValor = formulas.ebitdaExcluirImpostos ? lucroLiquido + totalImpostos : lucroLiquido;
+  const runwayDias =
+    projecao.saidaMediaDia > 0 ? Math.round(saldoConsolidado / projecao.saidaMediaDia) : 999;
 
   return [
     {
+      slot: "receita",
       titulo: "Receita Bruta",
       valorFormatado: formatBRL(receitaBruta),
       pct: pctMoM("entrada"),
@@ -291,13 +254,15 @@ function buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolida
       cor: "#10b981",
     },
     {
-      titulo: "EBITDA / Lucro Líquido",
-      valorFormatado: formatBRL(lucroLiquido),
+      slot: "segundo",
+      titulo: formulas.ebitdaExcluirImpostos ? "EBITDA (aprox.)" : "Lucro Líquido",
+      valorFormatado: formatBRL(segundoCardValor),
       pct: pctMoM("entrada") - pctMoM("saida"),
-      serie: serieTendencia(Math.abs(lucroLiquido) || 1000),
-      cor: lucroLiquido >= 0 ? "#7c3aed" : "#f43f5e",
+      serie: serieTendencia(Math.abs(segundoCardValor) || 1000),
+      cor: segundoCardValor >= 0 ? "#7c3aed" : "#f43f5e",
     },
     {
+      slot: "impostos",
       titulo: "Total de Impostos",
       valorFormatado: formatBRL(totalImpostos),
       pct: pctMoM("saida") * 0.6,
@@ -305,6 +270,7 @@ function buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolida
       cor: "#f59e0b",
     },
     {
+      slot: "runway",
       titulo: "Runway (dias de caixa)",
       valorFormatado: `${runwayDias} dias`,
       pct: runwayDias >= 60 ? 4.2 : -4.2,
@@ -312,4 +278,36 @@ function buildKpis(transacoesFiltradas, waterfall, totalImpostos, saldoConsolida
       cor: "#0ea5e9",
     },
   ];
+}
+
+// Aplica as métricas customizadas (Fórmulas & Métricas) por cima dos 4 KPIs
+// padrão: quem tem exibirCard=true e substituirSlot num dos 4 slots fixos
+// TROCA o card padrão daquele slot; quem tem substituirSlot="novo" (ou não
+// tem slot nenhum reconhecido) entra como card adicional, ao final. Métrica
+// com erro de fórmula ainda aparece (com "Erro na fórmula" no lugar do
+// valor) - some da fórmula, não do dashboard, senão a pessoa não teria como
+// saber que precisa corrigir.
+function aplicarMetricasCustomizadas(kpisBase, metricas, variaveisFormula) {
+  const porSlot = new Map(kpisBase.map((k) => [k.slot, k]));
+  const extras = [];
+  metricas
+    .filter((m) => m.exibirCard)
+    .forEach((m) => {
+      const resultado = avaliarFormula(m.expressao, variaveisFormula);
+      const card = {
+        slot: `custom-${m.id}`,
+        titulo: m.nome,
+        valorFormatado: resultado.ok ? formatarValorMetrica(resultado.valor, m.formato) : "Erro na fórmula",
+        pct: 0,
+        semVariacao: true,
+        serie: serieTendencia(Math.abs(resultado.valor) || 1000),
+        cor: resultado.ok && resultado.valor < 0 ? "#f43f5e" : "#7c3aed",
+      };
+      if (m.substituirSlot && m.substituirSlot !== "novo" && porSlot.has(m.substituirSlot)) {
+        porSlot.set(m.substituirSlot, card);
+      } else {
+        extras.push(card);
+      }
+    });
+  return [...porSlot.values(), ...extras];
 }

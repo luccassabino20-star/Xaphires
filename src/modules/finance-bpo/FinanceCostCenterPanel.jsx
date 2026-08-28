@@ -1,9 +1,11 @@
-import { formatBRL, formatBRLShort } from "./financeMockData.js";
+import { formatBRL, formatBRLShort, DEFAULT_FORMULAS } from "./financeMockData.js";
 
-// DRE por Centro de Custo/Obra - clicar numa linha filtra o dashboard
-// inteiro (centroSelecionado sobe pro componente pai, que já filtra
-// TRANSACOES por centroId antes de recalcular tudo - ver XaphiresFinanceView.jsx).
-export default function FinanceCostCenterPanel({ resumo, centroSelecionado, onSelecionarCentro }) {
+// DRE por Centro de Custo/Obra - clicar numa linha destaca localmente (ver
+// FinanceObrasContas.jsx pro porquê de não filtrar as outras telas).
+// metaPct vem de formulas.margemMetaPct (Fórmulas & Métricas) - o selo de
+// margem compara contra a meta, não só contra zero, então uma obra
+// "lucrando pouco" também aparece em vermelho, não só a que dá prejuízo.
+export default function FinanceCostCenterPanel({ resumo, centroSelecionado, onSelecionarCentro, metaPct = DEFAULT_FORMULAS.margemMetaPct }) {
   const maiorEntrada = Math.max(1, ...resumo.map((c) => c.entradas));
 
   return (
@@ -16,7 +18,9 @@ export default function FinanceCostCenterPanel({ resumo, centroSelecionado, onSe
           </button>
         )}
       </div>
-      <p className="xf-panel-hint">Clique numa linha para filtrar bancos, lançamentos e notas por esse centro.</p>
+      <p className="xf-panel-hint">
+        Selo de margem compara contra a meta ({metaPct}%, editável em Fórmulas &amp; Métricas), não só contra zero.
+      </p>
 
       <div className="xf-costcenter-grid">
         <table className="xf-table xf-costcenter-table">
@@ -33,6 +37,7 @@ export default function FinanceCostCenterPanel({ resumo, centroSelecionado, onSe
             {resumo.map((c) => {
               const ativo = centroSelecionado === c.id;
               const positivo = c.resultado >= 0;
+              const acimaDaMeta = c.margem >= metaPct;
               return (
                 <tr
                   key={c.id}
@@ -50,7 +55,7 @@ export default function FinanceCostCenterPanel({ resumo, centroSelecionado, onSe
                     {formatBRL(c.resultado)}
                   </td>
                   <td className="xf-num">
-                    <span className={"xf-margin-badge" + (positivo ? " xf-positivo" : " xf-negativo")}>
+                    <span className={"xf-margin-badge" + (acimaDaMeta ? " xf-positivo" : " xf-negativo")} title={`Meta: ${metaPct}%`}>
                       {c.margem.toFixed(1)}%
                     </span>
                   </td>

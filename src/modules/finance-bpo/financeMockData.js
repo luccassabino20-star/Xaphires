@@ -31,8 +31,43 @@ export const COST_CENTERS = [
   { id: "filial-1", nome: "Filial 1", tipo: "Unidade" },
 ];
 
-const CATEGORIAS_ENTRADA = ["Medição de obra", "Venda de serviço", "Adiantamento de cliente", "Reembolso"];
-const CATEGORIAS_SAIDA = ["Folha de pagamento", "Materiais", "Fornecedor", "Impostos", "Aluguel", "Combustível"];
+export const CATEGORIAS_ENTRADA = ["Medição de obra", "Venda de serviço", "Adiantamento de cliente", "Reembolso"];
+export const CATEGORIAS_SAIDA = ["Folha de pagamento", "Materiais", "Fornecedor", "Impostos", "Aluguel", "Combustível"];
+
+// Parâmetros editáveis em Fórmulas & Métricas (FinanceFormulasMetricas.jsx) -
+// só o que muda um cálculo de verdade em algum lugar (dreWaterfall,
+// buildKpis em FinanceCentralExecutiva.jsx, a meta de margem em
+// FinanceObrasContas.jsx), nada de campo decorativo que não afeta nada.
+export const DEFAULT_FORMULAS = {
+  // Runway = saldo ÷ queima média diária. Quantos dias olhar pra trás pra
+  // calcular essa média - mais dias suaviza picos, menos dias reage mais
+  // rápido a uma mudança recente de ritmo de gasto.
+  runwayJanelaDias: 30,
+  // Categorias de saída fora de "Impostos" (que já sai antes, no Lucro
+  // Bruto) que NÃO devem contar como Custos Operacionais na cascata do DRE -
+  // ex.: tirar "Folha de pagamento" pra ver o DRE só com custo variável.
+  custosOperacionaisExcluir: [],
+  // "EBITDA/Lucro Líquido" é hoje um card só. Ligado, o card soma os
+  // impostos de volta ao Lucro Líquido (aproximação de EBITDA, que por
+  // definição é antes de impostos); desligado, mostra o Lucro Líquido de
+  // verdade, depois de impostos.
+  ebitdaExcluirImpostos: false,
+  // Meta de margem usada só como referência visual na tabela de Obras &
+  // Contas (badge verde acima da meta, vermelho abaixo).
+  margemMetaPct: 20,
+  // Métricas customizadas do construtor DAX/Power Query (ver
+  // FinanceFormulasMetricas.jsx e formulaEngine.js). Cada item:
+  // { id, nome, formato, expressao, exibirCard, substituirSlot }.
+  // `substituirSlot` é "novo" (card extra ao final) ou o id de um dos 4
+  // slots fixos da Central Executiva ("receita"|"segundo"|"impostos"|
+  // "runway") - nesse caso o card padrão daquele slot é trocado pelo
+  // customizado em vez de só somar mais um card.
+  metricas: [],
+  // Regras de categorização condicional (estilo coluna calculada do Power
+  // Query) - ver aplicarRegrasCategorizacao abaixo. Cada item:
+  // { id, campo, operador, valor, logica, campo2, operador2, valor2, resultado }.
+  regrasCategorizacao: [],
+};
 
 // Gerador determinístico (seed simples) - o protótipo precisa parecer o
 // mesmo a cada carga, senão comparar antes/depois de um filtro vira loteria.
@@ -159,16 +194,19 @@ export function fluxoMensal(transacoes) {
   return [...porMes.values()].sort((a, b) => (a.mes > b.mes ? 1 : -1));
 }
 
-// Projeção simples: média diária dos últimos 30 dias de entradas/saídas,
-// estendida pra frente - deixa claro que é projeção (linha tracejada no
-// gráfico), não é IA nem machine learning, só uma extrapolação de médias.
-export function projecaoSaldo(transacoes, saldoAtual, dias = 90) {
-  const ultimos30 = transacoes.filter((t) => {
+// Projeção simples: média diária dos últimos N dias (janelaMediaDias -
+// editável em Fórmulas & Métricas como "runwayJanelaDias", reaproveitada
+// aqui porque é a mesma pergunta - "qual o ritmo recente de caixa") de
+// entradas/saídas, estendida pra frente - deixa claro que é projeção (linha
+// tracejada no gráfico), não é IA nem machine learning, só uma extrapolação
+// de médias.
+export function projecaoSaldo(transacoes, saldoAtual, dias = 90, janelaMediaDias = 30) {
+  const recentes = transacoes.filter((t) => {
     const diff = (Date.now() - new Date(t.data).getTime()) / 86_400_000;
-    return diff <= 30;
+    return diff <= janelaMediaDias;
   });
-  const entradaMediaDia = ultimos30.filter((t) => t.tipo === "entrada").reduce((s, t) => s + t.valor, 0) / 30;
-  const saidaMediaDia = ultimos30.filter((t) => t.tipo === "saida").reduce((s, t) => s + t.valor, 0) / 30;
+  const entradaMediaDia = recentes.filter((t) => t.tipo === "entrada").reduce((s, t) => s + t.valor, 0) / janelaMediaDias;
+  const saidaMediaDia = recentes.filter((t) => t.tipo === "saida").reduce((s, t) => s + t.valor, 0) / janelaMediaDias;
   const pontos = [];
   let saldo = saldoAtual;
   for (let d = 0; d <= dias; d += 1) {
@@ -191,17 +229,20 @@ export function composicaoTributaria(documentos = DOCUMENTOS) {
 }
 
 // Passos do DRE em cascata - cada "type" decide a cor/direção na waterfall.
-// totalImpostos vem de fora (calculado uma vez em XaphiresFinanceView a
+// totalImpostos vem de fora (calculado uma vez em FinanceCentralExecutiva a
 // partir dos documentos já filtrados por centro de custo) em vez de
 // recalculado aqui com composicaoTributaria() sem argumento - senão o passo
 // "Deduções/Impostos" ignoraria o filtro de centro/banco enquanto o resto da
 // cascata respeita, e clicar numa obra pararia de "filtrar tudo" de verdade.
-export function dreWaterfall(transacoes, totalImpostos) {
+// formulas.custosOperacionaisExcluir (editável em Fórmulas & Métricas) tira
+// categorias específicas da conta de Custos Operacionais.
+export function dreWaterfall(transacoes, totalImpostos, formulas = DEFAULT_FORMULAS) {
   const receitaBruta = transacoes.filter((t) => t.tipo === "entrada").reduce((s, t) => s + t.valor, 0);
   const impostos = totalImpostos ?? 0;
   const lucroBruto = receitaBruta - impostos;
+  const excluidas = formulas.custosOperacionaisExcluir || [];
   const custosOperacionais = transacoes
-    .filter((t) => t.tipo === "saida" && t.categoria !== "Impostos")
+    .filter((t) => t.tipo === "saida" && t.categoria !== "Impostos" && !excluidas.includes(t.categoria))
     .reduce((s, t) => s + t.valor, 0);
   const lucroLiquido = lucroBruto - custosOperacionais;
   return [
@@ -211,6 +252,103 @@ export function dreWaterfall(transacoes, totalImpostos) {
     { label: "Custos Operacionais", valor: -custosOperacionais, tipo: "queda" },
     { label: "Lucro Líquido", valor: lucroLiquido, tipo: "total" },
   ];
+}
+
+// Mapa de variáveis que o construtor de métricas customizadas (formulaEngine.js)
+// enxerga como [Nome] dentro de uma fórmula - os mesmos valores que já
+// alimentam os 4 KPIs padrão e o DRE em cascata, pra uma métrica nova poder
+// referenciar exatamente o que a Central Executiva já calculou, sem uma
+// segunda fonte de verdade. `waterfall` é o array de dreWaterfall() (índices
+// fixos: 0 Receita Bruta, 2 Lucro Bruto, 3 -Custos Operacionais, 4 Lucro
+// Líquido - ver o comentário de dreWaterfall).
+export function montarVariaveisFormula(waterfall, totalImpostos, saldoConsolidado) {
+  const hoje = new Date();
+  return {
+    "Receita Bruta": waterfall?.[0]?.valor ?? 0,
+    "Lucro Bruto": waterfall?.[2]?.valor ?? 0,
+    "Custos Operacionais": Math.abs(waterfall?.[3]?.valor ?? 0),
+    "Lucro Líquido": waterfall?.[4]?.valor ?? 0,
+    "Impostos Total": totalImpostos ?? 0,
+    "Saldo Bancos": saldoConsolidado ?? 0,
+    "Dias do Mês": new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate(),
+  };
+}
+
+// ---------- Categorização condicional (Power Query) ----------
+// Campos de transação que uma regra pode testar, com o tipo de comparação
+// que cada um aceita - "lista" desenha um <select> com as opções reais do
+// módulo em vez de um texto livre que erraria o id na maior parte das vezes
+// (ex.: "Obra X" != "obra-x").
+export const CAMPOS_REGRA = [
+  { id: "centroId", label: "Centro de Custo", tipo: "lista", opcoes: COST_CENTERS.map((c) => ({ id: c.id, label: c.nome })) },
+  { id: "bancoId", label: "Banco", tipo: "lista", opcoes: BANKS.map((b) => ({ id: b.id, label: b.nome })) },
+  {
+    id: "tipo",
+    label: "Tipo",
+    tipo: "lista",
+    opcoes: [
+      { id: "entrada", label: "Entrada" },
+      { id: "saida", label: "Saída" },
+    ],
+  },
+  { id: "categoria", label: "Categoria", tipo: "lista", opcoes: [...CATEGORIAS_ENTRADA, ...CATEGORIAS_SAIDA].map((c) => ({ id: c, label: c })) },
+  { id: "valor", label: "Valor", tipo: "numero" },
+];
+
+export const OPERADORES_REGRA = [
+  { id: "==", label: "é igual a" },
+  { id: "!=", label: "é diferente de" },
+  { id: ">", label: "é maior que" },
+  { id: "<", label: "é menor que" },
+  { id: ">=", label: "é maior ou igual a" },
+  { id: "<=", label: "é menor ou igual a" },
+];
+
+function testarCondicao(transacao, campoId, operador, valorComparado) {
+  const campo = CAMPOS_REGRA.find((c) => c.id === campoId);
+  const atual = transacao[campoId];
+  const numerico = campo?.tipo === "numero";
+  const a = numerico ? Number(atual) : String(atual ?? "");
+  const b = numerico ? Number(valorComparado) : String(valorComparado ?? "");
+  switch (operador) {
+    case "==":
+      return a === b;
+    case "!=":
+      return a !== b;
+    case ">":
+      return a > b;
+    case "<":
+      return a < b;
+    case ">=":
+      return a >= b;
+    case "<=":
+      return a <= b;
+    default:
+      return false;
+  }
+}
+
+// Aplica a lista de regras a cada transação e devolve um Map id-da-transação
+// -> [rótulos que bateram]. Uma transação pode acumular mais de um rótulo
+// (regras não são mutuamente exclusivas de propósito - "Alerta de Custo
+// Alto" e "Sem centro definido" podem valer ao mesmo tempo). `logica`
+// decide se a segunda condição (quando existe) é "E" ou "OU" com a primeira.
+export function aplicarRegrasCategorizacao(transacoes, regras) {
+  const resultado = new Map();
+  if (!regras || regras.length === 0) return resultado;
+  transacoes.forEach((t) => {
+    const rotulos = [];
+    regras.forEach((r) => {
+      let bate = testarCondicao(t, r.campo, r.operador, r.valor);
+      if (bate && r.campo2) {
+        const segunda = testarCondicao(t, r.campo2, r.operador2, r.valor2);
+        bate = r.logica === "OU" ? bate || segunda : bate && segunda;
+      }
+      if (bate) rotulos.push(r.resultado);
+    });
+    if (rotulos.length > 0) resultado.set(t.id, rotulos);
+  });
+  return resultado;
 }
 
 // Série curta (14 pontos) só pra desenhar a sparkline dos KPIs - não precisa
