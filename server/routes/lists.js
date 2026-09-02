@@ -69,7 +69,7 @@ router.put(
   ah(async (req, res) => {
     const { cardIds } = req.body || {};
     if (!Array.isArray(cardIds)) return res.status(400).json({ error: "cardIds obrigatório", code: "CARD_IDS_REQUIRED" });
-    await repo.setCardOrder(req.params.id, cardIds);
+    await repo.setCardOrder(req.params.id, cardIds, req.user.id);
     res.json({ ok: true });
   })
 );

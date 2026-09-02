@@ -5,104 +5,27 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { useUsers } from "../state/UsersContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
-import { LABEL_COLORS } from "../utils/labels.js";
-import { geocodeAddress, addLinkAttachment, addFileAttachment, removeCardAttachment, attachmentDownloadUrl, getPlan } from "../state/api.js";
+import {
+  addLinkAttachment,
+  addFileAttachment,
+  removeCardAttachment,
+  attachmentDownloadUrl,
+  getPlan,
+  updateCardDescription,
+} from "../state/api.js";
 import { uid } from "../utils/id.js";
-import DatePicker from "./DatePicker.jsx";
 import SubtaskItem from "./SubtaskItem.jsx";
 import RecurrencesModal from "./RecurrencesModal.jsx";
-import Avatar from "./Avatar.jsx";
+import CardDescriptionEditor from "./CardDescriptionEditor.jsx";
+import CardActivityPanel from "./CardActivityPanel.jsx";
+import CardPropertiesToolbar from "./CardPropertiesToolbar.jsx";
+import { AttachmentFileIcon, AttachmentLinkIcon } from "./cardIcons.jsx";
 
-function AttachmentFileIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6z" />
-    </svg>
-  );
-}
-function AttachmentLinkIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M3.9 12a4.1 4.1 0 0 1 4.1-4.1h4V6.1h-4a5.9 5.9 0 0 0 0 11.8h4v-1.8h-4A4.1 4.1 0 0 1 3.9 12zM8 13h8v-2H8zm8.1-6.9h-4v1.8h4a4.1 4.1 0 0 1 0 8.2h-4v1.8h4a5.9 5.9 0 0 0 0-11.8z" />
-    </svg>
-  );
-}
 function formatBytes(bytes) {
   if (!bytes && bytes !== 0) return "";
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function UrgentIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M5 3v18h2v-7h10.5l-2.5-4 2.5-4H7V3z" />
-    </svg>
-  );
-}
-function ImportantIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-    </svg>
-  );
-}
-function PinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="13" height="13">
-      <path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
-    </svg>
-  );
-}
-function StatusIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16z" />
-    </svg>
-  );
-}
-function MembersIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z" />
-    </svg>
-  );
-}
-function TagIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M2 11.5V4a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.41.59l8.5 8.5a2 2 0 0 1 0 2.82l-7.5 7.5a2 2 0 0 1-2.82 0l-8.5-8.5A2 2 0 0 1 2 11.5zM7 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
-    </svg>
-  );
-}
-function CalendarIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2zm12 8v9H5v-9z" />
-    </svg>
-  );
-}
-function ListIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14">
-      <path fill="currentColor" d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z" />
-    </svg>
-  );
-}
-function CollapseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="13" height="13">
-      <path fill="currentColor" d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l7-7z" />
-    </svg>
-  );
-}
-function EditIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="15" height="15">
-      <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zm17.71-10.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0l-1.96 1.96 3.75 3.75z" />
-    </svg>
-  );
 }
 
 export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
@@ -126,14 +49,9 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
     !card?.creatorId || card.creatorId === user.id || board?.myRole === "owner" || user.role === "master";
 
   const [title, setTitle] = useState(card?.title || "");
-  const [description, setDescription] = useState(card?.description || "");
   const [checklistText, setChecklistText] = useState("");
   const [subtaskText, setSubtaskText] = useState("");
   const [addingSubtask, setAddingSubtask] = useState(false);
-  const [memberPickerOpen, setMemberPickerOpen] = useState(false);
-  const [addressInput, setAddressInput] = useState(card?.location?.address || "");
-  const [geocoding, setGeocoding] = useState(false);
-  const [geocodeError, setGeocodeError] = useState("");
   const [linkFormOpen, setLinkFormOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkName, setLinkName] = useState("");
@@ -141,15 +59,41 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
   // Teto de anexo do plano da empresa. Fica null até a consulta voltar; nesse
   // intervalo a checagem local é pulada e quem barra é o servidor.
   const [limiteAnexo, setLimiteAnexo] = useState(null);
-  // Começa mostrando tudo (mesmo estado inicial da referência: "Recolher
-  // campos vazios" é a ação ainda não tomada). Campo vazio some da grade só
-  // depois que a pessoa recolhe - e aqui parte de dado real (tem valor ou não),
-  // não de uma lista fixa de nomes de campo.
-  const [hideEmpty, setHideEmpty] = useState(false);
+  // Seção some quando vazia (mesmo espírito das pílulas da toolbar de
+  // propriedades) - mas começa aberta se já tem conteúdo, pra não esconder
+  // dado que a pessoa já tinha. Pílula de Checklist/Anexos (CardPropertiesToolbar)
+  // só alterna esse booleano; o formulário de adicionar continua sendo o
+  // desta seção mesmo, ela é grande demais pra caber num popover pequeno.
+  const [checklistOpen, setChecklistOpen] = useState((card?.checklist?.length || 0) > 0);
+  const [attachmentsOpen, setAttachmentsOpen] = useState((card?.attachments?.length || 0) > 0);
   const [recurrenceOpen, setRecurrenceOpen] = useState(false);
+  // Incrementar refaz a busca do feed de atividades (ver CardActivityPanel).
+  // Só precisa disso pra due date e mover de lista: os dois continuam otimistas
+  // (dispatch + PATCH fire-and-forget, ver sync.js), então não existe uma
+  // promise aqui pra esperar antes de recarregar - o setTimeout abaixo dá
+  // tempo do servidor gravar a atividade antes do refetch. Não é garantia
+  // dura, é a mesma folga otimista que o resto do modal já convive.
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const titleRef = useRef(null);
   const fileInputRef = useRef(null);
-  const descriptionRef = useRef(null);
+  // Não confiar só no useRef(true) inicial: o StrictMode do React roda o
+  // efeito duas vezes em dev (monta, desmonta, monta de novo, ver CLAUDE.md
+  // sobre a mesma pegadinha na auditoria do painel) - a segunda montagem
+  // reaproveita a MESMA ref, então sem o `= true` aqui dentro ela ficava presa
+  // em `false` (herdado da desmontagem simulada) pelo resto da vida real do
+  // componente, e o setTimeout abaixo nunca mais disparava o refresh.
+  const montado = useRef(true);
+  useEffect(() => {
+    montado.current = true;
+    return () => {
+      montado.current = false;
+    };
+  }, []);
+  function agendarRefreshAtividade() {
+    setTimeout(() => {
+      if (montado.current) setActivityRefresh((n) => n + 1);
+    }, 800);
+  }
 
   // "+" na barra de ações rápidas do card (CardItem) abre já com o campo de
   // nova subtarefa aberto - roda só no mount porque o componente inteiro
@@ -192,39 +136,22 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
     dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { title: val } });
     setTitle(val);
   }
-  function commitDescription() {
+  // Pessimista de propósito, diferente do resto do modal: só entra no estado
+  // (e portanto na tela) depois que o servidor confirmou. É a trava pedida
+  // para a descrição - nada de reducer otimista aqui, então nada pra desfazer
+  // se o PATCH falhar. Erro deixa o rascunho como está no editor (a pessoa não
+  // perde o que escreveu) e mostra toast.
+  async function commitDescription(text) {
     if (readOnly) return;
-    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { description } });
-  }
-  function handleDueChange(iso) {
-    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { due: iso || null } });
-  }
-  function handleStartDateChange(iso) {
-    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { startDate: iso || null } });
-  }
-  async function handleLocateAddress(e) {
-    e.preventDefault();
-    const q = addressInput.trim();
-    if (!q) {
-      dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { location: null } });
-      return;
-    }
-    setGeocoding(true);
-    setGeocodeError("");
-    try {
-      const result = await geocodeAddress(q);
-      dispatch({
-        type: "UPDATE_CARD",
-        boardId,
-        cardId,
-        patch: { location: { address: q, lat: result.lat, lng: result.lng } },
+    await updateCardDescription(cardId, text)
+      .then(() => {
+        dispatch({ type: "SET_CARD_DESCRIPTION_LOCAL", boardId, cardId, description: text });
+        setActivityRefresh((n) => n + 1);
+      })
+      .catch((err) => {
+        showToast(translateError(err, t));
+        throw err;
       });
-    } catch (err) {
-      setGeocodeError(translateError(err, t));
-      dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { location: { address: q, lat: null, lng: null } } });
-    } finally {
-      setGeocoding(false);
-    }
   }
   function toggleCompleted() {
     dispatch({ type: "TOGGLE_CARD_COMPLETED", boardId, cardId });
@@ -232,8 +159,7 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
   // Alternativa ao arrastar: essencial no toque, onde o board usa drag and drop
   // nativo do HTML5 e não existe arraste por dedo. Sempre entra no fim da lista
   // de destino - escolher a posição exata é o que o arraste ainda resolve melhor.
-  function moveToList(e) {
-    const toListId = e.target.value;
+  function moveToList(toListId) {
     const fromList = board.lists.find((l) => l.cardIds.includes(cardId));
     const toList = board.lists.find((l) => l.id === toListId);
     if (!fromList || !toList || fromList.id === toList.id) return;
@@ -248,18 +174,7 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
     });
     dispatch({ type: "COMMIT_CARD_ORDER", boardId, listIds: [fromList.id, toList.id] });
     showToast(t("board.cardModal.movedToList", { list: toList.title }));
-  }
-  function toggleUrgent() {
-    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { urgent: !card.urgent } });
-  }
-  function toggleImportant() {
-    dispatch({ type: "UPDATE_CARD", boardId, cardId, patch: { important: !card.important } });
-  }
-  function toggleLabel(labelId) {
-    dispatch({ type: "TOGGLE_CARD_LABEL", boardId, cardId, labelId });
-  }
-  function toggleMember(memberId) {
-    dispatch({ type: "TOGGLE_CARD_MEMBER", boardId, cardId, memberId });
+    agendarRefreshAtividade();
   }
   function addChecklistItem(e) {
     e.preventDefault();
@@ -361,12 +276,7 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
   const subtasks = card.subtasks || [];
   const subtasksDone = subtasks.filter((s) => s.done).length;
   const subtasksPct = subtasks.length ? Math.round((subtasksDone / subtasks.length) * 100) : 0;
-  const cardMembers = (card.memberIds || []).map((id) => users.find((m) => m.id === id)).filter(Boolean);
   const currentList = board.lists.find((l) => l.cardIds.includes(cardId));
-  const hasDates = !!(card.startDate || card.due);
-  const hasPriority = !!(card.urgent || card.important);
-  const hasLabels = card.labels.length > 0;
-  const hasLocation = !!card.location?.address;
 
   return (
     <>
@@ -386,18 +296,31 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
             checklist+anexos preenchidos e estourava a tela. */}
         <div className="card-detail-columns">
           <div className="card-detail-main">
-            <div className="card-detail-breadcrumb">
-              {board.title}
-              {currentList && <> / {currentList.title}</>}
+            {/* Linha 1: breadcrumb + badge de categoria à esquerda, status à
+                direita, na mesma altura - status sobe pra cá (era embaixo do
+                título, junto de "mover para lista") porque é a informação mais
+                importante do card, não um metadado a mais. */}
+            <div className="card-detail-topline">
+              <div className="card-detail-topline-left">
+                <span className="card-detail-breadcrumb">
+                  {board.title}
+                  {currentList && <> / {currentList.title}</>}
+                </span>
+                <span className="card-detail-type-badge">{t("board.cardModal.typeBadge")}</span>
+              </div>
+              <button
+                type="button"
+                className={"status-pill" + (card.completed ? " status-pill-success" : " status-pill-neutral")}
+                disabled={readOnly}
+                onClick={toggleCompleted}
+              >
+                {card.completed ? t("board.cardModal.complete") : t("board.cardModal.statusOpen")}
+              </button>
             </div>
 
-            <span className="card-detail-type-badge">{t("board.cardModal.typeBadge")}</span>
-            {card.createdAt && (
-              <div className="card-detail-created-at">
-                {t("board.cardModal.createdAt", { data: new Date(card.createdAt).toLocaleString(i18n.language) })}
-              </div>
-            )}
-
+            {/* Linha 2: título em destaque, com a data de criação discreta
+                logo abaixo - juntos, formam o "cartão de identidade" do card,
+                separados da barra de ações que vem a seguir. */}
             <div className="modal-header card-detail-header">
               <input
                 ref={titleRef}
@@ -412,29 +335,38 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
                 }}
               />
             </div>
-
-            {/* Sem IA neste app - o clique só leva pra descrição, que é a ação
-                real mais próxima do que essa caixa sugere visualmente. */}
-            {!readOnly && (
-              <button type="button" className="ai-input-box" onClick={() => descriptionRef.current?.focus()}>
-                <EditIcon /> {t("board.cardModal.descriptionShortcut")}
-              </button>
+            {card.createdAt && (
+              <div className="card-detail-created-at">
+                {t("board.cardModal.createdAt", { data: new Date(card.createdAt).toLocaleString(i18n.language) })}
+              </div>
             )}
 
             {readOnly && <div className="board-readonly-note">{t("board.cardModal.readOnlyNote")}</div>}
 
-            <div className="modal-section">
-              <label className="modal-label">{t("board.cardModal.description")}</label>
-              <textarea
-                ref={descriptionRef}
-                className="modal-textarea"
-                placeholder={t("board.cardModal.descriptionPlaceholder")}
-                value={description}
-                readOnly={readOnly}
-                onChange={(e) => setDescription(e.target.value)}
-                onBlur={commitDescription}
-              />
-            </div>
+            {/* Toolbar de propriedades rápidas: cada pílula abre o popover da
+                própria propriedade (ver CardPropertiesToolbar.jsx). Propriedade
+                vazia não aparece em lugar nenhum além daqui - substitui a
+                antiga grade fixa de metadados (status/membros/datas/
+                prioridade/etiquetas/local). "Mover para lista" mora aqui
+                também agora (era um <select> nativo, numa linha própria) -
+                mesma pílula, mesma linha, mesma identidade visual dos outros. */}
+            <CardPropertiesToolbar
+              boardId={boardId}
+              cardId={cardId}
+              card={card}
+              users={users}
+              readOnly={readOnly}
+              dispatch={dispatch}
+              onOpenRecurrence={() => setRecurrenceOpen(true)}
+              onDueChanged={agendarRefreshAtividade}
+              checklist={{ done, total: card.checklist.length, open: checklistOpen, onToggle: () => setChecklistOpen((v) => !v) }}
+              attachments={{ count: card.attachments?.length || 0, open: attachmentsOpen, onToggle: () => setAttachmentsOpen((v) => !v) }}
+              lists={board.lists}
+              currentListId={currentList?.id}
+              onMoveToList={moveToList}
+            />
+
+            <CardDescriptionEditor description={card.description} onSave={commitDescription} readOnly={readOnly} />
 
             <div className="modal-section">
               <div className="subtasks-header">
@@ -499,6 +431,7 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
                 ))}
             </div>
 
+            {checklistOpen && (
             <div className="modal-section">
               <label className="modal-label">{t("board.cardModal.checklist")}</label>
               {card.checklist.length > 0 && (
@@ -536,7 +469,9 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
                 </form>
               )}
             </div>
+            )}
 
+            {attachmentsOpen && (
             <div className="modal-section">
               <label className="modal-label">{t("board.cardModal.attachments")}</label>
               {card.attachments?.length > 0 && (
@@ -615,181 +550,11 @@ export default function CardModal({ boardId, cardId, onClose, initialFocus }) {
                 </form>
               )}
             </div>
+            )}
           </div>
 
           <div className="card-detail-sidebar">
-            <div className="metadata-grid">
-              <div className="metadata-row">
-                <span className="metadata-row-label">
-                  <StatusIcon /> {t("board.cardModal.status")}
-                </span>
-                <button
-                  type="button"
-                  className={"status-pill" + (card.completed ? " status-pill-success" : " status-pill-neutral")}
-                  disabled={readOnly}
-                  onClick={toggleCompleted}
-                >
-                  {card.completed ? t("board.cardModal.complete") : t("board.cardModal.statusOpen")}
-                </button>
-              </div>
-
-              <div className="metadata-row">
-                <span className="metadata-row-label">
-                  <MembersIcon /> {t("board.cardModal.members")}
-                </span>
-                <div className="metadata-row-value">
-                  <div className="member-avatars-row">
-                    {cardMembers.map((m) => (
-                      <Avatar key={m.id} id={m.id} name={m.name} avatarUrl={m.avatarUrl} title={m.name} />
-                    ))}
-                    {cardMembers.length === 0 && <span className="metadata-empty">{t("board.cardModal.empty")}</span>}
-                    {!readOnly && (
-                      <button type="button" className="avatar avatar-add" onClick={() => setMemberPickerOpen((o) => !o)}>
-                        +
-                      </button>
-                    )}
-                  </div>
-                  {memberPickerOpen && (
-                    <div className="member-picker">
-                      {users.length === 0 && <div className="member-picker-empty">{t("board.cardModal.noUsersYet")}</div>}
-                      {users.map((m) => (
-                        <label key={m.id} className="member-picker-row">
-                          <input type="checkbox" checked={(card.memberIds || []).includes(m.id)} onChange={() => toggleMember(m.id)} />
-                          <Avatar id={m.id} name={m.name} avatarUrl={m.avatarUrl} className="avatar-small" />
-                          <span>{m.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {(!hideEmpty || hasDates) && (
-                <div className="metadata-row">
-                  <span className="metadata-row-label">
-                    <CalendarIcon /> {t("board.cardModal.datesLabel")}
-                  </span>
-                  <div className="metadata-row-value date-range">
-                    <DatePicker
-                      value={card.startDate}
-                      onChange={handleStartDateChange}
-                      label={t("board.cardModal.startDate")}
-                      disabled={readOnly}
-                      onOpenRecurrence={readOnly ? undefined : () => setRecurrenceOpen(true)}
-                    />
-                    <span className="date-range-arrow">→</span>
-                    <DatePicker
-                      value={card.due}
-                      onChange={handleDueChange}
-                      label={t("board.cardModal.dueDate")}
-                      disabled={readOnly}
-                      onOpenRecurrence={readOnly ? undefined : () => setRecurrenceOpen(true)}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {(!hideEmpty || hasPriority) && (
-                <div className="metadata-row">
-                  <span className="metadata-row-label">{t("board.cardModal.priority")}</span>
-                  <div className="metadata-row-value priority-toggle-row priority-toggle-row-compact">
-                    <button
-                      type="button"
-                      className={"priority-chip priority-chip-urgent" + (card.urgent ? " active" : "")}
-                      disabled={readOnly}
-                      onClick={toggleUrgent}
-                    >
-                      <UrgentIcon /> {t("board.cardModal.urgent")}
-                    </button>
-                    <button
-                      type="button"
-                      className={"priority-chip priority-chip-important" + (card.important ? " active" : "")}
-                      disabled={readOnly}
-                      onClick={toggleImportant}
-                    >
-                      <ImportantIcon /> {t("board.cardModal.important")}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {(!hideEmpty || hasLabels) && (
-                <div className="metadata-row">
-                  <span className="metadata-row-label">
-                    <TagIcon /> {t("board.cardModal.labels")}
-                  </span>
-                  <div className="metadata-row-value label-picker">
-                    {LABEL_COLORS.map((meta) => (
-                      <button
-                        key={meta.id}
-                        type="button"
-                        className={"label-chip" + (card.labels.includes(meta.id) ? " active" : "")}
-                        style={{ background: meta.color }}
-                        disabled={readOnly}
-                        onClick={() => toggleLabel(meta.id)}
-                      >
-                        {card.labels.includes(meta.id) ? "✓" : ""}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {(!hideEmpty || hasLocation) && (
-                <div className="metadata-row">
-                  <span className="metadata-row-label">
-                    <PinIcon /> {t("board.cardModal.location")}
-                  </span>
-                  <div className="metadata-row-value">
-                    {readOnly ? (
-                      <div className="modal-readonly-value">{card.location?.address || t("board.cardModal.noLocation")}</div>
-                    ) : (
-                      <form className="location-form" onSubmit={handleLocateAddress}>
-                        <input
-                          type="text"
-                          className="modal-date location-input"
-                          placeholder={t("board.cardModal.addressPlaceholder")}
-                          value={addressInput}
-                          onChange={(e) => setAddressInput(e.target.value)}
-                        />
-                        <button type="submit" className="btn-primary btn-small" disabled={geocoding}>
-                          {geocoding ? t("board.cardModal.locating") : t("board.cardModal.locate")}
-                        </button>
-                      </form>
-                    )}
-                    {geocodeError && <div className="auth-error" style={{ marginTop: 8 }}>{geocodeError}</div>}
-                    {card.location?.lat != null && (
-                      <div className="location-confirmed">
-                        <PinIcon /> {t("board.cardModal.locationFound")}
-                      </div>
-                    )}
-                    {card.location?.address && card.location?.lat == null && !geocoding && (
-                      <div className="location-pending">{t("board.cardModal.locationPending")}</div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {!readOnly && (
-                <div className="metadata-row">
-                  <span className="metadata-row-label">
-                    <ListIcon /> {t("board.cardModal.moveToList")}
-                  </span>
-                  <select className="modal-select metadata-row-value" value={currentList?.id || ""} onChange={moveToList}>
-                    {board.lists.map((l) => (
-                      <option key={l.id} value={l.id}>
-                        {l.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-
-            <button type="button" className="collapse-empty-toggle" onClick={() => setHideEmpty((v) => !v)}>
-              <CollapseIcon />
-              {hideEmpty ? t("board.cardModal.showEmpty") : t("board.cardModal.collapseEmpty")}
-            </button>
+            <CardActivityPanel cardId={cardId} readOnly={readOnly} refreshToken={activityRefresh} />
           </div>
         </div>
 

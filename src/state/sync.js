@@ -51,9 +51,15 @@ export function syncAction(action, state) {
       if (list) api.setCardOrder(action.listId, list.cardIds).catch(logError);
       break;
     }
+    // Diferente dos outros cases (fire-and-forget), este devolve a promise: é o único
+    // ponto onde uma falha precisa desfazer o otimismo, porque um POST recusado aqui
+    // deixava o cartão fantasma na tela até o próximo HYDRATE, sem aviso nenhum
+    // (ver ROLLBACK_ADD_CARD em reducer.js e o catch em BoardContext.jsx).
     case "ADD_CARD":
-      api.createCard(action.listId, { id: action.id, title: action.title }).catch(logError);
-      break;
+      return api.createCard(action.listId, { id: action.id, title: action.title }).catch((err) => {
+        logError(err);
+        throw err;
+      });
     case "DELETE_CARD":
       api.deleteCard(action.cardId).catch(logError);
       break;

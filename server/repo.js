@@ -477,6 +477,119 @@ export function listExists(id) {
   return !!getDb().prepare("SELECT 1 FROM lists WHERE id = ?").get(id);
 }
 
+// ---------- Feed de atividades do cartão ----------
+// Chamado só de dentro deste arquivo, no mesmo lugar que já faz a escrita que a
+// atividade descreve - assim não existe caminho de mutação sem log correspondente.
+// userId nulo (rotina automática, ex. auto-arquivamento) grava a linha sem autor;
+// o feed mostra "Automação" nesse caso (ver CardActivityPanel.jsx).
+//
+// previousValue/newValue são o CONTEÚDO bruto (texto da descrição, título da
+// lista, data ISO) - NUNCA a frase pronta nem HTML. O app é i18n (pt/en/es);
+// quem monta a frase final é o cliente, com t("...activity." + actionType, {...}),
+// mesmo padrão de erro (code estável + tradução por chave) que o resto do app usa.
+function registrarAtividadeCartao(cardId, userId, actionType, { previousValue = null, newValue = null } = {}) {
+  getDb()
+    .prepare(
+      "INSERT INTO card_activities (id, card_id, user_id, action_type, description, previous_value, new_value, created_at) VALUES (?, ?, ?, ?, '', ?, ?, ?)"
+    )
+    .run(uid(), cardId, userId || null, actionType, previousValue, newValue, nowIso());
+}
+
+function linhaParaCliente(r) {
+  return {
+    id: r.id,
+    actionType: r.action_type,
+    previousValue: r.previous_value,
+    newValue: r.new_value,
+    createdAt: r.created_at,
+    user: r.user_id
+      ? { id: r.user_id, name: r.user_name, avatarUrl: r.avatar_path ? `/api/profile/${r.user_id}/avatar?v=${r.avatar_path}` : null }
+      : null,
+  };
+}
+
+export function getCardActivities(cardId) {
+  return getDb()
+    .prepare(
+      `SELECT a.id, a.action_type, a.previous_value, a.new_value, a.created_at, u.id AS user_id, u.name AS user_name, u.avatar_path
+         FROM card_activities a
+         LEFT JOIN users u ON u.id = a.user_id
+        WHERE a.card_id = ?
+        ORDER BY a.created_at DESC`
+    )
+    .all(cardId)
+    .map(linhaParaCliente);
+}
+
+// Comentário é só mais uma linha de card_activities (action_type COMMENT_ADDED),
+// com o texto em new_value - ver comentário da tabela em db.js. Devolve a linha
+// já no formato de getCardActivities, para o cliente inserir no topo do feed sem
+// precisar recarregar tudo (ele só existe depois do POST responder - comentário
+// pessimista de propósito, mesmo raciocínio do ADD_CARD).
+export function addCardComment(cardId, userId, text) {
+  const id = uid();
+  const createdAt = nowIso();
+  getDb()
+    .prepare(
+      "INSERT INTO card_activities (id, card_id, user_id, action_type, description, new_value, created_at) VALUES (?, ?, ?, 'COMMENT_ADDED', '', ?, ?)"
+    )
+    .run(id, cardId, userId, text, createdAt);
+  return getCardActivityById(id);
+}
+
+// Busca uma atividade pelo id, já no formato de getCardActivities - usado pelas
+// rotas de editar/excluir comentário pra conferir dono e devolver a linha
+// atualizada sem precisar recarregar o feed inteiro.
+export function getCardActivityById(id) {
+  const r = getDb()
+    .prepare(
+      `SELECT a.id, a.card_id, a.action_type, a.previous_value, a.new_value, a.created_at, a.user_id AS owner_id,
+              u.id AS user_id, u.name AS user_name, u.avatar_path
+         FROM card_activities a
+         LEFT JOIN users u ON u.id = a.user_id
+        WHERE a.id = ?`
+    )
+    .get(id);
+  if (!r) return null;
+  return { ...linhaParaCliente(r), cardId: r.card_id, userId: r.owner_id };
+}
+
+// Editar substitui new_value e empurra o texto antigo pra previous_value (um
+// nível só de histórico, não uma pilha de revisões - o suficiente pra "editado"
+// fazer sentido sem virar um versionamento completo que ninguém pediu).
+export function updateCardComment(id, text) {
+  const atual = getDb().prepare("SELECT new_value FROM card_activities WHERE id = ? AND action_type = 'COMMENT_ADDED'").get(id);
+  // Sem essa guarda, reenviar o mesmo texto (ex: clicar Salvar sem editar
+  // nada) empurraria new_value pra previous_value e o feed passaria a marcar
+  // "editado" num comentário que continua idêntico - mesmo cuidado que
+  // updateCardDescription já tem para a descrição do cartão.
+  if (atual && atual.new_value !== text) {
+    getDb()
+      .prepare("UPDATE card_activities SET previous_value = new_value, new_value = ? WHERE id = ? AND action_type = 'COMMENT_ADDED'")
+      .run(text, id);
+  }
+  return getCardActivityById(id);
+}
+
+export function deleteCardComment(id) {
+  getDb().prepare("DELETE FROM card_activities WHERE id = ? AND action_type = 'COMMENT_ADDED'").run(id);
+}
+
+// Dedicado (não passa pelo updateCard genérico) porque nasce do botão Salvar
+// do editor de descrição no modal - ao contrário do resto do cartão, que ainda
+// é otimista e grava no blur, a descrição só é confirmada depois da resposta
+// do servidor (ver commitDescription em CardModal.jsx). Só loga atividade
+// quando o texto de fato mudou - clicar Salvar sem editar nada não deveria
+// virar uma entrada "alterou a descrição" no feed.
+export function updateCardDescription(id, description, userId) {
+  const row = getDb().prepare("SELECT description FROM cards WHERE id = ?").get(id);
+  if (!row) return;
+  getDb().prepare("UPDATE cards SET description = ? WHERE id = ?").run(description, id);
+  if (row.description !== description) {
+    registrarAtividadeCartao(id, userId, "DESCRIPTION_CHANGED", { previousValue: row.description, newValue: description });
+  }
+}
+
 export function createCard(listId, { id, title, creatorId }) {
   const cardId = id || uid();
   const pos = nextPosition("cards", "list_id", listId);
@@ -490,6 +603,8 @@ export function createCard(listId, { id, title, creatorId }) {
   getDb().prepare(
     "INSERT INTO cards (id, list_id, title, description, labels, due, checklist, subtasks, member_ids, position, list_entered_at, created_at, creator_id) VALUES (?, ?, ?, '', '[]', NULL, '[]', '[]', '[]', ?, ?, ?, ?)"
   ).run(cardId, listId, title, pos, agora, agora, creatorId || null);
+  const lista = getDb().prepare("SELECT title FROM lists WHERE id = ?").get(listId);
+  registrarAtividadeCartao(cardId, creatorId, "CREATED", { newValue: lista?.title || "?" });
   return cardId;
 }
 export function deleteCard(id) {
@@ -550,7 +665,7 @@ export function archiveCompletedCards(listId) {
   rows.forEach((r) => stmt.run(at, r.id));
   return rows.map((r) => r.id);
 }
-export function updateCard(id, patch) {
+export function updateCard(id, patch, userId = null) {
   const row = getDb().prepare("SELECT * FROM cards WHERE id = ?").get(id);
   if (!row) return;
   const next = {
@@ -593,8 +708,18 @@ export function updateCard(id, patch) {
     completedAt,
     id
   );
+  // Só loga quando `due` de fato veio no patch e mudou - o mesmo PATCH genérico
+  // grava título, prioridade, membros etc., e nada disso deveria virar uma
+  // entrada "alterou a data" no feed.
+  if (patch.due !== undefined && patch.due !== row.due) {
+    // previousValue/newValue vão em ISO puro (YYYY-MM-DD) - quem formata pro
+    // idioma de quem lê é o cliente (toLocaleDateString), igual ao resto do
+    // modal já faz. newValue nulo (removeu a data) é o cliente que escolhe a
+    // frase certa a partir disso.
+    registrarAtividadeCartao(id, userId, "DUE_DATE_SET", { previousValue: row.due || null, newValue: patch.due || null });
+  }
 }
-export function setCardOrder(listId, cardIds) {
+export function setCardOrder(listId, cardIds, userId = null) {
   // Só aceita cartões que já pertencem ao quadro da lista de destino.
   //
   // A rota autoriza o acesso à lista de destino, mas os ids no corpo vinham sem
@@ -613,12 +738,31 @@ export function setCardOrder(listId, cardIds) {
   const stmt = getDb().prepare("UPDATE cards SET list_id = ?, position = ? WHERE id = ?");
   const marcaEntrada = getDb().prepare("UPDATE cards SET list_entered_at = ? WHERE id = ?");
   const agora = nowIso();
+  // Resolvida uma vez só (é sempre a mesma lista de destino no lote inteiro),
+  // não por cartão - senão vira uma consulta a mais por item arrastado. A de
+  // origem varia por cartão em tese (um arraste normal só move um por vez, mas
+  // a função aceita lote), daí o cache por list_id em vez de repetir a consulta.
+  let listaDestino;
+  const tituloListaCache = new Map();
+  function tituloLista(id) {
+    if (!tituloListaCache.has(id)) {
+      tituloListaCache.set(id, getDb().prepare("SELECT title FROM lists WHERE id = ?").get(id)?.title || "?");
+    }
+    return tituloListaCache.get(id);
+  }
   cardIds
     .filter((id) => doQuadro.has(id))
     .forEach((id, idx) => {
       const antes = atual.get(id);
       stmt.run(listId, idx, id);
-      if (antes && antes.list_id !== listId) marcaEntrada.run(agora, id);
+      if (antes && antes.list_id !== listId) {
+        marcaEntrada.run(agora, id);
+        // Só loga quando o cartão TROCOU de coluna, nunca em reordenação dentro
+        // da mesma lista - senão todo arraste vira um "CARD_MOVED" no feed,
+        // mesmo sem sair do lugar.
+        if (listaDestino === undefined) listaDestino = tituloLista(listId);
+        registrarAtividadeCartao(id, userId, "CARD_MOVED", { previousValue: tituloLista(antes.list_id), newValue: listaDestino });
+      }
     });
 }
 

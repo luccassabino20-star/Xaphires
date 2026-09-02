@@ -2255,7 +2255,13 @@ img.avatar { object-fit: cover; padding: 0; }
 
 /* ---------- Data menu (export/import) ---------- */
 .data-menu { position: relative; }
-.data-dropdown { min-width: 230px; max-width: 280px; padding-top: 8px; max-height: 78vh; overflow-y: auto; }
+.data-dropdown { min-width: 230px; max-width: 280px; padding-top: 8px; max-height: 78vh; overflow-y: auto; scroll-behavior: smooth; }
+/* Catálogo de temas cresceu (13 cores, 10 degradês, 11 wallpapers) - o painel
+   já rolava (max-height acima), só faltava a scrollbar deixar de ser a
+   genérica do navegador. Mesmo padrão de .cards-container/.board-wrapper. */
+.data-dropdown::-webkit-scrollbar { width: 8px; }
+.data-dropdown::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
+.data-dropdown::-webkit-scrollbar-track { background: transparent; }
 .data-menu-back { font-weight: 700; color: var(--text-primary); }
 .data-menu-back svg { flex-shrink: 0; }
 
@@ -2912,7 +2918,13 @@ img.avatar { object-fit: cover; padding: 0; }
 
 .card-detail-footer { flex-shrink: 0; border-top: 1px solid var(--border-subtle); padding: 14px 36px; margin: 0; }
 
-.card-detail-breadcrumb { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+/* Linha 1 do cabeçalho: breadcrumb + badge de categoria à esquerda, status à
+   direita, mesma altura (justify-between). */
+.card-detail-topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.card-detail-topline-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.card-detail-topline .status-pill { flex-shrink: 0; }
+
+.card-detail-breadcrumb { font-size: 12.5px; color: var(--text-muted); }
 
 .card-detail-type-badge {
   display: inline-flex;
@@ -2924,12 +2936,12 @@ img.avatar { object-fit: cover; padding: 0; }
   border: 1px solid var(--border-subtle);
   border-radius: 9999px;
   padding: 4px 12px;
-  margin-bottom: 12px;
 }
 
-.card-detail-created-at { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
-
-.card-detail-header { margin-bottom: 14px; padding-right: 0; }
+/* Linha 2: título em destaque, data de criação discreta logo abaixo dele -
+   sem margem entre os dois, pra ler como uma unidade só (título + metadado
+   de nascimento), separados do resto do cabeçalho por baixo. */
+.card-detail-header { margin-bottom: 2px; padding-right: 0; }
 .card-detail-title {
   font-size: 28px;
   font-weight: 800;
@@ -2937,6 +2949,7 @@ img.avatar { object-fit: cover; padding: 0; }
   padding: 4px 8px;
   width: 100%;
 }
+.card-detail-created-at { font-size: 12px; color: var(--text-muted); margin: 0 0 16px 8px; }
 
 /* Sem IA no app - o clique leva pra descrição (ver onClick em CardModal.jsx).
    O visual imita a caixa "Ask Brain" da referência, o texto não promete IA. */
@@ -3018,6 +3031,196 @@ img.avatar { object-fit: cover; padding: 0; }
   width: 100%;
 }
 .collapse-empty-toggle:hover { color: var(--text-primary); }
+
+/* ---------- Toolbar de propriedades rápidas (CardPropertiesToolbar.jsx) ----------
+   "Action pills bar": propriedade vazia não passa de um rótulo discreto,
+   propriedade ativa vira uma pílula preenchida com o valor - substitui a
+   antiga grade fixa de metadados (sempre visível, vazia ou não). */
+.property-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 20px; }
+
+.property-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-list);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1.2;
+  max-width: 220px;
+}
+.property-pill:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.property-pill:disabled { cursor: default; opacity: 0.7; }
+
+/* Botão principal "+ Adicionar" - único com acabamento de destaque (fundo
+   escuro/accent), o resto da barra é deliberadamente discreto por baixo dele. */
+.property-pill-add { background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
+.property-pill-add:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: white; }
+
+/* Propriedade com valor: mesmo pill, só troca o preenchimento pra marcar que
+   não está mais vazia - continua discreta, é dado, não alarme. */
+.property-pill-active { background: var(--bg-card); border-color: var(--border-strong); color: var(--text-primary); }
+
+.property-pill-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+.property-pill-dots { display: flex; gap: 3px; }
+.property-pill-dot { width: 10px; height: 10px; border-radius: 3px; }
+.property-pill-avatars { gap: 0; }
+.property-pill-clear {
+  display: inline-flex;
+  margin-left: 2px;
+  color: var(--text-muted);
+  border-radius: 50%;
+}
+.property-pill-clear:hover { color: var(--danger); }
+
+/* ---------- Popover de propriedade (PropertyPopover.jsx) ----------
+   Sem Radix UI (não instalado, ver CLAUDE.md) - posiciona pelo
+   getBoundingClientRect() do próprio gatilho (CardPropertiesToolbar.jsx). */
+.property-popover {
+  position: fixed;
+  z-index: 60;
+  /* Glassmorphism suave (bg-white/95 + blur) via color-mix a partir de
+     --bg-card, não um branco fixo - assim o vidro respeita o tema escuro
+     sozinho, sem precisar de uma segunda declaração em :root[data-theme]. */
+  background: color-mix(in srgb, var(--bg-card) 95%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  min-width: 240px;
+  max-width: min(320px, calc(100vw - 32px));
+  animation: property-popover-in 150ms ease-out;
+}
+:root[data-theme="dark"] .property-popover { box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45); }
+@keyframes property-popover-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.property-popover-title { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; }
+.property-popover-label-grid { flex-wrap: wrap; }
+.property-popover-member-list { max-height: 240px; overflow-y: auto; }
+
+/* Menu "Mover para lista" (dentro do property-popover) - itens em pílula
+   arredondada como o resto, com hover em --accent-glow-soft: é o mesmo realce
+   roxo/violeta "luxury glass" que hover de card e foco de botão já usam
+   noutros pontos do quadro (ver .list-menu-btn:hover), não uma cor nova só
+   pra isto - mantém os popovers do cabeçalho na mesma linguagem visual do
+   resto do quadro já redesenhado. */
+.list-picker-menu { display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
+.list-picker-item {
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+.list-picker-item:hover { background: var(--accent-glow-soft); color: var(--accent-glow); }
+.list-picker-item.active { font-weight: 700; color: var(--accent-glow); }
+
+/* ---------- Menu "+ Adicionar" (AddPropertyMenu.jsx) ---------- */
+.add-property-menu { display: flex; flex-direction: column; gap: 2px; min-width: 260px; }
+.add-property-menu-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+.add-property-menu-item:hover { background: var(--bg-list); }
+.add-property-menu-icon { color: var(--text-muted); margin-top: 2px; flex-shrink: 0; }
+.add-property-menu-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.add-property-menu-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+.add-property-menu-description { font-size: 12px; color: var(--text-muted); line-height: 1.35; }
+
+/* ---------- Editor de descrição (CardDescriptionEditor.jsx) ---------- */
+.description-toolbar { display: flex; gap: 4px; margin-bottom: 6px; }
+.description-toolbar button {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.description-toolbar button:hover { background: var(--bg-list); color: var(--text-primary); }
+.description-save-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* ---------- Comentários e feed de atividade (CardActivityPanel.jsx) ---------- */
+.card-activity-panel { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.card-activity-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.card-activity-toggle {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.card-activity-toggle:hover { text-decoration: underline; }
+
+.card-comment-composer { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 18px; }
+.card-comment-input { min-height: 56px; }
+.card-comment-composer .btn-primary { align-self: flex-end; }
+
+.card-activity-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; }
+.card-activity-empty, .card-activity-loading { font-size: 13px; color: var(--text-muted); }
+.card-activity-item { display: flex; gap: 10px; align-items: flex-start; }
+.card-activity-body { min-width: 0; flex: 1; }
+.card-activity-text { font-size: 13px; color: var(--text-primary); line-height: 1.45; word-break: break-word; }
+.card-activity-text strong { font-weight: 600; }
+.card-activity-time { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* Prévia de descrição alterada: bloco recuado, texto cru (sem HTML, ver
+   CardDescriptionEditor.jsx) - só um pouco destacado do resto do log. */
+.card-activity-preview {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-left: 2px solid var(--border-strong);
+  background: var(--bg-list);
+  border-radius: 4px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Card do comentário (imagem de referência do pedido): caixa própria com o
+   texto e, só pra quem escreveu, Editar/Excluir. */
+.card-comment-box { margin-top: 6px; padding: 8px 10px; background: var(--bg-list); border-radius: 6px; }
+.card-comment-box-text { font-size: 13px; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; }
+.card-comment-box-actions { display: flex; gap: 12px; margin-top: 6px; }
+.card-comment-box-actions button {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.card-comment-box-actions button:hover { color: var(--text-primary); text-decoration: underline; }
+.card-comment-box-editing { background: transparent; padding: 0; }
 
 .btn-danger {
   background: transparent;
@@ -4533,7 +4736,24 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   color: var(--text-muted);
   padding: 4px 6px 8px;
 }
-.board-bg-swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 6px; margin-bottom: 6px; }
+/* Rolagem própria pra cada grade (cores/gradientes/wallpapers), não só a do
+   painel inteiro (.data-dropdown) - com 18 cores + 15 gradientes + 16
+   wallpapers, rolar o painel de cima a baixo só pra sair de "Cores" e chegar
+   em "Imagens de fundo" ficava longo demais. Cada seção agora cabe numa
+   janela fixa com scroll suave própria. */
+.board-bg-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 0 6px;
+  margin-bottom: 6px;
+  max-height: 168px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.board-bg-swatch-grid::-webkit-scrollbar { width: 6px; }
+.board-bg-swatch-grid::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
+.board-bg-swatch-grid::-webkit-scrollbar-track { background: transparent; }
 .board-bg-swatch {
   width: 100%;
   aspect-ratio: 1.6;
@@ -4575,7 +4795,19 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
    CSS puro (ver comentário lá do porquê de não serem fotos de banco de
    imagens), e sem o nome escrito por baixo "Espaço/Galáxia" e "Abstrato 3D"
    ficam indistinguíveis um do outro numa amostra pequena. */
-.board-bg-wallpaper-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 0 6px; margin-bottom: 6px; }
+.board-bg-wallpaper-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 0 6px;
+  margin-bottom: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.board-bg-wallpaper-grid::-webkit-scrollbar { width: 6px; }
+.board-bg-wallpaper-grid::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
+.board-bg-wallpaper-grid::-webkit-scrollbar-track { background: transparent; }
 .board-bg-wallpaper-tile {
   display: flex;
   flex-direction: column;

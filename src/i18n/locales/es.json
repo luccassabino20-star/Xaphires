@@ -1732,7 +1732,58 @@
       "uploading": "Subiendo...",
       "deleteCard": "Eliminar tarjeta",
       "deleteCardConfirm": "¿Eliminar esta tarjeta de forma permanente?",
-      "cardDeletedToast": "Tarjeta eliminada"
+      "cardDeletedToast": "Tarjeta eliminada",
+      "descriptionEditor": {
+        "toolbarLabel": "Formato de la descripción",
+        "bold": "Negrita",
+        "italic": "Cursiva",
+        "bulletList": "Lista",
+        "link": "Enlace",
+        "boldPlaceholder": "texto en negrita",
+        "italicPlaceholder": "texto en cursiva",
+        "linkTextPlaceholder": "texto del enlace",
+        "saving": "Guardando..."
+      },
+      "activity": {
+        "title": "Actividad",
+        "commentPlaceholder": "Escribir un comentario...",
+        "commentSubmit": "Comentar",
+        "commentSending": "Enviando...",
+        "empty": "Todavía no hay actividad",
+        "automation": "Automatización",
+        "justNow": "justo ahora",
+        "minutesAgo": "hace {{count}} minuto",
+        "minutesAgo_other": "hace {{count}} minutos",
+        "hoursAgo": "hace {{count}} hora",
+        "hoursAgo_other": "hace {{count}} horas",
+        "daysAgo": "hace {{count}} día",
+        "daysAgo_other": "hace {{count}} días",
+        "CREATED": "añadió esta tarjeta a \"{{list}}\"",
+        "CARD_MOVED": "movió esta tarjeta a \"{{list}}\"",
+        "DUE_DATE_SET": "definió la fecha de entrega para {{date}}",
+        "DATE_CLEARED": "eliminó la fecha de entrega",
+        "DESCRIPTION_CHANGED": "modificó la descripción de esta tarjeta",
+        "COMMENT_ADDED_SHORT": "añadió un comentario",
+        "UNKNOWN": "actualizó esta tarjeta",
+        "showDetails": "Mostrar detalles",
+        "hideDetails": "Ocultar detalles",
+        "editComment": "Editar",
+        "deleteComment": "Eliminar",
+        "deleteCommentConfirm": "¿Eliminar este comentario de forma permanente?",
+        "edited": "editado"
+      },
+      "propertiesToolbar": {
+        "addButton": "Añadir",
+        "menu": {
+          "labels": { "title": "Etiquetas", "description": "Organiza, clasifica y prioriza con colores." },
+          "dates": { "title": "Fechas y plazos", "description": "Define la fecha de inicio, entrega y recordatorios." },
+          "checklist": { "title": "Checklist", "description": "Añade listas de verificación y subtareas." },
+          "members": { "title": "Miembros", "description": "Asigna responsables del equipo a la tarjeta." },
+          "priority": { "title": "Prioridad (Eisenhower)", "description": "Define como urgente, importante o baja." },
+          "location": { "title": "Ubicación", "description": "Añade una dirección o enlace del mapa." },
+          "attachments": { "title": "Adjuntos", "description": "Añade archivos, documentos o enlaces externos." }
+        }
+      }
     }
   },
   "views": {

@@ -1732,7 +1732,58 @@
       "uploading": "Uploading...",
       "deleteCard": "Delete card",
       "deleteCardConfirm": "Delete this card permanently?",
-      "cardDeletedToast": "Card deleted"
+      "cardDeletedToast": "Card deleted",
+      "descriptionEditor": {
+        "toolbarLabel": "Description formatting",
+        "bold": "Bold",
+        "italic": "Italic",
+        "bulletList": "List",
+        "link": "Link",
+        "boldPlaceholder": "bold text",
+        "italicPlaceholder": "italic text",
+        "linkTextPlaceholder": "link text",
+        "saving": "Saving..."
+      },
+      "activity": {
+        "title": "Activity",
+        "commentPlaceholder": "Write a comment...",
+        "commentSubmit": "Comment",
+        "commentSending": "Sending...",
+        "empty": "No activity yet",
+        "automation": "Automation",
+        "justNow": "just now",
+        "minutesAgo": "{{count}} minute ago",
+        "minutesAgo_other": "{{count}} minutes ago",
+        "hoursAgo": "{{count}} hour ago",
+        "hoursAgo_other": "{{count}} hours ago",
+        "daysAgo": "{{count}} day ago",
+        "daysAgo_other": "{{count}} days ago",
+        "CREATED": "added this card to \"{{list}}\"",
+        "CARD_MOVED": "moved this card to \"{{list}}\"",
+        "DUE_DATE_SET": "set the due date to {{date}}",
+        "DATE_CLEARED": "removed the due date",
+        "DESCRIPTION_CHANGED": "updated this card's description",
+        "COMMENT_ADDED_SHORT": "added a comment",
+        "UNKNOWN": "updated this card",
+        "showDetails": "Show details",
+        "hideDetails": "Hide details",
+        "editComment": "Edit",
+        "deleteComment": "Delete",
+        "deleteCommentConfirm": "Delete this comment permanently?",
+        "edited": "edited"
+      },
+      "propertiesToolbar": {
+        "addButton": "Add",
+        "menu": {
+          "labels": { "title": "Labels", "description": "Organize, categorize and prioritize with colors." },
+          "dates": { "title": "Dates & Deadlines", "description": "Set the start date, due date and reminders." },
+          "checklist": { "title": "Checklist", "description": "Add checklists and sub-tasks." },
+          "members": { "title": "Members", "description": "Assign team members to this card." },
+          "priority": { "title": "Priority (Eisenhower)", "description": "Set as urgent, important or low." },
+          "location": { "title": "Location", "description": "Add an address or map link." },
+          "attachments": { "title": "Attachments", "description": "Add files, documents or external links." }
+        }
+      }
     }
   },
   "views": {

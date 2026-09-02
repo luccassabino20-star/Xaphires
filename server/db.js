@@ -169,6 +169,34 @@ function applySchema(companyDb) {
       created_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_personal_tasks_user ON personal_tasks(user_id);
+
+    -- Feed de atividades do cartão (coluna direita do modal de detalhes):
+    -- criação, mudanças de coluna/data/descrição e comentários, em ordem
+    -- cronológica. Comentário é só mais um action_type (COMMENT_ADDED) aqui
+    -- dentro, não uma tabela própria. user_id vira NULL se o autor for
+    -- excluído (SET NULL, mesmo espírito de chat_messages.author_id): a
+    -- entrada é histórico do cartão e sobrevive a quem a gerou. card_id tem
+    -- CASCADE porque esta tabela existe só para alimentar o cartão vivo - não é
+    -- o log forense de "o card sumiu", que é uma decisão à parte (ver
+    -- conversa sobre card_events).
+    --
+    -- previous_value/new_value carregam o CONTEÚDO da mudança (texto da
+    -- descrição antes/depois, comentário atual e o anterior se editado, título
+    -- da lista de origem/destino) - description ficou só como campo legado,
+    -- sempre '' em linha nova (ver addColumnIfMissing logo abaixo). Nenhum dos
+    -- dois é a frase pronta: o app é i18n, quem traduz é o cliente por
+    -- actionType (ver CardActivityPanel.jsx) - aqui só vai o dado bruto.
+    CREATE TABLE IF NOT EXISTS card_activities (
+      id TEXT PRIMARY KEY,
+      card_id TEXT NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+      user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+      action_type TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      previous_value TEXT,
+      new_value TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_card_activities_card ON card_activities(card_id, created_at);
   `);
 
   // Arquivamento automático da agenda pessoal: concluída há mais de 2 dias
@@ -328,6 +356,43 @@ function applySchema(companyDb) {
   // Schema do módulo Xaphires Beauty, mesmo ponto preguiçoso.
   applyXaphiresBeautySchema(companyDb);
   applyTimeTrackingSchema(companyDb);
+
+  // card_activities nasceu só com `description`; previous_value/new_value chegaram
+  // pra alimentar a prévia de conteúdo no feed (descrição alterada, comentário
+  // editável). addColumnIfMissing cobre banco já existente; CREATE TABLE acima já
+  // nasce com as três, pra instalação nova.
+  addColumnIfMissing(companyDb, "card_activities", "previous_value", "previous_value TEXT");
+  addColumnIfMissing(companyDb, "card_activities", "new_value", "new_value TEXT");
+  // Os três action_type mudaram de nome pra bater com o contrato novo (CARD_MOVED,
+  // DUE_DATE_SET, DESCRIPTION_CHANGED em vez de MOVED/DATE_UPDATED/DESCRIPTION_UPDATED).
+  // Idempotente: na segunda vez que roda não sobra linha com o nome antigo pra casar.
+  companyDb.exec("UPDATE card_activities SET action_type = 'CARD_MOVED' WHERE action_type = 'MOVED'");
+  companyDb.exec("UPDATE card_activities SET action_type = 'DUE_DATE_SET' WHERE action_type = 'DATE_UPDATED'");
+  companyDb.exec("UPDATE card_activities SET action_type = 'DESCRIPTION_CHANGED' WHERE action_type = 'DESCRIPTION_UPDATED'");
+  // Migra o que dava pra recuperar de `description` (JSON de {list}/{date} nas
+  // entradas de sistema, texto cru no comentário) pra new_value, e esvazia
+  // `description` - marca de "já migrada" que faz esta consulta não achar a linha
+  // de novo no próximo boot. DESCRIPTION_CHANGED antiga nunca guardou o texto (só
+  // {}), então fica sem prévia mesmo - não tem como inventar um dado que nunca foi
+  // gravado, mesmo espírito do backfill de created_at mais acima.
+  const legado = companyDb.prepare("SELECT id, action_type, description FROM card_activities WHERE new_value IS NULL AND description != ''").all();
+  if (legado.length) {
+    const migrar = companyDb.prepare("UPDATE card_activities SET new_value = ?, description = '' WHERE id = ?");
+    for (const row of legado) {
+      let valor = null;
+      if (row.action_type === "COMMENT_ADDED") {
+        valor = row.description;
+      } else {
+        try {
+          const params = JSON.parse(row.description);
+          valor = params.list ?? params.date ?? null;
+        } catch {
+          valor = null;
+        }
+      }
+      migrar.run(valor, row.id);
+    }
+  }
 }
 
 const cache = new Map();

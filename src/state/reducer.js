@@ -141,6 +141,24 @@ export function reducer(state, action) {
         ...b,
         cards: { ...b.cards, [action.cardId]: { ...b.cards[action.cardId], ...action.patch } },
       }));
+    // Sem case em sync.js de propósito: diferente de UPDATE_CARD (otimista, dispara
+    // um PATCH), este só existe pra aplicar no estado uma descrição que o servidor
+    // JÁ confirmou (ver commitDescription em CardModal.jsx) - despachar de novo
+    // como UPDATE_CARD faria um segundo PATCH em cima do primeiro, à toa.
+    case "SET_CARD_DESCRIPTION_LOCAL":
+      return updateBoard(state, action.boardId, (b) => ({
+        ...b,
+        cards: { ...b.cards, [action.cardId]: { ...b.cards[action.cardId], description: action.description } },
+      }));
+    // Desfaz só o ADD_CARD otimista quando o POST falha (ver sync.js/BoardContext.jsx).
+    // Não reaproveita DELETE_CARD porque esse dispara um DELETE no servidor para um
+    // id que nunca chegou a existir lá - aqui é limpeza puramente local.
+    case "ROLLBACK_ADD_CARD":
+      return updateBoard(state, action.boardId, (b) => {
+        const cards = { ...b.cards };
+        delete cards[action.cardId];
+        return { ...b, cards, lists: b.lists.map((l) => (l.id === action.listId ? { ...l, cardIds: l.cardIds.filter((cid) => cid !== action.cardId) } : l)) };
+      });
     case "DELETE_CARD":
       return updateBoard(state, action.boardId, (b) => {
         const cards = { ...b.cards };

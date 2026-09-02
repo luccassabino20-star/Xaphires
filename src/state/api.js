@@ -181,6 +181,15 @@ export const deleteCard = (id) => request(`/cards/${id}`, { method: "DELETE" });
 export const archiveCard = (id) => request(`/cards/${id}/archive`, { method: "POST" });
 export const unarchiveCard = (id) => request(`/cards/${id}/unarchive`, { method: "POST" });
 export const archiveCompletedCards = (listId) => request(`/lists/${listId}/archive-completed`, { method: "POST" });
+// Dedicado (não é o updateCard genérico acima): só confirma no cliente depois
+// da resposta do servidor - ver commitDescription em CardModal.jsx.
+export const updateCardDescription = (id, description) =>
+  request(`/cards/${id}/description`, { method: "PATCH", body: { description } });
+export const getCardActivities = (id) => request(`/cards/${id}/activities`);
+export const addCardComment = (id, text) => request(`/cards/${id}/comments`, { method: "POST", body: { text } });
+export const updateCardComment = (id, activityId, text) =>
+  request(`/cards/${id}/comments/${activityId}`, { method: "PATCH", body: { text } });
+export const deleteCardComment = (id, activityId) => request(`/cards/${id}/comments/${activityId}`, { method: "DELETE" });
 
 // ---------- Card attachments ----------
 export const addLinkAttachment = (cardId, data) => request(`/cards/${cardId}/attachments/link`, { method: "POST", body: data });

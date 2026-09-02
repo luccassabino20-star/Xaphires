@@ -10,6 +10,22 @@ export const BACKGROUND_COLORS = [
   { id: "offWhite", css: "#F4F1EA" },
   { id: "petrol", css: "#0E7490" },
   { id: "wine", css: "#7F1D4B" },
+  // +5 pastel/luxo pedidos depois. "Azul Cerúleo Profundo" não usa o #1E293B
+  // do pedido - é o mesmo hex de "graphite" logo acima, e um swatch idêntico
+  // a outro já existente fica com dois botões "ativos" ao mesmo tempo (o
+  // destaque casa por cor, não por id). Troquei por um cerúleo genuinamente
+  // diferente, mesma intenção.
+  { id: "champagneBlush", css: "#F4EAE6" },
+  { id: "sageMint", css: "#E2EFCB" },
+  { id: "roseGoldNude", css: "#E8C5C8" },
+  { id: "ceruleanDeep", css: "#123C5C" },
+  { id: "botanicalOlive", css: "#2D3A2F" },
+  // +5, segundo pacote pastel/luxo. Nenhum hex bate com os 13 de cima.
+  { id: "lavenderSoft", css: "#E6E6FA" },
+  { id: "warmSand", css: "#F5EBE0" },
+  { id: "mutedSage", css: "#D8E2DC" },
+  { id: "premiumGraphite", css: "#2B2D42" },
+  { id: "deepPlum", css: "#4A1525" },
 ];
 
 // Cores para tingir listas. Separadas das de fundo de quadro de propósito: a lista
@@ -61,6 +77,23 @@ export const BACKGROUND_GRADIENTS = [
   { id: "midnightLuxury", css: "linear-gradient(145deg, #1e1b4b, #312e81, #020617)" },
   { id: "cosmicPurple", css: "linear-gradient(135deg, #7c3aed, #a855f7, #d946ef)" },
   { id: "cyberpunkNeon", css: "linear-gradient(120deg, #ff2d95, #a020f0, #00c8ff)" },
+  // +5 pedidos depois - as duas cores do pedido viram a primeira e a última
+  // parada, com uma terceira no meio inserida pra seguir a regra logo acima
+  // (3 paradas, não 2 - "poster liso" é exatamente o que 2 cores produzem).
+  { id: "sunsetSilk", css: "linear-gradient(135deg, #ffdee9, #fff1eb, #b5fffc)" },
+  { id: "champagneGlow", css: "linear-gradient(135deg, #fdfbfb, #f1e9d8, #ebedee)" },
+  { id: "nordicAurora", css: "linear-gradient(135deg, #e0c3fc, #8ec5fc, #b8fce0)" },
+  { id: "deepVelvet", css: "linear-gradient(145deg, #1e1035, #2d0f3d, #0f081d)" },
+  { id: "emeraldLuxe", css: "linear-gradient(135deg, #065f46, #064e3b, #022c22)" },
+  // +5, segundo pacote. "Rose Dust" veio do pedido com a última cor repetida
+  // (hard stop em 99%/100%, não uma terceira cor) - troquei por um tom malva
+  // genuíno no meio, mesma regra dos 5 anteriores. "Midnight Eclipse" já veio
+  // com 3 paradas de verdade, usada como está.
+  { id: "peachBlossom", css: "linear-gradient(135deg, #ffecd2, #fdd9b8, #fcb69f)" },
+  { id: "luxeCashmere", css: "linear-gradient(135deg, #e3d5ca, #dcc7b8, #d5bdaf)" },
+  { id: "mentaBreeze", css: "linear-gradient(135deg, #e8f5e9, #d5ecd6, #c8e6c9)" },
+  { id: "midnightEclipse", css: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)" },
+  { id: "roseDust", css: "linear-gradient(135deg, #f3e7e9, #e6d9e8, #e3eeff)" },
 ];
 
 // Escurece uma camada de fundo com imagem/padrão rico para o texto e os cards
@@ -119,6 +152,85 @@ export const BACKGROUND_WALLPAPERS = [
     id: "darkMinimal",
     label: "Minimalista Escuro",
     css: withOverlay("radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06) 0%, transparent 60%), linear-gradient(160deg, #111113, #000000)"),
+  },
+  // +5 pedidos depois, seguindo a mesma regra do comentário no topo do
+  // array: aproximação em CSS (gradiente/padrão), nunca foto de estoque real -
+  // "mármore" e "luz entre folhas" aqui são radial-gradient simulando veio e
+  // luz, não uma imagem baixada de algum banco de fotos.
+  {
+    id: "silkWaves",
+    label: "Seda Orgânica",
+    css: withOverlay(
+      "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.5) 0%, transparent 55%), radial-gradient(circle at 75% 65%, rgba(244,234,230,0.6) 0%, transparent 60%), linear-gradient(135deg, #fdf6f3, #f4eae6 50%, #eadfe0)"
+    ),
+  },
+  {
+    id: "marbleGold",
+    label: "Mármore Gold",
+    css: withOverlay(
+      "repeating-linear-gradient(115deg, rgba(212,175,55,0.18) 0 2px, transparent 2px 90px), repeating-linear-gradient(25deg, rgba(212,175,55,0.10) 0 1px, transparent 1px 140px), linear-gradient(160deg, #ffffff, #f3efe9 55%, #e8e2d8)"
+    ),
+  },
+  {
+    id: "botanicalLight",
+    label: "Luz Botânica",
+    css: withOverlay(
+      "radial-gradient(circle at 25% 20%, rgba(255,251,235,0.55) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(226,239,203,0.5) 0%, transparent 45%), linear-gradient(160deg, #f1efe7, #dce5c8 60%, #a8b896)"
+    ),
+  },
+  {
+    id: "frostedGlass",
+    label: "Vidro Jateado",
+    css: withOverlay(
+      "radial-gradient(circle at 30% 30%, #d9e4f5 0%, transparent 55%), radial-gradient(circle at 70% 70%, #f5e6f0 0%, transparent 55%), radial-gradient(circle at 50% 50%, #edeff3 0%, transparent 70%), linear-gradient(135deg, #f7f8fa, #e9ecf1)"
+    ),
+  },
+  {
+    id: "darkSpaLounge",
+    label: "Dark Spa Lounge",
+    css: withOverlay(
+      "radial-gradient(circle at 20% 80%, rgba(180,83,9,0.28) 0%, transparent 50%), radial-gradient(circle at 75% 25%, rgba(124,45,18,0.22) 0%, transparent 55%), linear-gradient(160deg, #241611, #140c09 70%, #000000)"
+    ),
+  },
+  // +5, segundo pacote - mesma regra do topo do arquivo (CSS puro, nunca
+  // foto de banco de imagens). "Luz Neon Pastel" usa cor mais saturada que
+  // "Vidro Jateado" (pacote anterior) de propósito, pra não sair uma cópia
+  // do mesmo efeito com nome diferente - um é vidro fosco/dessaturado, o
+  // outro é luz de estúdio com mais presença de cor.
+  {
+    id: "softConcrete",
+    label: "Concreto Minimalista",
+    css: withOverlay(
+      "repeating-linear-gradient(90deg, rgba(0,0,0,0.025) 0 1px, transparent 1px 60px), repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 60px), linear-gradient(150deg, #e8e8e6, #d6d6d3 55%, #c4c4c0)"
+    ),
+  },
+  {
+    id: "whiteQuartzite",
+    label: "Quartzito Branco",
+    css: withOverlay(
+      "repeating-linear-gradient(100deg, rgba(150,160,170,0.14) 0 1px, transparent 1px 110px), repeating-linear-gradient(10deg, rgba(150,160,170,0.10) 0 1px, transparent 1px 160px), linear-gradient(160deg, #ffffff, #f2f4f5 55%, #e4e8ea)"
+    ),
+  },
+  {
+    id: "softDunes",
+    label: "Dunas Suaves",
+    css: withOverlay(
+      "radial-gradient(circle at 30% 85%, rgba(255,255,255,0.18) 0%, transparent 45%), linear-gradient(180deg, #f9c98d 0%, #f2a878 35%, #d97b56 65%, #93493f 100%)"
+    ),
+  },
+  {
+    id: "pastelNeonLight",
+    label: "Luz Neon Pastel",
+    css: withOverlay(
+      "radial-gradient(circle at 20% 30%, #ff9ecf 0%, transparent 50%), radial-gradient(circle at 80% 70%, #7ec8ff 0%, transparent 50%), radial-gradient(circle at 50% 50%, #ffffff 0%, transparent 65%), linear-gradient(135deg, #fbe0f0, #e0f0ff)"
+    ),
+  },
+  {
+    id: "lightOak",
+    label: "Madeira Clara",
+    css: withOverlay(
+      "repeating-linear-gradient(90deg, rgba(140,105,70,0.12) 0 2px, transparent 2px 34px, rgba(140,105,70,0.06) 34px 36px, transparent 36px 68px), linear-gradient(180deg, #e8d3b3, #dcbf99)"
+    ),
   },
 ];
 

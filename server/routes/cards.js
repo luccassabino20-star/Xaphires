@@ -15,7 +15,89 @@ router.param("id", requireBoardAccessParam(repo.getBoardIdForCard));
 router.patch(
   "/:id",
   ah(async (req, res) => {
-    await repo.updateCard(req.params.id, req.body || {});
+    await repo.updateCard(req.params.id, req.body || {}, req.user.id);
+    res.json({ ok: true });
+  })
+);
+
+// Dedicado à descrição: diferente do PATCH genérico acima (otimista, grava no
+// blur), este só existe porque o botão Salvar do editor no modal precisa da
+// confirmação do servidor antes de aplicar a mudança no estado local (ver
+// commitDescription em CardModal.jsx) - e é o único ponto que gera a entrada
+// DESCRIPTION_CHANGED no feed.
+router.patch(
+  "/:id/description",
+  ah(async (req, res) => {
+    const { description } = req.body || {};
+    if (typeof description !== "string") {
+      return res.status(400).json({ error: "Descrição inválida", code: "INVALID_DESCRIPTION" });
+    }
+    await repo.updateCardDescription(req.params.id, description, req.user.id);
+    res.json({ ok: true });
+  })
+);
+
+router.get(
+  "/:id/activities",
+  ah(async (req, res) => {
+    res.json({ activities: await repo.getCardActivities(req.params.id) });
+  })
+);
+
+router.post(
+  "/:id/comments",
+  ah(async (req, res) => {
+    const text = (req.body?.text || "").trim();
+    if (!text) return res.status(400).json({ error: "Comentário vazio", code: "COMMENT_TEXT_REQUIRED" });
+    const activity = await repo.addCardComment(req.params.id, req.user.id, text);
+    res.status(201).json({ activity });
+  })
+);
+
+// Achar o comentário e conferir que é mesmo um comentário deste cartão vale
+// tanto pro PATCH quanto pro DELETE abaixo - id de atividade de outro cartão
+// (ou de um action_type que não é comentário) não pode ser editado/excluído
+// por aqui, mesmo que a pessoa tenha acesso de escrita ao cartão errado.
+async function acharComentario(req, res) {
+  const activity = await repo.getCardActivityById(req.params.activityId);
+  if (!activity || activity.cardId !== req.params.id || activity.actionType !== "COMMENT_ADDED") {
+    res.status(404).json({ error: "Comentário não encontrado", code: "COMMENT_NOT_FOUND" });
+    return null;
+  }
+  return activity;
+}
+
+// Só o autor edita - diferente da exclusão (abaixo), abrir exceção pra dono do
+// quadro/master aqui deixaria alguém reescrever palavras atribuídas a outra
+// pessoa, que é bem mais grave que só apagar.
+router.patch(
+  "/:id/comments/:activityId",
+  ah(async (req, res) => {
+    const activity = await acharComentario(req, res);
+    if (!activity) return;
+    if (activity.userId !== req.user.id) {
+      return res.status(403).json({ error: "Só quem escreveu pode editar o comentário", code: "FORBIDDEN_NOT_COMMENT_AUTHOR" });
+    }
+    const text = (req.body?.text || "").trim();
+    if (!text) return res.status(400).json({ error: "Comentário vazio", code: "COMMENT_TEXT_REQUIRED" });
+    const atualizado = await repo.updateCardComment(req.params.activityId, text);
+    res.json({ activity: atualizado });
+  })
+);
+
+router.delete(
+  "/:id/comments/:activityId",
+  ah(async (req, res) => {
+    const activity = await acharComentario(req, res);
+    if (!activity) return;
+    // Mesma exceção do DELETE /api/cards/:id: dono do quadro (privado) ou
+    // master da empresa modera comentário alheio; apagar não reescreve a
+    // palavra de ninguém, só remove.
+    const podeExcluir = activity.userId === req.user.id || req.boardRole === "owner" || req.user.role === "master";
+    if (!podeExcluir) {
+      return res.status(403).json({ error: "Só quem escreveu (ou o dono do quadro) pode excluir o comentário", code: "FORBIDDEN_NOT_COMMENT_AUTHOR" });
+    }
+    await repo.deleteCardComment(req.params.activityId);
     res.json({ ok: true });
   })
 );
