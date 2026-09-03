@@ -3891,17 +3891,6 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   color: var(--text-secondary);
 }
 
-.landing-benefits {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 24px 64px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 28px;
-}
-.landing-benefit-item h3 { font-size: 16px; font-weight: 700; margin: 0 0 8px; }
-.landing-benefit-item p { font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
-
 .landing-explore {
   max-width: 1080px;
   margin: 0 auto;

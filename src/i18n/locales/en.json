@@ -1035,11 +1035,6 @@
         { "label": "Sync", "value": "100%", "desc": "Real time across the whole team, on any device." },
         { "label": "Availability", "value": "24/7", "desc": "Board access from anywhere, any time." }
       ],
-      "benefits": [
-        { "title": "Everything in one place", "text": "Replace loose spreadsheets, WhatsApp groups and scattered tools with a single system." },
-        { "title": "Your team already gets it", "text": "Simple interface, no training needed. Anyone who's used a Kanban board starts using it in minutes." },
-        { "title": "Grows with you", "text": "From a small team to multiple departments, with private and shared boards, access control and roles." }
-      ],
       "exploreTitle": "Explore Xaphires",
       "exploreLinks": [
         { "page": "solutions", "badge": "S", "title": "Solutions", "text": "Sales & CRM, Finance and other pillars ready for your business, all in one place." },
@@ -1232,10 +1227,12 @@
       "modules": {
         "quadro": "Kanban Board",
         "vendas": "Sales & CRM",
-        "financeiro": "ERP & Finance",
+        "financeiro": "ERP IRES",
+        "finance-bpo": "Finance & BPO",
         "saude": "Health & Clinics",
-        "automacoes": "Automations",
-        "relatorios": "Reports"
+        "xaphires-beauty": "Xaphires Beauty",
+        "time-tracking": "Time & Tracking",
+        "automacoes": "Automations & Email"
       },
       "windowTitle": "Xaphires — {{module}}"
     },

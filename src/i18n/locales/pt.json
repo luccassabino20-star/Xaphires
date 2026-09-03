@@ -1058,20 +1058,6 @@
           "desc": "Acesso ao quadro de qualquer lugar, a qualquer hora."
         }
       ],
-      "benefits": [
-        {
-          "title": "Tudo num só lugar",
-          "text": "Substitua planilhas soltas, grupos de WhatsApp e ferramentas espalhadas por um único sistema."
-        },
-        {
-          "title": "Sua equipe já entende",
-          "text": "Interface simples, sem curso ou treinamento. Quem já usou um quadro Kanban começa a usar em minutos."
-        },
-        {
-          "title": "Cresce com você",
-          "text": "De um time pequeno a várias áreas com quadros privados e compartilhados, controle de acessos e papéis."
-        }
-      ],
       "exploreTitle": "Explore o Xaphires",
       "exploreLinks": [
         {
@@ -1369,10 +1355,12 @@
       "modules": {
         "quadro": "Quadro Kanban",
         "vendas": "Vendas & CRM",
-        "financeiro": "ERP & Financeiro",
+        "financeiro": "ERP IRES",
+        "finance-bpo": "Financeiro & BPO",
         "saude": "Saúde & Clínicas",
-        "automacoes": "Automações",
-        "relatorios": "Relatórios"
+        "xaphires-beauty": "Xaphires Beauty",
+        "time-tracking": "Time & Tracking",
+        "automacoes": "Automações & E-mail"
       },
       "windowTitle": "Xaphires — {{module}}"
     },

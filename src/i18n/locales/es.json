@@ -1035,11 +1035,6 @@
         { "label": "Sincronización", "value": "100%", "desc": "En tiempo real entre todo el equipo, en cualquier dispositivo." },
         { "label": "Disponibilidad", "value": "24/7", "desc": "Acceso al tablero desde cualquier lugar, a cualquier hora." }
       ],
-      "benefits": [
-        { "title": "Todo en un solo lugar", "text": "Reemplaza hojas de cálculo sueltas, grupos de WhatsApp y herramientas dispersas por un único sistema." },
-        { "title": "Tu equipo ya lo entiende", "text": "Interfaz simple, sin necesidad de capacitación. Quien ya usó un tablero Kanban empieza a usarlo en minutos." },
-        { "title": "Crece contigo", "text": "De un equipo pequeño a varias áreas, con tableros privados y compartidos, control de accesos y roles." }
-      ],
       "exploreTitle": "Explora Xaphires",
       "exploreLinks": [
         { "page": "solutions", "badge": "S", "title": "Soluciones", "text": "Ventas & CRM, Finanzas y otros pilares listos para tu empresa, en un solo lugar." },
@@ -1232,10 +1227,12 @@
       "modules": {
         "quadro": "Tablero Kanban",
         "vendas": "Ventas & CRM",
-        "financeiro": "ERP y Financiero",
+        "financeiro": "ERP IRES",
+        "finance-bpo": "Finanzas & BPO",
         "saude": "Salud & Clínicas",
-        "automacoes": "Automatizaciones",
-        "relatorios": "Informes"
+        "xaphires-beauty": "Xaphires Beauty",
+        "time-tracking": "Time & Tracking",
+        "automacoes": "Automatizaciones & Email"
       },
       "windowTitle": "Xaphires — {{module}}"
     },

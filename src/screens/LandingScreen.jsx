@@ -275,10 +275,8 @@ function StatCard({ value, label, desc }) {
 function HomePage({ onEnter, onNavigate }) {
   const { t } = useTranslation();
   const stats = t("landing.home.stats", { returnObjects: true });
-  const benefits = t("landing.home.benefits", { returnObjects: true });
   const exploreLinks = t("landing.home.exploreLinks", { returnObjects: true });
   const revealRef = useReveal();
-  const benefitsRef = useFlashlight();
   const exploreRef = useFlashlight();
 
   return (
@@ -331,20 +329,6 @@ function HomePage({ onEnter, onNavigate }) {
       <Testimonials />
 
       <PricingPreview onEnter={onEnter} onNavigate={onNavigate} />
-
-      <section className="landing-benefits" ref={benefitsRef}>
-        {benefits.map((b, i) => (
-          <div
-            className="landing-benefit-item landing-flash landing-reveal"
-            style={{ transitionDelay: `${i * 80}ms` }}
-            key={b.title}
-          >
-            <div className="landing-flash-border" />
-            <h3>{b.title}</h3>
-            <p>{b.text}</p>
-          </div>
-        ))}
-      </section>
 
       <section className="landing-explore">
         <h2 className="landing-reveal">{t("landing.home.exploreTitle")}</h2>

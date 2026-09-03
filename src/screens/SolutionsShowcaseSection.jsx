@@ -5,11 +5,13 @@ import ModuleIcon from "../modules/ModuleIcon.jsx";
 // Substitui o antigo carrossel (SystemShowcaseCarousel.jsx, arrows/dots/
 // autoplay): agora é a pessoa quem escolhe o módulo pelas pílulas da coluna
 // esquerda, e a "janela" da direita troca de conteúdo na hora - sem
-// temporizador, sem seta. "Automações" e "Relatórios" não são módulos reais
-// do Xaphires hoje (Relatórios & BI é uma aba dentro do ERP IRES, ver
-// FinanceiroModule.jsx; Automações é a feature de rotinas dentro de um
-// quadro) - viraram pílulas mesmo assim porque são o vocabulário de vendas
-// pedido; o conteúdo de cada tela é ilustrativo, igual o resto deste mockup.
+// temporizador, sem seta. As 8 pílulas cobrem os pilares reais do Xaphires
+// (mesmos ids de registry.js, ver MODULE_META) mais "Automações", que não é
+// módulo próprio (é a feature de rotinas dentro de um quadro/ERP) - vira
+// pílula mesmo assim porque é vocabulário de vendas pedido. O conteúdo de
+// cada tela é ilustrativo, igual o resto deste mockup - "financeiro" (ERP
+// IRES) e "finance-bpo" (Xaphires Finance & BPO) são dois módulos distintos
+// de propósito, mesma dualidade que já existe no launcher (ver registry.js).
 const MODULES = [
   {
     key: "quadro",
@@ -51,6 +53,17 @@ const MODULES = [
     ],
   },
   {
+    key: "finance-bpo",
+    icon: "bi",
+    tabs: ["Painel", "DRE por obra", "Conciliação"],
+    body: "chart",
+    kpis: [
+      { label: "Saldo em contas", accent: "success" },
+      { label: "A conciliar", accent: "amber" },
+    ],
+    bars: [38, 72, 54, 90, 65, 48],
+  },
+  {
     key: "saude",
     icon: "saude",
     tabs: ["Agenda", "Pacientes", "Prontuário"],
@@ -63,22 +76,39 @@ const MODULES = [
     ],
   },
   {
-    key: "automacoes",
-    icon: "automacoes",
-    tabs: ["Rotinas", "Gatilhos", "Histórico"],
-    body: "automation",
-    rows: [{ on: true }, { on: true }, { on: false }, { on: true }],
+    key: "xaphires-beauty",
+    icon: "beauty",
+    tabs: ["Agenda", "Clientes", "Financeiro"],
+    body: "agenda",
+    rows: [
+      { time: "09:30", accent: "sky" },
+      { time: "11:00", accent: "success" },
+      { time: "14:00", accent: "amber" },
+      { time: "16:30", accent: "sky" },
+    ],
   },
   {
-    key: "relatorios",
-    icon: "bi",
-    tabs: ["Dashboards", "Indicadores", "Exportar"],
-    body: "chart",
-    kpis: [
-      { label: "Receita", accent: "success" },
-      { label: "Ticket médio", accent: "sky" },
+    key: "time-tracking",
+    icon: "tempo",
+    tabs: ["Registros", "Equipe", "Relatórios"],
+    body: "table",
+    stats: [
+      { label: "Horas hoje", accent: "sky" },
+      { label: "Horas na semana", accent: "success" },
+      { label: "Produtividade", accent: "amber" },
     ],
-    bars: [38, 72, 54, 90, 65, 48],
+    rows: [
+      { accent: "success", wide: true },
+      { accent: "sky", wide: false },
+      { accent: "success", wide: true },
+    ],
+  },
+  {
+    key: "automacoes",
+    icon: "automacoes",
+    tabs: ["Rotinas", "Gatilhos", "E-mail"],
+    body: "automation",
+    rows: [{ on: true }, { on: true }, { on: false }, { on: true }],
   },
 ];
 

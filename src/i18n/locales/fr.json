@@ -744,20 +744,6 @@
           "desc": "Accès au tableau depuis n'importe où, à tout moment."
         }
       ],
-      "benefits": [
-        {
-          "title": "Tout en un seul endroit",
-          "text": "Remplacez les feuilles de calcul éparses, les groupes WhatsApp et les outils dispersés par un système unique."
-        },
-        {
-          "title": "Votre équipe comprend déjà",
-          "text": "Interface simple, sans cours ni formation. Quiconque a déjà utilisé un tableau Kanban commence à s'en servir en quelques minutes."
-        },
-        {
-          "title": "Grandit avec vous",
-          "text": "D'une petite équipe à plusieurs services avec des tableaux privés et partagés, contrôle des accès et des rôles."
-        }
-      ],
       "exploreTitle": "Découvrez Xaphires",
       "exploreLinks": [
         {
@@ -1045,10 +1031,12 @@
       "modules": {
         "quadro": "Tableau Kanban",
         "vendas": "Ventes & CRM",
-        "financeiro": "ERP & Finance",
+        "financeiro": "ERP IRES",
+        "finance-bpo": "Finance & BPO",
         "saude": "Santé & Cliniques",
-        "automacoes": "Automatisations",
-        "relatorios": "Rapports"
+        "xaphires-beauty": "Xaphires Beauty",
+        "time-tracking": "Time & Tracking",
+        "automacoes": "Automatisations & E-mail"
       },
       "windowTitle": "Xaphires — {{module}}"
     },
