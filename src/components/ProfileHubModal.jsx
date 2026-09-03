@@ -34,7 +34,7 @@ function hojeCivil() {
 // quem é dono dela.
 export default function ProfileHubModal({ onClose }) {
   const { t } = useTranslation();
-  const { user, applyProfileUpdate } = useAuth();
+  const { user, applyProfileUpdate, logout } = useAuth();
   const { refresh: refreshUsers } = useUsers();
   const boardState = useBoardState();
   const showToast = useToast();
@@ -201,6 +201,13 @@ export default function ProfileHubModal({ onClose }) {
             <p className="profile-hub-muted" style={{ margin: 0 }}>{user.email}</p>
             <span className="profile-hub-role-badge">{roleLabel}</span>
           </div>
+          {/* Único ponto de logout que o Hub (ModuleLauncher) enxerga - lá o item
+              "Perfil" da sidebar abre este modal direto, sem o dropdown que
+              AccountMenu.jsx tem nos outros módulos. Reaparece redundante ali
+              (o dropdown já tem "Sair"), mas é o único caminho no Hub. */}
+          <button type="button" className="btn-danger profile-hub-logout" onClick={logout}>
+            {t("app.accountMenu.logout")}
+          </button>
         </div>
 
         <div className="profile-hub-tabs">

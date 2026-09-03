@@ -4535,6 +4535,7 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
    sobre isso). .beauty-tab/.beauty-section-title etc. não servem aqui por
    esse motivo - classes próprias abaixo. */
 .profile-hub-head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
+.profile-hub-logout { margin-left: auto; flex-shrink: 0; }
 .profile-hub-avatar { position: relative; flex-shrink: 0; }
 .profile-hub-online-dot {
   position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px;
