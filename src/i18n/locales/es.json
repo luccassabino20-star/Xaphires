@@ -1031,7 +1031,7 @@
         ] }
       ] },
       "stats": [
-        { "label": "Funciones", "value": "13", "desc": "Herramientas de gestión integradas en un solo lugar, sin cambiar de sistema." },
+        { "label": "Funciones", "value": "13", "desc": "Soluciones y módulos de gestión integrados en un solo lugar." },
         { "label": "Sincronización", "value": "100%", "desc": "En tiempo real entre todo el equipo, en cualquier dispositivo." },
         { "label": "Disponibilidad", "value": "24/7", "desc": "Acceso al tablero desde cualquier lugar, a cualquier hora." }
       ],
@@ -1241,7 +1241,7 @@
     },
     "logos": {
       "label": "Todo esto en un solo lugar",
-      "items": ["Tablero Kanban", "Tabla", "Calendario", "Línea de tiempo", "Panel", "Mapa", "Matriz Eisenhower", "Archivado automático", "Monitor de atascos", "Rutinas automáticas", "Letrero de tareas", "Adjuntos y enlaces"]
+      "items": ["Tablero Kanban", "Ventas & CRM", "Xaphires Finance & BPO", "ERP IRES", "Salud & Clínicas", "Xaphires Beauty", "Time & Tracking", "BPO Financiero Interactivo", "Automatizaciones Inteligentes", "Obras & Proyecciones"]
     },
     "testimonials": {
       "title": "Lo que dicen los equipos",

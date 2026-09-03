@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
 import ModuleIcon from "../modules/ModuleIcon.jsx";
+import { MODULE_META } from "../modules/registry.js";
 import SolutionsShowcaseSection from "./SolutionsShowcaseSection.jsx";
 import { WHATSAPP_VENDAS_URL } from "../utils/contact.js";
 import xaphiresLogo from "../assets/xaphires-logo.png";
@@ -317,7 +318,12 @@ function HomePage({ onEnter, onNavigate }) {
       <section className="landing-stats">
         {stats.map((s, i) => (
           <div className="landing-reveal" style={{ transitionDelay: `${i * 80}ms` }} key={s.label}>
-            <StatCard value={s.value} label={s.label} desc={s.desc} />
+            {/* O primeiro card ("Recursos"/"Features"...) é sempre o total de
+                pilares da plataforma - MODULE_META é o registro único desses
+                pilares (ver registry.js), então o valor vem de lá em vez do
+                número fixo gravado no locale, que ficaria desatualizado a
+                cada módulo novo. */}
+            <StatCard value={i === 0 ? String(Object.keys(MODULE_META).length) : s.value} label={s.label} desc={s.desc} />
           </div>
         ))}
       </section>

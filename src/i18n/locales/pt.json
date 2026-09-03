@@ -1045,7 +1045,7 @@
         {
           "label": "Recursos",
           "value": "13",
-          "desc": "Ferramentas de gestão integradas num só lugar, sem trocar de sistema."
+          "desc": "Soluções e módulos de gestão integrados num só lugar."
         },
         {
           "label": "Sincronização",
@@ -1380,17 +1380,15 @@
       "label": "Tudo isso num só lugar",
       "items": [
         "Quadro Kanban",
-        "Tabela",
-        "Calendário",
-        "Linha do tempo",
-        "Painel",
-        "Mapa",
-        "Matriz Eisenhower",
-        "Arquivamento automático",
-        "Monitor de gargalos",
-        "Rotinas automáticas",
-        "Letreiro de tarefas",
-        "Anexos e links"
+        "Vendas & CRM",
+        "Xaphires Finance & BPO",
+        "ERP IRES",
+        "Saúde & Clínicas",
+        "Xaphires Beauty",
+        "Time & Tracking",
+        "BPO Financeiro Interativo",
+        "Automações Inteligentes",
+        "Gestão de Obras & Projeções"
       ]
     },
     "testimonials": {

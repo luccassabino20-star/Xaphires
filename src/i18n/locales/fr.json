@@ -731,7 +731,7 @@
         {
           "label": "Fonctionnalités",
           "value": "13",
-          "desc": "Des outils de gestion intégrés en un seul endroit, sans changer de système."
+          "desc": "Solutions et modules de gestion intégrés en un seul endroit."
         },
         {
           "label": "Synchronisation",
@@ -1056,17 +1056,15 @@
       "label": "Tout ça en un seul endroit",
       "items": [
         "Tableau Kanban",
-        "Tableur",
-        "Calendrier",
-        "Chronologie",
-        "Tableau de bord",
-        "Carte",
-        "Matrice d'Eisenhower",
-        "Archivage automatique",
-        "Moniteur de goulots d'étranglement",
-        "Routines automatiques",
-        "Bandeau de tâches",
-        "Pièces jointes et liens"
+        "Ventes & CRM",
+        "Xaphires Finance & BPO",
+        "ERP IRES",
+        "Santé & Cliniques",
+        "Xaphires Beauty",
+        "Time & Tracking",
+        "BPO Financier Interactif",
+        "Automatisations Intelligentes",
+        "Chantiers & Projections"
       ]
     },
     "testimonials": {

@@ -717,7 +717,7 @@
         ] }
       ] },
       "stats": [
-        { "label": "Funktionen", "value": "13", "desc": "Integrierte Managementtools an einem Ort, ohne Systemwechsel." },
+        { "label": "Funktionen", "value": "13", "desc": "Lösungen und Verwaltungsmodule an einem Ort integriert." },
         { "label": "Synchronisierung", "value": "100%", "desc": "In Echtzeit im gesamten Team, auf jedem Gerät." },
         { "label": "Verfügbarkeit", "value": "24/7", "desc": "Zugriff auf das Board von überall, jederzeit." }
       ],
@@ -835,7 +835,7 @@
     },
     "logos": {
       "label": "Alles an einem Ort",
-      "items": ["Kanban-Board", "Tabelle", "Kalender", "Zeitachse", "Dashboard", "Karte", "Eisenhower-Matrix", "Automatische Archivierung", "Engpass-Monitor", "Automatische Routinen", "Aufgaben-Ticker", "Anhänge und Links"]
+      "items": ["Kanban-Board", "Vertrieb & CRM", "Xaphires Finance & BPO", "ERP IRES", "Gesundheit & Kliniken", "Xaphires Beauty", "Time & Tracking", "Interaktives Finanz-BPO", "Intelligente Automatisierungen", "Bauprojekte & Prognosen"]
     },
     "testimonials": {
       "title": "Was Teams sagen",

@@ -1031,7 +1031,7 @@
         ] }
       ] },
       "stats": [
-        { "label": "Features", "value": "13", "desc": "Management tools integrated in one place, no switching systems." },
+        { "label": "Features", "value": "13", "desc": "Solutions and management modules integrated in one place." },
         { "label": "Sync", "value": "100%", "desc": "Real time across the whole team, on any device." },
         { "label": "Availability", "value": "24/7", "desc": "Board access from anywhere, any time." }
       ],
@@ -1241,7 +1241,7 @@
     },
     "logos": {
       "label": "All of it in one place",
-      "items": ["Kanban board", "Table", "Calendar", "Timeline", "Dashboard", "Map", "Eisenhower matrix", "Auto-archiving", "Bottleneck monitor", "Automatic routines", "Task ticker", "Attachments and links"]
+      "items": ["Kanban Board", "Sales & CRM", "Xaphires Finance & BPO", "ERP IRES", "Health & Clinics", "Xaphires Beauty", "Time & Tracking", "Interactive Financial BPO", "Smart Automations", "Construction & Forecasts"]
     },
     "testimonials": {
       "title": "What teams are saying",
