@@ -4043,11 +4043,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .landing-feature-card h3 { font-size: 15px; font-weight: 700; margin: 0 0 6px; }
 .landing-feature-card p { font-size: 13.5px; line-height: 1.55; color: var(--text-secondary); margin: 0; }
 
-/* 1200px para caber os 4 planos numa linha só. Com os 1080px anteriores, o
-   auto-fit de minmax(260px) só acomodava 3 colunas e o quarto card caía sozinho
-   numa segunda linha. */
+/* 1500px para caber os 5 planos (Free/Starter/Growth/Full Suite/Enterprise)
+   numa linha só. Com os 1200px de quando eram 4 planos, o auto-fit de
+   minmax(230px) só acomodava 4 colunas e o quinto card caía sozinho numa
+   segunda linha, esticado por conta própria (mesma armadilha documentada
+   aqui desde a época dos 4 - o número mudou, o cálculo é o mesmo). */
 .landing-pricing {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 0 24px 72px;
 }
@@ -4125,7 +4127,9 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
    preços, só compacto (sem tagline nem lista de recursos) - full-card fica reservado
    pra landing.pricing de verdade, aqui é só o gancho pra "ver todos os planos". */
 .landing-pricing-preview {
-  max-width: 1200px;
+  /* 1300px pelo mesmo motivo do container cheio acima: 1200px só acomodava 4
+     dos 5 planos numa linha, o quinto (Enterprise) caía sozinho e estreito. */
+  max-width: 1300px;
   margin: 0 auto;
   padding: 0 24px 72px;
   text-align: center;
