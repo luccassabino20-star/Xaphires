@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import * as api from "../state/api.js";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import { localeTag } from "../i18n/locale.js";
 import { weekdayNames, monthNames, toISODate, buildGrid } from "../utils/calendarGrid.js";
+import { HORA_INICIO, PASSO_MIN, TOTAL_SLOTS, SLOT_ALTURA, minutosParaHora, slotDoHorario, weekDays } from "../utils/timeGrid.js";
 import DatePicker from "./DatePicker.jsx";
 import PersonalTaskDetailModal from "./PersonalTaskDetailModal.jsx";
+import PlannerWeekGrid from "./PlannerWeekGrid.jsx";
+import PlannerSidebar from "./PlannerSidebar.jsx";
 
 function CalendarBadgeIcon() {
   return (
@@ -53,6 +56,27 @@ function EmptyPlannerIcon() {
     </svg>
   );
 }
+function ChevronLeftIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15">
+      <path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
+    </svg>
+  );
+}
+function ChevronRightIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15">
+      <path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" />
+    </svg>
+  );
+}
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="13" height="13">
+      <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
 
 function formatDue(iso, lng) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -65,11 +89,19 @@ function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+const TABS = ["week", "month", "list"];
+
 // Agenda pessoal: tarefas fora de qualquer quadro, só de quem está logado (ver
-// personal_tasks no servidor). Duas abas sobre o mesmo dado - Planejador abre
-// aqui na aba Calendário, Minhas tarefas abre na aba de lista - porque são a
-// mesma coisa vista de dois jeitos, não duas telas com fonte própria.
-export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
+// personal_tasks no servidor). Três abas sobre o mesmo dado - Semana (grade
+// por horário, a visão principal), Mês (calendário) e Lista - porque são a
+// mesma coisa vista de três jeitos, não telas com fonte própria cada.
+export default function PersonalPlanner({ onClose, initialTab = "week" }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const WEEKDAYS = useMemo(() => weekdayNames(i18n.language), [i18n.language]);
@@ -83,12 +115,24 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+  const [weekAnchor, setWeekAnchor] = useState(() => new Date());
   const [addingDate, setAddingDate] = useState(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newDue, setNewDue] = useState(() => toISODate(new Date()));
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [dragPreview, setDragPreview] = useState(null); // {taskId, iso, slot, duracaoSlots, title}
+  // Foco automático do campo de título ao trocar para a aba de lista pelo
+  // botão "+ Nova tarefa" do topo - só nesse caminho (não quando a pessoa
+  // clica na aba "Minhas tarefas" na mão, o que roubaria o foco sem pedir).
+  const [focusAddOnList, setFocusAddOnList] = useState(false);
+  const newTitleInputRef = useRef(null);
+  // Distingue clique de arraste no fim do gesto de pointer (mesma técnica de
+  // AgendaView.jsx: um pointerup sem movimento real ainda dispara onClick no
+  // elemento, e sem essa flag abriria o editor bem na hora em que a pessoa só
+  // queria mover o bloco).
+  const arrastouRef = useRef(false);
 
   useEffect(() => {
     api
@@ -142,14 +186,34 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
 
   function goToday() {
     const now = new Date();
-    setMonthDate(new Date(now.getFullYear(), now.getMonth(), 1));
+    if (tab === "week") setWeekAnchor(now);
+    else setMonthDate(new Date(now.getFullYear(), now.getMonth(), 1));
   }
   function goPrev() {
-    setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
+    if (tab === "week") setWeekAnchor((d) => addDays(d, -7));
+    else setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
   }
   function goNext() {
-    setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
+    if (tab === "week") setWeekAnchor((d) => addDays(d, 7));
+    else setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
   }
+  function handleQuickCreate() {
+    setFocusAddOnList(true);
+    setTab("list");
+  }
+  function handleToolbarAdd() {
+    if (tab === "week") createAndOpen({ due: toISODate(weekAnchor), allDay: false, startTime: "09:00" });
+    else handleQuickCreate();
+  }
+  // Roda depois do commit da troca de aba (não na hora do clique) - o campo
+  // do formulário de "Minhas tarefas" só existe no DOM depois que `tab` virou
+  // "list" de verdade, então focar antes disso não acha o ref.
+  useEffect(() => {
+    if (tab === "list" && focusAddOnList) {
+      newTitleInputRef.current?.focus();
+      setFocusAddOnList(false);
+    }
+  }, [tab, focusAddOnList]);
 
   async function addTask(due, title) {
     const trimmed = title.trim();
@@ -157,6 +221,26 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
     try {
       const criada = await api.createPersonalTask({ title: trimmed, due });
       setTasks((atual) => [...atual, criada]);
+    } catch (err) {
+      showToast(translateError(err, t));
+    }
+  }
+
+  // Criação "nasce já editável": cria a tarefa com um título provisório e
+  // abre o editor na hora - mesmo espírito de Notion/Linear (clicar cria e
+  // já deixa digitar o nome de verdade), em vez de inventar um rascunho
+  // local que só vira tarefa de verdade num segundo passo.
+  async function createAndOpen(opts = {}) {
+    try {
+      const criada = await api.createPersonalTask({
+        title: t("planner.untitled"),
+        due: opts.due || todayIso,
+        priority: opts.priority,
+        allDay: opts.allDay,
+        startTime: opts.startTime,
+      });
+      setTasks((atual) => [...atual, criada]);
+      setDetailTaskId(criada.id);
     } catch (err) {
       showToast(translateError(err, t));
     }
@@ -202,7 +286,134 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
     setTasks((atual) => atual.map((x) => (x.id === atualizada.id ? atualizada : x)));
   }
 
+  // Abre o editor, exceto quando o clique é o fim de um arraste (ver
+  // arrastouRef) - passado como onOpenTask tanto pra grade semanal quanto
+  // pro painel lateral, os dois lugares de onde um arraste pode começar.
+  function openTaskIfNotDragged(id) {
+    if (arrastouRef.current) {
+      arrastouRef.current = false;
+      return;
+    }
+    setDetailTaskId(id);
+  }
+
+  async function commitTiming(taskId, patch) {
+    try {
+      const atualizada = await api.updatePersonalTask(taskId, patch);
+      setTasks((atual) => atual.map((x) => (x.id === taskId ? atualizada : x)));
+    } catch (err) {
+      showToast(translateError(err, t));
+    }
+  }
+
+  // Mover um bloco (ou agendar um item "sem horário" do painel lateral,
+  // mesmo caminho - a diferença entre os dois é só se a tarefa já tinha
+  // horário antes, o commit final é idêntico) - pointer events +
+  // elementFromPoint pra achar a coluna do dia, mesma técnica de
+  // AgendaView.jsx (iniciarArrastoAgendamento), não o draggable/onDragOver
+  // nativo do quadro Kanban (que é melhor pra listas lado a lado, não pra uma
+  // grade de pixels).
+  function startDrag(e, tsk) {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    arrastouRef.current = false;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const cardRect = e.currentTarget.getBoundingClientRect();
+    const grabOffsetY = startY - cardRect.top;
+    const duracaoMin = tsk.durationMin || 60;
+    const duracaoSlots = Math.max(1, Math.round(duracaoMin / PASSO_MIN));
+    let arrastando = false;
+
+    function onMove(ev) {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      if (!arrastando && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      arrastando = true;
+      arrastouRef.current = true;
+      document.body.style.cursor = "grabbing";
+      const alvo = document.elementFromPoint(ev.clientX, ev.clientY);
+      const dayEl = alvo && alvo.closest(".planner-week-day-body");
+      if (!dayEl) return;
+      const dayRect = dayEl.getBoundingClientRect();
+      const iso = dayEl.dataset.iso;
+      const localY = ev.clientY - dayRect.top - grabOffsetY;
+      let slot = Math.round(localY / SLOT_ALTURA);
+      slot = Math.max(0, Math.min(slot, TOTAL_SLOTS - duracaoSlots));
+      setDragPreview({ taskId: tsk.id, iso, slot, duracaoSlots, title: tsk.title });
+    }
+    function onUp() {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      document.body.style.cursor = "";
+      if (!arrastando) {
+        setDragPreview(null);
+        return;
+      }
+      setDragPreview((atual) => {
+        if (atual) {
+          commitTiming(tsk.id, {
+            due: atual.iso,
+            allDay: false,
+            startTime: minutosParaHora(HORA_INICIO + atual.slot * PASSO_MIN),
+            durationMin: atual.duracaoSlots * PASSO_MIN,
+          });
+        }
+        return null;
+      });
+    }
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  // Redimensionar (puxar a borda de baixo do bloco): só muda a duração,
+  // sempre no mesmo dia/horário de início - mesmo par
+  // iniciarRedimensionamento de AgendaView.jsx.
+  function startResize(e, tsk) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    arrastouRef.current = false;
+    const dayEl = e.currentTarget.closest(".planner-week-day-body");
+    const iso = dayEl?.dataset.iso || tsk.due;
+    const inicioSlot = slotDoHorario(tsk.startTime || "09:00");
+    const startY = e.clientY;
+    let arrastando = false;
+
+    function onMove(ev) {
+      if (!arrastando && Math.abs(ev.clientY - startY) < 4) return;
+      arrastando = true;
+      arrastouRef.current = true;
+      document.body.style.cursor = "ns-resize";
+      const dayRect = dayEl.getBoundingClientRect();
+      const localY = ev.clientY - dayRect.top;
+      let fimSlot = Math.round(localY / SLOT_ALTURA);
+      fimSlot = Math.max(inicioSlot + 1, Math.min(fimSlot, TOTAL_SLOTS));
+      setDragPreview({ taskId: tsk.id, iso, slot: inicioSlot, duracaoSlots: fimSlot - inicioSlot, title: tsk.title });
+    }
+    function onUp() {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      document.body.style.cursor = "";
+      setDragPreview((atual) => {
+        if (atual) commitTiming(tsk.id, { durationMin: atual.duracaoSlots * PASSO_MIN });
+        return null;
+      });
+    }
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
   const detailTask = tasks.find((x) => x.id === detailTaskId) || null;
+  const segIndex = TABS.indexOf(tab);
+
+  const weekDaysList = useMemo(() => weekDays(weekAnchor), [weekAnchor]);
+  const weekRangeLabel = useMemo(() => {
+    const inicio = weekDaysList[0];
+    const fim = weekDaysList[6];
+    const fmt = new Intl.DateTimeFormat(localeTag(i18n.language), { day: "2-digit", month: "short" });
+    return `${fmt.format(inicio)} – ${fmt.format(fim)}`;
+  }, [weekDaysList, i18n.language]);
 
   return (
     <div
@@ -211,28 +422,65 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="modal modal-wide">
+      <div className="modal premium-modal planner-modal">
         <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
           &times;
         </button>
-        <div className="modal-header">
-          <span className="planner-header-icon">
-            <CalendarBadgeIcon />
-          </span>
-          <div className="planner-header-text">
-            <h2 className="members-modal-title">{t("planner.title")}</h2>
-            <p className="planner-header-subtitle">{t("planner.subtitle")}</p>
+        <div className="planner-modal-header">
+          <div className="planner-modal-heading">
+            <span className="planner-header-icon">
+              <CalendarBadgeIcon />
+            </span>
+            <div className="planner-header-text">
+              <h2 className="planner-modal-title">{t("planner.title")}</h2>
+              <p className="planner-modal-subtitle">{t("planner.subtitle")}</p>
+            </div>
+          </div>
+          <div className="planner-segmented" role="tablist" style={{ "--seg-count": TABS.length }}>
+            {TABS.map((v) => (
+              <button
+                key={v}
+                type="button"
+                role="tab"
+                aria-selected={tab === v}
+                className={"planner-segment" + (tab === v ? " active" : "")}
+                onClick={() => setTab(v)}
+              >
+                {t(`planner.tab${capitalize(v)}`)}
+              </button>
+            ))}
+            <span className="planner-segment-thumb" style={{ "--seg-count": TABS.length, "--seg-index": segIndex }} aria-hidden="true" />
           </div>
         </div>
-        <nav className="planner-tabs">
-          <button type="button" className={"planner-tab" + (tab === "calendar" ? " active" : "")} onClick={() => setTab("calendar")}>
-            {t("planner.tabCalendar")}
-          </button>
-          <button type="button" className={"planner-tab" + (tab === "list" ? " active" : "")} onClick={() => setTab("list")}>
-            {t("planner.tabList")}
-          </button>
-        </nav>
-        <div className="modal-body">
+
+        {(tab === "week" || tab === "month") && (
+          <div className="planner-toolbar">
+            <div className="planner-month-nav">
+              <button type="button" className="planner-nav-arrow" onClick={goPrev} aria-label={t("views.calendar.prevMonth")}>
+                <ChevronLeftIcon />
+              </button>
+              <span className="planner-month-title">
+                {tab === "week" ? weekRangeLabel : `${capitalize(MONTH_NAMES[monthDate.getMonth()])} ${monthDate.getFullYear()}`}
+              </span>
+              <button type="button" className="planner-nav-arrow" onClick={goNext} aria-label={t("views.calendar.nextMonth")}>
+                <ChevronRightIcon />
+              </button>
+            </div>
+            <div className="planner-toolbar-actions">
+              <button type="button" className="planner-today-pill" onClick={goToday}>
+                {t("views.calendar.today")}
+              </button>
+              {canUse && (
+                <button type="button" className="planner-quickadd-btn" onClick={handleToolbarAdd}>
+                  <PlusIcon />
+                  {t("planner.add")}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className={"modal-body planner-modal-body" + (tab === "week" ? " planner-modal-body-week" : "")}>
           {loading ? (
             <p className="share-empty">{t("common.loading")}</p>
           ) : (
@@ -241,98 +489,100 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
                   quem caiu de plano continua vendo e podendo apagar o que já criou,
                   só não cria nem edita nada novo. Mesmo padrão de RecurrencesModal. */}
               {!canUse && <p className="recurrence-locked">{t("planner.planRequired")}</p>}
-              {tab === "calendar" ? (
-                <>
-                  <div className="calendar-header">
-                    <div className="calendar-title">
-                      {MONTH_NAMES[monthDate.getMonth()]} {monthDate.getFullYear()}
+              {tab === "week" && (
+                <div className="planner-week-body">
+                  <PlannerSidebar
+                    tasks={tasks}
+                    canUse={canUse}
+                    todayIso={todayIso}
+                    onOpenTask={openTaskIfNotDragged}
+                    onQuickCreate={(opts) => createAndOpen({ due: todayIso, ...opts })}
+                    onStartDrag={startDrag}
+                  />
+                  <PlannerWeekGrid
+                    weekAnchor={weekAnchor}
+                    tasks={tasks}
+                    canUse={canUse}
+                    todayIso={todayIso}
+                    dragPreview={dragPreview}
+                    onSlotClick={(iso, time) => createAndOpen({ due: iso, allDay: false, startTime: time })}
+                    onOpenTask={openTaskIfNotDragged}
+                    onStartDrag={startDrag}
+                    onStartResize={startResize}
+                  />
+                </div>
+              )}
+              {tab === "month" && (
+                <div className="calendar-grid planner-grid">
+                  {WEEKDAYS.map((w) => (
+                    <div key={w} className="calendar-weekday">
+                      {w}
                     </div>
-                    <div className="calendar-nav">
-                      <button type="button" className="btn-ghost btn-small" onClick={goToday}>
-                        {t("views.calendar.today")}
-                      </button>
-                      <button type="button" className="icon-btn" onClick={goPrev} aria-label={t("views.calendar.prevMonth")}>
-                        <svg viewBox="0 0 24 24" width="16" height="16">
-                          <path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
-                        </svg>
-                      </button>
-                      <button type="button" className="icon-btn" onClick={goNext} aria-label={t("views.calendar.nextMonth")}>
-                        <svg viewBox="0 0 24 24" width="16" height="16">
-                          <path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="calendar-grid planner-grid">
-                    {WEEKDAYS.map((w) => (
-                      <div key={w} className="calendar-weekday">
-                        {w}
-                      </div>
-                    ))}
-                    {grid.map(({ date, inMonth }) => {
-                      const iso = toISODate(date);
-                      const dayTasks = tasksByDate[iso] || [];
-                      const isToday = iso === todayIso;
-                      return (
-                        <div key={iso} className={"calendar-cell" + (inMonth ? "" : " outside") + (isToday ? " today" : "")}>
-                          <div className="calendar-day-num-row">
-                            <span className="calendar-day-num">{date.getDate()}</span>
-                            {canUse && (
-                              <button
-                                type="button"
-                                className="planner-day-add"
-                                aria-label={t("planner.add")}
-                                onClick={() => {
-                                  setAddingDate(iso);
-                                  setDraftTitle("");
-                                }}
-                              >
-                                +
-                              </button>
-                            )}
-                          </div>
-                          <div className="calendar-day-cards">
-                            {dayTasks.map((tsk) => (
-                              <button
-                                key={tsk.id}
-                                className={"calendar-card-chip" + (tsk.completed ? " completed" : "")}
-                                onClick={() => toggleTask(tsk)}
-                                disabled={!canUse}
-                                title={tsk.title}
-                              >
-                                {tsk.title}
-                              </button>
-                            ))}
-                          </div>
-                          {addingDate === iso && (
-                            <form className="planner-inline-add" onSubmit={(e) => e.preventDefault()}>
-                              <input
-                                autoFocus
-                                value={draftTitle}
-                                onChange={(e) => setDraftTitle(e.target.value)}
-                                onBlur={() => handleQuickAdd(iso)}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") {
-                                    e.preventDefault();
-                                    handleQuickAdd(iso);
-                                  }
-                                  if (e.key === "Escape") setAddingDate(null);
-                                }}
-                                placeholder={t("planner.addPlaceholder")}
-                              />
-                            </form>
+                  ))}
+                  {grid.map(({ date, inMonth }) => {
+                    const iso = toISODate(date);
+                    const dayTasks = tasksByDate[iso] || [];
+                    const isToday = iso === todayIso;
+                    return (
+                      <div key={iso} className={"calendar-cell" + (inMonth ? "" : " outside") + (isToday ? " today" : "")}>
+                        <div className="calendar-day-num-row">
+                          <span className="calendar-day-num">{date.getDate()}</span>
+                          {canUse && (
+                            <button
+                              type="button"
+                              className="planner-day-add"
+                              aria-label={t("planner.add")}
+                              onClick={() => {
+                                setAddingDate(iso);
+                                setDraftTitle("");
+                              }}
+                            >
+                              +
+                            </button>
                           )}
                         </div>
-                      );
-                    })}
-                  </div>
-                </>
-              ) : (
+                        <div className="calendar-day-cards">
+                          {dayTasks.map((tsk) => (
+                            <button
+                              key={tsk.id}
+                              className={"calendar-card-chip" + (tsk.completed ? " completed" : "")}
+                              onClick={() => toggleTask(tsk)}
+                              disabled={!canUse}
+                              title={tsk.title}
+                            >
+                              {tsk.title}
+                            </button>
+                          ))}
+                        </div>
+                        {addingDate === iso && (
+                          <form className="planner-inline-add" onSubmit={(e) => e.preventDefault()}>
+                            <input
+                              autoFocus
+                              value={draftTitle}
+                              onChange={(e) => setDraftTitle(e.target.value)}
+                              onBlur={() => handleQuickAdd(iso)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  handleQuickAdd(iso);
+                                }
+                                if (e.key === "Escape") setAddingDate(null);
+                              }}
+                              placeholder={t("planner.addPlaceholder")}
+                            />
+                          </form>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {tab === "list" && (
                 <>
                   {canUse && (
                     <form className="planner-list-add" onSubmit={handleFormAdd}>
                       <input
+                        ref={newTitleInputRef}
                         type="text"
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
@@ -381,6 +631,10 @@ export default function PersonalPlanner({ onClose, initialTab = "calendar" }) {
                                 </button>
                                 <span className={"planner-task-title" + (tsk.completed ? " completed" : "")}>{tsk.title}</span>
                                 <div className="planner-task-badges">
+                                  <span className={"priority-badge priority-" + (tsk.priority || "medium")}>
+                                    <span className="priority-badge-dot" aria-hidden="true" />
+                                    {t(`planner.priority.${tsk.priority || "medium"}`)}
+                                  </span>
                                   {checklistTotal > 0 && (
                                     <span
                                       className={"planner-task-checklist-badge" + (checklistDone === checklistTotal ? " all-done" : "")}

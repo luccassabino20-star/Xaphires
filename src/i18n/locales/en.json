@@ -2042,8 +2042,10 @@
   "planner": {
     "title": "Personal planner",
     "subtitle": "Your agenda, outside the boards",
-    "tabCalendar": "Calendar",
+    "tabWeek": "Week",
+    "tabMonth": "Month",
     "tabList": "My tasks",
+    "untitled": "New task",
     "addPlaceholder": "New personal task...",
     "add": "Add",
     "empty": "No personal tasks yet.",
@@ -2057,7 +2059,35 @@
     "subtasks": "Subtasks",
     "subtasksProgress": "{{done}} of {{total}} subtasks completed",
     "addSubtaskPlaceholder": "Add a subtask...",
-    "saveAndClose": "Save and close"
+    "saveAndClose": "Save and close",
+    "priorityLabel": "Priority",
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "type": {
+      "event": "Event",
+      "task": "Task",
+      "focus": "Focus time",
+      "vacation": "Time off"
+    },
+    "startTimeLabel": "Time",
+    "allDay": "All day",
+    "timed": "Timed",
+    "labelField": "Label",
+    "labelPlaceholder": "Add a label...",
+    "sidebar": {
+      "priorities": "Priorities",
+      "prioritiesEmpty": "Prioritize a task to see it here.",
+      "addPriority": "Add priority",
+      "todayOverdue": "Today and overdue",
+      "todayOverdueEmpty": "Nothing here.",
+      "next7Days": "Next 7 days",
+      "next7DaysEmpty": "Nothing here.",
+      "unscheduled": "Unscheduled",
+      "unscheduledEmpty": "Nothing unscheduled."
+    }
   },
   "plan": {
     "monthlyLabel": "Monthly price",
@@ -2297,6 +2327,11 @@
     "CURRENT_PASSWORD_INCORRECT": "Current password is incorrect",
     "TITLE_REQUIRED": "Title is required",
     "DUE_REQUIRED": "Choose a date",
+    "PRIORITY_INVALID": "Invalid priority",
+    "TYPE_INVALID": "Invalid type",
+    "START_TIME_INVALID": "Invalid time",
+    "DURATION_INVALID": "Invalid duration",
+    "LABEL_TOO_LONG": "Label is too long",
     "PERSONAL_TASK_NOT_FOUND": "Task not found",
     "NAME_REQUIRED": "Name is required",
     "BIO_TOO_LONG": "The bio is too long",

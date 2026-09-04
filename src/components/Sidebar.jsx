@@ -466,7 +466,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
               propósito, com title="Em breve" pra quem passar o mouse não
               achar que é bug. Planejador é real: agenda pessoal (ver
               PersonalPlanner.jsx), fora de qualquer quadro. */}
-          <RailItem icon={<IconCalendar />} label={t("app.sidebar.rail.planner")} onClick={() => setPlannerTab("calendar")} />
+          <RailItem icon={<IconCalendar />} label={t("app.sidebar.rail.planner")} onClick={() => setPlannerTab("week")} />
           <RailItem icon={<IconSparkle />} label={t("app.sidebar.rail.ai")} title={t("app.sidebar.comingSoon")} />
           <RailItem icon={<IconUsers />} label={t("app.sidebar.rail.team")} onClick={() => setTeamPanelOpen(true)} />
           <RailItem icon={<IconChart />} label={t("app.sidebar.rail.dashboards")} title={t("app.sidebar.comingSoon")} />

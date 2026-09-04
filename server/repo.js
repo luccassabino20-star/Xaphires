@@ -1279,6 +1279,12 @@ function parsePersonalTask(row) {
     createdAt: row.created_at,
     description: row.description || "",
     checklist: JSON.parse(row.checklist || "[]"),
+    priority: row.priority || "medium",
+    type: row.type || "task",
+    allDay: row.all_day === undefined || row.all_day === null ? true : !!row.all_day,
+    startTime: row.start_time || null,
+    durationMin: row.duration_min ?? null,
+    label: row.label || "",
   };
 }
 
@@ -1299,9 +1305,30 @@ export function getPersonalTask(id) {
 
 export function createPersonalTask(userId, data) {
   const id = uid();
+  // all_day é inferido quando não vem explícito: hora de início presente
+  // (criação a partir de um clique na grade semanal) implica bloco com
+  // horário; ausente (criação pelo "+" do mês/lista, o caminho de sempre)
+  // continua "sem horário", igual ao comportamento anterior a esta coluna.
+  const allDay = data.allDay === undefined ? !data.startTime : !!data.allDay;
+  const startTime = allDay ? null : data.startTime || null;
+  const durationMin = allDay ? null : data.durationMin || 60;
   getDb()
-    .prepare("INSERT INTO personal_tasks (id, user_id, title, due, completed, created_at) VALUES (?, ?, ?, ?, 0, ?)")
-    .run(id, userId, data.title, data.due, nowIso());
+    .prepare(
+      "INSERT INTO personal_tasks (id, user_id, title, due, completed, priority, type, all_day, start_time, duration_min, label, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)"
+    )
+    .run(
+      id,
+      userId,
+      data.title,
+      data.due,
+      data.priority || "medium",
+      data.type || "task",
+      allDay ? 1 : 0,
+      startTime,
+      durationMin,
+      data.label || "",
+      nowIso()
+    );
   return getPersonalTask(id);
 }
 
@@ -1316,9 +1343,35 @@ export function updatePersonalTask(id, patch) {
   const completedAt = completed ? atual.completedAt || nowIso() : null;
   const description = patch.description === undefined ? atual.description : patch.description;
   const checklist = patch.checklist === undefined ? atual.checklist : patch.checklist;
+  const priority = patch.priority === undefined ? atual.priority : patch.priority;
+  const type = patch.type === undefined ? atual.type : patch.type;
+  const label = patch.label === undefined ? atual.label : patch.label;
+  const allDay = patch.allDay === undefined ? atual.allDay : !!patch.allDay;
+  // Virar "sem horário" (arrastar de volta pro painel lateral, por exemplo)
+  // limpa hora/duração - um bloco all_day com hora fantasma sobraria escondido,
+  // pronto pra reaparecer com o horário antigo se a pessoa marcasse "com
+  // horário" de novo sem preencher um novo, o que confundiria mais que ajudaria.
+  const startTime = allDay ? null : patch.startTime !== undefined ? patch.startTime : atual.startTime;
+  const durationMin = allDay ? null : patch.durationMin !== undefined ? patch.durationMin : atual.durationMin || 60;
   getDb()
-    .prepare("UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=?, description=?, checklist=? WHERE id=?")
-    .run(patch.title ?? atual.title, patch.due ?? atual.due, completed ? 1 : 0, completedAt, description, JSON.stringify(checklist), id);
+    .prepare(
+      "UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=?, description=?, checklist=?, priority=?, type=?, all_day=?, start_time=?, duration_min=?, label=? WHERE id=?"
+    )
+    .run(
+      patch.title ?? atual.title,
+      patch.due ?? atual.due,
+      completed ? 1 : 0,
+      completedAt,
+      description,
+      JSON.stringify(checklist),
+      priority,
+      type,
+      allDay ? 1 : 0,
+      startTime,
+      durationMin,
+      label,
+      id
+    );
   return getPersonalTask(id);
 }
 

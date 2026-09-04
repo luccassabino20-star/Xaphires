@@ -904,7 +904,28 @@ input, textarea { font-family: inherit; }
 .calendar-card-chip.completed { text-decoration: line-through; color: var(--text-muted); }
 .calendar-more { font-size: 11px; color: var(--text-muted); padding: 2px 6px; }
 
-/* ---------- Planejador pessoal (PersonalPlanner) ---------- */
+/* ---------- Planejador pessoal (PersonalPlanner) ----------
+   Modal Ultra Premium (Raycast/Notion Calendar/Linear): reaproveita a casca
+   .premium-modal (overlay com blur, cantos e animação de entrada - ver seção
+   "Fluxo premium de contratação" acima) e ganha a própria classe de tamanho
+   (.planner-modal), como .module-picker-modal/.plan-overview-modal já fazem
+   cada um para o seu modal. Tudo que toca o calendário (.calendar-grid/
+   .calendar-cell/.calendar-weekday/.calendar-card-chip) é escopado por baixo
+   de .planner-grid de propósito: essas classes-base são as MESMAS de
+   CalendarView.jsx (a visão de calendário do quadro), que não leva
+   .planner-grid como ancestral - mexer na regra sem escopo mudaria a visão do
+   quadro sem querer. */
+.planner-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.planner-modal-heading { display: flex; align-items: center; gap: 12px; }
 .planner-header-icon {
   width: 40px;
   height: 40px;
@@ -913,41 +934,180 @@ input, textarea { font-family: inherit; }
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-list));
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
 }
 .planner-header-text { display: flex; flex-direction: column; }
-.planner-header-text .members-modal-title { margin: 0; }
-.planner-header-subtitle { font-size: 12.5px; color: var(--text-muted); margin: 2px 0 0; }
+.planner-modal-title { margin: 0; font-size: 18px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+.planner-modal-subtitle { margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted); }
 
-/* Abas em pílula (segmentado), no lugar das .view-tab do quadro - o Planejador
-   é um modal flutuante, não uma página com cabeçalho fixo, e o contraste do
-   segmento ativo lê melhor sobre o fundo do modal do que um sublinhado. */
-.planner-tabs {
+/* Segmented control estilo iOS/macOS: uma pílula neutra com uma segunda
+   pílula (o "thumb") deslizando por baixo do rótulo ativo via transform - só
+   2 posições hoje (Calendário/Minhas tarefas), então metade da largura basta;
+   um terceiro segmento pediria calcular a posição em JS. */
+.planner-segmented {
+  position: relative;
   display: inline-flex;
-  gap: 2px;
   padding: 3px;
-  margin-bottom: 20px;
+  border-radius: 999px;
   background: var(--bg-list);
-  border-radius: 10px;
 }
-.planner-tab {
+.planner-segment {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 7px 18px;
   border: none;
-  background: transparent;
-  padding: 7px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+  background: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
   color: var(--text-secondary);
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  transition: color 0.2s ease;
 }
-.planner-tab:hover { color: var(--text-primary); }
-.planner-tab.active { background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-card); }
+.planner-segment.active { color: var(--text-primary); }
+/* Genérico pra N segmentos (2 quando só Calendário/Lista existiam, 3 agora
+   com Semana) via --seg-count/--seg-index (inline, ver JSX) - largura é a
+   pista útil (100% menos os 3px de padding de cada lado) dividida pelo total
+   de segmentos, e o deslocamento é sempre "index vezes a própria largura do
+   thumb" (translateX em % é relativo à própria caixa, não ao pai). */
+.planner-segment-thumb {
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  left: 3px;
+  bottom: 3px;
+  width: calc((100% - 6px) / var(--seg-count, 2));
+  transform: translateX(calc(var(--seg-index, 0) * 100%));
+  border-radius: 999px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-.planner-grid .calendar-cell { min-height: 84px; position: relative; transition: background 0.15s ease; }
+/* Barra de navegação de mês + ações rápidas - só existe na aba Calendário
+   (ver JSX), por isso fica fora do header fixo. */
+.planner-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 26px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.planner-month-nav { display: flex; align-items: center; gap: 4px; }
+.planner-month-title {
+  min-width: 150px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.planner-nav-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.planner-nav-arrow:hover { background: var(--bg-card-hover); border-color: var(--border-strong); color: var(--text-primary); }
+.planner-toolbar-actions { display: flex; align-items: center; gap: 8px; }
+.planner-today-pill {
+  padding: 6px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.planner-today-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-card));
+}
+.planner-quickadd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px 7px 12px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.planner-quickadd-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -6px color-mix(in srgb, var(--accent) 65%, transparent); }
+
+/* Corpo com rolagem própria - mesma lição do hero card do "Plano da empresa"
+   (ver seção "Dashboard premium..." abaixo): filho direto de um flex-column
+   com overflow diferente de visible (o .calendar-grid, mais abaixo, tem
+   overflow:hidden) zera o min-height:auto automático dele e passa a poder
+   encolher abaixo do conteúdo em vez do corpo rolar - flex-shrink:0 em todo
+   filho direto evita isso de novo aqui. */
+.planner-modal-body { flex: 1; min-height: 0; overflow-y: auto; padding: 22px 26px 26px; }
+.planner-modal-body > * { flex-shrink: 0; }
+
+/* Grid do mês: moldura mais macia que a do calendário do quadro (raio maior,
+   borda quase invisível) - só no elemento que carrega as duas classes junto
+   (calendar-grid E planner-grid), não a base .calendar-grid inteira. */
+.planner-grid.calendar-grid {
+  border-color: color-mix(in srgb, var(--border-subtle) 70%, transparent);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+.planner-grid.calendar-grid > * {
+  border-color: color-mix(in srgb, var(--border-subtle) 55%, transparent);
+}
+.planner-grid .calendar-weekday {
+  background: transparent;
+  padding: 11px 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  opacity: 0.7;
+  text-align: center;
+}
+.planner-grid .calendar-cell { min-height: 84px; position: relative; transition: background 0.15s ease; cursor: default; }
+/* Fora do mês vigente: opacidade reduzida no conteúdo inteiro (não só no
+   número do dia, como a base .calendar-cell.outside faz para o calendário do
+   quadro), pra sumir de verdade em vez de só ficar acinzentado. */
+.planner-grid .calendar-cell.outside { opacity: 0.42; }
 .planner-grid .calendar-cell.today { background: color-mix(in srgb, var(--accent) 6%, var(--bg-topbar)); }
 .planner-grid .calendar-cell.today.outside { background: color-mix(in srgb, var(--accent) 6%, var(--bg-app)); }
+.planner-grid .calendar-cell:hover { background: color-mix(in srgb, var(--text-primary) 4%, var(--bg-topbar)); }
+.planner-grid .calendar-cell.outside:hover { background: color-mix(in srgb, var(--text-primary) 4%, var(--bg-app)); }
+.planner-grid .calendar-cell.today:hover { background: color-mix(in srgb, var(--accent) 11%, var(--bg-topbar)); }
+/* Dia atual: a base .calendar-cell.today .calendar-day-num já pinta a pílula
+   sólida em --accent (compartilhada com o calendário do quadro) - aqui só
+   soma a auréola em volta, um box-shadow em duas camadas, sem repetir
+   background/border-radius/tamanho que a base já definiu. */
+.planner-grid .calendar-cell.today .calendar-day-num {
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 4px 10px -2px color-mix(in srgb, var(--accent) 55%, transparent);
+}
 .calendar-day-num-row { display: flex; align-items: center; justify-content: space-between; }
 .planner-day-add {
   width: 20px;
@@ -1155,9 +1315,260 @@ input, textarea { font-family: inherit; }
 .planner-empty svg { opacity: 0.45; }
 .planner-empty p { margin: 0; font-size: 13.5px; }
 
+/* Prioridade da tarefa pessoal - dois usos do mesmo trio de cor (alta/média/
+   baixa: perigo/âmbar/sucesso, o mesmo trio que .plan-history-status já usa
+   pra pago/pendente/falhou, ver seção do Plano da empresa): .priority-badge é
+   a pílula só-leitura na linha da lista, sempre colorida; .priority-chip é o
+   seletor clicável do modal de detalhe, neutro até ficar .active - o ponto
+   nele já nasce colorido (pista de qual é qual antes mesmo de escolher), o
+   resto (borda/fundo/texto) só pinta quando selecionado. */
+.priority-badge, .priority-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 3px 10px 3px 8px;
+  white-space: nowrap;
+}
+.priority-badge-dot, .priority-chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: currentColor; }
+
+.priority-badge { background: color-mix(in srgb, currentColor 14%, transparent); }
+.priority-badge.priority-high { color: var(--danger); }
+.priority-badge.priority-medium { color: #c9922f; }
+.priority-badge.priority-low { color: var(--success); }
+
+.priority-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.priority-chip {
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.priority-chip .priority-chip-dot { opacity: 0.6; }
+.priority-chip:hover:not(:disabled) { border-color: var(--border-strong); }
+.priority-chip:disabled { cursor: not-allowed; opacity: 0.6; }
+.priority-chip.priority-high .priority-chip-dot { color: var(--danger); }
+.priority-chip.priority-medium .priority-chip-dot { color: #c9922f; }
+.priority-chip.priority-low .priority-chip-dot { color: var(--success); }
+.priority-chip.active .priority-chip-dot { opacity: 1; }
+.priority-chip.priority-high.active { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--bg-card)); color: var(--danger); }
+.priority-chip.priority-medium.active { border-color: #c9922f; background: color-mix(in srgb, #c9922f 15%, var(--bg-card)); color: #c9922f; }
+.priority-chip.priority-low.active { border-color: var(--success); background: color-mix(in srgb, var(--success) 12%, var(--bg-card)); color: var(--success); }
+
+/* Modal cresce bastante nesta versão pra caber a grade semanal + painel
+   lateral lado a lado - Mês e Lista sobram com mais respiro, sem problema. */
+/* Seletor composto (.modal.planner-modal), não só .planner-modal: a base
+   .modal (mais abaixo no arquivo, mesma especificidade de classe única) tem
+   width:100%/max-width:620px, e por ordem de cascata venceria uma regra
+   também de classe única declarada mais cedo - foi o que prendia este modal
+   em ~620px de largura mesmo com este bloco escrito depois de propósito. Duas
+   classes batem uma independente de ordem no arquivo. Mesmo cuidado que
+   .module-picker-modal e .plan-overview-modal já tomam ao virem DEPOIS da
+   base .modal no arquivo - aqui a base fica antes por causa da posição desta
+   seção (perto do topo), então a especificidade extra resolve sem precisar
+   mover a seção inteira. */
+.modal.planner-modal { max-width: 1180px; width: 92vw; height: 86vh; max-height: 86vh; }
+
+/* ---------- Aba Semana: painel lateral + grade por horário ----------
+   O corpo do modal vira linha (sidebar | grade) em vez da coluna com scroll
+   único que Mês/Lista usam - .planner-modal-body-week zera o padding
+   genérico e delega o scroll pra cada painel (sidebar e grade rolam cada um
+   por si, a grade nas duas direções por causa da largura dos 7 dias). */
+.planner-modal-body.planner-modal-body-week { padding: 0; display: flex; flex-direction: column; }
+.planner-week-body { flex: 1; min-height: 0; display: flex; }
+
+.planner-sidebar {
+  flex: 0 0 232px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 16px 20px;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-list);
+  overflow-y: auto;
+}
+.planner-sidebar-head { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 800; color: var(--text-primary); }
+.planner-sidebar-add {
+  width: 24px; height: 24px; border-radius: 8px; border: 1px solid var(--border-subtle);
+  background: var(--bg-card); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.planner-sidebar-add:hover { background: var(--bg-card-hover); color: var(--accent); border-color: var(--accent); }
+
+.planner-sidebar-section-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+.planner-sidebar-empty { display: flex; flex-direction: column; gap: 8px; padding: 14px 12px; border: 1px dashed var(--border-subtle); border-radius: 12px; text-align: center; }
+.planner-sidebar-empty p { margin: 0; font-size: 11.5px; color: var(--text-muted); }
+.planner-sidebar-empty-btn {
+  display: inline-flex; align-items: center; gap: 5px; justify-content: center;
+  padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border-subtle);
+  background: var(--bg-card); color: var(--accent); font-size: 11px; font-weight: 700;
+  font-family: inherit; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease;
+}
+.planner-sidebar-empty-btn:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--bg-card)); }
+.planner-sidebar-empty-text { margin: 0; padding: 2px; font-size: 11.5px; color: var(--text-muted); }
+
+.planner-sidebar-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.planner-sidebar-item {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px;
+  cursor: pointer; font-size: 12px; color: var(--text-primary); transition: background 0.12s ease;
+}
+.planner-sidebar-item:hover { background: var(--bg-card-hover); }
+.planner-sidebar-item-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.planner-sidebar-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+.planner-sidebar-dot.overdue { background: var(--danger); }
+.planner-sidebar-backlog-item { cursor: grab; user-select: none; -webkit-user-select: none; }
+.planner-sidebar-backlog-item:active { cursor: grabbing; }
+
+.planner-accordion { border-top: 1px solid var(--border-subtle); padding-top: 10px; }
+.planner-accordion-head {
+  width: 100%; display: flex; align-items: center; gap: 6px; padding: 0; border: none; background: none;
+  font: inherit; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); cursor: pointer; text-align: left;
+}
+.planner-accordion-head:hover { color: var(--text-primary); }
+.planner-accordion-count { margin-left: auto; font-size: 10px; font-weight: 700; color: var(--text-muted); background: var(--bg-card); border-radius: 999px; padding: 1px 7px; }
+.planner-accordion-body { margin-top: 8px; }
+
+.planner-sidebar-backlog { border-top: 1px solid var(--border-subtle); padding-top: 14px; margin-top: auto; }
+
+/* Grade: gutter de horas fixo + 7 colunas de dia, cada uma com header
+   pegajoso e um corpo relativo onde os slots (botões, um por 15min) e os
+   blocos (absolutos) vivem - mesma estrutura de AgendaView.jsx. */
+.planner-week-grid { flex: 1; min-width: 0; display: flex; overflow: auto; }
+.planner-week-gutter { flex: 0 0 44px; position: relative; border-right: 1px solid var(--border-subtle); }
+.planner-week-header-cell { height: 44px; border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; background: var(--bg-card); z-index: 2; }
+.planner-week-gutter-slot { position: absolute; left: 0; right: 0; height: 22px; }
+.planner-week-gutter-slot span { display: block; font-size: 9px; color: var(--text-muted); text-align: right; padding-right: 6px; transform: translateY(-6px); white-space: nowrap; }
+.planner-week-gutter-slot.hour span { font-size: 10.5px; font-weight: 700; color: var(--accent); }
+
+.planner-week-day { flex: 1 0 132px; min-width: 132px; border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; }
+.planner-week-day:last-child { border-right: none; }
+.planner-week-day-header {
+  height: 44px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; background: var(--bg-card); z-index: 2;
+}
+.planner-week-day.today .planner-week-day-header { background: color-mix(in srgb, var(--accent) 5%, var(--bg-card)); }
+.planner-week-day-weekday { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.planner-week-day-num { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.planner-week-day-num.today {
+  color: #fff; background: var(--accent); width: 21px; height: 21px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.planner-week-day-body { position: relative; }
+
+.planner-week-slot { position: absolute; left: 0; right: 0; padding: 0; margin: 0; background: none; border: none; border-top: 1px dashed var(--border-subtle); cursor: pointer; }
+.planner-week-slot.hour { border-top: 1px solid var(--border-strong); }
+.planner-week-slot:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.planner-week-slot:disabled { cursor: default; }
+
+.planner-week-block {
+  position: absolute; display: flex; flex-direction: column; gap: 1px; overflow: hidden;
+  padding: 4px 6px 3px; text-align: left; font: inherit; font-size: 10.5px; line-height: 1.25;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-left-width: 3px; border-left-color: var(--accent);
+  border-radius: 8px; cursor: pointer; z-index: 1;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+  color: var(--text-primary);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.planner-week-block:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); z-index: 3; }
+.planner-week-block.completed { opacity: 0.55; text-decoration: line-through; }
+.planner-week-block.type-focus { background: color-mix(in srgb, #7c3aed 14%, var(--bg-card)); border-color: color-mix(in srgb, #7c3aed 35%, transparent); border-left-color: #7c3aed; }
+.planner-week-block.type-vacation { background: color-mix(in srgb, #c9922f 16%, var(--bg-card)); border-color: color-mix(in srgb, #c9922f 35%, transparent); border-left-color: #c9922f; }
+.planner-week-block-time { font-size: 9.5px; font-weight: 700; color: var(--text-muted); }
+.planner-week-block-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.planner-week-block-resize { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; cursor: ns-resize; }
+.planner-week-block-preview { background: color-mix(in srgb, var(--accent) 22%, var(--bg-card)); border-color: var(--accent); opacity: 0.9; pointer-events: none; }
+
+/* Linha de "agora" - mesmo desenho de .beauty-agenda-now-line (véu pulsante
+   com @keyframes), só trocando a cor fixa do Beauty por --accent (a grade
+   pessoal segue a cor da empresa, não uma paleta de módulo à parte). */
+.planner-now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--accent); z-index: 2; pointer-events: none; }
+.planner-now-line::before {
+  content: ""; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent); z-index: 1;
+}
+.planner-now-line::after {
+  content: ""; position: absolute; left: -4px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  animation: planner-now-pulse 1.8s ease-out infinite;
+}
+@keyframes planner-now-pulse {
+  0% { opacity: 0.55; transform: translateY(-50%) scale(1); }
+  100% { opacity: 0; transform: translateY(-50%) scale(2.4); }
+}
+
+/* ---------- Editor de tarefa: abas de tipo, horário e etiqueta ----------
+   (PersonalTaskDetailModal.jsx) - modal simples (não premium-modal), então
+   sem padding próprio aqui: usa o padding de .modal que já envolve tudo. */
+.type-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+.type-tab {
+  padding: 6px 13px; border-radius: 999px; border: 1px solid var(--border-subtle);
+  background: var(--bg-card); color: var(--text-secondary); font-family: inherit;
+  font-size: 11.5px; font-weight: 700; cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.type-tab:hover:not(:disabled) { border-color: var(--border-strong); }
+.type-tab.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)); color: var(--accent); }
+.type-tab:disabled { cursor: not-allowed; opacity: 0.6; }
+
+.timing-toggle { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--bg-list); margin-bottom: 10px; }
+.timing-toggle-btn {
+  padding: 6px 14px; border: none; background: none; border-radius: 999px; font: inherit;
+  font-size: 12px; font-weight: 700; color: var(--text-secondary); cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.timing-toggle-btn.active { background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-card); }
+.timing-toggle-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.timing-fields { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.timing-time-input {
+  border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 10px;
+  font-size: 13px; font-family: inherit; background: var(--bg-card); color: var(--text-primary);
+}
+.duration-presets { display: flex; gap: 4px; flex-wrap: wrap; }
+.duration-preset {
+  padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border-subtle);
+  background: var(--bg-card); color: var(--text-secondary); font-family: inherit;
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.duration-preset:hover:not(:disabled) { border-color: var(--border-strong); }
+.duration-preset.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)); color: var(--accent); }
+.duration-preset:disabled { cursor: not-allowed; opacity: 0.6; }
+
+.label-input {
+  width: 100%; border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 12px;
+  font-size: 13.5px; font-family: inherit; background: var(--bg-card); color: var(--text-primary);
+  outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.label-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent); }
+
 @media (max-width: 900px) {
   .calendar-cell { min-height: 64px; }
   .calendar-weekday { font-size: 9.5px; padding: 6px 4px; }
+}
+
+@media (max-width: 640px) {
+  .modal.planner-modal { width: 96vw; height: 90vh; max-height: 90vh; }
+  .planner-modal-header { padding: 18px 18px 16px; }
+  .planner-toolbar { padding: 12px 18px; flex-wrap: wrap; }
+  .planner-modal-body { padding: 16px 18px 20px; }
+  .planner-grid .calendar-cell { min-height: 58px; }
+  .planner-week-body { flex-direction: column; }
+  .planner-sidebar { flex: 0 0 auto; max-height: 180px; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planner-segment-thumb, .planner-quickadd-btn, .planner-grid .calendar-cell, .priority-chip,
+  .planner-week-block, .type-tab, .timing-toggle-btn, .duration-preset { transition: none; }
+  .planner-now-line::after { animation: none; }
 }
 
 /* ---------- Gantt chart genérico (src/components/gantt) ----------

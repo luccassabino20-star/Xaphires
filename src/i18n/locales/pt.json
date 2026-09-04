@@ -2301,8 +2301,10 @@
   "planner": {
     "title": "Planejador pessoal",
     "subtitle": "Sua agenda, fora dos quadros",
-    "tabCalendar": "Calendário",
+    "tabWeek": "Semana",
+    "tabMonth": "Mês",
     "tabList": "Minhas tarefas",
+    "untitled": "Nova tarefa",
     "addPlaceholder": "Nova tarefa pessoal...",
     "add": "Adicionar",
     "empty": "Nenhuma tarefa pessoal ainda.",
@@ -2316,7 +2318,35 @@
     "subtasks": "Subtarefas",
     "subtasksProgress": "{{done}} de {{total}} subtarefas concluídas",
     "addSubtaskPlaceholder": "Adicionar subtarefa...",
-    "saveAndClose": "Salvar e fechar"
+    "saveAndClose": "Salvar e fechar",
+    "priorityLabel": "Prioridade",
+    "priority": {
+      "high": "Alta",
+      "medium": "Média",
+      "low": "Baixa"
+    },
+    "type": {
+      "event": "Evento",
+      "task": "Tarefa",
+      "focus": "Tempo de foco",
+      "vacation": "Férias"
+    },
+    "startTimeLabel": "Horário",
+    "allDay": "Dia inteiro",
+    "timed": "Com horário",
+    "labelField": "Etiqueta",
+    "labelPlaceholder": "Adicionar etiqueta...",
+    "sidebar": {
+      "priorities": "Prioridades",
+      "prioritiesEmpty": "Priorize uma tarefa para vê-la aqui.",
+      "addPriority": "Adicionar prioridade",
+      "todayOverdue": "Hoje e atrasadas",
+      "todayOverdueEmpty": "Nada por aqui.",
+      "next7Days": "Próximos 7 dias",
+      "next7DaysEmpty": "Nada por aqui.",
+      "unscheduled": "Sem horário",
+      "unscheduledEmpty": "Nada sem horário."
+    }
   },
   "plan": {
     "monthlyLabel": "Mensalidade",
@@ -2556,6 +2586,11 @@
     "CURRENT_PASSWORD_INCORRECT": "Senha atual incorreta",
     "TITLE_REQUIRED": "Título obrigatório",
     "DUE_REQUIRED": "Escolha uma data",
+    "PRIORITY_INVALID": "Prioridade inválida",
+    "TYPE_INVALID": "Tipo inválido",
+    "START_TIME_INVALID": "Horário inválido",
+    "DURATION_INVALID": "Duração inválida",
+    "LABEL_TOO_LONG": "Etiqueta muito longa",
     "PERSONAL_TASK_NOT_FOUND": "Tarefa não encontrada",
     "NAME_REQUIRED": "Nome obrigatório",
     "BIO_TOO_LONG": "A descrição é muito longa",

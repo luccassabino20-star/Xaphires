@@ -17,6 +17,10 @@ function exigePlano(req, res, next) {
   });
 }
 
+const PRIORITIES = ["low", "medium", "high"];
+const TYPES = ["event", "task", "focus", "vacation"];
+const LABEL_MAX = 40;
+
 // Sempre a agenda de quem está logado - não há id de usuário no corpo nem na
 // URL para ninguém escolher tarefa de outra pessoa, e toda consulta já nasce
 // filtrada por req.user.id.
@@ -24,6 +28,28 @@ function validar(body) {
   if (!body?.title?.trim()) return { error: "Título obrigatório", code: "TITLE_REQUIRED" };
   if (!body?.due || !/^\d{4}-\d{2}-\d{2}$/.test(body.due)) {
     return { error: "Escolha uma data", code: "DUE_REQUIRED" };
+  }
+  if (body.priority !== undefined && !PRIORITIES.includes(body.priority)) {
+    return { error: "Prioridade inválida", code: "PRIORITY_INVALID" };
+  }
+  if (body.type !== undefined && !TYPES.includes(body.type)) {
+    return { error: "Tipo inválido", code: "TYPE_INVALID" };
+  }
+  // startTime só é exigido quando o bloco tem horário (allDay:false) - a
+  // grade semanal manda os dois juntos; o mês/lista não mandam nenhum dos
+  // dois, e continuam "sem horário" (ver createPersonalTask/updatePersonalTask).
+  if (body.startTime !== undefined && body.startTime !== null && !/^\d{2}:\d{2}$/.test(body.startTime)) {
+    return { error: "Horário inválido", code: "START_TIME_INVALID" };
+  }
+  if (
+    body.durationMin !== undefined &&
+    body.durationMin !== null &&
+    (!Number.isInteger(body.durationMin) || body.durationMin < 5 || body.durationMin > 1440)
+  ) {
+    return { error: "Duração inválida", code: "DURATION_INVALID" };
+  }
+  if (body.label !== undefined && body.label.length > LABEL_MAX) {
+    return { error: "Etiqueta muito longa", code: "LABEL_TOO_LONG" };
   }
   return null;
 }
@@ -55,7 +81,16 @@ router.post(
   ah(async (req, res) => {
     const erro = validar(req.body);
     if (erro) return res.status(400).json(erro);
-    const criada = repo.createPersonalTask(req.user.id, { title: req.body.title.trim(), due: req.body.due });
+    const criada = repo.createPersonalTask(req.user.id, {
+      title: req.body.title.trim(),
+      due: req.body.due,
+      priority: req.body.priority,
+      type: req.body.type,
+      allDay: req.body.allDay,
+      startTime: req.body.startTime,
+      durationMin: req.body.durationMin,
+      label: req.body.label,
+    });
     res.status(201).json(criada);
   })
 );
@@ -65,9 +100,19 @@ router.patch(
   ownedOr404,
   exigePlano,
   ah(async (req, res) => {
-    if (req.body?.title !== undefined || req.body?.due !== undefined) {
+    const camposValidaveis = ["title", "due", "priority", "type", "startTime", "durationMin", "label"];
+    if (camposValidaveis.some((campo) => req.body?.[campo] !== undefined)) {
       const atual = repo.getPersonalTask(req.params.id);
-      const erro = validar({ title: req.body.title ?? atual.title, due: req.body.due ?? atual.due });
+      const erro = validar({
+        title: req.body.title ?? atual.title,
+        due: req.body.due ?? atual.due,
+        priority: req.body.priority ?? atual.priority,
+        type: req.body.type ?? atual.type,
+        allDay: req.body.allDay,
+        startTime: req.body.startTime !== undefined ? req.body.startTime : atual.startTime,
+        durationMin: req.body.durationMin !== undefined ? req.body.durationMin : atual.durationMin,
+        label: req.body.label ?? atual.label,
+      });
       if (erro) return res.status(400).json(erro);
     }
     const atualizada = repo.updatePersonalTask(req.params.id, req.body || {});

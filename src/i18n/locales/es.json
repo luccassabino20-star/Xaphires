@@ -2042,8 +2042,10 @@
   "planner": {
     "title": "Planificador personal",
     "subtitle": "Tu agenda, fuera de los tableros",
-    "tabCalendar": "Calendario",
+    "tabWeek": "Semana",
+    "tabMonth": "Mes",
     "tabList": "Mis tareas",
+    "untitled": "Nueva tarea",
     "addPlaceholder": "Nueva tarea personal...",
     "add": "Agregar",
     "empty": "Todavía no hay tareas personales.",
@@ -2057,7 +2059,35 @@
     "subtasks": "Subtareas",
     "subtasksProgress": "{{done}} de {{total}} subtareas completadas",
     "addSubtaskPlaceholder": "Agregar subtarea...",
-    "saveAndClose": "Guardar y cerrar"
+    "saveAndClose": "Guardar y cerrar",
+    "priorityLabel": "Prioridad",
+    "priority": {
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja"
+    },
+    "type": {
+      "event": "Evento",
+      "task": "Tarea",
+      "focus": "Tiempo de enfoque",
+      "vacation": "Vacaciones"
+    },
+    "startTimeLabel": "Horario",
+    "allDay": "Todo el día",
+    "timed": "Con horario",
+    "labelField": "Etiqueta",
+    "labelPlaceholder": "Agregar etiqueta...",
+    "sidebar": {
+      "priorities": "Prioridades",
+      "prioritiesEmpty": "Prioriza una tarea para verla aquí.",
+      "addPriority": "Agregar prioridad",
+      "todayOverdue": "Hoy y atrasadas",
+      "todayOverdueEmpty": "Nada por aquí.",
+      "next7Days": "Próximos 7 días",
+      "next7DaysEmpty": "Nada por aquí.",
+      "unscheduled": "Sin horario",
+      "unscheduledEmpty": "Nada sin horario."
+    }
   },
   "plan": {
     "monthlyLabel": "Mensualidad",
@@ -2297,6 +2327,11 @@
     "CURRENT_PASSWORD_INCORRECT": "La contraseña actual es incorrecta",
     "TITLE_REQUIRED": "El título es obligatorio",
     "DUE_REQUIRED": "Elige una fecha",
+    "PRIORITY_INVALID": "Prioridad inválida",
+    "TYPE_INVALID": "Tipo inválido",
+    "START_TIME_INVALID": "Horario inválido",
+    "DURATION_INVALID": "Duración inválida",
+    "LABEL_TOO_LONG": "Etiqueta demasiado larga",
     "PERSONAL_TASK_NOT_FOUND": "Tarea no encontrada",
     "NAME_REQUIRED": "El nombre es obligatorio",
     "BIO_TOO_LONG": "La descripción es demasiado larga",

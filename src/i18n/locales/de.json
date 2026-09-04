@@ -1712,8 +1712,10 @@
   "planner": {
     "title": "Persönlicher Planer",
     "subtitle": "Ihre Agenda, außerhalb der Boards",
-    "tabCalendar": "Kalender",
+    "tabWeek": "Woche",
+    "tabMonth": "Monat",
     "tabList": "Meine Aufgaben",
+    "untitled": "Neue Aufgabe",
     "addPlaceholder": "Neue persönliche Aufgabe...",
     "add": "Hinzufügen",
     "empty": "Noch keine persönliche Aufgabe.",
@@ -1727,7 +1729,35 @@
     "subtasks": "Unteraufgaben",
     "subtasksProgress": "{{done}} von {{total}} Unteraufgaben erledigt",
     "addSubtaskPlaceholder": "Unteraufgabe hinzufügen...",
-    "saveAndClose": "Speichern und schließen"
+    "saveAndClose": "Speichern und schließen",
+    "priorityLabel": "Priorität",
+    "priority": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "type": {
+      "event": "Termin",
+      "task": "Aufgabe",
+      "focus": "Fokuszeit",
+      "vacation": "Urlaub"
+    },
+    "startTimeLabel": "Uhrzeit",
+    "allDay": "Ganztägig",
+    "timed": "Mit Uhrzeit",
+    "labelField": "Etikett",
+    "labelPlaceholder": "Etikett hinzufügen...",
+    "sidebar": {
+      "priorities": "Prioritäten",
+      "prioritiesEmpty": "Priorisieren Sie eine Aufgabe, um sie hier zu sehen.",
+      "addPriority": "Priorität hinzufügen",
+      "todayOverdue": "Heute und überfällig",
+      "todayOverdueEmpty": "Nichts hier.",
+      "next7Days": "Nächste 7 Tage",
+      "next7DaysEmpty": "Nichts hier.",
+      "unscheduled": "Ohne Uhrzeit",
+      "unscheduledEmpty": "Nichts ohne Uhrzeit."
+    }
   },
   "plan": {
     "monthlyLabel": "Monatsbeitrag",
@@ -1967,6 +1997,11 @@
     "CURRENT_PASSWORD_INCORRECT": "Aktuelles Passwort falsch",
     "TITLE_REQUIRED": "Titel erforderlich",
     "DUE_REQUIRED": "Wählen Sie ein Datum",
+    "PRIORITY_INVALID": "Ungültige Priorität",
+    "TYPE_INVALID": "Ungültiger Typ",
+    "START_TIME_INVALID": "Ungültige Uhrzeit",
+    "DURATION_INVALID": "Ungültige Dauer",
+    "LABEL_TOO_LONG": "Etikett zu lang",
     "PERSONAL_TASK_NOT_FOUND": "Aufgabe nicht gefunden",
     "NAME_REQUIRED": "Name erforderlich",
     "BIO_TOO_LONG": "Die Beschreibung ist zu lang",

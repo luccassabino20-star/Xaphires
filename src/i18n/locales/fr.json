@@ -1886,8 +1886,10 @@
   "planner": {
     "title": "Planificateur personnel",
     "subtitle": "Votre agenda, en dehors des tableaux",
-    "tabCalendar": "Calendrier",
+    "tabWeek": "Semaine",
+    "tabMonth": "Mois",
     "tabList": "Mes tâches",
+    "untitled": "Nouvelle tâche",
     "addPlaceholder": "Nouvelle tâche personnelle...",
     "add": "Ajouter",
     "empty": "Aucune tâche personnelle pour l'instant.",
@@ -1901,7 +1903,35 @@
     "subtasks": "Sous-tâches",
     "subtasksProgress": "{{done}} sur {{total}} sous-tâches terminées",
     "addSubtaskPlaceholder": "Ajouter une sous-tâche...",
-    "saveAndClose": "Enregistrer et fermer"
+    "saveAndClose": "Enregistrer et fermer",
+    "priorityLabel": "Priorité",
+    "priority": {
+      "high": "Haute",
+      "medium": "Moyenne",
+      "low": "Basse"
+    },
+    "type": {
+      "event": "Événement",
+      "task": "Tâche",
+      "focus": "Temps de concentration",
+      "vacation": "Congés"
+    },
+    "startTimeLabel": "Horaire",
+    "allDay": "Toute la journée",
+    "timed": "Avec horaire",
+    "labelField": "Étiquette",
+    "labelPlaceholder": "Ajouter une étiquette...",
+    "sidebar": {
+      "priorities": "Priorités",
+      "prioritiesEmpty": "Priorisez une tâche pour la voir ici.",
+      "addPriority": "Ajouter une priorité",
+      "todayOverdue": "Aujourd'hui et en retard",
+      "todayOverdueEmpty": "Rien ici.",
+      "next7Days": "7 prochains jours",
+      "next7DaysEmpty": "Rien ici.",
+      "unscheduled": "Sans horaire",
+      "unscheduledEmpty": "Rien sans horaire."
+    }
   },
   "plan": {
     "monthlyLabel": "Mensualité",
@@ -2141,6 +2171,11 @@
     "CURRENT_PASSWORD_INCORRECT": "Mot de passe actuel incorrect",
     "TITLE_REQUIRED": "Titre obligatoire",
     "DUE_REQUIRED": "Choisissez une date",
+    "PRIORITY_INVALID": "Priorité invalide",
+    "TYPE_INVALID": "Type invalide",
+    "START_TIME_INVALID": "Horaire invalide",
+    "DURATION_INVALID": "Durée invalide",
+    "LABEL_TOO_LONG": "Étiquette trop longue",
     "PERSONAL_TASK_NOT_FOUND": "Tâche introuvable",
     "NAME_REQUIRED": "Nom obligatoire",
     "BIO_TOO_LONG": "La description est trop longue",

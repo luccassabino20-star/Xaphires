@@ -216,6 +216,23 @@ function applySchema(companyDb) {
   // porque o volume por tarefa é pequeno e não precisa ser consultado à parte.
   addColumnIfMissing(companyDb, "personal_tasks", "description", "description TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing(companyDb, "personal_tasks", "checklist", "checklist TEXT NOT NULL DEFAULT '[]'");
+  // Prioridade (alta/média/baixa), exibida como badge colorido na lista do
+  // Planejador. Default 'medium' pro histórico existente - diferente de
+  // completed_at/list_entered_at, não há nenhum dado por trás de uma tarefa
+  // antiga que sugira a prioridade dela, então não tem o que fazer backfill
+  // com COALESCE aqui, um default fixo já resolve.
+  addColumnIfMissing(companyDb, "personal_tasks", "priority", "priority TEXT NOT NULL DEFAULT 'medium'");
+  // Grade semanal por horário (Planejador): tarefa antiga vira "sem horário"
+  // (all_day=1) automaticamente pelo DEFAULT - continua aparecendo igual no
+  // mês/lista, só a semana passa a tratá-la como bloco arrastável do painel
+  // lateral em vez de um evento com hora. duration_min serve dois papéis (a
+  // altura do bloco na grade E a "estimativa de tempo" do editor) de
+  // propósito - são o mesmo número, não faz sentido duas colunas pra isso.
+  addColumnIfMissing(companyDb, "personal_tasks", "type", "type TEXT NOT NULL DEFAULT 'task'");
+  addColumnIfMissing(companyDb, "personal_tasks", "all_day", "all_day INTEGER NOT NULL DEFAULT 1");
+  addColumnIfMissing(companyDb, "personal_tasks", "start_time", "start_time TEXT");
+  addColumnIfMissing(companyDb, "personal_tasks", "duration_min", "duration_min INTEGER");
+  addColumnIfMissing(companyDb, "personal_tasks", "label", "label TEXT NOT NULL DEFAULT ''");
 
   // Perfil pessoal (routes/profile.js): as únicas duas coisas que o próprio
   // usuário edita sobre si mesmo. E-mail continua fora daqui de propósito -
