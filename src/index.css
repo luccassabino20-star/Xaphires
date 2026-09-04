@@ -4055,7 +4055,10 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 .landing-pricing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  /* 230px, não 260px: num viewport comum de notebook (~1366px, ~1318px de
+     conteúdo após o padding), 260px só encaixava 4 colunas - o max-width do
+     container (acima) não ajuda em telas que já são mais estreitas que ele. */
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 20px;
   text-align: left;
 }
