@@ -215,6 +215,52 @@ function formatarValor(valor, locale) {
   return new Intl.NumberFormat(locale, { style: "currency", currency: "BRL" }).format(valor);
 }
 
+// Ícones de linha do card de status - mesmo estilo (stroke, sem preenchimento)
+// dos SVGs já usados no fluxo premium (PlanStepper, module-card-check), para
+// não introduzir lib de ícone nova só para este dashboard.
+function IconWallet({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+      <path d="M3.5 7.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-9Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M14.6 12.2h4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconCalendar({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+      <rect x="3.5" y="5" width="17" height="16" rx="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconUsers({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+      <circle cx="9" cy="8.5" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M15.3 6.3a3 3 0 0 1 0 5.7M18.5 19c0-2.4-1.6-4.3-3.7-4.9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconInfo({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+      <circle cx="12" cy="12" r="8.3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 11v5.3M12 8.2v.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// Subtexto do card de plano na grade de troca - null é "sem teto" (Full Suite/
+// Enterprise entitlam a todos os módulos não-core de uma vez, ver trocarPara),
+// 0 é o Free (só o Kanban, que é core e nem entra na conta de maxModules).
+function moduleCapLabel(p, t) {
+  if (p.maxModules === null) return t("plan.cardModules.all");
+  if (p.maxModules === 0) return t("plan.cardModules.none");
+  return t("plan.cardModules.count", { count: p.maxModules });
+}
+
 export default function PlanModal({ onClose }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -302,8 +348,6 @@ export default function PlanModal({ onClose }) {
   const valor = plano && formatarValor(plano.price, i18n.language);
   // Ilimitado vira traço em vez de "null" na tela.
   const limite = plano && (plano.maxUsers === null ? t("plan.unlimited") : plano.maxUsers);
-  // O servidor já decidiu o que é autoatendimento; aqui só se exibe.
-  const podeEscolher = plano?.catalog?.filter((p) => p.selfSelectable) || [];
   // Sem plano pago em vigor a lista deixa de ser só "subir": entram o Básico e o
   // próprio plano atual, para renovar. O título e a dica mudam junto, senão a tela
   // continuaria dizendo "só é possível subir" embaixo de um botão de Básico.
@@ -315,6 +359,23 @@ export default function PlanModal({ onClose }) {
   const planoAtual = plano?.catalog?.find((p) => p.current);
   const escolhaLivre = !!plano && !(planoAtual?.paid && plano.status === "active");
 
+  // Barra de progresso da validade: proporção calculada a partir das próprias
+  // datas que a tela já mostra (contratado em / válido até), não de uma
+  // constante de dias de teste/carência duplicada do servidor (TRIAL_DAYS/
+  // GRACE_DAYS vivem só em server/plans.js e server/billing/lifecycle.js) -
+  // assim funciona igual para teste, carência e ciclo mensal pago, sem o
+  // cliente reimplementar regra nenhuma.
+  const diasTotaisPeriodo =
+    plano && plano.contractedAt && plano.expiresAt
+      ? Math.max(1, Math.round((new Date(plano.expiresAt) - new Date(plano.contractedAt)) / 86400000))
+      : null;
+  const progressoValidade =
+    plano && diasTotaisPeriodo && plano.daysLeft !== null
+      ? Math.max(0, Math.min(100, (plano.daysLeft / diasTotaisPeriodo) * 100))
+      : null;
+  const progressoUsuarios =
+    plano && plano.maxUsers !== null ? Math.max(0, Math.min(100, (plano.userCount / plano.maxUsers) * 100)) : null;
+
   return (
     <div
       className="modal-overlay"
@@ -322,7 +383,11 @@ export default function PlanModal({ onClose }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className={"modal plan-modal" + (escolhaModulos ? " module-picker-modal premium-modal" : "")}>
+      <div
+        className={
+          "modal plan-modal premium-modal " + (escolhaModulos ? "module-picker-modal" : "plan-overview-modal")
+        }
+      >
         <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
           &times;
         </button>
@@ -330,8 +395,9 @@ export default function PlanModal({ onClose }) {
             stepper) desenhado dentro de ModulePickerStep - este aqui duplicaria
             o topo do modal por cima dele. */}
         {!escolhaModulos && (
-          <div className="modal-header">
-            <h2 className="plan-modal-title">{t("plan.title")}</h2>
+          <div className="premium-modal-header">
+            <h2 className="premium-modal-title">{t("plan.title")}</h2>
+            <p className="premium-modal-subtitle">{t("plan.subtitle")}</p>
           </div>
         )}
 
@@ -346,64 +412,87 @@ export default function PlanModal({ onClose }) {
             }}
           />
         ) : (
-        <div className="modal-body">
+        <div className="modal-body plan-overview-body">
           {erro && <div className="auth-error">{erro}</div>}
           {!plano && !erro && <p className="plan-modal-loading">{t("common.loading")}</p>}
 
           {plano && (
             <>
-              <div className="plan-current">
-                <div className="plan-current-name">
-                  {t(`plan.names.${plano.plan}`)}
-                  <span className={"plan-status plan-status-" + plano.status}>
+              <div className="plan-hero-card">
+                <div className="plan-hero-top">
+                  <span className="plan-hero-identity">
+                    <span className="plan-hero-name">{t(`plan.names.${plano.plan}`)}</span>
+                    {dataInicio && (
+                      <span className="plan-hero-since">
+                        {t("plan.contractedAtLabel")} {dataInicio}
+                      </span>
+                    )}
+                  </span>
+                  <span className={"plan-status-pill status-" + plano.status}>
+                    <span className="plan-status-pill-dot" aria-hidden="true" />
                     {t(`plan.status.${plano.status}`)}
                   </span>
                 </div>
 
-                <dl className="plan-facts">
-                  <div>
-                    <dt>{t("plan.monthlyLabel")}</dt>
-                    <dd>{valor ?? t("plan.onRequest")}</dd>
+                <div className="plan-hero-metrics">
+                  <div className="plan-metric">
+                    <span className="plan-metric-label">
+                      <IconWallet />
+                      {t("plan.monthlyLabel")}
+                    </span>
+                    <span className="plan-metric-value">{valor ?? t("plan.onRequest")}</span>
+                    {plano.discountCents > 0 && (
+                      <span className="plan-metric-sub plan-discount-row">
+                        <span className="plan-list-price">{formatarValor(plano.listPrice, i18n.language)}</span>
+                        <span className="plan-discount-chip">
+                          -{formatarValor(plano.discountCents / 100, i18n.language)}
+                        </span>
+                      </span>
+                    )}
                   </div>
-                  {plano.discountCents > 0 && (
-                    <>
-                      <div>
-                        <dt>{t("plan.listPriceLabel")}</dt>
-                        <dd>{formatarValor(plano.listPrice, i18n.language)}</dd>
-                      </div>
-                      <div>
-                        <dt>{t("plan.discountLabel")}</dt>
-                        <dd>{formatarValor(plano.discountCents / 100, i18n.language)}</dd>
-                      </div>
-                    </>
-                  )}
-                  {dataInicio && (
-                    <div>
-                      <dt>{t("plan.contractedAtLabel")}</dt>
-                      <dd>{dataInicio}</dd>
-                    </div>
-                  )}
-                  {dataFim && (
-                    <div>
-                      <dt>
-                        {plano.status === "expired" ? t("plan.expiredOnLabel") : t("plan.renewsOnLabel")}
-                      </dt>
-                      <dd>{dataFim}</dd>
-                    </div>
-                  )}
-                  {plano.daysLeft !== null && plano.daysLeft > 0 && (
-                    <div>
-                      <dt>{t("plan.daysLeftLabel")}</dt>
-                      <dd>{t("plan.daysLeftValue", { count: plano.daysLeft })}</dd>
-                    </div>
-                  )}
-                  <div>
-                    <dt>{t("plan.usersLabel")}</dt>
-                    <dd>
+
+                  <div className="plan-metric">
+                    <span className="plan-metric-label">
+                      <IconCalendar />
+                      {plano.status === "expired" ? t("plan.expiredOnLabel") : t("plan.renewsOnLabel")}
+                    </span>
+                    <span className="plan-metric-value">{dataFim ?? "—"}</span>
+                    {plano.daysLeft !== null && plano.daysLeft > 0 && (
+                      <>
+                        <span className="plan-metric-sub">{t("plan.daysLeftValue", { count: plano.daysLeft })}</span>
+                        {progressoValidade !== null && (
+                          <span className="plan-progress-track">
+                            <span
+                              className={
+                                "plan-progress-fill" +
+                                (plano.daysLeft <= 2 ? " danger" : plano.daysLeft <= 3 ? " warn" : "")
+                              }
+                              style={{ width: progressoValidade + "%" }}
+                            />
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  <div className="plan-metric">
+                    <span className="plan-metric-label">
+                      <IconUsers />
+                      {t("plan.usersLabel")}
+                    </span>
+                    <span className="plan-metric-value">
                       {plano.userCount} / {limite}
-                    </dd>
+                    </span>
+                    {progressoUsuarios !== null && (
+                      <span className="plan-progress-track">
+                        <span
+                          className={"plan-progress-fill" + (!plano.canAddUser ? " danger" : "")}
+                          style={{ width: progressoUsuarios + "%" }}
+                        />
+                      </span>
+                    )}
                   </div>
-                </dl>
+                </div>
 
                 {!plano.canAddUser && <p className="plan-warning">{t("plan.userLimitReached")}</p>}
               </div>
@@ -439,7 +528,7 @@ export default function PlanModal({ onClose }) {
               )}
 
               {cobranca?.subscription && (
-                <div className="plan-subscription">
+                <div className="plan-subscription plan-section-card">
                   <h3>{t("billing.subscriptionTitle")}</h3>
                   <dl className="plan-facts">
                     <div>
@@ -469,7 +558,7 @@ export default function PlanModal({ onClose }) {
               )}
 
               {cobranca?.payments?.length > 0 && (
-                <div className="plan-history">
+                <div className="plan-history plan-section-card">
                   <h3>{t("billing.historyTitle")}</h3>
                   <ul className="plan-history-list">
                     {cobranca.payments.map((p) => (
@@ -491,33 +580,38 @@ export default function PlanModal({ onClose }) {
 
               {ehMaster ? (
                 <div className="plan-switch">
-                  {podeEscolher.length > 0 && (
-                    <>
-                      <h3>{escolhaLivre ? t("plan.selectTitle") : t("plan.upgradeTitle")}</h3>
-                      <div className="plan-switch-list">
-                        {podeEscolher.map((p) => (
-                          <button
-                            key={p.id}
-                            className="plan-switch-btn"
-                            onClick={() => trocarPara(p)}
-                            disabled={trocando !== null}
-                          >
-                            <span className="plan-switch-name">{t(`plan.names.${p.id}`)}</span>
-                            <span className="plan-switch-price">
-                              {formatarValor(p.price, i18n.language)}
-                              {t("plan.perMonth")}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                  <p className="plan-switch-hint">
-                    {escolhaLivre ? t("plan.freeChoiceHint") : t("plan.downgradeHint")}
-                  </p>
+                  <h3>{escolhaLivre ? t("plan.selectTitle") : t("plan.upgradeTitle")}</h3>
+                  <div className="plan-grid">
+                    {(plano.catalog || []).map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className={"plan-tile" + (p.current ? " current" : "")}
+                        onClick={() => p.selfSelectable && trocarPara(p)}
+                        disabled={!p.selfSelectable || trocando !== null}
+                      >
+                        {p.current && <span className="plan-tile-tag">{t("plan.currentBadge")}</span>}
+                        <span className="plan-tile-name">{t(`plan.names.${p.id}`)}</span>
+                        <span className="plan-tile-price">
+                          {formatarValor(p.price, i18n.language)}
+                          <small>{t("plan.perMonth")}</small>
+                        </span>
+                        <span className="plan-tile-desc">{moduleCapLabel(p, t)}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="plan-callout">
+                    <IconInfo />
+                    <span className="plan-callout-text">
+                      {escolhaLivre ? t("plan.freeChoiceHint") : t("plan.downgradeHint")}
+                    </span>
+                  </div>
                 </div>
               ) : (
-                <p className="plan-switch-hint">{t("plan.masterOnly")}</p>
+                <div className="plan-callout">
+                  <IconInfo />
+                  <span className="plan-callout-text">{t("plan.masterOnly")}</span>
+                </div>
               )}
             </>
           )}

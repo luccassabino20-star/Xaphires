@@ -1915,6 +1915,8 @@
     "downgradeHint": "Pour descendre de plan ou annuler, contactez le support. Ici, il n'est possible que de monter.",
     "menuItem": "Mon plan",
     "title": "Plan de l'entreprise",
+    "subtitle": "Suivez l'abonnement, l'utilisation du forfait et changez quand vous le souhaitez.",
+    "currentBadge": "Forfait actuel",
     "unlimited": "illimité",
     "usersLabel": "Utilisateurs",
     "renewsOnLabel": "Valide jusqu'au",
@@ -1943,6 +1945,11 @@
       "continue": "Continuer vers le paiement",
       "limitBadge": "Limite du plan",
       "limitHint": "Vous avez déjà utilisé les emplacements de module de ce plan. {{plan}} débloque plus de modules à la fois - vous pouvez changer de plan quand vous voulez."
+    },
+    "cardModules": {
+      "all": "Tous les modules débloqués",
+      "none": "Inclut seulement le Kanban",
+      "count": "Jusqu'à {{count}} module(s) au choix"
     },
     "stepper": {
       "step1": "Plan",

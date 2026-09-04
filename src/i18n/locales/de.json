@@ -1741,6 +1741,8 @@
     "downgradeHint": "Um den Plan herabzustufen oder zu kündigen, wenden Sie sich an den Support. Hier ist nur ein Upgrade möglich.",
     "menuItem": "Mein Plan",
     "title": "Plan des Unternehmens",
+    "subtitle": "Behalten Sie Abo und Plan-Nutzung im Blick und wechseln Sie jederzeit.",
+    "currentBadge": "Aktueller Plan",
     "unlimited": "unbegrenzt",
     "usersLabel": "Nutzer",
     "renewsOnLabel": "Gültig bis",
@@ -1769,6 +1771,11 @@
       "continue": "Weiter zur Zahlung",
       "limitBadge": "Planlimit",
       "limitHint": "Sie haben die Modulplätze dieses Plans bereits ausgeschöpft. {{plan}} schaltet mehr Module auf einmal frei - Sie können jederzeit den Plan wechseln."
+    },
+    "cardModules": {
+      "all": "Alle Module freigeschaltet",
+      "none": "Nur Kanban enthalten",
+      "count": "Bis zu {{count}} Modul(e) zur Wahl"
     },
     "stepper": {
       "step1": "Plan",

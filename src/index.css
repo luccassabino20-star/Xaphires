@@ -5901,38 +5901,11 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 .plan-banner-text { text-align: center; }
 
-/* ---------- Modal do plano ---------- */
-.plan-modal { max-width: 480px; }
-.plan-modal-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text-primary); }
+/* ---------- Modal do plano ----------
+   A visão principal (hero card + grade de troca) mora na seção "Dashboard
+   premium do Plano da empresa", mais abaixo - aqui fica só o que os dois
+   modos (visão principal e picker de módulo) ainda compartilham. */
 .plan-modal-loading { font-size: 14px; color: var(--text-secondary); margin: 0; }
-
-.plan-current {
-  padding: 16px;
-  background: var(--bg-list);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-}
-.plan-current-name {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-}
-.plan-status {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 8px;
-  border-radius: 999px;
-}
-.plan-status-active { background: color-mix(in srgb, var(--success) 22%, transparent); color: var(--success); }
-.plan-status-trialing { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--text-primary); }
-.plan-status-expired { background: color-mix(in srgb, var(--danger) 22%, transparent); color: var(--danger); }
 
 .plan-facts { margin: 0; display: flex; flex-direction: column; gap: 8px; }
 .plan-facts > div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -5946,31 +5919,7 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   color: var(--danger);
 }
 
-.plan-switch { margin-top: 20px; }
-.plan-switch h3 { font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text-primary); }
-.plan-switch-list { display: flex; flex-wrap: wrap; gap: 8px; }
-.plan-switch-btn {
-  flex: 1 1 auto;
-  min-width: 110px;
-  padding: 9px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  color: var(--text-primary);
-  background: var(--bg-card);
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  cursor: pointer;
-}
-.plan-switch-btn:hover:not(:disabled) { background: var(--bg-card-hover); }
-.plan-switch-btn.active { border-color: var(--accent); cursor: default; }
-.plan-switch-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 .plan-switch-hint { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
-
-/* Botão de subir de plano: nome em cima, valor embaixo. */
-.plan-switch-btn { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
-.plan-switch-name { font-size: 13px; font-weight: 600; }
-.plan-switch-price { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 
 /* ---------- Fluxo premium de contratação (PlanModal/picker + CheckoutModal) ----------
    Header com badge/título/stepper + corpo em 2 colunas (config à esquerda, resumo
@@ -6300,6 +6249,209 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
     transition: none;
     animation: none;
   }
+}
+
+/* ---------- Dashboard premium do "Plano da empresa" (PlanModal, visão principal) ----------
+   Mesma linguagem do fluxo premium de contratação logo acima (badge/--accent/
+   color-mix/var(--shadow-card)) - aqui sem o painel escuro fixo (não há total
+   de carrinho pra vitrinar), então o corpo inteiro é uma coluna com scroll
+   própria, plano.catalog inteiro na grade de troca (não só os selfSelectable)
+   para o "seu plano" continuar visível e destacado mesmo quando ninguém é
+   clicável (plano pago em vigor - ver canSelfSelectPlan em server/plans.js);
+   quem decide o que é clicável continua sendo p.selfSelectable vindo do
+   servidor, o card só desenha disabled/opaco por cima. */
+/* height (não só max-height) pelo mesmo motivo do module-picker-modal acima:
+   sem uma altura DEFINIDA no modal, o flex:1/min-height:0 do
+   .plan-overview-body não tem o que repartir e o corpo cresce por conteúdo em
+   vez de ganhar rolagem interna - o hero card acabava cortado pelo
+   overflow:hidden dele mesmo, sem aviso nenhum (achado no navegador). */
+.plan-overview-modal { max-width: 640px; height: 88vh; max-height: 88vh; }
+.plan-overview-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px 28px 28px;
+}
+/* flex-shrink:0 em TODOS os filhos diretos: qualquer um deles com
+   overflow:hidden (o hero card, para o véu radial não vazar dos cantos
+   arredondados) zera o min-height:auto automático do flex item por
+   especificação, e o item passa a poder encolher abaixo do próprio conteúdo
+   em vez do corpo (que tem overflow-y:auto) rolar - foi assim que o hero card
+   apareceu cortado no meio da grade de métricas, achado inspecionando a altura
+   computada no navegador. */
+.plan-overview-body > * { flex-shrink: 0; }
+
+/* Hero card do status atual - fundo em degradê sutil na cor da empresa
+   (--accent, a mesma que o resto do tema já usa) com um véu radial no canto
+   pra dar profundidade sem depender de imagem nem de nova variável de cor. */
+.plan-hero-card {
+  position: relative;
+  overflow: hidden;
+  padding: 22px 24px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border-subtle));
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 60%),
+    linear-gradient(155deg, color-mix(in srgb, var(--accent) 9%, var(--bg-card)) 0%, var(--bg-card) 65%);
+  box-shadow: var(--shadow-card-hover);
+}
+.plan-hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+.plan-hero-identity { display: flex; flex-direction: column; gap: 3px; }
+.plan-hero-name { font-size: 21px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+.plan-hero-since { font-size: 11.5px; color: var(--text-muted); }
+
+/* Badge pílula com pontinho pulsante - o pulse é feito com box-shadow
+   crescendo em @keyframes (sem elemento extra), currentColor pra herdar a cor
+   de cada variante sem repetir o tom no keyframe. */
+.plan-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.plan-status-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: planStatusPulse 1.8s ease-out infinite; }
+@keyframes planStatusPulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); }
+  70% { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.plan-status-pill.status-active { color: var(--success); background: color-mix(in srgb, var(--success) 16%, transparent); }
+.plan-status-pill.status-trialing { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.plan-status-pill.status-expired { color: var(--danger); background: color-mix(in srgb, var(--danger) 16%, transparent); }
+.plan-status-pill.status-grace { color: #c9922f; background: color-mix(in srgb, #c9922f 18%, transparent); }
+
+.plan-hero-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+.plan-metric { display: flex; flex-direction: column; gap: 6px; }
+.plan-metric-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.plan-metric-label svg { flex-shrink: 0; color: var(--accent); }
+.plan-metric-value { font-size: 18px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+.plan-metric-sub { font-size: 11.5px; color: var(--text-secondary); }
+.plan-discount-row { display: flex; align-items: center; gap: 6px; }
+.plan-list-price { text-decoration: line-through; color: var(--text-muted); }
+.plan-discount-chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.plan-progress-track { height: 5px; border-radius: 999px; background: var(--border-subtle); overflow: hidden; margin-top: 1px; }
+.plan-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 45%, #fff));
+  transition: width 0.3s ease;
+}
+.plan-progress-fill.warn { background: linear-gradient(90deg, #c9922f, #e0ab4c); }
+.plan-progress-fill.danger { background: linear-gradient(90deg, var(--danger), color-mix(in srgb, var(--danger) 60%, #ff8a8a)); }
+
+.plan-hero-card .plan-warning { margin: 16px 0 0; }
+
+/* Cartões de assinatura/histórico envolvidos por este cartão genérico, mesma
+   moldura dos módulos do picker (var(--radius-card)/var(--shadow-card)) -
+   plan-pending-charge fica de fora de propósito: já tem moldura âmbar própria
+   de aviso, que já lê como card "urgente" sem precisar da genérica. */
+.plan-section-card {
+  margin-top: 0;
+  padding: 16px 18px;
+  border-radius: var(--radius-card);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+.plan-switch h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; color: var(--text-muted); }
+
+/* Grade de planos - cada card é o próprio botão. .current fica destacado com
+   borda --accent mesmo quando não é clicável (plano pago em vigor só permite
+   subir, ver canSelfSelectPlan) porque o ponto aqui é mostrar "esse é o seu
+   plano", não convidar pro clique. */
+.plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
+.plan-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  padding: 16px 15px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.plan-tile:hover:not(:disabled):not(.current) { transform: translateY(-3px) scale(1.03); box-shadow: var(--shadow-card-hover); border-color: var(--border-strong); }
+.plan-tile.current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 12px 26px -14px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.plan-tile:disabled { cursor: default; }
+.plan-tile:disabled:not(.current) { opacity: 0.5; }
+.plan-tile-tag {
+  position: absolute;
+  top: -9px;
+  left: 14px;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--accent);
+  padding: 3px 9px;
+  border-radius: 999px;
+  box-shadow: 0 3px 8px -2px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.plan-tile-name { font-size: 14.5px; font-weight: 800; color: var(--text-primary); }
+.plan-tile-price { font-size: 18px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+.plan-tile-price small { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
+.plan-tile-desc { font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; }
+
+/* Callout de rodapé - troca o parágrafo cinza solto por um banner com ícone,
+   no mesmo tom de --accent do resto do fluxo premium. */
+.plan-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border-subtle));
+}
+.plan-callout svg { flex-shrink: 0; color: var(--accent); margin-top: 1px; }
+.plan-callout-text { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
+
+@media (max-width: 640px) {
+  .plan-overview-body { padding: 18px 18px 22px; }
+  .plan-hero-card { padding: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-status-pill-dot, .plan-progress-fill, .plan-tile { transition: none; animation: none; }
 }
 
 /* ---------- Monitor de gargalos ---------- */

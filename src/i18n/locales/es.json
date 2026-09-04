@@ -2071,6 +2071,8 @@
     "downgradeHint": "Para bajar de plan o cancelar, contacta al soporte. Aquí solo se puede subir.",
     "menuItem": "Mi plan",
     "title": "Plan de la empresa",
+    "subtitle": "Sigue la suscripción, el uso del plan y cambia cuando quieras.",
+    "currentBadge": "Plan actual",
     "unlimited": "ilimitado",
     "usersLabel": "Usuarios",
     "renewsOnLabel": "Válido hasta",
@@ -2099,6 +2101,11 @@
       "continue": "Continuar al pago",
       "limitBadge": "Límite del plan",
       "limitHint": "Ya usaste las vacantes de módulo de este plan. {{plan}} desbloquea más módulos a la vez - puedes cambiar de plan cuando quieras."
+    },
+    "cardModules": {
+      "all": "Todos los módulos liberados",
+      "none": "Solo incluye Kanban",
+      "count": "Hasta {{count}} módulo(s) a elegir"
     },
     "stepper": {
       "step1": "Plan",

@@ -2071,6 +2071,8 @@
     "downgradeHint": "To move down a plan or cancel, contact support. Only upgrades are available here.",
     "menuItem": "My plan",
     "title": "Company plan",
+    "subtitle": "Track the subscription, plan usage, and switch whenever you want.",
+    "currentBadge": "Current plan",
     "unlimited": "unlimited",
     "usersLabel": "Users",
     "renewsOnLabel": "Valid until",
@@ -2099,6 +2101,11 @@
       "continue": "Continue to payment",
       "limitBadge": "Plan limit",
       "limitHint": "You've used this plan's module slots. {{plan}} unlocks more modules at once - you can switch plans anytime."
+    },
+    "cardModules": {
+      "all": "All modules unlocked",
+      "none": "Kanban only",
+      "count": "Up to {{count}} module(s) to choose"
     },
     "stepper": {
       "step1": "Plan",

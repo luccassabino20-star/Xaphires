@@ -2330,6 +2330,8 @@
     "downgradeHint": "Para descer de plano ou cancelar, fale com o suporte. Por aqui só é possível subir.",
     "menuItem": "Meu plano",
     "title": "Plano da empresa",
+    "subtitle": "Acompanhe a assinatura, o uso do plano e troque quando quiser.",
+    "currentBadge": "Plano atual",
     "unlimited": "ilimitado",
     "usersLabel": "Usuários",
     "renewsOnLabel": "Válido até",
@@ -2358,6 +2360,11 @@
       "continue": "Continuar para pagamento",
       "limitBadge": "Limite do plano",
       "limitHint": "Você já usou as vagas de módulo deste plano. O {{plan}} libera mais módulos de uma vez - dá para mudar de plano quando quiser."
+    },
+    "cardModules": {
+      "all": "Todos os módulos liberados",
+      "none": "Inclui só o Kanban",
+      "count": "Até {{count}} módulo(s) à escolha"
     },
     "stepper": {
       "step1": "Plano",
