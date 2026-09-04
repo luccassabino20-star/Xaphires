@@ -1162,6 +1162,16 @@ input, textarea { font-family: inherit; }
   border-radius: 50%;
   background: var(--accent);
 }
+/* Tag de cor no ponto do chip do mês - mesmo par hex das 5 tags do bloco
+   semanal (ver .planner-week-block.color-* mais abaixo), só no marcador (o
+   fundo do chip continua neutro de propósito, pra não brigar com o desenho
+   de pílula que já existe). Antes do .completed::before de propósito: quando
+   os dois se aplicam, concluído (verde) precisa vencer a cor da tag. */
+.planner-grid .calendar-card-chip.color-teal::before { background: #10b981; }
+.planner-grid .calendar-card-chip.color-blue::before { background: #3b82f6; }
+.planner-grid .calendar-card-chip.color-purple::before { background: #a855f7; }
+.planner-grid .calendar-card-chip.color-amber::before { background: #f59e0b; }
+.planner-grid .calendar-card-chip.color-rose::before { background: #f43f5e; }
 .planner-grid .calendar-card-chip.completed::before { background: var(--success); }
 .planner-grid .calendar-card-chip:hover { background: var(--border-subtle); transform: translateX(1px); }
 
@@ -1234,6 +1244,13 @@ input, textarea { font-family: inherit; }
 }
 .planner-task-row:hover { border-color: var(--border-strong); box-shadow: var(--shadow-card-hover); transform: translateY(-1px); }
 .planner-task-row.completed { opacity: 0.6; }
+/* Mesma tag de cor do bloco semanal, aqui só como borda esquerda acentuada -
+   a linha já é mais larga que um chip, não precisa tingir o fundo inteiro. */
+.planner-task-row.color-teal { border-left: 3px solid #10b981; }
+.planner-task-row.color-blue { border-left: 3px solid #3b82f6; }
+.planner-task-row.color-purple { border-left: 3px solid #a855f7; }
+.planner-task-row.color-amber { border-left: 3px solid #f59e0b; }
+.planner-task-row.color-rose { border-left: 3px solid #f43f5e; }
 
 .planner-task-check {
   flex-shrink: 0;
@@ -1476,13 +1493,54 @@ input, textarea { font-family: inherit; }
   -webkit-user-select: none;
 }
 .planner-week-block:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); z-index: 3; }
-.planner-week-block.completed { opacity: 0.55; text-decoration: line-through; }
+/* Concluído: desbotado no bloco inteiro, mas o risco vai só no título - texto
+   do horário (.planner-week-block-time, cor própria já explícita) não deve
+   ficar riscado junto, então o line-through mora no filho, não aqui. */
+.planner-week-block.completed { opacity: 0.55; }
+.planner-week-block.completed .planner-week-block-title { text-decoration: line-through; }
+/* Provisório: borda tracejada (evento ainda não confirmado) - troca só o
+   estilo da borda, a cor (sólida ou de tag) continua a mesma. */
+.planner-week-block.tentative { border-style: dashed; }
 .planner-week-block.type-focus { background: color-mix(in srgb, #7c3aed 14%, var(--bg-card)); border-color: color-mix(in srgb, #7c3aed 35%, transparent); border-left-color: #7c3aed; }
 .planner-week-block.type-vacation { background: color-mix(in srgb, #c9922f 16%, var(--bg-card)); border-color: color-mix(in srgb, #c9922f 35%, transparent); border-left-color: #c9922f; }
-.planner-week-block-time { font-size: 9.5px; font-weight: 700; color: var(--text-muted); }
+/* Tags de cor - 5 predefinidas, escolha deliberada da pessoa (hex fixo, não
+   var(--accent)/cor da empresa). Vem depois de .type-* no arquivo por
+   especificidade igual (uma classe cada) - color-* precisa vencer quando os
+   dois coexistem, mas na prática PlannerWeekGrid.jsx já manda só uma das
+   duas classes por vez (color quando setada, senão type). */
+.planner-week-block.color-teal { background: color-mix(in srgb, #10b981 14%, var(--bg-card)); border-color: color-mix(in srgb, #10b981 35%, transparent); border-left-color: #10b981; color: #047857; }
+.planner-week-block.color-blue { background: color-mix(in srgb, #3b82f6 14%, var(--bg-card)); border-color: color-mix(in srgb, #3b82f6 35%, transparent); border-left-color: #3b82f6; color: #1d4ed8; }
+.planner-week-block.color-purple { background: color-mix(in srgb, #a855f7 14%, var(--bg-card)); border-color: color-mix(in srgb, #a855f7 35%, transparent); border-left-color: #a855f7; color: #7e22ce; }
+.planner-week-block.color-amber { background: color-mix(in srgb, #f59e0b 16%, var(--bg-card)); border-color: color-mix(in srgb, #f59e0b 35%, transparent); border-left-color: #f59e0b; color: #b45309; }
+.planner-week-block.color-rose { background: color-mix(in srgb, #f43f5e 14%, var(--bg-card)); border-color: color-mix(in srgb, #f43f5e 35%, transparent); border-left-color: #f43f5e; color: #be123c; }
+.planner-week-block-time { display: flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 700; color: var(--text-muted); }
+.planner-week-block-time svg { color: var(--success); flex-shrink: 0; }
 .planner-week-block-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .planner-week-block-resize { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; cursor: ns-resize; }
 .planner-week-block-preview { background: color-mix(in srgb, var(--accent) 22%, var(--bg-card)); border-color: var(--accent); opacity: 0.9; pointer-events: none; }
+
+/* Checkbox no canto do bloco - concluir sem abrir o editor. Some quando o
+   bloco é baixo demais pra caber (overflow:hidden do bloco já cuida disso),
+   fica flutuando no canto superior direito pra não brigar com o horário/
+   título, que começam na esquerda. */
+.planner-week-block-check {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  opacity: 0.55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+.planner-week-block-check:hover { opacity: 1; }
+.planner-week-block-check.checked { opacity: 1; background: var(--success); border-color: var(--success); color: #fff; }
 
 /* Linha de "agora" - mesmo desenho de .beauty-agenda-now-line (véu pulsante
    com @keyframes), só trocando a cor fixa do Beauty por --accent (a grade
@@ -1539,12 +1597,44 @@ input, textarea { font-family: inherit; }
 .duration-preset.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)); color: var(--accent); }
 .duration-preset:disabled { cursor: not-allowed; opacity: 0.6; }
 
+/* Reaproveita o track+thumb de .addon-toggle (PlanModal.jsx) - mesma peça
+   visual, wrapper local aqui porque o componente React em si é privado
+   daquele arquivo (a CSS já era global). */
+.tentative-toggle-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; }
+
+/* Seletor de cor: círculos sólidos, não pílulas com texto - é a escolha mais
+   visual/compacta pra 5 opções, no espírito de color picker de
+   Motion/ClickUp. Primeiro swatch (sem classe color-*) representa "sem tag":
+   contorno tracejado neutro, clicar de novo em qualquer cor já ativa
+   remove a tag (ver commitColor em PersonalTaskDetailModal.jsx). */
+.color-swatch-picker { display: flex; gap: 8px; }
+.color-swatch {
+  width: 22px; height: 22px; padding: 0; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.color-swatch:hover:not(:disabled) { transform: scale(1.12); }
+.color-swatch.active { box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--text-primary); }
+.color-swatch:disabled { cursor: not-allowed; opacity: 0.6; }
+.color-swatch-teal { background: #10b981; }
+.color-swatch-blue { background: #3b82f6; }
+.color-swatch-purple { background: #a855f7; }
+.color-swatch-amber { background: #f59e0b; }
+.color-swatch-rose { background: #f43f5e; }
+
 .label-input {
   width: 100%; border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 12px;
   font-size: 13.5px; font-family: inherit; background: var(--bg-card); color: var(--text-primary);
   outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .label-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent); }
+
+/* Checkbox de concluído no cabeçalho do editor (ao lado do título) - mesma
+   pílula redonda de .planner-task-check (lista), só reaproveitada aqui fora
+   da lista. Título ganha o risco junto (mesmo raciocínio do bloco semanal:
+   line-through no elemento certo, não em tudo). */
+.modal-header .planner-task-check { margin-top: 2px; }
+.modal-title-input.completed { text-decoration: line-through; color: var(--text-muted); }
 
 @media (max-width: 900px) {
   .calendar-cell { min-height: 64px; }
@@ -1562,7 +1652,7 @@ input, textarea { font-family: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .planner-segment-thumb, .planner-quickadd-btn, .planner-grid .calendar-cell, .priority-chip,
-  .planner-week-block, .type-tab, .timing-toggle-btn, .duration-preset { transition: none; }
+  .planner-week-block, .type-tab, .timing-toggle-btn, .duration-preset, .color-swatch, .planner-week-block-check { transition: none; }
   .planner-now-line::after { animation: none; }
 }
 

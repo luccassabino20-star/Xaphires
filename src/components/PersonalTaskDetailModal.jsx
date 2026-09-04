@@ -23,6 +23,8 @@ const TYPES = ["event", "task", "focus", "vacation"];
 // servidor aceita qualquer inteiro de 5 a 1440), só os atalhos mais usados;
 // o campo continua sendo um <input type="number"> de verdade por baixo.
 const DURATION_PRESETS = [15, 30, 45, 60, 90, 120];
+// Espelha COLORS em server/routes/personalTasks.js.
+const COLORS = ["teal", "blue", "purple", "amber", "rose"];
 
 // Detalhes de uma tarefa pessoal: título, prazo, descrição e a checklist de
 // subtarefas. Mesmo padrão de autosave do CardModal (onChange no estado local,
@@ -42,6 +44,9 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
   const [allDay, setAllDay] = useState(task.allDay !== false);
   const [startTime, setStartTime] = useState(task.startTime || "09:00");
   const [durationMin, setDurationMin] = useState(task.durationMin || 60);
+  const [color, setColor] = useState(task.color || null);
+  const [tentative, setTentative] = useState(!!task.tentative);
+  const [completed, setCompleted] = useState(!!task.completed);
   const readOnly = !canUse;
 
   // Troca de tarefa (o usuário fechou e abriu outra) - sem isso os campos
@@ -57,6 +62,9 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
     setAllDay(task.allDay !== false);
     setStartTime(task.startTime || "09:00");
     setDurationMin(task.durationMin || 60);
+    setColor(task.color || null);
+    setTentative(!!task.tentative);
+    setCompleted(!!task.completed);
   }, [task.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function persist(patch) {
@@ -122,6 +130,25 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
     if (!allDay) persist({ durationMin: min });
   }
 
+  // Clicar de novo na cor já marcada tira a tag (volta pra null, a cor
+  // derivada do type) - mesmo padrão de "clicar de novo desliga" que várias
+  // pílulas de seleção única já usam neste app.
+  function commitColor(c) {
+    const proximo = color === c ? null : c;
+    setColor(proximo);
+    persist({ color: proximo });
+  }
+
+  function commitTentative(v) {
+    setTentative(v);
+    persist({ tentative: v });
+  }
+
+  function commitCompleted(v) {
+    setCompleted(v);
+    persist({ completed: v });
+  }
+
   function addChecklistItem(e) {
     e.preventDefault();
     const texto = checklistText.trim();
@@ -183,8 +210,17 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
         </div>
 
         <div className="modal-header">
+          <button
+            type="button"
+            className={"planner-task-check" + (completed ? " checked" : "")}
+            onClick={() => commitCompleted(!completed)}
+            disabled={readOnly}
+            aria-label={completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
+          >
+            {completed && <CheckMarkIcon />}
+          </button>
           <input
-            className="modal-title-input"
+            className={"modal-title-input" + (completed ? " completed" : "")}
             value={title}
             readOnly={readOnly}
             spellCheck={false}
@@ -245,6 +281,15 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
               </div>
             </div>
           )}
+          <label className="tentative-toggle-row">
+            <span className="addon-toggle">
+              <input type="checkbox" checked={tentative} disabled={readOnly} onChange={(e) => commitTentative(e.target.checked)} />
+              <span className="addon-toggle-track">
+                <span className="addon-toggle-thumb" />
+              </span>
+            </span>
+            <span>{t("planner.tentativeLabel")}</span>
+          </label>
         </div>
 
         <div className="modal-section">
@@ -262,6 +307,24 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
                 <span className="priority-chip-dot" aria-hidden="true" />
                 {t(`planner.priority.${p}`)}
               </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="modal-section">
+          <label className="modal-label">{t("planner.colorLabel")}</label>
+          <div className="color-swatch-picker">
+            {COLORS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className={"color-swatch color-swatch-" + c + (color === c ? " active" : "")}
+                onClick={() => commitColor(c)}
+                disabled={readOnly}
+                aria-pressed={color === c}
+                aria-label={t(`planner.colorTags.${c}`)}
+                title={t(`planner.colorTags.${c}`)}
+              />
             ))}
           </div>
         </div>

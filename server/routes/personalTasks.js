@@ -19,6 +19,7 @@ function exigePlano(req, res, next) {
 
 const PRIORITIES = ["low", "medium", "high"];
 const TYPES = ["event", "task", "focus", "vacation"];
+const COLORS = ["teal", "blue", "purple", "amber", "rose"];
 const LABEL_MAX = 40;
 
 // Sempre a agenda de quem está logado - não há id de usuário no corpo nem na
@@ -50,6 +51,9 @@ function validar(body) {
   }
   if (body.label !== undefined && body.label.length > LABEL_MAX) {
     return { error: "Etiqueta muito longa", code: "LABEL_TOO_LONG" };
+  }
+  if (body.color !== undefined && body.color !== null && !COLORS.includes(body.color)) {
+    return { error: "Cor inválida", code: "COLOR_INVALID" };
   }
   return null;
 }
@@ -90,6 +94,8 @@ router.post(
       startTime: req.body.startTime,
       durationMin: req.body.durationMin,
       label: req.body.label,
+      color: req.body.color,
+      tentative: req.body.tentative,
     });
     res.status(201).json(criada);
   })
@@ -100,7 +106,7 @@ router.patch(
   ownedOr404,
   exigePlano,
   ah(async (req, res) => {
-    const camposValidaveis = ["title", "due", "priority", "type", "startTime", "durationMin", "label"];
+    const camposValidaveis = ["title", "due", "priority", "type", "startTime", "durationMin", "label", "color"];
     if (camposValidaveis.some((campo) => req.body?.[campo] !== undefined)) {
       const atual = repo.getPersonalTask(req.params.id);
       const erro = validar({
@@ -112,6 +118,7 @@ router.patch(
         startTime: req.body.startTime !== undefined ? req.body.startTime : atual.startTime,
         durationMin: req.body.durationMin !== undefined ? req.body.durationMin : atual.durationMin,
         label: req.body.label ?? atual.label,
+        color: req.body.color !== undefined ? req.body.color : atual.color,
       });
       if (erro) return res.status(400).json(erro);
     }

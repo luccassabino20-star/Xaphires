@@ -233,6 +233,13 @@ function applySchema(companyDb) {
   addColumnIfMissing(companyDb, "personal_tasks", "start_time", "start_time TEXT");
   addColumnIfMissing(companyDb, "personal_tasks", "duration_min", "duration_min INTEGER");
   addColumnIfMissing(companyDb, "personal_tasks", "label", "label TEXT NOT NULL DEFAULT ''");
+  // Tag de cor do bloco na grade semanal (teal/blue/purple/amber/rose,
+  // NULL = sem tag, usa a cor derivada do type) e "provisório" (borda
+  // tracejada - convite/horário ainda não fechado). Dois campos novos,
+  // nenhum default retroativo faz sentido (nem cor nem provisório têm sinal
+  // nenhum por trás de tarefa antiga).
+  addColumnIfMissing(companyDb, "personal_tasks", "color", "color TEXT");
+  addColumnIfMissing(companyDb, "personal_tasks", "tentative", "tentative INTEGER NOT NULL DEFAULT 0");
 
   // Perfil pessoal (routes/profile.js): as únicas duas coisas que o próprio
   // usuário edita sobre si mesmo. E-mail continua fora daqui de propósito -

@@ -1921,6 +1921,15 @@
     "timed": "Avec horaire",
     "labelField": "Étiquette",
     "labelPlaceholder": "Ajouter une étiquette...",
+    "colorLabel": "Couleur",
+    "colorTags": {
+      "teal": "Vert d'eau",
+      "blue": "Bleu roi",
+      "purple": "Violet",
+      "amber": "Ambre",
+      "rose": "Rose"
+    },
+    "tentativeLabel": "Provisoire (horaire pas encore confirmé)",
     "sidebar": {
       "priorities": "Priorités",
       "prioritiesEmpty": "Priorisez une tâche pour la voir ici.",
@@ -2176,6 +2185,7 @@
     "START_TIME_INVALID": "Horaire invalide",
     "DURATION_INVALID": "Durée invalide",
     "LABEL_TOO_LONG": "Étiquette trop longue",
+    "COLOR_INVALID": "Couleur invalide",
     "PERSONAL_TASK_NOT_FOUND": "Tâche introuvable",
     "NAME_REQUIRED": "Nom obligatoire",
     "BIO_TOO_LONG": "La description est trop longue",

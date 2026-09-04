@@ -24,6 +24,14 @@ import {
 // draggable/onDragOver nativo que o quadro Kanban usa (esse é melhor pra
 // listas lado a lado; aqui o alvo é uma grade de pixels, elementFromPoint
 // resolve isso sozinho tanto pro card existente quanto pro item do painel).
+function CheckMarkTinyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="9" height="9">
+      <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
+    </svg>
+  );
+}
+
 export default function PlannerWeekGrid({
   weekAnchor,
   tasks,
@@ -34,8 +42,9 @@ export default function PlannerWeekGrid({
   onOpenTask,
   onStartDrag,
   onStartResize,
+  onToggleComplete,
 }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [now, setNow] = useState(() => new Date());
 
   // Linha de "agora" recalculada a cada minuto - não precisa de mais
@@ -115,17 +124,39 @@ export default function PlannerWeekGrid({
                     left: `${raia * largura}%`,
                     width: `calc(${largura}% - 3px)`,
                   };
+                  const corClasse = tsk.color ? " color-" + tsk.color : " type-" + (tsk.type || "task");
                   return (
                     <button
                       type="button"
                       key={tsk.id}
-                      className={"planner-week-block type-" + (tsk.type || "task") + (tsk.completed ? " completed" : "")}
+                      className={
+                        "planner-week-block" +
+                        corClasse +
+                        (tsk.completed ? " completed" : "") +
+                        (tsk.tentative ? " tentative" : "")
+                      }
                       style={style}
                       onPointerDown={canUse ? (e) => onStartDrag(e, tsk) : undefined}
                       onClick={() => onOpenTask(tsk.id)}
                     >
+                      {canUse && (
+                        <span
+                          className={"planner-week-block-check" + (tsk.completed ? " checked" : "")}
+                          role="button"
+                          tabIndex={-1}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleComplete(tsk);
+                          }}
+                          aria-label={tsk.completed ? t("board.cardItem.markIncomplete") : t("board.cardItem.markComplete")}
+                        >
+                          {tsk.completed && <CheckMarkTinyIcon />}
+                        </span>
+                      )}
                       <span className="planner-week-block-time">
                         {tsk.startTime}–{minutosParaHora(paraMinutos(tsk.startTime) + (tsk.durationMin || 60))}
+                        {tsk.completed && <CheckMarkTinyIcon />}
                       </span>
                       <span className="planner-week-block-title">{tsk.title}</span>
                       {canUse && (

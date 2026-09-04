@@ -1747,6 +1747,15 @@
     "timed": "Mit Uhrzeit",
     "labelField": "Etikett",
     "labelPlaceholder": "Etikett hinzufügen...",
+    "colorLabel": "Farbe",
+    "colorTags": {
+      "teal": "Türkis",
+      "blue": "Königsblau",
+      "purple": "Lila",
+      "amber": "Bernstein",
+      "rose": "Rosé"
+    },
+    "tentativeLabel": "Vorläufig (Uhrzeit noch nicht bestätigt)",
     "sidebar": {
       "priorities": "Prioritäten",
       "prioritiesEmpty": "Priorisieren Sie eine Aufgabe, um sie hier zu sehen.",
@@ -2002,6 +2011,7 @@
     "START_TIME_INVALID": "Ungültige Uhrzeit",
     "DURATION_INVALID": "Ungültige Dauer",
     "LABEL_TOO_LONG": "Etikett zu lang",
+    "COLOR_INVALID": "Ungültige Farbe",
     "PERSONAL_TASK_NOT_FOUND": "Aufgabe nicht gefunden",
     "NAME_REQUIRED": "Name erforderlich",
     "BIO_TOO_LONG": "Die Beschreibung ist zu lang",

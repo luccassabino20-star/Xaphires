@@ -1285,6 +1285,8 @@ function parsePersonalTask(row) {
     startTime: row.start_time || null,
     durationMin: row.duration_min ?? null,
     label: row.label || "",
+    color: row.color || null,
+    tentative: !!row.tentative,
   };
 }
 
@@ -1314,7 +1316,7 @@ export function createPersonalTask(userId, data) {
   const durationMin = allDay ? null : data.durationMin || 60;
   getDb()
     .prepare(
-      "INSERT INTO personal_tasks (id, user_id, title, due, completed, priority, type, all_day, start_time, duration_min, label, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO personal_tasks (id, user_id, title, due, completed, priority, type, all_day, start_time, duration_min, label, color, tentative, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     .run(
       id,
@@ -1327,6 +1329,8 @@ export function createPersonalTask(userId, data) {
       startTime,
       durationMin,
       data.label || "",
+      data.color || null,
+      data.tentative ? 1 : 0,
       nowIso()
     );
   return getPersonalTask(id);
@@ -1346,6 +1350,8 @@ export function updatePersonalTask(id, patch) {
   const priority = patch.priority === undefined ? atual.priority : patch.priority;
   const type = patch.type === undefined ? atual.type : patch.type;
   const label = patch.label === undefined ? atual.label : patch.label;
+  const color = patch.color === undefined ? atual.color : patch.color;
+  const tentative = patch.tentative === undefined ? atual.tentative : !!patch.tentative;
   const allDay = patch.allDay === undefined ? atual.allDay : !!patch.allDay;
   // Virar "sem horário" (arrastar de volta pro painel lateral, por exemplo)
   // limpa hora/duração - um bloco all_day com hora fantasma sobraria escondido,
@@ -1355,7 +1361,7 @@ export function updatePersonalTask(id, patch) {
   const durationMin = allDay ? null : patch.durationMin !== undefined ? patch.durationMin : atual.durationMin || 60;
   getDb()
     .prepare(
-      "UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=?, description=?, checklist=?, priority=?, type=?, all_day=?, start_time=?, duration_min=?, label=? WHERE id=?"
+      "UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=?, description=?, checklist=?, priority=?, type=?, all_day=?, start_time=?, duration_min=?, label=?, color=?, tentative=? WHERE id=?"
     )
     .run(
       patch.title ?? atual.title,
@@ -1370,6 +1376,8 @@ export function updatePersonalTask(id, patch) {
       startTime,
       durationMin,
       label,
+      color,
+      tentative ? 1 : 0,
       id
     );
   return getPersonalTask(id);

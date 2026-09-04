@@ -2077,6 +2077,15 @@
     "timed": "Timed",
     "labelField": "Label",
     "labelPlaceholder": "Add a label...",
+    "colorLabel": "Color",
+    "colorTags": {
+      "teal": "Teal",
+      "blue": "Royal blue",
+      "purple": "Purple",
+      "amber": "Amber",
+      "rose": "Rose"
+    },
+    "tentativeLabel": "Tentative (time not confirmed yet)",
     "sidebar": {
       "priorities": "Priorities",
       "prioritiesEmpty": "Prioritize a task to see it here.",
@@ -2332,6 +2341,7 @@
     "START_TIME_INVALID": "Invalid time",
     "DURATION_INVALID": "Invalid duration",
     "LABEL_TOO_LONG": "Label is too long",
+    "COLOR_INVALID": "Invalid color",
     "PERSONAL_TASK_NOT_FOUND": "Task not found",
     "NAME_REQUIRED": "Name is required",
     "BIO_TOO_LONG": "The bio is too long",

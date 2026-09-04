@@ -504,6 +504,7 @@ export default function PersonalPlanner({ initialTab = "week" }) {
                     onOpenTask={openTaskIfNotDragged}
                     onStartDrag={startDrag}
                     onStartResize={startResize}
+                    onToggleComplete={toggleTask}
                   />
                 </div>
               )}
@@ -540,7 +541,11 @@ export default function PersonalPlanner({ initialTab = "week" }) {
                           {dayTasks.map((tsk) => (
                             <button
                               key={tsk.id}
-                              className={"calendar-card-chip" + (tsk.completed ? " completed" : "")}
+                              className={
+                                "calendar-card-chip" +
+                                (tsk.color ? " color-" + tsk.color : "") +
+                                (tsk.completed ? " completed" : "")
+                              }
                               onClick={() => toggleTask(tsk)}
                               disabled={!canUse}
                               title={tsk.title}
@@ -609,7 +614,11 @@ export default function PersonalPlanner({ initialTab = "week" }) {
                             return (
                               <li
                                 key={tsk.id}
-                                className={"planner-task-row" + (tsk.completed ? " completed" : "")}
+                                className={
+                                  "planner-task-row" +
+                                  (tsk.color ? " color-" + tsk.color : "") +
+                                  (tsk.completed ? " completed" : "")
+                                }
                                 onClick={() => setDetailTaskId(tsk.id)}
                               >
                                 <button
