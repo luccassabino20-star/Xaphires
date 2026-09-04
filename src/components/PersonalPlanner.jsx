@@ -101,7 +101,11 @@ const TABS = ["week", "month", "list"];
 // personal_tasks no servidor). Três abas sobre o mesmo dado - Semana (grade
 // por horário, a visão principal), Mês (calendário) e Lista - porque são a
 // mesma coisa vista de três jeitos, não telas com fonte própria cada.
-export default function PersonalPlanner({ onClose, initialTab = "week" }) {
+//
+// Página cheia dentro de .main-area (ver AuthenticatedApp.jsx), não modal -
+// sem overlay, sem X, sem onClose: sair daqui é navegar pra outro lugar
+// (rail "Início" ou escolher um quadro), a mesma lógica de qualquer página.
+export default function PersonalPlanner({ initialTab = "week" }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
   const WEEKDAYS = useMemo(() => weekdayNames(i18n.language), [i18n.language]);
@@ -416,17 +420,8 @@ export default function PersonalPlanner({ onClose, initialTab = "week" }) {
   }, [weekDaysList, i18n.language]);
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="modal premium-modal planner-modal">
-        <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
-          &times;
-        </button>
-        <div className="planner-modal-header">
+    <div className="planner-page">
+      <div className="planner-modal-header">
           <div className="planner-modal-heading">
             <span className="planner-header-icon">
               <CalendarBadgeIcon />
@@ -480,7 +475,7 @@ export default function PersonalPlanner({ onClose, initialTab = "week" }) {
           </div>
         )}
 
-        <div className={"modal-body planner-modal-body" + (tab === "week" ? " planner-modal-body-week" : "")}>
+        <div className={"planner-modal-body" + (tab === "week" ? " planner-modal-body-week" : "")}>
           {loading ? (
             <p className="share-empty">{t("common.loading")}</p>
           ) : (
@@ -671,7 +666,6 @@ export default function PersonalPlanner({ onClose, initialTab = "week" }) {
             </>
           )}
         </div>
-      </div>
       {detailTask && (
         <PersonalTaskDetailModal
           task={detailTask}
@@ -683,3 +677,4 @@ export default function PersonalPlanner({ onClose, initialTab = "week" }) {
     </div>
   );
 }
+

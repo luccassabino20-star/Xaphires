@@ -905,24 +905,28 @@ input, textarea { font-family: inherit; }
 .calendar-more { font-size: 11px; color: var(--text-muted); padding: 2px 6px; }
 
 /* ---------- Planejador pessoal (PersonalPlanner) ----------
-   Modal Ultra Premium (Raycast/Notion Calendar/Linear): reaproveita a casca
-   .premium-modal (overlay com blur, cantos e animação de entrada - ver seção
-   "Fluxo premium de contratação" acima) e ganha a própria classe de tamanho
-   (.planner-modal), como .module-picker-modal/.plan-overview-modal já fazem
-   cada um para o seu modal. Tudo que toca o calendário (.calendar-grid/
-   .calendar-cell/.calendar-weekday/.calendar-card-chip) é escopado por baixo
-   de .planner-grid de propósito: essas classes-base são as MESMAS de
-   CalendarView.jsx (a visão de calendário do quadro), que não leva
-   .planner-grid como ancestral - mexer na regra sem escopo mudaria a visão do
-   quadro sem querer. */
+   Página cheia dentro de .main-area (ver .planner-page, mais abaixo, e
+   AuthenticatedApp.jsx) - não é modal, a Sidebar (.dsb-rail/.dsb-panel)
+   continua visível ao lado. As classes de header/toolbar/corpo mantêm o
+   prefixo "planner-modal-*" só por não valer o custo de renomear import por
+   import; nenhuma delas depende de ancestral .modal/.premium-modal. Tudo que
+   toca o calendário (.calendar-grid/.calendar-cell/.calendar-weekday/
+   .calendar-card-chip) é escopado por baixo de .planner-grid de propósito:
+   essas classes-base são as MESMAS de CalendarView.jsx (a visão de
+   calendário do quadro), que não leva .planner-grid como ancestral - mexer
+   na regra sem escopo mudaria a visão do quadro sem querer. */
 .planner-modal-header {
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
   padding: 22px 26px;
+  background: var(--bg-topbar);
   border-bottom: 1px solid var(--border-subtle);
 }
 .planner-modal-heading { display: flex; align-items: center; gap: 12px; }
@@ -1360,19 +1364,11 @@ input, textarea { font-family: inherit; }
 .priority-chip.priority-medium.active { border-color: #c9922f; background: color-mix(in srgb, #c9922f 15%, var(--bg-card)); color: #c9922f; }
 .priority-chip.priority-low.active { border-color: var(--success); background: color-mix(in srgb, var(--success) 12%, var(--bg-card)); color: var(--success); }
 
-/* Modal cresce bastante nesta versão pra caber a grade semanal + painel
-   lateral lado a lado - Mês e Lista sobram com mais respiro, sem problema. */
-/* Seletor composto (.modal.planner-modal), não só .planner-modal: a base
-   .modal (mais abaixo no arquivo, mesma especificidade de classe única) tem
-   width:100%/max-width:620px, e por ordem de cascata venceria uma regra
-   também de classe única declarada mais cedo - foi o que prendia este modal
-   em ~620px de largura mesmo com este bloco escrito depois de propósito. Duas
-   classes batem uma independente de ordem no arquivo. Mesmo cuidado que
-   .module-picker-modal e .plan-overview-modal já tomam ao virem DEPOIS da
-   base .modal no arquivo - aqui a base fica antes por causa da posição desta
-   seção (perto do topo), então a especificidade extra resolve sem precisar
-   mover a seção inteira. */
-.modal.planner-modal { max-width: 1180px; width: 92vw; height: 86vh; max-height: 86vh; }
+/* Página cheia (não mais modal) dentro de .main-area, docada ao lado da
+   Sidebar (.dsb-rail/.dsb-panel) - ver AuthenticatedApp.jsx. Mesma receita de
+   .view-content-area (flex:1/min-height:0 dentro de um pai coluna com altura
+   real): sem max-width/vh nenhum, preenche o que sobrar de verdade. */
+.planner-page { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; background: var(--bg-topbar); }
 
 /* ---------- Aba Semana: painel lateral + grade por horário ----------
    O corpo do modal vira linha (sidebar | grade) em vez da coluna com scroll
@@ -1556,7 +1552,6 @@ input, textarea { font-family: inherit; }
 }
 
 @media (max-width: 640px) {
-  .modal.planner-modal { width: 96vw; height: 90vh; max-height: 90vh; }
   .planner-modal-header { padding: 18px 18px 16px; }
   .planner-toolbar { padding: 12px 18px; flex-wrap: wrap; }
   .planner-modal-body { padding: 16px 18px 20px; }

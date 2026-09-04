@@ -10,6 +10,7 @@ import CalendarView from "./components/views/CalendarView.jsx";
 import DashboardView from "./components/views/DashboardView.jsx";
 import MapView from "./components/views/MapView.jsx";
 import MatrixView from "./components/views/MatrixView.jsx";
+import PersonalPlanner from "./components/PersonalPlanner.jsx";
 import CardModal from "./components/CardModal.jsx";
 import { useBoardState } from "./state/BoardContext.jsx";
 import { useUsers } from "./state/UsersContext.jsx";
@@ -38,6 +39,12 @@ export default function AuthenticatedApp({ onExitModule }) {
   }
   const [searchQuery, setSearchQuery] = useState("");
   const [memberFilter, setMemberFilter] = useState(null);
+  // Planejador ocupa a área de conteúdo principal como página cheia (não é
+  // mais modal - ver Sidebar.jsx) - null significa "mostrando o quadro
+  // ativo", "week"/"list" é a aba com que ele abre. Mora aqui (não em
+  // Sidebar.jsx) porque quem decide o que aparece em .main-area é este
+  // componente, o mesmo dono de `view`.
+  const [plannerTab, setPlannerTab] = useState(null);
   // No celular o sidebar é um painel sobreposto (ver @media em index.css), e abrir
   // por cima do quadro na primeira visita seria uma surpresa - só em telas largas
   // ele começa aberto, empurrando o layout como sempre foi.
@@ -61,6 +68,10 @@ export default function AuthenticatedApp({ onExitModule }) {
 
   function selectBoard(id) {
     setActiveBoardId(id);
+    // Escolher um quadro sai do Planejador (se estiver aberto) - mesmo
+    // espírito de qualquer navegação: ir pra outro lugar troca o que a área
+    // de conteúdo mostra.
+    setPlannerTab(null);
     // No overlay do celular, escolher um quadro deixaria o painel em cima dele até
     // o próximo toque no hambúrguer - fecha sozinho, como qualquer menu de navegação.
     if (window.innerWidth <= 720) setSidebarOpen(false);
@@ -74,37 +85,56 @@ export default function AuthenticatedApp({ onExitModule }) {
 
   return (
     <div className="app-shell">
-      <Sidebar collapsed={!sidebarOpen} activeBoardId={activeBoardId} onSelectBoard={selectBoard} onOpenCard={openCard} />
+      <Sidebar
+        collapsed={!sidebarOpen}
+        activeBoardId={activeBoardId}
+        onSelectBoard={selectBoard}
+        onOpenCard={openCard}
+        plannerActive={!!plannerTab}
+        onOpenPlanner={setPlannerTab}
+        onExitPlanner={() => setPlannerTab(null)}
+      />
       {/* Some sozinho fora do celular via CSS - no desktop o sidebar empurra o
           layout em vez de sobrepor, e um véu escurecendo o resto não faria sentido. */}
       {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
       <div className="main-area">
         <PlanBanner />
-        <TopBar
-          board={board}
-          onExitModule={onExitModule}
-          onToggleSidebar={() => setSidebarOpen((o) => !o)}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          memberFilter={memberFilter}
-          onFilterChange={setMemberFilter}
-          onSelectBoard={selectBoard}
-        />
-        {board && <TaskTicker board={board} onOpenCard={openCard} />}
-        {board && <ViewSwitcher view={view} onChange={setView} />}
-        {board ? (
-          <div className="view-content-area" style={board.background ? { background: board.background } : undefined}>
-            {view === "board" && (
-              <BoardView board={board} members={users} searchQuery={searchQuery} memberFilter={memberFilter} onOpenCard={openCard} />
-            )}
-            {view === "table" && <TableView {...viewProps} />}
-            {view === "calendar" && <CalendarView {...viewProps} />}
-            {view === "dashboard" && <DashboardView {...viewProps} />}
-            {view === "map" && <MapView {...viewProps} />}
-            {view === "matrix" && <MatrixView {...viewProps} />}
-          </div>
+        {plannerTab ? (
+          // Página cheia dentro da própria área de conteúdo (não modal) -
+          // TopBar/TaskTicker/ViewSwitcher são chrome de quadro, sem sentido
+          // aqui já que o Planejador é fora de qualquer quadro; ele traz o
+          // próprio cabeçalho. Voltar é pelo rail "Início" (ver Sidebar.jsx),
+          // não um X - mesma lógica de qualquer outra página do app.
+          <PersonalPlanner initialTab={plannerTab} />
         ) : (
-          <div className="empty-state">{t("app.noBoards")}</div>
+          <>
+            <TopBar
+              board={board}
+              onExitModule={onExitModule}
+              onToggleSidebar={() => setSidebarOpen((o) => !o)}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              memberFilter={memberFilter}
+              onFilterChange={setMemberFilter}
+              onSelectBoard={selectBoard}
+            />
+            {board && <TaskTicker board={board} onOpenCard={openCard} />}
+            {board && <ViewSwitcher view={view} onChange={setView} />}
+            {board ? (
+              <div className="view-content-area" style={board.background ? { background: board.background } : undefined}>
+                {view === "board" && (
+                  <BoardView board={board} members={users} searchQuery={searchQuery} memberFilter={memberFilter} onOpenCard={openCard} />
+                )}
+                {view === "table" && <TableView {...viewProps} />}
+                {view === "calendar" && <CalendarView {...viewProps} />}
+                {view === "dashboard" && <DashboardView {...viewProps} />}
+                {view === "map" && <MapView {...viewProps} />}
+                {view === "matrix" && <MatrixView {...viewProps} />}
+              </div>
+            ) : (
+              <div className="empty-state">{t("app.noBoards")}</div>
+            )}
+          </>
         )}
       </div>
       {activeCardId && board && board.cards[activeCardId] && (

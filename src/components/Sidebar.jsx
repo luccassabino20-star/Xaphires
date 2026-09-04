@@ -10,7 +10,6 @@ import { isDarkBackground } from "../utils/contrast.js";
 import * as api from "../state/api.js";
 import UsersPanel from "./UsersPanel.jsx";
 import TeamPanel from "./TeamPanel.jsx";
-import PersonalPlanner from "./PersonalPlanner.jsx";
 import PlanModal from "./PlanModal.jsx";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import AccountMenu from "./AccountMenu.jsx";
@@ -168,7 +167,7 @@ function ShortcutRow({ icon, label, badge, onClick, title }) {
   );
 }
 
-export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpenCard }) {
+export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpenCard, plannerActive, onOpenPlanner, onExitPlanner }) {
   const { t } = useTranslation();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -188,7 +187,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
   // já nasce com o formulário de novo usuário aberto (ver UsersPanel.jsx).
   const [usersPanelInvite, setUsersPanelInvite] = useState(false);
   const [teamPanelOpen, setTeamPanelOpen] = useState(false);
-  const [plannerTab, setPlannerTab] = useState(null); // null = fechado; "calendar" | "list" = aberto nessa aba
   const [planOpen, setPlanOpen] = useState(false);
   const [plataformaOpen, setPlataformaOpen] = useState(false);
   // null = sem teto (ou ainda não carregou - getPlan() tem cache de 30s em
@@ -459,14 +457,29 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
         </div>
 
         <div className="dsb-rail-nav">
-          <RailItem icon={<IconHome />} label={t("app.sidebar.rail.home")} active />
+          {/* "Início" volta pro quadro quando o Planejador está ocupando a
+              área de conteúdo (ver AuthenticatedApp.jsx) - é o "voltar" da
+              página cheia, no lugar do X que o modal tinha. Sem onClick
+              quando já está no quadro (nada pra voltar). */}
+          <RailItem
+            icon={<IconHome />}
+            label={t("app.sidebar.rail.home")}
+            active={!plannerActive}
+            onClick={plannerActive ? onExitPlanner : undefined}
+          />
           {/* PLACEHOLDER: IA/Painéis/Quadros/Mais não têm tela nem dado por
               trás no Xaphires hoje - ver decisão registrada na conversa
               ("visual completo, com placeholders"). Ficam sem onClick de
               propósito, com title="Em breve" pra quem passar o mouse não
               achar que é bug. Planejador é real: agenda pessoal (ver
-              PersonalPlanner.jsx), fora de qualquer quadro. */}
-          <RailItem icon={<IconCalendar />} label={t("app.sidebar.rail.planner")} onClick={() => setPlannerTab("week")} />
+              PersonalPlanner.jsx), fora de qualquer quadro - ocupa a área de
+              conteúdo principal como página cheia, não é mais modal. */}
+          <RailItem
+            icon={<IconCalendar />}
+            label={t("app.sidebar.rail.planner")}
+            active={plannerActive}
+            onClick={() => onOpenPlanner("week")}
+          />
           <RailItem icon={<IconSparkle />} label={t("app.sidebar.rail.ai")} title={t("app.sidebar.comingSoon")} />
           <RailItem icon={<IconUsers />} label={t("app.sidebar.rail.team")} onClick={() => setTeamPanelOpen(true)} />
           <RailItem icon={<IconChart />} label={t("app.sidebar.rail.dashboards")} title={t("app.sidebar.comingSoon")} />
@@ -571,7 +584,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
           <ShortcutRow
             icon={<IconCheckCircle size={15} />}
             label={t("app.sidebar.shortcuts.myTasks")}
-            onClick={() => setPlannerTab("list")}
+            onClick={() => onOpenPlanner("list")}
           />
         </div>
 
@@ -791,7 +804,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
           }
         />
       )}
-      {plannerTab && <PersonalPlanner initialTab={plannerTab} onClose={() => setPlannerTab(null)} />}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
       {plataformaOpen && (
         <Suspense fallback={null}>
