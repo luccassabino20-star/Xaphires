@@ -20,8 +20,9 @@ import {
 } from "../admin/auth.js";
 import * as repo from "../repo.js";
 import * as billing from "../billing/store.js";
-import { PLAN_IDS, getPlan, effectiveStatus, daysLeft, addOneMonth, maxUsersFor, attachmentLimitFor } from "../plans.js";
+import { PLAN_IDS, getPlan, effectiveStatus, daysLeft, addOneMonth, maxUsersFor, maxModulesFor, attachmentLimitFor } from "../plans.js";
 import { MODULE_IDS, moduleEntitlementsFor } from "../modules.js";
+import { ADDON_IDS, addonCatalogFor } from "../addons.js";
 
 const router = Router();
 
@@ -254,12 +255,41 @@ router.post(
 // lista explícita. Isto é dado do diretório (não entra no banco da empresa),
 // então não passa por comAcessoAEmpresa - mas é auditado como qualquer mudança
 // contratual.
+// maxModules/moduleCount/moduleLimitWarning são só INFORMATIVOS - o teto do
+// plano (ver plans.js) não bloqueia o PUT abaixo de propósito. A concessão de
+// módulo é a válvula de segurança manual do sistema (decisão registrada em
+// billing/lifecycle.js/confirmarPagamento): quem administra pode conceder
+// módulo extra por cortesia ou negociação sem o sistema brigar, só fica
+// avisado quando está acima do que o plano contratado prevê.
+function infoLimiteModulos(company, entitlements) {
+  const max = maxModulesFor(company);
+  const usados = entitlements.filter((m) => m.entitled && !m.core).length;
+  return {
+    maxModules: max,
+    moduleCount: usados,
+    moduleLimitWarning: max !== null && usados > max,
+  };
+}
+
+// O que o cliente PEDIU no checkout (ver requestedModules em routes/billing.js),
+// não o que já está concedido - é o que vira o selo "cliente pediu" na tela,
+// pro admin decidir se marca. Sem assinatura ativa, lista vazia.
+function modulosPedidosPor(companyId) {
+  const assinatura = billing.getActiveSubscription(companyId);
+  return billing.parseRequestedList(assinatura?.requested_modules);
+}
+
 router.get(
   "/companies/:id/modules",
   ah(async (req, res) => {
     const e = store.acharEmpresa(req.params.id);
     if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
-    res.json({ modules: moduleEntitlementsFor(e) });
+    const entitlements = moduleEntitlementsFor(e);
+    res.json({
+      modules: entitlements,
+      requestedModules: modulosPedidosPor(e.id),
+      ...infoLimiteModulos(e, entitlements),
+    });
   })
 );
 
@@ -276,7 +306,46 @@ router.put(
     const alvo = MODULE_IDS.filter((id) => modules.includes(id));
     const atualizada = dir.setCompanyModules(req.params.id, alvo);
     auditar(req, "definir_modulos", { companyId: e.id, alvo: e.name, detalhe: { modules: alvo } });
-    res.json({ company: visaoEmpresa(atualizada), modules: moduleEntitlementsFor(atualizada) });
+    const entitlements = moduleEntitlementsFor(atualizada);
+    res.json({
+      company: visaoEmpresa(atualizada),
+      modules: entitlements,
+      requestedModules: modulosPedidosPor(e.id),
+      ...infoLimiteModulos(atualizada, entitlements),
+    });
+  })
+);
+
+// Entitlement de ADD-ONS da empresa - mesmo desenho do bloco de módulos acima,
+// espelhando addonCatalogFor (server/addons.js). Diferente de módulo, add-on
+// já é liberado sozinho na confirmação do pagamento (ver
+// billing/lifecycle.js/confirmarPagamento) - esta rota existe para o admin
+// AJUSTAR (cortesia, estorno manual, correção), não para ser o único caminho
+// de concessão.
+router.get(
+  "/companies/:id/addons",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    res.json({ addons: addonCatalogFor(e) });
+  })
+);
+
+router.put(
+  "/companies/:id/addons",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    const { addons } = req.body || {};
+    if (!Array.isArray(addons) || !addons.every((a) => ADDON_IDS.includes(a))) {
+      return res.status(400).json({ error: "Lista de add-ons inválida", code: "INVALID_ADDONS" });
+    }
+    const alvo = ADDON_IDS.filter((id) => addons.includes(id));
+    // union:false substitui a lista inteira - mesmo comportamento do PUT de
+    // módulos (o admin está definindo o estado final, não somando).
+    const atualizada = dir.setCompanyAddons(req.params.id, alvo, { union: false });
+    auditar(req, "definir_addons", { companyId: e.id, alvo: e.name, detalhe: { addons: alvo } });
+    res.json({ company: visaoEmpresa(atualizada), addons: addonCatalogFor(atualizada) });
   })
 );
 

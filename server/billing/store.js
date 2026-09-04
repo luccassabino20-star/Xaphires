@@ -86,6 +86,18 @@ function addColumnIfMissing(tabela, nome, ddl) {
 addColumnIfMissing("subscriptions", "payer_email", "payer_email TEXT");
 addColumnIfMissing("subscriptions", "payer_doc", "payer_doc TEXT");
 
+// O PEDIDO de módulo/add-on feito no checkout (ver ciclo.assinar em
+// lifecycle.js), como JSON de ids. "Pedido", não "concedido": módulo
+// nunca é aplicado a companies.enabled_modules sozinho, mesmo depois do
+// pagamento confirmar - fica só registrado aqui para o painel admin
+// mostrar "cliente pediu X, Y" e quem administra decidir (ver comentário
+// em confirmarPagamento, lifecycle.js). Add-on é diferente: confirmarPagamento
+// libera sozinho em companies.enabled_addons, mas o pedido continua gravado
+// aqui também - é o "carrinho" da assinatura, histórico de o que foi
+// contratado neste ciclo, independente de quando/como foi aplicado.
+addColumnIfMissing("subscriptions", "requested_modules", "requested_modules TEXT");
+addColumnIfMissing("subscriptions", "requested_addons", "requested_addons TEXT");
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -122,13 +134,15 @@ export function createSubscription({
   nextChargeAt,
   payerEmail,
   payerDoc,
+  requestedModules,
+  requestedAddons,
 }) {
   const agora = nowIso();
   db.prepare(
     `INSERT INTO subscriptions
      (id, company_id, plan, method, status, provider, provider_subscription_id, next_charge_at,
-      payer_email, payer_doc, created_at, updated_at)
-     VALUES (?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`
+      payer_email, payer_doc, requested_modules, requested_addons, created_at, updated_at)
+     VALUES (?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
     companyId,
@@ -139,10 +153,27 @@ export function createSubscription({
     nextChargeAt || null,
     payerEmail || null,
     payerDoc || null,
+    requestedModules && requestedModules.length ? JSON.stringify(requestedModules) : null,
+    requestedAddons && requestedAddons.length ? JSON.stringify(requestedAddons) : null,
     agora,
     agora
   );
   return getSubscription(id);
+}
+
+// Leitura já parseada do "carrinho" gravado na assinatura - usado pelo painel
+// admin (o pedido de módulo) e por confirmarPagamento (o pedido de add-on).
+// Lista vazia tanto para coluna NULL quanto para JSON inválido - nunca deveria
+// dar parse error (só esta função escreve a coluna), mas não é o tipo de
+// função que deveria derrubar a leitura da assinatura por causa disso.
+export function parseRequestedList(json) {
+  if (!json) return [];
+  try {
+    const arr = JSON.parse(json);
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
 }
 
 export function updateSubscription(id, campos) {

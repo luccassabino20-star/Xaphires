@@ -1112,15 +1112,108 @@
       ]
     },
     "pricing": {
-      "headerTitle": "Choose your team's plan",
-      "headerText": "Pick the right plan for your team and change it as it grows.",
-      "mostPopular": "Most popular",
+      "headerTitle": "A plan for every stage of your operation",
+      "headerText": "From the freelancer who just needs to organize tasks to the clinic network running its own IT - the price ladder follows the real size of the problem, not the other way around.",
+      "howItWorks": {
+        "eyebrow": "How it works",
+        "title": "How the Modular Platform & Add-ons work",
+        "text": "Three decisions, in the order you actually make them - none of them go through sales.",
+        "steps": [
+          { "title": "Start with Kanban, for free", "text": "Essential task, list and card management, no credit card. It's our front door - not a crippled version built to force an upgrade." },
+          { "title": "Add the modules your operation uses", "text": "Health & Clinics, Sales & CRM, Finance & BPO... pick 1, 3 or all 8. You pay for what actually runs your business, never for a whole idle suite." },
+          { "title": "Turn on Add-ons inside each module, on demand", "text": "WhatsApp reminders in Health, bank reconciliation in Finance, an extra pipeline in CRM. Specific firepower, switched on only when that module needs it." }
+        ]
+      },
       "plans": [
-        { "name": "Free", "price": "Free", "period": "", "tagline": "For small teams to get started with the essentials", "cta": "Start for free", "features": ["Up to 7 users", "Up to 4 boards, private and shared", "Kanban, Table and Calendar", "Manual card archiving", "Card attachments and links (up to 10 MB)", "Email support"] },
-        { "name": "Unlimited", "price": "R$ 530.00", "period": "/month", "tagline": "For teams that outgrew seven people", "cta": "Explore the platform", "note": "7 days free to try", "features": ["Up to 15 users", "Everything in Free, plus:", "Unlimited boards", "All 7 views (+ Gantt, Dashboard, Map, Eisenhower Matrix)", "Card attachments and links (up to 50 MB)"] },
-        { "name": "Pro", "price": "R$ 1,850.00", "period": "/month", "tagline": "For teams that want full control", "cta": "Explore the platform", "note": "7 days free to try", "highlight": true, "features": ["Unlimited users", "Everything in Unlimited, plus:", "Pending tasks ticker", "Auto-archiving of completed cards", "Bottleneck monitor", "Personal planner", "Routines that create cards on their own", "Priority support"] },
-        { "name": "Enterprise", "price": "R$ 3,780.00", "period": "/month", "tagline": "For organizations with specific needs", "cta": "Explore the platform", "note": "7 days free to try", "features": ["Everything in Pro, plus:", "Dedicated onboarding", "Dedicated support", "Service level agreement (SLA)", "Development of any custom feature you need", "We build any tailored solution your business requires", "Open scope for exclusive projects and customizations"] }
-      ]
+        {
+          "name": "Free",
+          "badge": "Start here",
+          "price": "R$ 0",
+          "period": "/month, forever",
+          "tagline": "Your entry point to organize any operation.",
+          "cta": "Create a free account",
+          "features": ["Full Kanban Board module", "Lists, cards, due dates and assignees with no cap on essential use"],
+          "addonFeatures": ["Add-ons on demand: Gantt, Eisenhower Matrix, advanced Calendar"]
+        },
+        {
+          "name": "Starter",
+          "badge": "Great for clinics & freelancers",
+          "price": "R$ 149",
+          "period": "/month",
+          "tagline": "The right solution, without paying for the other seven you don't use.",
+          "cta": "Pick my module",
+          "features": ["Everything in Free (Kanban included)", "+1 specialized module of your choice, Base tier", "Up to 5 users included", "Standard support"],
+          "addonFeatures": ["Add-ons for the active module, sold separately"]
+        },
+        {
+          "name": "Growth",
+          "badge": "Most popular",
+          "price": "R$ 390",
+          "period": "/month",
+          "tagline": "Support, sales and management in one place - no more tab juggling.",
+          "cta": "Build my Growth plan",
+          "highlight": true,
+          "features": ["Everything in Free", "+up to 3 modules of your choice, advanced tier", "Up to 15 users included", "Native automations across contracted modules", "Priority support"]
+        },
+        {
+          "name": "Full Suite",
+          "badge": "Best value",
+          "price": "R$ 890",
+          "period": "/month",
+          "tagline": "Every piece of software you pay for today, inside one platform.",
+          "cta": "Subscribe to Full Suite",
+          "features": ["Unlimited access to all 8 modules", "Up to 30 users included", "Cross-module data flows across every department", "Advanced end-to-end automations", "Priority support via Chat/WhatsApp"]
+        },
+        {
+          "name": "Enterprise",
+          "badge": "Tailored",
+          "price": "R$ 1,990",
+          "period": "/month, starting at",
+          "tagline": "For operations that already think at scale.",
+          "cta": "Talk to sales",
+          "features": ["Everything in Full Suite", "Unlimited users and storage", "Every add-on from every module included", "VIP onboarding, SLA and a dedicated account manager", "Custom development"]
+        }
+      ],
+      "planNote": "The real unit isn't the plan tier - it's the module. A clinic pays for one well-equipped Health module, not for a whole Full Suite it will never open. Grow by adding modules and add-ons, not by switching tiers.",
+      "addons": {
+        "eyebrow": "In-app monetization",
+        "title": "Add-on matrix by module",
+        "text": "Every module ships already well-equipped - the specific upgrade becomes available inside it, the moment you actually feel the need, not before.",
+        "modules": [
+          {
+            "name": "Kanban Board",
+            "items": [
+              { "name": "Gantt view & advanced Timeline", "desc": "A project schedule built on the same cards, no re-entering data." },
+              { "name": "Extended attachments (100MB+)", "desc": "For teams already using a card as a project folder - blueprints, videos, large PDFs." },
+              { "name": "Extra internal automations", "desc": "More automatic routines per board, beyond the plan's quota." }
+            ]
+          },
+          {
+            "name": "Health & Clinics",
+            "items": [
+              { "name": "WhatsApp/SMS confirmation", "desc": "Automatic appointment reminders, cutting no-shows without a call center." },
+              { "name": "VIP patient record", "desc": "Custom fields and unlimited attachments per patient." },
+              { "name": "Recall reminders", "desc": "Automatic recall of inactive patients, on a configurable schedule." }
+            ]
+          },
+          {
+            "name": "Sales & CRM",
+            "items": [
+              { "name": "Unlimited pipelines", "desc": "One funnel per product line or sales team, at no cost per funnel." },
+              { "name": "Lead enrichment", "desc": "Company and contact data filled in automatically when a lead is created." },
+              { "name": "Proposals with e-signature", "desc": "Close the funnel without leaving the CRM for another tool." }
+            ]
+          },
+          {
+            "name": "Finance & BPO",
+            "items": [
+              { "name": "Open Finance reconciliation", "desc": "Bank statement matched against cash flow on its own, no manual OFX import." },
+              { "name": "Automated invoice issuance", "desc": "Invoices go out together with the payment settlement, no rework." },
+              { "name": "P&L by cost center", "desc": "Results broken down by project or unit, not just the consolidated total." }
+            ]
+          }
+        ]
+      }
     },
     "privacy": {
       "backLink": "← Back",
@@ -1992,7 +2085,17 @@
       "basic": "Free",
       "intermediate": "Unlimited",
       "professional": "Pro",
-      "enterprise": "Enterprise"
+      "enterprise": "Enterprise",
+      "free": "Free",
+      "starter": "Starter",
+      "growth": "Growth",
+      "fullsuite": "Full Suite",
+      "custom": "Enterprise"
+    },
+    "modulePicker": {
+      "hint": "The {{plan}} plan includes up to {{count}} module(s) of your choice, besides Kanban. Pick the ones your operation uses - you can add add-ons for each right below.",
+      "totalLabel": "Monthly total",
+      "continue": "Continue to payment"
     },
     "status": {
       "active": "Active",
@@ -2078,9 +2181,27 @@
       "failed": "Not approved",
       "canceled": "Canceled",
       "refunded": "Refunded"
+    },
+    "addons": {
+      "items": {
+        "quadro-gantt": { "label": "Gantt view & advanced Timeline", "desc": "A project schedule built on the same cards, no re-entering data." },
+        "quadro-anexos": { "label": "Extended attachments (100MB+)", "desc": "For teams already using a card as a project folder - blueprints, videos, large PDFs." },
+        "quadro-automacoes": { "label": "Extra internal automations", "desc": "More automatic routines per board, beyond the plan's quota." },
+        "saude-whatsapp": { "label": "WhatsApp/SMS confirmation", "desc": "Automatic appointment reminders, cutting no-shows without a call center." },
+        "saude-prontuario-vip": { "label": "VIP patient record", "desc": "Custom fields and unlimited attachments per patient." },
+        "saude-recall": { "label": "Recall reminders", "desc": "Automatic recall of inactive patients, on a configurable schedule." },
+        "vendas-pipelines": { "label": "Unlimited pipelines", "desc": "One funnel per product line or sales team, at no cost per funnel." },
+        "vendas-enriquecimento": { "label": "Lead enrichment", "desc": "Company and contact data filled in automatically when a lead is created." },
+        "vendas-assinatura": { "label": "Proposals with e-signature", "desc": "Close the funnel without leaving the CRM for another tool." },
+        "financebpo-openfinance": { "label": "Open Finance reconciliation", "desc": "Bank statement matched against cash flow on its own, no manual OFX import." },
+        "financebpo-nf": { "label": "Automated invoice issuance", "desc": "Invoices go out together with the payment settlement, no rework." },
+        "financebpo-dre": { "label": "P&L by cost center", "desc": "Results broken down by project or unit, not just the consolidated total." }
+      }
     }
   },
   "errors": {
+    "PLAN_MODULE_LIMIT_EXCEEDED": "The chosen plan doesn't allow that many modules.",
+    "INVALID_ADDON": "Unknown add-on.",
     "MODULE_FORBIDDEN": "Module unavailable",
     "CLINIC_TYPE_INVALID": "Invalid specialty",
     "CLINIC_THEME_INVALID": "Invalid theme",

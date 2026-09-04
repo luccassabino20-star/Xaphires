@@ -369,7 +369,7 @@ function PricingPreview({ onEnter, onNavigate }) {
           const ctaClass = p.highlight ? "btn-primary" : "btn-secondary";
           return (
             <div className={"landing-plan-card landing-plan-card-compact" + (p.highlight ? " highlight" : "")} key={p.name}>
-              {p.highlight && <span className="landing-plan-badge">{t("landing.pricing.mostPopular")}</span>}
+              {p.badge && <span className="landing-plan-badge">{p.badge}</span>}
               <h3>{p.name}</h3>
               <div className="landing-plan-price">
                 <span className="landing-plan-price-value">{p.price}</span>
@@ -540,6 +540,68 @@ function ProductTeamsPage({ onEnter, onNavigate }) {
   );
 }
 
+// Os 3 passos de "como montar o plano" - Kanban grátis, módulos à escolha,
+// add-on dentro de cada módulo. Fica entre o header e a grade de planos: é a
+// explicação de por que a página tem 5 cartões em vez de 3, antes da pessoa
+// chegar neles.
+function PricingHowItWorks() {
+  const { t } = useTranslation();
+  const steps = t("landing.pricing.howItWorks.steps", { returnObjects: true });
+
+  return (
+    <section className="landing-howitworks">
+      <div className="landing-howitworks-head">
+        <span className="landing-section-eyebrow">{t("landing.pricing.howItWorks.eyebrow")}</span>
+        <h2>{t("landing.pricing.howItWorks.title")}</h2>
+        <p>{t("landing.pricing.howItWorks.text")}</p>
+      </div>
+      <div className="landing-howitworks-steps">
+        {steps.map((s, i) => (
+          <div className="landing-howitworks-step" key={s.title}>
+            <span className="landing-howitworks-num">{i + 1}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Matriz de add-ons por módulo - o "cardápio" de upgrade in-app que cada
+// pilar oferece à parte do plano. Ilustrativo (nenhum desses add-ons é
+// contratável hoje, ver ressalva de backend), mesmo espírito do mock da
+// SolutionsShowcaseSection.
+function PricingAddonMatrix() {
+  const { t } = useTranslation();
+  const modules = t("landing.pricing.addons.modules", { returnObjects: true });
+
+  return (
+    <section className="landing-addon-matrix">
+      <div className="landing-addon-matrix-head">
+        <span className="landing-section-eyebrow">{t("landing.pricing.addons.eyebrow")}</span>
+        <h2>{t("landing.pricing.addons.title")}</h2>
+        <p>{t("landing.pricing.addons.text")}</p>
+      </div>
+      <div className="landing-addon-grid">
+        {modules.map((m) => (
+          <div className="landing-addon-card" key={m.name}>
+            <h3>{m.name}</h3>
+            <ul>
+              {m.items.map((it) => (
+                <li key={it.name}>
+                  <strong>{it.name}</strong>
+                  <span>{it.desc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function PricingPage({ onEnter }) {
   const { t } = useTranslation();
   const plans = t("landing.pricing.plans", { returnObjects: true });
@@ -551,13 +613,15 @@ function PricingPage({ onEnter }) {
         <p>{t("landing.pricing.headerText")}</p>
       </section>
 
+      <PricingHowItWorks />
+
       <section className="landing-pricing">
         <div className="landing-pricing-grid">
           {plans.map((p) => {
             const ctaClass = p.highlight ? "btn-primary" : "btn-secondary";
             return (
               <div className={"landing-plan-card" + (p.highlight ? " highlight" : "")} key={p.name}>
-                {p.highlight && <span className="landing-plan-badge">{t("landing.pricing.mostPopular")}</span>}
+                {p.badge && <span className="landing-plan-badge">{p.badge}</span>}
                 <h3>{p.name}</h3>
                 <p className="landing-plan-tagline">{p.tagline}</p>
                 <div className="landing-plan-price">
@@ -573,12 +637,20 @@ function PricingPage({ onEnter }) {
                   {p.features.map((f) => (
                     <li key={f}>{f}</li>
                   ))}
+                  {/* Linha "sob demanda" do módulo/add-on - visualmente separada das
+                      incluídas (sem check verde, ícone "+" mudo em vez de confirmação). */}
+                  {p.addonFeatures && p.addonFeatures.map((f) => (
+                    <li className="addon" key={f}>{f}</li>
+                  ))}
                 </ul>
               </div>
             );
           })}
         </div>
+        <p className="landing-pricing-note">{t("landing.pricing.planNote")}</p>
       </section>
+
+      <PricingAddonMatrix />
     </>
   );
 }

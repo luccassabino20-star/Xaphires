@@ -39,7 +39,7 @@ function IconeBoleto() {
 
 const ICONES = { pix: IconePix, card: IconeCartao, boleto: IconeBoleto };
 
-export default function CheckoutModal({ plan, priceCents, simulated, docInicial, onClose, onPaid }) {
+export default function CheckoutModal({ plan, priceCents, modules, addons, simulated, docInicial, onClose, onPaid }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
 
@@ -107,7 +107,14 @@ export default function CheckoutModal({ plan, priceCents, simulated, docInicial,
       // pessoa digita o número na página hospedada do gateway, depois do
       // redirecionamento logo abaixo. Nenhum dado de cartão passa por este código.
       const card = metodo === "card" && simulated ? { number: numero.replace(/\s+/g, ""), name: nome, validade, cvv } : undefined;
-      const r = await api.subscribe({ plan, method: metodo, card, payerDoc: normalizarDoc(doc) || undefined });
+      const r = await api.subscribe({
+        plan,
+        method: metodo,
+        card,
+        payerDoc: normalizarDoc(doc) || undefined,
+        modules: modules || [],
+        addons: addons || [],
+      });
       if (metodo === "card" && !simulated && r.payment?.checkoutUrl) {
         // Sai do app agora: quem confirma o pagamento é a página do gateway. A
         // volta (successUrl/cancelUrl configurados no servidor) cai no app de

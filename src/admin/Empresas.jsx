@@ -1,12 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "./api.js";
 
-const PLANOS = ["basic", "intermediate", "professional", "enterprise"];
-const NOMES = { basic: "Free", intermediate: "Unlimited", professional: "Pro", enterprise: "Enterprise" };
-// Só planos pagos com preço de tabela levam desconto - Free já é grátis. O
-// Enterprise passou a ter preço de tabela (autoatendimento igual aos demais),
-// então entra na lista.
-const PLANOS_COM_DESCONTO = ["intermediate", "professional", "enterprise"];
+// Os 4 primeiros são o catálogo legacy (ver server/plans.js) - continuam
+// aparecendo aqui porque "definir plano" é a válvula manual do admin, inclusive
+// para uma empresa legacy que precise de ajuste; os 5 seguintes são o catálogo
+// modular atual (autoatendimento).
+const PLANOS = ["basic", "intermediate", "professional", "enterprise", "free", "starter", "growth", "fullsuite", "custom"];
+const NOMES = {
+  basic: "Free (legacy)",
+  intermediate: "Unlimited (legacy)",
+  professional: "Pro (legacy)",
+  enterprise: "Enterprise (legacy)",
+  free: "Free",
+  starter: "Starter",
+  growth: "Growth",
+  fullsuite: "Full Suite",
+  custom: "Enterprise",
+};
+// Só planos pagos com preço de tabela levam desconto - Free já é grátis.
+const PLANOS_COM_DESCONTO = ["intermediate", "professional", "enterprise", "starter", "growth", "fullsuite", "custom"];
 const SITUACAO = { active: "Ativa", trialing: "Em teste", grace: "Pagamento em aberto", expired: "Vencida", blocked: "Bloqueada" };
 // Nomes dos módulos da plataforma para o painel (só em português, ferramenta
 // interna). Espelha os ids de server/modules.js.
@@ -14,7 +26,25 @@ const NOMES_MODULOS = {
   quadro: "Quadro Kanban",
   "vendas-crm": "Vendas & CRM",
   financeiro: "ERP IRES",
+  "finance-bpo": "Xaphires Finance & BPO",
   "saude-clinicas": "Saúde & Clínicas",
+  "xaphires-beauty": "Xaphires Beauty",
+  "time-tracking": "Xaphires Time & Tracking",
+};
+// Espelha server/addons.js - só em português, mesmo critério de NOMES_MODULOS.
+const NOMES_ADDONS = {
+  "quadro-gantt": "Visão Gantt & Linha do tempo avançada",
+  "quadro-anexos": "Anexos estendidos (100MB+)",
+  "quadro-automacoes": "Automações internas extra",
+  "saude-whatsapp": "Confirmação via WhatsApp/SMS",
+  "saude-prontuario-vip": "Prontuário VIP",
+  "saude-recall": "Lembretes de retorno",
+  "vendas-pipelines": "Pipelines ilimitados",
+  "vendas-enriquecimento": "Enriquecimento de leads",
+  "vendas-assinatura": "Propostas com assinatura eletrônica",
+  "financebpo-openfinance": "Conciliação via Open Finance",
+  "financebpo-nf": "Emissão automatizada de NF",
+  "financebpo-dre": "DRE por centro de custo",
 };
 
 function data(iso) {
@@ -39,6 +69,9 @@ function Detalhe({ id, onFechar, onMudou }) {
   const [salvandoTeste, setSalvandoTeste] = useState(null); // 1, -1 ou null
   const [modulos, setModulos] = useState(null); // [{id, core, available, entitled}]
   const [salvandoModulo, setSalvandoModulo] = useState(null); // id do módulo em salvamento
+  const [modulosInfo, setModulosInfo] = useState(null); // {maxModules, moduleCount, moduleLimitWarning, requestedModules}
+  const [addons, setAddons] = useState(null); // [{id, moduleId, priceCents, enabled}]
+  const [salvandoAddon, setSalvandoAddon] = useState(null); // id do add-on em salvamento
 
   const carregar = useCallback(async () => {
     try {
@@ -66,6 +99,14 @@ function Detalhe({ id, onFechar, onMudou }) {
       );
       const m = await api.verModulos(id);
       setModulos(m.modules);
+      setModulosInfo({
+        maxModules: m.maxModules,
+        moduleCount: m.moduleCount,
+        moduleLimitWarning: m.moduleLimitWarning,
+        requestedModules: m.requestedModules || [],
+      });
+      const a = await api.verAddons(id);
+      setAddons(a.addons);
     } catch (e) {
       setErro(e.message);
     }
@@ -124,6 +165,26 @@ function Detalhe({ id, onFechar, onMudou }) {
       setErro(e.message);
     } finally {
       setSalvandoModulo(null);
+    }
+  }
+
+  // Mesmo padrão de alternarModulo, para add-ons. Diferente de módulo, add-on
+  // já costuma vir ligado sozinho pela confirmação do pagamento (ver
+  // server/billing/lifecycle.js) - este toggle é só o ajuste manual (cortesia,
+  // estorno, correção), não o caminho principal de concessão.
+  async function alternarAddon(aid) {
+    if (!addons) return;
+    const ligados = addons.filter((a) => a.enabled).map((a) => a.id);
+    const alvo = ligados.includes(aid) ? ligados.filter((x) => x !== aid) : [...ligados, aid];
+    setSalvandoAddon(aid);
+    try {
+      const r = await api.definirAddons(id, alvo);
+      setAddons(r.addons);
+      onMudou?.();
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setSalvandoAddon(null);
     }
   }
 
@@ -428,8 +489,22 @@ function Detalhe({ id, onFechar, onMudou }) {
         <p className="adm-fraco">
           Controla o que esta empresa pode usar de cada módulo. "Em breve" ainda não foi construído -
           liberar aqui já deixa pré-autorizado para quando entrar no ar. Dentro da empresa, o master
-          ainda decide quais usuários acessam cada módulo.
+          ainda decide quais usuários acessam cada módulo. A concessão aqui é SEMPRE manual - o
+          checkout de módulo (ver plano da empresa) só registra o pedido, nunca aplica sozinho.
         </p>
+        {modulosInfo && (
+          <p className="adm-fraco">
+            {modulosInfo.maxModules === null
+              ? "Plano sem teto de módulo add-on."
+              : `${modulosInfo.moduleCount} de ${modulosInfo.maxModules} vaga(s) de módulo do plano em uso.`}
+            {modulosInfo.moduleLimitWarning && " Acima do que o plano contratado prevê - concessão continua valendo, é só aviso."}
+          </p>
+        )}
+        {modulosInfo?.requestedModules?.length > 0 && (
+          <p className="adm-fraco">
+            Cliente pediu no checkout: {modulosInfo.requestedModules.map((mid) => NOMES_MODULOS[mid] || mid).join(", ")}.
+          </p>
+        )}
         {!modulos ? (
           <p className="adm-fraco">Carregando...</p>
         ) : (
@@ -445,6 +520,38 @@ function Detalhe({ id, onFechar, onMudou }) {
                 <span className="adm-modulo-nome">{NOMES_MODULOS[m.id] || m.id}</span>
                 {m.core && <span className="adm-chip">core</span>}
                 {!m.available && <span className="adm-chip adm-chip-fraco">em breve</span>}
+                {!m.stored && modulosInfo?.requestedModules?.includes(m.id) && (
+                  <span className="adm-chip adm-chip-master">cliente pediu</span>
+                )}
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="adm-secao">
+        <h3>Add-ons por módulo</h3>
+        <p className="adm-fraco">
+          Reserva de recurso cobrada no checkout (ver server/addons.js) - nenhum add-on desbloqueia
+          feature nenhuma ainda, é só o direito registrado. Diferente de módulo, add-on já é
+          liberado sozinho quando o pagamento confirma; este toggle é o ajuste manual (cortesia,
+          estorno, correção).
+        </p>
+        {!addons ? (
+          <p className="adm-fraco">Carregando...</p>
+        ) : (
+          <div className="adm-modulos">
+            {addons.map((a) => (
+              <label key={a.id} className="adm-modulo">
+                <input
+                  type="checkbox"
+                  checked={a.enabled}
+                  disabled={salvandoAddon === a.id}
+                  onChange={() => alternarAddon(a.id)}
+                />
+                <span className="adm-modulo-nome">{NOMES_ADDONS[a.id] || a.id}</span>
+                <span className="adm-chip adm-chip-fraco">{NOMES_MODULOS[a.moduleId] || a.moduleId}</span>
+                <span className="adm-chip">R$ {(a.priceCents / 100).toFixed(2)}</span>
               </label>
             ))}
           </div>

@@ -84,6 +84,8 @@ export const definirLimites = (id, maxUsersOverride, maxAttachmentBytesOverride)
 export const prorrogarTeste = (id, days) => req(`/companies/${id}/extend-trial`, { method: "POST", body: { days } });
 export const verModulos = (id) => req(`/companies/${id}/modules`);
 export const definirModulos = (id, modules) => req(`/companies/${id}/modules`, { method: "PUT", body: { modules } });
+export const verAddons = (id) => req(`/companies/${id}/addons`);
+export const definirAddons = (id, addons) => req(`/companies/${id}/addons`, { method: "PUT", body: { addons } });
 
 export const verQuadros = (id) => req(`/companies/${id}/boards`);
 export const alterarCartao = (id, cardId, patch) => req(`/companies/${id}/cards/${cardId}`, { method: "PATCH", body: patch });

@@ -6,6 +6,124 @@ import { translateError } from "../utils/errors.js";
 import * as api from "../state/api.js";
 import CheckoutModal from "./CheckoutModal.jsx";
 
+// Passo intermediário entre "escolher plano" e "pagar", só para planos com
+// vaga de módulo LIMITADA (Starter/Growth - maxModules é um número). Full
+// Suite/Enterprise (maxModules null) não passam por aqui: pedem todos os
+// módulos não-core disponíveis de uma vez (ver trocarPara), porque não há o
+// que escolher quando o plano já entitla a tudo. A concessão de verdade
+// continua manual pelo painel admin de qualquer forma (ver comentário em
+// server/billing/lifecycle.js confirmarPagamento) - isto aqui só registra o
+// pedido e monta o valor certo pro checkout.
+function ModulePickerStep({ alvo, addonCatalog, onCancel, onContinue }) {
+  const { t, i18n } = useTranslation();
+  const [modulos, setModulos] = useState(null); // catálogo cru de GET /api/modules
+  const [erro, setErro] = useState("");
+  const [escolhidos, setEscolhidos] = useState([]);
+  const [addonsEscolhidos, setAddonsEscolhidos] = useState([]);
+
+  useEffect(() => {
+    api.getModules().then((r) => setModulos(r.modules)).catch((e) => setErro(translateError(e, t)));
+  }, [t]);
+
+  const opcoes = (modulos || []).filter((m) => m.available && !m.core);
+  const noLimite = escolhidos.length >= alvo.maxModules;
+
+  function alternarModulo(id) {
+    setEscolhidos((atual) => {
+      if (atual.includes(id)) {
+        // Tirar o módulo tira junto os add-ons dele - não faz sentido cobrar
+        // add-on de um módulo que não foi mais selecionado.
+        setAddonsEscolhidos((as) => as.filter((aid) => addonCatalog.find((a) => a.id === aid)?.moduleId !== id));
+        return atual.filter((x) => x !== id);
+      }
+      if (atual.length >= alvo.maxModules) return atual;
+      return [...atual, id];
+    });
+  }
+
+  function alternarAddon(id) {
+    setAddonsEscolhidos((atual) => (atual.includes(id) ? atual.filter((x) => x !== id) : [...atual, id]));
+  }
+
+  const addonsDisponiveis = addonCatalog.filter((a) => escolhidos.includes(a.moduleId));
+  const totalAddonsCents = addonsDisponiveis
+    .filter((a) => addonsEscolhidos.includes(a.id))
+    .reduce((soma, a) => soma + a.priceCents, 0);
+  const precoBaseCents = Math.round((alvo.price || 0) * 100);
+
+  return (
+    <div className="modal-body module-picker">
+      <p className="module-picker-hint">
+        {t("plan.modulePicker.hint", { count: alvo.maxModules, plan: t(`plan.names.${alvo.id}`) })}
+      </p>
+      {erro && <div className="auth-error">{erro}</div>}
+      {!modulos && !erro && <p className="plan-modal-loading">{t("common.loading")}</p>}
+
+      {modulos && (
+        <div className="module-picker-list">
+          {opcoes.map((m) => {
+            const marcado = escolhidos.includes(m.id);
+            const addonsDoModulo = addonCatalog.filter((a) => a.moduleId === m.id);
+            return (
+              <div className={"module-picker-item" + (marcado ? " active" : "")} key={m.id}>
+                <label className="module-picker-check">
+                  <input
+                    type="checkbox"
+                    checked={marcado}
+                    disabled={!marcado && noLimite}
+                    onChange={() => alternarModulo(m.id)}
+                  />
+                  <span>{t(`modules.${m.id}.name`)}</span>
+                </label>
+                {marcado && addonsDoModulo.length > 0 && (
+                  <div className="module-picker-addons">
+                    {addonsDoModulo.map((a) => (
+                      <label className="module-picker-addon" key={a.id}>
+                        <input
+                          type="checkbox"
+                          checked={addonsEscolhidos.includes(a.id)}
+                          onChange={() => alternarAddon(a.id)}
+                        />
+                        <span>{t(a.labelKey)}</span>
+                        <span className="module-picker-addon-price">
+                          +{new Intl.NumberFormat(i18n.language, { style: "currency", currency: "BRL" }).format(a.priceCents / 100)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="module-picker-total">
+        <span>{t("plan.modulePicker.totalLabel")}</span>
+        <strong>
+          {new Intl.NumberFormat(i18n.language, { style: "currency", currency: "BRL" }).format(
+            (precoBaseCents + totalAddonsCents) / 100
+          )}
+        </strong>
+      </div>
+
+      <div className="module-picker-actions">
+        <button type="button" className="btn-cancel" onClick={onCancel}>
+          {t("common.cancel")}
+        </button>
+        <button
+          type="button"
+          className="btn-primary"
+          disabled={escolhidos.length === 0}
+          onClick={() => onContinue(escolhidos, addonsEscolhidos, precoBaseCents + totalAddonsCents)}
+        >
+          {t("plan.modulePicker.continue")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function formatarData(iso, locale) {
   if (!iso) return null;
   const d = new Date(iso);
@@ -28,7 +146,8 @@ export default function PlanModal({ onClose }) {
   const [cobranca, setCobranca] = useState(null);
   const [erro, setErro] = useState(null);
   const [trocando, setTrocando] = useState(null);
-  const [checkout, setCheckout] = useState(null); // { id, priceCents }
+  const [checkout, setCheckout] = useState(null); // { id, priceCents, modules, addons }
+  const [escolhaModulos, setEscolhaModulos] = useState(null); // plano-alvo aguardando o picker
 
   const carregar = useCallback(async () => {
     try {
@@ -51,7 +170,28 @@ export default function PlanModal({ onClose }) {
   // troca direta, porque não cobra nada.
   async function trocarPara(alvo) {
     if (alvo.paid) {
-      setCheckout({ id: alvo.id, priceCents: Math.round((alvo.price || 0) * 100) });
+      // maxModules é um número (Starter/Growth): a pessoa escolhe QUAIS módulos,
+      // dentro da vaga do plano - passa pelo picker antes do checkout. null
+      // (Full Suite/Enterprise) não tem o que escolher - o plano já entitla a
+      // todos, então o pedido de módulo vai com a lista inteira de uma vez,
+      // sem perguntar (a concessão de verdade continua manual pelo painel
+      // admin de qualquer forma - ver comentário em confirmarPagamento).
+      if (alvo.maxModules === null) {
+        let todos = [];
+        try {
+          const r = await api.getModules();
+          todos = r.modules.filter((m) => m.available && !m.core).map((m) => m.id);
+        } catch {
+          /* sem catálogo, segue sem módulo pedido - checkout continua válido */
+        }
+        setCheckout({ id: alvo.id, priceCents: Math.round((alvo.price || 0) * 100), modules: todos, addons: [] });
+        return;
+      }
+      if (alvo.maxModules > 0) {
+        setEscolhaModulos(alvo);
+        return;
+      }
+      setCheckout({ id: alvo.id, priceCents: Math.round((alvo.price || 0) * 100), modules: [], addons: [] });
       return;
     }
     const nome = t(`plan.names.${alvo.id}`);
@@ -113,6 +253,17 @@ export default function PlanModal({ onClose }) {
           <h2 className="plan-modal-title">{t("plan.title")}</h2>
         </div>
 
+        {escolhaModulos ? (
+          <ModulePickerStep
+            alvo={escolhaModulos}
+            addonCatalog={plano?.addonCatalog || []}
+            onCancel={() => setEscolhaModulos(null)}
+            onContinue={(modules, addons, totalCents) => {
+              setCheckout({ id: escolhaModulos.id, priceCents: totalCents, modules, addons });
+              setEscolhaModulos(null);
+            }}
+          />
+        ) : (
         <div className="modal-body">
           {erro && <div className="auth-error">{erro}</div>}
           {!plano && !erro && <p className="plan-modal-loading">{t("common.loading")}</p>}
@@ -281,12 +432,15 @@ export default function PlanModal({ onClose }) {
             </>
           )}
         </div>
+        )}
       </div>
 
       {checkout && (
         <CheckoutModal
           plan={checkout.id}
           priceCents={checkout.priceCents}
+          modules={checkout.modules}
+          addons={checkout.addons}
           simulated={!!cobranca?.simulated}
           docInicial={cobranca?.subscription?.payerDoc}
           onClose={() => {

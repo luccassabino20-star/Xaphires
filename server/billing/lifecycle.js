@@ -12,8 +12,9 @@
 //    vezes o mesmo ciclo nem emitir um Pix por acesso.
 
 import crypto from "node:crypto";
-import { getCompany, setCompanyPlan, setCompanyGrace, getCompanyPlanDiscounts } from "../directory.js";
+import { getCompany, setCompanyPlan, setCompanyGrace, setCompanyAddons, getCompanyPlanDiscounts } from "../directory.js";
 import { getPlan, priceCentsOf, addOneMonth, effectiveStatus } from "../plans.js";
+import { totalPriceCents as totalAddonsCents } from "../addons.js";
 import { gateway, metodoTemDebitoAutomatico, metodoRenovaSozinho } from "./gateway.js";
 import * as store from "./store.js";
 
@@ -73,6 +74,21 @@ export function confirmarPagamento(paymentId, { paidAt } = {}) {
   // Pagou: não há mais o que perdoar.
   setCompanyGrace(pagamento.company_id, null);
 
+  // Add-on pedido no checkout (ver assinar()) é liberado AQUI, automaticamente -
+  // diferente de módulo, que fica só registrado (requested_modules) para o
+  // painel admin aplicar na mão. Add-on hoje não desbloqueia nenhuma feature
+  // sensível (nenhuma ainda lê enabled_addons - ver server/addons.js), então
+  // não há risco em conceder sozinho assim que o pagamento confirma; é
+  // exatamente o mesmo espírito de "confirmarPagamento é o único caminho que
+  // libera acesso", só que o que ele libera aqui é entitlement de add-on, não
+  // o plano. union:true (padrão) nunca tira um add-on de ciclo anterior -
+  // cada renovação soma ao que já foi pago, não substitui.
+  const assinaturaDoPagamento = pagamento.subscription_id ? store.getSubscription(pagamento.subscription_id) : null;
+  const addonsPedidos = store.parseRequestedList(assinaturaDoPagamento?.requested_addons);
+  if (addonsPedidos.length) {
+    setCompanyAddons(pagamento.company_id, addonsPedidos);
+  }
+
   if (pagamento.subscription_id) {
     store.updateSubscription(pagamento.subscription_id, {
       plan: pagamento.plan,
@@ -125,20 +141,31 @@ export function registrarFalha(paymentId, motivo) {
 // Emite a cobrança de um ciclo. Devolve o pagamento criado, já com o estado que o
 // gateway respondeu — pago (cartão aprovado), pendente (Pix/boleto) ou falho.
 export async function emitirCobranca({ companyId, plan, method, subscriptionId, card, payer, periodStart, attempt }) {
-  const centavos = priceCentsOf(plan);
-  if (centavos === null) {
+  const centavosPlano = priceCentsOf(plan);
+  if (centavosPlano === null) {
     const err = new Error("Plano sob consulta não passa por cobrança automática");
     err.code = "PLAN_NOT_CHARGEABLE";
     throw err;
   }
+  // Add-on pedido no checkout (gravado na assinatura, ver assinar()) entra na
+  // cobrança de TODO ciclo, não só do primeiro - é recorrência de verdade,
+  // mesmo raciocínio de um plano: continua sendo cobrado até a empresa
+  // cancelar. Lido daqui (não recebido por parâmetro) porque emitirCobranca
+  // também é chamada pela varredura de renovação, que não tem o carrinho em
+  // mãos - só o id da assinatura.
+  const assinaturaAtual = subscriptionId ? store.getSubscription(subscriptionId) : null;
+  const addonsAtivos = store.parseRequestedList(assinaturaAtual?.requested_addons);
+  const centavosAddons = totalAddonsCents(addonsAtivos);
+  const centavos = centavosPlano + centavosAddons;
   // Desconto negociado por fora, por plano (companies.discount_by_plan, ver
   // directory.js) - o mesmo desconto não segue a empresa se ela mudar de plano.
-  // Vai como discount na cobrança do Asaas em cima do preço de tabela, não
-  // subtraído aqui - o boleto/Pix precisa mostrar os dois valores, não só o líquido.
-  // O que esta função registra localmente em amountCents É o líquido, porque é o
-  // que a empresa de fato paga; o preço de tabela sem desconto some deste ponto em
-  // diante e só existe para o gateway montar o documento.
-  const descontoCentavos = Math.min(getCompanyPlanDiscounts(getCompany(companyId))[plan] || 0, centavos);
+  // Incide só sobre o preço do PLANO, nunca sobre add-on: um desconto
+  // negociado no plano não deveria abater silenciosamente um add-on contratado
+  // depois, que ninguém negociou. Vai como discount na cobrança do Asaas em
+  // cima do preço de tabela, não subtraído aqui - o boleto/Pix precisa mostrar
+  // os dois valores, não só o líquido. O que esta função registra localmente
+  // em amountCents É o líquido, porque é o que a empresa de fato paga.
+  const descontoCentavos = Math.min(getCompanyPlanDiscounts(getCompany(companyId))[plan] || 0, centavosPlano);
   const centavosLiquidos = centavos - descontoCentavos;
 
   const inicio = periodStart || nowIso();
@@ -201,7 +228,7 @@ export async function emitirCobranca({ companyId, plan, method, subscriptionId, 
 // pagamento. Com cartão aprovado isso acontece na mesma chamada; com Pix e boleto o
 // plano só muda quando o pagamento for confirmado, e até lá a empresa continua
 // exatamente no acesso que já tinha.
-export async function assinar({ companyId, plan, method, card, payer }) {
+export async function assinar({ companyId, plan, method, card, payer, modules, addons }) {
   const jaPendente = store.pendingPayment(companyId);
   if (jaPendente) {
     const err = new Error("Já existe uma cobrança em aberto. Pague ou aguarde o vencimento dela.");
@@ -224,9 +251,14 @@ export async function assinar({ companyId, plan, method, card, payer }) {
     store.updateSubscription(anterior.id, { status: "canceled", canceledAt: nowIso(), nextChargeAt: null });
   }
 
+  // Valor mostrado/cobrado no checkout hospedado de cartão já inclui os add-ons
+  // pedidos - mesmo total que emitirCobranca vai calcular logo abaixo (ver
+  // comentário lá sobre reler o carrinho da assinatura a cada ciclo).
+  const amountComAddons = priceCentsOf(plan) + totalAddonsCents(addons);
+
   let providerSubscriptionId = null;
   if (metodoTemDebitoAutomatico(method)) {
-    const r = await gateway.criarAssinatura({ plan, method, card, payer, amountCents: priceCentsOf(plan) });
+    const r = await gateway.criarAssinatura({ plan, method, card, payer, amountCents: amountComAddons });
     if (r.status === "failed") {
       const err = new Error("O cartão foi recusado.");
       err.code = "CARD_DECLINED";
@@ -248,6 +280,13 @@ export async function assinar({ companyId, plan, method, card, payer }) {
     nextChargeAt: null,
     payerEmail: payer?.email,
     payerDoc: payer?.doc,
+    // O "carrinho" desta contratação - módulo fica só registrado (concessão é
+    // manual, painel admin); add-on é liberado sozinho na confirmação do
+    // pagamento (ver confirmarPagamento). Validado em routes/billing.js antes
+    // de chegar aqui (mesma divisão de responsabilidade que já existe pra
+    // method/payerDoc/teto de usuário).
+    requestedModules: modules,
+    requestedAddons: addons,
   });
 
   const pagamento = await emitirCobranca({

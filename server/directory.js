@@ -95,6 +95,15 @@ addColumnIfMissing("companies", "max_attachment_bytes_override", "max_attachment
 // painel passa a valer explicitamente por cima do padrão.
 addColumnIfMissing("companies", "enabled_modules", "enabled_modules TEXT");
 
+// Entitlement de ADD-ON por módulo (ver server/addons.js), mesmo formato de
+// enabled_modules: JSON com a lista de ids de add-on. NULL/ausente = nenhum
+// add-on. Diferente de enabled_modules, quem escreve aqui hoje não é só o
+// painel admin - confirmarPagamento() (billing/lifecycle.js) também grava,
+// automaticamente, o que a empresa pagou no checkout (ver decisão registrada
+// lá: add-on ainda não desbloqueia nada sensível, então liberar sozinho na
+// confirmação do pagamento é seguro - módulo continua manual, de propósito).
+addColumnIfMissing("companies", "enabled_addons", "enabled_addons TEXT");
+
 // A cobrança guarda os dados dela no mesmo banco global, porque pagamento é da
 // empresa e não de dentro de um quadro. Fica em server/billing/store.js, que cria
 // as próprias tabelas — este arquivo continua sendo só o cadastro de empresas.
@@ -175,6 +184,31 @@ export function setCompanyModules(id, moduleIds) {
   directoryDb
     .prepare("UPDATE companies SET enabled_modules = ? WHERE id = ?")
     .run(moduleIds ? JSON.stringify(moduleIds) : null, id);
+  return getCompany(id);
+}
+
+// Mesmo padrão de setCompanyModules, para add-ons. `union` (true, padrão) faz
+// merge com o que já está gravado em vez de substituir - é o modo que
+// confirmarPagamento() usa (nunca tira add-on que já foi pago numa renovação
+// anterior); o painel admin, se algum dia editar isso, passaria union:false
+// pra substituir a lista inteira (mesmo comportamento que já tem em módulo).
+export function setCompanyAddons(id, addonIds, { union = true } = {}) {
+  const atual = getCompany(id);
+  if (!atual) return null;
+  let novaLista = addonIds || [];
+  if (union) {
+    let existente = [];
+    try {
+      const parsed = atual.enabled_addons ? JSON.parse(atual.enabled_addons) : [];
+      if (Array.isArray(parsed)) existente = parsed;
+    } catch {
+      existente = [];
+    }
+    novaLista = Array.from(new Set([...existente, ...novaLista]));
+  }
+  directoryDb
+    .prepare("UPDATE companies SET enabled_addons = ? WHERE id = ?")
+    .run(novaLista.length ? JSON.stringify(novaLista) : null, id);
   return getCompany(id);
 }
 

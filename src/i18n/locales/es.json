@@ -1112,15 +1112,108 @@
       ]
     },
     "pricing": {
-      "headerTitle": "Elige el plan de tu equipo",
-      "headerText": "Elige el plan ideal para tu equipo y cámbialo cuando crezca.",
-      "mostPopular": "Más popular",
+      "headerTitle": "Un plan para cada etapa de la operación",
+      "headerText": "Del autónomo que solo necesita organizar tareas a la red de clínicas con TI propio - la escala de precios sigue el tamaño real del problema, no al revés.",
+      "howItWorks": {
+        "eyebrow": "Cómo funciona",
+        "title": "Cómo funciona la Plataforma Modular & Add-ons",
+        "text": "Tres decisiones, en el orden en que realmente las tomas - ninguna pasa por ventas.",
+        "steps": [
+          { "title": "Empieza con el Kanban, gratis", "text": "Gestión esencial de tareas, listas y tarjetas, sin tarjeta de crédito. Es nuestra puerta de entrada, no una versión recortada para forzar el upgrade." },
+          { "title": "Añade los módulos que tu operación usa", "text": "Salud & Clínicas, Ventas & CRM, Finanzas & BPO... elige 1, 3 u 8. Pagas por lo que realmente corre en tu negocio, nunca por una suite entera parada." },
+          { "title": "Activa Add-ons dentro de cada módulo, bajo demanda", "text": "Recordatorio por WhatsApp en Salud, conciliación bancaria en Finanzas, pipeline extra en el CRM. Potencia específica, encendida solo cuando ese módulo la necesita." }
+        ]
+      },
       "plans": [
-        { "name": "Free", "price": "Gratis", "period": "", "tagline": "Para equipos pequeños que empiezan con lo esencial", "cta": "Empezar gratis", "features": ["Hasta 7 usuarios", "Hasta 4 tableros, privados y compartidos", "Kanban, Tabla y Calendario", "Archivado manual de tarjetas", "Adjuntos y enlaces en las tarjetas (hasta 10 MB)", "Soporte por correo"] },
-        { "name": "Unlimited", "price": "R$ 530,00", "period": "/mes", "tagline": "Para equipos que crecieron más allá de siete personas", "cta": "Conocer la plataforma", "note": "7 días gratis para probar", "features": ["Hasta 15 usuarios", "Todo lo de Free, más:", "Tableros ilimitados", "Las 7 vistas (+ Gantt, Panel, Mapa, Matriz de Eisenhower)", "Adjuntos y enlaces en las tarjetas (hasta 50 MB)"] },
-        { "name": "Pro", "price": "R$ 1.850,00", "period": "/mes", "tagline": "Para equipos que quieren control total", "cta": "Conocer la plataforma", "note": "7 días gratis para probar", "highlight": true, "features": ["Usuarios ilimitados", "Todo lo de Unlimited, más:", "Letrero de tareas pendientes", "Archivado automático de completadas", "Monitor de cuellos de botella", "Planificador personal", "Rutinas que crean tarjetas solas", "Soporte prioritario"] },
-        { "name": "Enterprise", "price": "R$ 3.780,00", "period": "/mes", "tagline": "Para organizaciones con necesidades específicas", "cta": "Conocer la plataforma", "note": "7 días gratis para probar", "features": ["Todo lo incluido en Pro, más:", "Incorporación dedicada", "Soporte dedicado", "Acuerdo de nivel de servicio (SLA)", "Desarrollo de cualquier funcionalidad a medida", "Creamos cualquier solución personalizada que tu negocio necesite", "Alcance abierto para proyectos y personalizaciones exclusivas"] }
-      ]
+        {
+          "name": "Free",
+          "badge": "Empieza aquí",
+          "price": "R$ 0",
+          "period": "/mes, para siempre",
+          "tagline": "Tu puerta de entrada para organizar cualquier operación.",
+          "cta": "Crear cuenta gratis",
+          "features": ["Módulo Tablero Kanban completo", "Listas, tarjetas, plazos y responsables sin límite de uso esencial"],
+          "addonFeatures": ["Add-ons bajo demanda: Gantt, Matriz de Eisenhower, Calendario avanzado"]
+        },
+        {
+          "name": "Starter",
+          "badge": "Ideal p/ clínicas y autónomos",
+          "price": "R$ 149",
+          "period": "/mes",
+          "tagline": "La solución correcta, sin pagar por las otras siete que no usas.",
+          "cta": "Elegir mi módulo",
+          "features": ["Todo lo de Free (Kanban incluido)", "+1 módulo especializado a elección, versión Base", "Hasta 5 usuarios incluidos", "Soporte estándar"],
+          "addonFeatures": ["Add-ons del módulo activo, contratados aparte"]
+        },
+        {
+          "name": "Growth",
+          "badge": "Más popular",
+          "price": "R$ 390",
+          "period": "/mes",
+          "tagline": "Atención, ventas y gestión en un mismo lugar - sin saltar de pestaña en pestaña.",
+          "cta": "Armar mi Growth",
+          "highlight": true,
+          "features": ["Todo lo de Free", "+hasta 3 módulos a elección, versión avanzada", "Hasta 15 usuarios incluidos", "Automatizaciones nativas entre los módulos contratados", "Soporte prioritario"]
+        },
+        {
+          "name": "Full Suite",
+          "badge": "Máximo ahorro",
+          "price": "R$ 890",
+          "period": "/mes",
+          "tagline": "Todos los programas que pagas hoy, dentro de uno solo.",
+          "cta": "Suscribir Full Suite",
+          "features": ["Acceso ilimitado a los 8 módulos", "Hasta 30 usuarios incluidos", "Flujos de datos cruzados entre todas las áreas", "Automatizaciones avanzadas de punta a punta", "Soporte prioritario vía Chat/WhatsApp"]
+        },
+        {
+          "name": "Enterprise",
+          "badge": "A medida",
+          "price": "R$ 1.990",
+          "period": "/mes, desde",
+          "tagline": "Para operaciones que ya piensan en escala.",
+          "cta": "Hablar con ventas",
+          "features": ["Todo lo de Full Suite", "Usuarios y almacenamiento ilimitados", "Todos los add-ons de todos los módulos incluidos", "Onboarding VIP, SLA y gerente de cuenta exclusivo", "Desarrollo a medida"]
+        }
+      ],
+      "planNote": "La escala real no son los planes - es el módulo. Un consultorio paga por un único módulo de Salud bien equipado, no por un Full Suite que nunca va a abrir. Crece añadiendo módulos y add-ons, no cambiando de plan.",
+      "addons": {
+        "eyebrow": "Monetización in-app",
+        "title": "Matriz de Add-ons por módulo",
+        "text": "Cada módulo se vende ya bien equipado - el upgrade específico queda disponible dentro de él, en el momento en que sientes la necesidad, no antes.",
+        "modules": [
+          {
+            "name": "Tablero Kanban",
+            "items": [
+              { "name": "Vista Gantt & Línea de tiempo", "desc": "Cronograma de proyecto sobre las mismas tarjetas, sin volver a cargar nada." },
+              { "name": "Adjuntos ampliados (100MB+)", "desc": "Para quien ya usa la tarjeta como carpeta de proyecto - planos, videos, PDFs grandes." },
+              { "name": "Automatizaciones internas extra", "desc": "Más rutinas automáticas por tablero, además de la cuota del plan." }
+            ]
+          },
+          {
+            "name": "Salud & Clínicas",
+            "items": [
+              { "name": "Confirmación por WhatsApp/SMS", "desc": "Recordatorio automático de cita, reduce ausencias sin call center." },
+              { "name": "Historia clínica VIP", "desc": "Campos personalizados y adjuntos ilimitados por paciente." },
+              { "name": "Recordatorios de retorno", "desc": "Recall automático de pacientes inactivos, con periodo configurable." }
+            ]
+          },
+          {
+            "name": "Ventas & CRM",
+            "items": [
+              { "name": "Pipelines ilimitados", "desc": "Un embudo por línea de producto o equipo comercial, sin costo por embudo." },
+              { "name": "Enriquecimiento de leads", "desc": "CUIT/RFC y datos de contacto completados automáticamente al crear el lead." },
+              { "name": "Propuestas con firma electrónica", "desc": "Cierra el embudo sin salir del CRM hacia otra herramienta." }
+            ]
+          },
+          {
+            "name": "Finanzas & BPO",
+            "items": [
+              { "name": "Conciliación vía Open Finance", "desc": "Extracto bancario cuadra solo con la caja, sin importar OFX a mano." },
+              { "name": "Emisión automatizada de facturas", "desc": "La factura sale junto con la baja del cobro, sin retrabajo." },
+              { "name": "ERE por centro de costo", "desc": "Resultado desglosado por obra, proyecto o unidad, no solo el consolidado." }
+            ]
+          }
+        ]
+      }
     },
     "privacy": {
       "backLink": "← Volver",
@@ -1992,7 +2085,17 @@
       "basic": "Free",
       "intermediate": "Unlimited",
       "professional": "Pro",
-      "enterprise": "Enterprise"
+      "enterprise": "Enterprise",
+      "free": "Free",
+      "starter": "Starter",
+      "growth": "Growth",
+      "fullsuite": "Full Suite",
+      "custom": "Enterprise"
+    },
+    "modulePicker": {
+      "hint": "El plan {{plan}} incluye hasta {{count}} módulo(s) a elección, además del Kanban. Marca los que tu operación usa - puedes añadir add-ons de cada uno justo abajo.",
+      "totalLabel": "Total mensual",
+      "continue": "Continuar al pago"
     },
     "status": {
       "active": "Activo",
@@ -2078,9 +2181,27 @@
       "failed": "No aprobado",
       "canceled": "Cancelado",
       "refunded": "Devuelto"
+    },
+    "addons": {
+      "items": {
+        "quadro-gantt": { "label": "Vista Gantt & Línea de tiempo avanzada", "desc": "Cronograma de proyecto sobre las mismas tarjetas, sin volver a cargar nada." },
+        "quadro-anexos": { "label": "Adjuntos ampliados (100MB+)", "desc": "Para quien ya usa la tarjeta como carpeta de proyecto - planos, videos, PDFs grandes." },
+        "quadro-automacoes": { "label": "Automatizaciones internas extra", "desc": "Más rutinas automáticas por tablero, además de la cuota del plan." },
+        "saude-whatsapp": { "label": "Confirmación por WhatsApp/SMS", "desc": "Recordatorio automático de cita, reduce ausencias sin call center." },
+        "saude-prontuario-vip": { "label": "Historia clínica VIP", "desc": "Campos personalizados y adjuntos ilimitados por paciente." },
+        "saude-recall": { "label": "Recordatorios de retorno", "desc": "Recall automático de pacientes inactivos, con periodo configurable." },
+        "vendas-pipelines": { "label": "Pipelines ilimitados", "desc": "Un embudo por línea de producto o equipo comercial, sin costo por embudo." },
+        "vendas-enriquecimento": { "label": "Enriquecimiento de leads", "desc": "CUIT/RFC y datos de contacto completados automáticamente al crear el lead." },
+        "vendas-assinatura": { "label": "Propuestas con firma electrónica", "desc": "Cierra el embudo sin salir del CRM hacia otra herramienta." },
+        "financebpo-openfinance": { "label": "Conciliación vía Open Finance", "desc": "Extracto bancario cuadra solo con la caja, sin importar OFX a mano." },
+        "financebpo-nf": { "label": "Emisión automatizada de facturas", "desc": "La factura sale junto con la baja del cobro, sin retrabajo." },
+        "financebpo-dre": { "label": "ERE por centro de costo", "desc": "Resultado desglosado por obra, proyecto o unidad, no solo el consolidado." }
+      }
     }
   },
   "errors": {
+    "PLAN_MODULE_LIMIT_EXCEEDED": "El plan elegido no permite tantos módulos.",
+    "INVALID_ADDON": "Add-on desconocido.",
     "MODULE_FORBIDDEN": "Módulo no disponible",
     "CLINIC_TYPE_INVALID": "Especialidad inválida",
     "CLINIC_THEME_INVALID": "Tema inválido",

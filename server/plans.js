@@ -33,11 +33,37 @@ export const ALL_VIEWS = ["board", "table", "calendar", "dashboard", "map", "mat
 // de degrau dos campos acima, mapeados 1:1 nas fases do módulo: o núcleo
 // (clientes/serviços/agenda) é grátis em todo plano - só financeiro/equipe
 // (Fase 2) e agendamento online (Fase 4) são pagos.
+//
+// legacy:true marca os 4 planos de antes da precificação modular (ver os 5
+// novos abaixo). Continuam cobrando e funcionando exatamente como sempre -
+// getPlan()/priceCentsOf()/effectiveStatus() não distinguem legacy de novo,
+// só canSelfSelectPlan() (abaixo) recusa oferecer um legacy pra quem não já
+// está nele. Sem isso, remapear quem já paga pros novos preços (ex.:
+// Intermediário R$530 -> Starter R$149) cortaria receita de gente que nunca
+// pediu desconto - decisão de negócio, não algo pra automatizar em silêncio.
+// maxModules:null neles preserva o comportamento de sempre (sem teto de
+// módulo add-on, igual hoje).
 const DEFINICOES = {
-  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false, beautyFinance: false, beautyOnlineBooking: false },
-  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 53000, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false, beautyFinance: true, beautyOnlineBooking: false },
-  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 185000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true }, // null = ilimitado
-  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: 378000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true },
+  basic: { rank: 0, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false, beautyFinance: false, beautyOnlineBooking: false, legacy: true, maxModules: null },
+  intermediate: { rank: 1, maxUsers: 15, paid: true, priceCents: 53000, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false, beautyFinance: true, beautyOnlineBooking: false, legacy: true, maxModules: null },
+  professional: { rank: 2, maxUsers: null, paid: true, priceCents: 185000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true, legacy: true, maxModules: null }, // null = ilimitado
+  enterprise: { rank: 3, maxUsers: null, paid: true, priceCents: 378000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true, legacy: true, maxModules: null },
+
+  // Precificação modular (catálogo de autoatendimento atual). rank continua
+  // acima dos 4 legacy (4-8): não competem por "subir de plano" com eles,
+  // e um legacy nunca teria alvo.rank > atual.rank menor que um novo por
+  // acidente. maxModules conta só módulo ADD-ON (não-core, ver modules.js) -
+  // free não leva nenhum, e fullsuite/enterprise usam null (todos os que
+  // existirem agora ou vierem a existir, sem hardcodar a contagem de hoje).
+  free: { rank: 4, maxUsers: 7, paid: false, priceCents: 0, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 10 * 1024 * 1024, maxBoards: 4, views: ["board", "table", "calendar"], taskTicker: false, personalPlanner: false, beautyFinance: false, beautyOnlineBooking: false, maxModules: 0 },
+  starter: { rank: 5, maxUsers: 5, paid: true, priceCents: 14900, autoArchive: false, recurringCards: false, bottleneckMonitor: false, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: false, personalPlanner: false, beautyFinance: true, beautyOnlineBooking: false, maxModules: 1 },
+  growth: { rank: 6, maxUsers: 15, paid: true, priceCents: 39000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true, maxModules: 3 },
+  fullsuite: { rank: 7, maxUsers: 30, paid: true, priceCents: 89000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true, maxModules: null },
+  // Id "custom" porque "enterprise" já é o legacy acima - preço de tabela
+  // R$1.990 é o piso ("a partir de" no copy); negociação além disso é
+  // fora da banda, tratada fora do autoatendimento (mesmo caminho de
+  // sempre: contato comercial, ajuste manual pelo painel).
+  custom: { rank: 8, maxUsers: null, paid: true, priceCents: 199000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true, maxModules: null },
 };
 
 // price derivado de priceCents num único lugar, para os dois nunca discordarem.
@@ -49,7 +75,10 @@ export const PLANS = Object.fromEntries(
 );
 
 export const PLAN_IDS = Object.keys(PLANS);
-export const DEFAULT_TRIAL_PLAN = "professional";
+// "growth" é o tier novo com o mesmo espírito do antigo "professional"
+// (legacy): grupo inteiro de features pagas liberado, é o que dá o gosto
+// certo do produto durante o teste.
+export const DEFAULT_TRIAL_PLAN = "growth";
 
 export function getPlan(planId) {
   return PLANS[planId] || PLANS.basic;
@@ -124,6 +153,16 @@ export function canAddUser(company, currentUserCount) {
   return max === null || currentUserCount < max;
 }
 
+// Quantos módulos ADD-ON (não-core, ver modules.js) o plano da empresa
+// permite ligar. null = sem teto (todos os que existirem). Sem override por
+// empresa hoje - diferente de maxUsersFor/attachmentLimitFor, a concessão de
+// módulo específico já é a válvula de exceção (painel admin escreve
+// enabled_modules direto, ignorando este teto - ver comentário em
+// server/routes/admin.js sobre a checagem ser só informativa).
+export function maxModulesFor(company) {
+  return getPlan(company?.plan).maxModules;
+}
+
 // Mesmo par maxUsersFor/canAddUser, para quadros. Sem override por empresa (a
 // exceção administrativa de usuário/anexo existe porque cliente grande pede
 // caso a caso; teto de quadro do Básico não teve esse pedido até aqui - se
@@ -181,6 +220,9 @@ export function canSelfSelectPlan(company, targetPlanId) {
   // Empresa bloqueada não sai do bloqueio contratando plano. O bloqueio é decisão
   // da plataforma; pagar não deve desfazê-lo.
   if (company?.blocked_at) return false;
+  // Legacy só continua vigente pra quem já está nele - autoatendimento nunca
+  // OFERECE um legacy pra ninguém de novo (ver comentário em DEFINICOES).
+  if (alvo.legacy && company?.plan !== targetPlanId) return false;
 
   // "Em vigor" é só o plano pago ATIVO. Teste e carência não contam: em nenhum dos
   // dois a empresa está pagando, então não há ciclo contratado a proteger — e tratar

@@ -19,9 +19,12 @@ import {
   attachmentLimitFor,
   maxUsersFor,
   maxBoardsFor,
+  maxModulesFor,
   canAddBoard,
   viewsFor,
 } from "../plans.js";
+import { MODULE_IDS, getModule, companyEntitled } from "../modules.js";
+import { addonCatalogFor, enabledAddonsFor } from "../addons.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -75,15 +78,31 @@ function resumo(companyId) {
     canUseBeautyFinance: canUseBeautyFinance(company?.plan),
     canUseBeautyOnlineBooking: canUseBeautyOnlineBooking(company?.plan),
     maxAttachmentBytes: attachmentLimitFor(company),
+    // Vaga de módulo ADD-ON do plano (null = sem teto) e quantos a empresa já
+    // tem ligados hoje - conta só não-core, mesmo critério de maxModulesFor
+    // (ver plans.js). "Ligado" aqui é o que companyEntitled já resolve
+    // (painel admin quem escreve), não o pedido do checkout - ver
+    // requestedModules em GET /api/billing.
+    maxModules: maxModulesFor(company),
+    moduleCount: MODULE_IDS.filter((id) => !getModule(id)?.core && companyEntitled(company, id)).length,
+    // Add-on, ao contrário de módulo, JÁ é liberado sozinho na confirmação do
+    // pagamento (ver confirmarPagamento em billing/lifecycle.js) - por isso
+    // "addons" aqui é o direito de verdade, não um pedido pendente.
+    addons: enabledAddonsFor(company),
+    addonCatalog: addonCatalogFor(company),
     // Catálogo com a decisão de autoatendimento já resolvida no servidor, para o
     // cliente não reimplementar a regra e as duas pontas discordarem. price aqui
     // também já é líquido de desconto, para o botão de trocar de plano e o
-    // checkout mostrarem o valor que será cobrado de verdade.
-    catalog: PLAN_IDS.map((id) => ({
+    // checkout mostrarem o valor que será cobrado de verdade. Plano legacy só
+    // aparece pra quem já está nele (ver canSelfSelectPlan) - não é oferecido
+    // como opção nova, mas a própria tela de "meu plano" precisa continuar
+    // mostrando corretamente o plano atual de quem ainda está num deles.
+    catalog: PLAN_IDS.filter((id) => !PLANS[id].legacy || id === (company?.plan || "basic")).map((id) => ({
       id,
       price: precoComDesconto(id, discounts),
       listPrice: PLANS[id].price,
       maxUsers: PLANS[id].maxUsers,
+      maxModules: PLANS[id].maxModules,
       paid: PLANS[id].paid,
       current: id === (company?.plan || "basic"),
       selfSelectable: canSelfSelectPlan(company, id),

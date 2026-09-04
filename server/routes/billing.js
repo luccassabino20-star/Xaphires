@@ -5,6 +5,8 @@ import { getCompany } from "../directory.js";
 import { countUsers } from "../repo.js";
 import { docValido, normalizarDoc } from "../doc.js";
 import { canSelfSelectPlan, getPlan, priceCentsOf } from "../plans.js";
+import { getModule } from "../modules.js";
+import { ADDON_IDS } from "../addons.js";
 import { metodoValido, METODOS, gateway } from "../billing/gateway.js";
 import * as store from "../billing/store.js";
 import * as ciclo from "../billing/lifecycle.js";
@@ -26,6 +28,11 @@ function visaoAssinatura(row, ehMaster = false) {
     canceledAt: row.canceled_at,
     createdAt: row.created_at,
     payerDoc: ehMaster ? row.payer_doc || null : null,
+    // O "carrinho" desta assinatura - módulo é só o pedido (concessão real
+    // continua manual, painel admin); add-on já está de fato liberado em
+    // companies.enabled_addons a esta altura (confirmarPagamento aplicou).
+    requestedModules: store.parseRequestedList(row.requested_modules),
+    requestedAddons: store.parseRequestedList(row.requested_addons),
   };
 }
 
@@ -73,6 +80,38 @@ router.post(
   ah(async (req, res) => {
     const { plan, method, card } = req.body || {};
     const empresa = getCompany(req.companyId);
+
+    // Módulo pedido no checkout: só id real, disponível (não "em breve") e
+    // não-core (core já vem incluso, não ocupa vaga do plano - pedir de
+    // propósito é raro, então filtra em silêncio em vez de recusar o
+    // checkout inteiro por isso). Fica registrado (requestedModules) pro
+    // painel admin aplicar - ver comentário em billing/lifecycle.js sobre
+    // por que a concessão de módulo continua manual.
+    const modulosPedidos = Array.isArray(req.body?.modules)
+      ? req.body.modules.filter((id) => {
+          const mod = getModule(id);
+          return mod && mod.available && !mod.core;
+        })
+      : [];
+    const maxModulos = getPlan(plan).maxModules;
+    if (maxModulos !== null && modulosPedidos.length > maxModulos) {
+      return res.status(400).json({
+        error: `O plano escolhido permite até ${maxModulos} módulo(s) e ${modulosPedidos.length} foram selecionados.`,
+        code: "PLAN_MODULE_LIMIT_EXCEEDED",
+        maxModules: maxModulos,
+      });
+    }
+
+    // Add-on pedido: precisa ser um id real do catálogo (ver server/addons.js).
+    // Diferente de módulo, um id desconhecido aqui recusa o checkout inteiro -
+    // é sempre bug de cliente (a tela só deveria oferecer o catálogo real),
+    // nunca escolha legítima do usuário, então não faz sentido filtrar em
+    // silêncio como faz com módulo.
+    const addonsPedidos = Array.isArray(req.body?.addons) ? req.body.addons : [];
+    const addonInvalido = addonsPedidos.find((id) => !ADDON_IDS.includes(id));
+    if (addonInvalido) {
+      return res.status(400).json({ error: `Add-on desconhecido: ${addonInvalido}`, code: "INVALID_ADDON" });
+    }
 
     // Pagar pelo plano que já se tem é sempre permitido: é renovação, e o ciclo novo
     // começa no fim do atual, então não se perde dia nenhum. A regra de "só subir"
@@ -132,7 +171,15 @@ router.post(
       // cliente escolhe. O documento vem do formulário porque não temos CPF/CNPJ no
       // cadastro.
       const payer = { email: req.user.email, name: req.user.name, doc: docPagador || null };
-      const r = await ciclo.assinar({ companyId: req.companyId, plan, method, card, payer });
+      const r = await ciclo.assinar({
+        companyId: req.companyId,
+        plan,
+        method,
+        card,
+        payer,
+        modules: modulosPedidos,
+        addons: addonsPedidos,
+      });
       res.status(201).json({
         subscription: visaoAssinatura(r.subscription),
         payment: store.publicPayment(r.payment),
