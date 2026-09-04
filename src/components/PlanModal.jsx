@@ -4,7 +4,29 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import * as api from "../state/api.js";
+import ModuleIcon from "../modules/ModuleIcon.jsx";
+import { metaFor } from "../modules/registry.js";
 import CheckoutModal from "./CheckoutModal.jsx";
+import PlanStepper from "./PlanStepper.jsx";
+
+function formatarMoeda(cents, locale) {
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "BRL" }).format(cents / 100);
+}
+
+// Toggle visual (trilho + bolinha) por cima de um checkbox de verdade - o
+// checkbox continua controlando estado/acessibilidade (foco, leitor de tela,
+// clique em qualquer parte do <label> que o envolve), o CSS só desenha por
+// cima. Mesmo padrão do resto do design system: sem componente de terceiro.
+function AddonToggle({ checked, onChange }) {
+  return (
+    <span className="addon-toggle">
+      <input type="checkbox" checked={checked} onChange={onChange} />
+      <span className="addon-toggle-track">
+        <span className="addon-toggle-thumb" />
+      </span>
+    </span>
+  );
+}
 
 // Passo intermediário entre "escolher plano" e "pagar", só para planos com
 // vaga de módulo LIMITADA (Starter/Growth - maxModules é um número). Full
@@ -50,75 +72,130 @@ function ModulePickerStep({ alvo, addonCatalog, onCancel, onContinue }) {
     .filter((a) => addonsEscolhidos.includes(a.id))
     .reduce((soma, a) => soma + a.priceCents, 0);
   const precoBaseCents = Math.round((alvo.price || 0) * 100);
+  const totalCents = precoBaseCents + totalAddonsCents;
+  const addonsAtivos = addonsDisponiveis.filter((a) => addonsEscolhidos.includes(a.id));
+  // Sugestão de upgrade no aviso de limite: o próximo degrau de vaga de módulo
+  // acima do plano atual (Starter->Growth->Full Suite) - nunca o próprio plano
+  // sendo configurado, senão o aviso soaria "faça upgrade pro que você já tem".
+  const proximoTier = alvo.id === "starter" ? "growth" : "fullsuite";
 
   return (
-    <div className="modal-body module-picker">
-      <p className="module-picker-hint">
-        {t("plan.modulePicker.hint", { count: alvo.maxModules, plan: t(`plan.names.${alvo.id}`) })}
-      </p>
-      {erro && <div className="auth-error">{erro}</div>}
-      {!modulos && !erro && <p className="plan-modal-loading">{t("common.loading")}</p>}
-
-      {modulos && (
-        <div className="module-picker-list">
-          {opcoes.map((m) => {
-            const marcado = escolhidos.includes(m.id);
-            const addonsDoModulo = addonCatalog.filter((a) => a.moduleId === m.id);
-            return (
-              <div className={"module-picker-item" + (marcado ? " active" : "")} key={m.id}>
-                <label className="module-picker-check">
-                  <input
-                    type="checkbox"
-                    checked={marcado}
-                    disabled={!marcado && noLimite}
-                    onChange={() => alternarModulo(m.id)}
-                  />
-                  <span>{t(`modules.${m.id}.name`)}</span>
-                </label>
-                {marcado && addonsDoModulo.length > 0 && (
-                  <div className="module-picker-addons">
-                    {addonsDoModulo.map((a) => (
-                      <label className="module-picker-addon" key={a.id}>
-                        <input
-                          type="checkbox"
-                          checked={addonsEscolhidos.includes(a.id)}
-                          onChange={() => alternarAddon(a.id)}
-                        />
-                        <span>{t(a.labelKey)}</span>
-                        <span className="module-picker-addon-price">
-                          +{new Intl.NumberFormat(i18n.language, { style: "currency", currency: "BRL" }).format(a.priceCents / 100)}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="module-picker-total">
-        <span>{t("plan.modulePicker.totalLabel")}</span>
-        <strong>
-          {new Intl.NumberFormat(i18n.language, { style: "currency", currency: "BRL" }).format(
-            (precoBaseCents + totalAddonsCents) / 100
-          )}
-        </strong>
+    <div className="premium-flow-root">
+      <div className="premium-modal-header">
+        <span className="premium-badge">{t(`plan.names.${alvo.id}`)}</span>
+        <h2 className="premium-modal-title">{t("plan.modulePicker.title")}</h2>
+        <p className="premium-modal-subtitle">
+          {t("plan.modulePicker.hint", { count: alvo.maxModules, plan: t(`plan.names.${alvo.id}`) })}
+        </p>
+        <PlanStepper current={2} />
       </div>
 
-      <div className="module-picker-actions">
-        <button type="button" className="btn-cancel" onClick={onCancel}>
-          {t("common.cancel")}
-        </button>
+      <div className="premium-body">
+      <div className="module-picker-scroll">
+        {erro && <div className="auth-error">{erro}</div>}
+        {!modulos && !erro && <p className="plan-modal-loading">{t("common.loading")}</p>}
+
+        {modulos && (
+          <div className="module-picker-cards">
+            {opcoes.map((m) => {
+              const meta = metaFor(m.id);
+              const marcado = escolhidos.includes(m.id);
+              const bloqueado = !marcado && noLimite;
+              const addonsDoModulo = addonCatalog.filter((a) => a.moduleId === m.id);
+              return (
+                <div className={"module-card" + (marcado ? " selected" : "") + (bloqueado ? " locked" : "")} key={m.id}>
+                  <button
+                    type="button"
+                    className="module-card-main"
+                    onClick={() => alternarModulo(m.id)}
+                    disabled={bloqueado}
+                    aria-pressed={marcado}
+                  >
+                    <span className="module-card-icon">
+                      <ModuleIcon name={meta.icon} size={22} />
+                    </span>
+                    <span className="module-card-text">
+                      <span className="module-card-title">{t(meta.labelKey)}</span>
+                      <span className="module-card-desc">{t(meta.descKey)}</span>
+                    </span>
+                    {bloqueado ? (
+                      <span className="module-card-lock-badge">{t("plan.modulePicker.limitBadge")}</span>
+                    ) : (
+                      <span className={"module-card-check" + (marcado ? " on" : "")} aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="13" height="13">
+                          <path fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" d="m5 12.5 5 5L19 7" />
+                        </svg>
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Sempre montado (nunca condicionado a `marcado`) para o grid-template-rows
+                      poder animar de 0fr pra 1fr em vez de só aparecer/sumir - é o "desliza
+                      suavemente" pedido, sem JS medindo altura. */}
+                  {addonsDoModulo.length > 0 && (
+                    <div className={"module-card-addons" + (marcado ? " expanded" : "")}>
+                      <div className="module-card-addons-inner">
+                        {addonsDoModulo.map((a) => (
+                          <label className="addon-row" key={a.id}>
+                            <span className="addon-row-text">
+                              <span className="addon-row-name">{t(a.labelKey)}</span>
+                              <span className="addon-row-price">+{formatarMoeda(a.priceCents, i18n.language)}/mês</span>
+                            </span>
+                            <AddonToggle checked={addonsEscolhidos.includes(a.id)} onChange={() => alternarAddon(a.id)} />
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {noLimite && (
+          <div className="module-picker-upsell">
+            <span className="module-picker-upsell-text">
+              {t("plan.modulePicker.limitHint", { plan: t(`plan.names.${proximoTier}`) })}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="premium-summary-panel">
+        <span className="premium-summary-eyebrow">{t("plan.modulePicker.totalLabel")}</span>
+        <strong className="premium-summary-total-value" key={totalCents}>
+          {formatarMoeda(totalCents, i18n.language)}
+        </strong>
+
+        <div className="premium-summary-lines">
+          <div className="premium-summary-line">
+            <span>{t(`plan.names.${alvo.id}`)}</span>
+            <span>{formatarMoeda(precoBaseCents, i18n.language)}</span>
+          </div>
+          {addonsAtivos.map((a) => (
+            <div className="premium-summary-line addon" key={a.id}>
+              <span>{t(a.labelKey)}</span>
+              <span>+{formatarMoeda(a.priceCents, i18n.language)}</span>
+            </div>
+          ))}
+        </div>
+
         <button
           type="button"
-          className="btn-primary"
+          className="premium-cta"
           disabled={escolhidos.length === 0}
           onClick={() => onContinue(escolhidos, addonsEscolhidos, precoBaseCents + totalAddonsCents)}
         >
           {t("plan.modulePicker.continue")}
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </button>
+        <button type="button" className="premium-cancel-link" onClick={onCancel}>
+          {t("common.cancel")}
+        </button>
+      </div>
       </div>
     </div>
   );
@@ -245,13 +322,18 @@ export default function PlanModal({ onClose }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="modal plan-modal">
+      <div className={"modal plan-modal" + (escolhaModulos ? " module-picker-modal premium-modal" : "")}>
         <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
           &times;
         </button>
-        <div className="modal-header">
-          <h2 className="plan-modal-title">{t("plan.title")}</h2>
-        </div>
+        {/* Em modo picker o header é o premium-modal-header (badge + título +
+            stepper) desenhado dentro de ModulePickerStep - este aqui duplicaria
+            o topo do modal por cima dele. */}
+        {!escolhaModulos && (
+          <div className="modal-header">
+            <h2 className="plan-modal-title">{t("plan.title")}</h2>
+          </div>
+        )}
 
         {escolhaModulos ? (
           <ModulePickerStep
@@ -339,7 +421,15 @@ export default function PlanModal({ onClose }) {
                     <button
                       className="btn-primary btn-small"
                       onClick={() =>
-                        setCheckout({ id: cobranca.pendingPayment.plan, priceCents: cobranca.pendingPayment.amountCents })
+                        setCheckout({
+                          id: cobranca.pendingPayment.plan,
+                          priceCents: cobranca.pendingPayment.amountCents,
+                          // Melhor esforço: o carrinho de quando a cobrança foi
+                          // emitida - a assinatura pode ter mudado desde então,
+                          // mas é o que dá pra mostrar no resumo sem uma rota nova.
+                          modules: cobranca.subscription?.requestedModules,
+                          addons: cobranca.subscription?.requestedAddons,
+                        })
                       }
                     >
                       {t("billing.finishPayment")}
@@ -441,6 +531,7 @@ export default function PlanModal({ onClose }) {
           priceCents={checkout.priceCents}
           modules={checkout.modules}
           addons={checkout.addons}
+          addonCatalog={plano?.addonCatalog || []}
           simulated={!!cobranca?.simulated}
           docInicial={cobranca?.subscription?.payerDoc}
           onClose={() => {

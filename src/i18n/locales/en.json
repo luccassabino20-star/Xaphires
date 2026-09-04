@@ -2093,9 +2093,17 @@
       "custom": "Enterprise"
     },
     "modulePicker": {
+      "title": "Build your plan",
       "hint": "The {{plan}} plan includes up to {{count}} module(s) of your choice, besides Kanban. Pick the ones your operation uses - you can add add-ons for each right below.",
       "totalLabel": "Monthly total",
-      "continue": "Continue to payment"
+      "continue": "Continue to payment",
+      "limitBadge": "Plan limit",
+      "limitHint": "You've used this plan's module slots. {{plan}} unlocks more modules at once - you can switch plans anytime."
+    },
+    "stepper": {
+      "step1": "Plan",
+      "step2": "Modules & Add-ons",
+      "step3": "Payment"
     },
     "status": {
       "active": "Active",
@@ -2114,6 +2122,7 @@
   },
   "billing": {
     "checkoutTitle": "Subscribe to {{plan}}",
+    "checkoutSubtitle": "Secure payment. Cancel the renewal anytime, no penalty.",
     "chooseMethod": "How would you like to pay",
     "methods": {
       "pix": "Pix",

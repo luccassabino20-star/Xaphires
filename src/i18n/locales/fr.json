@@ -1937,9 +1937,17 @@
       "custom": "Enterprise"
     },
     "modulePicker": {
+      "title": "Composez votre plan",
       "hint": "Le plan {{plan}} inclut jusqu'à {{count}} module(s) au choix, en plus du Kanban. Cochez ceux dont votre activité a besoin - vous pourrez ajouter des add-ons pour chacun juste en dessous.",
       "totalLabel": "Total mensuel",
-      "continue": "Continuer vers le paiement"
+      "continue": "Continuer vers le paiement",
+      "limitBadge": "Limite du plan",
+      "limitHint": "Vous avez déjà utilisé les emplacements de module de ce plan. {{plan}} débloque plus de modules à la fois - vous pouvez changer de plan quand vous voulez."
+    },
+    "stepper": {
+      "step1": "Plan",
+      "step2": "Modules & Add-ons",
+      "step3": "Paiement"
     },
     "status": {
       "active": "Actif",
@@ -1958,6 +1966,7 @@
   },
   "billing": {
     "checkoutTitle": "Souscrire à {{plan}}",
+    "checkoutSubtitle": "Paiement sécurisé. Annulez le renouvellement quand vous voulez, sans pénalité.",
     "chooseMethod": "Comment souhaitez-vous payer",
     "methods": {
       "pix": "Pix",

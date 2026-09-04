@@ -2321,6 +2321,11 @@ img.avatar { object-fit: cover; padding: 0; }
   .modal-overlay { padding: 16px 8px; }
   .modal { padding: 16px 16px 20px; }
   .modal-wide { width: 96vw; }
+  .module-picker-modal, .checkout-modal.premium-modal { width: 96vw; height: 92vh; max-height: 92vh; }
+  .addon-row { padding-left: 20px; }
+  .premium-modal-header { padding: 20px 20px 16px; }
+  .module-picker-scroll { padding: 18px 20px; }
+  .premium-body-single { padding: 20px; }
   /* Início/Entrega lado a lado cabem num tablet, mas espremem demais num celular -
      empilha em vez de cortar o campo de data pela metade. */
   .modal-section-row { flex-direction: column; gap: 14px; }
@@ -5967,39 +5972,335 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .plan-switch-name { font-size: 13px; font-weight: 600; }
 .plan-switch-price { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 
-/* ---------- Picker de módulo/add-on (PlanModal, passo antes do checkout) ---------- */
-.module-picker-hint { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 16px; }
-.module-picker-list { display: flex; flex-direction: column; gap: 8px; }
-.module-picker-item {
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 10px 14px;
-  background: var(--bg-card);
+/* ---------- Fluxo premium de contratação (PlanModal/picker + CheckoutModal) ----------
+   Header com badge/título/stepper + corpo em 2 colunas (config à esquerda, resumo
+   financeiro escuro sempre visível à direita) - linguagem Stripe/Vercel, reaproveitada
+   nos dois modais (ver PlanStepper.jsx sobre por que o stepper é componente à parte:
+   picker e checkout são dois modais React distintos, não passos internos do mesmo). */
+.modal-overlay:has(.premium-modal) {
+  background: rgba(10, 12, 20, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
-.module-picker-item.active { border-color: var(--accent); }
-.module-picker-check { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; }
-.module-picker-addons { margin: 10px 0 2px 26px; display: flex; flex-direction: column; gap: 6px; }
-.module-picker-addon {
+.premium-modal {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: premiumModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes premiumModalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.premium-modal .modal-close { border-radius: 50%; top: 16px; right: 16px; z-index: 2; }
+
+/* height (não só max-height): um flex column só reparte espaço de verdade
+   entre os filhos flex:1 quando o próprio container tem uma altura DEFINIDA -
+   com max-height sozinho (sem height), o Chrome deixa o conteúdo crescer
+   livre e o .premium-body vaza pra fora do overflow:hidden do modal em vez
+   de ativar o scroll interno. Descoberto testando no navegador: o scroll da
+   coluna simplesmente não se movia. */
+.module-picker-modal { max-width: 760px; height: 88vh; max-height: 88vh; }
+
+.premium-modal-header {
+  flex-shrink: 0;
+  padding: 26px 30px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.premium-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-topbar));
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.premium-modal-title { font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; letter-spacing: -0.01em; }
+.premium-modal-subtitle { font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 18px; max-width: 46ch; }
+
+/* Stepper - ver PlanStepper.jsx. Linha fina conectando os círculos, passo atual
+   destacado em --accent, passo concluído vira check preenchido. */
+.premium-stepper { display: flex; align-items: center; list-style: none; margin: 0; padding: 0; }
+.premium-stepper-item { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+.premium-stepper-item:not(:last-child) { flex: 1; }
+.premium-stepper-dot {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--text-secondary);
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-topbar);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.premium-stepper-label { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.premium-stepper-line { flex: 1; height: 1px; background: var(--border-subtle); margin: 0 10px; }
+.premium-stepper-item.current .premium-stepper-dot { border-color: var(--accent); color: var(--accent); }
+.premium-stepper-item.current .premium-stepper-label { color: var(--text-primary); }
+.premium-stepper-item.done .premium-stepper-dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+.premium-stepper-item.done .premium-stepper-label { color: var(--text-secondary); }
+@media (max-width: 640px) {
+  .premium-stepper-label { display: none; }
+}
+
+/* Wrapper de ModulePickerStep (o componente inteiro é um filho de .premium-modal) -
+   sem display:flex aqui, a cadeia flex-column quebra no meio: .premium-body
+   (mais abaixo) vira filho de um <div> comum, o flex:1/min-height:0 dele não
+   tem efeito nenhum, e a coluna cresce pro tamanho do conteúdo em vez de
+   travar na altura do modal - foi exatamente esse o bug do scroll que não
+   se movia, achado inspecionando o computed style no navegador. */
+.premium-flow-root { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.premium-body { flex: 1; min-height: 0; display: flex; }
+.premium-body-single { justify-content: center; overflow-y: auto; padding: 28px 30px; }
+
+.module-picker-scroll { flex: 1 1 auto; min-width: 0; min-height: 0; overflow-y: auto; padding: 22px 26px; }
+
+.module-picker-cards { display: flex; flex-direction: column; gap: 10px; }
+
+/* Card do módulo - o botão inteiro é a área clicável (título+descrição), com um
+   selo de check à direita. overflow:hidden pra faixa de add-ons deslizar sem
+   estourar os cantos arredondados do card. */
+.module-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+}
+.module-card:hover:not(.locked):not(.selected) { border-color: var(--border-strong); box-shadow: var(--shadow-card-hover); }
+.module-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 10px 28px -12px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.module-card.locked { opacity: 0.55; }
+
+.module-card-main {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: inherit;
   cursor: pointer;
 }
-.module-picker-addon-price { margin-left: auto; font-weight: 600; color: var(--text-primary); }
-.module-picker-total {
+.module-card-main:disabled { cursor: not-allowed; }
+
+.module-card-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-subtle);
-  font-size: 13px;
-  color: var(--text-secondary);
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+  color: var(--accent);
 }
-.module-picker-total strong { font-size: 19px; color: var(--text-primary); }
-.module-picker-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.module-card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding-top: 1px; }
+.module-card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.module-card-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; }
+
+.module-card-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  margin-top: 1px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.module-card-check.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.module-card-lock-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* Revelação dos add-ons: grid-template-rows de 0fr pra 1fr anima pra "altura
+   automática" sem JS medindo nada - .module-card-addons-inner com overflow:hidden
+   é o que garante que o conteúdo não vaza durante a transição. */
+.module-card-addons {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+  border-top: 1px solid transparent;
+}
+.module-card-addons.expanded { grid-template-rows: 1fr; border-top-color: var(--border-subtle); }
+.module-card-addons-inner { overflow: hidden; }
+.addon-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px 10px 68px;
+  cursor: pointer;
+}
+.addon-row + .addon-row { border-top: 1px solid var(--border-subtle); }
+.addon-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.addon-row-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.addon-row-price { font-size: 11.5px; color: var(--text-muted); }
+
+/* Toggle/switch - trilho + bolinha por cima de um checkbox de verdade (ver
+   AddonToggle no componente); a seleção :checked ~ irmão é puro CSS. */
+.addon-toggle { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; }
+.addon-toggle input {
+  position: absolute;
+  inset: 0;
+  width: 36px;
+  height: 20px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.addon-toggle-track {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  transition: background 0.18s ease;
+}
+.addon-toggle-thumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s ease;
+}
+.addon-toggle input:checked + .addon-toggle-track { background: var(--accent); }
+.addon-toggle input:checked + .addon-toggle-track .addon-toggle-thumb { transform: translateX(16px); }
+.addon-toggle input:focus-visible + .addon-toggle-track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.module-picker-upsell {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border-subtle));
+}
+.module-picker-upsell-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
+
+/* Painel de resumo - coluna fixa à direita, altura cheia (irmão em flex-row de
+   .module-picker-scroll dentro de .premium-body), sempre visível sem sticky/
+   scroll trick nenhum. Fundo escuro FIXO (não segue --bg-card/tema claro-escuro
+   do app) de propósito - é vitrine de preço no estilo Stripe/Vercel, não uma
+   superfície comum da UI; --accent ainda entra no glow/gradiente pra casar com
+   o tema da empresa (cores custom de módulo, ver :root[data-theme] no topo do
+   arquivo). */
+.premium-summary-panel {
+  flex: 0 0 268px;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 24px;
+  background: linear-gradient(160deg, #12162a 0%, #1a2140 55%, color-mix(in srgb, var(--accent) 30%, #161b34) 100%);
+  color: rgba(255, 255, 255, 0.92);
+  overflow-y: auto;
+}
+.premium-summary-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.55); }
+.premium-summary-total-value {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  display: inline-block;
+  margin: 4px 0 2px;
+  animation: premiumTotalPop 0.22s ease;
+}
+.premium-summary-permonth { font-size: 12px; color: rgba(255, 255, 255, 0.55); margin-bottom: 20px; }
+@keyframes premiumTotalPop {
+  from { transform: scale(1.06); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
+}
+.premium-summary-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+  margin-bottom: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.premium-summary-line { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; color: rgba(255, 255, 255, 0.85); }
+.premium-summary-line.addon { color: rgba(255, 255, 255, 0.6); }
+.premium-summary-fineprint { font-size: 11px; color: rgba(255, 255, 255, 0.5); line-height: 1.5; margin: 10px 0 0; }
+
+.premium-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: auto;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #12162a;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+.premium-cta:hover:not(:disabled) { box-shadow: 0 14px 30px -8px rgba(0, 0, 0, 0.55); transform: translateY(-1px); }
+.premium-cta:disabled { opacity: 0.5; cursor: not-allowed; }
+.premium-cta svg { transition: transform 0.15s ease; }
+.premium-cta:hover:not(:disabled) svg { transform: translateX(2px); }
+.premium-cancel-link {
+  margin-top: 10px;
+  padding: 6px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  text-align: center;
+}
+.premium-cancel-link:hover { color: #fff; }
+
+@media (max-width: 640px) {
+  .premium-body:not(.premium-body-single) { flex-direction: column; }
+  .premium-summary-panel { flex: 0 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .module-card-addons, .addon-toggle-track, .addon-toggle-thumb, .premium-summary-total-value, .premium-cta, .premium-cta svg, .premium-modal {
+    transition: none;
+    animation: none;
+  }
+}
 
 /* ---------- Monitor de gargalos ---------- */
 .card-stuck {
@@ -6284,16 +6585,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 
 /* ---------- Cobrança: checkout, assinatura e extrato ---------- */
-.checkout-modal { max-width: 520px; }
-.checkout-title { margin: 0; font-size: 18px; font-weight: 700; color: var(--text-primary); }
-.checkout-amount {
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin-bottom: 20px;
-}
-.checkout-amount span { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-left: 2px; }
+/* Largura maior que os 520px de antes - precisa caber as 2 colunas (form de
+   pagamento + resumo) do layout premium. Nos estados finais (pendente/pago/
+   falhou), .premium-body-single centraliza o conteúdo dentro dessa largura. */
+/* height explícito, mesmo motivo do .module-picker-modal acima (ver comentário
+   lá): sem isso o flex:1 da coluna de resumo/formulário não reparte a altura
+   de verdade e o scroll interno não ativa. */
+.checkout-modal.premium-modal { max-width: 760px; height: 88vh; max-height: 88vh; }
 
 /* Os meios ficam em grade que colapsa para uma coluna no celular, onde três cartões
    lado a lado deixariam o texto de apoio ilegível. */

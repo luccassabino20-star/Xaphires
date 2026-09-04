@@ -2352,9 +2352,17 @@
       "custom": "Enterprise"
     },
     "modulePicker": {
+      "title": "Monte seu plano",
       "hint": "O plano {{plan}} inclui até {{count}} módulo(s) à sua escolha, além do Kanban. Marque os que sua operação usa - dá para adicionar add-ons de cada um logo abaixo.",
       "totalLabel": "Total mensal",
-      "continue": "Continuar para pagamento"
+      "continue": "Continuar para pagamento",
+      "limitBadge": "Limite do plano",
+      "limitHint": "Você já usou as vagas de módulo deste plano. O {{plan}} libera mais módulos de uma vez - dá para mudar de plano quando quiser."
+    },
+    "stepper": {
+      "step1": "Plano",
+      "step2": "Módulos & Add-ons",
+      "step3": "Pagamento"
     },
     "status": {
       "active": "Ativo",
@@ -2373,6 +2381,7 @@
   },
   "billing": {
     "checkoutTitle": "Contratar {{plan}}",
+    "checkoutSubtitle": "Pagamento seguro. Cancele a renovação quando quiser, sem multa.",
     "chooseMethod": "Como você quer pagar",
     "methods": {
       "pix": "Pix",

@@ -4,6 +4,7 @@ import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import { docValido, formatarDoc, normalizarDoc } from "../utils/doc.js";
 import * as api from "../state/api.js";
+import PlanStepper from "./PlanStepper.jsx";
 
 // Intervalo da consulta de status enquanto a cobrança está pendente. Webhook perdido
 // é comum, e sem essa conferência o cliente paga e fica olhando uma tela que não
@@ -39,7 +40,7 @@ function IconeBoleto() {
 
 const ICONES = { pix: IconePix, card: IconeCartao, boleto: IconeBoleto };
 
-export default function CheckoutModal({ plan, priceCents, modules, addons, simulated, docInicial, onClose, onPaid }) {
+export default function CheckoutModal({ plan, priceCents, modules, addons, addonCatalog, simulated, docInicial, onClose, onPaid }) {
   const { t, i18n } = useTranslation();
   const showToast = useToast();
 
@@ -169,6 +170,16 @@ export default function CheckoutModal({ plan, priceCents, modules, addons, simul
   const docObrigatorio = metodo === "pix" || metodo === "boleto";
   const docComErro = docTocado && docObrigatorio && doc.length > 0 && !docValido(doc);
 
+  // Discrimina o total em plano + add-ons pro painel de resumo - deriva do
+  // addonCatalog (preço) em vez de receber um valor já pronto, então
+  // qualquer chamador que só tenha plan/priceCents (ex.: retomar um Pix
+  // pendente sem saber mais o carrinho) ainda funciona: addons vazio faz
+  // baseCents cair pro total inteiro, uma linha só, sem quebrar.
+  const catalogo = addonCatalog || [];
+  const addonsSelecionados = (addons || []).map((id) => catalogo.find((a) => a.id === id)).filter(Boolean);
+  const addonsCents = addonsSelecionados.reduce((soma, a) => soma + a.priceCents, 0);
+  const baseCents = priceCents - addonsCents;
+
   return (
     <div
       className="modal-overlay"
@@ -176,22 +187,23 @@ export default function CheckoutModal({ plan, priceCents, modules, addons, simul
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="modal checkout-modal">
+      <div className="modal checkout-modal premium-modal">
         <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>
           &times;
         </button>
-        <div className="modal-header">
-          <h2 className="checkout-title">{t("billing.checkoutTitle", { plan: t(`plan.names.${plan}`) })}</h2>
-        </div>
 
-        <div className="modal-body">
-          <div className="checkout-amount">
-            {formatarValor(priceCents, i18n.language)}
-            <span>{t("plan.perMonth")}</span>
-          </div>
+        {!cobranca ? (
+          <>
+            <div className="premium-modal-header">
+              <span className="premium-badge">{t(`plan.names.${plan}`)}</span>
+              <h2 className="premium-modal-title">{t("billing.checkoutTitle", { plan: t(`plan.names.${plan}`) })}</h2>
+              <p className="premium-modal-subtitle">{t("billing.checkoutSubtitle")}</p>
+              <PlanStepper current={3} />
+            </div>
 
-          {!cobranca && (
-            <form onSubmit={pagar}>
+            <div className="premium-body">
+            <div className="module-picker-scroll">
+            <form id="checkout-payment-form" onSubmit={pagar}>
               <label className="modal-label">{t("billing.chooseMethod")}</label>
               <div className="checkout-methods">
                 {["pix", "card", "boleto"].map((m) => {
@@ -278,14 +290,38 @@ export default function CheckoutModal({ plan, priceCents, modules, addons, simul
               )}
 
               {erro && <div className="auth-error">{erro}</div>}
+            </form>
+            </div>
 
-              <button type="submit" className="btn-primary checkout-submit" disabled={enviando}>
+            <div className="premium-summary-panel">
+              <span className="premium-summary-eyebrow">{t("plan.modulePicker.totalLabel")}</span>
+              <strong className="premium-summary-total-value" key={priceCents}>
+                {formatarValor(priceCents, i18n.language)}
+              </strong>
+              <span className="premium-summary-permonth">{t("plan.perMonth")}</span>
+
+              <div className="premium-summary-lines">
+                <div className="premium-summary-line">
+                  <span>{t(`plan.names.${plan}`)}</span>
+                  <span>{formatarValor(baseCents, i18n.language)}</span>
+                </div>
+                {addonsSelecionados.map((a) => (
+                  <div className="premium-summary-line addon" key={a.id}>
+                    <span>{t(a.labelKey)}</span>
+                    <span>+{formatarValor(a.priceCents, i18n.language)}</span>
+                  </div>
+                ))}
+              </div>
+
+              <button type="submit" form="checkout-payment-form" className="premium-cta" disabled={enviando}>
                 {enviando ? t("billing.processing") : metodo === "card" && !simulated ? t("billing.continueToCheckout") : t("billing.payNow")}
               </button>
-              <p className="checkout-fineprint">{t("billing.fineprint")}</p>
-            </form>
-          )}
-
+              <p className="premium-summary-fineprint">{t("billing.fineprint")}</p>
+            </div>
+            </div>
+          </>
+        ) : (
+          <div className="premium-body premium-body-single">
           {pendente && (
             <div className="checkout-pending">
               <div className="checkout-status-badge pending">{t("billing.awaitingPayment")}</div>
@@ -344,7 +380,8 @@ export default function CheckoutModal({ plan, priceCents, modules, addons, simul
               </button>
             </div>
           )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
