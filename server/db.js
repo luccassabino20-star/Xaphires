@@ -240,6 +240,13 @@ function applySchema(companyDb) {
   // nenhum por trás de tarefa antiga).
   addColumnIfMissing(companyDb, "personal_tasks", "color", "color TEXT");
   addColumnIfMissing(companyDb, "personal_tasks", "tentative", "tentative INTEGER NOT NULL DEFAULT 0");
+  // Vídeochamada da Reuniões (aba nova sobre o mesmo dado, type='event'):
+  // link colado à mão ou resolvido a partir do link fixo do perfil
+  // (users.prefs.personalMeetingLink) ou gerado via server/integrations/zoom.js.
+  // video_provider é só rótulo pro ícone (zoom/meet/teams/custom) - a validação
+  // de verdade é o link em si, então NULL/valor desconhecido cai no ícone genérico.
+  addColumnIfMissing(companyDb, "personal_tasks", "video_link", "video_link TEXT");
+  addColumnIfMissing(companyDb, "personal_tasks", "video_provider", "video_provider TEXT");
 
   // Perfil pessoal (routes/profile.js): as únicas duas coisas que o próprio
   // usuário edita sobre si mesmo. E-mail continua fora daqui de propósito -

@@ -561,23 +561,24 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
         </div>
 
         <div className="dsb-shortcuts">
-          {/* Caixa de entrada abre o mesmo chat da empresa (useChat) - "Reuniões"
-              continua sem função (ver decisão da conversa), com title="Em breve"
-              como os placeholders do rail. "Mais" saiu daqui: virou redundante
-              depois que Monitor de gargalos/Rotinas automáticas/Cartões arquivados
-              foram para o "Mais" do rail escuro, que já era funcional (idioma/
-              tema/painel da plataforma). O modal do chat continua montado só pela
-              TopBar. */}
+          {/* Caixa de entrada abre o mesmo chat da empresa (useChat). "Mais" saiu
+              daqui: virou redundante depois que Monitor de gargalos/Rotinas
+              automáticas/Cartões arquivados foram para o "Mais" do rail escuro,
+              que já era funcional (idioma/tema/painel da plataforma). O modal
+              do chat continua montado só pela TopBar. */}
           <ShortcutRow
             icon={<IconInbox size={15} />}
             label={t("app.sidebar.shortcuts.inbox")}
             badge={totalUnread > 0 ? (totalUnread > 9 ? "9+" : totalUnread) : null}
             onClick={openChat}
           />
+          {/* Real: mesma agenda pessoal do Planejador (PersonalPlanner), aberta
+              direto na aba "Reuniões" (type==='event' com vídeochamada) - ver
+              PersonalTaskDetailModal.jsx para o campo de link do Zoom/Meet/Teams. */}
           <ShortcutRow
             icon={<IconVideo size={15} />}
             label={t("app.sidebar.shortcuts.meetings")}
-            title={t("app.sidebar.comingSoon")}
+            onClick={() => onOpenPlanner("meetings")}
           />
           {/* Real: lista da mesma agenda pessoal do Planejador (PersonalPlanner),
               só que aberta direto na aba de lista em vez da de calendário. */}

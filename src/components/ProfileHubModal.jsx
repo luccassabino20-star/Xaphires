@@ -55,6 +55,8 @@ export default function ProfileHubModal({ onClose }) {
   const [notifyAssignment, setNotifyAssignment] = useState(user.prefs?.notifyAssignment !== false);
   const [notifyDeadline, setNotifyDeadline] = useState(user.prefs?.notifyDeadline !== false);
   const [defaultBoardBackground, setDefaultBoardBackground] = useState(user.prefs?.defaultBoardBackground || "");
+  const [personalMeetingProvider, setPersonalMeetingProvider] = useState(user.prefs?.personalMeetingProvider || "zoom");
+  const [personalMeetingLink, setPersonalMeetingLink] = useState(user.prefs?.personalMeetingLink || "");
   const [savingPrefs, setSavingPrefs] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -116,6 +118,11 @@ export default function ProfileHubModal({ onClose }) {
 
   async function salvarPrefs(e) {
     e.preventDefault();
+    const link = personalMeetingLink.trim();
+    if (link && !/^https:\/\//i.test(link)) {
+      showToast(t("errors.VIDEO_LINK_INVALID"));
+      return;
+    }
     setSavingPrefs(true);
     try {
       const atualizado = await api.updateMyProfilePrefs({
@@ -124,6 +131,8 @@ export default function ProfileHubModal({ onClose }) {
         notifyAssignment,
         notifyDeadline,
         defaultBoardBackground,
+        personalMeetingLink: link,
+        personalMeetingProvider,
       });
       aplicarLocal(atualizado);
       showToast(t("app.profileHub.preferencias.salvo"));
@@ -359,6 +368,28 @@ export default function ProfileHubModal({ onClose }) {
                 </div>
                 <p className="profile-hub-note">{t("app.profileHub.preferencias.corQuadroNota")}</p>
               </div>
+
+              <h3 className="profile-hub-section-title">{t("app.profileHub.preferencias.reuniaoTitulo")}</h3>
+              <div className="video-link-prefs-row">
+                <select
+                  className="video-link-provider-select"
+                  value={personalMeetingProvider}
+                  onChange={(e) => setPersonalMeetingProvider(e.target.value)}
+                >
+                  <option value="zoom">{t("planner.video.providerZoom")}</option>
+                  <option value="meet">{t("planner.video.providerMeet")}</option>
+                  <option value="teams">{t("planner.video.providerTeams")}</option>
+                  <option value="custom">{t("planner.video.providerCustom")}</option>
+                </select>
+                <input
+                  type="url"
+                  className="video-link-input"
+                  placeholder={t("app.profileHub.preferencias.reuniaoLinkPlaceholder")}
+                  value={personalMeetingLink}
+                  onChange={(e) => setPersonalMeetingLink(e.target.value)}
+                />
+              </div>
+              <p className="profile-hub-note">{t("app.profileHub.preferencias.reuniaoNota")}</p>
 
               <div className="composer-actions" style={{ marginTop: 16 }}>
                 <button type="submit" className="btn-primary btn-small" disabled={savingPrefs}>

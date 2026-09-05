@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../state/ToastContext.jsx";
+import { useAuth } from "../state/AuthContext.jsx";
 import { translateError } from "../utils/errors.js";
 import * as api from "../state/api.js";
 import DatePicker from "./DatePicker.jsx";
@@ -11,6 +12,39 @@ function CheckMarkIcon() {
       <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
     </svg>
   );
+}
+// Câmera genérica, não o logo de nenhum provedor - o distintivo de Zoom/Meet/
+// Teams é só a cor de fundo do badge (ver .video-quick-btn/.video-join-btn no
+// CSS), para não reproduzir marca registrada de terceiros.
+function VideoCallIcon({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size}>
+      <path fill="currentColor" d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 3.5v-11z" />
+    </svg>
+  );
+}
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="11" height="11">
+      <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" d="M5 5l14 14M19 5 5 19" />
+    </svg>
+  );
+}
+
+// Provedor a partir do domínio do link colado - só decide qual ícone/cor
+// mostrar (ver COLORS acima), nunca valida se a URL é "de verdade" de um
+// serviço de vídeo. Link fora dos três hosts conhecidos cai em "custom",
+// mesmo que a pessoa tenha colado um Zoom com domínio custom de empresa.
+function detectVideoProvider(link) {
+  try {
+    const host = new URL(link).hostname;
+    if (host.endsWith("zoom.us")) return "zoom";
+    if (host === "meet.google.com") return "meet";
+    if (host.endsWith("teams.microsoft.com") || host.endsWith("teams.live.com")) return "teams";
+  } catch {
+    /* link ainda incompleto enquanto a pessoa digita - cai em custom */
+  }
+  return "custom";
 }
 
 // Ordem fixa alta->média->baixa, a mesma em que os chips aparecem no seletor
@@ -33,6 +67,7 @@ const COLORS = ["teal", "blue", "purple", "amber", "rose"];
 export default function PersonalTaskDetailModal({ task, canUse, onClose, onChange }) {
   const { t } = useTranslation();
   const showToast = useToast();
+  const { user } = useAuth();
   const [title, setTitle] = useState(task.title);
   const [due, setDue] = useState(task.due);
   const [description, setDescription] = useState(task.description || "");
@@ -47,7 +82,11 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
   const [color, setColor] = useState(task.color || null);
   const [tentative, setTentative] = useState(!!task.tentative);
   const [completed, setCompleted] = useState(!!task.completed);
+  const [videoLink, setVideoLink] = useState(task.videoLink || "");
+  const [videoProvider, setVideoProvider] = useState(task.videoProvider || null);
+  const [generatingZoom, setGeneratingZoom] = useState(false);
   const readOnly = !canUse;
+  const personalMeetingLink = user?.prefs?.personalMeetingLink || "";
 
   // Troca de tarefa (o usuário fechou e abriu outra) - sem isso os campos
   // ficariam com o conteúdo da tarefa anterior até o próximo re-render.
@@ -65,6 +104,8 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
     setColor(task.color || null);
     setTentative(!!task.tentative);
     setCompleted(!!task.completed);
+    setVideoLink(task.videoLink || "");
+    setVideoProvider(task.videoProvider || null);
   }, [task.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function persist(patch) {
@@ -142,6 +183,64 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
   function commitTentative(v) {
     setTentative(v);
     persist({ tentative: v });
+  }
+
+  // Link colado à mão: valida na saída do campo (não tecla a tecla, mesmo
+  // padrão de commitTitle/commitLabel) e deriva o provedor do domínio - a
+  // pessoa não escolhe "isto é Zoom" num seletor à parte, o link já diz.
+  function commitVideoLink() {
+    const trimmed = videoLink.trim();
+    if (trimmed === (task.videoLink || "")) return;
+    if (trimmed && !/^https:\/\//i.test(trimmed)) {
+      showToast(t("errors.VIDEO_LINK_INVALID"));
+      setVideoLink(task.videoLink || "");
+      return;
+    }
+    const provider = trimmed ? detectVideoProvider(trimmed) : null;
+    setVideoProvider(provider);
+    persist({ videoLink: trimmed, videoProvider: provider });
+  }
+
+  function clearVideoLink() {
+    setVideoLink("");
+    setVideoProvider(null);
+    persist({ videoLink: "", videoProvider: null });
+  }
+
+  // "Solução Rápida" do pedido: usa o link fixo salvo no perfil (Personal
+  // Meeting ID do Zoom, ou qualquer outro) em vez de gerar sala nova -
+  // desabilitado quando a pessoa ainda não configurou nada lá (ver
+  // ProfileHubModal.jsx, aba Preferências).
+  function useMyLink() {
+    if (!personalMeetingLink) return;
+    const provider = user?.prefs?.personalMeetingProvider || "zoom";
+    setVideoLink(personalMeetingLink);
+    setVideoProvider(provider);
+    persist({ videoLink: personalMeetingLink, videoProvider: provider });
+  }
+
+  // O Meet não tem API pública para criar sala sem OAuth de usuário (ver
+  // server/integrations/zoom.js) - meet.google.com/new cria uma sala de
+  // verdade na hora quando a pessoa já está logada no Google, só que o link
+  // final não volta pra nós (aba nova, outra origem): a pessoa precisa colar
+  // de volta no campo manual, por isso o toast explicando o passo seguinte.
+  function createMeet() {
+    window.open("https://meet.google.com/new", "_blank", "noopener,noreferrer");
+    showToast(t("planner.video.createMeetHint"));
+  }
+
+  async function generateZoom() {
+    setGeneratingZoom(true);
+    try {
+      const atualizada = await api.generateZoomLink(task.id);
+      setVideoLink(atualizada.videoLink || "");
+      setVideoProvider(atualizada.videoProvider || null);
+      onChange(atualizada);
+    } catch (err) {
+      showToast(translateError(err, t));
+    } finally {
+      setGeneratingZoom(false);
+    }
   }
 
   function commitCompleted(v) {
@@ -291,6 +390,71 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
             <span>{t("planner.tentativeLabel")}</span>
           </label>
         </div>
+
+        {type === "event" && (
+          <div className="modal-section">
+            <label className="modal-label">
+              <VideoCallIcon /> {t("planner.video.sectionLabel")}
+            </label>
+            <div className="video-link-row">
+              <input
+                type="url"
+                className="video-link-input"
+                value={videoLink}
+                readOnly={readOnly}
+                placeholder={t("planner.video.linkPlaceholder")}
+                onChange={(e) => setVideoLink(e.target.value)}
+                onBlur={commitVideoLink}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.currentTarget.blur();
+                }}
+              />
+              {videoLink && !readOnly && (
+                <button type="button" className="video-link-clear" onClick={clearVideoLink} aria-label={t("planner.video.remove")}>
+                  <CloseIcon />
+                </button>
+              )}
+            </div>
+
+            {!readOnly && (
+              <div className="video-quick-actions">
+                <button
+                  type="button"
+                  className="video-quick-btn provider-zoom"
+                  onClick={useMyLink}
+                  disabled={!personalMeetingLink}
+                  title={!personalMeetingLink ? t("planner.video.useMyLinkMissing") : undefined}
+                >
+                  <VideoCallIcon /> {t("planner.video.useMyLink")}
+                </button>
+                <button type="button" className="video-quick-btn provider-meet" onClick={createMeet}>
+                  <VideoCallIcon /> {t("planner.video.createMeet")}
+                </button>
+                <button type="button" className="video-quick-btn provider-zoom" onClick={generateZoom} disabled={generatingZoom}>
+                  <VideoCallIcon /> {generatingZoom ? t("planner.video.generatingZoom") : t("planner.video.generateZoom")}
+                </button>
+              </div>
+            )}
+
+            {videoLink && (
+              <a
+                className={"video-join-btn provider-" + (videoProvider || "custom")}
+                href={videoLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <VideoCallIcon size={15} />
+                {videoProvider === "zoom"
+                  ? t("planner.video.joinZoom")
+                  : videoProvider === "meet"
+                  ? t("planner.video.joinMeet")
+                  : videoProvider === "teams"
+                  ? t("planner.video.joinTeams")
+                  : t("planner.video.join")}
+              </a>
+            )}
+          </div>
+        )}
 
         <div className="modal-section">
           <label className="modal-label">{t("planner.priorityLabel")}</label>

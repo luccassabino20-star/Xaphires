@@ -1287,6 +1287,8 @@ function parsePersonalTask(row) {
     label: row.label || "",
     color: row.color || null,
     tentative: !!row.tentative,
+    videoLink: row.video_link || null,
+    videoProvider: row.video_provider || null,
   };
 }
 
@@ -1316,7 +1318,7 @@ export function createPersonalTask(userId, data) {
   const durationMin = allDay ? null : data.durationMin || 60;
   getDb()
     .prepare(
-      "INSERT INTO personal_tasks (id, user_id, title, due, completed, priority, type, all_day, start_time, duration_min, label, color, tentative, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO personal_tasks (id, user_id, title, due, completed, priority, type, all_day, start_time, duration_min, label, color, tentative, video_link, video_provider, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     .run(
       id,
@@ -1331,6 +1333,8 @@ export function createPersonalTask(userId, data) {
       data.label || "",
       data.color || null,
       data.tentative ? 1 : 0,
+      data.videoLink || null,
+      data.videoProvider || null,
       nowIso()
     );
   return getPersonalTask(id);
@@ -1352,6 +1356,12 @@ export function updatePersonalTask(id, patch) {
   const label = patch.label === undefined ? atual.label : patch.label;
   const color = patch.color === undefined ? atual.color : patch.color;
   const tentative = patch.tentative === undefined ? atual.tentative : !!patch.tentative;
+  // Link vazio ("") apaga a vídeochamada de propósito - é o "Remover" do
+  // campo manual no modal, não um valor esquecido. undefined é o único caso
+  // que preserva o que já estava lá (patch parcial vindo de outro commit,
+  // ex.: só a cor mudou).
+  const videoLink = patch.videoLink === undefined ? atual.videoLink : patch.videoLink || null;
+  const videoProvider = patch.videoProvider === undefined ? atual.videoProvider : patch.videoProvider || null;
   const allDay = patch.allDay === undefined ? atual.allDay : !!patch.allDay;
   // Virar "sem horário" (arrastar de volta pro painel lateral, por exemplo)
   // limpa hora/duração - um bloco all_day com hora fantasma sobraria escondido,
@@ -1361,7 +1371,7 @@ export function updatePersonalTask(id, patch) {
   const durationMin = allDay ? null : patch.durationMin !== undefined ? patch.durationMin : atual.durationMin || 60;
   getDb()
     .prepare(
-      "UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=?, description=?, checklist=?, priority=?, type=?, all_day=?, start_time=?, duration_min=?, label=?, color=?, tentative=? WHERE id=?"
+      "UPDATE personal_tasks SET title=?, due=?, completed=?, completed_at=?, description=?, checklist=?, priority=?, type=?, all_day=?, start_time=?, duration_min=?, label=?, color=?, tentative=?, video_link=?, video_provider=? WHERE id=?"
     )
     .run(
       patch.title ?? atual.title,
@@ -1378,6 +1388,8 @@ export function updatePersonalTask(id, patch) {
       label,
       color,
       tentative ? 1 : 0,
+      videoLink,
+      videoProvider,
       id
     );
   return getPersonalTask(id);

@@ -31,6 +31,13 @@ function CheckMarkTinyIcon() {
     </svg>
   );
 }
+function VideoCallTinyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="9" height="9">
+      <path fill="currentColor" d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 3.5v-11z" />
+    </svg>
+  );
+}
 
 export default function PlannerWeekGrid({
   weekAnchor,
@@ -158,7 +165,22 @@ export default function PlannerWeekGrid({
                         {tsk.startTime}–{minutosParaHora(paraMinutos(tsk.startTime) + (tsk.durationMin || 60))}
                         {tsk.completed && <CheckMarkTinyIcon />}
                       </span>
-                      <span className="planner-week-block-title">{tsk.title}</span>
+                      <span className="planner-week-block-title">
+                        {tsk.videoLink && (
+                          <a
+                            className="planner-week-block-video"
+                            href={tsk.videoLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
+                            title={t("planner.video.join")}
+                          >
+                            <VideoCallTinyIcon />
+                          </a>
+                        )}
+                        {tsk.title}
+                      </span>
                       {canUse && (
                         <span
                           className="planner-week-block-resize"

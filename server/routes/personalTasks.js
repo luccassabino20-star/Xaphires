@@ -3,6 +3,7 @@ import { ah } from "../asyncHandler.js";
 import * as repo from "../repo.js";
 import { getCompany } from "../directory.js";
 import { canUsePersonalPlanner } from "../plans.js";
+import { zoomConfigurado, criarReuniaoZoom } from "../integrations/zoom.js";
 
 const router = Router();
 
@@ -21,6 +22,11 @@ const PRIORITIES = ["low", "medium", "high"];
 const TYPES = ["event", "task", "focus", "vacation"];
 const COLORS = ["teal", "blue", "purple", "amber", "rose"];
 const LABEL_MAX = 40;
+// Rótulo do ícone na aba Reuniões - não trava o valor do link em si (é
+// possível colar qualquer URL), só decide qual logo mostrar. "custom" cobre
+// Teams e qualquer outro link colado à mão.
+const VIDEO_PROVIDERS = ["zoom", "meet", "teams", "custom"];
+const VIDEO_LINK_MAX = 500;
 
 // Sempre a agenda de quem está logado - não há id de usuário no corpo nem na
 // URL para ninguém escolher tarefa de outra pessoa, e toda consulta já nasce
@@ -54,6 +60,13 @@ function validar(body) {
   }
   if (body.color !== undefined && body.color !== null && !COLORS.includes(body.color)) {
     return { error: "Cor inválida", code: "COLOR_INVALID" };
+  }
+  if (body.videoLink !== undefined && body.videoLink !== null && body.videoLink !== "") {
+    if (body.videoLink.length > VIDEO_LINK_MAX) return { error: "Link muito longo", code: "VIDEO_LINK_TOO_LONG" };
+    if (!/^https:\/\/.+/i.test(body.videoLink)) return { error: "O link da vídeochamada precisa começar com https://", code: "VIDEO_LINK_INVALID" };
+  }
+  if (body.videoProvider !== undefined && body.videoProvider !== null && !VIDEO_PROVIDERS.includes(body.videoProvider)) {
+    return { error: "Provedor de vídeochamada inválido", code: "VIDEO_PROVIDER_INVALID" };
   }
   return null;
 }
@@ -96,6 +109,8 @@ router.post(
       label: req.body.label,
       color: req.body.color,
       tentative: req.body.tentative,
+      videoLink: req.body.videoLink,
+      videoProvider: req.body.videoProvider,
     });
     res.status(201).json(criada);
   })
@@ -106,7 +121,18 @@ router.patch(
   ownedOr404,
   exigePlano,
   ah(async (req, res) => {
-    const camposValidaveis = ["title", "due", "priority", "type", "startTime", "durationMin", "label", "color"];
+    const camposValidaveis = [
+      "title",
+      "due",
+      "priority",
+      "type",
+      "startTime",
+      "durationMin",
+      "label",
+      "color",
+      "videoLink",
+      "videoProvider",
+    ];
     if (camposValidaveis.some((campo) => req.body?.[campo] !== undefined)) {
       const atual = repo.getPersonalTask(req.params.id);
       const erro = validar({
@@ -119,6 +145,8 @@ router.patch(
         durationMin: req.body.durationMin !== undefined ? req.body.durationMin : atual.durationMin,
         label: req.body.label ?? atual.label,
         color: req.body.color !== undefined ? req.body.color : atual.color,
+        videoLink: req.body.videoLink !== undefined ? req.body.videoLink : atual.videoLink,
+        videoProvider: req.body.videoProvider !== undefined ? req.body.videoProvider : atual.videoProvider,
       });
       if (erro) return res.status(400).json(erro);
     }
@@ -133,6 +161,40 @@ router.delete(
   ah(async (req, res) => {
     repo.deletePersonalTask(req.params.id);
     res.json({ ok: true });
+  })
+);
+
+// Gera a sala pelo Zoom via OAuth Server-to-Server (ver
+// server/integrations/zoom.js) e já grava o link na própria tarefa - o
+// front chama isso quando a pessoa clica "Gerar link do Zoom" em vez de
+// colar um link manual. 501 (não 500) quando o servidor não tem credencial:
+// não é erro nosso, é recurso não configurado nesta instalação, mesmo
+// espírito do "fake" da cobrança - sem credencial, não finge que gerou.
+router.post(
+  "/:id/video-link/zoom",
+  ownedOr404,
+  exigePlano,
+  ah(async (req, res) => {
+    if (!zoomConfigurado()) {
+      return res.status(501).json({
+        error: "A integração com o Zoom não está configurada neste servidor. Peça ao administrador para definir ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID e ZOOM_CLIENT_SECRET.",
+        code: "ZOOM_NOT_CONFIGURED",
+      });
+    }
+    const atual = repo.getPersonalTask(req.params.id);
+    try {
+      const reuniao = await criarReuniaoZoom({
+        topic: atual.title,
+        due: atual.due,
+        startTime: atual.startTime,
+        durationMin: atual.durationMin,
+      });
+      const atualizada = repo.updatePersonalTask(req.params.id, { videoLink: reuniao.joinUrl, videoProvider: "zoom" });
+      res.json(atualizada);
+    } catch (err) {
+      console.error("[zoom] falha ao criar reunião:", err.message);
+      res.status(502).json({ error: "Não foi possível criar a reunião no Zoom agora.", code: "ZOOM_CREATE_FAILED" });
+    }
   })
 );
 

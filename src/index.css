@@ -1629,6 +1629,96 @@ input, textarea { font-family: inherit; }
 }
 .label-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent); }
 
+/* ---------- Vídeochamada (Reuniões) ----------
+   Cor por provedor é só um acento de fundo/borda num ícone de câmera
+   genérico - nenhum logo de terceiro é desenhado aqui (ver comentário de
+   VideoCallIcon em PersonalTaskDetailModal.jsx). Tons aproximados da marca de
+   cada serviço só para reconhecimento rápido: Zoom (azul), Meet (verde),
+   Teams (roxo); "custom" cai no --accent da própria empresa. */
+.video-link-row { display: flex; align-items: center; gap: 6px; }
+.video-link-input {
+  flex: 1; min-width: 0; border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 12px;
+  font-size: 13.5px; font-family: inherit; background: var(--bg-card); color: var(--text-primary);
+  outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.video-link-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent); }
+.video-link-clear {
+  flex-shrink: 0; width: 28px; height: 28px; padding: 0; border-radius: 8px; border: 1px solid var(--border-subtle);
+  background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease;
+}
+.video-link-clear:hover { border-color: var(--danger); color: var(--danger); }
+
+.video-quick-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.video-quick-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-secondary);
+  font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+.video-quick-btn:hover:not(:disabled) { border-color: var(--border-strong); }
+.video-quick-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+.video-quick-btn.provider-zoom:hover:not(:disabled) { border-color: #2d8cff; color: #2d8cff; }
+.video-quick-btn.provider-meet:hover:not(:disabled) { border-color: #12a150; color: #12a150; }
+
+/* Botão de entrar na sala - o mais chamativo dos três estados do campo
+   (vazio / com link colado mas fora do dia / entrar agora), sempre
+   preenchido, nunca fantasma, porque é a ação mais provável de quem abriu
+   uma reunião que já tem link. */
+.video-join-btn {
+  display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; padding: 9px 16px; border-radius: 10px;
+  font-size: 13px; font-weight: 800; text-decoration: none; color: #fff; cursor: pointer;
+  box-shadow: var(--shadow-card); transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.video-join-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); opacity: 0.95; }
+.video-join-btn.provider-zoom { background: #2d8cff; }
+.video-join-btn.provider-meet { background: #12a150; }
+.video-join-btn.provider-teams { background: #6264a7; }
+.video-join-btn.provider-custom { background: var(--accent); }
+.video-join-btn.small { margin-top: 0; padding: 4px 10px; font-size: 11px; border-radius: 999px; flex-shrink: 0; }
+/* Reunião que já aconteceu (aba Reuniões, grupo "Já aconteceram") - cinza
+   neutro em vez da cor do provedor, de propósito: um pill azul/verde vivo ali
+   parece convite pra entrar numa chamada que já passou. Continua sendo link
+   de verdade (sala fixa do Zoom não expira), só não chama atenção. */
+.video-join-btn.muted { background: var(--bg-list); color: var(--text-muted); box-shadow: none; }
+.video-join-btn.muted:hover { opacity: 1; color: var(--text-secondary); box-shadow: none; transform: none; }
+
+/* Badge "🎥 Entrar na chamada" - só nos compromissos que começam hoje (ver
+   PersonalPlanner.jsx, aba Reuniões): pulso sutil pra chamar atenção sem
+   virar propaganda, mesma animação de .planner-now-line só que em opacidade
+   em vez de escala, pra não fazer o texto "pular". */
+.meeting-join-badge {
+  flex-shrink: 0; display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px;
+  background: linear-gradient(135deg, #2d8cff, #12a150); color: #fff; font-size: 12px; font-weight: 800;
+  text-decoration: none; white-space: nowrap; animation: meeting-badge-pulse 2.2s ease-in-out infinite;
+}
+.meeting-join-badge:hover { animation: none; opacity: 0.9; }
+@keyframes meeting-badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, #12a150 45%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, #12a150 0%, transparent); }
+}
+
+.meeting-row { gap: 10px; }
+.meeting-row-icon {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  background: var(--bg-list); color: var(--text-muted);
+}
+.meeting-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.meeting-row-time { font-size: 12px; color: var(--text-muted); }
+
+/* Ícone de câmera dentro do bloco da grade semanal (PlannerWeekGrid.jsx) -
+   inline com o título, não absoluto como o check, porque o bloco já é
+   estreito e os dois brigariam pelo mesmo canto. */
+.planner-week-block-video { display: inline-flex; margin-right: 3px; color: inherit; vertical-align: -1px; }
+
+/* Preferência de link fixo (ProfileHubModal.jsx, aba Preferências) - select +
+   input lado a lado, mesma altura de .video-link-input pra alinhar. */
+.video-link-prefs-row { display: flex; gap: 8px; margin-top: 4px; }
+.video-link-provider-select {
+  flex: 0 0 150px; border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 10px;
+  font-size: 13px; font-family: inherit; background: var(--bg-card); color: var(--text-primary);
+}
+
 /* Checkbox de concluído no cabeçalho do editor (ao lado do título) - mesma
    pílula redonda de .planner-task-check (lista), só reaproveitada aqui fora
    da lista. Título ganha o risco junto (mesmo raciocínio do bloco semanal:

@@ -77,6 +77,16 @@ function PlusIcon() {
     </svg>
   );
 }
+// Câmera genérica, mesmo ícone (sem marca de provedor) de
+// PersonalTaskDetailModal.jsx - duplicado aqui porque cada arquivo deste
+// projeto define seus próprios ícones locais (ver EmptyPlannerIcon acima).
+function VideoCallIcon({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size}>
+      <path fill="currentColor" d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 3.5v-11z" />
+    </svg>
+  );
+}
 
 function formatDue(iso, lng) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -95,7 +105,7 @@ function addDays(date, n) {
   return d;
 }
 
-const TABS = ["week", "month", "list"];
+const TABS = ["week", "month", "list", "meetings"];
 
 // Agenda pessoal: tarefas fora de qualquer quadro, só de quem está logado (ver
 // personal_tasks no servidor). Três abas sobre o mesmo dado - Semana (grade
@@ -187,6 +197,22 @@ export default function PersonalPlanner({ initialTab = "week" }) {
       .map((key) => ({ key, items: buckets[key] }))
       .filter((g) => g.items.length > 0);
   }, [sortedTasks, todayIso, tomorrowIso]);
+
+  // Aba Reuniões: mesma agenda, filtrada a type==="event" - não é uma
+  // segunda fonte de dado (ver comentário de topo do arquivo), só outro
+  // recorte. Agrupada por Hoje/Em breve/Já aconteceram em vez do
+  // atrasada/hoje/amanhã da lista principal, porque "atrasada" não faz
+  // sentido pra um compromisso que já passou - ele não fica pendente.
+  const meetingTasks = useMemo(() => sortedTasks.filter((tsk) => tsk.type === "event"), [sortedTasks]);
+  const meetingGroups = useMemo(() => {
+    const buckets = { today: [], upcoming: [], past: [] };
+    meetingTasks.forEach((tsk) => {
+      if (tsk.due < todayIso) buckets.past.push(tsk);
+      else if (tsk.due === todayIso) buckets.today.push(tsk);
+      else buckets.upcoming.push(tsk);
+    });
+    return ["today", "upcoming", "past"].map((key) => ({ key, items: buckets[key] })).filter((g) => g.items.length > 0);
+  }, [meetingTasks, todayIso]);
 
   function goToday() {
     const now = new Date();
@@ -663,6 +689,84 @@ export default function PersonalPlanner({ initialTab = "week" }) {
                                 >
                                   <TrashIcon />
                                 </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
+              {tab === "meetings" && (
+                <>
+                  {meetingTasks.length === 0 ? (
+                    <div className="planner-empty">
+                      <VideoCallIcon size={40} />
+                      <p>{t("planner.meetingsEmpty")}</p>
+                    </div>
+                  ) : (
+                    meetingGroups.map((g) => (
+                      <div className="planner-group" key={g.key}>
+                        <div className="planner-group-title">
+                          {t(`planner.group${g.key === "today" ? "Today" : g.key === "upcoming" ? "Upcoming" : "PastMeetings"}`)}
+                          <span className="planner-group-count">{g.items.length}</span>
+                        </div>
+                        <ul className="planner-task-list">
+                          {g.items.map((tsk) => {
+                            return (
+                              <li
+                                key={tsk.id}
+                                className={"planner-task-row meeting-row" + (tsk.color ? " color-" + tsk.color : "")}
+                                onClick={() => setDetailTaskId(tsk.id)}
+                              >
+                                <span className="meeting-row-icon">
+                                  <VideoCallIcon />
+                                </span>
+                                <div className="meeting-row-main">
+                                  <span className="planner-task-title">{tsk.title}</span>
+                                  <span className="meeting-row-time">
+                                    {formatDue(tsk.due, i18n.language)}
+                                    {!tsk.allDay && tsk.startTime ? ` · ${tsk.startTime}` : ""}
+                                  </span>
+                                </div>
+                                {tsk.videoLink &&
+                                  (g.key === "today" ? (
+                                    <a
+                                      className="meeting-join-badge"
+                                      href={tsk.videoLink}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      {t("planner.meetingsBadgeToday")}
+                                    </a>
+                                  ) : g.key === "past" ? (
+                                    // Já aconteceu: sem cor de provedor de propósito - um
+                                    // pill colorido aqui parece convite pra entrar numa
+                                    // chamada que já passou. Cinza neutro comunica "só
+                                    // registro", ainda clicável pra quem quer reabrir uma
+                                    // sala fixa (Zoom PMI não expira), mas não chama atenção.
+                                    <a
+                                      className="video-join-btn small muted"
+                                      href={tsk.videoLink}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <VideoCallIcon size={12} /> {t("planner.video.join")}
+                                    </a>
+                                  ) : (
+                                    <a
+                                      className={"video-join-btn small provider-" + (tsk.videoProvider || "custom")}
+                                      href={tsk.videoLink}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <VideoCallIcon size={12} /> {t("planner.video.join")}
+                                    </a>
+                                  ))}
                               </li>
                             );
                           })}

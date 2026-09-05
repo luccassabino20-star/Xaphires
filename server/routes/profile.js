@@ -39,11 +39,24 @@ const CAMPOS_PREFS_VALIDOS = new Set([
   "notifyAssignment",
   "notifyDeadline",
   "defaultBoardBackground",
+  // Link fixo de vídeochamada (Reuniões do Planejador): "Usar meu link fixo"
+  // no editor de reunião insere isso direto, sem gerar nada novo - é a
+  // "Solução Rápida" (Personal Meeting ID) da vídeochamada, para quem não tem
+  // (ou não quer configurar) a integração via API do Zoom.
+  "personalMeetingLink",
+  "personalMeetingProvider",
 ]);
 router.patch(
   "/prefs",
   ah(async (req, res) => {
     const corpo = req.body || {};
+    // Mesma trava de server/routes/personalTasks.js: link precisa ser
+    // https:// de verdade. Sem isso um "javascript:" salvo aqui viraria um
+    // href clicável em "Entrar na chamada" - self-XSS (só afeta quem salvou),
+    // mas não custa nada recusar na entrada.
+    if (corpo.personalMeetingLink && !/^https:\/\/.+/i.test(corpo.personalMeetingLink)) {
+      return res.status(400).json({ error: "O link precisa começar com https://", code: "VIDEO_LINK_INVALID" });
+    }
     const patch = {};
     for (const campo of CAMPOS_PREFS_VALIDOS) {
       if (campo in corpo) patch[campo] = corpo[campo];

@@ -784,6 +784,7 @@ export const listPersonalTasks = () => request("/personal-tasks");
 export const createPersonalTask = (data) => request("/personal-tasks", { method: "POST", body: data });
 export const updatePersonalTask = (id, patch) => request(`/personal-tasks/${id}`, { method: "PATCH", body: patch });
 export const deletePersonalTask = (id) => request(`/personal-tasks/${id}`, { method: "DELETE" });
+export const generateZoomLink = (id) => request(`/personal-tasks/${id}/video-link/zoom`, { method: "POST" });
 
 // ---------- Relatórios ----------
 
