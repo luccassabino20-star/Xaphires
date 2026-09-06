@@ -1892,7 +1892,7 @@
     },
     "table": {
       "columns": {
-        "completed": "",
+        "completed": "Estado",
         "title": "Título",
         "listTitle": "Lista",
         "labels": "Etiquetas",
@@ -1901,6 +1901,9 @@
         "due": "Entrega",
         "checklist": "Lista de tareas"
       },
+      "statusColumnLabel": "Estado",
+      "openCard": "Abrir tarjeta",
+      "addCard": "Agregar tarjeta",
       "empty": "No se encontraron tarjetas."
     },
     "calendar": {

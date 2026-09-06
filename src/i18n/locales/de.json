@@ -1543,7 +1543,7 @@
     },
     "table": {
       "columns": {
-        "completed": "",
+        "completed": "Status",
         "title": "Titel",
         "listTitle": "Liste",
         "labels": "Etiketten",
@@ -1552,6 +1552,9 @@
         "due": "Fällig",
         "checklist": "Checkliste"
       },
+      "statusColumnLabel": "Status",
+      "openCard": "Karte öffnen",
+      "addCard": "Karte hinzufügen",
       "empty": "Keine Karten gefunden."
     },
     "calendar": {

@@ -797,51 +797,218 @@ input, textarea { font-family: inherit; }
 .view-placeholder { display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px; }
 
 /* ---------- Table view ---------- */
-.table-view-wrap { background: var(--bg-topbar); border: 1px solid var(--border-subtle); border-radius: 10px; overflow: hidden; }
+/* ---------- Table view ("Tabela" do quadro) ----------
+   Data-grid Ultra Premium (Notion/Airtable/Linear): moldura em card único
+   (borda suave + sombra leve, cantos de 16px) em vez do painel cinza-escuro
+   antigo, cabeçalho em caixa alta discreto, e cada célula com um componente
+   de UI próprio (pílula de status, chip de etiqueta, grupo de avatares,
+   badge de data) em vez de texto cru. .tbl-* é namespace exclusivo deste
+   arquivo (TableView.jsx) - NÃO reaproveita .card-labels/.card-avatars/
+   .card-label (esses são do CardItem/board Kanban e de outros módulos, ver
+   grep antes de tocar). */
+.table-view-wrap {
+  background: var(--bg-topbar);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
 .board-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .board-table th {
   text-align: left;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 11px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
   background: var(--bg-list);
   user-select: none;
   white-space: nowrap;
 }
 .board-table th.sortable { cursor: pointer; }
 .board-table th.sortable:hover { color: var(--text-primary); }
-.sort-arrow { color: var(--text-secondary); }
-.board-table td { padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); vertical-align: middle; }
-.board-table tbody tr { cursor: pointer; }
-.board-table tbody tr:hover { background: var(--bg-list); }
+.board-table th.sortable:hover .tbl-sort-icon { opacity: 0.9; }
+.tbl-th-inner { display: inline-flex; align-items: center; gap: 4px; }
+.tbl-sort-icon { color: var(--text-muted); opacity: 0.35; flex-shrink: 0; transition: opacity 0.15s ease; }
+.tbl-sort-icon.active { opacity: 1; color: var(--accent); }
+/* Coluna de status (checkbox) e de ações (menu "..."): estreitas e
+   centralizadas, sem o padding largo das colunas de conteúdo. */
+.board-table th.tbl-col-status, .board-table td.tbl-col-status { width: 34px; text-align: center; padding-left: 10px; padding-right: 4px; }
+.board-table th.tbl-col-actions, .board-table td.tbl-col-actions { width: 40px; padding-left: 4px; padding-right: 10px; }
+.board-table td { padding: 13px 14px; border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent); color: var(--text-primary); vertical-align: middle; }
+.board-table tbody tr { cursor: pointer; transition: background 0.12s ease; }
+.board-table tbody tr:hover { background: color-mix(in srgb, var(--text-primary) 3%, var(--bg-topbar)); }
 .board-table tbody tr:last-child td { border-bottom: none; }
-.table-title { font-weight: 500; min-width: 220px; }
-.table-title.completed-text { color: var(--text-muted); text-decoration: line-through; }
+.table-title { font-weight: 600; color: var(--text-primary); min-width: 220px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table-title.completed-text { color: var(--text-muted); text-decoration: line-through; font-weight: 500; }
 .row-completed { opacity: 0.7; }
 .table-check.checked { opacity: 1; }
 .table-check { position: static; opacity: 1; cursor: default; }
 .table-empty { text-align: center; color: var(--text-muted); padding: 32px !important; cursor: default; }
 .table-empty:hover { background: transparent !important; }
 
-/* ---------- Calendar view ---------- */
+/* Pílula pastel reutilizável (status da lista e etiquetas) - mesma receita
+   --chip-color de .calendar-card-chip/.dash-label-chip (ver seções
+   Calendar/Dashboard view), duplicada aqui em vez de importada de lá: cada
+   seção deste arquivo já é autocontida de propósito (comentário de
+   .planner-grid mais abaixo explica o mesmo raciocínio para o calendário). */
+.tbl-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--chip-color) 16%, transparent);
+  color: var(--chip-color);
+}
+.tbl-chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+/* Grupo de avatares sobrepostos - .avatar-small já vem com o anel (box-shadow
+   0 0 0 2px var(--bg-card)) e a sobreposição (margin-left:-6px) prontos,
+   mesmo par usado em .card-avatars (cartão do Kanban); aqui só o container
+   flex, sem reinventar o anel. */
+.tbl-avatar-group { display: flex; align-items: center; }
+.tbl-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-list);
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.tbl-date-badge svg { color: var(--text-muted); flex-shrink: 0; }
+.tbl-date-badge.overdue { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+.tbl-date-badge.overdue svg { color: var(--danger); }
+.tbl-dash { color: var(--text-muted); opacity: 0.5; }
+.tbl-checklist-pill {
+  display: inline-flex;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  background: var(--bg-list);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.tbl-checklist-pill.all-done { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+/* Botão "..." só aparece no hover da linha - mesmo padrão de
+   .planner-day-add (hover-reveal em .calendar-cell), aqui escopado à linha
+   da tabela inteira em vez de uma célula só. */
+.tbl-row-action {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.board-table tbody tr:hover .tbl-row-action { opacity: 1; }
+.tbl-row-action:hover { background: var(--border-subtle); color: var(--text-primary); }
+
+.tbl-add-row { padding: 4px 10px; border-top: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent); }
+.tbl-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tbl-add-btn:hover { background: var(--bg-list); color: var(--accent); }
+.tbl-add-form { display: flex; gap: 8px; padding: 6px 2px; }
+.tbl-add-form input {
+  flex: 1;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tbl-add-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent); }
+
+/* ---------- Calendar view ----------
+   Redesenho "Ultra Premium" (inspirado em Notion Calendar/Linear/Cron) só do
+   calendário do QUADRO (CalendarView.jsx) - o mês do Planejador reusa estas
+   mesmas classes-base e se protege via seletores escopados em .planner-grid
+   com especificidade maior (ver o comentário grande logo antes da seção
+   "Planejador pessoal" abaixo); toda propriedade nova aqui que o Planejador
+   já sobrescreve (background/borda/hover/raio/o chip inteiro) fica só no
+   quadro, sem repetir trabalho nem duplicar seletor. */
 .calendar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
-.calendar-title { font-size: 17px; font-weight: 700; color: var(--text-primary); text-transform: capitalize; }
-.calendar-nav { display: flex; align-items: center; gap: 6px; }
+.calendar-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); text-transform: capitalize; }
+.calendar-nav { display: flex; align-items: center; gap: 8px; }
+
+/* Pílula minimalista, própria do calendário (não usa .btn-ghost, que é
+   reaproveitado em dezenas de lugares no app - mudar o genérico mudaria tudo
+   o resto sem querer). */
+.calendar-today-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.calendar-today-btn:hover { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+/* Setas agrupadas numa cápsula só, em vez de dois .icon-btn soltos - mesmo
+   motivo do botão "Hoje": .icon-btn é global, uma cápsula dedicada não. */
+.calendar-nav-group { display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 999px; background: var(--bg-list); }
+.calendar-nav-arrow {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.calendar-nav-arrow:hover { background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-card); }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent);
+  border-radius: 16px;
   overflow: hidden;
 }
 /* Linhas entre os dias: bordas de verdade em cada célula, não o truque de
@@ -849,20 +1016,25 @@ input, textarea { font-family: inherit; }
    linha visível - em zoom fora de 100% o arredondamento zera a linha
    horizontal entre semanas e some com o grid inteiro). :nth-child(7n) acerta
    a última coluna de cada linha porque os 7 cabeçalhos de dia da semana
-   entram na mesma contagem dos filhos do grid, antes das células do mês. */
+   entram na mesma contagem dos filhos do grid, antes das células do mês.
+   color-mix com transparência em vez da cor sólida - divisor mais suave,
+   sem depender de uma variável "--border-faint" nova (nenhuma existe, ver
+   convenção de :root no topo deste arquivo). */
 .calendar-grid > * {
-  border-right: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  border-right: 1px solid color-mix(in srgb, var(--border-subtle) 55%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 55%, transparent);
 }
 .calendar-grid > *:nth-child(7n) { border-right: none; }
 .calendar-weekday {
   background: var(--bg-list);
-  padding: 8px 10px;
-  font-size: 11px;
+  padding: 11px 10px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
+  opacity: 0.75;
+  text-align: center;
 }
 .calendar-cell {
   background: var(--bg-topbar);
@@ -871,9 +1043,23 @@ input, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transition: background 0.15s ease;
 }
+.calendar-cell:hover { background: color-mix(in srgb, var(--text-primary) 3%, var(--bg-topbar)); }
 .calendar-cell.outside { background: var(--bg-app); }
-.calendar-cell.outside .calendar-day-num { color: var(--text-muted); }
+.calendar-cell.outside:hover { background: color-mix(in srgb, var(--text-primary) 3%, var(--bg-app)); }
+/* Número do dia fora do mês: opacidade reduzida no número (não a célula
+   inteira, que continua com o fundo levemente diferenciado de sempre) -
+   ainda dá pra ler, só comunica "não é deste mês" sem competir com os dias
+   de verdade. */
+.calendar-cell.outside .calendar-day-num { color: var(--text-muted); opacity: 0.35; }
+.calendar-cell.today { background: color-mix(in srgb, var(--accent) 5%, var(--bg-topbar)); }
+.calendar-cell.today:hover { background: color-mix(in srgb, var(--accent) 9%, var(--bg-topbar)); }
+/* Badge do dia atual: pílula sólida na cor da empresa + auréola em duas
+   camadas (glow) em vez do círculo plano de antes - mesma receita de
+   .planner-grid .calendar-cell.today .calendar-day-num logo abaixo, só que
+   ali é a Planner somando por cima; aqui é a base, então o quadro já nasce
+   com o brilho. */
 .calendar-cell.today .calendar-day-num {
   background: var(--accent);
   color: var(--bg-app);
@@ -883,26 +1069,50 @@ input, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 4px 10px -2px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .calendar-day-num { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); padding: 2px; }
-.calendar-day-cards { display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+.calendar-day-cards { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+/* Chip do cartão: pílula com fundo pastel na cor da etiqueta/lista
+   (--chip-color vem inline de CalendarView.jsx, ver chipColorFor) em vez da
+   barra cinza antiga - a borda esquerda sólida some na mesma cor, então o
+   olho lê "categoria" pelo par borda+fundo sem precisar abrir o cartão.
+   --chip-color com fallback: o chip de prévia de rotina (sem cartão, sem
+   cor) não passa a variável e cai no neutro de sempre. */
 .calendar-card-chip {
+  --chip-color: var(--border-strong);
+  display: flex;
+  align-items: center;
+  gap: 6px;
   text-align: left;
   border: none;
-  border-left: 3px solid var(--border-strong);
-  background: var(--bg-list);
+  border-left: 3px solid var(--chip-color);
+  background: color-mix(in srgb, var(--chip-color) 16%, var(--bg-card));
   color: var(--text-primary);
   font-size: 11.5px;
-  padding: 3px 6px;
-  border-radius: 3px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
-.calendar-card-chip:hover { background: var(--border-subtle); }
+.calendar-card-chip:hover { transform: translateY(-1px); box-shadow: var(--shadow-card); }
 .calendar-card-chip.completed { text-decoration: line-through; color: var(--text-muted); }
-.calendar-more { font-size: 11px; color: var(--text-muted); padding: 2px 6px; }
+.calendar-more {
+  align-self: flex-start;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-list);
+  padding: 3px 8px;
+  border-radius: 999px;
+  cursor: default;
+}
 
 /* ---------- Planejador pessoal (PersonalPlanner) ----------
    Página cheia dentro de .main-area (ver .planner-page, mais abaixo, e
@@ -2138,59 +2348,142 @@ input, textarea { font-family: inherit; }
   body.gnt-printing .gnt-body { align-items: flex-start; }
 }
 
-/* ---------- Dashboard view ---------- */
-.dash-stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+/* ---------- Dashboard view ("Painel" do quadro) ----------
+   Central de analytics: cartões-superfície (branco + borda fina + sombra
+   leve, mais forte no hover) sobre o fundo que já existe atrás de
+   .view-scroll (gradiente off-white padrão OU a cor que a pessoa escolheu em
+   Personalizar > Fundo do quadro, ver .view-content-area) - de propósito não
+   toquei o fundo da página aqui, só o das superfícies, senão o "limpar o
+   cinza" desta tela apagaria a personalização de fundo do quadro de todo
+   mundo que já configurou uma. Namespace .dash-* é usado só por este
+   arquivo (DashboardView.jsx) - confirmado, sem colisão com
+   MainDashboardView.jsx (.dash-kpi-* e .dash-panel-*, bem mais abaixo) nem com
+   o Saúde & Clínicas (.sc-dash-*). */
+.dash-stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 16px; }
 .dash-stat-tile {
+  position: relative;
   background: var(--bg-topbar);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
-.dash-stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
-.dash-stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+.dash-stat-tile:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-1px); }
+.dash-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  margin-bottom: 12px;
+}
+.dash-stat-icon-neutral { background: var(--bg-list); color: var(--text-muted); }
+.dash-stat-icon-green { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+.dash-stat-icon-red { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+.dash-stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+.dash-stat-value { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1; }
 .dash-stat-value.dash-stat-good { color: var(--success); }
 .dash-stat-value.dash-stat-critical { color: var(--danger); }
 .dash-stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+/* Card "Concluídos": porcentagem grande + pílula com a fração ao lado, no
+   lugar do texto solto que .dash-stat-sub sozinho dava antes - mesma ideia
+   de badge que .priority-badge já usa em outro canto do app (fundo na cor
+   com opacidade, texto sólido). */
+.dash-stat-value-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.dash-stat-pill { font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.dash-stat-pill-green { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
 
 .dash-meter-card {
   background: var(--bg-topbar);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+  border-radius: 16px;
+  padding: 18px 20px;
   margin-bottom: 16px;
+  box-shadow: var(--shadow-card);
 }
-.dash-meter-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
-.dash-meter-track { height: 10px; background: var(--bg-list); border-radius: 6px; overflow: hidden; }
-.dash-meter-fill { height: 100%; background: var(--success); border-radius: 6px; transition: width 0.2s; }
+.dash-meter-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 12px; flex-wrap: wrap; }
+.dash-meter-title { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+.dash-meter-title svg { color: var(--text-muted); flex-shrink: 0; }
+.dash-meter-header-right { display: flex; align-items: baseline; gap: 8px; }
+/* Fixo em violeta (não var(--accent)) de propósito - o pedido é essa cor
+   específica pro destaque do percentual geral, mesmo raciocínio da barra
+   "por membro" (MEMBER_BAR_COLOR em DashboardView.jsx): identidade da
+   empresa já aparece em outro lugar, aqui é sempre a mesma cor de "métrica
+   principal". */
+.dash-meter-pct { font-size: 18px; font-weight: 800; color: #7c3aed; letter-spacing: -0.01em; }
+.dash-meter-fraction { font-size: 12px; font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.dash-meter-track { height: 10px; background: var(--bg-list); border-radius: 999px; overflow: hidden; }
+.dash-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7c3aed, #3b82f6);
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
 .dash-card {
   background: var(--bg-topbar);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.18s ease;
 }
-.dash-card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+.dash-card:hover { box-shadow: var(--shadow-card-hover); }
+.dash-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 16px; }
 .dash-empty { font-size: 12.5px; color: var(--text-muted); }
 
-.dash-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.dash-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .dash-bar-row:last-child { margin-bottom: 0; }
 .dash-bar-label {
   width: 120px;
   min-width: 120px;
   flex-shrink: 0;
   font-size: 12.5px;
+  font-weight: 500;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-.dash-bar-track { flex: 1; height: 14px; background: var(--bg-list); border-radius: 4px; overflow: hidden; }
-.dash-bar-fill { height: 100%; border-radius: 0 4px 4px 0; transition: width 0.2s; }
-.dash-bar-value { width: 24px; text-align: right; font-size: 12.5px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.dash-bar-label > span:not(.dash-label-chip) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Pílula pastel com o nome da etiqueta (Cartões por etiqueta) - mesma
+   receita --chip-color de .calendar-card-chip (ver seção Calendar view
+   acima): a cor chega inline de DashboardView.jsx, aqui só derivam fundo e
+   texto dela. */
+.dash-label-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--chip-color) 16%, transparent);
+  color: var(--chip-color);
+}
+.dash-bar-track { flex: 1; height: 8px; background: var(--bg-list); border-radius: 999px; overflow: hidden; }
+.dash-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+/* Valor por padrão, percentual do total no hover da linha inteira - as duas
+   camadas ocupam o mesmo espaço (absolute) e trocam de opacidade, sem
+   deslocar o layout ao trocar. */
+.dash-bar-value-wrap { position: relative; width: 34px; height: 15px; flex-shrink: 0; }
+.dash-bar-value, .dash-bar-pct {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.15s ease;
+}
+.dash-bar-value { color: var(--text-primary); opacity: 1; }
+.dash-bar-pct { color: var(--text-muted); opacity: 0; }
+.dash-bar-row:hover .dash-bar-value { opacity: 0; }
+.dash-bar-row:hover .dash-bar-pct { opacity: 1; }
 
 /* ---------- Eisenhower matrix view ---------- */
 .matrix-scroll { padding: 20px; overflow: auto; }
@@ -11191,7 +11484,7 @@ body.sc-pub-body { overflow: auto; }
 }
 
 /* ---------- Xaphires Time & Tracking ---------- */
-/* Variáveis globais (--text-*/--bg-*/--border-*/--accent), como o resto do
+/* Variáveis globais (--text-*, --bg-*, --border-*, --accent), como o resto do
    app - este módulo não tem tema próprio isolado tipo .beauty-shell, então
    usa o mesmo mecanismo de tema (claro/escuro) que já existe na plataforma.
    O gradiente navy do ícone/cronômetro é o mesmo já usado no Hub/Dashboard

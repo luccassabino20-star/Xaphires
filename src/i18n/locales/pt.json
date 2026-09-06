@@ -2132,7 +2132,7 @@
     },
     "table": {
       "columns": {
-        "completed": "",
+        "completed": "Status",
         "title": "Título",
         "listTitle": "Lista",
         "labels": "Etiquetas",
@@ -2141,6 +2141,9 @@
         "due": "Entrega",
         "checklist": "Checklist"
       },
+      "statusColumnLabel": "Status",
+      "openCard": "Abrir cartão",
+      "addCard": "Adicionar cartão",
       "empty": "Nenhum cartão encontrado."
     },
     "calendar": {

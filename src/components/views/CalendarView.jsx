@@ -3,9 +3,27 @@ import { useTranslation } from "react-i18next";
 import { useBoardDispatch } from "../../state/BoardContext.jsx";
 import { flattenCards } from "../../utils/boardCards.js";
 import { LABEL_COLORS } from "../../utils/labels.js";
+import { isCompletionColumnTitle } from "../../utils/columnCompletion.js";
 import { weekdayNames, monthNames, toISODate, buildGrid, occurrencesInRange } from "../../utils/calendarGrid.js";
 import { uid } from "../../utils/id.js";
 import * as api from "../../state/api.js";
+
+// Cor do chip quando o cartão não tem etiqueta própria: por lista, não por
+// cartão - cicla essas 5 (mesmo par hex das tags de cor do Planejador, ver
+// .planner-week-block.color-* em index.css) pela posição da lista no quadro,
+// então "A Fazer" e "Em andamento" saem com cores diferentes mesmo sem
+// ninguém configurar nada. Lista de conclusão (isCompletionColumnTitle) e
+// cartão marcado como concluído vencem a cor da lista/etiqueta de propósito -
+// "feito" precisa parecer feito, não importa a cor que o cartão carregava.
+const LIST_PALETTE = ["#3b82f6", "#f59e0b", "#a855f7", "#f43f5e", "#10b981"];
+function chipColorFor(card, board) {
+  if (card.completed) return "var(--success)";
+  const labelMeta = card.labels?.length ? LABEL_COLORS.find((l) => l.id === card.labels[0]) : null;
+  if (labelMeta) return labelMeta.color;
+  const idx = board.lists.findIndex((l) => l.id === card.listId);
+  if (idx >= 0 && isCompletionColumnTitle(board.lists[idx].title)) return "var(--success)";
+  return LIST_PALETTE[idx >= 0 ? idx % LIST_PALETTE.length : 0];
+}
 
 export default function CalendarView({ board, users, searchQuery, memberFilter, onOpenCard }) {
   const { t, i18n } = useTranslation();
@@ -119,15 +137,17 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
           {MONTH_NAMES[monthDate.getMonth()]} {monthDate.getFullYear()}
         </div>
         <div className="calendar-nav">
-          <button className="btn-ghost btn-small" onClick={goToday}>
+          <button className="calendar-today-btn" onClick={goToday}>
             {t("views.calendar.today")}
           </button>
-          <button className="icon-btn" onClick={goPrev} aria-label={t("views.calendar.prevMonth")}>
-            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" /></svg>
-          </button>
-          <button className="icon-btn" onClick={goNext} aria-label={t("views.calendar.nextMonth")}>
-            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" /></svg>
-          </button>
+          <div className="calendar-nav-group">
+            <button className="calendar-nav-arrow" onClick={goPrev} aria-label={t("views.calendar.prevMonth")}>
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" /></svg>
+            </button>
+            <button className="calendar-nav-arrow" onClick={goNext} aria-label={t("views.calendar.nextMonth")}>
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z" /></svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -162,21 +182,18 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
                 )}
               </div>
               <div className="calendar-day-cards">
-                {dayCards.slice(0, 4).map((c) => {
-                  const labelMeta = c.labels?.length ? LABEL_COLORS.find((l) => l.id === c.labels[0]) : null;
-                  return (
-                    <button
-                      key={c.id}
-                      className={"calendar-card-chip" + (c.completed ? " completed" : "")}
-                      style={labelMeta ? { borderLeftColor: labelMeta.color } : undefined}
-                      onClick={() => onOpenCard(c.id)}
-                      title={c.title}
-                    >
-                      {c.title}
-                    </button>
-                  );
-                })}
-                {dayRotinas.slice(0, Math.max(0, 4 - dayCards.length)).map((r) => (
+                {dayCards.slice(0, 3).map((c) => (
+                  <button
+                    key={c.id}
+                    className={"calendar-card-chip" + (c.completed ? " completed" : "")}
+                    style={{ "--chip-color": chipColorFor(c, board) }}
+                    onClick={() => onOpenCard(c.id)}
+                    title={c.title}
+                  >
+                    {c.title}
+                  </button>
+                ))}
+                {dayRotinas.slice(0, Math.max(0, 3 - dayCards.length)).map((r) => (
                   // Só prévia: sem cartão ainda, então sem onClick de abrir. Estilo
                   // tracejado + opacidade reduzida (inline, não classe nova - CSS
                   // deste projeto tem regra de especificidade e variável
@@ -192,7 +209,16 @@ export default function CalendarView({ board, users, searchQuery, memberFilter, 
                     {r.title}
                   </div>
                 ))}
-                {total > 4 && <div className="calendar-more">{t("views.calendar.more", { count: total - 4 })}</div>}
+                {total > 3 && (
+                  <div
+                    className="calendar-more"
+                    title={[...dayCards.slice(3), ...dayRotinas.slice(Math.max(0, 3 - dayCards.length))]
+                      .map((item) => item.title)
+                      .join(", ")}
+                  >
+                    {t("views.calendar.more", { count: total - 3 })}
+                  </div>
+                )}
               </div>
               {addingDate === iso && (
                 <form className="planner-inline-add" onSubmit={(e) => e.preventDefault()}>

@@ -1892,7 +1892,7 @@
     },
     "table": {
       "columns": {
-        "completed": "",
+        "completed": "Status",
         "title": "Title",
         "listTitle": "List",
         "labels": "Labels",
@@ -1901,6 +1901,9 @@
         "due": "Due",
         "checklist": "Checklist"
       },
+      "statusColumnLabel": "Status",
+      "openCard": "Open card",
+      "addCard": "Add card",
       "empty": "No cards found."
     },
     "calendar": {

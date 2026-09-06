@@ -1717,7 +1717,7 @@
     },
     "table": {
       "columns": {
-        "completed": "",
+        "completed": "Statut",
         "title": "Titre",
         "listTitle": "Liste",
         "labels": "Étiquettes",
@@ -1726,6 +1726,9 @@
         "due": "Échéance",
         "checklist": "Checklist"
       },
+      "statusColumnLabel": "Statut",
+      "openCard": "Ouvrir la carte",
+      "addCard": "Ajouter une carte",
       "empty": "Aucune carte trouvée."
     },
     "calendar": {
