@@ -2530,7 +2530,12 @@
     "acoes": {
       "novoAgendamento": "+ New Appointment",
       "lancarVenda": "+ Log a Sale",
-      "novaTarefa": "+ New Kanban Task"
+      "novaTarefa": "+ New Kanban Task",
+      "hints": {
+        "novoAgendamento": "Activate the Xaphires Beauty module to unlock new appointments.",
+        "lancarVenda": "Activate the Finance module to unlock sales entries.",
+        "novaTarefa": "Activate the Kanban Board module to create tasks."
+      }
     },
     "kpis": {
       "faturamentoMes": "Revenue This Month",
@@ -2551,7 +2556,8 @@
     "solucoes": {
       "titulo": "Status of contracted solutions",
       "entrar": "Open module",
-      "emBreve": "Coming soon"
+      "emBreve": "Coming soon",
+      "contratar": "Add module"
     },
     "atividades": {
       "titulo": "Recent activity",

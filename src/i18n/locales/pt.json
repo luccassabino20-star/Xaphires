@@ -2789,7 +2789,12 @@
     "acoes": {
       "novoAgendamento": "+ Novo Agendamento",
       "lancarVenda": "+ Lançar Venda",
-      "novaTarefa": "+ Nova Tarefa Kanban"
+      "novaTarefa": "+ Nova Tarefa Kanban",
+      "hints": {
+        "novoAgendamento": "Ative o módulo Xaphires Beauty para liberar novos agendamentos.",
+        "lancarVenda": "Ative o módulo Financeiro para liberar o lançamento de vendas.",
+        "novaTarefa": "Ative o módulo Quadro Kanban para criar tarefas."
+      }
     },
     "kpis": {
       "faturamentoMes": "Faturamento do Mês",
@@ -2810,7 +2815,8 @@
     "solucoes": {
       "titulo": "Status das soluções contratadas",
       "entrar": "Entrar no módulo",
-      "emBreve": "Em breve"
+      "emBreve": "Em breve",
+      "contratar": "Contratar módulo"
     },
     "atividades": {
       "titulo": "Atividades recentes",

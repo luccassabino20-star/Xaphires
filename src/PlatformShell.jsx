@@ -4,6 +4,7 @@ import { getModules } from "./state/api.js";
 import ModuleLauncher from "./modules/ModuleLauncher.jsx";
 import AuthenticatedApp from "./AuthenticatedApp.jsx";
 import InstallPwaBanner from "./components/InstallPwaBanner.jsx";
+import PlanModal from "./components/PlanModal.jsx";
 // Lazy: o Financeiro (com exceljs/pdf-parse na cauda) não deve pesar no pacote que
 // todo cliente baixa - só é buscado quando alguém abre o módulo.
 const FinanceiroModule = lazy(() => import("./modules/financeiro/FinanceiroModule.jsx"));
@@ -49,6 +50,14 @@ export default function PlatformShell() {
   // quem loga (ou recarrega a página logado), sempre — nunca pula direto para
   // o último módulo aberto.
   const [activeModule, setActiveModule] = useState(null);
+  // Modal de plano/contratação de módulo - mora aqui (não dentro do
+  // ModuleLauncher) porque também precisa abrir por cima do launcher inteiro,
+  // e é o mesmo componente que Sidebar.jsx/AccountMenu.jsx já usam dentro de
+  // um módulo aberto. Sem parâmetro de módulo pré-selecionado: quem contratou
+  // plano ativo em vigor não tem como autoatender a troca de módulo isolada
+  // hoje (ver canSelfSelectPlan em server/plans.js) - abrir o modal já leva
+  // a pessoa para a grade de planos/upgrade certa.
+  const [planOpen, setPlanOpen] = useState(false);
 
   useEffect(() => {
     let vivo = true;
@@ -104,8 +113,9 @@ export default function PlatformShell() {
 
   return (
     <>
-      <ModuleLauncher modules={modules} onOpen={abrir} />
+      <ModuleLauncher modules={modules} onOpen={abrir} onOpenPlan={() => setPlanOpen(true)} />
       <InstallPwaBanner />
+      {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
     </>
   );
 }

@@ -4,6 +4,16 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { getDashboardResumo } from "../state/api.js";
 import { metaFor } from "./registry.js";
 import ModuleIcon from "./ModuleIcon.jsx";
+import PropertyPopover from "../components/PropertyPopover.jsx";
+
+function IconLock({ size = 11 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="10.5" width="16" height="10" rx="2.5" />
+      <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+    </svg>
+  );
+}
 
 function formatarValor(cents, locale) {
   return new Intl.NumberFormat(locale, { style: "currency", currency: "BRL" }).format((cents || 0) / 100);
@@ -53,11 +63,16 @@ function textoAtividade(t, evento) {
 // numa tela só. Os números vêm prontos de GET /api/dashboard/resumo (mesmo
 // princípio de /api/plan e /api/modules) - este componente só desenha o que
 // veio, e trata null como "módulo não habilitado" (não como zero).
-export default function MainDashboardView({ modules, onOpenModule }) {
+export default function MainDashboardView({ modules, onOpenModule, onOpenPlan }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [resumo, setResumo] = useState(null);
   const [erro, setErro] = useState(false);
+  // Ação rápida clicada sem o módulo ativo: guarda a própria ação (pra saber
+  // qual dica mostrar) e o elemento do botão (pra ancorar o popover) - null
+  // fecha. Não usa mais `disabled`/title nativo: o pedido é a área virar
+  // ponto de conversão ativo, não um botão morto com tooltip.
+  const [upsellFor, setUpsellFor] = useState(null); // { acao, el }
 
   useEffect(() => {
     let vivo = true;
@@ -87,17 +102,41 @@ export default function MainDashboardView({ modules, onOpenModule }) {
               <button
                 type="button"
                 key={acao.moduleId}
-                className="dash-pill-btn"
-                disabled={!habilitado}
-                title={habilitado ? undefined : t("modules.comingSoon")}
-                onClick={() => onOpenModule(acao.moduleId)}
+                className={"dash-pill-btn" + (habilitado ? "" : " dash-pill-btn-locked")}
+                onClick={(e) => {
+                  if (habilitado) onOpenModule(acao.moduleId);
+                  else setUpsellFor({ acao, el: e.currentTarget });
+                }}
               >
+                {!habilitado && <IconLock />}
                 {t(`dashboard.acoes.${acao.tKey}`)}
               </button>
             );
           })}
         </div>
       </div>
+
+      {/* Callout de upsell: aparece só ao clicar numa ação cujo módulo dono
+          não está ativo - texto explica qual módulo ativar, botão leva direto
+          para o modal de plano (mesmo componente que Sidebar.jsx/AccountMenu.jsx
+          já usam dentro de um módulo aberto). */}
+      <PropertyPopover anchorEl={upsellFor?.el} open={!!upsellFor} onClose={() => setUpsellFor(null)}>
+        {upsellFor && (
+          <div className="dash-upsell-popover">
+            <p className="dash-upsell-text">{t(`dashboard.acoes.hints.${upsellFor.acao.tKey}`)}</p>
+            <button
+              type="button"
+              className="btn-primary btn-small"
+              onClick={() => {
+                setUpsellFor(null);
+                onOpenPlan();
+              }}
+            >
+              {t("dashboard.solucoes.contratar")}
+            </button>
+          </div>
+        )}
+      </PropertyPopover>
 
       <div className="dash-kpi-grid">
         <div className="dash-kpi-card">
@@ -182,7 +221,9 @@ export default function MainDashboardView({ modules, onOpenModule }) {
                       {t("dashboard.solucoes.entrar")} →
                     </button>
                   ) : (
-                    <span className="dash-module-soon">{t("dashboard.solucoes.emBreve")}</span>
+                    <button type="button" className="dash-module-upsell" onClick={onOpenPlan}>
+                      {t("dashboard.solucoes.contratar")}
+                    </button>
                   )}
                 </li>
               );

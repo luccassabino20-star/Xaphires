@@ -90,7 +90,7 @@ function normalizar(texto) {
 // Home da plataforma: um card por pilar. Módulo liberado (enabled) abre; módulo
 // só de vitrine mostra "Em breve" e não é clicável. A decisão de enabled vem
 // pronta do servidor (server/modules.js) — aqui só se desenha o que veio.
-export default function ModuleLauncher({ modules, onOpen }) {
+export default function ModuleLauncher({ modules, onOpen, onOpenPlan }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [query, setQuery] = useState("");
@@ -181,7 +181,7 @@ export default function ModuleLauncher({ modules, onOpen }) {
 
       <div className="launcher-main">
 
-        {vista === "dashboard" && <MainDashboardView modules={modules} onOpenModule={onOpen} />}
+        {vista === "dashboard" && <MainDashboardView modules={modules} onOpenModule={onOpen} onOpenPlan={onOpenPlan} />}
 
         {vista === "solucoes" && (
         <div className="launcher-body">
@@ -285,6 +285,13 @@ export default function ModuleLauncher({ modules, onOpen }) {
               {modulesFiltrados.map((m) => {
                 const meta = metaFor(m.id);
                 const clickable = m.enabled;
+                // Módulo real (veio de server/modules.js, via GET /api/modules) vs.
+                // pilar decorativo sem entitlement algum por trás (marketing/
+                // juridico, ver PILARES_PLACEHOLDER) - só o primeiro grupo pode virar
+                // "Contratar módulo"; o segundo não tem o que contratar, e continua
+                // travado com "Em breve" de verdade.
+                const real = modules.some((x) => x.id === m.id);
+                const upsell = real && !clickable;
                 // tagKey é o rótulo específico do card (ver comentário em
                 // registry.js) - sem ele, cai no rótulo da própria categoria
                 // de filtro, como antes.
@@ -292,11 +299,11 @@ export default function ModuleLauncher({ modules, onOpen }) {
                 return (
                   <button
                     key={m.id}
-                    className={"module-card" + (clickable ? "" : " module-card-locked")}
+                    className={"module-card" + (clickable ? "" : " module-card-locked") + (upsell ? " module-card-upsell" : "")}
                     style={{ "--module-accent": meta.accent }}
-                    onClick={clickable ? () => onOpen(m.id) : undefined}
-                    disabled={!clickable}
-                    title={clickable ? undefined : t("modules.comingSoon")}
+                    onClick={clickable ? () => onOpen(m.id) : upsell ? () => onOpenPlan() : undefined}
+                    disabled={!clickable && !upsell}
+                    title={!clickable && !upsell ? t("modules.comingSoon") : undefined}
                   >
                     <span className="module-card-head">
                       <span className="hub-card-icon">
@@ -316,6 +323,8 @@ export default function ModuleLauncher({ modules, onOpen }) {
                             <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
                           </svg>
                         </span>
+                      ) : upsell ? (
+                        <span className="module-card-badge module-card-badge-cta">{t("dashboard.solucoes.contratar")}</span>
                       ) : (
                         <span className="module-card-badge">{t("modules.comingSoon")}</span>
                       )}

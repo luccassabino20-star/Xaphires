@@ -2374,7 +2374,12 @@
     "acoes": {
       "novoAgendamento": "+ Nouveau rendez-vous",
       "lancarVenda": "+ Enregistrer une vente",
-      "novaTarefa": "+ Nouvelle tâche Kanban"
+      "novaTarefa": "+ Nouvelle tâche Kanban",
+      "hints": {
+        "novoAgendamento": "Activez le module Xaphires Beauty pour débloquer les nouveaux rendez-vous.",
+        "lancarVenda": "Activez le module Finances pour débloquer l'enregistrement des ventes.",
+        "novaTarefa": "Activez le module Tableau Kanban pour créer des tâches."
+      }
     },
     "kpis": {
       "faturamentoMes": "Chiffre d'affaires du mois",
@@ -2395,7 +2400,8 @@
     "solucoes": {
       "titulo": "État des solutions souscrites",
       "entrar": "Ouvrir le module",
-      "emBreve": "Bientôt disponible"
+      "emBreve": "Bientôt disponible",
+      "contratar": "Ajouter le module"
     },
     "atividades": {
       "titulo": "Activité récente",

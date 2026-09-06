@@ -2200,7 +2200,12 @@
     "acoes": {
       "novoAgendamento": "+ Neuer Termin",
       "lancarVenda": "+ Verkauf erfassen",
-      "novaTarefa": "+ Neue Kanban-Aufgabe"
+      "novaTarefa": "+ Neue Kanban-Aufgabe",
+      "hints": {
+        "novoAgendamento": "Aktivieren Sie das Modul Xaphires Beauty, um neue Termine freizuschalten.",
+        "lancarVenda": "Aktivieren Sie das Finanzmodul, um die Verkaufserfassung freizuschalten.",
+        "novaTarefa": "Aktivieren Sie das Kanban-Board-Modul, um Aufgaben zu erstellen."
+      }
     },
     "kpis": {
       "faturamentoMes": "Umsatz diesen Monat",
@@ -2221,7 +2226,8 @@
     "solucoes": {
       "titulo": "Status der gebuchten Lösungen",
       "entrar": "Modul öffnen",
-      "emBreve": "Demnächst"
+      "emBreve": "Demnächst",
+      "contratar": "Modul hinzufügen"
     },
     "atividades": {
       "titulo": "Letzte Aktivitäten",
