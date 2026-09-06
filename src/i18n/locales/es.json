@@ -2352,6 +2352,7 @@
     "EMAIL_ALREADY_REGISTERED": "Correo electrónico ya registrado",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Correo electrónico ya registrado (puede pertenecer a otra empresa)",
     "INVALID_CREDENTIALS": "Correo electrónico o contraseña inválidos",
+    "COMPANY_DEACTIVATED": "Esta empresa fue desactivada. Contacta al soporte.",
     "CNPJ_INVALID": "CNPJ o CPF inválido",
     "COMPANY_NOT_FOUND": "Ninguna empresa encontrada con ese CNPJ o CPF",
     "CNPJ_IN_USE": "Ese CNPJ o CPF ya está en uso por otra empresa",

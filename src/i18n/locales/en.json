@@ -2352,6 +2352,7 @@
     "EMAIL_ALREADY_REGISTERED": "Email already registered",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "Email already registered (it may already belong to another company)",
     "INVALID_CREDENTIALS": "Invalid email or password",
+    "COMPANY_DEACTIVATED": "This company has been deactivated. Contact support.",
     "CNPJ_INVALID": "Invalid CNPJ or CPF",
     "COMPANY_NOT_FOUND": "No company found with that CNPJ or CPF",
     "CNPJ_IN_USE": "That CNPJ or CPF is already used by another company",

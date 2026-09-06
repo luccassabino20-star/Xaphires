@@ -72,6 +72,9 @@ function Detalhe({ id, onFechar, onMudou }) {
   const [modulosInfo, setModulosInfo] = useState(null); // {maxModules, moduleCount, moduleLimitWarning, requestedModules}
   const [addons, setAddons] = useState(null); // [{id, moduleId, priceCents, enabled}]
   const [salvandoAddon, setSalvandoAddon] = useState(null); // id do add-on em salvamento
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+  const [nomeConfirmacao, setNomeConfirmacao] = useState("");
+  const [excluindo, setExcluindo] = useState(false);
 
   const carregar = useCallback(async () => {
     try {
@@ -275,6 +278,27 @@ function Detalhe({ id, onFechar, onMudou }) {
     }
   }
 
+  // Diferente de bloquear (só tira escrita, empresa continua logando e
+  // lendo): desativar corta login e leitura por completo, sem apagar nada -
+  // reversível, ao contrário de excluir. Sessão já aberta cai no próximo
+  // request (ver requireAuth em server/middleware.js).
+  async function alternarDesativacao() {
+    const desativando = !dados.company.deactivated;
+    let motivo = null;
+    if (desativando) {
+      if (!confirm("Desativar esta empresa? Ninguém dela conseguirá logar até você reativar.")) return;
+      motivo = prompt("Motivo da desativação (fica registrado na auditoria):");
+      if (motivo === null) return;
+    } else if (!confirm("Reativar esta empresa? Os usuários voltam a conseguir logar normalmente.")) return;
+    try {
+      await api.definirDesativacao(id, desativando, motivo);
+      await carregar();
+      onMudou?.();
+    } catch (e) {
+      setErro(e.message);
+    }
+  }
+
   async function abrirQuadros() {
     try {
       const r = await api.verQuadros(id);
@@ -292,6 +316,22 @@ function Detalhe({ id, onFechar, onMudou }) {
       await carregar();
     } catch (e) {
       setErro(e.message);
+    }
+  }
+
+  // Digitar o nome exato é a única confirmação deste botão de propósito - é a
+  // única ação do painel que apaga banco de dados inteiro (quadros, cartões,
+  // anexos) sem volta, e o resto do arquivo só usa confirm()/prompt() nativo
+  // (ver alternarBloqueio acima), fácil demais de clicar OK sem ler.
+  async function excluirEmpresa() {
+    setExcluindo(true);
+    try {
+      await api.excluirEmpresa(id);
+      onMudou?.();
+      onFechar();
+    } catch (e) {
+      setErro(e.message);
+      setExcluindo(false);
     }
   }
 
@@ -325,6 +365,7 @@ function Detalhe({ id, onFechar, onMudou }) {
         <span className="adm-chip">{c.maxUsers === null ? "usuários ilimitados" : `até ${c.maxUsers} usuários`}</span>
         {c.expiresAt && <span className="adm-chip">vence {data(c.expiresAt)}</span>}
         {c.permanentAccess && <span className="adm-chip adm-chip-permanente">acesso permanente</span>}
+        {c.deactivated && <span className="adm-chip adm-chip-blocked">desativada</span>}
       </div>
       {c.blocked && (
         <div className="adm-bloqueio">
@@ -336,6 +377,12 @@ function Detalhe({ id, onFechar, onMudou }) {
         <div className="adm-permanente">
           Acesso permanente concedido em {dataHora(c.permanentAccessAt)}
           {c.permanentAccessReason ? ` — ${c.permanentAccessReason}` : ""}
+        </div>
+      )}
+      {c.deactivated && (
+        <div className="adm-bloqueio">
+          Desativada em {dataHora(c.deactivatedAt)} — ninguém desta empresa consegue logar
+          {c.deactivatedReason ? ` — ${c.deactivatedReason}` : ""}
         </div>
       )}
 
@@ -385,16 +432,23 @@ function Detalhe({ id, onFechar, onMudou }) {
             </button>
           ))}
         </div>
-        <button className={"adm-btn " + (c.blocked ? "adm-btn-primario" : "adm-btn-perigo")} onClick={alternarBloqueio}>
-          {c.blocked ? "Desbloquear empresa" : "Bloquear empresa"}
-        </button>
-        <button
-          className={"adm-btn " + (c.permanentAccess ? "adm-btn-perigo" : "adm-btn-primario")}
-          onClick={alternarAcessoPermanente}
-          style={{ marginLeft: 8 }}
-        >
-          {c.permanentAccess ? "Remover acesso permanente" : "Conceder acesso permanente"}
-        </button>
+        <div className="adm-botoes">
+          <button className={"adm-btn " + (c.blocked ? "adm-btn-primario" : "adm-btn-perigo")} onClick={alternarBloqueio}>
+            {c.blocked ? "Desbloquear empresa" : "Bloquear empresa"}
+          </button>
+          <button
+            className={"adm-btn " + (c.permanentAccess ? "adm-btn-perigo" : "adm-btn-primario")}
+            onClick={alternarAcessoPermanente}
+          >
+            {c.permanentAccess ? "Remover acesso permanente" : "Conceder acesso permanente"}
+          </button>
+          <button
+            className={"adm-btn " + (c.deactivated ? "adm-btn-primario" : "adm-btn-perigo")}
+            onClick={alternarDesativacao}
+          >
+            {c.deactivated ? "Reativar empresa" : "Desativar empresa"}
+          </button>
+        </div>
 
         <div className="adm-grade2" style={{ marginTop: 14 }}>
           <label className="adm-campo">
@@ -632,6 +686,47 @@ function Detalhe({ id, onFechar, onMudou }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="adm-secao adm-secao-perigo">
+        <h3>Zona de perigo</h3>
+        <p className="adm-fraco">
+          Exclui a empresa definitivamente: cadastro, assinatura, histórico de cobrança e o banco de dados inteiro
+          (quadros, cartões, anexos) da pasta dela. Não existe desfazer.
+        </p>
+        {!confirmandoExclusao ? (
+          <button className="adm-btn adm-btn-perigo" onClick={() => setConfirmandoExclusao(true)}>
+            Excluir empresa definitivamente
+          </button>
+        ) : (
+          <div className="adm-confirma-exclusao">
+            <label className="adm-campo">
+              <span>
+                Digite <strong>{c.name}</strong> para confirmar
+              </span>
+              <input value={nomeConfirmacao} onChange={(e) => setNomeConfirmacao(e.target.value)} autoFocus />
+            </label>
+            <div className="adm-botoes">
+              <button
+                className="adm-btn adm-btn-perigo"
+                disabled={nomeConfirmacao.trim() !== c.name || excluindo}
+                onClick={excluirEmpresa}
+              >
+                {excluindo ? "Excluindo..." : "Excluir definitivamente"}
+              </button>
+              <button
+                className="adm-btn adm-btn-fantasma"
+                disabled={excluindo}
+                onClick={() => {
+                  setConfirmandoExclusao(false);
+                  setNomeConfirmacao("");
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2022,6 +2022,7 @@
     "EMAIL_ALREADY_REGISTERED": "E-Mail bereits registriert",
     "EMAIL_ALREADY_REGISTERED_OTHER_COMPANY": "E-Mail bereits registriert (könnte bereits einem anderen Unternehmen gehören)",
     "INVALID_CREDENTIALS": "Ungültige E-Mail oder ungültiges Passwort",
+    "COMPANY_DEACTIVATED": "Dieses Unternehmen wurde deaktiviert. Kontaktieren Sie den Support.",
     "CNPJ_INVALID": "Ungültige CNPJ oder CPF",
     "COMPANY_NOT_FOUND": "Kein Unternehmen mit dieser CNPJ oder CPF gefunden",
     "CNPJ_IN_USE": "Diese CNPJ oder CPF wird bereits von einem anderen Unternehmen verwendet",

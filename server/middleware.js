@@ -63,8 +63,17 @@ export const requireAuth = ah(async (req, res, next) => {
   // esta conferência, getCompanyDb() adiante faz mkdirSync e RECRIA um banco vazio
   // a cada requisição da sessão órfã — ninguém entra, porque o usuário não existe
   // no banco novo, mas a pasta ressuscita sozinha depois de apagada.
-  if (!getCompany(payload.companyId)) {
+  const company = getCompany(payload.companyId);
+  if (!company) {
     return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+  }
+  // Desativada pelo painel admin (diferente de bloqueada - ver
+  // definirDesativacao em admin/store.js): corta a sessão já aberta aqui, no
+  // mesmo request em que a checagem acontece, sem esperar o token de 7 dias
+  // expirar. Bloqueio não passa por aqui de propósito - continua só sem
+  // escrita (requireWritablePlan), a pessoa não perde acesso de leitura.
+  if (company.deactivated_at) {
+    return res.status(401).json({ error: "Esta empresa foi desativada. Fale com o suporte.", code: "COMPANY_DEACTIVATED" });
   }
   return runWithCompany(payload.companyId, async () => {
     const user = await getUserById(payload.sub);

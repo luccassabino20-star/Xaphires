@@ -115,6 +115,18 @@ router.get(
     const token = req.cookies?.[COOKIE_NAME];
     const payload = token && verifyToken(token);
     if (!payload?.companyId) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+    // Checagem duplicada da de requireAuth (middleware.js) de propósito - esta
+    // rota não passa por aquele middleware (precisa devolver 401 estruturado
+    // sem exigir sessão prévia, é o primeiro request de qualquer carregamento
+    // da página). Empresa excluída ou desativada precisa cair aqui também,
+    // senão a sessão de 7 dias continuaria "válida" pro /me mesmo depois de
+    // desativada - foi exatamente o bug encontrado ao testar: as outras rotas
+    // (que passam por requireAuth) já cortavam, esta não.
+    const company = directory.getCompany(payload.companyId);
+    if (!company) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
+    if (company.deactivated_at) {
+      return res.status(401).json({ error: "Esta empresa foi desativada. Fale com o suporte.", code: "COMPANY_DEACTIVATED" });
+    }
     const user = await runWithCompany(payload.companyId, () => getUserById(payload.sub));
     if (!user) return res.status(401).json({ error: "Não autenticado", code: "NOT_AUTHENTICATED" });
     res.json(usuarioComAtalho(user));
@@ -254,6 +266,15 @@ router.post(
     }
     // Acertou a senha: o dono legítimo da conta não fica preso pelas tentativas anteriores.
     loginLimitByEmail.reset(req);
+    // Checa DEPOIS de validar a senha, de propósito - senão alguém testando
+    // e-mails ao acaso descobriria que uma empresa existe e está desativada
+    // sem precisar acertar a senha. Bloqueio (blocked_at) não impede login,
+    // só escrita (ver requireWritablePlan em plans.js) - só desativação corta
+    // aqui.
+    const company = directory.getCompany(companyId);
+    if (company?.deactivated_at) {
+      return res.status(403).json({ error: "Esta empresa foi desativada. Fale com o suporte.", code: "COMPANY_DEACTIVATED" });
+    }
     setAuthCookie(res, user, companyId);
     res.json(usuarioComAtalho(user));
   })

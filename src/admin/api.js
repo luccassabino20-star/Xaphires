@@ -77,6 +77,9 @@ export const definirPlano = (id, plan, expiresAt) => req(`/companies/${id}/plan`
 export const bloquear = (id, blocked, reason) => req(`/companies/${id}/block`, { method: "POST", body: { blocked, reason } });
 export const definirAcessoPermanente = (id, granted, reason) =>
   req(`/companies/${id}/permanent-access`, { method: "POST", body: { granted, reason } });
+export const definirDesativacao = (id, deactivated, reason) =>
+  req(`/companies/${id}/deactivate`, { method: "POST", body: { deactivated, reason } });
+export const excluirEmpresa = (id) => req(`/companies/${id}`, { method: "DELETE" });
 export const definirDesconto = (id, plan, discountCents) =>
   req(`/companies/${id}/discount`, { method: "POST", body: { plan, discountCents } });
 export const definirLimites = (id, maxUsersOverride, maxAttachmentBytesOverride) =>

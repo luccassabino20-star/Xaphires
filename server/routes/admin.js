@@ -9,7 +9,9 @@ import { excluirCentroCusto as finExcluirCentro, excluirTodosCentrosCusto as fin
 import { novoDestinoDeImagem, extensaoValida, apagarImagem } from "../admin/popupUploads.js";
 import Busboy from "busboy";
 import fs from "node:fs";
+import path from "node:path";
 import { comAcessoAEmpresa, auditar } from "../admin/tenant.js";
+import { companiesDir, closeCompanyDb } from "../db.js";
 import {
   requireAdmin,
   hashSenha,
@@ -111,6 +113,9 @@ function visaoEmpresa(e) {
     permanentAccess: !!e.permanent_access_at,
     permanentAccessAt: e.permanent_access_at,
     permanentAccessReason: e.permanent_access_reason,
+    deactivated: !!e.deactivated_at,
+    deactivatedAt: e.deactivated_at,
+    deactivatedReason: e.deactivated_reason,
     expiresAt: e.expires_at,
     contractedAt: e.contracted_at,
     daysLeft: daysLeft(e),
@@ -458,6 +463,63 @@ router.post(
       detalhe: { motivo: reason || null },
     });
     res.json({ company: visaoEmpresa(atualizada) });
+  })
+);
+
+// Desativação: diferente de bloqueio (só tira escrita, ver /block acima) -
+// corta login e leitura por completo, sem apagar nenhum dado. Reversível
+// (reativa a qualquer momento), ao contrário de excluir. A sessão já aberta
+// de alguém da empresa cai no próximo request (requireAuth em
+// middleware.js), não precisa esperar o token de 7 dias expirar.
+router.post(
+  "/companies/:id/deactivate",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    const { deactivated, reason } = req.body || {};
+    const atualizada = store.definirDesativacao(req.params.id, { desativado: !!deactivated, motivo: reason });
+    auditar(req, deactivated ? "desativar_empresa" : "reativar_empresa", {
+      companyId: e.id,
+      alvo: e.name,
+      detalhe: { motivo: reason || null },
+    });
+    res.json({ company: visaoEmpresa(atualizada) });
+  })
+);
+
+// Exclusão definitiva: apaga a empresa do banco do diretório (payments,
+// subscriptions, user_directory, companies - ver excluirEmpresa em
+// admin/store.js), fecha a conexão cacheada com o banco DESTA empresa e só
+// então remove a pasta inteira do disco (app.sqlite + uploads/) - nessa
+// ordem, porque no Windows o fs.rm falha (EBUSY) enquanto o arquivo
+// app.sqlite segue com handle aberto pelo cache de getCompanyDb (ver
+// closeCompanyDb em db.js). Auditado ANTES de mexer em qualquer coisa, mesmo
+// espírito de comAcessoAEmpresa: se falhar no meio, a tentativa já ficou
+// registrada. Não passa por comAcessoAEmpresa porque não lê nem escreve
+// dentro do contexto da empresa - o banco dela está sendo destruído, não
+// consultado.
+//
+// Irreversível, e de propósito não tenta ser "gentil" com o disco: se a
+// pasta não sair (permissão, arquivo aberto por outro processo), a exclusão
+// no diretório já valeu - a empresa some do painel e não consegue mais
+// logar - e o response avisa com folderRemoved:false para alguém limpar a
+// pasta órfã manualmente depois.
+router.delete(
+  "/companies/:id",
+  ah(async (req, res) => {
+    const e = store.acharEmpresa(req.params.id);
+    if (!e) return res.status(404).json({ error: "Empresa não encontrada", code: "COMPANY_NOT_FOUND" });
+    auditar(req, "excluir_empresa", { companyId: e.id, alvo: e.name });
+    store.excluirEmpresa(e.id);
+    closeCompanyDb(e.id);
+    let folderRemoved = true;
+    try {
+      fs.rmSync(path.join(companiesDir(), e.id), { recursive: true, force: true });
+    } catch (err) {
+      folderRemoved = false;
+      console.error(`[admin] falha ao remover a pasta da empresa ${e.id} (${e.name}):`, err.message);
+    }
+    res.json({ ok: true, folderRemoved });
   })
 );
 

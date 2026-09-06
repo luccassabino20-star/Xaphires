@@ -446,3 +446,18 @@ export function closeAllDbs() {
   for (const companyDb of cache.values()) companyDb.close();
   cache.clear();
 }
+
+// Fecha só UMA conexão cacheada, sem derrubar as demais - diferente de
+// closeAllDbs (só chamada no shutdown do processo inteiro). Usada antes de
+// apagar a pasta de uma empresa excluída pelo painel admin: no Windows o
+// arquivo app.sqlite continua com handle aberto pelo processo enquanto
+// segue no cache, e o fs.rm da pasta falha (EBUSY) até esse handle soltar.
+// Sem efeito se a empresa nunca teve o banco aberto nesta execução (cache
+// sem a entrada) - nesse caso não há handle para soltar.
+export function closeCompanyDb(companyId) {
+  const companyDb = cache.get(companyId);
+  if (companyDb) {
+    companyDb.close();
+    cache.delete(companyId);
+  }
+}

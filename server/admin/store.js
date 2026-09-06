@@ -70,6 +70,15 @@ addColumnIfMissing("companies", "blocked_reason", "blocked_reason TEXT");
 // - confirmarPagamento() nunca escreve aqui, e a varredura de cobrança nunca lê.
 addColumnIfMissing("companies", "permanent_access_at", "permanent_access_at TEXT");
 addColumnIfMissing("companies", "permanent_access_reason", "permanent_access_reason TEXT");
+// Desativação: mais forte que bloqueio, e um estado diferente dele. Bloqueio
+// (blocked_at acima) só tira a ESCRITA (ver SEM_ESCRITA em plans.js) - a
+// empresa continua logando e lendo tudo. Desativação corta o acesso inteiro
+// (login recusado, sessão já aberta cai no próximo request - ver
+// requireAuth em middleware.js e o login em routes/auth.js), sem apagar
+// nenhum dado - reversível, ao contrário de excluir empresa. Mesmo padrão
+// dos outros dois campos: reason fica só quando o campo _at está preenchido.
+addColumnIfMissing("companies", "deactivated_at", "deactivated_at TEXT");
+addColumnIfMissing("companies", "deactivated_reason", "deactivated_reason TEXT");
 
 function nowIso() {
   return new Date().toISOString();
@@ -211,6 +220,43 @@ export function definirAcessoPermanente(id, { concedido, motivo }) {
     id
   );
   return acharEmpresa(id);
+}
+
+export function definirDesativacao(id, { desativado, motivo }) {
+  db.prepare("UPDATE companies SET deactivated_at = ?, deactivated_reason = ? WHERE id = ?").run(
+    desativado ? nowIso() : null,
+    desativado ? motivo || null : null,
+    id
+  );
+  return acharEmpresa(id);
+}
+
+// Exclusão definitiva da empresa no banco do diretório: payments e
+// subscriptions são do billing (server/billing/store.js), mas moram neste
+// mesmo banco global (getDirectoryDb()) - por isso apagar por SQL cru aqui
+// funciona sem importar aquele módulo. Sem ON DELETE CASCADE nas FKs deste
+// banco (nenhuma tabela do diretório roda com PRAGMA foreign_keys = ON,
+// diferente do banco de empresa em db.js), então a ordem importa: quem
+// referencia company_id primeiro, companies por último. admin_audit fica de
+// fora de propósito - trilha é histórico, não unidade que se apaga junto com
+// o que ela documenta.
+//
+// Só a linha de banco. O banco da própria empresa (companies/<id>/app.sqlite)
+// e a pasta de anexos são responsabilidade de quem chama isto (ver DELETE
+// /companies/:id em routes/admin.js) - este arquivo não sabe caminho de
+// arquivo.
+export function excluirEmpresa(id) {
+  db.exec("BEGIN");
+  try {
+    db.prepare("DELETE FROM payments WHERE company_id = ?").run(id);
+    db.prepare("DELETE FROM subscriptions WHERE company_id = ?").run(id);
+    db.prepare("DELETE FROM user_directory WHERE company_id = ?").run(id);
+    db.prepare("DELETE FROM companies WHERE id = ?").run(id);
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
+  }
 }
 
 export function emailsDaEmpresa(companyId) {

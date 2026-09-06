@@ -7919,6 +7919,12 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 }
 .adm-secao h3 { margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--adm-fraco); }
 .adm-secao .adm-tabela { border: 0; }
+/* Última seção da tela de empresa, de propósito - borda vermelha tênue
+   separa visualmente "excluir empresa" (irreversível) do resto (reversível:
+   bloquear, trocar plano etc). */
+.adm-secao-perigo { border-color: color-mix(in srgb, var(--adm-perigo) 40%, var(--adm-borda)); }
+.adm-secao-perigo h3 { color: var(--adm-perigo); }
+.adm-confirma-exclusao { display: flex; flex-direction: column; gap: 10px; max-width: 360px; }
 .adm-detalhe-topo { display: flex; align-items: center; justify-content: space-between; }
 .adm-detalhe-topo h2 { margin: 0; font-size: 21px; }
 
