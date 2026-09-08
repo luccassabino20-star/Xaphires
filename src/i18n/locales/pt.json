@@ -1708,7 +1708,6 @@
     "dataMenu": {
       "recurrences": "Rotinas automáticas",
       "bottlenecks": "Monitor de gargalos",
-      "mindMap": "Mapa mental",
       "archivedCards": "Cartões arquivados",
       "moreOptions": "Mais opções",
       "personalize": "Personalizar",
@@ -1922,23 +1921,6 @@
       "msgBody": "Estou passando para saber como está \"{{title}}\". O cartão está em {{list}} há {{duration}}.",
       "msgDue": "O prazo combinado é {{date}}.",
       "msgClosing": "Consegue me dar um retorno sobre o andamento? Obrigado!"
-    },
-    "mindMap": {
-      "title": "Mapa mental",
-      "empty": "Este quadro ainda não tem nenhuma lista.",
-      "cardsCount": "{{count}} cartão",
-      "cardsCount_other": "{{count}} cartões",
-      "zoomIn": "Aumentar",
-      "zoomOut": "Diminuir",
-      "zoomReset": "Restaurar zoom",
-      "modeBoard": "Do quadro",
-      "modeFree": "Mapa em branco",
-      "freeHint": "Duplo clique no fundo cria um tópico. Arraste o fundo pra mover a tela, e o scroll dá zoom. Clique em dois tópicos pra ligar (ou desligar). Selecione um tópico pra arrastá-lo, apagá-lo ou usar o + para ramificar.",
-      "clear": "Limpar mapa",
-      "clearConfirm": "Apagar todos os tópicos deste mapa? Essa ação não pode ser desfeita.",
-      "undo": "Desfazer",
-      "redo": "Refazer",
-      "center": "Centralizar"
     },
     "archive": {
       "autoPlanRequired": "O arquivamento automático está disponível a partir do plano Pro. O arquivamento manual continua liberado.",

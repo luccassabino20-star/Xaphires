@@ -1468,7 +1468,6 @@
     "dataMenu": {
       "recurrences": "Recurring routines",
       "bottlenecks": "Bottleneck monitor",
-      "mindMap": "Mind map",
       "archivedCards": "Archived cards",
       "moreOptions": "More options",
       "personalize": "Customize",
@@ -1682,23 +1681,6 @@
       "msgBody": "Just checking in on \"{{title}}\". The card has been in {{list}} for {{duration}}.",
       "msgDue": "The agreed due date is {{date}}.",
       "msgClosing": "Could you let me know where it stands? Thanks!"
-    },
-    "mindMap": {
-      "title": "Mind map",
-      "empty": "This board has no lists yet.",
-      "cardsCount": "{{count}} card",
-      "cardsCount_other": "{{count}} cards",
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out",
-      "zoomReset": "Reset zoom",
-      "modeBoard": "From board",
-      "modeFree": "Blank map",
-      "freeHint": "Double-click the background to create a topic. Drag the background to pan, scroll to zoom. Click two topics to link (or unlink) them. Select a topic to drag it, delete it, or use + to branch out.",
-      "clear": "Clear map",
-      "clearConfirm": "Delete all topics in this map? This cannot be undone.",
-      "undo": "Undo",
-      "redo": "Redo",
-      "center": "Center"
     },
     "archive": {
       "autoPlanRequired": "Auto-archiving is available from the Pro plan up. Manual archiving stays available.",

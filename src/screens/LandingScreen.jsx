@@ -437,8 +437,7 @@ function SolutionsPage({ onNavigate }) {
 
 // Mentoria e Consultoria compartilham o mesmo formato de página (hero com CTA
 // pro WhatsApp + grade de benefícios) - só o conteúdo muda, então é uma função
-// só parametrizada pela chave de i18n, no mesmo espírito do MindMapFromBoard
-// reaproveitado por modo.
+// só parametrizada pela chave de i18n, em vez de um componente por página.
 function ServiceOfferingPage({ i18nKey }) {
   const { t } = useTranslation();
   const items = t(`landing.${i18nKey}.items`, { returnObjects: true });

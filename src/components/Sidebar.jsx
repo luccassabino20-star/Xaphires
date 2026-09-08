@@ -16,7 +16,6 @@ import AccountMenu from "./AccountMenu.jsx";
 import ArchiveModal from "./ArchiveModal.jsx";
 import BottlenecksModal from "./BottlenecksModal.jsx";
 import RecurrencesModal from "./RecurrencesModal.jsx";
-import MindMapModal from "./MindMapModal.jsx";
 
 /* ---------- Ícones (viewBox 24x24, fill=currentColor - mesmo molde do resto
    do app, ver CardItem.jsx/ganttIcons.jsx). Sem lib de ícone nova só pra isto. ---------- */
@@ -210,7 +209,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [gargalosOpen, setGargalosOpen] = useState(false);
   const [rotinasOpen, setRotinasOpen] = useState(false);
-  const [mapaMentalOpen, setMapaMentalOpen] = useState(false);
 
   // Personalização isolada do painel lateral - estado próprio (sidebarStyle),
   // persistido no localStorage do navegador, sem relação com board.background
@@ -671,16 +669,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
             >
               {t("app.dataMenu.bottlenecks")}
             </div>
-            <div
-              className={"dropdown-item" + (!activeBoard ? " disabled" : "")}
-              onClick={() => {
-                if (!activeBoard) return;
-                setMapaMentalOpen(true);
-                setMoreOpen(false);
-              }}
-            >
-              {t("app.dataMenu.mindMap")}
-            </div>
             {!activeBoardReadOnly && (
               <>
                 <div
@@ -789,9 +777,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
       {archiveOpen && activeBoard && <ArchiveModal board={activeBoard} onClose={() => setArchiveOpen(false)} />}
       {gargalosOpen && activeBoard && <BottlenecksModal board={activeBoard} onClose={() => setGargalosOpen(false)} />}
       {rotinasOpen && activeBoard && <RecurrencesModal board={activeBoard} onClose={() => setRotinasOpen(false)} />}
-      {mapaMentalOpen && activeBoard && (
-        <MindMapModal board={activeBoard} onClose={() => setMapaMentalOpen(false)} onOpenCard={onOpenCard} />
-      )}
     </div>
   );
 }

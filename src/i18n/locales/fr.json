@@ -1345,7 +1345,6 @@
     "dataMenu": {
       "recurrences": "Routines automatiques",
       "bottlenecks": "Moniteur de goulots d'étranglement",
-      "mindMap": "Carte mentale",
       "archivedCards": "Cartes archivées",
       "moreOptions": "Plus d'options",
       "personalize": "Personnaliser",
@@ -1559,23 +1558,6 @@
       "msgBody": "Je fais un point sur \"{{title}}\". La carte est dans {{list}} depuis {{duration}}.",
       "msgDue": "L'échéance convenue est {{date}}.",
       "msgClosing": "Peux-tu me donner des nouvelles de l'avancement ? Merci !"
-    },
-    "mindMap": {
-      "title": "Carte mentale",
-      "empty": "Ce tableau n'a encore aucune liste.",
-      "cardsCount": "{{count}} carte",
-      "cardsCount_other": "{{count}} cartes",
-      "zoomIn": "Zoomer",
-      "zoomOut": "Dézoomer",
-      "zoomReset": "Réinitialiser le zoom",
-      "modeBoard": "Depuis le tableau",
-      "modeFree": "Carte vierge",
-      "freeHint": "Double-cliquez sur le fond pour créer un sujet. Faites glisser le fond pour déplacer la vue, et le défilement zoome. Cliquez sur deux sujets pour les relier (ou les délier). Sélectionnez un sujet pour le déplacer, le supprimer ou utiliser le + pour créer une ramification.",
-      "clear": "Effacer la carte",
-      "clearConfirm": "Supprimer tous les sujets de cette carte ? Cette action est irréversible.",
-      "undo": "Annuler",
-      "redo": "Rétablir",
-      "center": "Centrer"
     },
     "archive": {
       "autoPlanRequired": "L'archivage automatique est disponible à partir du plan Pro. L'archivage manuel reste accessible.",

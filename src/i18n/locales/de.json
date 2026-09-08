@@ -1171,7 +1171,6 @@
     "dataMenu": {
       "recurrences": "Automatische Routinen",
       "bottlenecks": "Engpass-Monitor",
-      "mindMap": "Mindmap",
       "archivedCards": "Archivierte Karten",
       "moreOptions": "Weitere Optionen",
       "personalize": "Anpassen",
@@ -1385,23 +1384,6 @@
       "msgBody": "Ich wollte kurz nachfragen, wie es mit \"{{title}}\" steht. Die Karte ist seit {{duration}} in {{list}}.",
       "msgDue": "Die vereinbarte Frist ist {{date}}.",
       "msgClosing": "Können Sie mir eine Rückmeldung zum Stand geben? Danke!"
-    },
-    "mindMap": {
-      "title": "Mindmap",
-      "empty": "Dieses Board hat noch keine Liste.",
-      "cardsCount": "{{count}} Karte",
-      "cardsCount_other": "{{count}} Karten",
-      "zoomIn": "Vergrößern",
-      "zoomOut": "Verkleinern",
-      "zoomReset": "Zoom zurücksetzen",
-      "modeBoard": "Vom Board",
-      "modeFree": "Leere Mindmap",
-      "freeHint": "Doppelklick auf den Hintergrund erstellt ein Thema. Ziehen Sie den Hintergrund, um die Ansicht zu verschieben, und scrollen Sie zum Zoomen. Klicken Sie auf zwei Themen, um sie zu verbinden (oder zu trennen). Wählen Sie ein Thema aus, um es zu verschieben, zu löschen oder mit + zu verzweigen.",
-      "clear": "Mindmap leeren",
-      "clearConfirm": "Alle Themen dieser Mindmap löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-      "undo": "Rückgängig",
-      "redo": "Wiederholen",
-      "center": "Zentrieren"
     },
     "archive": {
       "autoPlanRequired": "Die automatische Archivierung ist ab dem Plan Pro verfügbar. Die manuelle Archivierung bleibt weiterhin verfügbar.",

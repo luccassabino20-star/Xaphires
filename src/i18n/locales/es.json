@@ -1468,7 +1468,6 @@
     "dataMenu": {
       "recurrences": "Rutinas automáticas",
       "bottlenecks": "Monitor de cuellos de botella",
-      "mindMap": "Mapa mental",
       "archivedCards": "Tarjetas archivadas",
       "moreOptions": "Más opciones",
       "personalize": "Personalizar",
@@ -1682,23 +1681,6 @@
       "msgBody": "Te escribo para saber cómo va \"{{title}}\". La tarjeta está en {{list}} desde hace {{duration}}.",
       "msgDue": "La fecha acordada es {{date}}.",
       "msgClosing": "¿Me puedes contar cómo está avanzando? ¡Gracias!"
-    },
-    "mindMap": {
-      "title": "Mapa mental",
-      "empty": "Este tablero todavía no tiene ninguna lista.",
-      "cardsCount": "{{count}} tarjeta",
-      "cardsCount_other": "{{count}} tarjetas",
-      "zoomIn": "Acercar",
-      "zoomOut": "Alejar",
-      "zoomReset": "Restablecer zoom",
-      "modeBoard": "Del tablero",
-      "modeFree": "Mapa en blanco",
-      "freeHint": "Doble clic en el fondo crea un tema. Arrastra el fondo para mover la vista, y el scroll da zoom. Haz clic en dos temas para enlazarlos (o desenlazarlos). Selecciona un tema para arrastrarlo, borrarlo o usar el + para ramificar.",
-      "clear": "Limpiar mapa",
-      "clearConfirm": "¿Borrar todos los temas de este mapa? Esta acción no se puede deshacer.",
-      "undo": "Deshacer",
-      "redo": "Rehacer",
-      "center": "Centrar"
     },
     "archive": {
       "autoPlanRequired": "El archivado automático está disponible desde el plan Pro. El archivado manual sigue disponible.",
