@@ -64,6 +64,16 @@ const DEFINICOES = {
   // fora da banda, tratada fora do autoatendimento (mesmo caminho de
   // sempre: contato comercial, ajuste manual pelo painel).
   custom: { rank: 8, maxUsers: null, paid: true, priceCents: 199000, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 50 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true, maxModules: null },
+
+  // "Master Geral" - licença interna da própria empresa do proprietário da
+  // plataforma (não um plano comercial). paid:false já faz effectiveStatus()
+  // devolver "active" para sempre, sem expires_at - não precisa de nenhum
+  // caso especial de vencimento/carência. ownerOnly é o que impede esse plano
+  // de aparecer como opção pra qualquer cliente: canSelfSelectPlan() recusa
+  // incondicionalmente, e o catálogo em routes/plan.js só devolve este id pra
+  // quem já está nele. A única forma de uma empresa entrar aqui é o painel
+  // admin (POST /companies/:id/plan), nunca por autoatendimento.
+  owner: { rank: 99, maxUsers: null, paid: false, priceCents: 0, autoArchive: true, recurringCards: true, bottleneckMonitor: true, maxAttachmentBytes: 500 * 1024 * 1024, maxBoards: null, views: null, taskTicker: true, personalPlanner: true, beautyFinance: true, beautyOnlineBooking: true, maxModules: null, ownerOnly: true },
 };
 
 // price derivado de priceCents num único lugar, para os dois nunca discordarem.
@@ -217,6 +227,9 @@ export function canSelfSelectPlan(company, targetPlanId) {
   const alvo = PLANS[targetPlanId];
   if (!alvo) return false;
   if (alvo.price === null) return false;
+  // Master Geral não é oferecido a ninguém por aqui, nem a quem já está nele -
+  // só o painel admin atribui esse plano (ver comentário em DEFINICOES.owner).
+  if (alvo.ownerOnly) return false;
   // Empresa bloqueada não sai do bloqueio contratando plano. O bloqueio é decisão
   // da plataforma; pagar não deve desfazê-lo.
   if (company?.blocked_at) return false;

@@ -7359,6 +7359,42 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 
 .plan-hero-card .plan-warning { margin: 16px 0 0; }
 
+/* Cartão do plano "Master Geral" (empresa do proprietário da plataforma,
+   ver server/plans.js DEFINICOES.owner) - tratamento escuro/dourado fixo,
+   independente do --accent do tema, no mesmo espírito do cartão "Plataforma
+   Admin" da sidebar do Hub (ModuleLauncher.jsx) e do botão primário do
+   modal de Rotinas: um status executivo precisa ler como isso à primeira
+   vista, não como "mais um plano pago". */
+.plan-hero-owner {
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(196, 181, 253, 0.2) 0%, transparent 60%),
+    linear-gradient(155deg, #1e1b4b 0%, #2e1065 55%, #1e1b4b 100%);
+  border: 1px solid rgba(196, 181, 253, 0.35);
+  box-shadow: 0 12px 32px -8px rgba(76, 29, 149, 0.45);
+}
+.plan-hero-owner .plan-hero-name { color: #fff; }
+.plan-hero-owner .plan-metric-label { color: rgba(255, 255, 255, 0.62); }
+.plan-hero-owner .plan-metric-label svg { color: #d8b4fe; }
+.plan-hero-owner .plan-metric-value { color: #fff; }
+
+.plan-owner-badge {
+  color: #2a1a06;
+  background: linear-gradient(120deg, #fde68a, #fbbf24 55%, #f59e0b);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 2px 12px -2px rgba(245, 158, 11, 0.65);
+}
+
+.plan-owner-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, #7c3aed 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, #7c3aed 25%, var(--border-subtle));
+}
+.plan-owner-message p { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); }
+
 /* Cartões de assinatura/histórico envolvidos por este cartão genérico, mesma
    moldura dos módulos do picker (var(--radius-card)/var(--shadow-card)) -
    plan-pending-charge fica de fora de propósito: já tem moldura âmbar própria

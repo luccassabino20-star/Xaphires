@@ -25,7 +25,7 @@ function iniciaisEmpresa(nome) {
 // aparecendo aqui porque "definir plano" é a válvula manual do admin, inclusive
 // para uma empresa legacy que precise de ajuste; os 5 seguintes são o catálogo
 // modular atual (autoatendimento).
-const PLANOS = ["basic", "intermediate", "professional", "enterprise", "free", "starter", "growth", "fullsuite", "custom"];
+const PLANOS = ["basic", "intermediate", "professional", "enterprise", "free", "starter", "growth", "fullsuite", "custom", "owner"];
 const NOMES = {
   basic: "Free (legacy)",
   intermediate: "Unlimited (legacy)",
@@ -36,6 +36,10 @@ const NOMES = {
   growth: "Growth",
   fullsuite: "Full Suite",
   custom: "Enterprise",
+  // Não é plano comercial - é a licença interna da empresa do proprietário
+  // da plataforma (ver comentário em server/plans.js DEFINICOES.owner). Só
+  // atribuível por aqui; nunca aparece pra cliente contratar.
+  owner: "Master Geral (Owner - uso interno)",
 };
 // Só planos pagos com preço de tabela levam desconto - Free já é grátis.
 const PLANOS_COM_DESCONTO = ["intermediate", "professional", "enterprise", "starter", "growth", "fullsuite", "custom"];

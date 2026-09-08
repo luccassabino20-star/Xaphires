@@ -2143,6 +2143,13 @@
     "userLimitReached": "You reached this plan's user limit. Change plans to add more people.",
     "masterOnly": "Only the master user can change the company plan.",
     "changed": "Plan changed to {{plan}}",
+    "ownerBadge": "Unlimited / Full access",
+    "ownerExempt": "Exempt (Owner)",
+    "ownerLifetime": "Lifetime",
+    "ownerModulesLabel": "Modules",
+    "ownerModulesValue": "All unlocked",
+    "ownerMessage": "Your account has unrestricted access to every module, advanced feature, and administrative panel of the Xaphires platform.",
+    "ownerManageClients": "Manage client plans",
     "names": {
       "basic": "Free",
       "intermediate": "Unlimited",
@@ -2152,7 +2159,8 @@
       "starter": "Starter",
       "growth": "Growth",
       "fullsuite": "Full Suite",
-      "custom": "Enterprise"
+      "custom": "Enterprise",
+      "owner": "Master License"
     },
     "modulePicker": {
       "title": "Build your plan",
@@ -2320,6 +2328,7 @@
     "INVALID_STUCK_HOURS": "Enter a number of hours between 1 and 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "Auto-archiving is available from the Pro plan up.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Only upgrades are available here. To move down or cancel, contact support.",
+    "OWNER_LICENSE_NOT_BILLABLE": "This company has an internal license (Master License) and is not billed.",
     "PLAN_EXPIRED": "Your plan expired. Renew to edit again.",
     "PLAN_USER_LIMIT": "Your plan reached its user limit. Change plans to add more.",
     "PLAN_USER_LIMIT_EXCEEDED": "The company has more users than the chosen plan allows.",

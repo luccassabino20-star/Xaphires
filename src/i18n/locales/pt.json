@@ -2402,6 +2402,13 @@
     "userLimitReached": "Você atingiu o limite de usuários deste plano. Mude de plano para adicionar mais pessoas.",
     "masterOnly": "Só o usuário master pode mudar o plano da empresa.",
     "changed": "Plano alterado para {{plan}}",
+    "ownerBadge": "Ilimitado / Acesso total",
+    "ownerExempt": "Isento (Proprietário)",
+    "ownerLifetime": "Vitalício",
+    "ownerModulesLabel": "Módulos",
+    "ownerModulesValue": "Todos liberados",
+    "ownerMessage": "Sua conta possui acesso irrestrito a todos os módulos, recursos avançados e painéis administrativos da plataforma Xaphires.",
+    "ownerManageClients": "Gerenciar planos dos clientes",
     "names": {
       "basic": "Free",
       "intermediate": "Unlimited",
@@ -2411,7 +2418,8 @@
       "starter": "Starter",
       "growth": "Growth",
       "fullsuite": "Full Suite",
-      "custom": "Enterprise"
+      "custom": "Enterprise",
+      "owner": "Master Geral"
     },
     "modulePicker": {
       "title": "Monte seu plano",
@@ -2579,6 +2587,7 @@
     "INVALID_STUCK_HOURS": "Informe um número de horas entre 1 e 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "O arquivamento automático está disponível a partir do plano Pro.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Só é possível subir de plano por aqui. Para descer ou cancelar, fale com o suporte.",
+    "OWNER_LICENSE_NOT_BILLABLE": "Esta empresa tem licença interna (Master Geral) e não passa por cobrança.",
     "PLAN_EXPIRED": "Seu plano expirou. Renove para voltar a editar.",
     "PLAN_USER_LIMIT": "Seu plano atingiu o limite de usuários. Mude de plano para adicionar mais.",
     "PLAN_USER_LIMIT_EXCEEDED": "A empresa tem mais usuários do que o plano escolhido permite.",

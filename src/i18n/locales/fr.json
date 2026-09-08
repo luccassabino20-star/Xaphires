@@ -1987,6 +1987,13 @@
     "userLimitReached": "Vous avez atteint la limite d'utilisateurs de ce plan. Changez de plan pour ajouter d'autres personnes.",
     "masterOnly": "Seul l'utilisateur master peut changer le plan de l'entreprise.",
     "changed": "Plan changé pour {{plan}}",
+    "ownerBadge": "Illimité / Accès total",
+    "ownerExempt": "Exonéré (Propriétaire)",
+    "ownerLifetime": "À vie",
+    "ownerModulesLabel": "Modules",
+    "ownerModulesValue": "Tous débloqués",
+    "ownerMessage": "Votre compte dispose d'un accès illimité à tous les modules, fonctionnalités avancées et panneaux d'administration de la plateforme Xaphires.",
+    "ownerManageClients": "Gérer les plans des clients",
     "names": {
       "basic": "Free",
       "intermediate": "Unlimited",
@@ -1996,7 +2003,8 @@
       "starter": "Starter",
       "growth": "Growth",
       "fullsuite": "Full Suite",
-      "custom": "Enterprise"
+      "custom": "Enterprise",
+      "owner": "Licence Master"
     },
     "modulePicker": {
       "title": "Composez votre plan",
@@ -2164,6 +2172,7 @@
     "INVALID_STUCK_HOURS": "Indiquez un nombre d'heures entre 1 et 8760",
     "PLAN_FEATURE_AUTO_ARCHIVE": "L'archivage automatique est disponible à partir du plan Pro.",
     "PLAN_DOWNGRADE_NOT_SELF_SERVICE": "Il n'est possible que de monter de plan ici. Pour descendre ou annuler, contactez le support.",
+    "OWNER_LICENSE_NOT_BILLABLE": "Cette entreprise a une licence interne (Licence Master) et n'est pas facturée.",
     "PLAN_EXPIRED": "Votre plan a expiré. Renouvelez-le pour reprendre l'édition.",
     "PLAN_USER_LIMIT": "Votre plan a atteint la limite d'utilisateurs. Changez de plan pour en ajouter d'autres.",
     "PLAN_USER_LIMIT_EXCEEDED": "L'entreprise compte plus d'utilisateurs que ce que le plan choisi permet.",

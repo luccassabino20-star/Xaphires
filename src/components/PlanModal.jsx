@@ -287,6 +287,12 @@ export default function PlanModal({ onClose }) {
   }, [carregar]);
 
   const ehMaster = user?.role === "master";
+  // "Master Geral" é o plano da própria empresa do proprietário da plataforma
+  // (ver server/plans.js DEFINICOES.owner) - não um flag de perfil calculado
+  // no cliente. Igual a canUseAutoArchive/catalog[].selfSelectable, o servidor
+  // já decidiu (é o id de plano que veio em GET /api/plan); aqui só se lê o
+  // que chegou, sem reimplementar "é o dono?" de outro jeito.
+  const souDono = plano?.plan === "owner";
 
   // Plano pago abre o checkout: o acesso só muda quando o pagamento é confirmado, e
   // por isso não há mais um "confirmar e pronto" aqui. Plano gratuito continua sendo
@@ -418,6 +424,49 @@ export default function PlanModal({ onClose }) {
 
           {plano && (
             <>
+              {souDono ? (
+                <div className="plan-hero-card plan-hero-owner">
+                  <div className="plan-hero-top">
+                    <span className="plan-hero-identity">
+                      <span className="plan-hero-name">{t("plan.names.owner")}</span>
+                    </span>
+                    <span className="plan-status-pill plan-owner-badge">
+                      <span className="plan-status-pill-dot" aria-hidden="true" />
+                      {t("plan.ownerBadge")}
+                    </span>
+                  </div>
+                  <div className="plan-hero-metrics">
+                    <div className="plan-metric">
+                      <span className="plan-metric-label">
+                        <IconWallet />
+                        {t("plan.monthlyLabel")}
+                      </span>
+                      <span className="plan-metric-value">{t("plan.ownerExempt")}</span>
+                    </div>
+                    <div className="plan-metric">
+                      <span className="plan-metric-label">
+                        <IconCalendar />
+                        {t("plan.renewsOnLabel")}
+                      </span>
+                      <span className="plan-metric-value">{t("plan.ownerLifetime")}</span>
+                    </div>
+                    <div className="plan-metric">
+                      <span className="plan-metric-label">
+                        <IconUsers />
+                        {t("plan.usersLabel")}
+                      </span>
+                      <span className="plan-metric-value">{t("plan.unlimited")}</span>
+                    </div>
+                    <div className="plan-metric">
+                      <span className="plan-metric-label">
+                        <IconInfo />
+                        {t("plan.ownerModulesLabel")}
+                      </span>
+                      <span className="plan-metric-value">{t("plan.ownerModulesValue")}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
               <div className="plan-hero-card">
                 <div className="plan-hero-top">
                   <span className="plan-hero-identity">
@@ -496,10 +545,16 @@ export default function PlanModal({ onClose }) {
 
                 {!plano.canAddUser && <p className="plan-warning">{t("plan.userLimitReached")}</p>}
               </div>
+              )}
 
               {/* Cobrança em aberto vem antes de tudo: é a única coisa nesta tela que
-                  exige ação e tem prazo. */}
-              {cobranca?.pendingPayment && (
+                  exige ação e tem prazo. Nenhuma das três seções de cobrança faz
+                  sentido pra Master Geral - é licença interna, não passou por
+                  checkout nenhum; mostrar "aguardando pagamento" ou histórico de
+                  boleto ali contradiria o "Isento" do card acima. Dado pode
+                  sobreviver de antes da troca de plano (empresa que já teve
+                  assinatura de verdade e virou Master Geral depois). */}
+              {!souDono && cobranca?.pendingPayment && (
                 <div className="plan-pending-charge">
                   <div className="plan-pending-head">
                     <span className="checkout-status-badge pending">{t("billing.awaitingPayment")}</span>
@@ -527,7 +582,7 @@ export default function PlanModal({ onClose }) {
                 </div>
               )}
 
-              {cobranca?.subscription && (
+              {!souDono && cobranca?.subscription && (
                 <div className="plan-subscription plan-section-card">
                   <h3>{t("billing.subscriptionTitle")}</h3>
                   <dl className="plan-facts">
@@ -557,7 +612,7 @@ export default function PlanModal({ onClose }) {
                 </div>
               )}
 
-              {cobranca?.payments?.length > 0 && (
+              {!souDono && cobranca?.payments?.length > 0 && (
                 <div className="plan-history plan-section-card">
                   <h3>{t("billing.historyTitle")}</h3>
                   <ul className="plan-history-list">
@@ -578,7 +633,14 @@ export default function PlanModal({ onClose }) {
                 </div>
               )}
 
-              {ehMaster ? (
+              {souDono ? (
+                <div className="plan-owner-message">
+                  <p>{t("plan.ownerMessage")}</p>
+                  <a className="btn-primary" href="/admin" target="_blank" rel="noopener noreferrer">
+                    {t("plan.ownerManageClients")}
+                  </a>
+                </div>
+              ) : ehMaster ? (
                 <div className="plan-switch">
                   <h3>{escolhaLivre ? t("plan.selectTitle") : t("plan.upgradeTitle")}</h3>
                   <div className="plan-grid">

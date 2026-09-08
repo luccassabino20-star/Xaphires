@@ -97,7 +97,9 @@ function resumo(companyId) {
     // aparece pra quem já está nele (ver canSelfSelectPlan) - não é oferecido
     // como opção nova, mas a própria tela de "meu plano" precisa continuar
     // mostrando corretamente o plano atual de quem ainda está num deles.
-    catalog: PLAN_IDS.filter((id) => !PLANS[id].legacy || id === (company?.plan || "basic")).map((id) => ({
+    catalog: PLAN_IDS.filter(
+      (id) => (!PLANS[id].legacy && !PLANS[id].ownerOnly) || id === (company?.plan || "basic")
+    ).map((id) => ({
       id,
       price: precoComDesconto(id, discounts),
       listPrice: PLANS[id].price,

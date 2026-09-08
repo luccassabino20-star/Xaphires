@@ -81,6 +81,20 @@ router.post(
     const { plan, method, card } = req.body || {};
     const empresa = getCompany(req.companyId);
 
+    // Licença interna (Master Geral - ver server/plans.js DEFINICOES.owner)
+    // nunca passa por cobrança, em nenhuma hipótese: nem para "trocar" para
+    // outro plano, nem para "renovar" o próprio (que nem existe pra ela, já
+    // que paid:false não expira). A trava é pelo plano ATUAL da empresa, não
+    // por quem está logado - protege a empresa inteira, não só quem a
+    // configurou, e usa a mesma autoridade única de sempre (plans.js) em vez
+    // de um segundo critério de "é o dono?" reimplementado aqui.
+    if (getPlan(empresa?.plan).ownerOnly) {
+      return res.status(403).json({
+        error: "Esta empresa tem licença interna (Master Geral) e não passa por cobrança.",
+        code: "OWNER_LICENSE_NOT_BILLABLE",
+      });
+    }
+
     // Módulo pedido no checkout: só id real, disponível (não "em breve") e
     // não-core (core já vem incluso, não ocupa vaga do plano - pedir de
     // propósito é raro, então filtra em silêncio em vez de recusar o
