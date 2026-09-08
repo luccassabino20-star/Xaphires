@@ -5,6 +5,51 @@ import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import * as api from "../state/api.js";
 
+// Mesmo molde de ícone do resto do app (viewBox 24x24, stroke fino) - ver
+// RecurrencesModal.jsx/admin/icons.jsx. Sem lib nova só para os traços daqui.
+function IconSearch({ size = 15 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+function IconInfo({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5.5" />
+      <circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+function IconArchiveBox({ size = 26 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 4h18v4H3z" />
+      <path d="M4 8v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V8" />
+      <path d="M10 12h4" />
+    </svg>
+  );
+}
+function IconRestore({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v5h5" />
+    </svg>
+  );
+}
+function IconTrash({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18" />
+      <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0-.7 13.1a2 2 0 0 1-2 1.9H8.7a2 2 0 0 1-2-1.9L6 6" />
+    </svg>
+  );
+}
+
 function formatArchivedAt(iso, locale) {
   if (!iso) return "";
   const d = new Date(iso);
@@ -57,10 +102,14 @@ export default function ArchiveModal({ board, onClose }) {
       .sort((a, b) => String(b.archivedAt || "").localeCompare(String(a.archivedAt || "")));
   }, [board]);
 
+  // Busca por nome OU pela lista de origem (ex: digitar "concluído" acha todo
+  // cartão arquivado que veio daquela coluna, sem precisar saber o título).
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return archived;
-    return archived.filter((c) => c.title.toLowerCase().includes(q));
+    return archived.filter(
+      (c) => c.title.toLowerCase().includes(q) || (c.fromTitle || "").toLowerCase().includes(q)
+    );
   }, [archived, query]);
 
   function restore(card) {
@@ -97,69 +146,88 @@ export default function ArchiveModal({ board, onClose }) {
 
         <div className="modal-body">
           <div className="archive-rule">
-            <label className="archive-rule-toggle">
-              <input
-                type="checkbox"
-                checked={ligada}
+            <div className="archive-rule-row">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={ligada}
+                aria-label={t("board.archive.autoLabel")}
+                className={"archive-toggle" + (ligada ? " on" : "")}
                 disabled={!automacaoLiberada}
-                onChange={(e) => salvarRegra(e.target.checked, dias)}
-              />
-              <span>{t("board.archive.autoLabel")}</span>
-            </label>
-            <div className="archive-rule-days">
-              <input
-                type="number"
-                min="1"
-                max="365"
-                value={dias}
-                disabled={!ligada || !automacaoLiberada}
-                onChange={(e) => setDias(e.target.value)}
-                onBlur={() => ligada && salvarRegra(true, dias)}
-              />
-              <span>{t("board.archive.autoDaysSuffix")}</span>
+                onClick={() => salvarRegra(!ligada, dias)}
+              >
+                <span className="archive-toggle-thumb" />
+              </button>
+              <span className="archive-rule-label">{t("board.archive.autoLabel")}</span>
+              <div className="archive-rule-days">
+                <input
+                  type="number"
+                  min="1"
+                  max="365"
+                  value={dias}
+                  disabled={!ligada || !automacaoLiberada}
+                  onChange={(e) => setDias(e.target.value)}
+                  onBlur={() => ligada && salvarRegra(true, dias)}
+                />
+                <span>{t("board.archive.autoDaysSuffix")}</span>
+              </div>
             </div>
             <p className="archive-rule-hint">
-              {temAutomacao === false
-                ? t("board.archive.autoPlanRequired")
-                : ligada
-                  ? t("board.archive.autoOnHint", { days: Number(dias) || board.autoArchiveDays })
-                  : t("board.archive.autoOffHint")}
+              <IconInfo />
+              <span>
+                {temAutomacao === false
+                  ? t("board.archive.autoPlanRequired")
+                  : ligada
+                    ? t("board.archive.autoOnHint", { days: Number(dias) || board.autoArchiveDays })
+                    : t("board.archive.autoOffHint")}
+              </span>
             </p>
           </div>
 
           {archived.length > 0 && (
-            <input
-              className="archive-search"
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("board.archive.searchPlaceholder")}
-            />
+            <span className="archive-search-wrap">
+              <IconSearch />
+              <input
+                className="archive-search"
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t("board.archive.searchPlaceholder")}
+              />
+            </span>
           )}
 
           {archived.length === 0 ? (
-            <p className="archive-empty">{t("board.archive.empty")}</p>
+            <div className="archive-empty">
+              <span className="archive-empty-icon">
+                <IconArchiveBox />
+              </span>
+              <p className="archive-empty-title">{t("board.archive.emptyTitle")}</p>
+              <p className="archive-empty-sub">{t("board.archive.empty")}</p>
+            </div>
           ) : filtered.length === 0 ? (
-            <p className="archive-empty">{t("board.archive.noResults")}</p>
+            <p className="archive-no-results">{t("board.archive.noResults")}</p>
           ) : (
             <ul className="archive-list">
               {filtered.map((card) => (
                 <li className="archive-item" key={card.id}>
                   <div className="archive-item-info">
-                    <span className="archive-item-title">{card.title}</span>
-                    <span className="archive-item-meta">
-                      {card.fromTitle
-                        ? t("board.archive.fromList", { list: card.fromTitle })
-                        : t("board.archive.fromDeletedList")}
-                      {card.archivedAt && ` · ${formatArchivedAt(card.archivedAt, i18n.language)}`}
-                    </span>
+                    <div className="archive-item-heading">
+                      <span className="archive-item-title">{card.title}</span>
+                      <span className="archive-item-badge">
+                        {card.fromTitle ? card.fromTitle : t("board.archive.fromDeletedList")}
+                      </span>
+                    </div>
+                    {card.archivedAt && (
+                      <span className="archive-item-meta">{formatArchivedAt(card.archivedAt, i18n.language)}</span>
+                    )}
                   </div>
                   <div className="archive-item-actions">
-                    <button className="btn-secondary btn-small" onClick={() => restore(card)}>
-                      {t("board.archive.restore")}
+                    <button className="archive-action-btn" onClick={() => restore(card)}>
+                      <IconRestore /> {t("board.archive.restore")}
                     </button>
-                    <button className="btn-danger btn-small" onClick={() => remove(card)}>
-                      {t("board.archive.delete")}
+                    <button className="archive-action-btn danger" onClick={() => remove(card)}>
+                      <IconTrash /> {t("board.archive.delete")}
                     </button>
                   </div>
                 </li>
