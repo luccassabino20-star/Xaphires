@@ -5804,11 +5804,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   background-size: cover;
 }
 .board-bg-wallpaper-tile:hover .board-bg-wallpaper-preview { filter: brightness(1.08); }
+/* Borda "iluminada" azul/roxo no tile selecionado, independente do --accent
+   do tema (que pode ser qualquer cor escolhida em Preferências) - a galeria
+   de fundos ganhou uma identidade azul própria (ver backgrounds.js), e o
+   destaque de seleção segue essa mesma paleta em vez do accent genérico. */
 .board-bg-wallpaper-tile.active .board-bg-wallpaper-preview {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--bg-topbar) inset;
-  outline: 2px solid var(--accent);
-  outline-offset: -4px;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px var(--bg-topbar) inset, 0 0 0 1px #60a5fa, 0 0 14px -2px rgba(96, 165, 250, 0.65), 0 0 22px -6px rgba(139, 92, 246, 0.55);
 }
 .board-bg-wallpaper-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); padding: 0 1px; }
 
@@ -7768,12 +7770,19 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   --adm-fundo: #f6f7f9;
   --adm-superficie: #ffffff;
   --adm-borda: #dcdfe4;
+  /* Borda "suave" (transparência em vez de cor sólida) - pedido explícito do
+     redesign Enterprise (Stripe/Clerk/Vercel): moldura quase invisível em
+     vez de linha cinza opaca. Não substitui --adm-borda (ainda usada em
+     campo de formulário, onde a linha precisa ser bem definida). */
+  --adm-borda-suave: color-mix(in srgb, #dcdfe4 65%, transparent);
   --adm-texto: #1a1c20;
   --adm-fraco: #6b7280;
   --adm-acento: #2563eb;
   --adm-perigo: #b3444a;
   --adm-ok: #16a34a;
   --adm-alerta: #c9922f;
+  --adm-sombra: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+  --adm-sombra-md: 0 8px 20px -6px rgba(15,23,42,0.12);
   font-family: var(--font);
   color: var(--adm-texto);
   background: var(--adm-fundo);
@@ -7794,47 +7803,98 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 
 .adm-topo {
   display: flex; align-items: center; gap: 20px;
-  padding: 0 20px; height: 56px;
-  background: var(--adm-superficie); border-bottom: 1px solid var(--adm-borda);
+  padding: 0 22px; height: 58px;
+  background: var(--adm-superficie); border-bottom: 1px solid var(--adm-borda-suave);
+  box-shadow: var(--adm-sombra);
   position: sticky; top: 0; z-index: 10;
 }
-.adm-marca { font-family: "Playfair Display", serif; font-size: 19px; font-weight: 700; }
-.adm-marca span { font-family: var(--font); font-size: 11px; font-weight: 600; color: var(--adm-fraco); text-transform: uppercase; letter-spacing: 0.06em; margin-left: 6px; }
-.adm-abas { display: flex; gap: 4px; margin-left: 12px; }
+.adm-marca { display: flex; align-items: center; gap: 10px; font-family: "Playfair Display", serif; font-size: 19px; font-weight: 700; }
+/* Badge escura "PLATAFORMA ADMIN" no lugar do texto cinza solto de antes -
+   brilho sutil via inset highlight, sem animação (é ferramenta de trabalho,
+   não vitrine). */
+.adm-marca-badge {
+  font-family: var(--font);
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 6px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #fff; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+/* Segmented tab navigation: pista neutra clara com a aba ativa em contraste
+   escuro, mesma receita do .planner-segmented do app (ver DashboardView).
+   margin-left compensa não ter mais o padding do texto solto ao lado. */
+.adm-abas { display: flex; gap: 2px; margin-left: 12px; padding: 4px; background: var(--adm-fundo); border-radius: 12px; }
 .adm-aba {
-  padding: 7px 13px; border: 0; border-radius: 7px; background: transparent;
-  font-size: 13.5px; font-weight: 500; color: var(--adm-fraco); cursor: pointer;
+  padding: 7px 14px; border: 0; border-radius: 9px; background: transparent;
+  font-size: 13px; font-weight: 600; color: var(--adm-fraco); cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
-.adm-aba:hover { background: var(--adm-fundo); color: var(--adm-texto); }
-.adm-aba.ativa { background: var(--adm-texto); color: #fff; }
+.adm-aba:hover { background: color-mix(in srgb, var(--adm-texto) 6%, transparent); color: var(--adm-texto); }
+.adm-aba.ativa { background: var(--adm-texto); color: #fff; box-shadow: var(--adm-sombra); }
 .adm-conta { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--adm-fraco); }
+/* Botão fantasma com ícone (Sair/Encerrar acesso) - gap entre o SVG e o
+   texto, reaproveitado por cima de .adm-btn-fantasma existente. */
+.adm-btn-icone { display: inline-flex; align-items: center; gap: 6px; }
 
-/* Aviso permanente sobre a auditoria. Faixa fixa, sem botão de fechar: quem opera
-   precisa lembrar o tempo todo de que está mexendo em dado de cliente. */
+/* Aviso permanente sobre a auditoria - callout com borda lateral de destaque
+   (ao contrário do amarelo cheio de antes) + ícone de escudo, sem botão de
+   fechar: quem opera precisa lembrar o tempo todo de que está mexendo em
+   dado de cliente. */
 .adm-aviso {
-  padding: 9px 20px; font-size: 12.5px; line-height: 1.5;
-  background: color-mix(in srgb, var(--adm-alerta) 14%, var(--adm-superficie));
-  border-bottom: 1px solid color-mix(in srgb, var(--adm-alerta) 30%, var(--adm-borda));
-  color: color-mix(in srgb, var(--adm-alerta) 70%, var(--adm-texto));
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 22px; font-size: 12.5px; line-height: 1.5;
+  background: color-mix(in srgb, var(--adm-acento) 6%, var(--adm-superficie));
+  border-bottom: 1px solid var(--adm-borda-suave);
+  border-left: 4px solid var(--adm-acento);
+  color: color-mix(in srgb, var(--adm-acento) 55%, var(--adm-texto));
 }
+.adm-aviso svg { flex-shrink: 0; color: var(--adm-acento); }
 
-.adm-conteudo { padding: 20px; max-width: 1200px; margin: 0 auto; }
+.adm-conteudo { padding: 22px; max-width: 1240px; margin: 0 auto; }
 .adm-painel, .adm-detalhe { display: flex; flex-direction: column; gap: 16px; }
 .adm-barra { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .adm-barra .adm-fraco { flex: 1; margin: 0; }
+/* Container relativo pro ícone de lupa e o atalho "Ctrl K" ficarem por cima
+   do input, sem precisar de JS de máscara - ver IconSearch em admin/icons.jsx.
+   Usado em toda busca do painel (Empresas e Auditoria), não só aqui, para o
+   visual ficar consistente entre as abas. */
+.adm-busca-wrap { position: relative; flex: 1; min-width: 220px; display: flex; align-items: center; }
+.adm-busca-wrap svg { position: absolute; left: 12px; color: var(--adm-fraco); pointer-events: none; }
 .adm-busca {
-  flex: 1; min-width: 200px; padding: 8px 11px; font-size: 13.5px;
-  border: 1px solid var(--adm-borda); border-radius: 8px; background: var(--adm-superficie); color: inherit;
+  width: 100%; padding: 9px 54px 9px 36px; font-size: 13.5px;
+  border: 1px solid var(--adm-borda-suave); border-radius: 12px;
+  background: var(--adm-superficie); color: inherit;
+  box-shadow: var(--adm-sombra);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.adm-busca:focus {
+  outline: none; border-color: var(--adm-acento);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--adm-acento) 15%, transparent);
+}
+.adm-kbd {
+  position: absolute; right: 10px;
+  padding: 2px 6px; border-radius: 5px;
+  border: 1px solid var(--adm-borda); background: var(--adm-fundo);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px; font-weight: 600; color: var(--adm-fraco);
+  pointer-events: none;
 }
 
 .adm-btn {
   padding: 8px 13px; font-size: 13px; font-weight: 500; cursor: pointer;
   border: 1px solid var(--adm-borda); border-radius: 8px;
   background: var(--adm-superficie); color: var(--adm-texto);
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 .adm-btn:hover:not(:disabled) { border-color: var(--adm-fraco); }
 .adm-btn:disabled { opacity: 0.45; cursor: default; }
-.adm-btn-primario { background: var(--adm-texto); color: #fff; border-color: var(--adm-texto); }
+/* Botão primário de alto impacto (pedido do redesign) - cantos mais
+   arredondados, sombra própria que intensifica no hover, leve elevação. */
+.adm-btn-primario {
+  background: var(--adm-texto); color: #fff; border-color: var(--adm-texto);
+  border-radius: 10px; box-shadow: var(--adm-sombra-md);
+}
+.adm-btn-primario:hover:not(:disabled) { background: #2b2f38; border-color: #2b2f38; transform: translateY(-1px); }
 .adm-btn-perigo { background: var(--adm-perigo); color: #fff; border-color: var(--adm-perigo); }
 .adm-btn-fantasma { background: transparent; border-color: transparent; color: var(--adm-fraco); }
 .adm-btn-fantasma:hover { background: var(--adm-fundo); color: var(--adm-texto); }
@@ -7864,29 +7924,73 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 
 .adm-tabela {
   width: 100%; border-collapse: collapse; font-size: 13.5px;
-  background: var(--adm-superficie); border: 1px solid var(--adm-borda); border-radius: 10px; overflow: hidden;
+  background: var(--adm-superficie); border: 1px solid var(--adm-borda-suave);
+  border-radius: 14px; overflow: hidden; box-shadow: var(--adm-sombra);
 }
 .adm-tabela th {
-  text-align: left; padding: 9px 12px; font-size: 11.5px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.04em; color: var(--adm-fraco);
-  border-bottom: 1px solid var(--adm-borda);
+  text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--adm-fraco);
+  background: color-mix(in srgb, var(--adm-fundo) 55%, var(--adm-superficie));
+  border-bottom: 1px solid var(--adm-borda-suave);
 }
-.adm-tabela td { padding: 10px 12px; border-bottom: 1px solid var(--adm-borda); vertical-align: middle; }
+.adm-tabela td { padding: 13px 16px; border-bottom: 1px solid var(--adm-borda-suave); vertical-align: middle; }
 .adm-tabela tr:last-child td { border-bottom: 0; }
-.adm-linha-clicavel { cursor: pointer; }
-.adm-linha-clicavel:hover { background: var(--adm-fundo); }
+.adm-linha-clicavel { cursor: pointer; transition: background 0.12s ease; }
+.adm-linha-clicavel:hover { background: color-mix(in srgb, var(--adm-fundo) 65%, var(--adm-superficie)); }
+/* Tabela dentro de um .adm-secao (Usuários, Últimos acessos etc.) já tem a
+   moldura do card por fora - zera a própria, senão fica caixa dentro de caixa. */
+.adm-secao .adm-tabela { border: 0; border-radius: 0; box-shadow: none; }
 
 .adm-chip {
-  display: inline-block; padding: 2px 8px; margin-right: 4px;
-  border-radius: 999px; font-size: 11px; font-weight: 600;
-  background: var(--adm-fundo); color: var(--adm-fraco); border: 1px solid var(--adm-borda);
+  display: inline-flex; align-items: center; padding: 3px 10px; margin-right: 4px;
+  border-radius: 999px; font-size: 11px; font-weight: 700;
+  background: var(--adm-fundo); color: var(--adm-fraco); border: 1px solid var(--adm-borda-suave);
 }
-.adm-chip-active { background: color-mix(in srgb, var(--adm-ok) 15%, transparent); color: var(--adm-ok); border-color: transparent; }
-.adm-chip-trialing { background: color-mix(in srgb, var(--adm-acento) 15%, transparent); color: var(--adm-acento); border-color: transparent; }
-.adm-chip-grace, .adm-chip-expired { background: color-mix(in srgb, var(--adm-alerta) 18%, transparent); color: var(--adm-alerta); border-color: transparent; }
-.adm-chip-blocked { background: color-mix(in srgb, var(--adm-perigo) 15%, transparent); color: var(--adm-perigo); border-color: transparent; }
+/* Pílulas de situação: fundo pastel + texto e borda na mesma cor semântica
+   (verde=ativa, azul=teste, âmbar=vencida/carência, vermelho=bloqueada) -
+   pedido explícito do redesign, mesma fórmula color-mix nos três, só a
+   variável semântica muda. */
+.adm-chip-active { background: color-mix(in srgb, var(--adm-ok) 10%, var(--adm-superficie)); color: var(--adm-ok); border-color: color-mix(in srgb, var(--adm-ok) 30%, transparent); }
+.adm-chip-trialing { background: color-mix(in srgb, var(--adm-acento) 10%, var(--adm-superficie)); color: var(--adm-acento); border-color: color-mix(in srgb, var(--adm-acento) 30%, transparent); }
+.adm-chip-grace, .adm-chip-expired { background: color-mix(in srgb, var(--adm-alerta) 12%, var(--adm-superficie)); color: var(--adm-alerta); border-color: color-mix(in srgb, var(--adm-alerta) 35%, transparent); }
+.adm-chip-blocked { background: color-mix(in srgb, var(--adm-perigo) 12%, var(--adm-superficie)); color: var(--adm-perigo); border-color: color-mix(in srgb, var(--adm-perigo) 35%, transparent); }
 .adm-chip-permanente { background: color-mix(in srgb, var(--adm-acento) 15%, transparent); color: var(--adm-acento); border-color: transparent; }
 .adm-chip-master { background: var(--adm-texto); color: #fff; border-color: transparent; }
+/* Pílula neutra da coluna Plano - mesmo molde do chip de situação, sem cor
+   semântica (plano não é "bom" ou "ruim"). */
+.adm-chip-plano { background: var(--adm-fundo); color: var(--adm-texto); font-weight: 700; }
+
+/* Coluna Empresa: avatar com iniciais (cor derivada do id, ver
+   corParaEmpresa em Empresas.jsx) + nome em destaque/e-mail secundário
+   abaixo, no lugar do <strong> solto de antes. */
+.adm-empresa-cel { display: flex; align-items: center; gap: 11px; }
+.adm-avatar-empresa {
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 12px; font-weight: 700;
+}
+.adm-empresa-nome { font-weight: 600; color: var(--adm-texto); font-size: 13.5px; }
+.adm-empresa-email { font-size: 11.5px; color: var(--adm-fraco); margin-top: 1px; }
+
+/* Menu de ações rápidas ("...") no fim da linha - dropdown via PropertyPopover
+   (mesmo componente genérico já usado no Hub, ver MainDashboardView.jsx),
+   com as cores do painel em vez das do app (ele é montado dentro de
+   .adm-shell de qualquer forma, isto só afina a paleta). */
+.adm-col-acoes { width: 44px; text-align: right; }
+.adm-kebab-btn {
+  width: 30px; height: 30px; padding: 0; border: none; border-radius: 8px;
+  background: transparent; color: var(--adm-fraco); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.adm-kebab-btn:hover { background: var(--adm-fundo); color: var(--adm-texto); }
+.adm-shell .property-popover { background: var(--adm-superficie); border-color: var(--adm-borda-suave); color: var(--adm-texto); padding: 6px; min-width: 195px; }
+.adm-kebab-menu { display: flex; flex-direction: column; }
+.adm-kebab-item {
+  text-align: left; padding: 8px 10px; border: none; background: transparent;
+  border-radius: 7px; font-size: 13px; font-family: inherit; color: var(--adm-texto); cursor: pointer;
+}
+.adm-kebab-item:hover { background: var(--adm-fundo); }
 /* Centros de custo (árvore): código monoespaçado e indentado pelo nível, linha
    inativa esmaecida, edição inline da descrição, e um select de empresa na barra. */
 .adm-cc-codigo { display: inline-block; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
@@ -8442,6 +8546,46 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   white-space: nowrap;
 }
 
+/* Único ponto de entrada do painel da plataforma (ver comentário em
+   ModuleLauncher.jsx) - visual deliberadamente destacado do resto da nav
+   (fundo escuro sólido em vez de --bg-list/--accent) pra parecer um atalho
+   executivo, não mais um item de menu igual aos outros. O Hub não tem tema
+   escuro (só o app autenticado tem), então só existe esta variante. */
+.launcher-admin-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 8px 2px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: 0 4px 14px -6px rgba(15, 23, 42, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.launcher-admin-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+.launcher-admin-card-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(139, 92, 246, 0.22);
+  color: #c4b5fd;
+}
+.launcher-admin-card-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.launcher-admin-card-title { font-size: 12.5px; font-weight: 700; line-height: 1.2; }
+.launcher-admin-card-sub { font-size: 10.5px; color: rgba(255, 255, 255, 0.62); line-height: 1.2; }
+
 /* Idioma voltou pro rodapé da sidebar do launcher (saiu do header de cima,
    removido - ver decisão registrada na conversa). margin-top:auto empurra
    pro fim do flex column de .launcher-sidebar; o dropdown abre pra CIMA
@@ -8904,8 +9048,10 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   .launcher-sidebar-brand span:last-child,
   .launcher-sidebar-group-title,
   .launcher-sidebar-item-label,
-  .launcher-sidebar-badge { display: none; }
+  .launcher-sidebar-badge,
+  .launcher-admin-card-text { display: none; }
   .launcher-sidebar-item { justify-content: center; }
+  .launcher-admin-card { justify-content: center; padding: 10px; }
 }
 @media (max-width: 960px) {
   .launcher-grid { grid-template-columns: repeat(2, 1fr); }

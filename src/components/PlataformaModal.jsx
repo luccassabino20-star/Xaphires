@@ -8,6 +8,7 @@ import Auditoria from "../admin/Auditoria.jsx";
 import Admins from "../admin/Admins.jsx";
 import Popups from "../admin/Popups.jsx";
 import CentrosCusto from "../admin/CentrosCusto.jsx";
+import { IconLogOut, IconShieldCheck } from "../admin/icons.jsx";
 
 // Painel da plataforma dentro do app, para quem administra a plataforma.
 //
@@ -98,7 +99,7 @@ export default function PlataformaModal({ onClose }) {
       <div className="modal adm-shell plataforma-modal">
         <div className="plataforma-topo">
           <div className="adm-marca">
-            Xaphires <span>plataforma</span>
+            Xaphires <span className="adm-marca-badge">PLATAFORMA ADMIN</span>
           </div>
           {admin && (
             <nav className="adm-abas">
@@ -111,8 +112,12 @@ export default function PlataformaModal({ onClose }) {
           )}
           <div className="plataforma-acoes">
             {admin && (
-              <button className="adm-btn adm-btn-fantasma" onClick={encerrarElevacao} title="Encerra o acesso de administrador sem sair do app">
-                Encerrar acesso
+              <button
+                className="adm-btn adm-btn-fantasma adm-btn-icone"
+                onClick={encerrarElevacao}
+                title="Encerra o acesso de administrador sem sair do app"
+              >
+                <IconLogOut /> Encerrar acesso
               </button>
             )}
             <button className="adm-btn adm-btn-fantasma" onClick={onClose}>
@@ -147,7 +152,8 @@ export default function PlataformaModal({ onClose }) {
         {admin && (
           <>
             <div className="adm-aviso">
-              Tudo o que você abrir ou alterar aqui fica registrado na aba Auditoria, com seu nome, a empresa e o horário.
+              <IconShieldCheck />
+              <span>Tudo o que você abrir ou alterar aqui fica registrado na aba Auditoria, com seu nome, a empresa e o horário.</span>
             </div>
             <div className="plataforma-conteudo">
               {aba === "empresas" && <Empresas />}

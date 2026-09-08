@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "./api.js";
+import { IconSearch } from "./icons.jsx";
 
 // Ações que tocam dado de cliente ganham destaque. A trilha fica longa rápido, e o
 // que interessa numa revisão é separar "alguém abriu os dados de um cliente" de
@@ -34,7 +35,10 @@ export default function Auditoria() {
   return (
     <div className="adm-painel">
       <div className="adm-barra">
-        <input className="adm-busca" placeholder="Filtrar por ação, admin ou alvo" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+        <div className="adm-busca-wrap">
+          <IconSearch />
+          <input className="adm-busca" placeholder="Filtrar por ação, admin ou alvo" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+        </div>
         <button className="adm-btn" onClick={carregar}>
           Atualizar
         </button>

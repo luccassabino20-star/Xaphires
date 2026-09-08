@@ -6,6 +6,7 @@ import Auditoria from "./Auditoria.jsx";
 import Admins from "./Admins.jsx";
 import Popups from "./Popups.jsx";
 import CentrosCusto from "./CentrosCusto.jsx";
+import { IconLogOut, IconShieldCheck } from "./icons.jsx";
 
 // O painel é interno e tem um público só: quem opera a plataforma. Por isso os
 // textos ficam em português direto no componente, sem passar pelo i18n do produto —
@@ -95,7 +96,7 @@ export default function AdminApp() {
     <div className="adm-shell">
       <header className="adm-topo">
         <div className="adm-marca">
-          Xaphires <span>plataforma</span>
+          Xaphires <span className="adm-marca-badge">PLATAFORMA ADMIN</span>
         </div>
         <nav className="adm-abas">
           {ABAS.map((a) => (
@@ -106,8 +107,8 @@ export default function AdminApp() {
         </nav>
         <div className="adm-conta">
           <span title={admin.email}>{admin.name}</span>
-          <button className="adm-btn adm-btn-fantasma" onClick={sair}>
-            Sair
+          <button className="adm-btn adm-btn-fantasma adm-btn-icone" onClick={sair}>
+            <IconLogOut /> Sair
           </button>
         </div>
       </header>
@@ -115,7 +116,8 @@ export default function AdminApp() {
       {/* Aviso permanente, e não um alerta que se fecha: o painel lê e altera dados
           de clientes, e quem está operando precisa lembrar disso o tempo todo. */}
       <div className="adm-aviso">
-        Tudo o que você abrir ou alterar aqui fica registrado na aba Auditoria, com seu nome, a empresa e o horário.
+        <IconShieldCheck />
+        <span>Tudo o que você abrir ou alterar aqui fica registrado na aba Auditoria, com seu nome, a empresa e o horário.</span>
       </div>
 
       <main className="adm-conteudo">

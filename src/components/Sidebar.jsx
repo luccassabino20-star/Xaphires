@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useBoardDispatch, useBoardState } from "../state/BoardContext.jsx";
@@ -17,10 +17,6 @@ import ArchiveModal from "./ArchiveModal.jsx";
 import BottlenecksModal from "./BottlenecksModal.jsx";
 import RecurrencesModal from "./RecurrencesModal.jsx";
 import MindMapModal from "./MindMapModal.jsx";
-
-// Mesmo lazy load de AccountMenu.jsx: o painel de plataforma arrasta os
-// componentes de administração junto, e só quem abre precisa pagar o peso.
-const PlataformaModal = lazy(() => import("./PlataformaModal.jsx"));
 
 /* ---------- Ícones (viewBox 24x24, fill=currentColor - mesmo molde do resto
    do app, ver CardItem.jsx/ganttIcons.jsx). Sem lib de ícone nova só pra isto. ---------- */
@@ -188,7 +184,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
   const [usersPanelInvite, setUsersPanelInvite] = useState(false);
   const [teamPanelOpen, setTeamPanelOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
-  const [plataformaOpen, setPlataformaOpen] = useState(false);
   // null = sem teto (ou ainda não carregou - getPlan() tem cache de 30s em
   // api.js, então não é uma requisição a mais por render). A contagem em si
   // vem do estado real (state.boards.length), não desta resposta: ela muda a
@@ -484,8 +479,7 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
           <RailItem icon={<IconUsers />} label={t("app.sidebar.rail.team")} onClick={() => setTeamPanelOpen(true)} />
           <RailItem icon={<IconChart />} label={t("app.sidebar.rail.dashboards")} title={t("app.sidebar.comingSoon")} />
           <RailItem icon={<IconGrid />} label={t("app.sidebar.rail.boards")} title={t("app.sidebar.comingSoon")} />
-          {/* Real: abre o flyout com idioma/tema (e, para quem administra a
-              plataforma, o painel de administração) - ver moreOpen acima.
+          {/* Real: abre o flyout com idioma/tema - ver moreOpen acima.
               Não é mais placeholder. */}
           <button
             type="button"
@@ -711,20 +705,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
                 </div>
               </>
             )}
-            {user.platformAdmin && (
-              <>
-                <div className="dropdown-divider" />
-                <div
-                  className="dropdown-item"
-                  onClick={() => {
-                    setPlataformaOpen(true);
-                    setMoreOpen(false);
-                  }}
-                >
-                  {t("app.accountMenu.platformPanel")}
-                </div>
-              </>
-            )}
           </div>,
           document.body
         )}
@@ -806,11 +786,6 @@ export default function Sidebar({ collapsed, activeBoardId, onSelectBoard, onOpe
         />
       )}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
-      {plataformaOpen && (
-        <Suspense fallback={null}>
-          <PlataformaModal onClose={() => setPlataformaOpen(false)} />
-        </Suspense>
-      )}
       {archiveOpen && activeBoard && <ArchiveModal board={activeBoard} onClose={() => setArchiveOpen(false)} />}
       {gargalosOpen && activeBoard && <BottlenecksModal board={activeBoard} onClose={() => setGargalosOpen(false)} />}
       {rotinasOpen && activeBoard && <RecurrencesModal board={activeBoard} onClose={() => setRotinasOpen(false)} />}

@@ -60,7 +60,9 @@
           "metricas": "Kennzahlen",
           "perfil": "Profil",
           "atualizacoes": "Aktualisierungen"
-        }
+        },
+        "platformAdmin": "Plattform-Admin",
+        "platformAdminSub": "Globale Xaphires-Verwaltung"
       }
     },
     "comingSoon": "Demnächst",

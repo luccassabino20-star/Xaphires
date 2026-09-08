@@ -1,5 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "./api.js";
+import PropertyPopover from "../components/PropertyPopover.jsx";
+import { IconSearch, IconMoreHorizontal } from "./icons.jsx";
+
+// Avatar da coluna Empresa: cor derivada do id (determinística, mesmo par
+// nunca muda de cor entre carregamentos) e iniciais do nome - mesma ideia de
+// utils/members.js do app, reescrita aqui pequena e local de propósito: este
+// arquivo já duplica NOMES_MODULOS/NOMES_ADDONS em vez de importar do app
+// (ver comentário deles), o painel é deliberadamente autocontido.
+const CORES_AVATAR = ["#2563eb", "#7c3aed", "#0891b2", "#c2410c", "#be123c", "#059669", "#4338ca", "#b45309"];
+function corParaEmpresa(id) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  return CORES_AVATAR[hash % CORES_AVATAR.length];
+}
+function iniciaisEmpresa(nome) {
+  const partes = (nome || "").trim().split(/\s+/).filter(Boolean);
+  if (!partes.length) return "?";
+  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
+  return (partes[0][0] + partes[1][0]).toUpperCase();
+}
 
 // Os 4 primeiros são o catálogo legacy (ver server/plans.js) - continuam
 // aparecendo aqui porque "definir plano" é a válvula manual do admin, inclusive
@@ -739,6 +759,9 @@ export default function Empresas() {
   const [busca, setBusca] = useState("");
   const [criando, setCriando] = useState(false);
   const [nova, setNova] = useState({ name: "", plan: "basic", contactName: "", contactEmail: "", contactPhone: "", doc: "" });
+  // Menu de ações rápidas ("...") da linha: guarda o id da empresa e o botão
+  // que abriu, pra ancorar o PropertyPopover - null fecha.
+  const [menuAberto, setMenuAberto] = useState(null); // { id, el }
 
   const carregar = useCallback(async () => {
     try {
@@ -751,6 +774,42 @@ export default function Empresas() {
   useEffect(() => {
     carregar();
   }, [carregar]);
+
+  // Ações rápidas do menu "..." - mesmo par bloquear/desativar já usado
+  // dentro de Detalhe (mesma API, mesmo padrão de confirm()/prompt()), só
+  // que sem precisar abrir o cadastro inteiro da empresa primeiro.
+  async function acaoRapidaBloquear(c) {
+    setMenuAberto(null);
+    const bloqueando = !c.blocked;
+    let motivo = null;
+    if (bloqueando) {
+      motivo = prompt("Motivo do bloqueio (fica registrado na auditoria):");
+      if (motivo === null) return;
+    } else if (!confirm(`Desbloquear ${c.name}?`)) return;
+    try {
+      await api.bloquear(c.id, bloqueando, motivo);
+      await carregar();
+    } catch (e) {
+      setErro(e.message);
+    }
+  }
+
+  async function acaoRapidaDesativar(c) {
+    setMenuAberto(null);
+    const desativando = !c.deactivated;
+    let motivo = null;
+    if (desativando) {
+      if (!confirm(`Desativar ${c.name}? Ninguém dela conseguirá logar até você reativar.`)) return;
+      motivo = prompt("Motivo da desativação (fica registrado na auditoria):");
+      if (motivo === null) return;
+    } else if (!confirm(`Reativar ${c.name}?`)) return;
+    try {
+      await api.definirDesativacao(c.id, desativando, motivo);
+      await carregar();
+    } catch (e) {
+      setErro(e.message);
+    }
+  }
 
   async function criar(e) {
     e.preventDefault();
@@ -775,7 +834,11 @@ export default function Empresas() {
     <div className="adm-painel">
       {erro && <div className="adm-erro">{erro}</div>}
       <div className="adm-barra">
-        <input className="adm-busca" placeholder="Buscar por nome ou e-mail" value={busca} onChange={(e) => setBusca(e.target.value)} />
+        <div className="adm-busca-wrap">
+          <IconSearch />
+          <input className="adm-busca" placeholder="Buscar por nome ou e-mail" value={busca} onChange={(e) => setBusca(e.target.value)} />
+          <kbd className="adm-kbd">Ctrl K</kbd>
+        </div>
         <button className="adm-btn adm-btn-primario" onClick={() => setCriando((v) => !v)}>
           {criando ? "Cancelar" : "Nova empresa"}
         </button>
@@ -822,32 +885,86 @@ export default function Empresas() {
             <th>Situação</th>
             <th>Contato</th>
             <th>Criada</th>
+            <th aria-hidden="true" />
           </tr>
         </thead>
         <tbody>
           {filtradas.map((c) => (
             <tr key={c.id} onClick={() => setAberta(c.id)} className="adm-linha-clicavel">
               <td>
-                <strong>{c.name}</strong>
-                <div className="adm-fraco">{c.emails[0] || "sem usuários"}</div>
+                <div className="adm-empresa-cel">
+                  <span className="adm-avatar-empresa" style={{ background: corParaEmpresa(c.id) }}>
+                    {iniciaisEmpresa(c.name)}
+                  </span>
+                  <div>
+                    <div className="adm-empresa-nome">{c.name}</div>
+                    <div className="adm-empresa-email">{c.emails[0] || "sem usuários"}</div>
+                  </div>
+                </div>
               </td>
-              <td>{NOMES[c.plan]}</td>
+              <td>
+                <span className="adm-chip adm-chip-plano">{NOMES[c.plan]}</span>
+              </td>
               <td>
                 <span className={"adm-chip adm-chip-" + c.status}>{SITUACAO[c.status] || c.status}</span>
               </td>
               <td className="adm-fraco">{c.contactEmail || c.contactPhone || "—"}</td>
               <td className="adm-fraco">{data(c.createdAt)}</td>
+              <td className="adm-col-acoes" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  className="adm-kebab-btn"
+                  onClick={(e) => setMenuAberto((atual) => (atual?.id === c.id ? null : { id: c.id, el: e.currentTarget }))}
+                  aria-label="Ações rápidas"
+                >
+                  <IconMoreHorizontal />
+                </button>
+              </td>
             </tr>
           ))}
           {filtradas.length === 0 && (
             <tr>
-              <td colSpan={5} className="adm-fraco">
+              <td colSpan={6} className="adm-fraco">
                 Nenhuma empresa encontrada.
               </td>
             </tr>
           )}
         </tbody>
       </table>
+
+      {/* Menu de ações rápidas: "ver detalhes" (mesmo destino do clique na
+          linha) + bloquear/desativar direto, sem abrir o cadastro inteiro.
+          Gerenciar plano/assinatura já mora dentro de "Ver detalhes" (seção
+          "Plano e acesso") - não existe hoje um fluxo separado de
+          "personificar empresa" nem um visualizador de logs à parte da aba
+          Auditoria, então este menu não inventa os dois. */}
+      <PropertyPopover anchorEl={menuAberto?.el} open={!!menuAberto} onClose={() => setMenuAberto(null)} align="right">
+        {menuAberto &&
+          (() => {
+            const c = filtradas.find((x) => x.id === menuAberto.id);
+            if (!c) return null;
+            return (
+              <div className="adm-kebab-menu">
+                <button
+                  type="button"
+                  className="adm-kebab-item"
+                  onClick={() => {
+                    setMenuAberto(null);
+                    setAberta(c.id);
+                  }}
+                >
+                  Ver detalhes
+                </button>
+                <button type="button" className="adm-kebab-item" onClick={() => acaoRapidaBloquear(c)}>
+                  {c.blocked ? "Desbloquear empresa" : "Bloquear empresa"}
+                </button>
+                <button type="button" className="adm-kebab-item" onClick={() => acaoRapidaDesativar(c)}>
+                  {c.deactivated ? "Reativar empresa" : "Desativar empresa"}
+                </button>
+              </div>
+            );
+          })()}
+      </PropertyPopover>
     </div>
   );
 }

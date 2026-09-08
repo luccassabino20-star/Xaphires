@@ -6,6 +6,12 @@ import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 // lazy pelo mesmo motivo de lá (métricas/preferências pesam mais que o modal
 // simples que ela substituiu).
 const ProfileHubModal = lazy(() => import("../components/ProfileHubModal.jsx"));
+// Mesmo painel usado em AccountMenu.jsx/Sidebar.jsx (quadro Kanban) - agora o
+// único ponto de entrada é este, aqui na sidebar do Hub (ver comentário em
+// abrirItemSidebar). Continua lazy pelo mesmo motivo: arrasta os componentes
+// de administração inteiros, peso que só quem administra a plataforma paga.
+const PlataformaModal = lazy(() => import("../components/PlataformaModal.jsx"));
+import { IconShieldCheck } from "../admin/icons.jsx";
 import ModuleIcon from "./ModuleIcon.jsx";
 import LauncherSidebarIcon from "./LauncherSidebarIcon.jsx";
 import MainDashboardView from "./MainDashboardView.jsx";
@@ -95,6 +101,7 @@ export default function ModuleLauncher({ modules, onOpen, onOpenPlan }) {
   const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
+  const [plataformaOpen, setPlataformaOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("todas");
   const [sortBy, setSortBy] = useState("recentes");
   // Vista principal do Hub: "dashboard" (resumo executivo) ou "solucoes" (a
@@ -172,6 +179,24 @@ export default function ModuleLauncher({ modules, onOpen, onOpenPlan }) {
             );
           })}
         </nav>
+
+        {/* Único ponto de entrada do painel da plataforma no app inteiro - os
+            atalhos que viviam dentro do menu de conta (AccountMenu.jsx) e do
+            flyout "Mais" do quadro Kanban (Sidebar.jsx) foram removidos a
+            pedido do cliente, exatamente para centralizar aqui. `platformAdmin`
+            só decide se o botão aparece; a sessão de administrador (separada,
+            com senha própria) continua sendo exigida dentro do modal. */}
+        {user?.platformAdmin && (
+          <button type="button" className="launcher-admin-card" onClick={() => setPlataformaOpen(true)}>
+            <span className="launcher-admin-card-icon">
+              <IconShieldCheck size={18} />
+            </span>
+            <span className="launcher-admin-card-text">
+              <span className="launcher-admin-card-title">{t("modules.launcher.sidebar.platformAdmin")}</span>
+              <span className="launcher-admin-card-sub">{t("modules.launcher.sidebar.platformAdminSub")}</span>
+            </span>
+          </button>
+        )}
 
         <div className="launcher-sidebar-footer">
           <LanguageSwitcher className="launcher-sidebar-lang" />
@@ -376,6 +401,11 @@ export default function ModuleLauncher({ modules, onOpen, onOpenPlan }) {
       {profileOpen && (
         <Suspense fallback={null}>
           <ProfileHubModal onClose={() => setProfileOpen(false)} />
+        </Suspense>
+      )}
+      {plataformaOpen && (
+        <Suspense fallback={null}>
+          <PlataformaModal onClose={() => setPlataformaOpen(false)} />
         </Suspense>
       )}
     </div>

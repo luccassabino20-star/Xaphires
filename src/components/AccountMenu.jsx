@@ -5,11 +5,9 @@ import { useToast } from "../state/ToastContext.jsx";
 import { translateError } from "../utils/errors.js";
 import PlanModal from "./PlanModal.jsx";
 
-// Carregados sob demanda: o painel arrasta junto os quatro componentes de
-// administração, e a Central de Perfil tem métricas/preferências que pesam
-// mais que um modal simples - importar os dois direto colocaria esse peso no
-// pacote que TODO cliente baixa, mesmo quem nunca abre nenhum dos dois.
-const PlataformaModal = lazy(() => import("./PlataformaModal.jsx"));
+// Carregado sob demanda: a Central de Perfil tem métricas/preferências que
+// pesam mais que um modal simples - importar direto colocaria esse peso no
+// pacote que TODO cliente baixa, mesmo quem nunca abre.
 const ProfileHubModal = lazy(() => import("./ProfileHubModal.jsx"));
 import * as api from "../state/api.js";
 import { initials, colorForUser } from "../utils/members.js";
@@ -22,7 +20,6 @@ export default function AccountMenu() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
-  const [plataformaOpen, setPlataformaOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
@@ -118,14 +115,6 @@ export default function AccountMenu() {
             </form>
           ) : (
             <>
-              {/* Só aparece para quem também administra a plataforma. Abrir o item
-                  não concede nada: o painel busca tudo da API de administração, que
-                  exige a sessão própria, e pede a senha na primeira vez. */}
-              {user.platformAdmin && (
-                <div className="dropdown-item" onClick={() => { setPlataformaOpen(true); setOpen(false); }}>
-                  {t("app.accountMenu.platformPanel")}
-                </div>
-              )}
               <div className="dropdown-item" onClick={() => { setProfileOpen(true); setOpen(false); }}>
                 {t("app.accountMenu.myProfile")}
               </div>
@@ -148,11 +137,6 @@ export default function AccountMenu() {
         </Suspense>
       )}
       {planOpen && <PlanModal onClose={() => setPlanOpen(false)} />}
-      {plataformaOpen && (
-        <Suspense fallback={null}>
-          <PlataformaModal onClose={() => setPlataformaOpen(false)} />
-        </Suspense>
-      )}
     </div>
   );
 }

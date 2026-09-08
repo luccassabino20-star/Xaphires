@@ -149,40 +149,53 @@ export const BACKGROUND_WALLPAPERS = [
     ),
   },
   {
+    // Era "Minimalista Escuro" (cinza/preto puro, #111113→#000000) - a mesma
+    // fatia de "escuro elegante" que o pedido de paleta em azul quer com tom
+    // ardósia/azul (#0B0F17), não neutro puro. Reaproveitei o id e a posição
+    // no array (o valor gravado no quadro é a string CSS, não o id - ver
+    // DataMenu.jsx `board?.background === w.css` -, então mudar o gradiente
+    // aqui não quebra quadro nenhum que já usava a versão antiga).
     id: "darkMinimal",
-    label: "Minimalista Escuro",
-    css: withOverlay("radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06) 0%, transparent 60%), linear-gradient(160deg, #111113, #000000)"),
-  },
-  // +5 pedidos depois, seguindo a mesma regra do comentário no topo do
-  // array: aproximação em CSS (gradiente/padrão), nunca foto de estoque real -
-  // "mármore" e "luz entre folhas" aqui são radial-gradient simulando veio e
-  // luz, não uma imagem baixada de algum banco de fotos.
-  {
-    id: "silkWaves",
-    label: "Seda Orgânica",
+    label: "Dark Slate",
     css: withOverlay(
-      "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.5) 0%, transparent 55%), radial-gradient(circle at 75% 65%, rgba(244,234,230,0.6) 0%, transparent 60%), linear-gradient(135deg, #fdf6f3, #f4eae6 50%, #eadfe0)"
+      "radial-gradient(circle at 70% 20%, rgba(96,165,250,0.07) 0%, transparent 55%), linear-gradient(160deg, #131a26, #0b0f17)"
     ),
   },
-  {
-    id: "marbleGold",
-    label: "Mármore Gold",
-    css: withOverlay(
-      "repeating-linear-gradient(115deg, rgba(212,175,55,0.18) 0 2px, transparent 2px 90px), repeating-linear-gradient(25deg, rgba(212,175,55,0.10) 0 1px, transparent 1px 140px), linear-gradient(160deg, #ffffff, #f3efe9 55%, #e8e2d8)"
-    ),
-  },
+  // Trio removido daqui (Seda Orgânica, Mármore Gold, Concreto Minimalista):
+  // eram três variações do mesmo "neutro claro empoeirado" (creme/branco/
+  // cinza), indistinguíveis em miniatura e sem nenhuma ler como acabamento
+  // de produto - exatamente a redundância apontada no pedido de paleta em
+  // azul. "Quartzito Branco", mais abaixo, sobrevive como o único neutro
+  // claro da lista (era o pedido: unificar em 1 opção, não em zero).
   {
     id: "botanicalLight",
     label: "Luz Botânica",
+    // Visual atualizado (pedido): tons um pouco mais vivos que a versão
+    // original (verde oliva em vez de verde acastanhado apagado), mesma
+    // composição clara/orgânica.
     css: withOverlay(
-      "radial-gradient(circle at 25% 20%, rgba(255,251,235,0.55) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(226,239,203,0.5) 0%, transparent 45%), linear-gradient(160deg, #f1efe7, #dce5c8 60%, #a8b896)"
+      "radial-gradient(circle at 25% 20%, rgba(255,251,235,0.6) 0%, transparent 42%), radial-gradient(circle at 70% 60%, rgba(200,224,150,0.55) 0%, transparent 48%), linear-gradient(160deg, #f4f6ea, #d7e4b8 58%, #7fa05f)"
     ),
   },
   {
-    id: "frostedGlass",
-    label: "Vidro Jateado",
+    // Par escuro de "Luz Botânica" acima - mesmo pilar (botânica/natureza),
+    // versão noturna/refinada em vez de clara, pedido explícito da paleta
+    // em azul (que também queria mais opções escuras premium no geral).
+    id: "botanicalDark",
+    label: "Botânica Profunda",
     css: withOverlay(
-      "radial-gradient(circle at 30% 30%, #d9e4f5 0%, transparent 55%), radial-gradient(circle at 70% 70%, #f5e6f0 0%, transparent 55%), radial-gradient(circle at 50% 50%, #edeff3 0%, transparent 70%), linear-gradient(135deg, #f7f8fa, #e9ecf1)"
+      "radial-gradient(circle at 25% 20%, rgba(134,239,172,0.10) 0%, transparent 45%), radial-gradient(circle at 75% 70%, rgba(6,95,70,0.35) 0%, transparent 55%), linear-gradient(160deg, #0d1f16, #123222 55%, #04140b)"
+    ),
+  },
+  {
+    // Era "Vidro Jateado" (vidro fosco claro, cinza/lavanda apagado) - virou
+    // o "vidro azulado" da paleta em azul: base escura com dois brilhos
+    // (azul e roxo) simulando o `backdrop-blur` pedido, que uma string de
+    // `background` sozinha não reproduz de verdade.
+    id: "auroraGlassBlue",
+    label: "Vidro Azulado",
+    css: withOverlay(
+      "radial-gradient(circle at 25% 25%, rgba(59,130,246,0.35) 0%, transparent 50%), radial-gradient(circle at 75% 70%, rgba(139,92,246,0.32) 0%, transparent 55%), linear-gradient(135deg, #0b1120, #111827 55%, #1e1b4b)"
     ),
   },
   {
@@ -192,17 +205,23 @@ export const BACKGROUND_WALLPAPERS = [
       "radial-gradient(circle at 20% 80%, rgba(180,83,9,0.28) 0%, transparent 50%), radial-gradient(circle at 75% 25%, rgba(124,45,18,0.22) 0%, transparent 55%), linear-gradient(160deg, #241611, #140c09 70%, #000000)"
     ),
   },
-  // +5, segundo pacote - mesma regra do topo do arquivo (CSS puro, nunca
-  // foto de banco de imagens). "Luz Neon Pastel" usa cor mais saturada que
-  // "Vidro Jateado" (pacote anterior) de propósito, pra não sair uma cópia
-  // do mesmo efeito com nome diferente - um é vidro fosco/dessaturado, o
-  // outro é luz de estúdio com mais presença de cor.
   {
-    id: "softConcrete",
-    label: "Concreto Minimalista",
+    // "Azul Profundo" - mesma referência Vercel/Linear do pedido
+    // (slate-950 → blue-950 → indigo-950), com um brilho índigo bem sutil
+    // no canto pra não ficar um degradê chapado.
+    id: "darkNavyPro",
+    label: "Azul Profundo",
     css: withOverlay(
-      "repeating-linear-gradient(90deg, rgba(0,0,0,0.025) 0 1px, transparent 1px 60px), repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 60px), linear-gradient(150deg, #e8e8e6, #d6d6d3 55%, #c4c4c0)"
+      "radial-gradient(circle at 75% 15%, rgba(99,102,241,0.20) 0%, transparent 45%), linear-gradient(135deg, #020617, #172554 55%, #1e1b4b)"
     ),
+  },
+  {
+    // "Azul Royal Tech" - degradê linear de 3 paradas só (sem blobs/radiais),
+    // de propósito: é o item "limpo e minimalista" da paleta, pra contrastar
+    // com o vidro/aurora acima que é todo textura.
+    id: "royalTechBlue",
+    label: "Azul Royal Tech",
+    css: withOverlay("linear-gradient(145deg, #1e3a8a, #2563eb 55%, #3b82f6)"),
   },
   {
     id: "whiteQuartzite",
