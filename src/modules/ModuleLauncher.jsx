@@ -1,6 +1,7 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../state/AuthContext.jsx";
+import * as api from "../state/api.js";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 // Mesma Central de Perfil que AccountMenu.jsx usa em todo o resto do app -
 // lazy pelo mesmo motivo de lá (métricas/preferências pesam mais que o modal
@@ -31,18 +32,18 @@ import xaphiresLogo from "../assets/xaphires-logo.png";
 const SIDEBAR_GROUPS = [
   { key: "learn", items: ["dashboard", "consultor", "solucoes"] },
   { key: "tools", items: ["builder", "ferramentas"] },
-  { key: "account", items: ["metricas", "perfil", "atualizacoes"] },
+  { key: "account", items: ["metricas", "perfil", "plano", "atualizacoes"] },
 ];
 
 // "dashboard" e "solucoes" trocam o conteúdo principal (ver `vista`); "perfil"
-// abre modal por cima, sem trocar vista nenhuma.
+// e "plano" abrem modal por cima, sem trocar vista nenhuma.
 const VISTAS_REAIS = ["dashboard", "solucoes"];
 
 // Único ponto que decide "item real" (clicável) vs. vitrine "Em breve" - usado
 // tanto para desenhar o botão quanto para decidir se o título do grupo
 // aparece (grupo sem nenhum item real esconde o título, ver JSX abaixo).
 function ehItemReal(item) {
-  return VISTAS_REAIS.includes(item) || item === "perfil";
+  return VISTAS_REAIS.includes(item) || item === "perfil" || item === "plano";
 }
 
 // Abas de categoria da barra de Soluções, na mesma ordem da referência. Só
@@ -109,6 +110,22 @@ export default function ModuleLauncher({ modules, onOpen, onOpenPlan }) {
   // item do topo do menu, e agora é uma tela real, não só vitrine.
   const [vista, setVista] = useState("dashboard");
 
+  // Só o id do plano, pro badge ao lado de "Meu Plano" na sidebar - o modal
+  // em si (PlanModal, aberto via onOpenPlan) busca o resumo completo sozinho.
+  // api.getPlan() já tem cache de 30s (ver state/api.js), então não é uma
+  // segunda requisição de verdade quando o modal abre logo em seguida.
+  const [planoAtual, setPlanoAtual] = useState(null);
+  useEffect(() => {
+    let ativo = true;
+    api
+      .getPlan()
+      .then((r) => ativo && setPlanoAtual(r.plan))
+      .catch(() => {});
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
   // Módulos vindos do servidor + os pilares sem módulo real (Marketing,
   // Jurídico) que ainda assim precisam de cartão - ver PILARES_PLACEHOLDER.
   const todosOsModulos = useMemo(() => [...modules, ...PILARES_PLACEHOLDER], [modules]);
@@ -137,6 +154,7 @@ export default function ModuleLauncher({ modules, onOpen, onOpenPlan }) {
 
   function abrirItemSidebar(id) {
     if (id === "perfil") setProfileOpen(true);
+    else if (id === "plano") onOpenPlan();
     else if (VISTAS_REAIS.includes(id)) setVista(id);
     // os demais itens ainda não têm destino - o botão fica desabilitado com
     // o selo "Em breve".
@@ -171,6 +189,11 @@ export default function ModuleLauncher({ modules, onOpen, onOpenPlan }) {
                   >
                     <LauncherSidebarIcon name={item} />
                     <span className="launcher-sidebar-item-label">{t(`modules.launcher.sidebar.items.${item}`)}</span>
+                    {item === "plano" && planoAtual && (
+                      <span className={"launcher-sidebar-badge launcher-plan-badge" + (planoAtual === "owner" ? " owner" : "")}>
+                        {t(`plan.names.${planoAtual}`)}
+                      </span>
+                    )}
                     {!real && <span className="launcher-sidebar-badge">{t("modules.comingSoon")}</span>}
                   </button>
                 );

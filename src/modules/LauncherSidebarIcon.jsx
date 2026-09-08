@@ -72,6 +72,13 @@ const ICONS = {
       <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
     </>
   ),
+  plano: (
+    <>
+      <rect x="2" y="5" width="20" height="14" rx="2.5" />
+      <path d="M2 10h20" />
+      <path d="M6 15h4" />
+    </>
+  ),
   atualizacoes: (
     <>
       <path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" />

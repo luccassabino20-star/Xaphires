@@ -8727,6 +8727,21 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   border-radius: 999px;
   white-space: nowrap;
 }
+/* Badge do plano atual ao lado de "Meu Plano" - mesma pílula acima, só com
+   tom informativo (tinta de --accent) em vez do cinza neutro de "Em breve":
+   este item é clicável e o plano já está em vigor, não é vitrine futura.
+   A variante .owner usa o mesmo dourado do card "Master Geral" no
+   PlanModal, pra ler como o mesmo status em qualquer lugar do app. */
+.launcher-plan-badge {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.launcher-plan-badge.owner {
+  color: #7c4a03;
+  background: linear-gradient(120deg, #fde68a, #fbbf24 55%, #f59e0b);
+  border: none;
+}
 
 /* Único ponto de entrada do painel da plataforma (ver comentário em
    ModuleLauncher.jsx) - visual deliberadamente destacado do resto da nav
