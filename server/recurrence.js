@@ -46,15 +46,24 @@ export function lastDueOccurrence(rule, now = new Date()) {
   }
 
   if (rule.freq === "weekly") {
-    // 0=domingo. Fora da faixa cai no padrão, para uma regra gravada com valor
-    // inválido não gerar em dia imprevisível.
-    const alvo = Number.isInteger(rule.weekday) && rule.weekday >= 0 && rule.weekday <= 6 ? rule.weekday : 1;
-    const d = atHour(now, hour);
-    // Recua até cair no dia da semana pedido, sem passar do agora.
-    const diff = (d.getDay() - alvo + 7) % 7;
-    d.setDate(d.getDate() - diff);
-    if (d > now) d.setDate(d.getDate() - 7);
-    return d;
+    // weekday2 é opcional - mesmo padrão do monthday2 logo abaixo: regra com
+    // um dia só (o caso comum) passa por aqui com uma lista de um elemento.
+    // Com os dois preenchidos, a última ocorrência devida é a mais recente
+    // entre os dois, para a rotina poder nascer duas vezes na mesma semana
+    // (ex: toda segunda e quinta) sem precisar de duas regras. Fora da faixa
+    // cai no padrão (segunda), para uma regra gravada com valor inválido não
+    // gerar em dia imprevisível.
+    const dias = [rule.weekday, rule.weekday2].filter((d) => Number.isInteger(d) && d >= 0 && d <= 6);
+    if (dias.length === 0) dias.push(1);
+    const candidatos = dias.map((alvo) => {
+      const d = atHour(now, hour);
+      // Recua até cair no dia da semana pedido, sem passar do agora.
+      const diff = (d.getDay() - alvo + 7) % 7;
+      d.setDate(d.getDate() - diff);
+      if (d > now) d.setDate(d.getDate() - 7);
+      return d;
+    });
+    return candidatos.reduce((a, b) => (a > b ? a : b));
   }
 
   if (rule.freq === "monthly") {

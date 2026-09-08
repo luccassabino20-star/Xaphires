@@ -7525,8 +7525,25 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   color: var(--text-primary);
 }
 
-/* ---------- Cartões recorrentes ---------- */
-.recurrence-modal { max-width: 620px; }
+/* ---------- Cartões recorrentes (editor de automações Ultra-Premium,
+   inspirado em Zapier/Make/Linear) ----------
+   O bug reportado (botão "Salvar alterações" sobreposto ao "Cancelar") vinha
+   de reaproveitar `.btn-cancel` - um "×" quadrado de 30x30 com texto forçado
+   a caber na caixa - para um botão de texto ("Cancelar"). O rodapé abaixo
+   usa classes próprias (.recurrence-btn-ghost/.recurrence-btn-primary), sem
+   dimensão fixa, então o texto sempre tem espaço - a causa raiz não pode
+   voltar mesmo que o rótulo do botão mude de idioma. */
+.modal-overlay:has(.recurrence-modal) {
+  background: rgba(10, 12, 20, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.recurrence-modal {
+  max-width: 660px;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35), 0 4px 16px -4px rgba(15, 23, 42, 0.15);
+  animation: premiumModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 .recurrence-modal-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text-primary); }
 .recurrence-empty { font-size: 14px; line-height: 1.55; color: var(--text-secondary); text-align: center; padding: 24px 0; margin: 0; }
 .recurrence-locked {
@@ -7540,56 +7557,143 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   border-radius: 8px;
 }
 
-.recurrence-list { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
-.recurrence-item {
+.recurrence-list { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+/* "Card de Automação Ativa" - borda refinada em vez da caixa lisa de antes,
+   com leve elevação no hover para ler como item acionável, não texto estático. */
+.recurrence-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 9px;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.recurrence-item.inactive { opacity: 0.55; }
-.recurrence-item-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.recurrence-item-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.recurrence-card:hover { border-color: var(--border-strong); box-shadow: 0 4px 14px -6px rgba(15, 23, 42, 0.12); }
+.recurrence-card.inactive { opacity: 0.65; }
+.recurrence-card-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.recurrence-card-heading { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.recurrence-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+/* Pílula de status - verde/âmbar via color-mix sobre --success/--text-muted,
+   mesmo padrão de chip pastel já usado no Painel/Admin (ver DashboardView.jsx,
+   Empresas.jsx) - não uma cor nova inventada só para aqui. */
+.recurrence-status-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.recurrence-status-pill.active {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+}
+.recurrence-status-pill.paused {
+  color: var(--text-muted);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+}
 .recurrence-item-meta { font-size: 12px; color: var(--text-muted); }
 .recurrence-item-last { font-size: 11.5px; color: var(--text-muted); font-style: italic; }
-.recurrence-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.recurrence-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+/* Ações rápidas compactas (ícone + texto), agrupadas à direita do card. */
+.recurrence-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.recurrence-action-btn:hover { background: var(--bg-list); color: var(--text-primary); }
+.recurrence-action-btn:disabled { opacity: 0.5; cursor: default; }
+.recurrence-action-btn.danger { color: var(--danger); }
+.recurrence-action-btn.danger:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
 
 .recurrence-new { width: 100%; }
 
+/* Fundo leve e distinto do modal (não mais o cinza escuro chapado de antes),
+   usando --bg-list em vez de um cinza fixo - segue a mesma variável que o
+   resto do app já usa pra "painel sutil dentro do modal". */
 .recurrence-form {
   margin-top: 16px;
-  padding: 15px;
-  background: var(--bg-list);
+  padding: 20px;
+  background: color-mix(in srgb, var(--bg-list) 70%, transparent);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
-.recurrence-row { display: flex; gap: 12px; flex-wrap: wrap; }
-.recurrence-row .recurrence-field { flex: 1 1 130px; }
-.recurrence-field { display: flex; flex-direction: column; gap: 5px; }
+.recurrence-editing-hint { margin: 0; }
+/* Grid responsivo (2-3 colunas) para as regras de frequência - substitui o
+   flex-wrap antigo, que deixava os rótulos desalinhados conforme o campo
+   condicional (dia da semana/mês) mudava a largura dos vizinhos. */
+.recurrence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+.recurrence-field { display: flex; flex-direction: column; gap: 6px; }
+.recurrence-field-title { width: 100%; }
 .recurrence-field > span { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.recurrence-checklist-label { display: inline-flex; align-items: center; gap: 6px; }
 .recurrence-field input,
 .recurrence-field select,
 .recurrence-field textarea {
-  border: 1px solid var(--border-strong);
-  border-radius: 7px;
-  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 9px 12px;
   font-size: 13.5px;
   font-family: inherit;
   background: var(--bg-card);
   color: var(--text-primary);
   outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .recurrence-field textarea { resize: vertical; line-height: 1.5; }
 .recurrence-field input:focus,
 .recurrence-field select:focus,
-.recurrence-field textarea:focus { box-shadow: inset 0 0 0 2px var(--accent); }
+.recurrence-field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.recurrence-field-hint { font-size: 11px; color: var(--text-muted); }
+/* Select nativo (sem lib nova) com seta discreta desenhada em CSS - troca só
+   o visual, mantém teclado/acessibilidade do <select> de verdade. */
+.recurrence-select-wrap { position: relative; display: block; }
+.recurrence-select-wrap select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 30px;
+  cursor: pointer;
+}
+.recurrence-select-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid var(--text-muted);
+  border-bottom: 1.6px solid var(--text-muted);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+}
 
 .recurrence-warning {
   margin: 0;
@@ -7597,12 +7701,65 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   line-height: 1.5;
   color: #f59e0b;
 }
-.recurrence-form-actions { display: flex; align-items: center; gap: 10px; }
+/* Rodapé de ações - era aqui que "Salvar alterações" e "Cancelar" se
+   sobrepunham (ver comentário no topo da seção). justify-content:flex-end +
+   botões sem largura fixa resolve para qualquer idioma/tamanho de rótulo. */
+.recurrence-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+.recurrence-btn-ghost {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.recurrence-btn-ghost:hover { background: var(--bg-list); color: var(--text-primary); }
+/* Escuro fixo (não var(--accent)) de propósito - é o CTA de um "editor de
+   workflow", mesmo tratamento executivo já usado no cartão "Plataforma
+   Admin" da sidebar do Hub (ver ModuleLauncher.jsx): destaca-se igual nos
+   dois temas em vez de herdar a cor de destaque que o usuário escolheu. */
+.recurrence-btn-primary {
+  border: none;
+  background: #0f172a;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 11px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.recurrence-btn-primary:hover { background: #1e293b; }
+.recurrence-btn-primary:disabled { opacity: 0.6; cursor: default; }
+
 .recurrence-hint { margin: 16px 0 0; font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+.recurrence-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  color: var(--text-muted);
+}
+.recurrence-info-banner svg { flex-shrink: 0; margin-top: 1px; }
 
 @media (max-width: 560px) {
-  .recurrence-item { flex-direction: column; align-items: stretch; }
-  .recurrence-item-actions { justify-content: flex-end; }
+  .recurrence-card { flex-direction: column; align-items: stretch; }
+  .recurrence-card-actions { justify-content: flex-end; flex-wrap: wrap; }
+  .recurrence-grid { grid-template-columns: 1fr; }
 }
 
 /* Subtítulo do bloco de automações na página de Recursos. O título acima já tinha

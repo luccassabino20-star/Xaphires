@@ -29,6 +29,16 @@ function validar(body) {
   if (body.freq === "weekly" && !(Number.isInteger(body.weekday) && body.weekday >= 0 && body.weekday <= 6)) {
     return { error: "Escolha o dia da semana", code: "WEEKDAY_REQUIRED" };
   }
+  // weekday2 é opcional - mesmo tratamento do monthday2 logo abaixo: só weekly
+  // usa, e só quando preenchido (null/undefined pula a checagem).
+  if (
+    body.freq === "weekly" &&
+    body.weekday2 !== undefined &&
+    body.weekday2 !== null &&
+    !(Number.isInteger(body.weekday2) && body.weekday2 >= 0 && body.weekday2 <= 6)
+  ) {
+    return { error: "Escolha o dia da semana", code: "WEEKDAY2_INVALID" };
+  }
   if (body.freq === "monthly" && !(Number.isInteger(body.monthday) && body.monthday >= 1 && body.monthday <= 31)) {
     return { error: "Escolha um dia do mês entre 1 e 31", code: "MONTHDAY_REQUIRED" };
   }

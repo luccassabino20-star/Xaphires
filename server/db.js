@@ -311,8 +311,12 @@ function applySchema(companyDb) {
   // Segundo dia do mês opcional para rotina mensal, para a mesma rotina nascer
   // duas vezes por mês (ex: fechar balancete no dia 5 e no dia 20) sem precisar
   // de duas regras separadas. NULL = só o dia único de `monthday`, que continua
-  // sendo o caso comum. Mesmo raciocínio não se aplica a `weekday`: ninguém pediu.
+  // sendo o caso comum.
   addColumnIfMissing(companyDb, "recurrences", "monthday2", "monthday2 INTEGER");
+  // Mesmo padrão do monthday2 acima, agora para rotina semanal (ex: segunda E
+  // quinta) - pedido depois do monthday2 existir, por isso entra como coluna
+  // separada em vez de nascer junto de `weekday`. NULL = só o dia único.
+  addColumnIfMissing(companyDb, "recurrences", "weekday2", "weekday2 INTEGER");
   // chat_messages nasceu só com o chat geral; conversation_id chegou depois para
   // separar as conversas privadas sem duplicar a tabela. NULL preserva as mensagens
   // do geral já gravadas antes desta coluna existir.

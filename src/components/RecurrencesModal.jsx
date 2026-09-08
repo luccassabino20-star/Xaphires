@@ -8,12 +8,68 @@ import * as api from "../state/api.js";
 const FREQS = ["daily", "weekly", "monthly"];
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 
+// Mesmo molde de ícone do resto do app (viewBox 24x24, stroke fino) - ver
+// admin/icons.jsx e ganttIcons.jsx. Sem lib nova só para os 4 traços daqui.
+function IconChecklist({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m4 6 2 2 3-3" />
+      <path d="M11 6h9" />
+      <path d="m4 13 2 2 3-3" />
+      <path d="M11 13h9" />
+      <path d="m4 20 2 2 3-3" />
+      <path d="M11 20h9" />
+    </svg>
+  );
+}
+function IconInfo({ size = 15 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5.5" />
+      <circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+function IconEdit({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  );
+}
+function IconPause({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+      <rect x="6" y="4" width="4" height="16" rx="1" />
+      <rect x="14" y="4" width="4" height="16" rx="1" />
+    </svg>
+  );
+}
+function IconPlay({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+      <path d="M7 4v16l14-8Z" />
+    </svg>
+  );
+}
+function IconTrash({ size = 13 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18" />
+      <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0-.7 13.1a2 2 0 0 1-2 1.9H8.7a2 2 0 0 1-2-1.9L6 6" />
+    </svg>
+  );
+}
+
 function moldeVazio(listId) {
   return {
     title: "",
     listId: listId || "",
     freq: "monthly",
     weekday: 1,
+    weekday2: "",
     monthday: 25,
     monthday2: "",
     hour: 8,
@@ -31,6 +87,7 @@ function paraForm(r) {
     listId: r.listId,
     freq: r.freq,
     weekday: r.weekday ?? 1,
+    weekday2: r.weekday2 ?? "",
     monthday: r.monthday ?? 25,
     monthday2: r.monthday2 ?? "",
     hour: r.hour,
@@ -92,6 +149,7 @@ export default function RecurrencesModal({ board, onClose }) {
       listId: form.listId,
       freq: form.freq,
       weekday: form.freq === "weekly" ? Number(form.weekday) : null,
+      weekday2: form.freq === "weekly" && form.weekday2 !== "" ? Number(form.weekday2) : null,
       monthday: form.freq === "monthly" ? Number(form.monthday) : null,
       monthday2: form.freq === "monthly" && form.monthday2 !== "" ? Number(form.monthday2) : null,
       hour: Number(form.hour),
@@ -143,8 +201,16 @@ export default function RecurrencesModal({ board, onClose }) {
 
   function descrever(r) {
     if (r.freq === "daily") return t("board.recurrences.everyDay", { hour: r.hour });
-    if (r.freq === "weekly")
+    if (r.freq === "weekly") {
+      if (Number.isInteger(r.weekday2)) {
+        return t("board.recurrences.everyWeekTwoDays", {
+          day: t(`board.recurrences.weekdays.${r.weekday}`),
+          day2: t(`board.recurrences.weekdays.${r.weekday2}`),
+          hour: r.hour,
+        });
+      }
       return t("board.recurrences.everyWeek", { day: t(`board.recurrences.weekdays.${r.weekday}`), hour: r.hour });
+    }
     if (r.monthday2)
       return t("board.recurrences.everyMonthTwoDays", { day: r.monthday, day2: r.monthday2, hour: r.hour });
     return t("board.recurrences.everyMonth", { day: r.monthday, hour: r.hour });
@@ -180,9 +246,14 @@ export default function RecurrencesModal({ board, onClose }) {
           ) : (
             <ul className="recurrence-list">
               {regras.map((r) => (
-                <li className={"recurrence-item" + (r.active ? "" : " inactive")} key={r.id}>
-                  <div className="recurrence-item-info">
-                    <span className="recurrence-item-title">{r.title}</span>
+                <li className={"recurrence-card" + (r.active ? "" : " inactive")} key={r.id}>
+                  <div className="recurrence-card-info">
+                    <div className="recurrence-card-heading">
+                      <span className="recurrence-card-title">{r.title}</span>
+                      <span className={"recurrence-status-pill" + (r.active ? " active" : " paused")}>
+                        {r.active ? t("board.recurrences.statusActive") : t("board.recurrences.statusPaused")}
+                      </span>
+                    </div>
                     <span className="recurrence-item-meta">
                       {descrever(r)} · {t("board.recurrences.intoList", { list: listaNome(r.listId) })}
                       {r.checklist.length > 0 &&
@@ -194,19 +265,20 @@ export default function RecurrencesModal({ board, onClose }) {
                       </span>
                     )}
                   </div>
-                  <div className="recurrence-item-actions">
+                  <div className="recurrence-card-actions">
                     <button
-                      className="btn-secondary btn-small"
+                      type="button"
+                      className="recurrence-action-btn"
                       onClick={() => iniciarEdicao(r)}
                       disabled={!podeUsar}
                     >
-                      {t("board.recurrences.edit")}
+                      <IconEdit /> {t("board.recurrences.edit")}
                     </button>
-                    <button className="btn-secondary btn-small" onClick={() => alternar(r)} disabled={!podeUsar}>
-                      {r.active ? t("board.recurrences.pause") : t("board.recurrences.resume")}
+                    <button type="button" className="recurrence-action-btn" onClick={() => alternar(r)} disabled={!podeUsar}>
+                      {r.active ? <IconPause /> : <IconPlay />} {r.active ? t("board.recurrences.pause") : t("board.recurrences.resume")}
                     </button>
-                    <button className="btn-danger btn-small" onClick={() => remover(r)}>
-                      {t("board.recurrences.delete")}
+                    <button type="button" className="recurrence-action-btn danger" onClick={() => remover(r)}>
+                      <IconTrash /> {t("board.recurrences.delete")}
                     </button>
                   </div>
                 </li>
@@ -222,8 +294,8 @@ export default function RecurrencesModal({ board, onClose }) {
 
           {podeUsar && (criando || editando) && (
             <form className="recurrence-form" onSubmit={salvar}>
-              {editando && <p className="recurrence-hint">{t("board.recurrences.editingHint", { title: editando.title })}</p>}
-              <label className="recurrence-field">
+              {editando && <p className="recurrence-hint recurrence-editing-hint">{t("board.recurrences.editingHint", { title: editando.title })}</p>}
+              <label className="recurrence-field recurrence-field-title">
                 <span>{t("board.recurrences.fieldTitle")}</span>
                 <input
                   value={form.title}
@@ -234,41 +306,60 @@ export default function RecurrencesModal({ board, onClose }) {
                 />
               </label>
 
-              <div className="recurrence-row">
+              <div className="recurrence-grid">
                 <label className="recurrence-field">
                   <span>{t("board.recurrences.fieldList")}</span>
-                  <select value={form.listId} onChange={(e) => set("listId", e.target.value)} required>
-                    {board.lists.map((l) => (
-                      <option key={l.id} value={l.id}>
-                        {l.title}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="recurrence-select-wrap">
+                    <select value={form.listId} onChange={(e) => set("listId", e.target.value)} required>
+                      {board.lists.map((l) => (
+                        <option key={l.id} value={l.id}>
+                          {l.title}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
                 </label>
 
                 <label className="recurrence-field">
                   <span>{t("board.recurrences.fieldFreq")}</span>
-                  <select value={form.freq} onChange={(e) => set("freq", e.target.value)}>
-                    {FREQS.map((f) => (
-                      <option key={f} value={f}>
-                        {t(`board.recurrences.freq.${f}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div className="recurrence-row">
-                {form.freq === "weekly" && (
-                  <label className="recurrence-field">
-                    <span>{t("board.recurrences.fieldWeekday")}</span>
-                    <select value={form.weekday} onChange={(e) => set("weekday", e.target.value)}>
-                      {WEEKDAYS.map((d) => (
-                        <option key={d} value={d}>
-                          {t(`board.recurrences.weekdays.${d}`)}
+                  <span className="recurrence-select-wrap">
+                    <select value={form.freq} onChange={(e) => set("freq", e.target.value)}>
+                      {FREQS.map((f) => (
+                        <option key={f} value={f}>
+                          {t(`board.recurrences.freq.${f}`)}
                         </option>
                       ))}
                     </select>
+                  </span>
+                </label>
+
+                {form.freq === "weekly" && (
+                  <label className="recurrence-field">
+                    <span>{t("board.recurrences.fieldWeekday")}</span>
+                    <span className="recurrence-select-wrap">
+                      <select value={form.weekday} onChange={(e) => set("weekday", e.target.value)}>
+                        {WEEKDAYS.map((d) => (
+                          <option key={d} value={d}>
+                            {t(`board.recurrences.weekdays.${d}`)}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
+                  </label>
+                )}
+                {form.freq === "weekly" && (
+                  <label className="recurrence-field">
+                    <span>{t("board.recurrences.fieldWeekday2")}</span>
+                    <span className="recurrence-select-wrap">
+                      <select value={form.weekday2} onChange={(e) => set("weekday2", e.target.value)}>
+                        <option value="">{t("board.recurrences.noSecondDay")}</option>
+                        {WEEKDAYS.map((d) => (
+                          <option key={d} value={d}>
+                            {t(`board.recurrences.weekdays.${d}`)}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
                   </label>
                 )}
                 {form.freq === "monthly" && (
@@ -314,31 +405,36 @@ export default function RecurrencesModal({ board, onClose }) {
               </div>
 
               <label className="recurrence-field">
-                <span>{t("board.recurrences.fieldChecklist")}</span>
+                <span className="recurrence-checklist-label">
+                  <IconChecklist /> {t("board.recurrences.fieldChecklist")}
+                </span>
                 <textarea
                   rows={4}
                   value={form.checklistTexto}
                   onChange={(e) => set("checklistTexto", e.target.value)}
                   placeholder={t("board.recurrences.checklistPlaceholder")}
                 />
+                <span className="recurrence-field-hint">{t("board.recurrences.checklistSyntaxHint")}</span>
               </label>
 
               {form.freq === "monthly" && (Number(form.monthday) > 28 || Number(form.monthday2) > 28) && (
                 <p className="recurrence-warning">{t("board.recurrences.monthdayWarning")}</p>
               )}
 
-              <div className="recurrence-form-actions">
-                <button type="submit" className="btn-primary btn-small" disabled={salvando}>
-                  {editando ? t("board.recurrences.saveEdit") : t("board.recurrences.save")}
-                </button>
-                <button type="button" className="btn-cancel" onClick={cancelar}>
+              <div className="recurrence-form-footer">
+                <button type="button" className="recurrence-btn-ghost" onClick={cancelar}>
                   {t("common.cancel")}
+                </button>
+                <button type="submit" className="recurrence-btn-primary" disabled={salvando}>
+                  {editando ? t("board.recurrences.saveEdit") : t("board.recurrences.save")}
                 </button>
               </div>
             </form>
           )}
 
-          <p className="recurrence-hint">{t("board.recurrences.hint")}</p>
+          <p className="recurrence-hint recurrence-info-banner">
+            <IconInfo /> {t("board.recurrences.hint")}
+          </p>
         </div>
       </div>
     </div>
