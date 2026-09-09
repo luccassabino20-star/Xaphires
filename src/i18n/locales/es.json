@@ -2006,7 +2006,7 @@
     "delete": "Eliminar",
     "newPasswordFor": "Nueva contraseña para {{name}}",
     "savePassword": "Guardar nueva contraseña",
-    "newUser": "+ Nuevo usuario",
+    "newUser": "Invitar nuevo usuario",
     "name": "Nombre",
     "email": "Correo electrónico",
     "password": "Contraseña",

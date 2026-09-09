@@ -1850,7 +1850,7 @@
     "delete": "Supprimer",
     "newPasswordFor": "Nouveau mot de passe pour {{name}}",
     "savePassword": "Enregistrer le nouveau mot de passe",
-    "newUser": "+ Nouvel utilisateur",
+    "newUser": "Inviter un utilisateur",
     "name": "Nom",
     "email": "E-mail",
     "password": "Mot de passe",

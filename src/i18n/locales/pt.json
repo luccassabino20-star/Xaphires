@@ -2265,7 +2265,7 @@
     "delete": "Excluir",
     "newPasswordFor": "Nova senha para {{name}}",
     "savePassword": "Salvar nova senha",
-    "newUser": "+ Novo usuário",
+    "newUser": "Convidar novo usuário",
     "name": "Nome",
     "email": "E-mail",
     "password": "Senha",
