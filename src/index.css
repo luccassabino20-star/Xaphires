@@ -5654,6 +5654,157 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .users-table-you { color: var(--text-muted); font-weight: 400; }
 .users-table-actions { display: flex; gap: 8px; justify-content: flex-end; white-space: nowrap; }
 
+/* ---------- Painel de usuários premium (UsersPanel.jsx) ----------
+   Grade em CSS grid (não <table>) pra nunca precisar de overflow-x: cada
+   coluna é minmax(0, ...) ou largura fixa, então o texto trunca com
+   ellipsis em vez de estourar a largura do modal. .users-table* acima
+   continua intocado - é o TeamPanel.jsx que usa. */
+.modal-wide.users-panel-modal { max-width: 1040px; max-height: 85vh; }
+.users-panel-header { justify-content: space-between; flex-wrap: wrap; }
+.users-panel-search { flex-shrink: 0; }
+.users-panel-search input { width: 220px; }
+.users-panel-body { overflow-x: hidden; }
+
+.users-settings-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-list);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.users-settings-cnpj { flex: 1; min-width: 220px; }
+.users-settings-cnpj-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.users-settings-cnpj-head .modal-label { margin: 0; }
+
+.users-requests-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.users-requests-toggle:hover { border-color: var(--border-strong); }
+.users-requests-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--bg-list);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.users-requests-count.has-pending { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+.users-requests-chevron { display: flex; color: var(--text-muted); transition: transform 0.15s ease; }
+.users-requests-chevron.open { transform: rotate(180deg); }
+
+.join-requests-panel { margin-bottom: 14px; }
+
+.users-panel-columns, .users-panel-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.6fr) 130px 90px 40px;
+  align-items: center;
+  gap: 10px;
+}
+.users-panel-columns {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-topbar);
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-top: 10px;
+}
+.users-panel-list { display: flex; flex-direction: column; }
+.users-panel-row { padding: 10px; border-bottom: 1px solid var(--border-subtle); }
+.users-panel-row:hover { background: var(--bg-list); }
+
+.users-row-member { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.users-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: var(--text-primary); }
+
+.users-row-email {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+.users-row-email-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.users-row-email svg { flex-shrink: 0; opacity: 0; transition: opacity 0.12s ease; }
+.users-row-email:hover { background: var(--bg-card); color: var(--text-primary); }
+.users-row-email:hover svg { opacity: 1; }
+
+.users-row-role { min-width: 0; }
+.users-row-role .share-role-select { width: 100%; }
+
+.users-row-finance { display: flex; justify-content: center; }
+
+.users-row-actions { display: flex; justify-content: flex-end; }
+.row-menu-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.row-menu-btn:hover { background: var(--bg-card); color: var(--text-primary); }
+/* .users-row-menu não usa position:absolute do .dropdown - ver comentário em
+   UserActionsMenu (UsersPanel.jsx): posição vem inline (position: fixed),
+   calculada do próprio botão, pra não ser cortada pelo scroll da lista. */
+
+.users-inline-panel {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-list);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  max-width: 360px;
+}
+
+.users-panel-footer { margin-top: 14px; }
+.users-panel-total { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+
+@media (max-width: 720px) {
+  .users-panel-columns, .users-panel-row { grid-template-columns: minmax(0, 1.6fr) 108px 76px 36px; }
+  .users-row-email { display: none; }
+  .users-panel-columns span:nth-child(2) { display: none; }
+  .users-panel-search input { width: 140px; }
+}
+
 /* ---------- Painel de equipe (TeamPanel) ---------- */
 .team-manage-link { margin-bottom: 14px; }
 .team-profile {

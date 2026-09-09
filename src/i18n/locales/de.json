@@ -1698,7 +1698,15 @@
     "approve": "Genehmigen",
     "reject": "Ablehnen",
     "requestApprovedToast": "{{name}} ist jetzt Teil des Unternehmens",
-    "requestRejectedToast": "Anfrage abgelehnt"
+    "requestRejectedToast": "Anfrage abgelehnt",
+    "searchPlaceholder": "Nach Name oder E-Mail suchen...",
+    "colMember": "Mitglied",
+    "companyCnpjActive": "Aktiv",
+    "copyEmailHint": "Klicken, um die E-Mail zu kopieren",
+    "emailCopied": "E-Mail kopiert",
+    "rowActions": "Aktionen",
+    "totalMembers": "Insgesamt: {{count}} aktives Mitglied",
+    "totalMembers_other": "Insgesamt: {{count}} aktive Mitglieder"
   },
   "team": {
     "title": "Team",

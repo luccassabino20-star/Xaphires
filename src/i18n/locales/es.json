@@ -2028,7 +2028,15 @@
     "approve": "Aprobar",
     "reject": "Rechazar",
     "requestApprovedToast": "{{name}} ahora es parte de la empresa",
-    "requestRejectedToast": "Solicitud rechazada"
+    "requestRejectedToast": "Solicitud rechazada",
+    "searchPlaceholder": "Buscar por nombre o correo...",
+    "colMember": "Miembro",
+    "companyCnpjActive": "Activo",
+    "copyEmailHint": "Haz clic para copiar el correo",
+    "emailCopied": "Correo copiado",
+    "rowActions": "Acciones",
+    "totalMembers": "Total: {{count}} miembro activo",
+    "totalMembers_other": "Total: {{count}} miembros activos"
   },
   "team": {
     "title": "Equipo",
