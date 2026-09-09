@@ -30,6 +30,13 @@ function CloseIcon() {
     </svg>
   );
 }
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14">
+      <path fill="currentColor" d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3zm2 5h2v10h-2zm-4 0h2v10H7zm8 0h2v10h-2z" />
+    </svg>
+  );
+}
 
 // Provedor a partir do domínio do link colado - só decide qual ícone/cor
 // mostrar (ver COLORS acima), nunca valida se a URL é "de verdade" de um
@@ -64,7 +71,7 @@ const COLORS = ["teal", "blue", "purple", "amber", "rose"];
 // subtarefas. Mesmo padrão de autosave do CardModal (onChange no estado local,
 // onBlur grava) - "editável em tempo real" aqui é digitar direto no campo, sem
 // modo de edição à parte, não sincronizar tecla a tecla com o servidor.
-export default function PersonalTaskDetailModal({ task, canUse, onClose, onChange }) {
+export default function PersonalTaskDetailModal({ task, canUse, onClose, onChange, onDelete }) {
   const { t } = useTranslation();
   const showToast = useToast();
   const { user } = useAuth();
@@ -562,7 +569,12 @@ export default function PersonalTaskDetailModal({ task, canUse, onClose, onChang
           )}
         </div>
 
-        <div className="modal-footer">
+        <div className="modal-footer modal-footer-split">
+          {onDelete && (
+            <button type="button" className="btn-danger" onClick={() => onDelete(task)}>
+              <TrashIcon /> {t("common.delete")}
+            </button>
+          )}
           <button type="button" className="btn-primary" onClick={handleSaveAndClose}>
             <CheckMarkIcon /> {t("planner.saveAndClose")}
           </button>

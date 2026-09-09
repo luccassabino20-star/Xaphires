@@ -572,8 +572,7 @@ export default function PersonalPlanner({ initialTab = "week" }) {
                                 (tsk.color ? " color-" + tsk.color : "") +
                                 (tsk.completed ? " completed" : "")
                               }
-                              onClick={() => toggleTask(tsk)}
-                              disabled={!canUse}
+                              onClick={() => setDetailTaskId(tsk.id)}
                               title={tsk.title}
                             >
                               {tsk.title}
@@ -785,6 +784,7 @@ export default function PersonalPlanner({ initialTab = "week" }) {
           canUse={canUse}
           onClose={() => setDetailTaskId(null)}
           onChange={handleDetailChange}
+          onDelete={removeTask}
         />
       )}
     </div>
