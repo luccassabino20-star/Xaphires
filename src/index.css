@@ -10264,6 +10264,74 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-novo-head select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
 .fin-novo-acoes { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .fin-novo-correntista { max-width: 360px; }
+
+/* Lançamentos (Novo Título) - central de criação Ultra-Premium: header,
+   segmented Entrada/Saída em destaque, badges de forma de pagamento, card de
+   líquido maior/temático e rodapé fixo de ações. Reaproveita .fin-bloco/
+   .fin-modal-grid/.fin-tit-liquido já usados no detalhe do título
+   (LancamentoModal.jsx) - só o que é específico desta tela mora aqui. */
+.fin-lanc-header { margin-bottom: 4px; }
+.fin-lanc-tipo-toggle { display: flex; gap: 8px; margin: 14px 0 18px; }
+.fin-lanc-tipo-btn {
+  flex: 1; padding: 14px 16px; font-size: 14px; font-weight: 650; text-align: center;
+  color: var(--text-secondary); background: var(--bg-list); border: 1.5px solid var(--border-subtle);
+  border-radius: 14px; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.fin-lanc-tipo-btn.tipo-receber.active { color: var(--fin-entrada); background: color-mix(in srgb, var(--fin-entrada) 12%, var(--bg-card)); border-color: var(--fin-entrada); }
+.fin-lanc-tipo-btn.tipo-pagar.active { color: var(--fin-saida); background: color-mix(in srgb, var(--fin-saida) 12%, var(--bg-card)); border-color: var(--fin-saida); }
+
+.fin-forma-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.fin-forma-badge {
+  padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+  background: var(--bg-list); border: 1.5px solid var(--border-subtle); border-radius: 999px; cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.fin-forma-badge.sel { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: var(--accent); }
+
+.fin-lanc-valor-bruto { font-size: 20px; font-weight: 700; }
+.fin-lanc-liquido-destaque {
+  margin-top: 12px; padding: 16px 18px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-list); border: 1px solid var(--border-subtle);
+}
+.fin-lanc-liquido-destaque span:first-child { font-size: 13px; color: var(--text-secondary); }
+.fin-lanc-liquido-destaque strong { font-size: 24px; letter-spacing: -0.3px; }
+.fin-lanc-liquido-destaque.tema-receber { background: color-mix(in srgb, var(--fin-entrada) 8%, var(--bg-list)); }
+.fin-lanc-liquido-destaque.tema-receber strong { color: var(--fin-entrada); }
+.fin-lanc-liquido-destaque.tema-pagar { background: color-mix(in srgb, var(--fin-saida) 8%, var(--bg-list)); }
+.fin-lanc-liquido-destaque.tema-pagar strong { color: var(--fin-saida); }
+
+.fin-lanc-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13.5px; color: var(--text-primary); }
+
+/* Não é position:sticky de propósito: dentro de um painel com scroll
+   (.fin-body), sticky sem reservar altura fica puxado pro fundo da janela
+   visível e SOBREPÕE os blocos anteriores em vez de vir depois deles -
+   confirmado testando no navegador. Uma barra normal, só destacada
+   visualmente (fundo/sombra), evita a armadilha e ainda lê como "rodapé de
+   ações" por estar sempre por último no formulário. */
+.fin-lanc-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  margin-top: 4px; padding: 14px 16px; background: var(--bg-card);
+  border: 1px solid var(--border-subtle); border-radius: 14px; box-shadow: var(--shadow-card);
+}
+.fin-lanc-footer-msg { flex: 1; min-width: 0; font-size: 12.5px; color: var(--text-secondary); }
+.fin-lanc-footer-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* Dropzone de anexos (AnexosLancamento.jsx) - mesma mecânica de arrastar de
+   FinanceUploadPanel.jsx (finance-bpo, protótipo simulado), estilo próprio,
+   upload de verdade. */
+.fin-dropzone {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;
+  padding: 26px 16px; margin-top: 10px; color: var(--text-secondary);
+  background: var(--bg-list); border: 1.5px dashed var(--border-strong); border-radius: 14px; cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.fin-dropzone:hover, .fin-dropzone.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--bg-list)); color: var(--accent); }
+.fin-dropzone.enviando { opacity: 0.6; pointer-events: none; }
+.fin-dropzone-titulo { font-size: 13px; font-weight: 650; color: var(--text-primary); }
+.fin-dropzone.active .fin-dropzone-titulo, .fin-dropzone.hover .fin-dropzone-titulo { color: var(--accent); }
+.fin-dropzone-sub { font-size: 11.5px; color: var(--text-muted); }
+.fin-anexos { margin-top: 10px; }
 /* Select pesquisável (SearchSelect): controle com lupa + popup com busca. Veste
    igual aos outros campos do formulário e abre um dropdown filtrável. */
 .fin-ss { position: relative; }
@@ -10281,6 +10349,18 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-ss-opt:hover { background: var(--bg-list); }
 .fin-ss-opt.sel { background: var(--bg-list); font-weight: 600; }
 .fin-ss-empty { padding: 10px; font-size: 12.5px; color: var(--text-muted); text-align: center; }
+
+/* Avatar de iniciais (contato) ou indicador receita/despesa (classe) no
+   SearchSelect - opcional, só quando a opção traz `sublabel` (ver
+   LancamentosView.jsx). Sem sublabel o comportamento é o de sempre acima. */
+.fin-ss-avatar {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 999px; font-size: 10px; font-weight: 700; color: #fff;
+}
+.fin-ss-opt-rico { display: flex; align-items: center; gap: 9px; white-space: normal; }
+.fin-ss-opt-textos { display: flex; flex-direction: column; gap: 1px; min-width: 0; overflow: hidden; }
+.fin-ss-opt-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-ss-opt-sub { font-size: 11.5px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Impostos aplicados ao título (bloco do detalhe) */
 .fin-imposto-lista { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 6px; }

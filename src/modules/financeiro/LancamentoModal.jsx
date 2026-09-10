@@ -7,6 +7,7 @@ import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents, formatPercent, reaisParaCents, centsOuZero } from "./dinheiro.js";
 import { comCodigo } from "./rotulo.js";
 import SearchSelect from "./SearchSelect.jsx";
+import AnexosLancamento from "./AnexosLancamento.jsx";
 
 // Formas de pagamento (conjunto fixo por ora; o SIGIM tem cadastro próprio). A
 // chave é gravada; o rótulo é traduzido em financeiro.forma.*. Exportado para o
@@ -82,6 +83,7 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
   // salvar - não dá para olhar `rateio.length`, porque "Remover rateio" esvazia o
   // estado local e aí a limpeza no servidor nunca aconteceria.
   const [tinhaRateio, setTinhaRateio] = useState(false);
+  const [anexos, setAnexos] = useState(l.anexos || []);
 
   useEffect(() => {
     api.finListImpostosAplicados(l.id).then(setAplicados).catch(() => {});
@@ -521,6 +523,11 @@ export default function LancamentoModal({ lancamento, categorias, centros, conta
             <span>{t("financeiro.tit.observacao")}</span>
             <textarea rows={2} value={f.observacao} onChange={(e) => setF({ ...f, observacao: e.target.value })} />
           </label>
+
+          <fieldset className="fin-bloco">
+            <legend>{t("financeiro.lanc.anexos")}</legend>
+            <AnexosLancamento lancamentoId={l.id} anexos={anexos} onChanged={setAnexos} />
+          </fieldset>
 
           {/* Detalhes do pagamento - só quando baixado (finalizado) */}
           {finalizado && (

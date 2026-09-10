@@ -8,6 +8,7 @@ import { formatCents, reaisParaCents, centsOuZero } from "./dinheiro.js";
 import { comCodigo } from "./rotulo.js";
 import LancamentoModal, { FORMAS } from "./LancamentoModal.jsx";
 import SearchSelect from "./SearchSelect.jsx";
+import AnexosLancamento from "./AnexosLancamento.jsx";
 
 // Data civil de HOJE no horário LOCAL, não UTC: toISOString() daria o dia de UTC
 // e, perto da meia-noite no Brasil (UTC-3), pré-preencheria vencimento/emissão um
@@ -20,18 +21,19 @@ const hoje = () => {
 function formVazio() {
   return {
     tipo: "receber", descricao: "", doc: "", emissao: hoje(), due: hoje(), formaPagto: "",
-    categoryId: "", centroCustoId: "", contatoId: "",
+    categoryId: "", centroCustoId: "", contatoId: "", contaId: "",
     valor: "", desconto: "", retencao: "", multa: "", juros: "", observacao: "",
   };
 }
 
-// Aba Lançamentos: o ato de lançar um título novo, com TODOS os campos que o
-// detalhe do título tem (identificação, apropriação, valores com juros/multa/
-// desconto/retenção e o líquido ao vivo). Impostos e parcelas não cabem aqui: os
-// dois geram títulos vinculados e precisam do título já salvo (id/número), então
-// são adicionados logo depois - por isso, ao criar, o título recém-nascido abre
-// no detalhe, onde se aplica imposto e se desdobra.
-export default function LancamentosView() {
+// Aba Lançamentos: central de criação de título Ultra-Premium (Stripe
+// Invoicing/Brex-like) - blocos separados (entidade, apropriação, valores,
+// parcelamento, anexos) em vez do formulário corrido de antes. Impostos não
+// cabem aqui (dependem do título já ter id) - por isso, ao criar sem "Emitir
+// Boleto/Pix", o título recém-nascido abre no detalhe, onde se aplica
+// imposto e ainda se desdobra mais (parcelamento já pode nascer aqui, no
+// Bloco 4).
+export default function LancamentosView({ onGerarCobranca }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -45,9 +47,14 @@ export default function LancamentosView() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [form, setForm] = useState(formVazio());
-  const [enviando, setEnviando] = useState(false);
+  const [salvando, setSalvando] = useState(false);
   const [formErro, setFormErro] = useState("");
   const [detalheId, setDetalheId] = useState(null);
+
+  const [parcelarAtivo, setParcelarAtivo] = useState(false);
+  const [nParcelas, setNParcelas] = useState(2);
+  const [periodicidade, setPeriodicidade] = useState("1");
+  const [anexosPendentes, setAnexosPendentes] = useState([]);
 
   async function carregar() {
     try {
@@ -73,13 +80,21 @@ export default function LancamentosView() {
     return Math.max(0, liq);
   }, [form.valor, form.desconto, form.retencao, form.multa, form.juros]);
 
-  async function submitNovo(e) {
-    e.preventDefault();
+  // Parcelamento (Bloco 4) espera o título limpo de encargos - mesma regra
+  // `!temEncargo` já aplicada ao desdobrar pós-criação em LancamentoModal.jsx,
+  // só que checada ANTES de existir o título, direto nos campos do form.
+  const temEncargo = !!(centsOuZero(form.desconto) || centsOuZero(form.retencao) || centsOuZero(form.multa) || centsOuZero(form.juros));
+  const podeParcelar = !temEncargo;
+  useEffect(() => { if (!podeParcelar) setParcelarAtivo(false); }, [podeParcelar]);
+
+  const podeEmitirBoleto = form.tipo === "receber" && !!form.contatoId;
+
+  async function salvar(statusAlvo, emitirBoleto) {
     setFormErro("");
     const valorCents = reaisParaCents(form.valor);
     if (!valorCents) return setFormErro(t("financeiro.form.valorInvalido"));
     if (!form.due) return setFormErro(t("financeiro.form.dataObrigatoria"));
-    setEnviando(true);
+    setSalvando(true);
     try {
       const criado = await api.finCreateLancamento({
         tipo: form.tipo, descricao: form.descricao.trim(), doc: form.doc.trim(), valorCents, due: form.due,
@@ -87,28 +102,55 @@ export default function LancamentosView() {
         descontoCents: centsOuZero(form.desconto), retencaoCents: centsOuZero(form.retencao),
         multaCents: centsOuZero(form.multa), jurosCents: centsOuZero(form.juros),
         categoryId: form.categoryId || undefined, centroCustoId: form.centroCustoId || undefined,
-        contatoId: form.contatoId || undefined,
+        contatoId: form.contatoId || undefined, contaId: form.contaId || undefined,
+        status: statusAlvo,
       });
+      if (parcelarAtivo && podeParcelar && Number(nParcelas) > 1) {
+        await api.finDesdobrarLancamento(criado.id, { parcelas: Number(nParcelas), intervaloMeses: Number(periodicidade) });
+      }
+      for (const file of anexosPendentes) {
+        await api.finAddAttachment(criado.id, file);
+      }
+      showToast(t(statusAlvo === "provisionado" ? "financeiro.lanc.toastRascunho" : "financeiro.toast.criado"));
+      const prefill = { contatoId: form.contatoId, descricao: form.descricao.trim(), valorInicial: form.valor };
       setForm(formVazio());
-      showToast(t("financeiro.toast.criado"));
-      // Recarrega e abre o título criado, para aplicar imposto/desdobrar já.
+      setParcelarAtivo(false);
+      setAnexosPendentes([]);
       await carregar();
-      setDetalheId(criado.id);
+      if (emitirBoleto) onGerarCobranca?.(prefill);
+      else setDetalheId(criado.id);
     } catch (err) {
       setFormErro(translateError(err, t));
     } finally {
-      setEnviando(false);
+      setSalvando(false);
     }
   }
 
-  // Opções {id,label} dos selects pesquisáveis. Classe/centro levam o código
-  // junto (comCodigo); contato é só o nome.
-  const contatoOpts = useMemo(() => contatos.map((c) => ({ id: c.id, label: c.nome })), [contatos]);
-  const categoriaOpts = useMemo(() => categorias.map((c) => ({ id: c.id, label: comCodigo(c) })), [categorias]);
+  // Opções {id,label} dos selects pesquisáveis. Contato ganha sublabel (doc) -
+  // o SearchSelect desenha avatar de iniciais + CPF/CNPJ embaixo do nome, e a
+  // busca passa a casar pelo documento também. Classe ganha um indicador
+  // receita/despesa (seta colorida) derivado de categoria.tipo - não existe
+  // ícone por categoria no cadastro, então não inventamos um.
+  const contatoOpts = useMemo(
+    () => contatos.map((c) => ({ id: c.id, label: c.nome, sublabel: c.doc || undefined })),
+    [contatos]
+  );
+  const categoriaOpts = useMemo(
+    () => categorias.map((c) => ({
+      id: c.id, label: comCodigo(c), sublabel: t("financeiro." + (c.tipo === "receita" ? "tipo.receber" : "tipo.pagar")),
+      avatarChar: c.tipo === "receita" ? "↑" : "↓",
+      avatarColor: c.tipo === "receita" ? "var(--fin-entrada)" : "var(--fin-saida)",
+    })),
+    [categorias, t]
+  );
   // Só analítico ativo recebe lançamento (sintético é nó de agrupamento na árvore).
   const centroOpts = useMemo(
     () => centros.filter((c) => c.tipo !== "sintetico" && c.ativo === 1).map((c) => ({ id: c.id, label: comCodigo(c) })),
     [centros]
+  );
+  const contaOpts = useMemo(
+    () => contas.filter((c) => c.ativo === 1).map((c) => ({ id: c.id, label: c.nome + (c.banco ? ` (${c.banco})` : "") })),
+    [contas]
   );
 
   const detalhe = detalheId ? lancamentos.find((l) => l.id === detalheId) : null;
@@ -117,32 +159,41 @@ export default function LancamentosView() {
   if (erro) return <div className="fin-error">{erro}</div>;
 
   return (
-    <div className="fin-novo-titulo">
-      <form onSubmit={submitNovo}>
-        <div className="fin-novo-head">
-          <h3>{t("financeiro.form.novoTitulo")}</h3>
-          <select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
-            <option value="receber">{t("financeiro.tipo.receber")}</option>
-            <option value="pagar">{t("financeiro.tipo.pagar")}</option>
-          </select>
-        </div>
+    <div className="fin-novo-titulo fin-lanc">
+      <div className="fin-lanc-header">
+        <h2 className="contatos-titulo">{t("financeiro.lanc.headerTitulo")}</h2>
+        <p className="contatos-contador">{t("financeiro.lanc.headerSubtitulo")}</p>
+      </div>
 
-        {/* Cliente/Fornecedor no topo, acima da identificação - é a primeira
-            coisa que se define ao lançar, como no cabeçalho do detalhe. */}
-        <label className="fin-field fin-novo-correntista">
-          <span>{t("financeiro.col.contraparte")}</span>
-          <SearchSelect
-            value={form.contatoId}
-            onChange={(id) => setForm({ ...form, contatoId: id })}
-            options={contatoOpts}
-            allLabel={t("financeiro.form.semContato")}
-          />
-        </label>
+      <div className="fin-lanc-tipo-toggle">
+        <button
+          type="button" className={"fin-lanc-tipo-btn tipo-receber" + (form.tipo === "receber" ? " active" : "")}
+          onClick={() => setForm({ ...form, tipo: "receber" })}
+        >
+          {t("financeiro.lanc.tipoReceber")}
+        </button>
+        <button
+          type="button" className={"fin-lanc-tipo-btn tipo-pagar" + (form.tipo === "pagar" ? " active" : "")}
+          onClick={() => setForm({ ...form, tipo: "pagar" })}
+        >
+          {t("financeiro.lanc.tipoPagar")}
+        </button>
+      </div>
 
-        {/* Identificação / Documento */}
+      <form onSubmit={(e) => e.preventDefault()} className="fin-lanc-form">
+        {/* Bloco 1 - Entidade & Identificação */}
         <fieldset className="fin-bloco">
-          <legend>{t("financeiro.tit.identificacao")}</legend>
+          <legend>{t("financeiro.lanc.blocoEntidade")}</legend>
           <div className="fin-modal-grid">
+            <label className="fin-field fin-field-wide">
+              <span>{t("financeiro.col.contraparte")}</span>
+              <SearchSelect
+                value={form.contatoId}
+                onChange={(id) => setForm({ ...form, contatoId: id })}
+                options={contatoOpts}
+                allLabel={t("financeiro.form.semContato")}
+              />
+            </label>
             <label className="fin-field fin-field-wide">
               <span>{t("financeiro.col.descricao")}</span>
               <input type="text" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
@@ -159,19 +210,12 @@ export default function LancamentosView() {
               <span>{t("financeiro.col.vencimento")}</span>
               <input type="date" value={form.due} onChange={(e) => setForm({ ...form, due: e.target.value })} />
             </label>
-            <label className="fin-field">
-              <span>{t("financeiro.tit.formaPagto")}</span>
-              <select value={form.formaPagto} onChange={(e) => setForm({ ...form, formaPagto: e.target.value })}>
-                <option value="">{t("financeiro.tit.semForma")}</option>
-                {FORMAS.map((k) => <option key={k} value={k}>{t("financeiro.forma." + k)}</option>)}
-              </select>
-            </label>
           </div>
         </fieldset>
 
-        {/* Apropriação: classe, centro de custo e contraparte */}
+        {/* Bloco 2 - Apropriação Financeira & DRE */}
         <fieldset className="fin-bloco">
-          <legend>{t("financeiro.tit.apropriacao")}</legend>
+          <legend>{t("financeiro.lanc.blocoApropriacao")}</legend>
           <div className="fin-modal-grid">
             <label className="fin-field">
               <span>{t("financeiro.cad.classes")}</span>
@@ -191,16 +235,39 @@ export default function LancamentosView() {
                 allLabel={t("financeiro.form.semCentro")}
               />
             </label>
+            <label className="fin-field">
+              <span>{t("financeiro.lanc.contaLiquidacao")}</span>
+              <SearchSelect
+                value={form.contaId}
+                onChange={(id) => setForm({ ...form, contaId: id })}
+                options={contaOpts}
+                allLabel={t("financeiro.baixa.semConta")}
+              />
+            </label>
           </div>
+          <label className="fin-field" style={{ marginTop: 10 }}>
+            <span>{t("financeiro.tit.formaPagto")}</span>
+            <div className="fin-forma-badges">
+              {FORMAS.map((k) => (
+                <button
+                  key={k} type="button"
+                  className={"fin-forma-badge" + (form.formaPagto === k ? " sel" : "")}
+                  onClick={() => setForm({ ...form, formaPagto: form.formaPagto === k ? "" : k })}
+                >
+                  {t("financeiro.forma." + k)}
+                </button>
+              ))}
+            </div>
+          </label>
         </fieldset>
 
-        {/* Valores */}
+        {/* Bloco 3 - Valores, Deduções & Cálculo Automático */}
         <fieldset className="fin-bloco">
-          <legend>{t("financeiro.tit.valores")}</legend>
+          <legend>{t("financeiro.lanc.blocoValores")}</legend>
           <div className="fin-modal-grid">
-            <label className="fin-field">
+            <label className="fin-field fin-field-wide">
               <span>{t("financeiro.tit.valorTitulo")}</span>
-              <input type="number" step="0.01" min="0" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
+              <input type="number" step="0.01" min="0" className="fin-lanc-valor-bruto" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
             </label>
             <label className="fin-field">
               <span>{t("financeiro.tit.desconto")}</span>
@@ -218,23 +285,70 @@ export default function LancamentosView() {
               <span>{t("financeiro.tit.juros")}</span>
               <input type="number" step="0.01" min="0" value={form.juros} placeholder="0,00" onChange={(e) => setForm({ ...form, juros: e.target.value })} />
             </label>
-            <div className="fin-field fin-tit-liquido">
-              <span>{t("financeiro.tit.valorLiquido")}</span>
-              <strong>{formatCents(liquido, lang)}</strong>
-            </div>
+          </div>
+          <div className={"fin-tit-liquido fin-lanc-liquido-destaque " + (form.tipo === "receber" ? "tema-receber" : "tema-pagar")}>
+            <span>{t("financeiro.tit.valorLiquido")}</span>
+            <strong>{formatCents(liquido, lang)}</strong>
           </div>
         </fieldset>
 
-        <label className="fin-field">
-          <span>{t("financeiro.tit.observacao")}</span>
-          <textarea rows={2} value={form.observacao} onChange={(e) => setForm({ ...form, observacao: e.target.value })} />
-        </label>
+        {/* Bloco 4 - Condições Especiais & Parcelamento */}
+        <fieldset className="fin-bloco">
+          <legend>{t("financeiro.lanc.parcelamentoTitulo")}</legend>
+          <div className="fin-lanc-toggle-row">
+            <span>{t("financeiro.lanc.parcelamentoPergunta")}</span>
+            <label className="addon-toggle" title={!podeParcelar ? t("financeiro.lanc.parcelamentoBloqueado") : undefined}>
+              <input type="checkbox" checked={parcelarAtivo} disabled={!podeParcelar} onChange={() => setParcelarAtivo((v) => !v)} />
+              <span className="addon-toggle-track"><span className="addon-toggle-thumb" /></span>
+            </label>
+          </div>
+          {!podeParcelar && <p className="fin-cad-hint">{t("financeiro.lanc.parcelamentoBloqueado")}</p>}
+          {parcelarAtivo && podeParcelar && (
+            <div className="fin-modal-grid">
+              <label className="fin-field">
+                <span>{t("financeiro.parcela.qtd")}</span>
+                <input type="number" min="2" max="120" value={nParcelas} onChange={(e) => setNParcelas(e.target.value)} />
+              </label>
+              <label className="fin-field">
+                <span>{t("financeiro.lanc.periodicidade")}</span>
+                <select value={periodicidade} onChange={(e) => setPeriodicidade(e.target.value)}>
+                  <option value="1">{t("financeiro.lanc.periodicidadeMensal")}</option>
+                  <option value="3">{t("financeiro.lanc.periodicidadeTrimestral")}</option>
+                  <option value="6">{t("financeiro.lanc.periodicidadeSemestral")}</option>
+                  <option value="12">{t("financeiro.lanc.periodicidadeAnual")}</option>
+                </select>
+              </label>
+            </div>
+          )}
+        </fieldset>
 
-        {formErro && <div className="fin-error">{formErro}</div>}
+        {/* Bloco 5 - Observações & Anexos */}
+        <fieldset className="fin-bloco">
+          <legend>{t("financeiro.lanc.blocoAnexos")}</legend>
+          <label className="fin-field">
+            <span>{t("financeiro.tit.observacao")}</span>
+            <textarea rows={2} value={form.observacao} onChange={(e) => setForm({ ...form, observacao: e.target.value })} />
+          </label>
+          <AnexosLancamento pendentes={anexosPendentes} onPendentesChange={setAnexosPendentes} />
+        </fieldset>
 
-        <div className="fin-novo-acoes">
-          <button type="submit" className="btn-primary btn-small" disabled={enviando}>{t("financeiro.form.adicionar")}</button>
-          <span className="fin-cad-hint">{t("financeiro.form.impostoAposCriar")}</span>
+        {/* Rodapé fixo de ações */}
+        <div className="fin-lanc-footer">
+          <span className="fin-lanc-footer-msg">
+            {formErro
+              ? <span className="fin-error">{formErro}</span>
+              : (parcelarAtivo && podeParcelar && Number(nParcelas) > 1 && reaisParaCents(form.valor)
+                ? t("financeiro.lanc.parcelamentoResumo", { n: nParcelas, valor: formatCents(Math.round((reaisParaCents(form.valor) || 0) / Number(nParcelas)), lang) })
+                : null)}
+          </span>
+          <div className="fin-lanc-footer-acoes">
+            <button type="button" className="btn-secondary btn-small" disabled={salvando} onClick={() => salvar("provisionado", false)}>
+              {t("financeiro.lanc.footerRascunho")}
+            </button>
+            <button type="button" className="recurrence-btn-primary" disabled={salvando} onClick={() => salvar("pendente", podeEmitirBoleto)}>
+              {podeEmitirBoleto ? t("financeiro.lanc.footerEmitir") : t("financeiro.lanc.footerConfirmar")}
+            </button>
+          </div>
         </div>
       </form>
 

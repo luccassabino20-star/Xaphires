@@ -2,7 +2,9 @@
 // getDb() (resolvido pelo AsyncLocalStorage do companyId) - logo, só funciona
 // dentro de um runWithCompany, que o requireAuth já garante nas rotas.
 import crypto from "node:crypto";
-import { getDb } from "../../db.js";
+import fs from "node:fs";
+import path from "node:path";
+import { getDb, companiesDir } from "../../db.js";
 import { uid } from "../../repo.js";
 import { getCurrentCompanyId } from "../../context.js";
 import * as centrosGlobais from "../../admin/centrosCustoStore.js";
@@ -443,8 +445,21 @@ export function updateCodigoServico(id, c) {
 }
 
 // ---------- Lançamentos ----------
+// anexos é guardado como texto JSON na coluna (mesmo desenho de
+// cards.attachments) - devolvido já como array para o cliente não parsear.
+function comAnexos(row) {
+  if (!row) return row;
+  let anexos;
+  try {
+    anexos = JSON.parse(row.anexos || "[]");
+  } catch {
+    anexos = [];
+  }
+  return { ...row, anexos };
+}
+
 export function getLancamento(id) {
-  return getDb().prepare("SELECT * FROM financeiro_lancamentos WHERE id = ?").get(id) || null;
+  return comAnexos(getDb().prepare("SELECT * FROM financeiro_lancamentos WHERE id = ?").get(id) || null);
 }
 
 // Valor líquido de um título, em centavos: o que de fato entra/sai de caixa.
@@ -484,10 +499,11 @@ export function listLancamentos({ tipo, status, de, ate } = {}) {
     .prepare(`SELECT financeiro_lancamentos.*,
                 (SELECT COUNT(*) FROM financeiro_apropriacoes a WHERE a.lancamento_id = financeiro_lancamentos.id) AS apropriacao_count
               FROM financeiro_lancamentos ${where} ORDER BY due ASC, created_at ASC`)
-    .all(...args);
+    .all(...args)
+    .map(comAnexos);
 }
 
-export function insertLancamento({ tipo, descricao, valorCents, due, emissao, formaPagto, observacao, impostoRetidoCents, impostoAcrescidoCents, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte, tituloOrigemId, origem, parcelaNum, parcelaTotal, createdBy }) {
+export function insertLancamento({ tipo, descricao, valorCents, due, emissao, formaPagto, observacao, impostoRetidoCents, impostoAcrescidoCents, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte, tituloOrigemId, origem, parcelaNum, parcelaTotal, status, createdBy }) {
   const id = uid();
   // Próximo número de título da empresa. node:sqlite é síncrono e single-thread
   // no processo, então o MAX+1 não corre risco de corrida entre requisições.
@@ -498,11 +514,12 @@ export function insertLancamento({ tipo, descricao, valorCents, due, emissao, fo
         (id, numero, tipo, descricao, valor_cents, due, emissao, forma_pagto, observacao,
          imposto_retido_cents, imposto_acrescido_cents, desconto_cents, retencao_cents, multa_cents, juros_cents,
          status, paid_at, category_id, centro_custo_id, contato_id, conta_id, doc, contraparte, titulo_origem_id, origem, parcela_num, parcela_total, created_at, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente', NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       id, numero, tipo, descricao || "", valorCents, due, emissao || null, formaPagto || "", observacao || "",
       impostoRetidoCents || 0, impostoAcrescidoCents || 0, descontoCents || 0, retencaoCents || 0, multaCents || 0, jurosCents || 0,
+      status || "pendente",
       categoryId || null, centroCustoId || null, contatoId || null, contaId || null, doc || "",
       contraparte || "", tituloOrigemId || null, origem || null, parcelaNum || null, parcelaTotal || null, new Date().toISOString(), createdBy || null
     );
@@ -820,6 +837,16 @@ export function deleteLancamento(id) {
     }
   }
   const marcas = ids.map(() => "?").join(",");
+  // Arquivos de anexo não têm cascade nenhum no disco - varre ANTES de apagar as
+  // linhas, senão o anexo de cada título da descendência vira lixo órfão em
+  // uploads/financeiro-anexos para sempre.
+  const linhasAnexo = db.prepare(`SELECT anexos FROM financeiro_lancamentos WHERE id IN (${marcas})`).all(...ids);
+  for (const row of linhasAnexo) {
+    for (const anexo of parseFinAttachments(row)) {
+      if (!anexo?.id) continue;
+      discardFinAttachmentFile(path.join(finAttachmentsUploadsDir(), anexo.id));
+    }
+  }
   // ANTES dos títulos: apagar os impostos aplicados que os referenciam. A FK
   // financeiro_lancamento_impostos.lancamento_id é NOT NULL e as FKs estão ON, então
   // deletar o título com imposto aplicado sem limpar isto dá "constraint failed".
@@ -827,6 +854,69 @@ export function deleteLancamento(id) {
   // Apropriações também referenciam o título (FK NOT NULL) - somem junto.
   db.prepare(`DELETE FROM financeiro_apropriacoes WHERE lancamento_id IN (${marcas})`).run(...ids);
   db.prepare(`DELETE FROM financeiro_lancamentos WHERE id IN (${marcas})`).run(...ids);
+}
+
+// ---------- Anexos de lançamento ----------
+// Mesmo desenho do anexo de cartão (server/repo.js): array JSON na coluna
+// `anexos`, arquivo em disco fora do banco, nomeado pelo próprio id do anexo -
+// nunca fica inteiro na memória (upload em streaming, ver routes.js).
+function finAttachmentsUploadsDir() {
+  const dir = path.join(companiesDir(), getCurrentCompanyId(), "uploads", "financeiro-anexos");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+function parseFinAttachments(row) {
+  try {
+    return JSON.parse(row?.anexos || "[]");
+  } catch {
+    return [];
+  }
+}
+
+// Caminho de destino para um anexo que está sendo gravado em streaming. O id
+// nasce antes porque o arquivo começa a ser escrito enquanto ainda chega.
+export function newFinAttachmentTarget() {
+  const id = uid();
+  return { id, path: path.join(finAttachmentsUploadsDir(), id) };
+}
+
+// Registra no lançamento um arquivo que já está no disco.
+export function registerFinAttachment(lancamentoId, { id, name, mimeType, size }) {
+  const row = getDb().prepare("SELECT anexos FROM financeiro_lancamentos WHERE id = ?").get(lancamentoId);
+  if (!row) return null;
+  const anexos = parseFinAttachments(row);
+  anexos.push({ id, name, mimeType: mimeType || "application/octet-stream", size, addedAt: new Date().toISOString() });
+  getDb().prepare("UPDATE financeiro_lancamentos SET anexos = ? WHERE id = ?").run(JSON.stringify(anexos), lancamentoId);
+  return anexos;
+}
+
+export function removeFinAttachment(lancamentoId, anexoId) {
+  const row = getDb().prepare("SELECT anexos FROM financeiro_lancamentos WHERE id = ?").get(lancamentoId);
+  if (!row) return null;
+  const anexos = parseFinAttachments(row);
+  const alvo = anexos.find((a) => a.id === anexoId);
+  const restantes = anexos.filter((a) => a.id !== anexoId);
+  if (alvo) discardFinAttachmentFile(path.join(finAttachmentsUploadsDir(), alvo.id));
+  getDb().prepare("UPDATE financeiro_lancamentos SET anexos = ? WHERE id = ?").run(JSON.stringify(restantes), lancamentoId);
+  return restantes;
+}
+
+export function getFinAttachmentFile(lancamentoId, anexoId) {
+  const row = getDb().prepare("SELECT anexos FROM financeiro_lancamentos WHERE id = ?").get(lancamentoId);
+  if (!row) return null;
+  const anexo = parseFinAttachments(row).find((a) => a.id === anexoId);
+  if (!anexo) return null;
+  const filePath = path.join(finAttachmentsUploadsDir(), anexo.id);
+  if (!fs.existsSync(filePath)) return null;
+  return { path: filePath, name: anexo.name, mimeType: anexo.mimeType };
+}
+
+export function discardFinAttachmentFile(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch {
+    /* arquivo pode nem ter sido criado */
+  }
 }
 
 // ---------- Apropriação (rateio) por centro de custo ----------

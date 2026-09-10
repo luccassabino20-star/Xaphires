@@ -132,7 +132,14 @@ export default function FinanceiroModule({ onExit }) {
         {!sidebarRecolhida && <div className="sidebar-backdrop" onClick={() => setSidebarRecolhida(true)} />}
 
         <div className="fin-body">
-          {aba === "lancamentos" && <LancamentosView />}
+          {aba === "lancamentos" && (
+            <LancamentosView
+              onGerarCobranca={(prefill) => {
+                setCobrancaPrefill(prefill);
+                setAba("cobrancas");
+              }}
+            />
+          )}
           {aba === "titulos" && (
             <TitulosView
               onGerarCobranca={(prefill) => {

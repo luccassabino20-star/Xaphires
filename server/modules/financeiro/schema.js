@@ -274,6 +274,11 @@ export function applyFinanceiroSchema(companyDb) {
   // movimento normal).
   addColumn(companyDb, "financeiro_lancamentos", "estornado_em", "estornado_em TEXT");
 
+  // Anexos do lançamento (NF-e, contrato, comprovante) - mesmo desenho de
+  // cards.attachments: array JSON guardado como texto, um arquivo por item
+  // gravado em disco fora do banco (ver uploads/financeiro-anexos em repo.js).
+  addColumn(companyDb, "financeiro_lancamentos", "anexos", "anexos TEXT NOT NULL DEFAULT '[]'");
+
   // Classe (categoria) por linha do rateio, além do centro. A apropriação nasceu
   // só com centro (rateio do detalhe do título); o Lançamento Manual dos Movimentos
   // rateia por Classe E Centro, então cada linha guarda também a classe. Nulo nas

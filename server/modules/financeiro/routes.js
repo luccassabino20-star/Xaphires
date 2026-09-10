@@ -1,6 +1,8 @@
 import { Router } from "express";
+import fs from "node:fs";
 import { requireAuth, requireWritablePlan, requireModule, requireMaster } from "../../middleware.js";
 import { ah } from "../../asyncHandler.js";
+import { attachmentLimitFor } from "../../plans.js";
 import {
   listCategorias,
   insertCategoria,
@@ -54,6 +56,11 @@ import {
   fecharMes,
   reabrirMes,
   mesFechado,
+  newFinAttachmentTarget,
+  registerFinAttachment,
+  removeFinAttachment,
+  getFinAttachmentFile,
+  discardFinAttachmentFile,
 } from "./repo.js";
 import { seedCategoriasSeVazio } from "./seed.js";
 import { montarFluxo, montarDRE, montarSaldos, montarMovimentacao, montarFluxoCaixaMatriz, listarLancamentosDoGrupo, GRUPOS_DRE_VALIDOS } from "./calculos.js";
@@ -613,19 +620,151 @@ function validarLancamento(body, { parcial } = {}) {
   return null;
 }
 
+// Situação aceita na CRIAÇÃO: só as duas de "ainda não comprometido" - 'disponivel'
+// é uma transição manual dentro do detalhe do título, e finalizado/anulado não
+// nascem prontos (baixa/anulação têm rota própria, com as regras de cada uma).
+const STATUS_CRIACAO = ["provisionado", "pendente"];
+
 router.post(
   "/lancamentos",
   ah(async (req, res) => {
     const erro = validarLancamento(req.body, { parcial: false });
     if (erro) return res.status(400).json(erro);
-    const { tipo, descricao, valorCents, due, emissao, formaPagto, observacao, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte } = req.body;
+    const { tipo, descricao, valorCents, due, emissao, formaPagto, observacao, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte, status } = req.body;
     const criado = insertLancamento({
       tipo, descricao, valorCents, due, emissao, formaPagto, observacao,
       descontoCents, retencaoCents, multaCents, jurosCents,
       categoryId, centroCustoId, contatoId, contaId, doc, contraparte,
+      status: STATUS_CRIACAO.includes(status) ? status : "pendente",
       createdBy: req.user.id,
     });
     res.status(201).json(criado);
+  })
+);
+
+// ---------- Anexos do lançamento (NF-e, contrato, comprovante) ----------
+// Mesmo upload em streaming de routes/cards.js: o arquivo é escrito no disco em
+// pedaços, conforme chega, e nunca existe inteiro na memória - o limite é
+// verificado DURANTE a transferência, não no fim.
+router.post("/lancamentos/:id/anexos", (req, res) => {
+  const limite = attachmentLimitFor(getCompany(req.companyId));
+  const alvo = newFinAttachmentTarget();
+
+  let bb;
+  try {
+    bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: limite } });
+  } catch {
+    return res.status(400).json({ error: "Envio inválido", code: "INVALID_UPLOAD" });
+  }
+
+  let nomeArquivo = "";
+  let tipo = "";
+  let bytes = 0;
+  let excedeu = false;
+  let respondido = false;
+  let saida = null;
+  let descartar = false;
+
+  function apagarQuandoPuder() {
+    descartar = true;
+    if (!saida || saida.destroyed) discardFinAttachmentFile(alvo.path);
+  }
+  function falhar(status, body) {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    res.status(status).json(body);
+  }
+
+  bb.on("file", (_campo, stream, info) => {
+    nomeArquivo = (info.filename || "").trim();
+    tipo = info.mimeType || "application/octet-stream";
+    saida = fs.createWriteStream(alvo.path);
+    saida.on("error", () => falhar(500, { error: "Erro ao gravar o arquivo", code: "UPLOAD_FAILED" }));
+    saida.on("close", () => { if (descartar) discardFinAttachmentFile(alvo.path); });
+
+    stream.on("data", (chunk) => { bytes += chunk.length; });
+    stream.on("limit", () => {
+      excedeu = true;
+      stream.unpipe(saida);
+      saida.end();
+      falhar(400, {
+        error: `Arquivo deve ter até ${Math.round(limite / 1024 / 1024)} MB`,
+        code: "FILE_TOO_LARGE",
+        maxBytes: limite,
+      });
+    });
+    stream.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+    stream.pipe(saida);
+  });
+
+  bb.on("error", () => falhar(400, { error: "Falha ao receber o arquivo", code: "UPLOAD_FAILED" }));
+
+  // Os eventos do busboy nascem do socket, de fora do AsyncLocalStorage do
+  // requireAuth - precisa reentrar no contexto da empresa pra getDb() saber
+  // qual banco abrir (mesma armadilha de routes/cards.js).
+  function registrar() {
+    if (respondido || excedeu) return;
+    try {
+      const anexos = runWithCompany(req.companyId, () =>
+        registerFinAttachment(req.params.id, { id: alvo.id, name: nomeArquivo, mimeType: tipo, size: bytes })
+      );
+      if (!anexos) return falhar(404, { error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+      respondido = true;
+      res.status(201).json({ anexos });
+    } catch (err) {
+      console.error("Falha ao registrar anexo do lançamento:", err);
+      falhar(500, { error: "Erro ao salvar o anexo", code: "ATTACHMENT_SAVE_FAILED" });
+    }
+  }
+
+  bb.on("close", () => {
+    if (respondido || excedeu) return;
+    if (!nomeArquivo || bytes === 0) return falhar(400, { error: "Arquivo inválido", code: "FILE_REQUIRED" });
+    if (saida && !saida.writableFinished) {
+      saida.once("finish", registrar);
+      return;
+    }
+    registrar();
+  });
+
+  req.on("aborted", () => {
+    if (respondido) return;
+    respondido = true;
+    apagarQuandoPuder();
+    req.unpipe(bb);
+    saida?.destroy();
+  });
+
+  req.pipe(bb);
+});
+
+router.delete(
+  "/lancamentos/:id/anexos/:anexoId",
+  ah(async (req, res) => {
+    const anexos = removeFinAttachment(req.params.id, req.params.anexoId);
+    if (!anexos) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    res.json({ anexos });
+  })
+);
+
+// mimeType vem do Content-Type que quem fez upload mandou - não confiável.
+// Mesma lista de tipos seguros de routes/cards.js: só esses são servidos
+// inline, o resto força download (evita HTML/script rodando na origem do app).
+const TIPOS_SEGUROS_PARA_INLINE = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "application/pdf"]);
+
+router.get(
+  "/lancamentos/:id/anexos/:anexoId/download",
+  ah(async (req, res) => {
+    const file = getFinAttachmentFile(req.params.id, req.params.anexoId);
+    if (!file) return res.status(404).json({ error: "Arquivo não encontrado", code: "ATTACHMENT_NOT_FOUND" });
+    const safeName = String(file.name).replace(/[\r\n"]/g, "");
+    const inline = TIPOS_SEGUROS_PARA_INLINE.has(file.mimeType);
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", inline ? file.mimeType : "application/octet-stream");
+    res.setHeader("Content-Disposition", `${inline ? "inline" : "attachment"}; filename="${safeName}"`);
+    res.sendFile(file.path);
   })
 );
 

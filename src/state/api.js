@@ -375,6 +375,36 @@ export const finDefinirApropriacoes = (id, itens) => request(`/financeiro/lancam
 export const finAplicarImposto = (id, impostoId) => request(`/financeiro/lancamentos/${id}/impostos`, { method: "POST", body: { impostoId } });
 export const finRemoverImpostoAplicado = (id, aplicadoId) => request(`/financeiro/lancamentos/${id}/impostos/${aplicadoId}`, { method: "DELETE" });
 export const finDeleteLancamento = (id) => request(`/financeiro/lancamentos/${id}`, { method: "DELETE" });
+// Anexos do lançamento (NF-e, contrato, comprovante) - mesmo desenho de
+// addFileAttachment/removeCardAttachment/attachmentDownloadUrl (cartão do
+// Kanban): upload não passa pelo request(), o corpo é multipart montado pelo
+// próprio navegador, e o arquivo vai em streaming.
+export async function finAddAttachment(lancamentoId, file) {
+  const form = new FormData();
+  form.append("file", file, file.name);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/lancamentos/${lancamentoId}/anexos`, { method: "POST", body: form, credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* sem corpo */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+export const finRemoveAttachment = (lancamentoId, anexoId) =>
+  request(`/financeiro/lancamentos/${lancamentoId}/anexos/${anexoId}`, { method: "DELETE" });
+export const finAttachmentDownloadUrl = (lancamentoId, anexoId) => `${BASE}/financeiro/lancamentos/${lancamentoId}/anexos/${anexoId}/download`;
 export const finGetFluxo = (ano) => request(`/financeiro/fluxo?ano=${ano}`);
 export const finGetDRE = (de, ate) => request(`/financeiro/dre?de=${de}&ate=${ate}`);
 // Fluxo de Caixa em matriz (DRE de caixa por período) - visão alternativa ao
