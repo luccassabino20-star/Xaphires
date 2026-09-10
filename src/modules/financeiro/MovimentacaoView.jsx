@@ -428,7 +428,7 @@ export default function MovimentacaoView() {
       )}
       {conciliacaoAberta && (
         <ConciliacaoFechamentoDrawer
-          resultado={resultado} de={aplicado?.de} ate={aplicado?.ate} lang={lang}
+          resultado={resultado} de={aplicado?.de} ate={aplicado?.ate} lang={lang} catById={catById}
           onClose={() => setConciliacaoAberta(false)} onChanged={refiltrar}
         />
       )}

@@ -844,7 +844,15 @@
         "somenteMaster": "Only the company's master can close or reopen a month",
         "reabrir": "Reopen",
         "mesFechadoToast": "{{mes}} closed",
-        "mesReabertoToast": "{{mes}} reopened"
+        "mesReabertoToast": "{{mes}} reopened",
+        "saldoRegistrado": "Recorded Balance (IRES OS)",
+        "saldoConferidoLabel": "Reconciled Balance (Bank Statement)",
+        "divergenciaLabel": "Difference to Reconcile",
+        "pendentesSecaoTitulo": "Entries Pending Reconciliation",
+        "pendentesBadge": "{{count}} pending",
+        "pendentesBadge_other": "{{count}} pending",
+        "statusAberto": "Open for Editing",
+        "statusFechado": "Month Closed"
       }
     },
     "baixa": { "semConta": "No account", "confirmar": "Confirm" },

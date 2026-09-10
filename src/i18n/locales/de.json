@@ -544,7 +544,15 @@
         "somenteMaster": "Nur der Master des Unternehmens kann einen Monat abschließen oder wieder öffnen",
         "reabrir": "Wieder öffnen",
         "mesFechadoToast": "{{mes}} abgeschlossen",
-        "mesReabertoToast": "{{mes}} wieder geöffnet"
+        "mesReabertoToast": "{{mes}} wieder geöffnet",
+        "saldoRegistrado": "Erfasster Saldo (IRES OS)",
+        "saldoConferidoLabel": "Abgeglichener Saldo (Kontoauszug)",
+        "divergenciaLabel": "Abzugleichende Differenz",
+        "pendentesSecaoTitulo": "Ausstehende Buchungen zum Abgleich",
+        "pendentesBadge": "{{count}} ausstehend",
+        "pendentesBadge_other": "{{count}} ausstehend",
+        "statusAberto": "Offen zur Bearbeitung",
+        "statusFechado": "Monat Geschlossen"
       }
     },
     "baixa": { "semConta": "Kein Konto", "confirmar": "Bestätigen" },

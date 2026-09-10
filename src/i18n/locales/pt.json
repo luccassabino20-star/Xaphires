@@ -844,7 +844,15 @@
         "somenteMaster": "Só o master da empresa pode fechar ou reabrir um mês",
         "reabrir": "Reabrir",
         "mesFechadoToast": "{{mes}} fechado",
-        "mesReabertoToast": "{{mes}} reaberto"
+        "mesReabertoToast": "{{mes}} reaberto",
+        "saldoRegistrado": "Saldo Registrado (IRES OS)",
+        "saldoConferidoLabel": "Saldo Conferido (Extrato Bancário)",
+        "divergenciaLabel": "Divergência a Conciliar",
+        "pendentesSecaoTitulo": "Lançamentos Pendentes de Conciliação",
+        "pendentesBadge": "{{count}} pendente",
+        "pendentesBadge_other": "{{count}} pendentes",
+        "statusAberto": "Aberto para Edição",
+        "statusFechado": "Mês Fechado"
       }
     },
     "baixa": { "semConta": "Sem conta", "confirmar": "Confirmar" },

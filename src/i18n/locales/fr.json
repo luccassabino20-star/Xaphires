@@ -544,7 +544,15 @@
         "somenteMaster": "Seul le master de l'entreprise peut clôturer ou rouvrir un mois",
         "reabrir": "Rouvrir",
         "mesFechadoToast": "{{mes}} clôturé",
-        "mesReabertoToast": "{{mes}} rouvert"
+        "mesReabertoToast": "{{mes}} rouvert",
+        "saldoRegistrado": "Solde Enregistré (IRES OS)",
+        "saldoConferidoLabel": "Solde Rapproché (Relevé Bancaire)",
+        "divergenciaLabel": "Écart à Rapprocher",
+        "pendentesSecaoTitulo": "Écritures en Attente de Rapprochement",
+        "pendentesBadge": "{{count}} en attente",
+        "pendentesBadge_other": "{{count}} en attente",
+        "statusAberto": "Ouvert à la Modification",
+        "statusFechado": "Mois Clôturé"
       }
     },
     "baixa": { "semConta": "Sans compte", "confirmar": "Confirmer" },

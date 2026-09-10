@@ -10110,21 +10110,76 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .mov-grupo { margin-bottom: 18px; }
 .mov-grupo-data { font-size: 13px; font-weight: 650; color: var(--text-secondary); margin: 0 0 8px; text-transform: capitalize; }
 
-/* Painel de Conciliação & Fechamento - modal mais largo que o padrão. */
-.mov-conciliacao-modal { max-width: 640px; }
-.mov-conciliacao-confronto {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 14px;
-  padding: 16px 18px;
-  background: var(--bg-list);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  margin-bottom: 8px;
+/* Painel de Conciliação & Fechamento - modal bem amplo (Ultra-Premium), bem
+   mais largo que o padrão de 620px de .contato-form-modal (herda dessa
+   classe o blur/radius/animação, só o max-width é sobrescrito aqui) -
+   pedido explícito pra ficar "visualmente grande", texto e cards também
+   maiores que o resto do app, só dentro deste modal (seletores descendentes,
+   não mexe no .fin-kpi usado nas outras telas). */
+/* .modal.mov-conciliacao-modal (duas classes) de propósito: .contato-form-modal
+   (uma classe, max-width:620px) vem DEPOIS no arquivo e venceria no empate de
+   especificidade - confirmado testando no navegador (getComputedStyle
+   mostrava 620px mesmo com a regra de 1200px escrita aqui). */
+.modal.mov-conciliacao-modal { max-width: 1200px; padding: 32px 36px 36px; }
+.mov-conciliacao-modal .cobr-form-header-icon { width: 52px; height: 52px; }
+.mov-conciliacao-modal .cobr-form-title { font-size: 22px; }
+.mov-conciliacao-modal .cobr-form-subtitle { font-size: 14.5px; }
+.mov-conciliacao-modal .fin-kpi { padding: 22px 24px; }
+.mov-conciliacao-modal .fin-kpi-label { font-size: 14px; }
+.mov-conciliacao-modal .fin-kpi-value { font-size: 30px; }
+.mov-conciliacao-modal .fin-mov-titulo { font-size: 16px; }
+.mov-conciliacao-modal .fin-count-pill { font-size: 12.5px; padding: 3px 12px; }
+.mov-conciliacao-modal .mov-conciliacao-item { padding: 14px 16px; }
+.mov-conciliacao-modal .mov-conciliacao-item-desc { font-size: 14.5px; }
+.mov-conciliacao-modal .mov-conciliacao-item-data { font-size: 12.5px; }
+.mov-conciliacao-modal .mov-conciliacao-item .fin-num,
+.mov-conciliacao-modal .mov-conciliacao-item .mov-badge-tipo-entrada,
+.mov-conciliacao-modal .mov-conciliacao-item .mov-badge-tipo-saida { font-size: 13.5px; }
+.mov-conciliacao-modal .mov-mes-picker select { font-size: 14.5px; }
+.mov-conciliacao-modal .mov-fechamento-pill { font-size: 12.5px; padding: 4px 12px; }
+.mov-conciliacao-modal .mov-conciliacao-lista { max-height: 340px; }
+/* Ícone do header circular com fundo em gradiente pastel sobre --accent -
+   pedido explicitamente "circular", diferente do quadrado 12px padrão de
+   .cobr-form-header-icon usado nos outros modais. */
+.mov-conciliacao-icone {
+  border-radius: 999px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 6%, transparent));
 }
+/* Card de Divergência quando ela existe (≠ 0) - fundo vermelho pastel, não só
+   texto colorido (diferente de .fin-kpi-atrasado, que só cora o valor). */
+.fin-kpi-alerta { background: color-mix(in srgb, var(--danger) 10%, var(--bg-card)); border-color: color-mix(in srgb, var(--danger) 25%, var(--border-subtle)); }
+.fin-kpi-alerta .fin-kpi-value { color: var(--danger); }
+
+/* Pílula de contagem genérica (não amarrada a este modal) - usada ao lado de
+   um título de seção pra separar "quantos" do texto do título. */
+.fin-count-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 2px 10px; font-size: 11.5px; font-weight: 650; border-radius: 999px;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.fin-mov-titulo-linha { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; }
+.fin-mov-titulo-linha .fin-mov-titulo { margin: 0; }
+.fin-mov-titulo-linha:first-of-type { margin-top: 4px; }
+
+/* Seletor de mês "vestido" - ícone de calendário + <select> de verdade por
+   baixo (acessível), transparente, com a seta própria por cima. */
+.mov-mes-picker {
+  position: relative; flex: 1; display: flex; align-items: center; gap: 8px;
+  padding: 9px 30px 9px 12px; color: var(--text-secondary);
+  background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 10px;
+}
+.mov-mes-picker select {
+  position: absolute; inset: 0; width: 100%; height: 100%; padding: 0 30px 0 34px;
+  appearance: none; -webkit-appearance: none; border: none; background: none; outline: none;
+  font-size: 13.5px; font-weight: 600; color: var(--text-primary); cursor: pointer;
+}
+.mov-mes-picker-chevron { position: absolute; right: 10px; pointer-events: none; color: var(--text-muted); }
 .mov-conciliacao-lista { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; margin-bottom: 8px; }
+/* Grid de 4 colunas (Descrição+Data / Tipo·Categoria / Valor / Ação) - era
+   flex antes, com só 3 blocos; a coluna de badge Tipo/Categoria é nova. */
 .mov-conciliacao-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 0.9fr auto;
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
@@ -10132,12 +10187,13 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
 }
-.mov-conciliacao-item-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.mov-conciliacao-item-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .mov-conciliacao-item-desc { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .mov-conciliacao-item-data { font-size: 11.5px; color: var(--text-muted); }
+.mov-conciliacao-item .mov-badge-tipo-entrada, .mov-conciliacao-item .mov-badge-tipo-saida { justify-self: start; }
+.mov-conciliacao-item .fin-num { text-align: right; }
 
 .mov-fechamento-acao { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.mov-fechamento-acao select { flex: 1; }
 .mov-fechamento-lista { display: flex; flex-direction: column; gap: 6px; }
 .mov-fechamento-item {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;

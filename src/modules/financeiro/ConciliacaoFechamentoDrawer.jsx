@@ -21,6 +21,13 @@ function IconCheck({ size = 14 }) {
     </svg>
   );
 }
+function IconCalendar({ size = 15 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3.5" y="5" width="17" height="16" rx="2.5" /><path d="M8 3v4M16 3v4M3.5 10h17" />
+    </svg>
+  );
+}
 
 // Meses civis 'YYYY-MM' entre de/ate (inclusive), na ordem em que aparecem.
 function mesesNoPeriodo(de, ate) {
@@ -45,7 +52,7 @@ function rotuloMes(anoMes, lang) {
 // saldoAtual vs saldoConferido, calculos.montarMovimentacao), lista dos
 // finalizados ainda não conferidos com um toque pra marcar, e o fechamento
 // mensal (trava real, ver bloqueadoPorFechamento em routes.js).
-export default function ConciliacaoFechamentoDrawer({ resultado, de, ate, lang, onClose, onChanged }) {
+export default function ConciliacaoFechamentoDrawer({ resultado, de, ate, lang, catById = {}, onClose, onChanged }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const showToast = useToast();
@@ -124,7 +131,7 @@ export default function ConciliacaoFechamentoDrawer({ resultado, de, ate, lang, 
         <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>&times;</button>
 
         <div className="cobr-form-header">
-          <span className="cobr-form-header-icon"><IconLock size={20} /></span>
+          <span className="cobr-form-header-icon mov-conciliacao-icone"><IconLock size={20} /></span>
           <div>
             <h2 className="cobr-form-title">{t("financeiro.movimentacao.conciliacao.titulo")}</h2>
             <p className="cobr-form-subtitle">{t("financeiro.movimentacao.conciliacao.subtitulo")}</p>
@@ -137,22 +144,25 @@ export default function ConciliacaoFechamentoDrawer({ resultado, de, ate, lang, 
           <p className="cobr-form-subtitle">{t("financeiro.mov.filtrePrompt")}</p>
         ) : (
           <>
-            <div className="mov-conciliacao-confronto">
-              <div>
-                <span className="fin-kpi-label">{t("financeiro.mov.saldoAtual")}</span>
-                <strong className="fin-kpi-value">{formatCents(resultado.saldoAtual, lang)}</strong>
+            <div className="fin-kpis">
+              <div className="fin-kpi">
+                <span className="fin-kpi-label">{t("financeiro.movimentacao.conciliacao.saldoRegistrado")}</span>
+                <span className="fin-kpi-value">{formatCents(resultado.saldoAtual, lang)}</span>
               </div>
-              <div>
-                <span className="fin-kpi-label">{t("financeiro.mov.saldoConferido")}</span>
-                <strong className="fin-kpi-value">{formatCents(resultado.saldoConferido, lang)}</strong>
+              <div className="fin-kpi">
+                <span className="fin-kpi-label">{t("financeiro.movimentacao.conciliacao.saldoConferidoLabel")}</span>
+                <span className="fin-kpi-value">{formatCents(resultado.saldoConferido, lang)}</span>
               </div>
-              <div>
-                <span className="fin-kpi-label">{t("financeiro.movimentacao.conciliacao.divergencia")}</span>
-                <strong className={"fin-kpi-value " + (divergencia === 0 ? "fin-receber" : "fin-pagar")}>{formatCents(divergencia, lang)}</strong>
+              <div className={"fin-kpi " + (divergencia === 0 ? "fin-kpi-receber" : "fin-kpi-alerta")}>
+                <span className="fin-kpi-label">{t("financeiro.movimentacao.conciliacao.divergenciaLabel")}</span>
+                <span className="fin-kpi-value">{formatCents(divergencia, lang)}</span>
               </div>
             </div>
 
-            <h3 className="fin-mov-titulo">{t("financeiro.movimentacao.conciliacao.pendentesTitulo", { count: pendentes.length })}</h3>
+            <div className="fin-mov-titulo-linha">
+              <h3 className="fin-mov-titulo">{t("financeiro.movimentacao.conciliacao.pendentesSecaoTitulo")}</h3>
+              <span className="fin-count-pill">{t("financeiro.movimentacao.conciliacao.pendentesBadge", { count: pendentes.length })}</span>
+            </div>
             {pendentes.length === 0 ? (
               <p className="cobr-form-subtitle">{t("financeiro.movimentacao.conciliacao.semPendencias")}</p>
             ) : (
@@ -163,6 +173,10 @@ export default function ConciliacaoFechamentoDrawer({ resultado, de, ate, lang, 
                       <span className="mov-conciliacao-item-desc">{m.descricao || "-"}</span>
                       <span className="mov-conciliacao-item-data">{m.data?.split("-").reverse().join("/")}</span>
                     </div>
+                    <span className={"mov-badge-tipo-" + (m.tipo === "receber" ? "entrada" : "saida")}>
+                      {t("financeiro.movimentacao." + (m.tipo === "receber" ? "entrada" : "saida"))}
+                      {catById[m.category_id] ? ` / ${catById[m.category_id].nome}` : ""}
+                    </span>
                     <span className={"fin-num " + (m.tipo === "receber" ? "fin-receber" : "fin-pagar")}>
                       {m.tipo === "receber" ? "+" : "-"} {formatCents(m.valor_cents, lang)}
                     </span>
@@ -183,19 +197,26 @@ export default function ConciliacaoFechamentoDrawer({ resultado, de, ate, lang, 
           <>
             {meses.length > 0 && (
               <div className="mov-fechamento-acao">
-                <select value={mesEscolhido} onChange={(e) => setMesEscolhido(e.target.value)}>
-                  {meses.map((m) => (
-                    <option key={m} value={m} disabled={fechadoSet.has(m)}>
-                      {rotuloMes(m, lang)}{fechadoSet.has(m) ? ` (${t("financeiro.movimentacao.conciliacao.jaFechado")})` : ""}
-                    </option>
-                  ))}
-                </select>
+                <label className="mov-mes-picker">
+                  <IconCalendar />
+                  <select value={mesEscolhido} onChange={(e) => setMesEscolhido(e.target.value)}>
+                    {meses.map((m) => (
+                      <option key={m} value={m} disabled={fechadoSet.has(m)}>
+                        {rotuloMes(m, lang)}{fechadoSet.has(m) ? ` (${t("financeiro.movimentacao.conciliacao.jaFechado")})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <svg className="mov-mes-picker-chevron" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z" /></svg>
+                </label>
+                <span className={"mov-fechamento-pill " + (fechadoSet.has(mesEscolhido) ? "mov-fechamento-pill-fechado" : "mov-fechamento-pill-aberto")}>
+                  {t(fechadoSet.has(mesEscolhido) ? "financeiro.movimentacao.conciliacao.statusFechado" : "financeiro.movimentacao.conciliacao.statusAberto")}
+                </span>
                 <button
                   type="button" className="recurrence-btn-primary" onClick={fecharMes}
                   disabled={!ehMaster || processando || fechadoSet.has(mesEscolhido)}
                   title={!ehMaster ? t("financeiro.movimentacao.conciliacao.somenteMaster") : undefined}
                 >
-                  {t("financeiro.movimentacao.conciliacao.fecharMes")}
+                  <IconLock size={14} /> {t("financeiro.movimentacao.conciliacao.fecharMes")}
                 </button>
               </div>
             )}
