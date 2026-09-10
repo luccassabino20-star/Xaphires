@@ -289,6 +289,48 @@ export const finMovimentacao = ({ contaId, de, ate, estornados } = {}) => {
   if (estornados) qs.set("estornados", "1");
   return request(`/financeiro/movimentacao?${qs.toString()}`);
 };
+// Fechamento mensal (Movimentação → Conciliação & Fechamento).
+export const finListFechamentos = () => request("/financeiro/fechamentos");
+export const finFecharMes = (anoMes) => request("/financeiro/fechamentos", { method: "POST", body: { anoMes } });
+export const finReabrirMes = (anoMes) => request(`/financeiro/fechamentos/${anoMes}`, { method: "DELETE" });
+// Mesmo desenho de finExportContatos: fetch com cookie, monta blob, nome do
+// arquivo vem do Content-Disposition que o servidor já decidiu.
+export async function finExportMovimentacao({ contaId, de, ate, estornados, formato, lang }) {
+  const p = new URLSearchParams({ de, ate, formato: formato || "csv" });
+  if (contaId) p.set("contaId", contaId);
+  if (estornados) p.set("estornados", "1");
+  if (lang) p.set("lang", lang);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/movimentacao/export?${p}`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      /* resposta sem corpo JSON */
+    }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  const disposicao = res.headers.get("Content-Disposition") || "";
+  const casado = /filename="?([^";]+)"?/i.exec(disposicao);
+  const nome = casado ? casado[1] : `movimentacao.${formato || "csv"}`;
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 export const finMudarStatus = (id, status) => request(`/financeiro/lancamentos/${id}/status`, { method: "PATCH", body: { status } });
 export const finDesdobrarLancamento = (id, dados) => request(`/financeiro/lancamentos/${id}/desdobrar`, { method: "POST", body: dados });
 export const finListImpostosAplicados = (id) => request(`/financeiro/lancamentos/${id}/impostos`);

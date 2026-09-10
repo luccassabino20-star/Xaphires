@@ -665,6 +665,27 @@ export function definirConferido(id, conferido) {
   return getLancamento(id);
 }
 
+// ---------- Fechamento mensal ----------
+export function listFechamentos() {
+  return getDb().prepare("SELECT * FROM financeiro_fechamentos_mes ORDER BY ano_mes DESC").all();
+}
+export function fecharMes(anoMes, userId) {
+  getDb()
+    .prepare("INSERT OR REPLACE INTO financeiro_fechamentos_mes (ano_mes, fechado_em, fechado_por) VALUES (?, ?, ?)")
+    .run(anoMes, new Date().toISOString(), userId || null);
+  return getDb().prepare("SELECT * FROM financeiro_fechamentos_mes WHERE ano_mes = ?").get(anoMes);
+}
+export function reabrirMes(anoMes) {
+  getDb().prepare("DELETE FROM financeiro_fechamentos_mes WHERE ano_mes = ?").run(anoMes);
+}
+// Puro (sem checar papel de usuário - isso é autorização, mora em routes.js):
+// o mês de uma data civil 'YYYY-MM-DD' está fechado?
+export function mesFechado(dataCivil) {
+  if (!dataCivil) return false;
+  const anoMes = String(dataCivil).slice(0, 7);
+  return !!getDb().prepare("SELECT 1 FROM financeiro_fechamentos_mes WHERE ano_mes = ?").get(anoMes);
+}
+
 // Movimentação de uma conta: os títulos FINALIZADOS apontando para ela (a fonte
 // dos saldos do período). Ordenados pela data da baixa. calculos.montarMovimentacao
 // filtra por período em JS, coerente com o resto do módulo.

@@ -155,6 +155,17 @@ export function applyFinanceiroSchema(companyDb) {
       created_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_fin_apropriacoes_titulo ON financeiro_apropriacoes(lancamento_id);
+
+    -- Fechamento mensal (trava contábil): uma linha PRESENTE trava o mês contra
+    -- edição/exclusão/baixa/estorno/conferência/imposto/apropriação/desdobramento
+    -- de qualquer lançamento datado nele (ver bloqueadoPorFechamento em routes.js).
+    -- Reabrir é DELETE da linha - não existe "fechado" como flag numa tabela maior,
+    -- porque o mês em si não é uma entidade que já exista em lugar nenhum.
+    CREATE TABLE IF NOT EXISTS financeiro_fechamentos_mes (
+      ano_mes TEXT PRIMARY KEY,
+      fechado_em TEXT NOT NULL,
+      fechado_por TEXT REFERENCES users(id)
+    );
   `);
 
   // Colunas acrescentadas depois do MVP - mesmo padrão addColumnIfMissing de

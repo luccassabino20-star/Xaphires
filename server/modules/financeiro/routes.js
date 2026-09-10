@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAuth, requireWritablePlan, requireModule } from "../../middleware.js";
+import { requireAuth, requireWritablePlan, requireModule, requireMaster } from "../../middleware.js";
 import { ah } from "../../asyncHandler.js";
 import {
   listCategorias,
@@ -50,6 +50,10 @@ import {
   definirApropriacoes,
   ApropriacaoError,
   importarExtrato,
+  listFechamentos,
+  fecharMes,
+  reabrirMes,
+  mesFechado,
 } from "./repo.js";
 import { seedCategoriasSeVazio } from "./seed.js";
 import { montarFluxo, montarDRE, montarSaldos, montarMovimentacao, montarFluxoCaixaMatriz, listarLancamentosDoGrupo, GRUPOS_DRE_VALIDOS } from "./calculos.js";
@@ -84,6 +88,7 @@ import {
 import { estagio, valorAtualizadoCents, montarMensagem, varrerRecorrencias } from "./cobrancaEngine.js";
 import { resolverGateway, metodoValido as metodoCobrancaValido } from "./gateway/index.js";
 import { montarExportContatos, gerarContatosCsv, gerarContatosPdf } from "./contatosExport.js";
+import { montarExportMovimentacao, gerarMovimentacaoCsv, gerarMovimentacaoPdf } from "./movimentacaoExport.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -117,6 +122,22 @@ const STATUS_ABERTOS = ["provisionado", "pendente", "disponivel"];
 const STATUS_MANUAIS = ["provisionado", "pendente", "disponivel", "anulado"];
 // Tesouraria (Contas correntes): enum fechado de tipo de conta.
 const TIPO_CONTA_VALIDOS = ["conta_corrente", "poupanca", "pagamento", "cartao_credito", "caixa"];
+
+// Fechamento mensal: barra qualquer rota que mude um lançamento datado num mês
+// já fechado, a menos que quem pede seja master da empresa (não há outro nível
+// de admin dentro do Financeiro). Responde e devolve true quando bloqueou -
+// a rota chamadora só precisa checar o retorno e sair (return) se vier true.
+// Recebe as datas relevantes daquela mutação específica (devido, baixa, etc);
+// datas undefined/null são ignoradas (nem toda rota mexe em toda data).
+function bloqueadoPorFechamento(req, res, ...datasCiveis) {
+  if (req.user?.role === "master") return false;
+  const travado = datasCiveis.some((d) => d && mesFechado(d));
+  if (travado) {
+    res.status(400).json({ error: "Este mês está fechado para lançamentos. Peça a um master para reabrir.", code: "FIN_MES_FECHADO" });
+    return true;
+  }
+  return false;
+}
 
 function valorCentsValido(v) {
   return Number.isInteger(v) && v > 0;
@@ -398,6 +419,41 @@ router.get("/movimentacao", ah(async (req, res) => {
   res.json(montarMovimentacao(contaId, de, ate, { incluirEstornados }));
 }));
 
+// Exportação CSV/PDF da movimentação - mesmos parâmetros do GET /movimentacao
+// acima (uma conta, ou "all" para todas as ativas somadas), recalculado aqui
+// (nunca confia em linha que o cliente mande) - mesma fonte única de sempre.
+// Os chips de Tipo/Conciliação/busca da tela são filtro de exibição em
+// memória, não entram no export: o arquivo sai com o período inteiro, e quem
+// abrir filtra de novo na planilha se quiser um recorte menor.
+router.get("/movimentacao/export", ah(async (req, res) => {
+  const { contaId, de, ate } = req.query;
+  if (!DATA_CIVIL.test(de || "") || !DATA_CIVIL.test(ate || ""))
+    return res.status(400).json({ error: "Informe o período (data início e data fim)", code: "FIN_DATE_INVALID" });
+  if (de > ate)
+    return res.status(400).json({ error: "A data de início não pode ser maior que a data de fim", code: "FIN_PERIODO_INVALIDO" });
+  const incluirEstornados = req.query.estornados === "1" || req.query.estornados === "true";
+  const formato = req.query.formato === "pdf" ? "pdf" : "csv";
+  const lang = LOCALES.includes(req.query.lang) ? req.query.lang : "pt";
+
+  const contasAlvo = !contaId || contaId === "all" ? listContas().filter((c) => c.ativo === 1) : [getConta(contaId)].filter(Boolean);
+  if (!contasAlvo.length) return res.status(400).json({ error: "Selecione uma conta", code: "FIN_CONTA_NOT_FOUND" });
+  const movimentos = contasAlvo.flatMap((c) => {
+    const r = montarMovimentacao(c.id, de, ate, { incluirEstornados });
+    return (r?.movimentos || []).map((m) => ({ ...m, banco: c.banco, contaNome: c.nome }));
+  });
+  const linhas = montarExportMovimentacao(movimentos, lang);
+  if (formato === "pdf") {
+    const buffer = await gerarMovimentacaoPdf(linhas, lang);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'attachment; filename="movimentacao.pdf"');
+    return res.send(buffer);
+  }
+  const buffer = gerarMovimentacaoCsv(linhas, lang);
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="movimentacao.csv"');
+  res.send(buffer);
+}));
+
 // Lançamento Manual dos Movimentos: cria UM título já classificado por Movimento
 // (tarifa, juros, aplicação...), que decide a direção débito/crédito. Nasce EM
 // ABERTO (pendente) na conta escolhida - a baixa fica para Títulos/Movimentação.
@@ -557,6 +613,7 @@ router.patch(
   ah(async (req, res) => {
     const atual = getLancamento(req.params.id);
     if (!atual) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, atual.due, req.body?.due)) return;
     const erro = validarLancamento(req.body, { parcial: true });
     if (erro) return res.status(400).json(erro);
     // Título FECHADO (finalizado/anulado) não muda de dinheiro nem de data: alterar
@@ -609,6 +666,7 @@ router.post(
   ah(async (req, res) => {
     const l = getLancamento(req.params.id);
     if (!l) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, l.due)) return;
     if (!STATUS_ABERTOS.includes(l.status)) return res.status(400).json({ error: "Só título em aberto pode receber imposto", code: "FIN_IMPOSTO_APLICADO_TITULO_PAGO" });
     if (l.origem === "imposto_aplicado") return res.status(400).json({ error: "Título de imposto não pode receber outro imposto", code: "FIN_IMPOSTO_APLICADO_INVALIDO" });
     const { impostoId } = req.body || {};
@@ -626,6 +684,7 @@ router.delete(
     const aplicado = getImpostoAplicado(req.params.aplicadoId);
     if (!aplicado || aplicado.lancamento_id !== req.params.id)
       return res.status(404).json({ error: "Imposto aplicado não encontrado", code: "FIN_IMPOSTO_APLICADO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, getLancamento(req.params.id)?.due)) return;
     if (aplicado.titulo_gerado_id) {
       const gerado = getLancamento(aplicado.titulo_gerado_id);
       if (gerado?.status === "finalizado")
@@ -651,8 +710,10 @@ router.get(
 router.put(
   "/lancamentos/:id/apropriacoes",
   ah(async (req, res) => {
-    if (!getLancamento(req.params.id))
+    const alvoApropriacao = getLancamento(req.params.id);
+    if (!alvoApropriacao)
       return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, alvoApropriacao.due)) return;
     try {
       res.json(definirApropriacoes(req.params.id, req.body?.itens));
     } catch (e) {
@@ -671,6 +732,7 @@ router.post(
     if (alvo.status === "anulado")
       return res.status(400).json({ error: "Título anulado não pode ser baixado", code: "FIN_STATUS_ANULADO" });
     const paidAt = DATA_CIVIL.test(req.body?.paidAt || "") ? req.body.paidAt : undefined;
+    if (bloqueadoPorFechamento(req, res, alvo.due, paidAt)) return;
     const contaId = req.body?.contaId;
     if (contaId && !getConta(contaId)) return res.status(400).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
     res.json(baixarLancamento(req.params.id, { paidAt, contaId }));
@@ -685,6 +747,7 @@ router.post(
   ah(async (req, res) => {
     const l = getLancamento(req.params.id);
     if (!l) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, l.due)) return;
     if (!STATUS_ABERTOS.includes(l.status)) return res.status(400).json({ error: "Só título em aberto pode ser desdobrado", code: "FIN_PARCELA_PAGO" });
     if (l.origem) return res.status(400).json({ error: "Título gerado não pode ser desdobrado", code: "FIN_PARCELA_INVALIDO" });
     if (l.parcela_total) return res.status(400).json({ error: "Título já está parcelado", code: "FIN_PARCELA_JA" });
@@ -710,8 +773,10 @@ router.post(
 router.post(
   "/lancamentos/:id/estornar",
   ah(async (req, res) => {
-    if (!getLancamento(req.params.id))
+    const alvoEstorno = getLancamento(req.params.id);
+    if (!alvoEstorno)
       return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, alvoEstorno.paid_at)) return;
     res.json(estornarLancamento(req.params.id));
   })
 );
@@ -723,6 +788,7 @@ router.patch(
   ah(async (req, res) => {
     const l = getLancamento(req.params.id);
     if (!l) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, l.due)) return;
     if (l.status !== "finalizado")
       return res.status(400).json({ error: "Só título baixado pode ser conferido", code: "FIN_CONFERIR_NAO_FINALIZADO" });
     res.json(definirConferido(req.params.id, !!req.body?.conferido));
@@ -738,6 +804,7 @@ router.patch(
   ah(async (req, res) => {
     const l = getLancamento(req.params.id);
     if (!l) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, l.due)) return;
     const { status } = req.body || {};
     if (!STATUS_MANUAIS.includes(status))
       return res.status(400).json({ error: "Situação inválida", code: "FIN_STATUS_INVALID" });
@@ -753,6 +820,7 @@ router.delete(
     const l = getLancamento(req.params.id);
     if (!l)
       return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
+    if (bloqueadoPorFechamento(req, res, l.due)) return;
     // Um recolhimento de imposto é gerado por outro título e referenciado na linha
     // de imposto do pai (titulo_gerado_id). Apagá-lo direto deixaria essa referência
     // pendurada e o imposto do pai inflado. O caminho certo é remover o imposto do
@@ -760,6 +828,27 @@ router.delete(
     if (l.origem === "imposto_aplicado")
       return res.status(400).json({ error: "Remova o imposto no título de origem, não apague o recolhimento direto", code: "FIN_DELETE_GERADO" });
     deleteLancamento(req.params.id);
+    res.json({ ok: true });
+  })
+);
+
+// ---------- Fechamento mensal ----------
+const ANO_MES = /^\d{4}-\d{2}$/;
+router.get("/fechamentos", ah(async (req, res) => res.json(listFechamentos())));
+router.post(
+  "/fechamentos",
+  requireMaster,
+  ah(async (req, res) => {
+    const { anoMes } = req.body || {};
+    if (!ANO_MES.test(anoMes || "")) return res.status(400).json({ error: "Informe o mês no formato AAAA-MM", code: "FIN_ANO_MES_INVALID" });
+    res.status(201).json(fecharMes(anoMes, req.user.id));
+  })
+);
+router.delete(
+  "/fechamentos/:anoMes",
+  requireMaster,
+  ah(async (req, res) => {
+    reabrirMes(req.params.anoMes);
     res.json({ ok: true });
   })
 );
