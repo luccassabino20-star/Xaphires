@@ -2332,6 +2332,7 @@
     "WHATSAPP_PHONE_INVALID": "Numéro de téléphone invalide.",
     "WHATSAPP_MESSAGE_INVALID": "Indiquez un numéro et un message.",
     "WHATSAPP_QR_NOT_AVAILABLE": "QR Code indisponible.",
+    "WHATSAPP_PHONE_NOT_FOUND": "Ce numéro n'est pas sur WhatsApp.",
     "FIN_DATE_INVALID": "Date d'échéance invalide.",
     "FIN_PERIODO_INVALIDO": "La date de début ne peut pas être postérieure à la date de fin.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Seul un titre réglé peut être vérifié.",

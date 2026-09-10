@@ -42,7 +42,7 @@ router.post("/send-message", ah(async (req, res) => {
     await whatsapp.sendMessage(req.companyId, phone, text.trim());
     res.json({ ok: true });
   } catch (err) {
-    if (err.code === "WHATSAPP_NOT_READY" || err.code === "WHATSAPP_PHONE_INVALID") {
+    if (err.code === "WHATSAPP_NOT_READY" || err.code === "WHATSAPP_PHONE_INVALID" || err.code === "WHATSAPP_PHONE_NOT_FOUND") {
       return res.status(400).json({ error: err.message, code: err.code });
     }
     throw err;

@@ -137,6 +137,19 @@ export async function disconnect(companyId) {
   return { status: "DISCONNECTED", qr: null, phone: null };
 }
 
+// Telefone cadastrado no Financeiro (financeiro_contatos.telefone) é DDD +
+// número, sem o código do país - o mesmo formato que a pessoa digita em
+// qualquer lugar do Brasil. O JID do WhatsApp exige o número internacional
+// completo (55 na frente); sem isso o Baileys aceita mandar mesmo assim
+// (não valida o destino sozinho) e a mensagem simplesmente nunca chega, sem
+// erro nenhum - foi exatamente o que aconteceu no primeiro teste real.
+function normalizarTelefoneBR(phone) {
+  const digitos = String(phone || "").replace(/\D/g, "");
+  if (digitos.startsWith("55") && (digitos.length === 12 || digitos.length === 13)) return digitos;
+  if (digitos.length === 10 || digitos.length === 11) return "55" + digitos;
+  return digitos;
+}
+
 export async function sendMessage(companyId, phone, text) {
   const estado = sessoes.get(companyId);
   if (!estado || estado.status !== "READY") {
@@ -144,11 +157,21 @@ export async function sendMessage(companyId, phone, text) {
     err.code = "WHATSAPP_NOT_READY";
     throw err;
   }
-  const digitos = String(phone || "").replace(/\D/g, "");
+  const digitos = normalizarTelefoneBR(phone);
   if (!digitos) {
     const err = new Error("Telefone inválido");
     err.code = "WHATSAPP_PHONE_INVALID";
     throw err;
   }
-  await estado.sock.sendMessage(`${digitos}@s.whatsapp.net`, { text });
+  // Confere que o número existe de verdade no WhatsApp antes de mandar - sem
+  // isso, um número com DDD errado (ou qualquer erro de digitação) "envia com
+  // sucesso" sem nunca chegar em lugar nenhum, porque sendMessage() sozinho
+  // não valida o destino. onWhatsApp() também devolve o JID exato a usar.
+  const [info] = (await estado.sock.onWhatsApp(digitos)) || [];
+  if (!info?.exists) {
+    const err = new Error("Este número não está no WhatsApp");
+    err.code = "WHATSAPP_PHONE_NOT_FOUND";
+    throw err;
+  }
+  await estado.sock.sendMessage(info.jid, { text });
 }

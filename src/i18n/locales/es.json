@@ -2488,6 +2488,7 @@
     "WHATSAPP_PHONE_INVALID": "Teléfono inválido.",
     "WHATSAPP_MESSAGE_INVALID": "Ingresa teléfono y mensaje.",
     "WHATSAPP_QR_NOT_AVAILABLE": "Código QR no disponible.",
+    "WHATSAPP_PHONE_NOT_FOUND": "Este número no está en WhatsApp.",
     "FIN_DATE_INVALID": "Fecha de vencimiento inválida.",
     "FIN_PERIODO_INVALIDO": "La fecha de inicio no puede ser mayor que la fecha de fin.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Solo un título liquidado puede conciliarse.",

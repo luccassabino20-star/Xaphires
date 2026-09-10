@@ -2488,6 +2488,7 @@
     "WHATSAPP_PHONE_INVALID": "Invalid phone number.",
     "WHATSAPP_MESSAGE_INVALID": "Enter a phone number and a message.",
     "WHATSAPP_QR_NOT_AVAILABLE": "QR Code not available.",
+    "WHATSAPP_PHONE_NOT_FOUND": "This number is not on WhatsApp.",
     "FIN_DATE_INVALID": "Invalid due date.",
     "FIN_PERIODO_INVALIDO": "The start date cannot be later than the end date.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Only a settled entry can be reconciled.",

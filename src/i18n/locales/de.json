@@ -2158,6 +2158,7 @@
     "WHATSAPP_PHONE_INVALID": "Ungültige Telefonnummer.",
     "WHATSAPP_MESSAGE_INVALID": "Geben Sie Telefonnummer und Nachricht ein.",
     "WHATSAPP_QR_NOT_AVAILABLE": "QR-Code nicht verfügbar.",
+    "WHATSAPP_PHONE_NOT_FOUND": "Diese Nummer ist nicht bei WhatsApp registriert.",
     "FIN_DATE_INVALID": "Ungültiges Fälligkeitsdatum.",
     "FIN_PERIODO_INVALIDO": "Das Startdatum darf nicht nach dem Enddatum liegen.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Nur ein beglichener Titel kann abgeglichen werden.",

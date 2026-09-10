@@ -2747,6 +2747,7 @@
     "WHATSAPP_PHONE_INVALID": "Telefone inválido.",
     "WHATSAPP_MESSAGE_INVALID": "Informe telefone e mensagem.",
     "WHATSAPP_QR_NOT_AVAILABLE": "QR Code indisponível.",
+    "WHATSAPP_PHONE_NOT_FOUND": "Este número não está no WhatsApp.",
     "FIN_DATE_INVALID": "Data de vencimento inválida.",
     "FIN_PERIODO_INVALIDO": "A data de início não pode ser maior que a data de fim.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Só título baixado pode ser conferido.",
