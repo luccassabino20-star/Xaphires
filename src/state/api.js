@@ -450,9 +450,10 @@ export const finFluxoCaixaMatriz = ({ view, referencia, contaId }) => {
   if (contaId) p.set("contaId", contaId);
   return request(`/financeiro/fluxo-caixa/matriz?${p}`);
 };
-export const finFluxoCaixaLancamentos = ({ grupo, de, ate, contaId }) => {
+export const finFluxoCaixaLancamentos = ({ grupo, de, ate, contaId, centroCustoId }) => {
   const p = new URLSearchParams({ grupo, de, ate });
   if (contaId) p.set("contaId", contaId);
+  if (centroCustoId) p.set("centroCustoId", centroCustoId);
   return request(`/financeiro/fluxo-caixa/lancamentos?${p}`);
 };
 // Mesmo desenho de scBaixarRelatorio (Saúde & Clínicas) - blob + link temporário; a
@@ -482,6 +483,51 @@ export async function finFluxoCaixaExport({ view, referencia, contaId, formato, 
   const disposicao = res.headers.get("Content-Disposition") || "";
   const casado = /filename="?([^";]+)"?/i.exec(disposicao);
   const nome = casado ? casado[1] : `fluxo-caixa.${formato}`;
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+// DRE em cascata contábil - totais brutos por grupo; a cascata em si (ordem,
+// subtotais) é montada no cliente (DREView.jsx), a partir destes números.
+export const finGetDreCascata = ({ de, ate, centroCustoId, contaId } = {}) => {
+  const p = new URLSearchParams({ de, ate });
+  if (centroCustoId) p.set("centroCustoId", centroCustoId);
+  if (contaId) p.set("contaId", contaId);
+  return request(`/financeiro/dre/cascata?${p}`);
+};
+// Mesmo desenho de finFluxoCaixaExport - blob + link temporário.
+export async function finExportDre({ de, ate, centroCustoId, contaId, formato, lang }) {
+  const p = new URLSearchParams({ de, ate, formato: formato || "csv" });
+  if (centroCustoId) p.set("centroCustoId", centroCustoId);
+  if (contaId) p.set("contaId", contaId);
+  if (lang) p.set("lang", lang);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/dre/export?${p}`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      /* resposta sem corpo JSON */
+    }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  const disposicao = res.headers.get("Content-Disposition") || "";
+  const casado = /filename="?([^";]+)"?/i.exec(disposicao);
+  const nome = casado ? casado[1] : `dre.${formato || "csv"}`;
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

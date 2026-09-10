@@ -9928,26 +9928,28 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 /* DRE */
 .fin-periodo { display: flex; gap: 16px; margin-bottom: 20px; }
 .fin-periodo label { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
-.fin-dre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.fin-dre-bloco { border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px 18px; background: var(--bg-card); }
-.fin-dre-titulo { font-size: 14px; font-weight: 650; margin: 0 0 12px; }
-.fin-dre-lista { list-style: none; margin: 0; padding: 0; }
-.fin-dre-lista li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; font-size: 13.5px; border-bottom: 1px dashed var(--border-subtle); }
-.fin-dre-lista li:last-child { border-bottom: none; }
-.fin-dre-subtotal { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-strong); font-weight: 650; font-size: 14px; }
-.fin-dre-resultado {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  padding: 16px 20px;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 720;
-}
-.fin-dre-resultado.positivo { background: color-mix(in srgb, var(--fin-entrada) 14%, var(--bg-card)); color: var(--fin-entrada); }
-.fin-dre-resultado.negativo { background: color-mix(in srgb, var(--fin-saida) 14%, var(--bg-card)); color: var(--fin-saida); }
 .fin-num { font-variant-numeric: tabular-nums; }
+
+/* DRE em cascata - reaproveita .fin-kpis/.fin-toolbar/.fin-field/.fin-table/
+   .contatos-header/.contas-empty/.addon-toggle/.timing-toggle já existentes
+   no módulo; só a árvore da cascata (linhas de subtotal/filho/final) e o
+   select de regime são específicos daqui. */
+.dre-regime-select { padding: 8px 10px; font-size: 13px; color: var(--text-primary); background: var(--bg-list); border: 1px solid var(--border-subtle); border-radius: 8px; }
+.dre-av-toggle { flex-direction: row !important; align-items: center; gap: 8px !important; }
+.dre-cascata-table .dre-col-label { min-width: 260px; }
+.dre-col-av, .dre-col-variacao { width: 90px; }
+.dre-col-acao { width: 140px; text-align: right; }
+.dre-chevron { display: inline-flex; margin-right: 6px; color: var(--text-muted); vertical-align: middle; }
+.dre-linha-filho .dre-col-label { padding-left: 34px; font-weight: 400; color: var(--text-secondary); }
+.dre-linha-filho { font-size: 13px; }
+/* Subtotal (Receita Líquida, Lucro Bruto, EBITDA...) - fundo sutil e negrito,
+   sem chevron quando não tem filhos. */
+.dre-linha-subtotal { background: var(--bg-list); font-weight: 700; }
+.dre-linha-subtotal .dre-col-label { font-weight: 700; }
+/* Lucro Líquido fecha a cascata - destaque nobre, cor conforme sinal já vem
+   das classes .fin-receber/.fin-pagar no valor; aqui só o fundo/borda. */
+.dre-linha-final { background: color-mix(in srgb, var(--accent) 10%, var(--bg-card)); border-top: 2px solid var(--border-strong); }
+.dre-linha-final .dre-col-label, .dre-linha-final .fin-num { font-size: 15px; font-weight: 750; }
 
 /* ---------- Matriz de Caixa (DRE de caixa por período, aba "Matriz") ---------- */
 /* Verde/vermelho aqui de propósito - é semântica contábil (receita boa/despesa

@@ -9,18 +9,27 @@ import { formatCents } from "./dinheiro.js";
 // isto aqui é relatório. Mesma classificação por grupo do servidor
 // (calculos.classificarPorGrupo), então a soma das linhas fecha com a célula que a
 // pessoa clicou.
-export default function FluxoCaixaLancamentosModal({ grupo, grupoLabel, colunaLabel, de, ate, contaId, onClose }) {
+//
+// `grupo` aceita string OU array de strings - a DRE em cascata usa array na
+// única linha que soma DOIS grupos reais (Despesas Administrativas =
+// despesa_administrativa + despesa_operacional legado, ver DREView.jsx):
+// sem isso, o drill-down dessa linha mostraria menos lançamentos do que o
+// valor que ela soma. Matriz de Caixa continua passando string única.
+export default function FluxoCaixaLancamentosModal({ grupo, grupoLabel, colunaLabel, de, ate, contaId, centroCustoId, onClose }) {
   const { t, i18n } = useTranslation();
   const [itens, setItens] = useState(null);
   const [erro, setErro] = useState("");
+  const grupos = Array.isArray(grupo) ? grupo : [grupo];
 
   useEffect(() => {
-    api
-      .finFluxoCaixaLancamentos({ grupo, de, ate, contaId })
-      .then((r) => { setItens(r); setErro(""); })
+    Promise.all(grupos.map((g) => api.finFluxoCaixaLancamentos({ grupo: g, de, ate, contaId, centroCustoId })))
+      .then((listas) => {
+        setItens(listas.flat().sort((a, b) => (a.data || "").localeCompare(b.data || "")));
+        setErro("");
+      })
       .catch((e) => setErro(translateError(e, t)));
     // eslint-disable-next-line
-  }, [grupo, de, ate, contaId]);
+  }, [grupos.join(","), de, ate, contaId, centroCustoId]);
 
   const total = itens ? itens.reduce((s, l) => s + l.valorCents, 0) : 0;
 

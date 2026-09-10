@@ -7,8 +7,16 @@ import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents } from "./dinheiro.js";
 import FluxoCaixaLancamentosModal from "./FluxoCaixaLancamentosModal.jsx";
 
-const GRUPOS_RECEITA = ["receita_atendimento", "receita_produtos", "receita_outras"];
-const GRUPOS_DESPESA = ["despesa_operacional", "despesa_financeira", "despesa_pessoal", "despesa_impostos", "despesa_outras"];
+// Mesma lista de server/modules/financeiro/calculos.js (GRUPOS_RECEITA/
+// GRUPOS_DESPESA) - os 4 grupos novos (receita_financeira,
+// despesa_administrativa, despesa_comercial, custo_servicos_produtos)
+// nasceram pra DRE em cascata, mas aparecem aqui também porque a Matriz
+// reaproveita a mesma classificação de categoria.
+const GRUPOS_RECEITA = ["receita_atendimento", "receita_produtos", "receita_outras", "receita_financeira"];
+const GRUPOS_DESPESA = [
+  "despesa_operacional", "despesa_financeira", "despesa_pessoal", "despesa_impostos", "despesa_outras",
+  "despesa_administrativa", "despesa_comercial", "custo_servicos_produtos",
+];
 
 function primeiroDiaMesCivil(civil) {
   return civil.slice(0, 7) + "-01";

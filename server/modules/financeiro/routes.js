@@ -63,7 +63,7 @@ import {
   discardFinAttachmentFile,
 } from "./repo.js";
 import { seedCategoriasSeVazio } from "./seed.js";
-import { montarFluxo, montarDRE, montarSaldos, montarMovimentacao, montarFluxoCaixaMatriz, listarLancamentosDoGrupo, GRUPOS_DRE_VALIDOS } from "./calculos.js";
+import { montarFluxo, montarDRE, montarDreCascata, montarSaldos, montarMovimentacao, montarFluxoCaixaMatriz, listarLancamentosDoGrupo, GRUPOS_DRE_VALIDOS } from "./calculos.js";
 import { gerarExcelExtrato } from "./extrato/excelExtrato.js";
 import { parseExtrato } from "./extrato/parseExtrato.js";
 import { RegraError } from "../../admin/centrosCustoStore.js";
@@ -98,6 +98,7 @@ import { montarExportContatos, gerarContatosCsv, gerarContatosPdf } from "./cont
 import { montarExportMovimentacao, gerarMovimentacaoCsv, gerarMovimentacaoPdf } from "./movimentacaoExport.js";
 import { montarExportTitulos, gerarTitulosCsv, gerarTitulosPdf } from "./titulosExport.js";
 import { montarExportFluxo, gerarFluxoCsv, gerarFluxoPdf } from "./fluxoExport.js";
+import { montarLinhasDreCascata, gerarDreCsv, gerarDrePdf, gerarDreExcel } from "./dreExport.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -1122,6 +1123,51 @@ router.get(
   })
 );
 
+// DRE em cascata contábil - totais brutos por grupo (calculos.montarDreCascata);
+// a montagem da cascata em si (o que soma/subtrai, os subtotais) é
+// apresentação e fica no cliente, mesma separação do resto do módulo.
+router.get(
+  "/dre/cascata",
+  ah(async (req, res) => {
+    const ano = new Date().getFullYear();
+    const de = DATA_CIVIL.test(req.query.de || "") ? req.query.de : `${ano}-01-01`;
+    const ate = DATA_CIVIL.test(req.query.ate || "") ? req.query.ate : `${ano}-12-31`;
+    const centroCustoId = req.query.centroCustoId || null;
+    const contaId = req.query.contaId || null;
+    if (centroCustoId && !getCentroCusto(centroCustoId)) return res.status(400).json({ error: "Centro de custo não encontrado", code: "FIN_CC_NOT_FOUND" });
+    if (contaId && !getConta(contaId)) return res.status(400).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
+    res.json(montarDreCascata(de, ate, { centroCustoId, contaId }));
+  })
+);
+
+router.get("/dre/export", ah(async (req, res) => {
+  const ano = new Date().getFullYear();
+  const de = DATA_CIVIL.test(req.query.de || "") ? req.query.de : `${ano}-01-01`;
+  const ate = DATA_CIVIL.test(req.query.ate || "") ? req.query.ate : `${ano}-12-31`;
+  const centroCustoId = req.query.centroCustoId || null;
+  const contaId = req.query.contaId || null;
+  const formato = ["pdf", "xlsx"].includes(req.query.formato) ? req.query.formato : "csv";
+  const lang = LOCALES.includes(req.query.lang) ? req.query.lang : "pt";
+  const totais = montarDreCascata(de, ate, { centroCustoId, contaId });
+  const linhas = montarLinhasDreCascata(totais, lang);
+  if (formato === "pdf") {
+    const buffer = await gerarDrePdf(linhas, de, ate, lang);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="dre-${de}-a-${ate}.pdf"`);
+    return res.send(buffer);
+  }
+  if (formato === "xlsx") {
+    const buffer = await gerarDreExcel(linhas, de, ate, lang);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="dre-${de}-a-${ate}.xlsx"`);
+    return res.send(buffer);
+  }
+  const buffer = gerarDreCsv(linhas, de, ate, lang);
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="dre-${de}-a-${ate}.csv"`);
+  res.send(buffer);
+}));
+
 // ---------- Fluxo de Caixa em matriz (DRE de caixa por período) ----------
 // Visão alternativa ao /fluxo (que é só o resumo do ano): uma linha por grupo fixo
 // do DRE, uma coluna por mês ou por dia. Mesma fonte única (calculos.js), mesmo
@@ -1154,6 +1200,7 @@ router.get(
   ah(async (req, res) => {
     const { grupo, de, ate } = req.query;
     const contaId = req.query.contaId || null;
+    const centroCustoId = req.query.centroCustoId || null;
     if (!GRUPOS_DRE_VALIDOS.includes(grupo) && grupo !== "transferencia_entrada" && grupo !== "transferencia_saida") {
       return res.status(400).json({ error: "Grupo inválido", code: "FLUXO_CAIXA_GRUPO_INVALID" });
     }
@@ -1163,7 +1210,7 @@ router.get(
     // Transferência não tem lançamento por trás ainda (ver calculos.js) - devolve
     // lista vazia em vez de 400, para o clique na célula (sempre zero) não quebrar.
     if (grupo === "transferencia_entrada" || grupo === "transferencia_saida") return res.json([]);
-    res.json(listarLancamentosDoGrupo({ grupo, de, ate, contaId }));
+    res.json(listarLancamentosDoGrupo({ grupo, de, ate, contaId, centroCustoId }));
   })
 );
 

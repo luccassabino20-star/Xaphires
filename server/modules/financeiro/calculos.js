@@ -226,8 +226,18 @@ export function montarDRE(de, ate) {
 // 8 baldes fixos (em vez da categoria livre) - o que o requisito do relatório pede
 // como linha. Uma categoria sem grupo_dre cai no default pelo tipo dela
 // (resolverGrupoDre), nunca some da matriz.
-const GRUPOS_RECEITA = ["receita_atendimento", "receita_produtos", "receita_outras"];
-const GRUPOS_DESPESA = ["despesa_operacional", "despesa_financeira", "despesa_pessoal", "despesa_impostos", "despesa_outras"];
+// "receita_financeira" e os 3 grupos de despesa novos (administrativa,
+// comercial, custo_servicos_produtos) foram acrescentados para a DRE em
+// cascata (montarDreCascata, abaixo) separar CPV de despesa operacional e
+// ter um lado de receita financeira de verdade - "despesa_operacional"
+// continua valendo (categoria já classificada assim não perde a
+// classificação), só passou a ser tratado como sinônimo legado de
+// "despesa_administrativa" na cascata.
+const GRUPOS_RECEITA = ["receita_atendimento", "receita_produtos", "receita_outras", "receita_financeira"];
+const GRUPOS_DESPESA = [
+  "despesa_operacional", "despesa_financeira", "despesa_pessoal", "despesa_impostos", "despesa_outras",
+  "despesa_administrativa", "despesa_comercial", "custo_servicos_produtos",
+];
 export const GRUPOS_DRE_VALIDOS = [...GRUPOS_RECEITA, ...GRUPOS_DESPESA];
 // Transferência entre contas próprias não existe no ledger hoje (só há
 // receber/pagar amarrado a categoria) - as linhas aparecem na matriz (fiéis ao
@@ -395,9 +405,14 @@ export function montarFluxoCaixaMatriz({ view, referencia, contaId } = {}) {
 // grupo+período clicado. Mesma classificação de montarFluxoCaixaMatriz (
 // classificarPorGrupo), então a soma das linhas devolvidas aqui sempre fecha com o
 // valor da célula que a pessoa clicou.
-export function listarLancamentosDoGrupo({ grupo, de, ate, contaId }) {
+export function listarLancamentosDoGrupo({ grupo, de, ate, contaId, centroCustoId }) {
   let titulos = lancamentosPagosNoPeriodo(de, ate);
   if (contaId) titulos = titulos.filter((l) => l.conta_id === contaId);
+  // Mesma simplificação documentada em montarDreCascata: filtra pelo centro
+  // PRÓPRIO do título, não pela fatia de cada apropriação - um título
+  // rateado entre vários centros conta inteiro se o centro único bater
+  // (raro na prática: título rateado não costuma ter centro único também).
+  if (centroCustoId) titulos = titulos.filter((l) => l.centro_custo_id === centroCustoId);
   const contas = new Map(listContas().map((c) => [c.id, c.nome]));
   return classificarPorGrupo(titulos)
     .filter((p) => p.grupo === grupo)
@@ -411,4 +426,40 @@ export function listarLancamentosDoGrupo({ grupo, de, ate, contaId }) {
       valorCents: p.valor,
     }))
     .sort((a, b) => (a.data || "").localeCompare(b.data || ""));
+}
+
+// DRE em cascata contábil (regime de caixa - só o que foi baixado no
+// período, mesmo livro-razão de montarDRE/montarFluxoCaixaMatriz). Devolve
+// só os TOTAIS BRUTOS por grupo (sempre positivos); montar a cascata em si
+// (ordem das linhas, o que soma/subtrai, os subtotais) é apresentação e
+// fica pro cliente - mesma separação de responsabilidade do resto deste
+// arquivo. "despesa_operacional" (grupo legado, anterior à separação
+// administrativa/comercial/CPV) entra somado dentro de despesaAdministrativa,
+// para uma categoria já classificada assim não sumir da DRE.
+export function montarDreCascata(de, ate, { centroCustoId, contaId } = {}) {
+  let titulos = lancamentosPagosNoPeriodo(de, ate);
+  if (contaId) titulos = titulos.filter((l) => l.conta_id === contaId);
+  if (centroCustoId) titulos = titulos.filter((l) => l.centro_custo_id === centroCustoId);
+
+  const porGrupo = new Map();
+  for (const p of classificarPorGrupo(titulos)) {
+    porGrupo.set(p.grupo, (porGrupo.get(p.grupo) || 0) + p.valor);
+  }
+  const g = (chave) => porGrupo.get(chave) || 0;
+
+  return {
+    de,
+    ate,
+    receitaProdutos: g("receita_produtos"),
+    receitaServicos: g("receita_atendimento"),
+    receitaOutras: g("receita_outras"),
+    impostosSobreVendas: g("despesa_impostos"),
+    cpv: g("custo_servicos_produtos"),
+    despesaPessoal: g("despesa_pessoal"),
+    despesaAdministrativa: g("despesa_administrativa") + g("despesa_operacional"),
+    despesaComercial: g("despesa_comercial"),
+    despesaOutrasOperacionais: g("despesa_outras"),
+    receitaFinanceira: g("receita_financeira"),
+    despesaFinanceira: g("despesa_financeira"),
+  };
 }
