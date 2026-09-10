@@ -23,6 +23,7 @@ import {
   getContato,
   insertContato,
   updateContato,
+  deleteContato,
   listImpostos,
   getImposto,
   insertImposto,
@@ -82,6 +83,7 @@ import {
 } from "./cobrancaRepo.js";
 import { estagio, valorAtualizadoCents, montarMensagem, varrerRecorrencias } from "./cobrancaEngine.js";
 import { resolverGateway, metodoValido as metodoCobrancaValido } from "./gateway/index.js";
+import { montarExportContatos, gerarContatosCsv, gerarContatosPdf } from "./contatosExport.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -335,6 +337,39 @@ router.patch(
   ah(async (req, res) => {
     if (!getContato(req.params.id)) return res.status(404).json({ error: "Contato não encontrado", code: "FIN_CONTATO_NOT_FOUND" });
     res.json(updateContato(req.params.id, req.body || {}));
+  })
+);
+router.delete(
+  "/contatos/:id",
+  ah(async (req, res) => {
+    if (!getContato(req.params.id)) return res.status(404).json({ error: "Contato não encontrado", code: "FIN_CONTATO_NOT_FOUND" });
+    try {
+      deleteContato(req.params.id);
+      res.status(204).end();
+    } catch (err) {
+      if (err.code === "FIN_CONTATO_EM_USO") {
+        return res.status(409).json({ error: "Este contato tem lançamentos ou cobranças e não pode ser excluído. Desative-o em vez disso.", code: "FIN_CONTATO_EM_USO" });
+      }
+      throw err;
+    }
+  })
+);
+router.get(
+  "/contatos/export",
+  ah(async (req, res) => {
+    const formato = req.query.formato === "pdf" ? "pdf" : "csv";
+    const lang = LOCALES.includes(req.query.lang) ? req.query.lang : "pt";
+    const linhas = montarExportContatos(listContatos(), lang);
+    if (formato === "pdf") {
+      const buffer = await gerarContatosPdf(linhas, lang);
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", 'attachment; filename="contatos.pdf"');
+      return res.send(buffer);
+    }
+    const buffer = gerarContatosCsv(linhas, lang);
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="contatos.csv"');
+    res.send(buffer);
   })
 );
 

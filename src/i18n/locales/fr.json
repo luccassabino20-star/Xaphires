@@ -80,7 +80,7 @@
       "tag": "Ventes"
     },
     "financeiro": {
-      "name": "ERP IRES",
+      "name": "IRES OS",
       "desc": "Plateforme complète pour plusieurs secteurs. Automatisez achats, stocks, flotte, chantiers et finances avec intelligence opérationnelle.",
       "tag": "Gestion ERP"
     },
@@ -364,6 +364,49 @@
       "taxas_caract": "Frais de gestion (caractéristiques)",
       "taxas_regras": "Règles des frais de gestion"
     },
+    "contatos": {
+      "titulo": "Clients & Fournisseurs",
+      "contador": "{{count}} contact enregistré",
+      "contador_other": "{{count}} contacts enregistrés",
+      "novoCadastro": "Nouveau Contact",
+      "exportar": "Exporter",
+      "exportarCsv": "Exporter en CSV",
+      "exportarPdf": "Exporter en PDF",
+      "buscarPlaceholder": "Rechercher par nom, n° fiscal, e-mail...",
+      "filtroTodos": "Tous",
+      "filtroClientes": "Clients",
+      "filtroFornecedores": "Fournisseurs",
+      "filtroParceiros": "Partenaires",
+      "statusTodos": "Tous",
+      "statusAtivos": "Actifs",
+      "statusInativos": "Inactifs",
+      "colContato": "Contact",
+      "colDocumento": "Document",
+      "colTipo": "Type",
+      "colCidade": "Ville/État",
+      "colStatus": "Statut",
+      "vazio": "Aucun contact trouvé",
+      "acoesLinha": "Actions",
+      "tipoParceiro": "Partenaire",
+      "menuEditar": "Modifier le contact",
+      "menuEmitirCobranca": "Émettre une facture directe",
+      "menuHistorico": "Voir l'historique / les transactions",
+      "menuExcluir": "Supprimer",
+      "confirmExcluir": "Supprimer ce contact ? Cette action est irréversible.",
+      "excluido": "Contact supprimé",
+      "modal": {
+        "tituloNovo": "Nouveau Contact",
+        "tituloEditar": "Modifier le contact",
+        "subtitulo": "Enregistrez un client, fournisseur ou partenaire à utiliser dans les factures et écritures.",
+        "abaDados": "Informations principales",
+        "abaEndereco": "Adresse & Facturation",
+        "consultarReceita": "Rechercher l'entreprise"
+      },
+      "historico": {
+        "titulo": "Historique des factures",
+        "vazio": "Aucune facture émise pour ce contact pour l'instant."
+      }
+    },
     "baixa": { "semConta": "Sans compte", "confirmar": "Confirmer" },
     "tit": { "numero": "N° du titre", "identificacao": "Identification", "docNumero": "Numéro du document", "emissao": "Émission", "formaPagto": "Mode de paiement", "semForma": "Non renseigné", "apropriacao": "Répartition", "valores": "Montants", "valorTitulo": "Montant du titre", "impostosRetidos": "Taxes retenues", "impostosAcrescidos": "Taxes ajoutées", "desconto": "Remise", "retencao": "Retenue", "multa": "Pénalité", "juros": "Intérêts", "valorLiquido": "Montant net", "emBreveImpostos": "Disponible dans le bloc des taxes (bientôt)", "observacao": "Remarque", "detalhesPagto": "Détails du paiement", "dataBaixa": "Date du règlement", "darQuitado": "Régler ({{n}})", "selecionados": "{{n}} sélectionné(s)", "quitados": "{{n}} titre(s) réglé(s)", "valorPago": "Montant payé", "baixaEmMovimentacao": "Le règlement et l'annulation se font dans l'onglet Mouvements.",
     "impostosAplicados": "Taxes appliquées", "semImpostoAplicado": "Aucune taxe appliquée à ce titre.", "escolherImposto": "Choisissez une taxe dans le registre", "aplicarImposto": "Appliquer", "impostoAplicado": "Taxe appliquée", "recolhimento": "a généré un versement", "valorTravadoImposto": "Retirez les taxes appliquées pour modifier le montant du titre",
@@ -395,11 +438,14 @@
       "canceladaToast": "Facture annulée", "baixadaToast": "Facture confirmée", "pixCopiado": "Clé Pix copiée",
       "semTelefone": "Ce client n'a pas de téléphone enregistré",
       "form": {
-        "titulo": "Nouvelle facture", "unica": "Unique", "recorrente": "Récurrente",
+        "titulo": "Nouvelle facture", "subtitulo": "Émettez une facture unique ou configurez une récurrence pour ce client.",
+        "unica": "Unique", "recorrente": "Récurrente",
         "cliente": "Client", "clientePlaceholder": "Rechercher un client...", "descricao": "Description",
+        "descricaoPlaceholder": "Ex. : Mensualité, service rendu...",
         "valor": "Montant", "vencimento": "Échéance", "primeiraEmissao": "Première facture", "intervalo": "Intervalle (mois)",
         "metodo": "Méthode", "cardNumberSimulado": "Numéro de carte (simulé - terminant par 0002/0003/0004 refusé)",
         "erroCliente": "Sélectionnez un client", "erroValor": "Indiquez un montant valide",
+        "resumoCliente": "Client", "resumoVencimento": "Échéance", "resumoPrimeira": "1ère facture", "resumoTotal": "Total",
         "emitir": "Émettre la facture", "cobrancaCriada": "Facture émise", "recorrenciaCriada": "Récurrence créée - la première facture a déjà été émise"
       },
       "config": {
@@ -2386,6 +2432,7 @@
     "TOO_MANY_CNPJ_REQUESTS": "Trop de recherches de CNPJ en peu de temps. Patientez un instant.",
     "FIN_CONTATO_NAME_REQUIRED": "Indiquez le nom.",
     "FIN_CONTATO_NOT_FOUND": "Contact introuvable.",
+    "FIN_CONTATO_EM_USO": "Ce contact a des écritures ou des factures et ne peut pas être supprimé. Désactivez-le plutôt.",
     "FIN_PARCELA_PAGO": "Seul un titre en attente peut être réparti en échéances.",
     "FIN_PARCELA_INVALIDO": "Un titre généré ne peut pas être réparti en échéances.",
     "FIN_PARCELA_JA": "Le titre est déjà réparti en échéances.",

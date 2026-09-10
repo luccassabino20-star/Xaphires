@@ -10292,6 +10292,258 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   resize: vertical;
 }
 
+/* ---------- Modal "Nova cobrança" (Ultra-Premium) ----------
+   Mesma linguagem visual de .archive-modal/.recurrence-modal: cantos 24px,
+   sombra em duas camadas, overlay escurecido com blur, entrada via
+   premiumModalIn (keyframe já definida perto de .archive-modal). CTA escuro
+   fixo reaproveita .recurrence-btn-ghost/.recurrence-btn-primary de propósito
+   - é o mesmo tratamento "executivo" usado em todo formulário deste padrão. */
+.modal-overlay:has(.cobr-form-modal) {
+  background: rgba(10, 12, 20, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.cobr-form-modal {
+  max-width: 560px;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35), 0 4px 16px -4px rgba(15, 23, 42, 0.15);
+  animation: premiumModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.cobr-form-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+.cobr-form-header-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.cobr-form-title { font-size: 18px; font-weight: 700; margin: 0 0 2px; color: var(--text-primary); }
+.cobr-form-subtitle { font-size: 13px; line-height: 1.5; margin: 0; color: var(--text-secondary); }
+
+.cobr-form-body { display: flex; flex-direction: column; gap: 16px; }
+.cobr-tipo-toggle { margin-bottom: 0; }
+
+.cobr-field { display: flex; flex-direction: column; gap: 6px; }
+.cobr-field > span { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.cobr-field input,
+.cobr-field select {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cobr-field input:focus,
+.cobr-field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.cobr-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.cobr-valor-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--bg-card);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cobr-valor-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.cobr-valor-prefixo { padding: 0 0 0 12px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); }
+.cobr-valor-wrap input {
+  border: none;
+  background: none;
+  box-shadow: none !important;
+}
+
+/* Picker de método - cartões seletáveis em vez de <select>, cada um com um
+   ícone pastel na cor do próprio meio de pagamento (mesma ideia dos badges
+   .fin-cobr-badge-metodo da grade, só que maiores e clicáveis). */
+.cobr-metodo-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cobr-metodo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.cobr-metodo-card:hover { border-color: var(--border-strong); }
+.cobr-metodo-card-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--bg-list); color: var(--text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cobr-metodo-card-pix.selected { border-color: var(--fin-entrada); color: var(--fin-entrada); background: color-mix(in srgb, var(--fin-entrada) 8%, transparent); }
+.cobr-metodo-card-pix.selected .cobr-metodo-card-icon { background: color-mix(in srgb, var(--fin-entrada) 16%, transparent); color: var(--fin-entrada); }
+.cobr-metodo-card-boleto.selected { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.cobr-metodo-card-boleto.selected .cobr-metodo-card-icon { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.cobr-metodo-card-card.selected { border-color: var(--text-primary); color: var(--text-primary); background: var(--bg-list); }
+.cobr-metodo-card-card.selected .cobr-metodo-card-icon { background: color-mix(in srgb, var(--text-primary) 12%, transparent); color: var(--text-primary); }
+
+/* Resumo ao vivo - só aparece quando cliente + valor já dão para prever o
+   que vai ser emitido, mesmo princípio do "não mostrar número que ainda não
+   existe" já seguido no resto do app. */
+.cobr-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--bg-list) 70%, transparent);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+}
+.cobr-resumo-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; }
+.cobr-resumo-label { color: var(--text-muted); }
+.cobr-resumo-valor { color: var(--text-primary); font-weight: 600; text-align: right; }
+.cobr-resumo-total { padding-top: 8px; border-top: 1px dashed var(--border-subtle); }
+.cobr-resumo-total-valor { color: var(--text-primary); font-weight: 700; font-size: 15px; }
+
+.cobr-form-erro {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: 10px;
+}
+
+.cobr-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+/* ---------- Clientes & Fornecedores (Cadastros → Contatos, Ultra-Premium) ----------
+   Central de contatos: o formulário de 12+ campos que ficava sempre exposto virou
+   o modal .contato-form-modal (mesmo esqueleto de .cobr-form-modal); aqui só ficam
+   o header com contador, a busca/segmentação e a grade com menu "..." por linha. */
+.contatos-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.contatos-titulo { font-size: 19px; font-weight: 700; margin: 0 0 2px; color: var(--text-primary); }
+.contatos-contador { font-size: 13px; margin: 0; color: var(--text-muted); }
+.contatos-header-acoes { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.contatos-export { position: relative; }
+
+.contatos-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.contatos-busca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 260px;
+  min-width: 200px;
+  padding: 8px 12px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.contatos-busca:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+.contatos-busca input { flex: 1; border: none; background: none; font-size: 13.5px; color: var(--text-primary); outline: none; }
+.contatos-segmented, .contatos-status-pills { margin-bottom: 0; flex-shrink: 0; }
+
+.contatos-table-wrap { overflow-x: auto; }
+.contatos-cell-contato { display: flex; flex-direction: column; gap: 2px; }
+.contatos-cell-nome { font-weight: 650; color: var(--text-primary); }
+.contatos-cell-email { font-size: 12px; color: var(--text-muted); }
+.contatos-cell-acoes { position: relative; text-align: right; }
+
+.contatos-badge-doc {
+  display: inline-block;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  background: var(--bg-list);
+  border-radius: 999px;
+}
+.contatos-badge-tipo {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 650;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.contatos-badge-tipo-cliente { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.contatos-badge-tipo-fornecedor { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+.contatos-badge-tipo-parceiro { color: #b45309; background: color-mix(in srgb, #f59e0b 16%, transparent); }
+
+.contatos-status-pill { display: inline-block; padding: 3px 10px; font-size: 11.5px; font-weight: 650; border-radius: 999px; }
+.contatos-status-ativo { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+.contatos-status-inativo { color: var(--text-muted); background: var(--bg-list); }
+
+/* Modal de Novo Cadastro/Edição - mesmo esqueleto do .cobr-form-modal (24px
+   radius, premiumModalIn, overlay com blur); os campos internos reaproveitam
+   .cobr-field/.cobr-form-grid/.cobr-form-footer/.timing-toggle diretamente. */
+.modal-overlay:has(.contato-form-modal) {
+  background: rgba(10, 12, 20, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.contato-form-modal {
+  max-width: 620px;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35), 0 4px 16px -4px rgba(15, 23, 42, 0.15);
+  animation: premiumModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.contatos-modal-cnpj { display: flex; align-items: flex-end; gap: 10px; }
+.contatos-modal-cnpj .cobr-field { flex: 1; }
+
+.contatos-historico-lista { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+.contatos-historico-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+.contatos-historico-item-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.contatos-historico-item-desc { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.contatos-historico-item-data { font-size: 11.5px; color: var(--text-muted); }
+.contatos-historico-item-valor { font-size: 13.5px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+
 .fin-mov-titulo { font-size: 14px; font-weight: 650; margin: 22px 0 10px; color: var(--text-secondary); }
 .fin-mov-titulo:first-of-type { margin-top: 4px; }
 

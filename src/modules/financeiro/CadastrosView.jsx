@@ -6,7 +6,7 @@ import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
 import { formatCents, reaisParaCents, centsOuZero, centsAssinado, formatPercent } from "./dinheiro.js";
 import { BANCOS, rotuloBanco } from "./bancos.js";
-import { normalizarDoc, cnpjValido } from "../../utils/doc.js";
+import ContatosView from "./ContatosView.jsx";
 
 // Cadastros de apoio do Financeiro, organizados em sidebar por categoria (o
 // mesmo agrupamento do menu "Cadastros Básicos" do SIGIM). Só 6 itens são reais
@@ -47,7 +47,7 @@ const GRUPOS_CADASTRO = [
   ]},
 ];
 
-export default function CadastrosView() {
+export default function CadastrosView({ onEmitirCobranca }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -99,6 +99,28 @@ export default function CadastrosView() {
       alert(translateError(e, t));
     }
   }
+  // Exclusão de verdade do contato (diferente do resto do Financeiro, que só
+  // desativa) - o servidor recusa com FIN_CONTATO_EM_USO se houver lançamento ou
+  // cobrança referenciando o id; a mensagem traduzida já explica e sugere desativar.
+  async function excluirContato(id) {
+    await api.finDeleteContato(id);
+    showToast(t("financeiro.contatos.excluido"));
+    await carregar();
+  }
+  // Sem o wrapper de fn/dados/limpar do criar/editar genéricos acima: o modal de
+  // contato (NovoContatoModal) chama isto direto e trata o erro inline no
+  // formulário (a lista de sucesso do resto do Financeiro usa alert()/toast, mas
+  // aqui o erro precisa aparecer perto do campo, não escondido atrás do modal).
+  async function criarContato(dados) {
+    await api.finCreateContato(dados);
+    showToast(t("financeiro.cad.criado"));
+    await carregar();
+  }
+  async function editarContato(id, dados) {
+    await api.finUpdateContato(id, dados);
+    showToast(t("financeiro.cad.criado"));
+    await carregar();
+  }
 
   return (
     <div className="fin-cad-layout">
@@ -127,7 +149,15 @@ export default function CadastrosView() {
         {selecionado === "contas" && <SecaoContas contas={contas} lang={lang} onCriar={criar} onEditar={editar} />}
         {selecionado === "centros" && <SecaoCentros centros={centros} onCriar={criar} onEditar={editar} onChanged={carregar} />}
         {selecionado === "classes" && <SecaoClasses classes={classes} onCriar={criar} onEditar={editar} onChanged={carregar} />}
-        {selecionado === "contatos" && <SecaoContatos contatos={contatos} onCriar={criar} onEditar={editar} />}
+        {selecionado === "contatos" && (
+          <ContatosView
+            contatos={contatos}
+            onCriar={criarContato}
+            onEditar={editarContato}
+            onExcluir={excluirContato}
+            onEmitirCobranca={onEmitirCobranca}
+          />
+        )}
         {selecionado === "impostos" && <SecaoImpostos impostos={impostos} lang={lang} onCriar={criar} onEditar={editar} />}
         {selecionado === "sped" && <SecaoCodigosServico codigos={codigosServico} onCriar={criar} onEditar={editar} />}
       </div>
@@ -516,206 +546,6 @@ function SecaoClasses({ classes, onCriar, onEditar, onChanged }) {
         { h: t("financeiro.cad.tipo"), c: (x) => (x.tipo === "receita" ? t("financeiro.dre.receitas") : t("financeiro.dre.despesas")) },
         { h: "", c: (x) => <AcoesCadastro x={x} onEditar={() => editar(x)} onToggle={() => onEditar(api.finUpdateCategoria, x.id, { ativo: !x.ativo }, () => {})} /> },
       ]} />
-    </div>
-  );
-}
-
-const CONTATO_VAZIO = { nome: "", tipo: "fornecedor", doc: "", email: "", telefone: "", cep: "", logradouro: "", numero: "", complemento: "", bairro: "", cidade: "", uf: "", pais: "Brasil", pontoReferencia: "" };
-
-function SecaoContatos({ contatos, onCriar, onEditar }) {
-  const { t } = useTranslation();
-  const [f, setF] = useState(CONTATO_VAZIO);
-  const [editandoId, setEditandoId] = useState(null);
-  const [buscandoCep, setBuscandoCep] = useState(false);
-  const [cepErro, setCepErro] = useState("");
-  const [buscandoCnpj, setBuscandoCnpj] = useState(false);
-  const [cnpjErro, setCnpjErro] = useState("");
-  const [detalhe, setDetalhe] = useState(null); // contato aberto para ver os dados
-  const rotuloTipo = (tp) => t(`financeiro.cad.tipo_${tp}`);
-  function editar(x) {
-    setEditandoId(x.id);
-    setCepErro("");
-    setF({
-      nome: x.nome, tipo: x.tipo, doc: x.doc || "", email: x.email || "", telefone: x.telefone || "",
-      cep: x.cep || "", logradouro: x.logradouro || "", numero: x.numero || "", complemento: x.complemento || "",
-      bairro: x.bairro || "", cidade: x.cidade || "", uf: x.uf || "", pais: x.pais || "Brasil", pontoReferencia: x.ponto_referencia || "",
-    });
-  }
-  function cancelar() { setEditandoId(null); setF(CONTATO_VAZIO); setCepErro(""); setCnpjErro(""); }
-
-  // Pesquisar empresa: busca os dados na BrasilAPI (via servidor) pelo CNPJ e
-  // preenche razão social, endereço, telefone e e-mail. Só CNPJ (14 dígitos) - CPF
-  // não tem cadastro de empresa. Não sobrescreve o que o usuário já tenha digitado
-  // de propósito? Não: é uma busca explícita, então preenche com o que veio (mantém
-  // só o número/complemento se a base não trouxer).
-  async function preencherPorCnpj() {
-    const doc = normalizarDoc(f.doc);
-    setCnpjErro("");
-    if (!cnpjValido(doc)) { setCnpjErro(t("financeiro.cad.cnpjInvalido")); return; }
-    setBuscandoCnpj(true);
-    try {
-      const e = await api.buscarCnpj(doc);
-      setF((cur) => ({
-        ...cur,
-        nome: e.nome || cur.nome,
-        cep: e.cep || cur.cep,
-        logradouro: e.logradouro || cur.logradouro,
-        numero: e.numero || cur.numero,
-        complemento: e.complemento || cur.complemento,
-        bairro: e.bairro || cur.bairro,
-        cidade: e.cidade || cur.cidade,
-        uf: e.uf || cur.uf,
-        telefone: e.telefone || cur.telefone,
-        email: e.email || cur.email,
-      }));
-    } catch (err) {
-      setCnpjErro(translateError(err, t));
-    } finally {
-      setBuscandoCnpj(false);
-    }
-  }
-
-  // Busca o endereço no ViaCEP (via servidor) e preenche logradouro/bairro/cidade/
-  // UF. Dispara ao completar 8 dígitos e também no blur, para não depender de sair
-  // do campo. Número e complemento continuam com quem digita.
-  async function preencherPorCep(valorCep) {
-    const digs = String(valorCep).replace(/\D/g, "");
-    if (digs.length !== 8) return;
-    setCepErro(""); setBuscandoCep(true);
-    try {
-      const e = await api.buscarCep(digs);
-      setF((cur) => ({
-        ...cur,
-        cep: e.cep || cur.cep,
-        logradouro: e.logradouro || "",
-        bairro: e.bairro || "",
-        cidade: e.cidade || "",
-        uf: e.uf || "",
-        complemento: e.complemento || cur.complemento,
-      }));
-    } catch (err) {
-      setCepErro(translateError(err, t));
-    } finally {
-      setBuscandoCep(false);
-    }
-  }
-
-  return (
-    <div className="fin-cad-secao">
-      <form
-        className="fin-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!f.nome.trim()) return;
-          const dados = { ...f, nome: f.nome.trim() };
-          if (editandoId) onEditar(api.finUpdateContato, editandoId, dados, cancelar);
-          else onCriar(api.finCreateContato, dados, () => setF(CONTATO_VAZIO));
-        }}
-      >
-        <input type="text" placeholder={t("financeiro.cad.nome")} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} />
-        <select value={f.tipo} onChange={(e) => setF({ ...f, tipo: e.target.value })}>
-          <option value="fornecedor">{rotuloTipo("fornecedor")}</option>
-          <option value="cliente">{rotuloTipo("cliente")}</option>
-          <option value="ambos">{rotuloTipo("ambos")}</option>
-        </select>
-        <input type="text" placeholder={t("financeiro.cad.doc")} value={f.doc} onChange={(e) => setF({ ...f, doc: e.target.value })} />
-        <button type="button" className="btn-secondary btn-small" onClick={preencherPorCnpj} disabled={buscandoCnpj}>
-          {buscandoCnpj ? t("financeiro.cad.buscandoEmpresa") : t("financeiro.cad.pesquisarEmpresa")}
-        </button>
-        <input type="text" placeholder={t("financeiro.cad.email")} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-        <input type="text" placeholder={t("financeiro.cad.telefone")} value={f.telefone} onChange={(e) => setF({ ...f, telefone: e.target.value })} />
-        <input
-          type="text" inputMode="numeric" className="fin-cep" placeholder={t("financeiro.cad.cep")} value={f.cep}
-          onChange={(e) => { const v = e.target.value; setF({ ...f, cep: v }); if (v.replace(/\D/g, "").length === 8) preencherPorCep(v); }}
-          onBlur={(e) => preencherPorCep(e.target.value)}
-        />
-        <input type="text" className="fin-end-logradouro" placeholder={t("financeiro.cad.logradouro")} value={f.logradouro} onChange={(e) => setF({ ...f, logradouro: e.target.value })} />
-        <input type="text" className="fin-end-numero" placeholder={t("financeiro.cad.numero")} value={f.numero} onChange={(e) => setF({ ...f, numero: e.target.value })} />
-        <input type="text" placeholder={t("financeiro.cad.complemento")} value={f.complemento} onChange={(e) => setF({ ...f, complemento: e.target.value })} />
-        <input type="text" placeholder={t("financeiro.cad.bairro")} value={f.bairro} onChange={(e) => setF({ ...f, bairro: e.target.value })} />
-        <input type="text" placeholder={t("financeiro.cad.cidade")} value={f.cidade} onChange={(e) => setF({ ...f, cidade: e.target.value })} />
-        <input type="text" className="fin-end-uf" maxLength={2} placeholder={t("financeiro.cad.uf")} value={f.uf} onChange={(e) => setF({ ...f, uf: e.target.value.toUpperCase() })} />
-        <input type="text" className="fin-end-pais" placeholder={t("financeiro.cad.pais")} value={f.pais} onChange={(e) => setF({ ...f, pais: e.target.value })} />
-        <input type="text" className="fin-end-referencia" placeholder={t("financeiro.cad.pontoReferencia")} value={f.pontoReferencia} onChange={(e) => setF({ ...f, pontoReferencia: e.target.value })} />
-        <button type="submit" className="btn-primary btn-small">{editandoId ? t("common.save") : t("financeiro.form.adicionar")}</button>
-        {editandoId && <button type="button" className="btn-ghost btn-small" onClick={cancelar}>{t("common.cancel")}</button>}
-      </form>
-      {buscandoCep && <div className="fin-cad-hint">{t("financeiro.cad.buscandoCep")}</div>}
-      {cepErro && <div className="fin-error">{cepErro}</div>}
-      {buscandoCnpj && <div className="fin-cad-hint">{t("financeiro.cad.buscandoEmpresa")}</div>}
-      {cnpjErro && <div className="fin-error">{cnpjErro}</div>}
-      <Tabela vazio={t("financeiro.vazio")} linhas={contatos} colunas={[
-        { h: t("financeiro.cad.nome"), c: (x) => <button type="button" className="fin-titulo-link" onClick={() => setDetalhe(x)}>{x.nome}</button> },
-        { h: t("financeiro.cad.tipo"), c: (x) => rotuloTipo(x.tipo) },
-        { h: t("financeiro.cad.doc"), c: (x) => x.doc || "-" },
-        { h: t("financeiro.cad.cidade"), c: (x) => (x.cidade ? `${x.cidade}${x.uf ? " / " + x.uf : ""}` : "-") },
-        { h: "", c: (x) => <AcoesCadastro x={x} onEditar={() => editar(x)} onToggle={() => onEditar(api.finUpdateContato, x.id, { ativo: !x.ativo }, () => {})} /> },
-      ]} />
-
-      {detalhe && (
-        <ContatoDetalhe
-          c={detalhe}
-          rotuloTipo={rotuloTipo}
-          onEditar={() => { editar(detalhe); setDetalhe(null); }}
-          onClose={() => setDetalhe(null)}
-        />
-      )}
-    </div>
-  );
-}
-
-// Painel de detalhes do cliente/fornecedor: abre ao clicar no nome, mostra os
-// dados de contato e o endereço completo (com o CEP e o ponto de referência) em
-// leitura, com um atalho para editar.
-function ContatoDetalhe({ c, rotuloTipo, onEditar, onClose }) {
-  const { t } = useTranslation();
-  const linha = (rotulo, valor) => (
-    <div>
-      <dt>{rotulo}</dt>
-      <dd>{valor || "-"}</dd>
-    </div>
-  );
-  const temEndereco = c.cep || c.logradouro || c.cidade || c.bairro || c.ponto_referencia;
-  return (
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal">
-        <button className="modal-close" onClick={onClose} aria-label={t("common.close")}>&times;</button>
-        <div className="fin-contato-detalhe">
-          <h3>{c.nome}</h3>
-          <div className="fin-contato-chips">
-            <span className="fin-badge fin-badge-pendente">{rotuloTipo(c.tipo)}</span>
-            <span className={"fin-badge " + (c.ativo ? "fin-badge-finalizado" : "fin-badge-anulado")}>
-              {c.ativo ? t("financeiro.cad.ativo") : t("financeiro.cad.inativo")}
-            </span>
-          </div>
-
-          <h4>{t("financeiro.cad.contato")}</h4>
-          <dl className="fin-detalhe-grid">
-            {linha(t("financeiro.cad.doc"), c.doc)}
-            {linha(t("financeiro.cad.email"), c.email)}
-            {linha(t("financeiro.cad.telefone"), c.telefone)}
-          </dl>
-
-          <h4>{t("financeiro.cad.endereco")}</h4>
-          {temEndereco ? (
-            <dl className="fin-detalhe-grid">
-              {linha(t("financeiro.cad.cep"), c.cep)}
-              {linha(t("financeiro.cad.logradouro"), c.numero ? `${c.logradouro || ""}, ${c.numero}` : c.logradouro)}
-              {linha(t("financeiro.cad.complemento"), c.complemento)}
-              {linha(t("financeiro.cad.bairro"), c.bairro)}
-              {linha(t("financeiro.cad.cidade"), c.cidade ? `${c.cidade}${c.uf ? " / " + c.uf : ""}` : "")}
-              {linha(t("financeiro.cad.pais"), c.pais)}
-              {linha(t("financeiro.cad.pontoReferencia"), c.ponto_referencia)}
-            </dl>
-          ) : (
-            <p className="fin-cad-hint">{t("financeiro.cad.semEndereco")}</p>
-          )}
-
-          <div className="fin-modal-acoes">
-            <button className="btn-primary btn-small" onClick={onEditar}>{t("financeiro.cad.editar")}</button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

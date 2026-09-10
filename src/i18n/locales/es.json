@@ -80,7 +80,7 @@
       "tag": "Ventas"
     },
     "financeiro": {
-      "name": "ERP IRES",
+      "name": "IRES OS",
       "desc": "Plataforma completa para múltiples segmentos. Automatice compras, inventario, flota, obras y finanzas con inteligencia operativa.",
       "tag": "Gestión ERP"
     },
@@ -664,6 +664,49 @@
       "taxas_caract": "Comisiones de administración (características)",
       "taxas_regras": "Reglas de comisiones de administración"
     },
+    "contatos": {
+      "titulo": "Clientes & Proveedores",
+      "contador": "{{count}} contacto registrado",
+      "contador_other": "{{count}} contactos registrados",
+      "novoCadastro": "Nuevo Contacto",
+      "exportar": "Exportar",
+      "exportarCsv": "Exportar CSV",
+      "exportarPdf": "Exportar PDF",
+      "buscarPlaceholder": "Buscar por nombre, CPF/CNPJ, correo...",
+      "filtroTodos": "Todos",
+      "filtroClientes": "Clientes",
+      "filtroFornecedores": "Proveedores",
+      "filtroParceiros": "Socios",
+      "statusTodos": "Todos",
+      "statusAtivos": "Activos",
+      "statusInativos": "Inactivos",
+      "colContato": "Contacto",
+      "colDocumento": "Documento",
+      "colTipo": "Tipo",
+      "colCidade": "Ciudad/Estado",
+      "colStatus": "Estado",
+      "vazio": "Ningún contacto encontrado",
+      "acoesLinha": "Acciones",
+      "tipoParceiro": "Socio",
+      "menuEditar": "Editar Contacto",
+      "menuEmitirCobranca": "Emitir Cobro Directo",
+      "menuHistorico": "Ver Historial / Transacciones",
+      "menuExcluir": "Eliminar",
+      "confirmExcluir": "¿Eliminar este contacto? Esta acción no se puede deshacer.",
+      "excluido": "Contacto eliminado",
+      "modal": {
+        "tituloNovo": "Nuevo Contacto",
+        "tituloEditar": "Editar Contacto",
+        "subtitulo": "Registra un cliente, proveedor o socio para usar en cobros y movimientos.",
+        "abaDados": "Datos Principales",
+        "abaEndereco": "Dirección & Facturación",
+        "consultarReceita": "Consultar empresa"
+      },
+      "historico": {
+        "titulo": "Historial de cobros",
+        "vazio": "Aún no hay cobros emitidos para este contacto."
+      }
+    },
     "baixa": { "semConta": "Sin cuenta", "confirmar": "Confirmar" },
     "tit": { "numero": "N.º de título", "identificacao": "Identificación", "docNumero": "Número del documento", "emissao": "Emisión", "formaPagto": "Forma de pago", "semForma": "No informada", "apropriacao": "Apropiación", "valores": "Importes", "valorTitulo": "Importe del título", "impostosRetidos": "Impuestos retenidos", "impostosAcrescidos": "Impuestos agregados", "desconto": "Descuento", "retencao": "Retención", "multa": "Multa", "juros": "Intereses", "valorLiquido": "Importe neto", "emBreveImpostos": "Disponible en el bloque de impuestos (próximamente)", "observacao": "Observación", "detalhesPagto": "Detalles del pago", "dataBaixa": "Fecha de pago", "darQuitado": "Saldar ({{n}})", "selecionados": "{{n}} seleccionado(s)", "quitados": "{{n}} título(s) saldado(s)", "valorPago": "Importe pagado", "baixaEmMovimentacao": "Saldar y revertir están en la pestaña Movimientos.",
     "impostosAplicados": "Impuestos aplicados", "semImpostoAplicado": "Ningún impuesto aplicado a este título.", "escolherImposto": "Elige un impuesto del registro", "aplicarImposto": "Aplicar", "impostoAplicado": "Impuesto aplicado", "recolhimento": "generó recaudación", "valorTravadoImposto": "Quita los impuestos aplicados para editar el importe del título",
@@ -695,11 +738,14 @@
       "canceladaToast": "Cobro cancelado", "baixadaToast": "Cobro confirmado", "pixCopiado": "Clave Pix copiada",
       "semTelefone": "Este cliente no tiene teléfono registrado",
       "form": {
-        "titulo": "Nuevo cobro", "unica": "Único", "recorrente": "Recurrente",
+        "titulo": "Nuevo cobro", "subtitulo": "Emite un cobro único o configura uno recurrente para este cliente.",
+        "unica": "Único", "recorrente": "Recurrente",
         "cliente": "Cliente", "clientePlaceholder": "Buscar cliente...", "descricao": "Descripción",
+        "descricaoPlaceholder": "Ej.: Mensualidad, servicio prestado...",
         "valor": "Monto", "vencimento": "Vencimiento", "primeiraEmissao": "Primer cobro", "intervalo": "Intervalo (meses)",
         "metodo": "Método", "cardNumberSimulado": "Número de tarjeta (simulado - terminación 0002/0003/0004 es rechazada)",
         "erroCliente": "Selecciona un cliente", "erroValor": "Ingresa un monto válido",
+        "resumoCliente": "Cliente", "resumoVencimento": "Vencimiento", "resumoPrimeira": "1er cobro", "resumoTotal": "Total",
         "emitir": "Emitir cobro", "cobrancaCriada": "Cobro emitido", "recorrenciaCriada": "Recurrencia creada - el primer cobro ya fue emitido"
       },
       "config": {
@@ -2542,6 +2588,7 @@
     "TOO_MANY_CNPJ_REQUESTS": "Demasiadas búsquedas de CNPJ. Espera un momento.",
     "FIN_CONTATO_NAME_REQUIRED": "Ingresa el nombre.",
     "FIN_CONTATO_NOT_FOUND": "Contacto no encontrado.",
+    "FIN_CONTATO_EM_USO": "Este contacto tiene movimientos o cobros y no puede eliminarse. Desactívalo en su lugar.",
     "FIN_PARCELA_PAGO": "Solo un título pendiente puede desdoblarse.",
     "FIN_PARCELA_INVALIDO": "Un título generado no puede desdoblarse.",
     "FIN_PARCELA_JA": "El título ya está desdoblado.",

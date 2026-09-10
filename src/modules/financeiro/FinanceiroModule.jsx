@@ -30,6 +30,10 @@ const POPOVER_LARGURA = 300;
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
   const [aba, setAba] = useState("lancamentos");
+  // Atalho "Emitir Cobrança Direta" (Clientes & Fornecedores → Cobranças): o
+  // contato escolhido lá precisa atravessar a troca de aba, que só existe aqui -
+  // cada view busca os próprios dados e não conhece a outra.
+  const [cobrancaPrefillContatoId, setCobrancaPrefillContatoId] = useState(null);
   // Fora do celular a sidebar nasce expandida (o modo ícone-só é escolha do
   // usuário, ver .fin-sidebar-toggle em IresSidebar.jsx); no celular ela
   // nasce fora da tela - mesmo critério de largura do Kanban (AuthenticatedApp.jsx,
@@ -130,8 +134,20 @@ export default function FinanceiroModule({ onExit }) {
           {aba === "fluxo" && <FluxoView />}
           {aba === "matriz" && <FluxoCaixaMatrizView />}
           {aba === "dre" && <DREView />}
-          {aba === "cadastros" && <CadastrosView />}
-          {aba === "cobrancas" && <CobrancasView />}
+          {aba === "cadastros" && (
+            <CadastrosView
+              onEmitirCobranca={(contatoId) => {
+                setCobrancaPrefillContatoId(contatoId);
+                setAba("cobrancas");
+              }}
+            />
+          )}
+          {aba === "cobrancas" && (
+            <CobrancasView
+              contatoIdInicial={cobrancaPrefillContatoId}
+              onPrefillConsumido={() => setCobrancaPrefillContatoId(null)}
+            />
+          )}
         </div>
       </div>
 

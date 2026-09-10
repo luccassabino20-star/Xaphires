@@ -80,7 +80,7 @@
       "tag": "Sales"
     },
     "financeiro": {
-      "name": "ERP IRES",
+      "name": "IRES OS",
       "desc": "A complete platform for multiple segments. Automate purchasing, inventory, fleet, projects and finance with operational intelligence.",
       "tag": "ERP Management"
     },
@@ -664,6 +664,49 @@
       "taxas_caract": "Management fees (features)",
       "taxas_regras": "Management fee rules"
     },
+    "contatos": {
+      "titulo": "Customers & Suppliers",
+      "contador": "{{count}} contact registered",
+      "contador_other": "{{count}} contacts registered",
+      "novoCadastro": "New Contact",
+      "exportar": "Export",
+      "exportarCsv": "Export CSV",
+      "exportarPdf": "Export PDF",
+      "buscarPlaceholder": "Search by name, tax ID, email...",
+      "filtroTodos": "All",
+      "filtroClientes": "Customers",
+      "filtroFornecedores": "Suppliers",
+      "filtroParceiros": "Partners",
+      "statusTodos": "All",
+      "statusAtivos": "Active",
+      "statusInativos": "Inactive",
+      "colContato": "Contact",
+      "colDocumento": "Document",
+      "colTipo": "Type",
+      "colCidade": "City/State",
+      "colStatus": "Status",
+      "vazio": "No contacts found",
+      "acoesLinha": "Actions",
+      "tipoParceiro": "Partner",
+      "menuEditar": "Edit Contact",
+      "menuEmitirCobranca": "Issue Charge Directly",
+      "menuHistorico": "View History / Transactions",
+      "menuExcluir": "Delete",
+      "confirmExcluir": "Delete this contact? This action cannot be undone.",
+      "excluido": "Contact deleted",
+      "modal": {
+        "tituloNovo": "New Contact",
+        "tituloEditar": "Edit Contact",
+        "subtitulo": "Register a customer, supplier or partner to use in charges and entries.",
+        "abaDados": "Main Details",
+        "abaEndereco": "Address & Billing",
+        "consultarReceita": "Look up company"
+      },
+      "historico": {
+        "titulo": "Charge history",
+        "vazio": "No charges issued to this contact yet."
+      }
+    },
     "baixa": { "semConta": "No account", "confirmar": "Confirm" },
     "tit": { "numero": "Title no.", "identificacao": "Identification", "docNumero": "Document number", "emissao": "Issue date", "formaPagto": "Payment method", "semForma": "Not set", "apropriacao": "Allocation", "valores": "Amounts", "valorTitulo": "Title amount", "impostosRetidos": "Withheld taxes", "impostosAcrescidos": "Added taxes", "desconto": "Discount", "retencao": "Retention", "multa": "Penalty", "juros": "Interest", "valorLiquido": "Net amount", "emBreveImpostos": "Available in the taxes block (coming soon)", "observacao": "Notes", "detalhesPagto": "Payment details", "dataBaixa": "Settlement date", "darQuitado": "Settle ({{n}})", "selecionados": "{{n}} selected", "quitados": "{{n}} title(s) settled", "valorPago": "Amount paid", "baixaEmMovimentacao": "Settling and reversing happen in the Movements tab.",
     "impostosAplicados": "Applied taxes", "semImpostoAplicado": "No tax applied to this title.", "escolherImposto": "Choose a tax from the register", "aplicarImposto": "Apply", "impostoAplicado": "Tax applied", "recolhimento": "generated remittance", "valorTravadoImposto": "Remove the applied taxes to edit the title amount",
@@ -695,11 +738,14 @@
       "canceladaToast": "Charge canceled", "baixadaToast": "Charge confirmed", "pixCopiado": "Pix key copied",
       "semTelefone": "This customer has no phone number registered",
       "form": {
-        "titulo": "New charge", "unica": "One-time", "recorrente": "Recurring",
+        "titulo": "New charge", "subtitulo": "Issue a one-time charge or set up a recurring one for this customer.",
+        "unica": "One-time", "recorrente": "Recurring",
         "cliente": "Customer", "clientePlaceholder": "Search customer...", "descricao": "Description",
+        "descricaoPlaceholder": "E.g.: Monthly fee, service rendered...",
         "valor": "Amount", "vencimento": "Due date", "primeiraEmissao": "First charge", "intervalo": "Interval (months)",
         "metodo": "Method", "cardNumberSimulado": "Card number (simulated - ending in 0002/0003/0004 is declined)",
         "erroCliente": "Select a customer", "erroValor": "Enter a valid amount",
+        "resumoCliente": "Customer", "resumoVencimento": "Due date", "resumoPrimeira": "1st charge", "resumoTotal": "Total",
         "emitir": "Issue charge", "cobrancaCriada": "Charge issued", "recorrenciaCriada": "Recurring charge created - the first charge was already issued"
       },
       "config": {
@@ -2542,6 +2588,7 @@
     "TOO_MANY_CNPJ_REQUESTS": "Too many CNPJ lookups. Wait a moment.",
     "FIN_CONTATO_NAME_REQUIRED": "Enter the name.",
     "FIN_CONTATO_NOT_FOUND": "Contact not found.",
+    "FIN_CONTATO_EM_USO": "This contact has entries or charges and can't be deleted. Deactivate it instead.",
     "FIN_PARCELA_PAGO": "Only a pending title can be split.",
     "FIN_PARCELA_INVALIDO": "A generated title cannot be split.",
     "FIN_PARCELA_JA": "Title is already split.",

@@ -347,6 +347,20 @@ export function updateContato(id, c) {
     );
   return getContato(id);
 }
+// Exclusão de verdade (diferente do resto do Financeiro, que só desativa) - pedido
+// explícito, com uma proteção: lançamento ou cobrança antiga referenciando este
+// contato não pode virar órfão, então recusa em vez de apagar.
+export function deleteContato(id) {
+  const db = getDb();
+  const emLancamentos = db.prepare("SELECT COUNT(*) AS n FROM financeiro_lancamentos WHERE contato_id = ?").get(id).n;
+  const emCobrancas = db.prepare("SELECT COUNT(*) AS n FROM financeiro_cobrancas WHERE contato_id = ?").get(id).n;
+  if (emLancamentos > 0 || emCobrancas > 0) {
+    const err = new Error("Contato em uso");
+    err.code = "FIN_CONTATO_EM_USO";
+    throw err;
+  }
+  db.prepare("DELETE FROM financeiro_contatos WHERE id = ?").run(id);
+}
 
 // ---------- Impostos (alíquotas) ----------
 export function listImpostos() {

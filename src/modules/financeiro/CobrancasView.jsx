@@ -18,7 +18,7 @@ const STATUS_FILTRO = ["pending", "atrasado", "paid", "canceled", "refunded"];
 // do Xaphires. Duas sub-abas internas (Dashboard/Emissão e Configurações),
 // mesmo espírito de CadastrosView.jsx: a divisão vive dentro da tela, não na
 // sidebar (que já tem "Cobranças" como um item só).
-export default function CobrancasView() {
+export default function CobrancasView({ contatoIdInicial, onPrefillConsumido }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -31,6 +31,7 @@ export default function CobrancasView() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
+  const [prefillContatoId, setPrefillContatoId] = useState(null);
 
   const [fContato, setFContato] = useState("");
   const [fMetodo, setFMetodo] = useState("");
@@ -69,6 +70,18 @@ export default function CobrancasView() {
     carregarBase();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // Atalho "Emitir Cobrança Direta" (Clientes & Fornecedores): quem chegou aqui já
+  // escolheu o contato lá, então abre o modal pronto em vez de fazer escolher de
+  // novo. onPrefillConsumido limpa o estado no FinanceiroModule para o modal não
+  // reabrir sozinho numa próxima troca de aba.
+  useEffect(() => {
+    if (!contatoIdInicial) return;
+    setSubaba("dashboard");
+    setPrefillContatoId(contatoIdInicial);
+    setModalAberto(true);
+    onPrefillConsumido?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contatoIdInicial]);
   useEffect(() => {
     carregarLista();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -299,7 +312,13 @@ export default function CobrancasView() {
       )}
 
       {modalAberto && (
-        <NovaCobrancaModal contatos={contatos} gatewayProvider={gatewayProvider} onClose={() => setModalAberto(false)} onCreated={carregarLista} />
+        <NovaCobrancaModal
+          contatos={contatos}
+          gatewayProvider={gatewayProvider}
+          contatoIdInicial={prefillContatoId}
+          onClose={() => { setModalAberto(false); setPrefillContatoId(null); }}
+          onCreated={carregarLista}
+        />
       )}
     </div>
   );

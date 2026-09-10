@@ -80,7 +80,7 @@
       "tag": "Vertrieb"
     },
     "financeiro": {
-      "name": "ERP IRES",
+      "name": "IRES OS",
       "desc": "Komplette Plattform für mehrere Branchen. Automatisieren Sie Einkauf, Lager, Fuhrpark, Bauprojekte und Finanzen mit operativer Intelligenz.",
       "tag": "ERP-Verwaltung"
     },
@@ -364,6 +364,49 @@
       "taxas_caract": "Verwaltungsgebühren (Merkmale)",
       "taxas_regras": "Regeln für Verwaltungsgebühren"
     },
+    "contatos": {
+      "titulo": "Kunden & Lieferanten",
+      "contador": "{{count}} Kontakt erfasst",
+      "contador_other": "{{count}} Kontakte erfasst",
+      "novoCadastro": "Neuer Kontakt",
+      "exportar": "Exportieren",
+      "exportarCsv": "Als CSV exportieren",
+      "exportarPdf": "Als PDF exportieren",
+      "buscarPlaceholder": "Suche nach Name, Steuernummer, E-Mail...",
+      "filtroTodos": "Alle",
+      "filtroClientes": "Kunden",
+      "filtroFornecedores": "Lieferanten",
+      "filtroParceiros": "Partner",
+      "statusTodos": "Alle",
+      "statusAtivos": "Aktiv",
+      "statusInativos": "Inaktiv",
+      "colContato": "Kontakt",
+      "colDocumento": "Dokument",
+      "colTipo": "Typ",
+      "colCidade": "Stadt/Bundesland",
+      "colStatus": "Status",
+      "vazio": "Kein Kontakt gefunden",
+      "acoesLinha": "Aktionen",
+      "tipoParceiro": "Partner",
+      "menuEditar": "Kontakt bearbeiten",
+      "menuEmitirCobranca": "Direkte Rechnung ausstellen",
+      "menuHistorico": "Verlauf / Transaktionen anzeigen",
+      "menuExcluir": "Löschen",
+      "confirmExcluir": "Diesen Kontakt löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "excluido": "Kontakt gelöscht",
+      "modal": {
+        "tituloNovo": "Neuer Kontakt",
+        "tituloEditar": "Kontakt bearbeiten",
+        "subtitulo": "Erfassen Sie einen Kunden, Lieferanten oder Partner für Rechnungen und Buchungen.",
+        "abaDados": "Hauptdaten",
+        "abaEndereco": "Adresse & Abrechnung",
+        "consultarReceita": "Unternehmen abfragen"
+      },
+      "historico": {
+        "titulo": "Rechnungsverlauf",
+        "vazio": "Für diesen Kontakt wurden noch keine Rechnungen ausgestellt."
+      }
+    },
     "baixa": { "semConta": "Kein Konto", "confirmar": "Bestätigen" },
     "tit": { "numero": "Titel-Nr.", "identificacao": "Identifikation", "docNumero": "Belegnummer", "emissao": "Ausstellung", "formaPagto": "Zahlungsart", "semForma": "Nicht angegeben", "apropriacao": "Zuordnung", "valores": "Beträge", "valorTitulo": "Titelbetrag", "impostosRetidos": "Einbehaltene Steuern", "impostosAcrescidos": "Hinzugefügte Steuern", "desconto": "Rabatt", "retencao": "Einbehalt", "multa": "Vertragsstrafe", "juros": "Zinsen", "valorLiquido": "Nettobetrag", "emBreveImpostos": "Im Steuerblock verfügbar (demnächst)", "observacao": "Anmerkung", "detalhesPagto": "Zahlungsdetails", "dataBaixa": "Datum der Begleichung", "darQuitado": "Begleichen ({{n}})", "selecionados": "{{n}} ausgewählt", "quitados": "{{n}} Titel beglichen", "valorPago": "Bezahlter Betrag", "baixaEmMovimentacao": "Begleichung und Stornierung erfolgen im Tab Bewegung.",
     "impostosAplicados": "Angewendete Steuern", "semImpostoAplicado": "Keine Steuer auf diesen Titel angewendet.", "escolherImposto": "Wählen Sie eine Steuer aus den Stammdaten", "aplicarImposto": "Anwenden", "impostoAplicado": "Steuer angewendet", "recolhimento": "erzeugte Abführung", "valorTravadoImposto": "Entfernen Sie die angewendeten Steuern, um den Titelbetrag zu bearbeiten",
@@ -395,11 +438,14 @@
       "canceladaToast": "Rechnung storniert", "baixadaToast": "Rechnung bestätigt", "pixCopiado": "Pix-Schlüssel kopiert",
       "semTelefone": "Dieser Kunde hat keine Telefonnummer hinterlegt",
       "form": {
-        "titulo": "Neue Rechnung", "unica": "Einmalig", "recorrente": "Wiederkehrend",
+        "titulo": "Neue Rechnung", "subtitulo": "Stellen Sie eine einmalige Rechnung aus oder richten Sie eine wiederkehrende für diesen Kunden ein.",
+        "unica": "Einmalig", "recorrente": "Wiederkehrend",
         "cliente": "Kunde", "clientePlaceholder": "Kunde suchen...", "descricao": "Beschreibung",
+        "descricaoPlaceholder": "Z. B.: Monatsbeitrag, erbrachte Dienstleistung...",
         "valor": "Betrag", "vencimento": "Fälligkeit", "primeiraEmissao": "Erste Rechnung", "intervalo": "Intervall (Monate)",
         "metodo": "Methode", "cardNumberSimulado": "Kartennummer (simuliert - Endung 0002/0003/0004 wird abgelehnt)",
         "erroCliente": "Wählen Sie einen Kunden", "erroValor": "Geben Sie einen gültigen Betrag ein",
+        "resumoCliente": "Kunde", "resumoVencimento": "Fälligkeit", "resumoPrimeira": "1. Rechnung", "resumoTotal": "Gesamt",
         "emitir": "Rechnung ausstellen", "cobrancaCriada": "Rechnung ausgestellt", "recorrenciaCriada": "Wiederkehrende Rechnung erstellt - die erste Rechnung wurde bereits ausgestellt"
       },
       "config": {
@@ -2212,6 +2258,7 @@
     "TOO_MANY_CNPJ_REQUESTS": "Zu viele CNPJ-Suchen in kurzer Zeit. Warten Sie einen Moment.",
     "FIN_CONTATO_NAME_REQUIRED": "Geben Sie den Namen an.",
     "FIN_CONTATO_NOT_FOUND": "Kontakt nicht gefunden.",
+    "FIN_CONTATO_EM_USO": "Dieser Kontakt hat Buchungen oder Rechnungen und kann nicht gelöscht werden. Deaktivieren Sie ihn stattdessen.",
     "FIN_PARCELA_PAGO": "Nur ein ausstehender Titel kann aufgeteilt werden.",
     "FIN_PARCELA_INVALIDO": "Ein erstellter Titel kann nicht aufgeteilt werden.",
     "FIN_PARCELA_JA": "Titel ist bereits in Raten aufgeteilt.",
