@@ -61,18 +61,27 @@ async function processarEmpresa(companyId) {
   });
 }
 
+// TEMPORÁRIO (teste real pedido em 2026-09-10): 00:05 no horário de Brasília,
+// não 09:00 - depois do teste, voltar para um horário comercial (09:00
+// America/Sao_Paulo, não 09:00 do servidor: o Contabo roda em CEST, e
+// "09:00" sem fuso explícito dispararia às 09:00 da Alemanha, 4-5h adiantado
+// do que uma empresa brasileira espera).
 export function iniciarBillingCron() {
-  cron.schedule("0 9 * * *", async () => {
-    console.log("[billing-cron] iniciando varredura diária da régua de cobrança...");
-    const empresas = listarEmpresas();
-    for (const empresa of empresas) {
-      try {
-        await processarEmpresa(empresa.id);
-      } catch (err) {
-        console.error(`[billing-cron] falha ao processar empresa ${empresa.id}:`, err);
+  cron.schedule(
+    "5 0 * * *",
+    async () => {
+      console.log("[billing-cron] iniciando varredura diária da régua de cobrança...");
+      const empresas = listarEmpresas();
+      for (const empresa of empresas) {
+        try {
+          await processarEmpresa(empresa.id);
+        } catch (err) {
+          console.error(`[billing-cron] falha ao processar empresa ${empresa.id}:`, err);
+        }
       }
-    }
-    console.log("[billing-cron] varredura concluída.");
-  });
-  console.log("[billing-cron] agendado para 09:00 todos os dias.");
+      console.log("[billing-cron] varredura concluída.");
+    },
+    { timezone: "America/Sao_Paulo" }
+  );
+  console.log("[billing-cron] agendado para 00:05 (America/Sao_Paulo) - horário de teste, ver comentário acima.");
 }
