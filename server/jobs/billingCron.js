@@ -61,27 +61,28 @@ async function processarEmpresa(companyId) {
   });
 }
 
+// Separada do agendamento pra poder ser chamada uma vez só, na mão (teste
+// real, ou reprocessar um dia que falhou) sem esperar o próximo disparo do
+// cron - é exatamente o mesmo caminho que roda sozinho às 00:05.
+export async function rodarVarredura() {
+  console.log("[billing-cron] iniciando varredura diária da régua de cobrança...");
+  const empresas = listarEmpresas();
+  for (const empresa of empresas) {
+    try {
+      await processarEmpresa(empresa.id);
+    } catch (err) {
+      console.error(`[billing-cron] falha ao processar empresa ${empresa.id}:`, err);
+    }
+  }
+  console.log("[billing-cron] varredura concluída.");
+}
+
 // TEMPORÁRIO (teste real pedido em 2026-09-10): 00:05 no horário de Brasília,
 // não 09:00 - depois do teste, voltar para um horário comercial (09:00
 // America/Sao_Paulo, não 09:00 do servidor: o Contabo roda em CEST, e
 // "09:00" sem fuso explícito dispararia às 09:00 da Alemanha, 4-5h adiantado
 // do que uma empresa brasileira espera).
 export function iniciarBillingCron() {
-  cron.schedule(
-    "5 0 * * *",
-    async () => {
-      console.log("[billing-cron] iniciando varredura diária da régua de cobrança...");
-      const empresas = listarEmpresas();
-      for (const empresa of empresas) {
-        try {
-          await processarEmpresa(empresa.id);
-        } catch (err) {
-          console.error(`[billing-cron] falha ao processar empresa ${empresa.id}:`, err);
-        }
-      }
-      console.log("[billing-cron] varredura concluída.");
-    },
-    { timezone: "America/Sao_Paulo" }
-  );
+  cron.schedule("5 0 * * *", rodarVarredura, { timezone: "America/Sao_Paulo" });
   console.log("[billing-cron] agendado para 00:05 (America/Sao_Paulo) - horário de teste, ver comentário acima.");
 }
