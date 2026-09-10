@@ -97,6 +97,7 @@ import { resolverGateway, metodoValido as metodoCobrancaValido } from "./gateway
 import { montarExportContatos, gerarContatosCsv, gerarContatosPdf } from "./contatosExport.js";
 import { montarExportMovimentacao, gerarMovimentacaoCsv, gerarMovimentacaoPdf } from "./movimentacaoExport.js";
 import { montarExportTitulos, gerarTitulosCsv, gerarTitulosPdf } from "./titulosExport.js";
+import { montarExportFluxo, gerarFluxoCsv, gerarFluxoPdf } from "./fluxoExport.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -1089,6 +1090,26 @@ router.get(
     res.json(montarFluxo(ano));
   })
 );
+
+// Exportação CSV/PDF do Fluxo de Caixa (ano inteiro, mesma fonte da tela -
+// não confundir com /fluxo-caixa/export, que é da Matriz, outra fonte).
+router.get("/fluxo/export", ah(async (req, res) => {
+  const ano = Number(req.query.ano) || new Date().getFullYear();
+  const formato = req.query.formato === "pdf" ? "pdf" : "csv";
+  const lang = LOCALES.includes(req.query.lang) ? req.query.lang : "pt";
+  const fluxo = montarFluxo(ano);
+  const linhas = montarExportFluxo(fluxo, lang);
+  if (formato === "pdf") {
+    const buffer = await gerarFluxoPdf(linhas, ano, lang);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="fluxo-caixa-${ano}.pdf"`);
+    return res.send(buffer);
+  }
+  const buffer = gerarFluxoCsv(linhas, lang);
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="fluxo-caixa-${ano}.csv"`);
+  res.send(buffer);
+}));
 
 router.get(
   "/dre",

@@ -406,6 +406,42 @@ export const finRemoveAttachment = (lancamentoId, anexoId) =>
   request(`/financeiro/lancamentos/${lancamentoId}/anexos/${anexoId}`, { method: "DELETE" });
 export const finAttachmentDownloadUrl = (lancamentoId, anexoId) => `${BASE}/financeiro/lancamentos/${lancamentoId}/anexos/${anexoId}/download`;
 export const finGetFluxo = (ano) => request(`/financeiro/fluxo?ano=${ano}`);
+// Mesmo desenho de finExportTitulos: fetch com cookie, monta blob, nome do
+// arquivo vem do Content-Disposition que o servidor já decidiu.
+export async function finExportFluxo(ano, formato, lang) {
+  const p = new URLSearchParams({ ano, formato });
+  if (lang) p.set("lang", lang);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/fluxo/export?${p}`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      /* resposta sem corpo JSON */
+    }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  const disposicao = res.headers.get("Content-Disposition") || "";
+  const casado = /filename="?([^";]+)"?/i.exec(disposicao);
+  const nome = casado ? casado[1] : `fluxo-caixa-${ano}.${formato}`;
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 export const finGetDRE = (de, ate) => request(`/financeiro/dre?de=${de}&ate=${ate}`);
 // Fluxo de Caixa em matriz (DRE de caixa por período) - visão alternativa ao
 // /fluxo acima (que é só o resumo do ano corrente).
