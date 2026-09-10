@@ -18,7 +18,7 @@ const STATUS_FILTRO = ["pending", "atrasado", "paid", "canceled", "refunded"];
 // do Xaphires. Duas sub-abas internas (Dashboard/Emissão e Configurações),
 // mesmo espírito de CadastrosView.jsx: a divisão vive dentro da tela, não na
 // sidebar (que já tem "Cobranças" como um item só).
-export default function CobrancasView({ contatoIdInicial, onPrefillConsumido }) {
+export default function CobrancasView({ contatoIdInicial, descricaoInicial, valorInicial, onPrefillConsumido }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -32,6 +32,8 @@ export default function CobrancasView({ contatoIdInicial, onPrefillConsumido }) 
   const [erro, setErro] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
   const [prefillContatoId, setPrefillContatoId] = useState(null);
+  const [prefillDescricao, setPrefillDescricao] = useState("");
+  const [prefillValor, setPrefillValor] = useState("");
 
   const [fContato, setFContato] = useState("");
   const [fMetodo, setFMetodo] = useState("");
@@ -78,6 +80,8 @@ export default function CobrancasView({ contatoIdInicial, onPrefillConsumido }) 
     if (!contatoIdInicial) return;
     setSubaba("dashboard");
     setPrefillContatoId(contatoIdInicial);
+    setPrefillDescricao(descricaoInicial || "");
+    setPrefillValor(valorInicial || "");
     setModalAberto(true);
     onPrefillConsumido?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -316,7 +320,9 @@ export default function CobrancasView({ contatoIdInicial, onPrefillConsumido }) 
           contatos={contatos}
           gatewayProvider={gatewayProvider}
           contatoIdInicial={prefillContatoId}
-          onClose={() => { setModalAberto(false); setPrefillContatoId(null); }}
+          descricaoInicial={prefillDescricao}
+          valorInicial={prefillValor}
+          onClose={() => { setModalAberto(false); setPrefillContatoId(null); setPrefillDescricao(""); setPrefillValor(""); }}
           onCreated={carregarLista}
         />
       )}

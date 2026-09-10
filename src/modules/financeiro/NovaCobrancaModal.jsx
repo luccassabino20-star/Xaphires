@@ -81,15 +81,15 @@ function formatDueBR(iso) {
 // simulado mostra (mesma regra do checkout de assinatura em CheckoutModal.jsx)
 // - nenhum provedor real recebe número de cartão do nosso servidor, cartão de
 // verdade é sempre um link de checkout hospedado.
-export default function NovaCobrancaModal({ contatos, gatewayProvider, contatoIdInicial, onClose, onCreated }) {
+export default function NovaCobrancaModal({ contatos, gatewayProvider, contatoIdInicial, descricaoInicial, valorInicial, onClose, onCreated }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
 
   const [recorrente, setRecorrente] = useState(false);
   const [contatoId, setContatoId] = useState(() => contatoIdInicial || "");
-  const [descricao, setDescricao] = useState("");
-  const [valor, setValor] = useState("");
+  const [descricao, setDescricao] = useState(() => descricaoInicial || "");
+  const [valor, setValor] = useState(() => valorInicial || "");
   const [due, setDue] = useState(hojeCivil());
   const [intervaloMeses, setIntervaloMeses] = useState(1);
   const [metodo, setMetodo] = useState("pix");

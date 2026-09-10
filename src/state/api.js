@@ -332,6 +332,42 @@ export async function finExportMovimentacao({ contaId, de, ate, estornados, form
   URL.revokeObjectURL(url);
 }
 export const finMudarStatus = (id, status) => request(`/financeiro/lancamentos/${id}/status`, { method: "PATCH", body: { status } });
+// Mesmo desenho de finExportContatos: fetch com cookie, monta blob, nome do
+// arquivo vem do Content-Disposition que o servidor já decidiu.
+export async function finExportTitulos(formato, lang) {
+  const p = new URLSearchParams({ formato });
+  if (lang) p.set("lang", lang);
+  let res;
+  try {
+    res = await fetch(`${BASE}/financeiro/titulos/export?${p}`, { credentials: "same-origin" });
+  } catch {
+    throw erroDeRede();
+  }
+  if (!res.ok) {
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {
+      /* resposta sem corpo JSON */
+    }
+    const err = new Error(data?.error || `Erro ${res.status}`);
+    err.code = data?.code || null;
+    err.status = res.status;
+    throw err;
+  }
+  const disposicao = res.headers.get("Content-Disposition") || "";
+  const casado = /filename="?([^";]+)"?/i.exec(disposicao);
+  const nome = casado ? casado[1] : `titulos.${formato}`;
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 export const finDesdobrarLancamento = (id, dados) => request(`/financeiro/lancamentos/${id}/desdobrar`, { method: "POST", body: dados });
 export const finListImpostosAplicados = (id) => request(`/financeiro/lancamentos/${id}/impostos`);
 export const finListApropriacoes = (id) => request(`/financeiro/lancamentos/${id}/apropriacoes`);

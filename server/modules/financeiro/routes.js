@@ -89,6 +89,7 @@ import { estagio, valorAtualizadoCents, montarMensagem, varrerRecorrencias } fro
 import { resolverGateway, metodoValido as metodoCobrancaValido } from "./gateway/index.js";
 import { montarExportContatos, gerarContatosCsv, gerarContatosPdf } from "./contatosExport.js";
 import { montarExportMovimentacao, gerarMovimentacaoCsv, gerarMovimentacaoPdf } from "./movimentacaoExport.js";
+import { montarExportTitulos, gerarTitulosCsv, gerarTitulosPdf } from "./titulosExport.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -551,6 +552,26 @@ router.get(
     );
   })
 );
+
+// Exportação CSV/PDF da tela de Títulos - foto do cadastro inteiro (ao
+// contrário da Movimentação, que exporta um período): os filtros da tela são
+// só de exibição, quem quiser um recorte menor filtra de novo na planilha.
+router.get("/titulos/export", ah(async (req, res) => {
+  const formato = req.query.formato === "pdf" ? "pdf" : "csv";
+  const lang = LOCALES.includes(req.query.lang) ? req.query.lang : "pt";
+  const contatoById = Object.fromEntries(listContatos().map((c) => [c.id, c]));
+  const linhas = montarExportTitulos(listLancamentos(), { contatoById }, lang);
+  if (formato === "pdf") {
+    const buffer = await gerarTitulosPdf(linhas, lang);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'attachment; filename="titulos.pdf"');
+    return res.send(buffer);
+  }
+  const buffer = gerarTitulosCsv(linhas, lang);
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="titulos.csv"');
+  res.send(buffer);
+}));
 
 // Valida o corpo de um lançamento novo/editado. Devolve { error, code } ou null.
 // Referências opcionais (categoria, centro de custo, contato, conta) são

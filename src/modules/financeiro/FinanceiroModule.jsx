@@ -30,10 +30,13 @@ const POPOVER_LARGURA = 300;
 export default function FinanceiroModule({ onExit }) {
   const { t } = useTranslation();
   const [aba, setAba] = useState("lancamentos");
-  // Atalho "Emitir Cobrança Direta" (Clientes & Fornecedores → Cobranças): o
-  // contato escolhido lá precisa atravessar a troca de aba, que só existe aqui -
-  // cada view busca os próprios dados e não conhece a outra.
-  const [cobrancaPrefillContatoId, setCobrancaPrefillContatoId] = useState(null);
+  // Atalho "Emitir Cobrança Direta" (Clientes & Fornecedores → Cobranças, e
+  // agora também Títulos → Cobranças, "Gerar Boleto/Pix"): o contato (e,
+  // vindo de Títulos, a descrição/valor do título) precisa atravessar a troca
+  // de aba, que só existe aqui - cada view busca os próprios dados e não
+  // conhece a outra. Cadastros só manda o contatoId (assinatura antiga do
+  // atalho); Títulos manda o objeto inteiro.
+  const [cobrancaPrefill, setCobrancaPrefill] = useState(null);
   // Atalho "Ver Extrato" (Contas correntes → Conciliação & Importar Extrato):
   // mesmo raciocínio do prefill de cobrança acima.
   const [importarPrefillContaId, setImportarPrefillContaId] = useState(null);
@@ -130,7 +133,14 @@ export default function FinanceiroModule({ onExit }) {
 
         <div className="fin-body">
           {aba === "lancamentos" && <LancamentosView />}
-          {aba === "titulos" && <TitulosView />}
+          {aba === "titulos" && (
+            <TitulosView
+              onGerarCobranca={(prefill) => {
+                setCobrancaPrefill(prefill);
+                setAba("cobrancas");
+              }}
+            />
+          )}
           {aba === "movimentacao" && <MovimentacaoView />}
           {aba === "contas" && (
             <ContasView
@@ -152,7 +162,7 @@ export default function FinanceiroModule({ onExit }) {
           {aba === "cadastros" && (
             <CadastrosView
               onEmitirCobranca={(contatoId) => {
-                setCobrancaPrefillContatoId(contatoId);
+                setCobrancaPrefill({ contatoId });
                 setAba("cobrancas");
               }}
               onVerExtrato={(contaId) => {
@@ -163,8 +173,10 @@ export default function FinanceiroModule({ onExit }) {
           )}
           {aba === "cobrancas" && (
             <CobrancasView
-              contatoIdInicial={cobrancaPrefillContatoId}
-              onPrefillConsumido={() => setCobrancaPrefillContatoId(null)}
+              contatoIdInicial={cobrancaPrefill?.contatoId}
+              descricaoInicial={cobrancaPrefill?.descricao}
+              valorInicial={cobrancaPrefill?.valorInicial}
+              onPrefillConsumido={() => setCobrancaPrefill(null)}
             />
           )}
         </div>
