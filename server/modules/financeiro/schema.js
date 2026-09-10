@@ -1,3 +1,5 @@
+import { applyCobrancaSchema } from "./cobrancaSchema.js";
+
 // Schema do módulo Financeiro, no banco da EMPRESA (companies/<id>/app.sqlite).
 //
 // Segue o mesmo padrão de db.js applySchema: CREATE TABLE IF NOT EXISTS, rodado a
@@ -12,6 +14,7 @@
 //   - Data civil YYYY-MM-DD (due), o formato do <input type="date"> - nunca
 //     timestamp ISO, que apareceria como "Invalid Date" e sairia da ordenação.
 export function applyFinanceiroSchema(companyDb) {
+  applyCobrancaSchema(companyDb);
   companyDb.exec(`
     CREATE TABLE IF NOT EXISTS financeiro_categorias (
       id TEXT PRIMARY KEY,

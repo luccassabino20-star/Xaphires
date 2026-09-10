@@ -285,7 +285,7 @@
     }
   },
   "financeiro": {
-    "tabs": { "lancamentos": "Buchungen", "titulos": "Titel", "movimentacao": "Bewegung", "contas": "Konten", "fluxo": "Cashflow", "dre": "GuV", "importar": "Kontoauszug importieren", "cadastros": "Stammdaten" },
+    "tabs": { "lancamentos": "Buchungen", "titulos": "Titel", "movimentacao": "Bewegung", "contas": "Konten", "fluxo": "Cashflow", "dre": "GuV", "importar": "Kontoauszug importieren", "cadastros": "Stammdaten", "cobrancas": "Rechnungsstellung" },
     "sidebar": {
       "expandir": "Menü erweitern", "recolher": "Menü einklappen",
       "grupo": { "financeiro": "Finanzen", "relatorios": "Berichte & GuV", "futuros": "Kommende Module" },
@@ -369,7 +369,70 @@
     "impostosAplicados": "Angewendete Steuern", "semImpostoAplicado": "Keine Steuer auf diesen Titel angewendet.", "escolherImposto": "Wählen Sie eine Steuer aus den Stammdaten", "aplicarImposto": "Anwenden", "impostoAplicado": "Steuer angewendet", "recolhimento": "erzeugte Abführung", "valorTravadoImposto": "Entfernen Sie die angewendeten Steuern, um den Titelbetrag zu bearbeiten",
     "geradoDe": "Steuertitel erstellt aus Titel {{n}}", "gerou": "Steuertitel Nr. {{n}} erstellt", "badgeImposto": "Steuer", "pesquisePrompt": "Nutzen Sie die Suche und Filter oben und klicken Sie auf Suchen.", "rateadoN": "Aufgeteilt ({{n}})" },
     "forma": { "operacao_bancaria": "Bankgeschäft", "pix": "Pix", "boleto": "Zahlschein", "transferencia": "Überweisung", "dinheiro": "Bargeld", "cheque": "Scheck", "cartao": "Karte" },
-    "parcela": { "botao": "In Raten aufteilen", "qtd": "Raten", "intervalo": "Intervall (Monate)", "confirmar": "Aufteilen", "xdeN": "{{x}}/{{n}}", "deTitulo": "Rate {{x}}/{{n}} von Titel {{t}}", "parcelado": "In {{n}}x aufgeteilt (Raten-Nr. {{nums}})", "desdobrado": "In {{n}} Raten aufgeteilt" }
+    "parcela": { "botao": "In Raten aufteilen", "qtd": "Raten", "intervalo": "Intervall (Monate)", "confirmar": "Aufteilen", "xdeN": "{{x}}/{{n}}", "deTitulo": "Rate {{x}}/{{n}} von Titel {{t}}", "parcelado": "In {{n}}x aufgeteilt (Raten-Nr. {{nums}})", "desdobrado": "In {{n}} Raten aufgeteilt" },
+    "cobrancas": {
+      "subaba": { "dashboard": "Dashboard", "config": "Einstellungen" },
+      "kpi": {
+        "recebido": "Erhaltener Umsatz (Monat)", "aReceber": "Offene Forderungen", "atrasado": "Zahlungsverzug",
+        "atencao": "Achtung", "saldo": "Verfügbares Guthaben", "solicitarSaque": "Überweisung anfordern",
+        "saqueIndisponivel": "Verfügbar, sobald ein echter Zahlungsanbieter konfiguriert ist"
+      },
+      "filtro": { "todosClientes": "Alle Kunden", "cliente": "Kunde", "todosMetodos": "Alle Methoden", "todosStatus": "Alle Status" },
+      "metodo": { "pix": "Pix", "boleto": "Boleto", "card": "Karte" },
+      "status": { "pending": "Ausstehend", "atrasado": "Überfällig", "paid": "Bezahlt", "canceled": "Storniert", "refunded": "Erstattet" },
+      "nova": "+ Neue Rechnung",
+      "vazio": "Keine Rechnungen gefunden.",
+      "col": { "numero": "Nr.", "cliente": "Kunde", "descricao": "Beschreibung", "metodo": "Methode", "valor": "Betrag", "vencimento": "Fälligkeit", "status": "Status" },
+      "acao": {
+        "copiarPix": "Pix kopieren", "baixarBoleto": "Boleto herunterladen", "whatsapp": "Per WhatsApp senden",
+        "baixarManual": "Manuell als bezahlt markieren", "devConfirmar": "Bestätigen (simuliert)",
+        "devConfirmarHint": "Gibt es nur beim simulierten Anbieter - markiert diese Rechnung ohne echtes Gateway als bezahlt.",
+        "cancelar": "Stornieren"
+      },
+      "valorOriginalHint": "Ursprünglicher Betrag vor Verzugszuschlag/Zinsen",
+      "confirmCancelar": "Diese Rechnung stornieren?",
+      "confirmBaixar": "Diese Rechnung manuell als bezahlt markieren? Nutzen, wenn die Zahlung außerhalb des Gateways einging (Bargeld, separate Überweisung...).",
+      "canceladaToast": "Rechnung storniert", "baixadaToast": "Rechnung bestätigt", "pixCopiado": "Pix-Schlüssel kopiert",
+      "semTelefone": "Dieser Kunde hat keine Telefonnummer hinterlegt",
+      "form": {
+        "titulo": "Neue Rechnung", "unica": "Einmalig", "recorrente": "Wiederkehrend",
+        "cliente": "Kunde", "clientePlaceholder": "Kunde suchen...", "descricao": "Beschreibung",
+        "valor": "Betrag", "vencimento": "Fälligkeit", "primeiraEmissao": "Erste Rechnung", "intervalo": "Intervall (Monate)",
+        "metodo": "Methode", "cardNumberSimulado": "Kartennummer (simuliert - Endung 0002/0003/0004 wird abgelehnt)",
+        "erroCliente": "Wählen Sie einen Kunden", "erroValor": "Geben Sie einen gültigen Betrag ein",
+        "emitir": "Rechnung ausstellen", "cobrancaCriada": "Rechnung ausgestellt", "recorrenciaCriada": "Wiederkehrende Rechnung erstellt - die erste Rechnung wurde bereits ausgestellt"
+      },
+      "config": {
+        "reguaTitulo": "Zahlungserinnerungen",
+        "reguaHint": "Legt fest, wann jede Rechnung in das Erinnerungsfenster eintritt, und den Text jeder Phase. Nichts wird automatisch versendet - die Schaltfläche \"Per WhatsApp senden\" in der Rechnungszeile nutzt diese Nachricht, aber Sie sind es, der sie sendet.",
+        "diasAntes": "Tage vor Fälligkeit", "multa": "Verzugszuschlag (%)", "jurosMes": "Monatlicher Zins (%)",
+        "mensagemPre": "Nachricht - vor Fälligkeit", "mensagemDia": "Nachricht - am Fälligkeitstag", "mensagemPos": "Nachricht - überfällig",
+        "placeholdersHint": "Nachrichten akzeptieren Name, Betrag, Fälligkeit und Link in doppelten geschweiften Klammern - sie werden beim Erstellen der Erinnerung ersetzt.",
+        "reguaSalva": "Erinnerungen gespeichert",
+        "gatewayTitulo": "Zahlungs-Gateway",
+        "gatewayHint": "Jedes Unternehmen nutzt sein eigenes Konto beim gewählten Anbieter - das ist nicht dieselbe Abrechnung wie das Xaphires-Abonnement.",
+        "provedor": "Anbieter", "provedorSimulado": "Simuliert (Entwicklung)",
+        "provedorNome": { "mercadopago": "Mercado Pago", "bancointer": "Banco Inter" },
+        "emBreve": "demnächst", "ambiente": "Umgebung", "sandbox": "Sandbox (Tests)", "producao": "Produktion",
+        "simuladoHint": "Pix und Boleto entstehen ausstehend; bestätigen Sie mit der Aktion \"Bestätigen (simuliert)\" in der Rechnungszeile. Karte mit Endung 0002/0003/0004 wird abgelehnt.",
+        "indisponivelHint": "Dieser Anbieter ist noch nicht verfügbar - verwenden Sie vorerst den simulierten.",
+        "gatewaySalvo": "Einstellungen gespeichert"
+      },
+      "whatsapp": {
+        "titulo": "WhatsApp-Verbindung (Kostenlose Automatisierung)",
+        "hint": "Verbindet das WhatsApp dieses Unternehmens, damit die Zahlungserinnerungen von selbst gesendet werden können, ohne zu klicken. Nutzt WhatsApp Web, nicht die offizielle API - die gescannte Nummer unterliegt den WhatsApp-Regeln für Automatisierung.",
+        "conectar": "WhatsApp verbinden",
+        "gerandoQr": "QR-Code wird erstellt...",
+        "instrucoesQr": "Öffnen Sie WhatsApp auf dem Handy, tippen Sie auf Weitere Optionen > Verknüpfte Geräte > Gerät verknüpfen, und scannen Sie den obigen Code.",
+        "conectado": "Verbunden",
+        "desconectar": "Trennen",
+        "confirmDesconectar": "Dieses WhatsApp trennen? Zum erneuten Verbinden muss ein neuer QR-Code gescannt werden.",
+        "numeroTeste": "Testnummer",
+        "enviarTeste": "Testnachricht senden",
+        "testeEnviado": "Testnachricht gesendet",
+        "mensagemTeste": "Testnachricht von Xaphires - die Verbindung funktioniert einwandfrei."
+      }
+    }
   },
   "saudeClinicas": {
     "voltarCards": "Zurück zu den Karten",
@@ -2083,6 +2146,18 @@
     "FIN_MASTER_ALWAYS": "Der Master hat bereits Zugriff auf Finanzen.",
     "FIN_TIPO_INVALID": "Ungültiger Buchungstyp.",
     "FIN_VALUE_INVALID": "Ungültiger Betrag.",
+    "FIN_COBRANCA_NOT_FOUND": "Rechnung nicht gefunden.",
+    "FIN_METODO_INVALID": "Ungültige Zahlungsmethode.",
+    "FIN_METODO_NAO_SUPORTADO": "Der konfigurierte Anbieter unterstützt diese Methode nicht.",
+    "FIN_COBRANCA_PAGA": "Eine bezahlte Rechnung kann nicht storniert werden.",
+    "FIN_COBRANCA_STATUS": "Diese Rechnung kann diese Aktion im aktuellen Status nicht erhalten.",
+    "FIN_COBRANCA_SEM_LEMBRETE": "Diese Rechnung ist nicht im Erinnerungsfenster.",
+    "FIN_GATEWAY_PROVIDER_INDISPONIVEL": "Dieser Anbieter ist noch nicht verfügbar.",
+    "FIN_GATEWAY_AMBIENTE_INVALID": "Ungültige Umgebung.",
+    "WHATSAPP_NOT_READY": "WhatsApp nicht verbunden.",
+    "WHATSAPP_PHONE_INVALID": "Ungültige Telefonnummer.",
+    "WHATSAPP_MESSAGE_INVALID": "Geben Sie Telefonnummer und Nachricht ein.",
+    "WHATSAPP_QR_NOT_AVAILABLE": "QR-Code nicht verfügbar.",
     "FIN_DATE_INVALID": "Ungültiges Fälligkeitsdatum.",
     "FIN_PERIODO_INVALIDO": "Das Startdatum darf nicht nach dem Enddatum liegen.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Nur ein beglichener Titel kann abgeglichen werden.",

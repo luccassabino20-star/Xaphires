@@ -13,6 +13,8 @@ const PATHS = {
   relatorios: "M4 20V10m5 10V4m5 16v-7m5 7V8M4 20h16",
   // Duas pessoas - "Users"
   cadastros: "M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm7 10v-2a4 4 0 0 0-3-3.87M15 3.13A4 4 0 0 1 15 10.87",
+  // Recibo/fatura - retângulo com borda serrilhada embaixo e linhas de texto
+  cobrancas: "M6 3h12v18l-3-2-3 2-3-2-3 2zm3 5h6m-6 4h6m-6 4h3",
 };
 function Icon({ name, size = 19 }) {
   const d = PATHS[name];
@@ -50,13 +52,18 @@ const GRUPOS = [
     ],
   },
   { id: "cadastros", icon: "cadastros", labelKey: "financeiro.tabs.cadastros" },
+  // Cobranças (Faturamento) - item de topo como Cadastros, sem accordion: a
+  // tela interna já tem suas próprias sub-abas (Dashboard/Emissão e
+  // Configurações), duplicar aqui em cima seria menu dentro de outro pelo
+  // mesmo dado. Saiu de ITENS_FUTUROS (era só popover "em breve") porque agora
+  // é uma tela de verdade.
+  { id: "cobrancas", icon: "cobrancas", labelKey: "financeiro.tabs.cobrancas" },
 ];
 
-// Compras & Estoque, Faturamento e Relatórios & BI - ver o comentário em
-// FinanceiroModule.jsx sobre por que viram popover em vez de navegar.
+// Compras & Estoque e Relatórios & BI - ver o comentário em FinanceiroModule.jsx
+// sobre por que viram popover em vez de navegar.
 export const ITENS_FUTUROS = [
   { id: "compras-estoque", icon: "estoque", labelKey: "modules.compras-estoque.name", descKey: "modules.compras-estoque.desc" },
-  { id: "faturamento", icon: "faturamento", labelKey: "modules.faturamento.name", descKey: "modules.faturamento.desc" },
   { id: "relatorios-bi", icon: "bi", labelKey: "modules.relatorios-bi.name", descKey: "modules.relatorios-bi.desc" },
 ];
 

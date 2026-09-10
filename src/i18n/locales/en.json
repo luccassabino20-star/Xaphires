@@ -563,7 +563,7 @@
     }
   },
   "financeiro": {
-    "tabs": { "lancamentos": "Entries", "titulos": "Titles", "movimentacao": "Movements", "contas": "Accounts", "fluxo": "Cash flow", "matriz": "Cash Flow Matrix", "dre": "P&L", "importar": "Import statement", "cadastros": "Registers" },
+    "tabs": { "lancamentos": "Entries", "titulos": "Titles", "movimentacao": "Movements", "contas": "Accounts", "fluxo": "Cash flow", "matriz": "Cash Flow Matrix", "dre": "P&L", "importar": "Import statement", "cadastros": "Registers", "cobrancas": "Billing" },
     "sidebar": {
       "expandir": "Expand menu", "recolher": "Collapse menu",
       "grupo": { "financeiro": "Finance", "relatorios": "Reports & P&L", "futuros": "Upcoming Modules" },
@@ -669,7 +669,70 @@
     "impostosAplicados": "Applied taxes", "semImpostoAplicado": "No tax applied to this title.", "escolherImposto": "Choose a tax from the register", "aplicarImposto": "Apply", "impostoAplicado": "Tax applied", "recolhimento": "generated remittance", "valorTravadoImposto": "Remove the applied taxes to edit the title amount",
     "geradoDe": "Tax title generated from title {{n}}", "gerou": "Generated tax title no. {{n}}", "badgeImposto": "tax", "pesquisePrompt": "Use the search and filters above, then click Search.", "rateadoN": "Split ({{n}})" },
     "forma": { "operacao_bancaria": "Bank operation", "pix": "Pix", "boleto": "Bank slip", "transferencia": "Transfer", "dinheiro": "Cash", "cheque": "Check", "cartao": "Card" },
-    "parcela": { "botao": "Split into installments", "qtd": "Installments", "intervalo": "Interval (months)", "confirmar": "Split", "xdeN": "{{x}}/{{n}}", "deTitulo": "Installment {{x}}/{{n}} of title {{t}}", "parcelado": "Split into {{n}}x (installments no. {{nums}})", "desdobrado": "Split into {{n}} installments" }
+    "parcela": { "botao": "Split into installments", "qtd": "Installments", "intervalo": "Interval (months)", "confirmar": "Split", "xdeN": "{{x}}/{{n}}", "deTitulo": "Installment {{x}}/{{n}} of title {{t}}", "parcelado": "Split into {{n}}x (installments no. {{nums}})", "desdobrado": "Split into {{n}} installments" },
+    "cobrancas": {
+      "subaba": { "dashboard": "Dashboard", "config": "Settings" },
+      "kpi": {
+        "recebido": "Revenue received (month)", "aReceber": "Receivable", "atrasado": "Overdue",
+        "atencao": "Attention", "saldo": "Available balance", "solicitarSaque": "Request transfer",
+        "saqueIndisponivel": "Available once a real payment provider is configured"
+      },
+      "filtro": { "todosClientes": "All customers", "cliente": "Customer", "todosMetodos": "All methods", "todosStatus": "All statuses" },
+      "metodo": { "pix": "Pix", "boleto": "Boleto", "card": "Card" },
+      "status": { "pending": "Awaiting", "atrasado": "Overdue", "paid": "Paid", "canceled": "Canceled", "refunded": "Refunded" },
+      "nova": "+ New charge",
+      "vazio": "No charges found.",
+      "col": { "numero": "No.", "cliente": "Customer", "descricao": "Description", "metodo": "Method", "valor": "Amount", "vencimento": "Due date", "status": "Status" },
+      "acao": {
+        "copiarPix": "Copy Pix", "baixarBoleto": "Download boleto", "whatsapp": "Send WhatsApp",
+        "baixarManual": "Mark as paid manually", "devConfirmar": "Confirm (simulated)",
+        "devConfirmarHint": "Only exists on the simulated provider - marks this charge as paid without a real gateway.",
+        "cancelar": "Cancel"
+      },
+      "valorOriginalHint": "Original amount before late fee/interest",
+      "confirmCancelar": "Cancel this charge?",
+      "confirmBaixar": "Mark this charge as paid manually? Use this when payment arrived outside the gateway (cash, a separate transfer...).",
+      "canceladaToast": "Charge canceled", "baixadaToast": "Charge confirmed", "pixCopiado": "Pix key copied",
+      "semTelefone": "This customer has no phone number registered",
+      "form": {
+        "titulo": "New charge", "unica": "One-time", "recorrente": "Recurring",
+        "cliente": "Customer", "clientePlaceholder": "Search customer...", "descricao": "Description",
+        "valor": "Amount", "vencimento": "Due date", "primeiraEmissao": "First charge", "intervalo": "Interval (months)",
+        "metodo": "Method", "cardNumberSimulado": "Card number (simulated - ending in 0002/0003/0004 is declined)",
+        "erroCliente": "Select a customer", "erroValor": "Enter a valid amount",
+        "emitir": "Issue charge", "cobrancaCriada": "Charge issued", "recorrenciaCriada": "Recurring charge created - the first charge was already issued"
+      },
+      "config": {
+        "reguaTitulo": "Collection reminders",
+        "reguaHint": "Defines when each charge enters the reminder window and the text for each stage. Nothing is sent automatically - the \"Send WhatsApp\" button on the charge row uses this message, but you're the one who sends it.",
+        "diasAntes": "Days before due date", "multa": "Late fee (%)", "jurosMes": "Monthly interest (%)",
+        "mensagemPre": "Message - before due date", "mensagemDia": "Message - on due date", "mensagemPos": "Message - overdue",
+        "placeholdersHint": "Messages accept name, amount, due date and link between double curly braces - they're replaced when the reminder is built.",
+        "reguaSalva": "Reminders saved",
+        "gatewayTitulo": "Payment gateway",
+        "gatewayHint": "Each company uses its own account with the chosen provider - this is not the same charge as the Xaphires subscription.",
+        "provedor": "Provider", "provedorSimulado": "Simulated (development)",
+        "provedorNome": { "mercadopago": "Mercado Pago", "bancointer": "Banco Inter" },
+        "emBreve": "coming soon", "ambiente": "Environment", "sandbox": "Sandbox (testing)", "producao": "Production",
+        "simuladoHint": "Pix and boleto are born pending; confirm with the \"Confirm (simulated)\" action on the charge row. Cards ending in 0002/0003/0004 are declined.",
+        "indisponivelHint": "This provider isn't available yet - use the simulated one for now.",
+        "gatewaySalvo": "Settings saved"
+      },
+      "whatsapp": {
+        "titulo": "WhatsApp Connection (Free Automation)",
+        "hint": "Connects this company's WhatsApp so the collection reminders can be sent automatically, with no clicking. Uses WhatsApp Web, not the official API - the scanned number is subject to WhatsApp's rules on automation.",
+        "conectar": "Connect WhatsApp",
+        "gerandoQr": "Generating QR Code...",
+        "instrucoesQr": "Open WhatsApp on your phone, tap More options > Linked devices > Link a device, and scan the code above.",
+        "conectado": "Connected",
+        "desconectar": "Disconnect",
+        "confirmDesconectar": "Disconnect this WhatsApp? You'll need to scan a new QR Code to reconnect.",
+        "numeroTeste": "Test number",
+        "enviarTeste": "Send test message",
+        "testeEnviado": "Test message sent",
+        "mensagemTeste": "Test message from Xaphires - the connection is working correctly."
+      }
+    }
   },
   "saudeClinicas": {
     "voltarCards": "Back to cards",
@@ -2413,6 +2476,18 @@
     "FIN_MASTER_ALWAYS": "The master already has access to Finance.",
     "FIN_TIPO_INVALID": "Invalid entry type.",
     "FIN_VALUE_INVALID": "Invalid amount.",
+    "FIN_COBRANCA_NOT_FOUND": "Charge not found.",
+    "FIN_METODO_INVALID": "Invalid charge method.",
+    "FIN_METODO_NAO_SUPORTADO": "The configured provider doesn't charge by this method.",
+    "FIN_COBRANCA_PAGA": "A paid charge cannot be canceled.",
+    "FIN_COBRANCA_STATUS": "This charge can't receive this action in its current state.",
+    "FIN_COBRANCA_SEM_LEMBRETE": "This charge isn't in the reminder window.",
+    "FIN_GATEWAY_PROVIDER_INDISPONIVEL": "This provider isn't available yet.",
+    "FIN_GATEWAY_AMBIENTE_INVALID": "Invalid environment.",
+    "WHATSAPP_NOT_READY": "WhatsApp not connected.",
+    "WHATSAPP_PHONE_INVALID": "Invalid phone number.",
+    "WHATSAPP_MESSAGE_INVALID": "Enter a phone number and a message.",
+    "WHATSAPP_QR_NOT_AVAILABLE": "QR Code not available.",
     "FIN_DATE_INVALID": "Invalid due date.",
     "FIN_PERIODO_INVALIDO": "The start date cannot be later than the end date.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Only a settled entry can be reconciled.",

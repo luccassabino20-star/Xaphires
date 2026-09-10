@@ -10196,6 +10196,102 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   .fin-tit-cab { grid-template-columns: 1fr; }
 }
 
+/* ---------- Cobranças (Faturamento) ----------
+   Empresa cobrando os PRÓPRIOS clientes dela (Pix/boleto/cartão) - reaproveita
+   .fin-table/.fin-toolbar/.fin-kpi* já existentes no módulo; só o que é
+   específico de cobrança (sub-abas, badges de método/status, cards de config)
+   entra aqui. */
+.fin-cobr-subtabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid var(--border-subtle); }
+.fin-cobr-subtab {
+  padding: 10px 4px;
+  margin-right: 14px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.fin-cobr-subtab:hover { color: var(--text-primary); }
+.fin-cobr-subtab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.fin-cobr-kpi-alerta {
+  align-self: flex-start;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+}
+.fin-kpi-atrasado .fin-kpi-value { color: var(--danger); }
+.fin-kpi-saldo { gap: 10px; }
+.fin-kpi-saldo .btn-secondary { align-self: flex-start; }
+
+.fin-cobr-badge-metodo, .fin-cobr-badge-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 650;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.fin-cobr-metodo-pix { color: var(--fin-entrada); background: color-mix(in srgb, var(--fin-entrada) 14%, transparent); }
+.fin-cobr-metodo-boleto { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.fin-cobr-metodo-card { color: var(--text-secondary); background: var(--bg-list); }
+
+.fin-cobr-status-pending { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.fin-cobr-status-atrasado { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); }
+.fin-cobr-status-paid { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+.fin-cobr-status-canceled, .fin-cobr-status-refunded { color: var(--text-muted); background: var(--bg-list); }
+
+.fin-cobr-valor-original { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+.fin-acao-perigo { color: var(--danger); }
+
+/* Configurações (régua + gateway) */
+.fin-cobr-config { display: flex; flex-direction: column; gap: 20px; max-width: 720px; }
+.fin-cobr-config-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+.fin-cobr-config-title { margin: 0; font-size: 15px; font-weight: 650; }
+.fin-cobr-config-hint { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+.fin-cobr-config-alerta {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.fin-wa-qr-box { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px; }
+.fin-wa-qr-img { width: 220px; height: 220px; border-radius: 8px; border: 1px solid var(--border-subtle); background: #fff; padding: 8px; }
+.fin-wa-conectado { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fin-wa-numero { font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.fin-wa-teste { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; padding-top: 12px; border-top: 1px dashed var(--border-subtle); }
+.fin-wa-teste .auth-field { flex: 1; min-width: 180px; }
+
+.fin-cobr-config-card textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-list);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  resize: vertical;
+}
+
 .fin-mov-titulo { font-size: 14px; font-weight: 650; margin: 22px 0 10px; color: var(--text-secondary); }
 .fin-mov-titulo:first-of-type { margin-top: 4px; }
 

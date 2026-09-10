@@ -563,7 +563,7 @@
     }
   },
   "financeiro": {
-    "tabs": { "lancamentos": "Lançamentos", "titulos": "Títulos", "movimentacao": "Movimentação", "contas": "Contas", "fluxo": "Fluxo de caixa", "matriz": "Matriz de Caixa", "dre": "DRE", "importar": "Importar extrato", "cadastros": "Cadastros" },
+    "tabs": { "lancamentos": "Lançamentos", "titulos": "Títulos", "movimentacao": "Movimentação", "contas": "Contas", "fluxo": "Fluxo de caixa", "matriz": "Matriz de Caixa", "dre": "DRE", "importar": "Importar extrato", "cadastros": "Cadastros", "cobrancas": "Cobranças" },
     "sidebar": {
       "expandir": "Expandir menu", "recolher": "Recolher menu",
       "grupo": { "financeiro": "Financeiro", "relatorios": "Relatórios & DRE", "futuros": "Módulos Futuros" },
@@ -669,7 +669,70 @@
     "impostosAplicados": "Impostos aplicados", "semImpostoAplicado": "Nenhum imposto aplicado a este título.", "escolherImposto": "Escolha um imposto do cadastro", "aplicarImposto": "Aplicar", "impostoAplicado": "Imposto aplicado", "recolhimento": "gerou recolhimento", "valorTravadoImposto": "Remova os impostos aplicados para editar o valor do título",
     "geradoDe": "Título de imposto gerado a partir do título {{n}}", "gerou": "Gerou o título de imposto nº {{n}}", "badgeImposto": "imposto", "pesquisePrompt": "Use a busca e os filtros acima e clique em Pesquisar.", "rateadoN": "Rateado ({{n}})" },
     "forma": { "operacao_bancaria": "Operação bancária", "pix": "Pix", "boleto": "Boleto", "transferencia": "Transferência", "dinheiro": "Dinheiro", "cheque": "Cheque", "cartao": "Cartão" },
-    "parcela": { "botao": "Desdobrar em parcelas", "qtd": "Parcelas", "intervalo": "Intervalo (meses)", "confirmar": "Desdobrar", "xdeN": "{{x}}/{{n}}", "deTitulo": "Parcela {{x}}/{{n}} do título {{t}}", "parcelado": "Parcelado em {{n}}x (parcelas nº {{nums}})", "desdobrado": "Desdobrado em {{n}} parcelas" }
+    "parcela": { "botao": "Desdobrar em parcelas", "qtd": "Parcelas", "intervalo": "Intervalo (meses)", "confirmar": "Desdobrar", "xdeN": "{{x}}/{{n}}", "deTitulo": "Parcela {{x}}/{{n}} do título {{t}}", "parcelado": "Parcelado em {{n}}x (parcelas nº {{nums}})", "desdobrado": "Desdobrado em {{n}} parcelas" },
+    "cobrancas": {
+      "subaba": { "dashboard": "Dashboard", "config": "Configurações" },
+      "kpi": {
+        "recebido": "Faturamento recebido (mês)", "aReceber": "A receber", "atrasado": "Inadimplência",
+        "atencao": "Atenção", "saldo": "Saldo disponível", "solicitarSaque": "Solicitar transferência",
+        "saqueIndisponivel": "Disponível quando um provedor de pagamento real estiver configurado"
+      },
+      "filtro": { "todosClientes": "Todos os clientes", "cliente": "Cliente", "todosMetodos": "Todos os métodos", "todosStatus": "Todas as situações" },
+      "metodo": { "pix": "Pix", "boleto": "Boleto", "card": "Cartão" },
+      "status": { "pending": "Aguardando", "atrasado": "Atrasado", "paid": "Pago", "canceled": "Cancelado", "refunded": "Reembolsado" },
+      "nova": "+ Nova cobrança",
+      "vazio": "Nenhuma cobrança encontrada.",
+      "col": { "numero": "Nº", "cliente": "Cliente", "descricao": "Descrição", "metodo": "Método", "valor": "Valor", "vencimento": "Vencimento", "status": "Situação" },
+      "acao": {
+        "copiarPix": "Copiar Pix", "baixarBoleto": "Baixar boleto", "whatsapp": "Enviar WhatsApp",
+        "baixarManual": "Dar baixa manual", "devConfirmar": "Confirmar (simulado)",
+        "devConfirmarHint": "Só existe no provedor simulado - marca esta cobrança como paga sem gateway de verdade.",
+        "cancelar": "Cancelar"
+      },
+      "valorOriginalHint": "Valor original antes de multa/juros por atraso",
+      "confirmCancelar": "Cancelar esta cobrança?",
+      "confirmBaixar": "Dar baixa manual nesta cobrança? Use quando o pagamento chegou fora do gateway (dinheiro, transferência avulsa...).",
+      "canceladaToast": "Cobrança cancelada", "baixadaToast": "Cobrança confirmada", "pixCopiado": "Chave Pix copiada",
+      "semTelefone": "Este cliente não tem telefone cadastrado",
+      "form": {
+        "titulo": "Nova cobrança", "unica": "Única", "recorrente": "Recorrente",
+        "cliente": "Cliente", "clientePlaceholder": "Buscar cliente...", "descricao": "Descrição",
+        "valor": "Valor", "vencimento": "Vencimento", "primeiraEmissao": "Primeira cobrança", "intervalo": "Intervalo (meses)",
+        "metodo": "Método", "cardNumberSimulado": "Número do cartão (simulado - final 0002/0003/0004 é recusado)",
+        "erroCliente": "Selecione um cliente", "erroValor": "Informe um valor válido",
+        "emitir": "Emitir cobrança", "cobrancaCriada": "Cobrança emitida", "recorrenciaCriada": "Recorrência criada - a primeira cobrança já foi emitida"
+      },
+      "config": {
+        "reguaTitulo": "Régua de cobrança",
+        "reguaHint": "Define quando cada cobrança entra no período de lembrete e o texto de cada estágio. Nada é enviado sozinho - o botão \"Enviar WhatsApp\" na linha da cobrança usa esta mensagem, mas quem manda é você.",
+        "diasAntes": "Dias antes do vencimento", "multa": "Multa (%)", "jurosMes": "Juros ao mês (%)",
+        "mensagemPre": "Mensagem - pré-vencimento", "mensagemDia": "Mensagem - no vencimento", "mensagemPos": "Mensagem - em atraso",
+        "placeholdersHint": "As mensagens aceitam nome, valor, vencimento e link entre chaves duplas - são substituídos na hora de montar o lembrete.",
+        "reguaSalva": "Régua salva",
+        "gatewayTitulo": "Gateway de pagamento",
+        "gatewayHint": "Cada empresa usa a própria conta no provedor escolhido - não é a mesma cobrança da assinatura do Xaphires.",
+        "provedor": "Provedor", "provedorSimulado": "Simulado (desenvolvimento)",
+        "provedorNome": { "mercadopago": "Mercado Pago", "bancointer": "Banco Inter" },
+        "emBreve": "em breve", "ambiente": "Ambiente", "sandbox": "Sandbox (testes)", "producao": "Produção",
+        "simuladoHint": "Pix e boleto nascem pendentes; confirme pela ação \"Confirmar (simulado)\" na linha da cobrança. Cartão com final 0002/0003/0004 é recusado.",
+        "indisponivelHint": "Este provedor ainda não está disponível - use o simulado por enquanto.",
+        "gatewaySalvo": "Configuração salva"
+      },
+      "whatsapp": {
+        "titulo": "Conexão WhatsApp (Automação Gratuita)",
+        "hint": "Conecta o WhatsApp desta empresa para a régua de cobrança poder enviar lembretes sozinha, sem clicar em nada. Usa o WhatsApp Web, não a API oficial - o número escaneado fica sujeito às regras do WhatsApp para automação.",
+        "conectar": "Conectar WhatsApp",
+        "gerandoQr": "Gerando QR Code...",
+        "instrucoesQr": "Abra o WhatsApp no celular, toque em Mais opções > Aparelhos conectados > Conectar um aparelho, e escaneie o código acima.",
+        "conectado": "Conectado",
+        "desconectar": "Desconectar",
+        "confirmDesconectar": "Desconectar este WhatsApp? Será preciso escanear um novo QR Code para reconectar.",
+        "numeroTeste": "Número para teste",
+        "enviarTeste": "Enviar mensagem de teste",
+        "testeEnviado": "Mensagem de teste enviada",
+        "mensagemTeste": "Mensagem de teste do Xaphires - a conexão está funcionando corretamente."
+      }
+    }
   },
   "saudeClinicas": {
     "voltarCards": "Voltar aos cards",
@@ -2672,6 +2735,18 @@
     "FIN_MASTER_ALWAYS": "O master já tem acesso ao Financeiro.",
     "FIN_TIPO_INVALID": "Tipo de lançamento inválido.",
     "FIN_VALUE_INVALID": "Valor inválido.",
+    "FIN_COBRANCA_NOT_FOUND": "Cobrança não encontrada.",
+    "FIN_METODO_INVALID": "Método de cobrança inválido.",
+    "FIN_METODO_NAO_SUPORTADO": "O provedor configurado não cobra por este método.",
+    "FIN_COBRANCA_PAGA": "Cobrança paga não pode ser cancelada.",
+    "FIN_COBRANCA_STATUS": "Esta cobrança não pode receber esta ação no estado atual.",
+    "FIN_COBRANCA_SEM_LEMBRETE": "Esta cobrança não está no período de lembrete.",
+    "FIN_GATEWAY_PROVIDER_INDISPONIVEL": "Este provedor ainda não está disponível.",
+    "FIN_GATEWAY_AMBIENTE_INVALID": "Ambiente inválido.",
+    "WHATSAPP_NOT_READY": "WhatsApp não conectado.",
+    "WHATSAPP_PHONE_INVALID": "Telefone inválido.",
+    "WHATSAPP_MESSAGE_INVALID": "Informe telefone e mensagem.",
+    "WHATSAPP_QR_NOT_AVAILABLE": "QR Code indisponível.",
     "FIN_DATE_INVALID": "Data de vencimento inválida.",
     "FIN_PERIODO_INVALIDO": "A data de início não pode ser maior que a data de fim.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Só título baixado pode ser conferido.",

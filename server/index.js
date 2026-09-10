@@ -3,9 +3,11 @@ import { app } from "./app.js";
 import { closeAllDbs } from "./db.js";
 import { migrateLegacyIfNeeded } from "./migrateLegacy.js";
 import { migrarIdModuloQuadro } from "./directory.js";
+import { iniciarBillingCron } from "./jobs/billingCron.js";
 
 migrateLegacyIfNeeded();
 migrarIdModuloQuadro();
+iniciarBillingCron();
 
 const PORT = process.env.PORT || 4000;
 const server = app.listen(PORT, () => {

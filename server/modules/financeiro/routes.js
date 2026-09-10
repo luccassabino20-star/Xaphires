@@ -63,6 +63,25 @@ import { PDFParse } from "pdf-parse";
 import { gerarCsvFluxoCaixa, gerarPdfFluxoCaixa, gerarExcelFluxoCaixa } from "./fluxoCaixaExport.js";
 import { rotulosFluxoCaixa } from "./fluxoCaixaLabels.js";
 import { getCompany } from "../../directory.js";
+import {
+  getReguaConfig,
+  salvarReguaConfig,
+  getGatewayConfigPublico,
+  salvarGatewayConfig,
+  getGatewayConfigInterno,
+  listCobrancas,
+  getCobranca,
+  getCobrancaComContato,
+  insertCobranca,
+  confirmarCobranca,
+  cancelarCobranca,
+  kpis as kpisCobrancas,
+  listRecorrencias,
+  insertRecorrencia,
+  definirRecorrenciaAtiva,
+} from "./cobrancaRepo.js";
+import { estagio, valorAtualizadoCents, montarMensagem, varrerRecorrencias } from "./cobrancaEngine.js";
+import { resolverGateway, metodoValido as metodoCobrancaValido } from "./gateway/index.js";
 
 const router = Router();
 // requireAuth resolve o companyId/ALS; requireWritablePlan tira a escrita de quem
@@ -868,6 +887,217 @@ router.get(
     res.setHeader("Content-Disposition", `attachment; filename="${nomeSemAcento}-${new Date().toISOString().slice(0, 10)}.${formato}"`);
     res.setHeader("Content-Length", arquivo.length);
     res.send(arquivo);
+  })
+);
+
+// ---------- Cobranças (Faturamento) ----------
+// Cada empresa cobra Pix/boleto/cartão dos PRÓPRIOS clientes dela
+// (financeiro_contatos) - não é o billing de assinatura do Xaphires
+// (server/billing/), que não muda. Ver cobrancaRepo.js e gateway/index.js.
+const STATUS_COBRANCA_VALIDOS = ["pending", "paid", "canceled", "refunded", "atrasado"];
+
+function anotarRegua(cobrancas, regua) {
+  return cobrancas.map((c) => {
+    const est = estagio(c, { diasAntes: regua.dias_antes_vencimento });
+    return { ...c, valorAtualizadoCents: valorAtualizadoCents(c), estagio: est };
+  });
+}
+
+router.get(
+  "/cobrancas",
+  ah(async (req, res) => {
+    // Emite as recorrências vencidas antes de listar (mesmo padrão de
+    // varrerCobranca() em server/billing/lifecycle.js: roda na leitura, sem
+    // cron). Falha do gateway aqui não pode impedir a tela de abrir.
+    try {
+      await varrerRecorrencias({ createdBy: req.user.id });
+    } catch (err) {
+      console.error("[financeiro/cobrancas] falha ao varrer recorrências:", err);
+    }
+    const { contatoId, metodo, status, de, ate } = req.query;
+    const lista = listCobrancas({
+      contatoId: contatoId || undefined,
+      metodo: metodoCobrancaValido(metodo) ? metodo : undefined,
+      status: STATUS_COBRANCA_VALIDOS.includes(status) ? status : undefined,
+      de: DATA_CIVIL.test(de || "") ? de : undefined,
+      ate: DATA_CIVIL.test(ate || "") ? ate : undefined,
+    });
+    res.json(anotarRegua(lista, getReguaConfig()));
+  })
+);
+
+router.get("/cobrancas/kpis", ah(async (req, res) => res.json(kpisCobrancas())));
+
+router.get(
+  "/cobrancas/:id/mensagem",
+  ah(async (req, res) => {
+    const c = getCobrancaComContato(req.params.id);
+    if (!c) return res.status(404).json({ error: "Cobrança não encontrada", code: "FIN_COBRANCA_NOT_FOUND" });
+    const regua = getReguaConfig();
+    const est = estagio(c, { diasAntes: regua.dias_antes_vencimento });
+    if (!est) return res.status(400).json({ error: "Esta cobrança não está no período de lembrete", code: "FIN_COBRANCA_SEM_LEMBRETE" });
+    const link = c.checkout_url || c.boleto_pdf_url || null;
+    res.json({ mensagem: montarMensagem(c, est, regua, { link }) });
+  })
+);
+
+router.post(
+  "/cobrancas",
+  ah(async (req, res) => {
+    const { contatoId, descricao, valorCents, due, metodo, cardNumber } = req.body || {};
+    if (!contatoId || !getContato(contatoId)) return res.status(400).json({ error: "Selecione um cliente", code: "FIN_CONTATO_NOT_FOUND" });
+    if (!valorCentsValido(valorCents)) return res.status(400).json({ error: "Valor inválido", code: "FIN_VALUE_INVALID" });
+    if (!DATA_CIVIL.test(due || "")) return res.status(400).json({ error: "Vencimento inválido", code: "FIN_DATE_INVALID" });
+    if (!metodoCobrancaValido(metodo)) return res.status(400).json({ error: "Método de cobrança inválido", code: "FIN_METODO_INVALID" });
+    const { provider, config } = getGatewayConfigInterno();
+    const gateway = resolverGateway(provider);
+    if (!gateway.metodosSuportados().includes(metodo)) {
+      return res.status(400).json({ error: "O provedor configurado não cobra por este método", code: "FIN_METODO_NAO_SUPORTADO" });
+    }
+    const contato = getContato(contatoId);
+    const resultado = await gateway.criarCobranca({ metodo, valorCents, descricao, contato, config, cardNumber });
+    const regua = getReguaConfig();
+    const criada = insertCobranca({
+      contatoId,
+      descricao,
+      valorCents,
+      due,
+      metodo,
+      provider: gateway.nome,
+      providerChargeId: resultado.providerChargeId,
+      status: resultado.status === "paid" ? "paid" : resultado.status === "failed" ? "canceled" : "pending",
+      pixPayload: resultado.pixPayload,
+      pixQrcodeB64: resultado.pixQrcodeB64,
+      boletoLine: resultado.boletoLine,
+      boletoPdfUrl: resultado.boletoPdfUrl,
+      checkoutUrl: resultado.checkoutUrl,
+      multaPercent: regua.multa_percent,
+      jurosPercentMes: regua.juros_percent_mes,
+      createdBy: req.user.id,
+    });
+    // Cartão aprova na hora (o gateway não fica "pendente" como Pix/boleto) -
+    // confirma e já gera o lançamento, mesma regra de ouro de confirmarCobranca.
+    if (resultado.status === "paid") confirmarCobranca(criada.id);
+    res.status(201).json(getCobranca(criada.id));
+  })
+);
+
+router.post(
+  "/cobrancas/:id/cancelar",
+  ah(async (req, res) => {
+    const c = getCobranca(req.params.id);
+    if (!c) return res.status(404).json({ error: "Cobrança não encontrada", code: "FIN_COBRANCA_NOT_FOUND" });
+    if (c.status === "paid") return res.status(400).json({ error: "Cobrança paga não pode ser cancelada", code: "FIN_COBRANCA_PAGA" });
+    const { config } = getGatewayConfigInterno();
+    const gateway = resolverGateway(c.provider);
+    if (c.provider_charge_id) {
+      try {
+        await gateway.cancelarCobranca(c.provider_charge_id, config);
+      } catch (err) {
+        // Falha no gateway não pode travar o cancelamento local - a pessoa quer
+        // parar de cobrar mesmo que o aviso ao provedor falhe; fica registrado
+        // no log para conferir depois.
+        console.error("[financeiro/cobrancas] falha ao cancelar no gateway:", err);
+      }
+    }
+    res.json(cancelarCobranca(req.params.id));
+  })
+);
+
+// Baixa manual: dinheiro recebido fora do gateway (dinheiro, transferência
+// avulsa...). Mesmo caminho de confirmação de uma cobrança paga pelo gateway -
+// confirmarCobranca é o único que gera o lançamento em ambos os casos.
+router.post(
+  "/cobrancas/:id/baixar",
+  ah(async (req, res) => {
+    const c = getCobranca(req.params.id);
+    if (!c) return res.status(404).json({ error: "Cobrança não encontrada", code: "FIN_COBRANCA_NOT_FOUND" });
+    if (c.status !== "pending") return res.status(400).json({ error: "Só cobrança pendente pode ser baixada", code: "FIN_COBRANCA_STATUS" });
+    const paidAt = DATA_CIVIL.test(req.body?.paidAt || "") ? req.body.paidAt : undefined;
+    res.json(confirmarCobranca(req.params.id, { paidAt }));
+  })
+);
+
+// Confirma uma cobrança do provedor SIMULADO - equivalente a
+// POST /api/billing/dev/confirm/:id. Com provedor real responde 404: sem isto,
+// não haveria como usar esta rota para dar baixa numa cobrança de verdade sem
+// o cliente ter pagado.
+router.post(
+  "/cobrancas/:id/dev-confirmar",
+  ah(async (req, res) => {
+    const c = getCobranca(req.params.id);
+    if (!c) return res.status(404).json({ error: "Cobrança não encontrada", code: "FIN_COBRANCA_NOT_FOUND" });
+    if (c.provider !== "fake") return res.status(404).json({ error: "Indisponível", code: "NOT_FOUND" });
+    res.json(confirmarCobranca(req.params.id));
+  })
+);
+
+// ---------- Recorrências ----------
+router.get("/cobrancas/recorrencias", ah(async (req, res) => res.json(listRecorrencias())));
+
+router.post(
+  "/cobrancas/recorrencias",
+  ah(async (req, res) => {
+    const { contatoId, descricao, valorCents, metodo, intervaloMeses, primeiraEmissao } = req.body || {};
+    if (!contatoId || !getContato(contatoId)) return res.status(400).json({ error: "Selecione um cliente", code: "FIN_CONTATO_NOT_FOUND" });
+    if (!valorCentsValido(valorCents)) return res.status(400).json({ error: "Valor inválido", code: "FIN_VALUE_INVALID" });
+    if (!metodoCobrancaValido(metodo)) return res.status(400).json({ error: "Método de cobrança inválido", code: "FIN_METODO_INVALID" });
+    if (!DATA_CIVIL.test(primeiraEmissao || "")) return res.status(400).json({ error: "Data da primeira cobrança inválida", code: "FIN_DATE_INVALID" });
+    const intervalo = Number.isInteger(intervaloMeses) && intervaloMeses >= 1 && intervaloMeses <= 12 ? intervaloMeses : 1;
+    const diaVencimento = Number(primeiraEmissao.slice(-2));
+    const criada = insertRecorrencia({
+      contatoId, descricao, valorCents, metodo, intervaloMeses: intervalo, diaVencimento, primeiraEmissao, createdBy: req.user.id,
+    });
+    // A primeira cobrança nasce na hora (varrerRecorrencias reconhece
+    // proxima_emissao <= hoje quando primeiraEmissao já chegou) - sem esperar a
+    // próxima leitura da lista.
+    await varrerRecorrencias({ createdBy: req.user.id });
+    res.status(201).json(criada);
+  })
+);
+
+router.patch(
+  "/cobrancas/recorrencias/:id",
+  ah(async (req, res) => {
+    const { ativa } = req.body || {};
+    if (typeof ativa !== "boolean") return res.status(400).json({ error: "Informe ativa (true/false)", code: "FIN_VALUE_INVALID" });
+    res.json(definirRecorrenciaAtiva(req.params.id, ativa));
+  })
+);
+
+// ---------- Configuração da régua e do gateway ----------
+router.get("/cobrancas/regua", ah(async (req, res) => res.json(getReguaConfig())));
+
+router.put(
+  "/cobrancas/regua",
+  ah(async (req, res) => {
+    const { diasAntesVencimento, multaPercent, jurosPercentMes, mensagemPre, mensagemDia, mensagemPos } = req.body || {};
+    if (diasAntesVencimento !== undefined && (!Number.isInteger(diasAntesVencimento) || diasAntesVencimento < 0 || diasAntesVencimento > 60))
+      return res.status(400).json({ error: "Dias antes do vencimento inválido", code: "FIN_VALUE_INVALID" });
+    for (const p of [multaPercent, jurosPercentMes]) {
+      if (p !== undefined && (!Number.isInteger(p) || p < 0 || p > 100))
+        return res.status(400).json({ error: "Percentual inválido", code: "FIN_VALUE_INVALID" });
+    }
+    res.json(salvarReguaConfig({ diasAntesVencimento, multaPercent, jurosPercentMes, mensagemPre, mensagemDia, mensagemPos }));
+  })
+);
+
+router.get("/cobrancas/gateway", ah(async (req, res) => res.json(getGatewayConfigPublico())));
+
+router.put(
+  "/cobrancas/gateway",
+  ah(async (req, res) => {
+    const { provider, ambiente, config } = req.body || {};
+    // Mercado Pago e Banco Inter ainda não têm provider real implementado (ver
+    // gateway/index.js - PROVEDORES só tem 'fake' por ora). Aceitar a escolha
+    // aqui e cair pro simulado por baixo em silêncio faria a empresa achar que
+    // configurou a conta dela quando nada real está cobrando - por isso a
+    // validação recusa em vez de aceitar e mentir.
+    if (provider !== "fake")
+      return res.status(400).json({ error: "Este provedor ainda não está disponível", code: "FIN_GATEWAY_PROVIDER_INDISPONIVEL" });
+    if (ambiente !== "sandbox" && ambiente !== "producao")
+      return res.status(400).json({ error: "Ambiente inválido", code: "FIN_GATEWAY_AMBIENTE_INVALID" });
+    res.json(salvarGatewayConfig({ provider, ambiente, config }));
   })
 );
 

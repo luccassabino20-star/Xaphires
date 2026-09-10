@@ -14,6 +14,7 @@ import DREView from "./DREView.jsx";
 import ContasView from "./ContasView.jsx";
 import ImportarExtratoView from "./ImportarExtratoView.jsx";
 import CadastrosView from "./CadastrosView.jsx";
+import CobrancasView from "./CobrancasView.jsx";
 
 // Casca do módulo ERP IRES (id interno "financeiro"): header enxuto (voltar ao
 // launcher + logo/nome + conta) e sidebar vertical retrátil à esquerda (ver
@@ -130,6 +131,7 @@ export default function FinanceiroModule({ onExit }) {
           {aba === "matriz" && <FluxoCaixaMatrizView />}
           {aba === "dre" && <DREView />}
           {aba === "cadastros" && <CadastrosView />}
+          {aba === "cobrancas" && <CobrancasView />}
         </div>
       </div>
 

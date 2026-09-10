@@ -285,7 +285,7 @@
     }
   },
   "financeiro": {
-    "tabs": { "lancamentos": "Écritures", "titulos": "Titres", "movimentacao": "Mouvements", "contas": "Comptes", "fluxo": "Trésorerie", "dre": "Compte de résultat", "importar": "Importer un relevé", "cadastros": "Registres" },
+    "tabs": { "lancamentos": "Écritures", "titulos": "Titres", "movimentacao": "Mouvements", "contas": "Comptes", "fluxo": "Trésorerie", "dre": "Compte de résultat", "importar": "Importer un relevé", "cadastros": "Registres", "cobrancas": "Facturation" },
     "sidebar": {
       "expandir": "Développer le menu", "recolher": "Réduire le menu",
       "grupo": { "financeiro": "Finance", "relatorios": "Rapports & Résultat", "futuros": "Modules à venir" },
@@ -369,7 +369,70 @@
     "impostosAplicados": "Taxes appliquées", "semImpostoAplicado": "Aucune taxe appliquée à ce titre.", "escolherImposto": "Choisissez une taxe dans le registre", "aplicarImposto": "Appliquer", "impostoAplicado": "Taxe appliquée", "recolhimento": "a généré un versement", "valorTravadoImposto": "Retirez les taxes appliquées pour modifier le montant du titre",
     "geradoDe": "Titre de taxe généré à partir du titre {{n}}", "gerou": "A généré le titre de taxe n° {{n}}", "badgeImposto": "taxe", "pesquisePrompt": "Utilisez la recherche et les filtres ci-dessus, puis cliquez sur Rechercher.", "rateadoN": "Réparti ({{n}})" },
     "forma": { "operacao_bancaria": "Opération bancaire", "pix": "Pix", "boleto": "Bordereau", "transferencia": "Virement", "dinheiro": "Espèces", "cheque": "Chèque", "cartao": "Carte" },
-    "parcela": { "botao": "Répartir en échéances", "qtd": "Échéances", "intervalo": "Intervalle (mois)", "confirmar": "Répartir", "xdeN": "{{x}}/{{n}}", "deTitulo": "Échéance {{x}}/{{n}} du titre {{t}}", "parcelado": "Réparti en {{n}}x (échéances n° {{nums}})", "desdobrado": "Réparti en {{n}} échéances" }
+    "parcela": { "botao": "Répartir en échéances", "qtd": "Échéances", "intervalo": "Intervalle (mois)", "confirmar": "Répartir", "xdeN": "{{x}}/{{n}}", "deTitulo": "Échéance {{x}}/{{n}} du titre {{t}}", "parcelado": "Réparti en {{n}}x (échéances n° {{nums}})", "desdobrado": "Réparti en {{n}} échéances" },
+    "cobrancas": {
+      "subaba": { "dashboard": "Tableau de bord", "config": "Paramètres" },
+      "kpi": {
+        "recebido": "Revenus reçus (mois)", "aReceber": "À recevoir", "atrasado": "Impayés",
+        "atencao": "Attention", "saldo": "Solde disponible", "solicitarSaque": "Demander un virement",
+        "saqueIndisponivel": "Disponible une fois un vrai prestataire de paiement configuré"
+      },
+      "filtro": { "todosClientes": "Tous les clients", "cliente": "Client", "todosMetodos": "Toutes les méthodes", "todosStatus": "Tous les statuts" },
+      "metodo": { "pix": "Pix", "boleto": "Boleto", "card": "Carte" },
+      "status": { "pending": "En attente", "atrasado": "En retard", "paid": "Payé", "canceled": "Annulé", "refunded": "Remboursé" },
+      "nova": "+ Nouvelle facture",
+      "vazio": "Aucune facture trouvée.",
+      "col": { "numero": "N°", "cliente": "Client", "descricao": "Description", "metodo": "Méthode", "valor": "Montant", "vencimento": "Échéance", "status": "Statut" },
+      "acao": {
+        "copiarPix": "Copier le Pix", "baixarBoleto": "Télécharger le boleto", "whatsapp": "Envoyer sur WhatsApp",
+        "baixarManual": "Marquer comme payé manuellement", "devConfirmar": "Confirmer (simulé)",
+        "devConfirmarHint": "N'existe que sur le prestataire simulé - marque cette facture comme payée sans vraie passerelle.",
+        "cancelar": "Annuler"
+      },
+      "valorOriginalHint": "Montant d'origine avant pénalité/intérêt de retard",
+      "confirmCancelar": "Annuler cette facture ?",
+      "confirmBaixar": "Marquer cette facture comme payée manuellement ? À utiliser quand le paiement est arrivé hors de la passerelle (espèces, virement séparé...).",
+      "canceladaToast": "Facture annulée", "baixadaToast": "Facture confirmée", "pixCopiado": "Clé Pix copiée",
+      "semTelefone": "Ce client n'a pas de téléphone enregistré",
+      "form": {
+        "titulo": "Nouvelle facture", "unica": "Unique", "recorrente": "Récurrente",
+        "cliente": "Client", "clientePlaceholder": "Rechercher un client...", "descricao": "Description",
+        "valor": "Montant", "vencimento": "Échéance", "primeiraEmissao": "Première facture", "intervalo": "Intervalle (mois)",
+        "metodo": "Méthode", "cardNumberSimulado": "Numéro de carte (simulé - terminant par 0002/0003/0004 refusé)",
+        "erroCliente": "Sélectionnez un client", "erroValor": "Indiquez un montant valide",
+        "emitir": "Émettre la facture", "cobrancaCriada": "Facture émise", "recorrenciaCriada": "Récurrence créée - la première facture a déjà été émise"
+      },
+      "config": {
+        "reguaTitulo": "Rappels de facturation",
+        "reguaHint": "Définit quand chaque facture entre dans la fenêtre de rappel et le texte de chaque étape. Rien n'est envoyé automatiquement - le bouton \"Envoyer sur WhatsApp\" sur la ligne de la facture utilise ce message, mais c'est vous qui l'envoyez.",
+        "diasAntes": "Jours avant l'échéance", "multa": "Pénalité (%)", "jurosMes": "Intérêt mensuel (%)",
+        "mensagemPre": "Message - avant échéance", "mensagemDia": "Message - le jour de l'échéance", "mensagemPos": "Message - en retard",
+        "placeholdersHint": "Les messages acceptent nom, montant, échéance et lien entre doubles accolades - ils sont remplacés à la construction du rappel.",
+        "reguaSalva": "Rappels enregistrés",
+        "gatewayTitulo": "Passerelle de paiement",
+        "gatewayHint": "Chaque entreprise utilise son propre compte chez le prestataire choisi - ce n'est pas la même facturation que l'abonnement Xaphires.",
+        "provedor": "Prestataire", "provedorSimulado": "Simulé (développement)",
+        "provedorNome": { "mercadopago": "Mercado Pago", "bancointer": "Banco Inter" },
+        "emBreve": "bientôt", "ambiente": "Environnement", "sandbox": "Bac à sable (tests)", "producao": "Production",
+        "simuladoHint": "Pix et boleto naissent en attente ; confirmez avec l'action \"Confirmer (simulé)\" sur la ligne de la facture. Carte terminant par 0002/0003/0004 refusée.",
+        "indisponivelHint": "Ce prestataire n'est pas encore disponible - utilisez le simulé pour l'instant.",
+        "gatewaySalvo": "Paramètres enregistrés"
+      },
+      "whatsapp": {
+        "titulo": "Connexion WhatsApp (Automatisation gratuite)",
+        "hint": "Connecte le WhatsApp de cette entreprise pour que les rappels de facturation soient envoyés automatiquement, sans rien cliquer. Utilise WhatsApp Web, pas l'API officielle - le numéro scanné est soumis aux règles de WhatsApp sur l'automatisation.",
+        "conectar": "Connecter WhatsApp",
+        "gerandoQr": "Génération du QR Code...",
+        "instrucoesQr": "Ouvrez WhatsApp sur le téléphone, appuyez sur Plus d'options > Appareils connectés > Connecter un appareil, et scannez le code ci-dessus.",
+        "conectado": "Connecté",
+        "desconectar": "Déconnecter",
+        "confirmDesconectar": "Déconnecter ce WhatsApp ? Il faudra scanner un nouveau QR Code pour se reconnecter.",
+        "numeroTeste": "Numéro de test",
+        "enviarTeste": "Envoyer un message de test",
+        "testeEnviado": "Message de test envoyé",
+        "mensagemTeste": "Message de test de Xaphires - la connexion fonctionne correctement."
+      }
+    }
   },
   "saudeClinicas": {
     "voltarCards": "Retour aux cartes",
@@ -2257,6 +2320,18 @@
     "FIN_MASTER_ALWAYS": "Le master a déjà accès au module Finance.",
     "FIN_TIPO_INVALID": "Type d'écriture invalide.",
     "FIN_VALUE_INVALID": "Montant invalide.",
+    "FIN_COBRANCA_NOT_FOUND": "Facture introuvable.",
+    "FIN_METODO_INVALID": "Méthode de facturation invalide.",
+    "FIN_METODO_NAO_SUPORTADO": "Le prestataire configuré ne facture pas par cette méthode.",
+    "FIN_COBRANCA_PAGA": "Une facture payée ne peut pas être annulée.",
+    "FIN_COBRANCA_STATUS": "Cette facture ne peut pas recevoir cette action dans son état actuel.",
+    "FIN_COBRANCA_SEM_LEMBRETE": "Cette facture n'est pas dans la fenêtre de rappel.",
+    "FIN_GATEWAY_PROVIDER_INDISPONIVEL": "Ce prestataire n'est pas encore disponible.",
+    "FIN_GATEWAY_AMBIENTE_INVALID": "Environnement invalide.",
+    "WHATSAPP_NOT_READY": "WhatsApp non connecté.",
+    "WHATSAPP_PHONE_INVALID": "Numéro de téléphone invalide.",
+    "WHATSAPP_MESSAGE_INVALID": "Indiquez un numéro et un message.",
+    "WHATSAPP_QR_NOT_AVAILABLE": "QR Code indisponible.",
     "FIN_DATE_INVALID": "Date d'échéance invalide.",
     "FIN_PERIODO_INVALIDO": "La date de début ne peut pas être postérieure à la date de fin.",
     "FIN_CONFERIR_NAO_FINALIZADO": "Seul un titre réglé peut être vérifié.",

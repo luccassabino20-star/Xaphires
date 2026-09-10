@@ -22,6 +22,7 @@ import { router as planRouter } from "./routes/plan.js";
 import { router as modulesRouter } from "./routes/modules.js";
 import { router as dashboardRouter } from "./routes/dashboard.js";
 import { router as financeiroRouter } from "./modules/financeiro/routes.js";
+import { router as whatsappRouter } from "./routes/whatsapp.js";
 import { router as saudeClinicasRouter } from "./modules/saude-clinicas/routes.js";
 import { router as crmRouter } from "./modules/crm/routes.js";
 import { router as xaphiresBeautyRouter } from "./modules/xaphires-beauty/routes.js";
@@ -144,6 +145,9 @@ app.use("/api/personal-tasks", requireAuth, requireWritablePlan, personalTasksRo
 // requireModule("financeiro") internamente, então monta direto - o requireModule
 // é que barra empresa sem o módulo ou usuário sem autorização.
 app.use("/api/financeiro", financeiroRouter);
+// Conexão de WhatsApp por empresa (Financeiro → Cobranças). Mesmo desenho: o
+// router já aplica requireAuth/requireWritablePlan/requireModule("financeiro").
+app.use("/api/whatsapp", whatsappRouter);
 // Módulo Saúde & Clínicas. Mesmo desenho do Financeiro: o router já aplica
 // requireAuth/requireWritablePlan/requireModule("saude-clinicas") internamente.
 app.use("/api/saude-clinicas", saudeClinicasRouter);

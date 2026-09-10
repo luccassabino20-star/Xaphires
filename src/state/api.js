@@ -448,6 +448,34 @@ export const finListCodigosServico = () => request("/financeiro/codigos-servico"
 export const finCreateCodigoServico = (data) => request("/financeiro/codigos-servico", { method: "POST", body: data });
 export const finUpdateCodigoServico = (id, data) => request(`/financeiro/codigos-servico/${id}`, { method: "PATCH", body: data });
 
+// ---------- Cobranças (Faturamento) ----------
+export function finListCobrancas(filtros = {}) {
+  const p = new URLSearchParams();
+  for (const k of ["contatoId", "metodo", "status", "de", "ate"]) if (filtros[k]) p.set(k, filtros[k]);
+  const s = p.toString();
+  return request("/financeiro/cobrancas" + (s ? `?${s}` : ""));
+}
+export const finGetKpisCobrancas = () => request("/financeiro/cobrancas/kpis");
+export const finGetMensagemCobranca = (id) => request(`/financeiro/cobrancas/${id}/mensagem`);
+export const finCreateCobranca = (data) => request("/financeiro/cobrancas", { method: "POST", body: data });
+export const finCancelarCobranca = (id) => request(`/financeiro/cobrancas/${id}/cancelar`, { method: "POST" });
+export const finBaixarCobranca = (id, paidAt) => request(`/financeiro/cobrancas/${id}/baixar`, { method: "POST", body: paidAt ? { paidAt } : {} });
+export const finDevConfirmarCobranca = (id) => request(`/financeiro/cobrancas/${id}/dev-confirmar`, { method: "POST" });
+export const finListRecorrencias = () => request("/financeiro/cobrancas/recorrencias");
+export const finCreateRecorrencia = (data) => request("/financeiro/cobrancas/recorrencias", { method: "POST", body: data });
+export const finDefinirRecorrenciaAtiva = (id, ativa) =>
+  request(`/financeiro/cobrancas/recorrencias/${id}`, { method: "PATCH", body: { ativa } });
+export const finGetReguaConfig = () => request("/financeiro/cobrancas/regua");
+export const finSalvarReguaConfig = (data) => request("/financeiro/cobrancas/regua", { method: "PUT", body: data });
+export const finGetGatewayConfig = () => request("/financeiro/cobrancas/gateway");
+export const finSalvarGatewayConfig = (data) => request("/financeiro/cobrancas/gateway", { method: "PUT", body: data });
+
+// ---------- Conexão WhatsApp (whatsapp-web.js) ----------
+export const waGetStatus = () => request("/whatsapp/status");
+export const waConnect = () => request("/whatsapp/connect", { method: "POST" });
+export const waDisconnect = () => request("/whatsapp/disconnect", { method: "POST" });
+export const waSendMessage = (phone, text) => request("/whatsapp/send-message", { method: "POST", body: { phone, text } });
+
 // ---------- Extrato bancário (PDF -> preview -> importar/Excel) ----------
 // Preview: sobe o PDF (FormData, como o anexo de cartão - fora do request() para o
 // boundary do multipart sair certo) e recebe as transações já parseadas, sem
