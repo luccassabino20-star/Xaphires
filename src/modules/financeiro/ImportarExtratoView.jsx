@@ -11,7 +11,7 @@ import SearchSelect from "./SearchSelect.jsx";
 // transações parseadas e, ao confirmar, cria lançamentos finalizados na conta
 // escolhida. O parser roda no servidor; aqui só o fluxo upload -> conferir ->
 // importar/baixar Excel. Nada é gravado até o botão Importar.
-export default function ImportarExtratoView() {
+export default function ImportarExtratoView({ contaIdInicial, onPrefillConsumido }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -28,11 +28,20 @@ export default function ImportarExtratoView() {
       .then((cs) => {
         const ativas = cs.filter((c) => c.ativo === 1);
         setContas(ativas);
-        if (ativas[0]) setContaId(ativas[0].id);
+        // Atalho "Ver Extrato" (Contas correntes) - se veio uma conta pré-escolhida,
+        // ela vence a auto-seleção da primeira ativa.
+        if (contaIdInicial) setContaId(contaIdInicial);
+        else if (ativas[0]) setContaId(ativas[0].id);
       })
       .catch((e) => setErro(translateError(e, t)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (!contaIdInicial) return;
+    setContaId(contaIdInicial);
+    onPrefillConsumido?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contaIdInicial]);
 
   const contaOpts = useMemo(() => contas.map((c) => ({ id: c.id, label: c.nome })), [contas]);
 

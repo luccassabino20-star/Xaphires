@@ -707,6 +707,52 @@
         "vazio": "Nenhuma cobrança emitida para este contato ainda."
       }
     },
+    "tesouraria": {
+      "titulo": "Contas Bancárias & Tesouraria",
+      "subtitulo": "Gerencie suas contas de depósito, carteiras virtuais e saldos operacionais.",
+      "novaConta": "Nova Conta Bancária",
+      "kpi": {
+        "saldoConsolidado": "Saldo Consolidado Total",
+        "contasAtivas": "Contas Ativas",
+        "maiorPosicao": "Maior Posição Financeira"
+      },
+      "modoCards": "Cards",
+      "modoTabela": "Tabela",
+      "emptyTitulo": "Nenhuma conta bancária cadastrada",
+      "emptyTexto": "Cadastre sua primeira conta corrente para começar a gerenciar lançamentos e conciliação.",
+      "emptyBotao": "Cadastrar Primeira Conta",
+      "principal": "Principal",
+      "agenciaAbrev": "Ag",
+      "contaAbrev": "C/C",
+      "verExtrato": "Ver Extrato",
+      "acoesLinha": "Ações",
+      "menuEditar": "Editar",
+      "menuAjustarSaldo": "Ajustar Saldo",
+      "colInstituicao": "Instituição / Banco",
+      "colIdentificacao": "Identificação da Conta",
+      "colAgenciaNumero": "Agência & Número",
+      "colTipo": "Tipo",
+      "colSaldoAtual": "Saldo Atual",
+      "erroNome": "Informe o nome da conta",
+      "tipo": {
+        "conta_corrente": "Conta Corrente",
+        "poupanca": "Conta Poupança",
+        "pagamento": "Conta de Pagamento",
+        "cartao_credito": "Cartão de Crédito",
+        "caixa": "Caixa"
+      },
+      "modal": {
+        "tituloNovo": "Nova Conta Bancária",
+        "tituloEditar": "Editar Conta Bancária",
+        "subtitulo": "Cadastre a conta de depósito, carteira virtual ou caixa interno para usar em lançamentos e conciliação.",
+        "escolhaBanco": "Instituição",
+        "apelido": "Apelido da Conta",
+        "apelidoPlaceholder": "Ex.: Conta Corrente - Folha de Pagamento",
+        "digito": "Dígito",
+        "dataSaldo": "Data do saldo inicial",
+        "contaPrincipal": "Definir como Conta Principal para Recebimentos"
+      }
+    },
     "baixa": { "semConta": "Sem conta", "confirmar": "Confirmar" },
     "tit": { "numero": "Nº do título", "identificacao": "Identificação", "docNumero": "Número do documento", "emissao": "Emissão", "formaPagto": "Forma de pagamento", "semForma": "Não informada", "apropriacao": "Apropriação", "valores": "Valores", "valorTitulo": "Valor do título", "impostosRetidos": "Impostos retidos", "impostosAcrescidos": "Impostos acrescidos", "desconto": "Desconto", "retencao": "Retenção", "multa": "Multa", "juros": "Juros", "valorLiquido": "Valor líquido", "emBreveImpostos": "Disponível no bloco de impostos (em breve)", "observacao": "Observação", "detalhesPagto": "Detalhes do pagamento", "dataBaixa": "Data da baixa", "darQuitado": "Dar quitado ({{n}})", "selecionados": "{{n}} selecionado(s)", "quitados": "{{n}} título(s) quitado(s)", "valorPago": "Valor pago", "baixaEmMovimentacao": "A baixa e o estorno ficam na aba Movimentação.",
     "impostosAplicados": "Impostos aplicados", "semImpostoAplicado": "Nenhum imposto aplicado a este título.", "escolherImposto": "Escolha um imposto do cadastro", "aplicarImposto": "Aplicar", "impostoAplicado": "Imposto aplicado", "recolhimento": "gerou recolhimento", "valorTravadoImposto": "Remova os impostos aplicados para editar o valor do título",

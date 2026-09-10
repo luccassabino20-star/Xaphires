@@ -34,6 +34,9 @@ export default function FinanceiroModule({ onExit }) {
   // contato escolhido lá precisa atravessar a troca de aba, que só existe aqui -
   // cada view busca os próprios dados e não conhece a outra.
   const [cobrancaPrefillContatoId, setCobrancaPrefillContatoId] = useState(null);
+  // Atalho "Ver Extrato" (Contas correntes → Conciliação & Importar Extrato):
+  // mesmo raciocínio do prefill de cobrança acima.
+  const [importarPrefillContaId, setImportarPrefillContaId] = useState(null);
   // Fora do celular a sidebar nasce expandida (o modo ícone-só é escolha do
   // usuário, ver .fin-sidebar-toggle em IresSidebar.jsx); no celular ela
   // nasce fora da tela - mesmo critério de largura do Kanban (AuthenticatedApp.jsx,
@@ -130,7 +133,12 @@ export default function FinanceiroModule({ onExit }) {
           {aba === "titulos" && <TitulosView />}
           {aba === "movimentacao" && <MovimentacaoView />}
           {aba === "contas" && <ContasView />}
-          {aba === "importar" && <ImportarExtratoView />}
+          {aba === "importar" && (
+            <ImportarExtratoView
+              contaIdInicial={importarPrefillContaId}
+              onPrefillConsumido={() => setImportarPrefillContaId(null)}
+            />
+          )}
           {aba === "fluxo" && <FluxoView />}
           {aba === "matriz" && <FluxoCaixaMatrizView />}
           {aba === "dre" && <DREView />}
@@ -139,6 +147,10 @@ export default function FinanceiroModule({ onExit }) {
               onEmitirCobranca={(contatoId) => {
                 setCobrancaPrefillContatoId(contatoId);
                 setAba("cobrancas");
+              }}
+              onVerExtrato={(contaId) => {
+                setImportarPrefillContaId(contaId);
+                setAba("importar");
               }}
             />
           )}

@@ -707,6 +707,52 @@
         "vazio": "No charges issued to this contact yet."
       }
     },
+    "tesouraria": {
+      "titulo": "Bank Accounts & Treasury",
+      "subtitulo": "Manage your deposit accounts, digital wallets and operating balances.",
+      "novaConta": "New Bank Account",
+      "kpi": {
+        "saldoConsolidado": "Total Consolidated Balance",
+        "contasAtivas": "Active Accounts",
+        "maiorPosicao": "Largest Financial Position"
+      },
+      "modoCards": "Cards",
+      "modoTabela": "Table",
+      "emptyTitulo": "No bank accounts registered",
+      "emptyTexto": "Register your first checking account to start managing entries and reconciliation.",
+      "emptyBotao": "Register First Account",
+      "principal": "Primary",
+      "agenciaAbrev": "Branch",
+      "contaAbrev": "Acct",
+      "verExtrato": "View Statement",
+      "acoesLinha": "Actions",
+      "menuEditar": "Edit",
+      "menuAjustarSaldo": "Adjust Balance",
+      "colInstituicao": "Institution / Bank",
+      "colIdentificacao": "Account Name",
+      "colAgenciaNumero": "Branch & Number",
+      "colTipo": "Type",
+      "colSaldoAtual": "Current Balance",
+      "erroNome": "Enter the account name",
+      "tipo": {
+        "conta_corrente": "Checking Account",
+        "poupanca": "Savings Account",
+        "pagamento": "Payment Account",
+        "cartao_credito": "Credit Card",
+        "caixa": "Cash Box"
+      },
+      "modal": {
+        "tituloNovo": "New Bank Account",
+        "tituloEditar": "Edit Bank Account",
+        "subtitulo": "Register the deposit account, digital wallet or internal cash box to use in entries and reconciliation.",
+        "escolhaBanco": "Institution",
+        "apelido": "Account Nickname",
+        "apelidoPlaceholder": "E.g.: Checking Account - Payroll",
+        "digito": "Check digit",
+        "dataSaldo": "Initial balance date",
+        "contaPrincipal": "Set as Primary Account for Receivables"
+      }
+    },
     "baixa": { "semConta": "No account", "confirmar": "Confirm" },
     "tit": { "numero": "Title no.", "identificacao": "Identification", "docNumero": "Document number", "emissao": "Issue date", "formaPagto": "Payment method", "semForma": "Not set", "apropriacao": "Allocation", "valores": "Amounts", "valorTitulo": "Title amount", "impostosRetidos": "Withheld taxes", "impostosAcrescidos": "Added taxes", "desconto": "Discount", "retencao": "Retention", "multa": "Penalty", "juros": "Interest", "valorLiquido": "Net amount", "emBreveImpostos": "Available in the taxes block (coming soon)", "observacao": "Notes", "detalhesPagto": "Payment details", "dataBaixa": "Settlement date", "darQuitado": "Settle ({{n}})", "selecionados": "{{n}} selected", "quitados": "{{n}} title(s) settled", "valorPago": "Amount paid", "baixaEmMovimentacao": "Settling and reversing happen in the Movements tab.",
     "impostosAplicados": "Applied taxes", "semImpostoAplicado": "No tax applied to this title.", "escolherImposto": "Choose a tax from the register", "aplicarImposto": "Apply", "impostoAplicado": "Tax applied", "recolhimento": "generated remittance", "valorTravadoImposto": "Remove the applied taxes to edit the title amount",

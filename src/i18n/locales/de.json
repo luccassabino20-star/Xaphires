@@ -407,6 +407,52 @@
         "vazio": "Für diesen Kontakt wurden noch keine Rechnungen ausgestellt."
       }
     },
+    "tesouraria": {
+      "titulo": "Bankkonten & Treasury",
+      "subtitulo": "Verwalten Sie Ihre Einlagenkonten, digitalen Wallets und operativen Salden.",
+      "novaConta": "Neues Bankkonto",
+      "kpi": {
+        "saldoConsolidado": "Gesamtsaldo Konsolidiert",
+        "contasAtivas": "Aktive Konten",
+        "maiorPosicao": "Größte Finanzposition"
+      },
+      "modoCards": "Karten",
+      "modoTabela": "Tabelle",
+      "emptyTitulo": "Kein Bankkonto erfasst",
+      "emptyTexto": "Erfassen Sie Ihr erstes Girokonto, um Buchungen und Abgleich zu verwalten.",
+      "emptyBotao": "Erstes Konto erfassen",
+      "principal": "Haupt",
+      "agenciaAbrev": "Fil",
+      "contaAbrev": "Kto",
+      "verExtrato": "Kontoauszug ansehen",
+      "acoesLinha": "Aktionen",
+      "menuEditar": "Bearbeiten",
+      "menuAjustarSaldo": "Saldo anpassen",
+      "colInstituicao": "Institut / Bank",
+      "colIdentificacao": "Kontobezeichnung",
+      "colAgenciaNumero": "Filiale & Nummer",
+      "colTipo": "Typ",
+      "colSaldoAtual": "Aktueller Saldo",
+      "erroNome": "Geben Sie den Kontonamen ein",
+      "tipo": {
+        "conta_corrente": "Girokonto",
+        "poupanca": "Sparkonto",
+        "pagamento": "Zahlungskonto",
+        "cartao_credito": "Kreditkarte",
+        "caixa": "Kasse"
+      },
+      "modal": {
+        "tituloNovo": "Neues Bankkonto",
+        "tituloEditar": "Bankkonto bearbeiten",
+        "subtitulo": "Erfassen Sie das Einlagenkonto, die digitale Wallet oder die interne Kasse für Buchungen und Abgleich.",
+        "escolhaBanco": "Institut",
+        "apelido": "Kontobezeichnung",
+        "apelidoPlaceholder": "Z. B.: Girokonto - Gehaltsabrechnung",
+        "digito": "Prüfziffer",
+        "dataSaldo": "Datum des Anfangssaldos",
+        "contaPrincipal": "Als Hauptkonto für Zahlungseingänge festlegen"
+      }
+    },
     "baixa": { "semConta": "Kein Konto", "confirmar": "Bestätigen" },
     "tit": { "numero": "Titel-Nr.", "identificacao": "Identifikation", "docNumero": "Belegnummer", "emissao": "Ausstellung", "formaPagto": "Zahlungsart", "semForma": "Nicht angegeben", "apropriacao": "Zuordnung", "valores": "Beträge", "valorTitulo": "Titelbetrag", "impostosRetidos": "Einbehaltene Steuern", "impostosAcrescidos": "Hinzugefügte Steuern", "desconto": "Rabatt", "retencao": "Einbehalt", "multa": "Vertragsstrafe", "juros": "Zinsen", "valorLiquido": "Nettobetrag", "emBreveImpostos": "Im Steuerblock verfügbar (demnächst)", "observacao": "Anmerkung", "detalhesPagto": "Zahlungsdetails", "dataBaixa": "Datum der Begleichung", "darQuitado": "Begleichen ({{n}})", "selecionados": "{{n}} ausgewählt", "quitados": "{{n}} Titel beglichen", "valorPago": "Bezahlter Betrag", "baixaEmMovimentacao": "Begleichung und Stornierung erfolgen im Tab Bewegung.",
     "impostosAplicados": "Angewendete Steuern", "semImpostoAplicado": "Keine Steuer auf diesen Titel angewendet.", "escolherImposto": "Wählen Sie eine Steuer aus den Stammdaten", "aplicarImposto": "Anwenden", "impostoAplicado": "Steuer angewendet", "recolhimento": "erzeugte Abführung", "valorTravadoImposto": "Entfernen Sie die angewendeten Steuern, um den Titelbetrag zu bearbeiten",

@@ -31,7 +31,7 @@ function hojeCivil() {
 // Lançamento Manual dos Movimentos: cria um título já classificado por Movimento
 // (que decide débito/crédito), em aberto na conta escolhida, com rateio opcional
 // por Classe + Centro. O rateio, se usado, precisa fechar o valor do lançamento.
-export default function LancamentoManualModal({ onClose, onCriado }) {
+export default function LancamentoManualModal({ contaIdInicial, onClose, onCriado }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -44,7 +44,7 @@ export default function LancamentoManualModal({ onClose, onCriado }) {
   const [salvando, setSalvando] = useState(false);
 
   // Dados do lançamento
-  const [contaId, setContaId] = useState("");
+  const [contaId, setContaId] = useState(() => contaIdInicial || "");
   const [movimento, setMovimento] = useState("tarifa_bancaria");
   const [data, setData] = useState(hojeCivil());
   const [valor, setValor] = useState("");

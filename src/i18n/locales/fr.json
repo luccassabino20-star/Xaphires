@@ -407,6 +407,52 @@
         "vazio": "Aucune facture émise pour ce contact pour l'instant."
       }
     },
+    "tesouraria": {
+      "titulo": "Comptes Bancaires & Trésorerie",
+      "subtitulo": "Gérez vos comptes de dépôt, portefeuilles numériques et soldes opérationnels.",
+      "novaConta": "Nouveau Compte Bancaire",
+      "kpi": {
+        "saldoConsolidado": "Solde Consolidé Total",
+        "contasAtivas": "Comptes Actifs",
+        "maiorPosicao": "Plus Grande Position Financière"
+      },
+      "modoCards": "Cartes",
+      "modoTabela": "Tableau",
+      "emptyTitulo": "Aucun compte bancaire enregistré",
+      "emptyTexto": "Enregistrez votre premier compte courant pour commencer à gérer les écritures et le rapprochement.",
+      "emptyBotao": "Enregistrer le Premier Compte",
+      "principal": "Principal",
+      "agenciaAbrev": "Ag",
+      "contaAbrev": "Cpte",
+      "verExtrato": "Voir le Relevé",
+      "acoesLinha": "Actions",
+      "menuEditar": "Modifier",
+      "menuAjustarSaldo": "Ajuster le Solde",
+      "colInstituicao": "Institution / Banque",
+      "colIdentificacao": "Nom du Compte",
+      "colAgenciaNumero": "Agence & Numéro",
+      "colTipo": "Type",
+      "colSaldoAtual": "Solde Actuel",
+      "erroNome": "Indiquez le nom du compte",
+      "tipo": {
+        "conta_corrente": "Compte Courant",
+        "poupanca": "Compte Épargne",
+        "pagamento": "Compte de Paiement",
+        "cartao_credito": "Carte de Crédit",
+        "caixa": "Caisse"
+      },
+      "modal": {
+        "tituloNovo": "Nouveau Compte Bancaire",
+        "tituloEditar": "Modifier le Compte Bancaire",
+        "subtitulo": "Enregistrez le compte de dépôt, le portefeuille numérique ou la caisse interne à utiliser dans les écritures et le rapprochement.",
+        "escolhaBanco": "Institution",
+        "apelido": "Nom du Compte",
+        "apelidoPlaceholder": "Ex. : Compte Courant - Paie",
+        "digito": "Clé",
+        "dataSaldo": "Date du solde initial",
+        "contaPrincipal": "Définir comme Compte Principal pour les Encaissements"
+      }
+    },
     "baixa": { "semConta": "Sans compte", "confirmar": "Confirmer" },
     "tit": { "numero": "N° du titre", "identificacao": "Identification", "docNumero": "Numéro du document", "emissao": "Émission", "formaPagto": "Mode de paiement", "semForma": "Non renseigné", "apropriacao": "Répartition", "valores": "Montants", "valorTitulo": "Montant du titre", "impostosRetidos": "Taxes retenues", "impostosAcrescidos": "Taxes ajoutées", "desconto": "Remise", "retencao": "Retenue", "multa": "Pénalité", "juros": "Intérêts", "valorLiquido": "Montant net", "emBreveImpostos": "Disponible dans le bloc des taxes (bientôt)", "observacao": "Remarque", "detalhesPagto": "Détails du paiement", "dataBaixa": "Date du règlement", "darQuitado": "Régler ({{n}})", "selecionados": "{{n}} sélectionné(s)", "quitados": "{{n}} titre(s) réglé(s)", "valorPago": "Montant payé", "baixaEmMovimentacao": "Le règlement et l'annulation se font dans l'onglet Mouvements.",
     "impostosAplicados": "Taxes appliquées", "semImpostoAplicado": "Aucune taxe appliquée à ce titre.", "escolherImposto": "Choisissez une taxe dans le registre", "aplicarImposto": "Appliquer", "impostoAplicado": "Taxe appliquée", "recolhimento": "a généré un versement", "valorTravadoImposto": "Retirez les taxes appliquées pour modifier le montant du titre",

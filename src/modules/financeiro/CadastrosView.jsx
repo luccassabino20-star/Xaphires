@@ -4,9 +4,9 @@ import { useToast } from "../../state/ToastContext.jsx";
 import { translateError } from "../../utils/errors.js";
 import * as api from "../../state/api.js";
 import { normalizeLanguage } from "../../i18n/locale.js";
-import { formatCents, reaisParaCents, centsOuZero, centsAssinado, formatPercent } from "./dinheiro.js";
-import { BANCOS, rotuloBanco } from "./bancos.js";
+import { centsOuZero, formatPercent } from "./dinheiro.js";
 import ContatosView from "./ContatosView.jsx";
+import ContasCorrentesView from "./ContasCorrentesView.jsx";
 
 // Cadastros de apoio do Financeiro, organizados em sidebar por categoria (o
 // mesmo agrupamento do menu "Cadastros Básicos" do SIGIM). Só 6 itens são reais
@@ -47,7 +47,7 @@ const GRUPOS_CADASTRO = [
   ]},
 ];
 
-export default function CadastrosView({ onEmitirCobranca }) {
+export default function CadastrosView({ onEmitirCobranca, onVerExtrato }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -121,6 +121,18 @@ export default function CadastrosView({ onEmitirCobranca }) {
     showToast(t("financeiro.cad.criado"));
     await carregar();
   }
+  // Mesmo desenho de criarContato/editarContato: o modal de conta bancária
+  // (NovaContaBancariaModal) chama direto e mostra o erro inline.
+  async function criarConta(dados) {
+    await api.finCreateConta(dados);
+    showToast(t("financeiro.cad.criado"));
+    await carregar();
+  }
+  async function editarConta(id, dados) {
+    await api.finUpdateConta(id, dados);
+    showToast(t("financeiro.cad.criado"));
+    await carregar();
+  }
 
   return (
     <div className="fin-cad-layout">
@@ -146,7 +158,15 @@ export default function CadastrosView({ onEmitirCobranca }) {
 
       <div className="fin-cad-content">
         {erro && <div className="fin-error">{erro}</div>}
-        {selecionado === "contas" && <SecaoContas contas={contas} lang={lang} onCriar={criar} onEditar={editar} />}
+        {selecionado === "contas" && (
+          <ContasCorrentesView
+            contas={contas}
+            lang={lang}
+            onCriar={criarConta}
+            onEditar={editarConta}
+            onVerExtrato={onVerExtrato}
+          />
+        )}
         {selecionado === "centros" && <SecaoCentros centros={centros} onCriar={criar} onEditar={editar} onChanged={carregar} />}
         {selecionado === "classes" && <SecaoClasses classes={classes} onCriar={criar} onEditar={editar} onChanged={carregar} />}
         {selecionado === "contatos" && (
@@ -161,63 +181,6 @@ export default function CadastrosView({ onEmitirCobranca }) {
         {selecionado === "impostos" && <SecaoImpostos impostos={impostos} lang={lang} onCriar={criar} onEditar={editar} />}
         {selecionado === "sped" && <SecaoCodigosServico codigos={codigosServico} onCriar={criar} onEditar={editar} />}
       </div>
-    </div>
-  );
-}
-
-function SecaoContas({ contas, lang, onCriar, onEditar }) {
-  const { t } = useTranslation();
-  const vazio = { nome: "", banco: "", agencia: "", numero: "", saldo: "" };
-  const [f, setF] = useState(vazio);
-  const [editandoId, setEditandoId] = useState(null);
-  // "Banco" é um select dos bancos comuns (código - nome, como no SIGIM); quem
-  // não achar o seu escolhe "Outro" e digita - não é obrigado a ficar preso à
-  // lista fixa.
-  const [bancoOutro, setBancoOutro] = useState("");
-  const usandoOutro = f.banco === "__outro__";
-
-  function editar(x) {
-    setEditandoId(x.id);
-    const conhecido = BANCOS.some((b) => rotuloBanco(b) === x.banco);
-    setF({ nome: x.nome, banco: conhecido || !x.banco ? x.banco : "__outro__", agencia: x.agencia || "", numero: x.numero || "", saldo: String((x.saldo_inicial_cents || 0) / 100) });
-    setBancoOutro(conhecido || !x.banco ? "" : x.banco);
-  }
-  function cancelar() { setEditandoId(null); setF(vazio); setBancoOutro(""); }
-
-  return (
-    <div className="fin-cad-secao">
-      <form
-        className="fin-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!f.nome.trim()) return;
-          const banco = usandoOutro ? bancoOutro.trim() : f.banco;
-          const dados = { nome: f.nome.trim(), banco, agencia: f.agencia, numero: f.numero, saldoInicialCents: centsAssinado(f.saldo) };
-          if (editandoId) onEditar(api.finUpdateConta, editandoId, dados, cancelar);
-          else onCriar(api.finCreateConta, dados, () => { setF(vazio); setBancoOutro(""); });
-        }}
-      >
-        <input type="text" placeholder={t("financeiro.contas.nome")} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} />
-        <select value={f.banco} onChange={(e) => setF({ ...f, banco: e.target.value })}>
-          <option value="">{t("financeiro.contas.bancoEscolha")}</option>
-          {BANCOS.map((b) => <option key={b.codigo} value={rotuloBanco(b)}>{rotuloBanco(b)}</option>)}
-          <option value="__outro__">{t("financeiro.contas.bancoOutro")}</option>
-        </select>
-        {usandoOutro && (
-          <input type="text" placeholder={t("financeiro.contas.bancoOutroPlaceholder")} value={bancoOutro} onChange={(e) => setBancoOutro(e.target.value)} />
-        )}
-        <input type="text" placeholder={t("financeiro.cad.agencia")} value={f.agencia} onChange={(e) => setF({ ...f, agencia: e.target.value })} />
-        <input type="text" placeholder={t("financeiro.cad.numero")} value={f.numero} onChange={(e) => setF({ ...f, numero: e.target.value })} />
-        <input type="number" step="0.01" placeholder={t("financeiro.contas.saldoInicial")} value={f.saldo} onChange={(e) => setF({ ...f, saldo: e.target.value })} />
-        <button type="submit" className="btn-primary btn-small">{editandoId ? t("common.save") : t("financeiro.form.adicionar")}</button>
-        {editandoId && <button type="button" className="btn-ghost btn-small" onClick={cancelar}>{t("common.cancel")}</button>}
-      </form>
-      <Tabela vazio={t("financeiro.contas.vazio")} linhas={contas} colunas={[
-        { h: t("financeiro.contas.nome"), c: (x) => x.nome },
-        { h: t("financeiro.contas.banco"), c: (x) => x.banco || "-" },
-        { h: t("financeiro.contas.saldoInicial"), c: (x) => formatCents(x.saldo_inicial_cents, lang), num: true },
-        { h: "", c: (x) => <AcoesCadastro x={x} onEditar={() => editar(x)} onToggle={() => onEditar(api.finUpdateConta, x.id, { ativo: !x.ativo }, () => {})} /> },
-      ]} />
     </div>
   );
 }

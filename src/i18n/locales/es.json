@@ -707,6 +707,52 @@
         "vazio": "Aún no hay cobros emitidos para este contacto."
       }
     },
+    "tesouraria": {
+      "titulo": "Cuentas Bancarias & Tesorería",
+      "subtitulo": "Gestiona tus cuentas de depósito, billeteras digitales y saldos operativos.",
+      "novaConta": "Nueva Cuenta Bancaria",
+      "kpi": {
+        "saldoConsolidado": "Saldo Consolidado Total",
+        "contasAtivas": "Cuentas Activas",
+        "maiorPosicao": "Mayor Posición Financiera"
+      },
+      "modoCards": "Tarjetas",
+      "modoTabela": "Tabla",
+      "emptyTitulo": "Ninguna cuenta bancaria registrada",
+      "emptyTexto": "Registra tu primera cuenta corriente para empezar a gestionar movimientos y conciliación.",
+      "emptyBotao": "Registrar Primera Cuenta",
+      "principal": "Principal",
+      "agenciaAbrev": "Suc",
+      "contaAbrev": "Cta",
+      "verExtrato": "Ver Extracto",
+      "acoesLinha": "Acciones",
+      "menuEditar": "Editar",
+      "menuAjustarSaldo": "Ajustar Saldo",
+      "colInstituicao": "Institución / Banco",
+      "colIdentificacao": "Nombre de la Cuenta",
+      "colAgenciaNumero": "Sucursal & Número",
+      "colTipo": "Tipo",
+      "colSaldoAtual": "Saldo Actual",
+      "erroNome": "Indica el nombre de la cuenta",
+      "tipo": {
+        "conta_corrente": "Cuenta Corriente",
+        "poupanca": "Cuenta de Ahorros",
+        "pagamento": "Cuenta de Pago",
+        "cartao_credito": "Tarjeta de Crédito",
+        "caixa": "Caja"
+      },
+      "modal": {
+        "tituloNovo": "Nueva Cuenta Bancaria",
+        "tituloEditar": "Editar Cuenta Bancaria",
+        "subtitulo": "Registra la cuenta de depósito, billetera digital o caja interna para usar en movimientos y conciliación.",
+        "escolhaBanco": "Institución",
+        "apelido": "Apodo de la Cuenta",
+        "apelidoPlaceholder": "Ej.: Cuenta Corriente - Nómina",
+        "digito": "Dígito verificador",
+        "dataSaldo": "Fecha del saldo inicial",
+        "contaPrincipal": "Definir como Cuenta Principal para Cobros"
+      }
+    },
     "baixa": { "semConta": "Sin cuenta", "confirmar": "Confirmar" },
     "tit": { "numero": "N.º de título", "identificacao": "Identificación", "docNumero": "Número del documento", "emissao": "Emisión", "formaPagto": "Forma de pago", "semForma": "No informada", "apropriacao": "Apropiación", "valores": "Importes", "valorTitulo": "Importe del título", "impostosRetidos": "Impuestos retenidos", "impostosAcrescidos": "Impuestos agregados", "desconto": "Descuento", "retencao": "Retención", "multa": "Multa", "juros": "Intereses", "valorLiquido": "Importe neto", "emBreveImpostos": "Disponible en el bloque de impuestos (próximamente)", "observacao": "Observación", "detalhesPagto": "Detalles del pago", "dataBaixa": "Fecha de pago", "darQuitado": "Saldar ({{n}})", "selecionados": "{{n}} seleccionado(s)", "quitados": "{{n}} título(s) saldado(s)", "valorPago": "Importe pagado", "baixaEmMovimentacao": "Saldar y revertir están en la pestaña Movimientos.",
     "impostosAplicados": "Impuestos aplicados", "semImpostoAplicado": "Ningún impuesto aplicado a este título.", "escolherImposto": "Elige un impuesto del registro", "aplicarImposto": "Aplicar", "impostoAplicado": "Impuesto aplicado", "recolhimento": "generó recaudación", "valorTravadoImposto": "Quita los impuestos aplicados para editar el importe del título",

@@ -228,6 +228,13 @@ export function applyFinanceiroSchema(companyDb) {
   addColumn(companyDb, "financeiro_contatos", "uf", "uf TEXT NOT NULL DEFAULT ''");
   addColumn(companyDb, "financeiro_contatos", "pais", "pais TEXT NOT NULL DEFAULT 'Brasil'");
   addColumn(companyDb, "financeiro_contatos", "ponto_referencia", "ponto_referencia TEXT NOT NULL DEFAULT ''");
+
+  // Tesouraria (redesign Ultra-Premium da tela de Contas correntes): tipo de
+  // conta, flag de conta principal (mutuamente exclusiva - ver repo.js) e a
+  // data do saldo inicial, que a tela antiga não pedia.
+  addColumn(companyDb, "financeiro_contas", "tipo", "tipo TEXT NOT NULL DEFAULT 'conta_corrente'");
+  addColumn(companyDb, "financeiro_contas", "principal", "principal INTEGER NOT NULL DEFAULT 0");
+  addColumn(companyDb, "financeiro_contas", "saldo_inicial_data", "saldo_inicial_data TEXT NOT NULL DEFAULT ''");
   // Número do TÍTULO: um sequencial legível por empresa (o "64194" do SIGIM), que
   // dá um identificador estável e pesquisável a cada lançamento em vez do uuid.
   // Atribuído no insert (repo.insertLancamento); o backfill abaixo numera os

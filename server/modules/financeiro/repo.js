@@ -60,29 +60,50 @@ export function listContas() {
 export function getConta(id) {
   return getDb().prepare("SELECT * FROM financeiro_contas WHERE id = ?").get(id) || null;
 }
-export function insertConta({ nome, banco, agencia, numero, saldoInicialCents }) {
+// Zera o principal de toda conta que não seja `id` - "principal" é
+// mutuamente exclusivo (mesmo espírito do popup da plataforma, só uma
+// campanha ativa por vez). Chamado só quando a gravação está marcando ALGUMA
+// conta como principal; se ninguém pediu principal:true, nada muda.
+function zerarOutrosPrincipais(exceptId) {
+  getDb().prepare("UPDATE financeiro_contas SET principal = 0 WHERE id <> ?").run(exceptId);
+}
+export function insertConta({ nome, banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData }) {
   const id = uid();
   getDb()
     .prepare(
-      "INSERT INTO financeiro_contas (id, nome, banco, agencia, numero, saldo_inicial_cents, ativo, created_at) VALUES (?, ?, ?, ?, ?, ?, 1, ?)"
+      `INSERT INTO financeiro_contas
+         (id, nome, banco, agencia, numero, saldo_inicial_cents, tipo, principal, saldo_inicial_data, ativo, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
     )
-    .run(id, nome, banco || "", agencia || "", numero || "", saldoInicialCents || 0, new Date().toISOString());
+    .run(
+      id, nome, banco || "", agencia || "", numero || "", saldoInicialCents || 0,
+      tipo || "conta_corrente", principal ? 1 : 0, saldoInicialData || "",
+      new Date().toISOString()
+    );
+  if (principal) zerarOutrosPrincipais(id);
   return getConta(id);
 }
 export function updateConta(id, c) {
   const a = getConta(id);
   if (!a) return null;
   getDb()
-    .prepare("UPDATE financeiro_contas SET nome = ?, banco = ?, agencia = ?, numero = ?, saldo_inicial_cents = ?, ativo = ? WHERE id = ?")
+    .prepare(
+      `UPDATE financeiro_contas SET nome = ?, banco = ?, agencia = ?, numero = ?, saldo_inicial_cents = ?,
+         tipo = ?, principal = ?, saldo_inicial_data = ?, ativo = ? WHERE id = ?`
+    )
     .run(
       c.nome ?? a.nome,
       c.banco ?? a.banco,
       c.agencia ?? a.agencia,
       c.numero ?? a.numero,
       c.saldoInicialCents ?? a.saldo_inicial_cents,
+      c.tipo ?? a.tipo,
+      c.principal !== undefined ? (c.principal ? 1 : 0) : a.principal,
+      c.saldoInicialData ?? a.saldo_inicial_data,
       c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo,
       id
     );
+  if (c.principal) zerarOutrosPrincipais(id);
   return getConta(id);
 }
 

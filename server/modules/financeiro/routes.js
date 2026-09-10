@@ -115,6 +115,8 @@ const MOVIMENTOS = {
 };
 const STATUS_ABERTOS = ["provisionado", "pendente", "disponivel"];
 const STATUS_MANUAIS = ["provisionado", "pendente", "disponivel", "anulado"];
+// Tesouraria (Contas correntes): enum fechado de tipo de conta.
+const TIPO_CONTA_VALIDOS = ["conta_corrente", "poupanca", "pagamento", "cartao_credito", "caixa"];
 
 function valorCentsValido(v) {
   return Number.isInteger(v) && v > 0;
@@ -209,11 +211,13 @@ router.get("/contas", ah(async (req, res) => res.json(listContas())));
 router.post(
   "/contas",
   ah(async (req, res) => {
-    const { nome, banco, agencia, numero, saldoInicialCents } = req.body || {};
+    const { nome, banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData } = req.body || {};
     if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome da conta", code: "FIN_CONTA_NAME_REQUIRED" });
     if (saldoInicialCents !== undefined && !Number.isInteger(saldoInicialCents))
       return res.status(400).json({ error: "Saldo inicial inválido", code: "FIN_VALUE_INVALID" });
-    res.status(201).json(insertConta({ nome: nome.trim(), banco, agencia, numero, saldoInicialCents }));
+    if (tipo !== undefined && !TIPO_CONTA_VALIDOS.includes(tipo))
+      return res.status(400).json({ error: "Tipo de conta inválido", code: "FIN_CONTA_TIPO_INVALID" });
+    res.status(201).json(insertConta({ nome: nome.trim(), banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData }));
   })
 );
 router.patch(
@@ -221,9 +225,11 @@ router.patch(
   ah(async (req, res) => {
     if (!getConta(req.params.id)) return res.status(404).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
     // Mesma validação do POST: saldo inicial não inteiro envenena montarSaldos (NaN).
-    const { saldoInicialCents } = req.body || {};
+    const { saldoInicialCents, tipo } = req.body || {};
     if (saldoInicialCents !== undefined && !Number.isInteger(saldoInicialCents))
       return res.status(400).json({ error: "Saldo inicial inválido", code: "FIN_VALUE_INVALID" });
+    if (tipo !== undefined && !TIPO_CONTA_VALIDOS.includes(tipo))
+      return res.status(400).json({ error: "Tipo de conta inválido", code: "FIN_CONTA_TIPO_INVALID" });
     res.json(updateConta(req.params.id, req.body || {}));
   })
 );
