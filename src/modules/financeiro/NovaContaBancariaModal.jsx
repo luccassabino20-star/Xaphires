@@ -37,7 +37,7 @@ function separarNumero(bruto) {
   return m ? { numero: m[1], digito: m[2] } : { numero: s, digito: "" };
 }
 
-const VAZIO = { nome: "", banco: "", tipo: "conta_corrente", agencia: "", numero: "", digito: "", saldo: "", saldoData: hojeCivil(), principal: false };
+const VAZIO = { nome: "", banco: "", tipo: "conta_corrente", agencia: "", numero: "", digito: "", saldo: "", saldoData: hojeCivil(), principal: false, chavePix: "" };
 
 // Modal "Nova Conta Bancária": mesmo esqueleto visual de NovoContatoModal.jsx
 // (header com ícone, premiumModalIn, CTA escuro). O seletor de banco é visual
@@ -54,7 +54,7 @@ export default function NovaContaBancariaModal({ conta, tipos, onClose, onSalvar
       nome: conta.nome, banco: conta.banco || "", tipo: conta.tipo || "conta_corrente",
       agencia: conta.agencia || "", numero, digito,
       saldo: String((conta.saldo_inicial_cents || 0) / 100), saldoData: conta.saldo_inicial_data || hojeCivil(),
-      principal: !!conta.principal,
+      principal: !!conta.principal, chavePix: conta.chave_pix || "",
       _outro: !destaque && !!conta.banco,
     };
   });
@@ -92,6 +92,7 @@ export default function NovaContaBancariaModal({ conta, tipos, onClose, onSalvar
       await onSalvar({
         nome: f.nome.trim(), banco, tipo: f.tipo, agencia: f.agencia, numero: numeroCompleto,
         saldoInicialCents: centsAssinado(f.saldo), saldoInicialData: f.saldoData, principal: f.principal,
+        chavePix: f.chavePix.trim(),
       });
     } catch (err) {
       setErro(translateError(err, t));
@@ -190,6 +191,14 @@ export default function NovaContaBancariaModal({ conta, tipos, onClose, onSalvar
               <input type="date" value={f.saldoData} onChange={(e) => setF({ ...f, saldoData: e.target.value })} />
             </label>
           </div>
+
+          <label className="cobr-field">
+            <span>{t("financeiro.tesouraria.modal.chavePix")}</span>
+            <input
+              type="text" placeholder={t("financeiro.tesouraria.modal.chavePixPlaceholder")}
+              value={f.chavePix} onChange={(e) => setF({ ...f, chavePix: e.target.value })}
+            />
+          </label>
 
           <label className="contas-principal-toggle">
             <span className="addon-toggle">

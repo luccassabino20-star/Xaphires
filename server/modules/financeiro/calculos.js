@@ -7,7 +7,7 @@
 // 'finalizado'), datado pela baixa (paid_at). O regime de competência (pelo
 // vencimento) fica anotado como evolução - hoje fluxo e DRE contam a mesma
 // história para não confundir.
-import { lancamentosDoAno, lancamentosPagosNoPeriodo, lancamentosFinalizadosAntesDe, getCategoria, listContas, movimentoPorConta, liquidoCents, getConta, finalizadosDaConta, estornadosDaConta, apropriacoesDeVarios, addMesesCivil } from "./repo.js";
+import { lancamentosDoAno, lancamentosPagosNoPeriodo, lancamentosFinalizadosAntesDe, getCategoria, listContas, movimentoPorConta, liquidoCents, getConta, finalizadosDaConta, estornadosDaConta, apropriacoesDeVarios, addMesesCivil, ultimaMovimentacaoPorConta } from "./repo.js";
 
 // Estados de "aberto" - o título ainda deve entrar/sair, então conta no previsto
 // do fluxo. 'finalizado' já é realizado; 'anulado' não conta em lugar nenhum.
@@ -73,6 +73,7 @@ export function montarFluxo(ano) {
 // nunca deixar o saldo mentindo. Devolve também o saldo total somado.
 export function montarSaldos() {
   const mov = Object.fromEntries(movimentoPorConta().map((r) => [r.conta_id, r.mov]));
+  const ultima = Object.fromEntries(ultimaMovimentacaoPorConta().map((r) => [r.conta_id, r.data]));
   const contas = listContas().map((c) => ({
     id: c.id,
     nome: c.nome,
@@ -81,6 +82,7 @@ export function montarSaldos() {
     saldoInicial: c.saldo_inicial_cents,
     movimento: mov[c.id] || 0,
     saldo: c.saldo_inicial_cents + (mov[c.id] || 0),
+    ultimaMovimentacao: ultima[c.id] || null,
   }));
   return { contas, saldoTotal: contas.reduce((s, c) => s + c.saldo, 0) };
 }

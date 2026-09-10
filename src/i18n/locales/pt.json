@@ -750,7 +750,27 @@
         "apelidoPlaceholder": "Ex.: Conta Corrente - Folha de Pagamento",
         "digito": "Dígito",
         "dataSaldo": "Data do saldo inicial",
-        "contaPrincipal": "Definir como Conta Principal para Recebimentos"
+        "contaPrincipal": "Definir como Conta Principal para Recebimentos",
+        "chavePix": "Chave Pix (opcional)",
+        "chavePixPlaceholder": "CPF/CNPJ, e-mail, telefone ou chave aleatória"
+      },
+      "dashboard": {
+        "titulo": "Contas Bancárias & Tesouraria",
+        "subtitulo": "Gerencie os saldos de depósitos, carteiras de pagamento e disponibilidade financeira da empresa em tempo real.",
+        "importarExtrato": "Importar Extrato (OFX/CSV)",
+        "ocultarSaldo": "Ocultar saldo",
+        "exibirSaldo": "Exibir saldo",
+        "atualizadoAgora": "Atualizado agora",
+        "kpiEntradas": "Entradas Previstas (Mês)",
+        "kpiSaidas": "Saídas Previstas (Mês)",
+        "kpiDisponibilidade": "Disponibilidade Imediata",
+        "emptyTitulo": "Nenhuma conta bancária conectada",
+        "emptyTexto": "Cadastre suas contas correntes, caixas físicos ou contas digitais para começar a conciliar entradas, saídas e faturamentos.",
+        "emptyBotao": "+ Cadastrar Primeira Conta",
+        "posicaoCaixa": "Posição de caixa",
+        "colChavePix": "Chave Pix",
+        "colUltimaMovimentacao": "Última movimentação",
+        "semMovimentacao": "Sem movimentação"
       }
     },
     "baixa": { "semConta": "Sem conta", "confirmar": "Confirmar" },

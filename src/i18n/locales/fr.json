@@ -450,7 +450,27 @@
         "apelidoPlaceholder": "Ex. : Compte Courant - Paie",
         "digito": "Clé",
         "dataSaldo": "Date du solde initial",
-        "contaPrincipal": "Définir comme Compte Principal pour les Encaissements"
+        "contaPrincipal": "Définir comme Compte Principal pour les Encaissements",
+        "chavePix": "Clé Pix (optionnel)",
+        "chavePixPlaceholder": "N° fiscal, e-mail, téléphone ou clé aléatoire"
+      },
+      "dashboard": {
+        "titulo": "Comptes Bancaires & Trésorerie",
+        "subtitulo": "Gérez les soldes de dépôt, les portefeuilles de paiement et la disponibilité financière de l'entreprise en temps réel.",
+        "importarExtrato": "Importer un relevé (OFX/CSV)",
+        "ocultarSaldo": "Masquer le solde",
+        "exibirSaldo": "Afficher le solde",
+        "atualizadoAgora": "Mis à jour à l'instant",
+        "kpiEntradas": "Entrées Prévues (Mois)",
+        "kpiSaidas": "Sorties Prévues (Mois)",
+        "kpiDisponibilidade": "Disponibilité Immédiate",
+        "emptyTitulo": "Aucun compte bancaire connecté",
+        "emptyTexto": "Enregistrez vos comptes courants, caisses physiques ou comptes numériques pour commencer à rapprocher entrées, sorties et facturation.",
+        "emptyBotao": "+ Enregistrer le Premier Compte",
+        "posicaoCaixa": "Position de trésorerie",
+        "colChavePix": "Clé Pix",
+        "colUltimaMovimentacao": "Dernier mouvement",
+        "semMovimentacao": "Aucun mouvement"
       }
     },
     "baixa": { "semConta": "Sans compte", "confirmar": "Confirmer" },

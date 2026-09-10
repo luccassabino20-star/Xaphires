@@ -9819,6 +9819,22 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-kpi-receber .fin-kpi-value { color: var(--fin-entrada); }
 .fin-kpi-pagar .fin-kpi-value { color: var(--fin-saida); }
 
+/* Dashboard de Tesouraria (Contas Bancárias & Caixa) - olho de privacidade e
+   badge "Atualizado agora" no card de Saldo Consolidado. */
+.contas-kpi-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.contas-kpi-privacidade {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; padding: 0; border: none; border-radius: 6px;
+  color: var(--text-muted); background: none; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.contas-kpi-privacidade:hover { background: var(--bg-list); color: var(--text-primary); }
+.contas-kpi-badge {
+  align-self: flex-start;
+  font-size: 10.5px; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-list); padding: 2px 8px; border-radius: 999px;
+}
+
 /* Formulário e filtros */
 .fin-form, .fin-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .fin-form input, .fin-form select, .fin-filtros select, .fin-periodo input {

@@ -750,7 +750,27 @@
         "apelidoPlaceholder": "E.g.: Checking Account - Payroll",
         "digito": "Check digit",
         "dataSaldo": "Initial balance date",
-        "contaPrincipal": "Set as Primary Account for Receivables"
+        "contaPrincipal": "Set as Primary Account for Receivables",
+        "chavePix": "Pix Key (optional)",
+        "chavePixPlaceholder": "Tax ID, email, phone or random key"
+      },
+      "dashboard": {
+        "titulo": "Bank Accounts & Treasury",
+        "subtitulo": "Manage deposit balances, payment wallets and the company's financial availability in real time.",
+        "importarExtrato": "Import Statement (OFX/CSV)",
+        "ocultarSaldo": "Hide balance",
+        "exibirSaldo": "Show balance",
+        "atualizadoAgora": "Updated now",
+        "kpiEntradas": "Expected Inflows (Month)",
+        "kpiSaidas": "Expected Outflows (Month)",
+        "kpiDisponibilidade": "Immediate Availability",
+        "emptyTitulo": "No bank account connected",
+        "emptyTexto": "Register your checking accounts, physical cash boxes or digital accounts to start reconciling inflows, outflows and billing.",
+        "emptyBotao": "+ Register First Account",
+        "posicaoCaixa": "Cash position",
+        "colChavePix": "Pix Key",
+        "colUltimaMovimentacao": "Last Activity",
+        "semMovimentacao": "No activity"
       }
     },
     "baixa": { "semConta": "No account", "confirmar": "Confirm" },

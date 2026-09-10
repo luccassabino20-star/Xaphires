@@ -67,17 +67,17 @@ export function getConta(id) {
 function zerarOutrosPrincipais(exceptId) {
   getDb().prepare("UPDATE financeiro_contas SET principal = 0 WHERE id <> ?").run(exceptId);
 }
-export function insertConta({ nome, banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData }) {
+export function insertConta({ nome, banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData, chavePix }) {
   const id = uid();
   getDb()
     .prepare(
       `INSERT INTO financeiro_contas
-         (id, nome, banco, agencia, numero, saldo_inicial_cents, tipo, principal, saldo_inicial_data, ativo, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
+         (id, nome, banco, agencia, numero, saldo_inicial_cents, tipo, principal, saldo_inicial_data, chave_pix, ativo, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
     )
     .run(
       id, nome, banco || "", agencia || "", numero || "", saldoInicialCents || 0,
-      tipo || "conta_corrente", principal ? 1 : 0, saldoInicialData || "",
+      tipo || "conta_corrente", principal ? 1 : 0, saldoInicialData || "", chavePix || "",
       new Date().toISOString()
     );
   if (principal) zerarOutrosPrincipais(id);
@@ -89,7 +89,7 @@ export function updateConta(id, c) {
   getDb()
     .prepare(
       `UPDATE financeiro_contas SET nome = ?, banco = ?, agencia = ?, numero = ?, saldo_inicial_cents = ?,
-         tipo = ?, principal = ?, saldo_inicial_data = ?, ativo = ? WHERE id = ?`
+         tipo = ?, principal = ?, saldo_inicial_data = ?, chave_pix = ?, ativo = ? WHERE id = ?`
     )
     .run(
       c.nome ?? a.nome,
@@ -100,11 +100,21 @@ export function updateConta(id, c) {
       c.tipo ?? a.tipo,
       c.principal !== undefined ? (c.principal ? 1 : 0) : a.principal,
       c.saldoInicialData ?? a.saldo_inicial_data,
+      c.chavePix ?? a.chave_pix,
       c.ativo !== undefined ? (c.ativo ? 1 : 0) : a.ativo,
       id
     );
   if (c.principal) zerarOutrosPrincipais(id);
   return getConta(id);
+}
+// Última movimentação FINALIZADA de cada conta - alimenta a coluna "Última
+// movimentação" do dashboard de tesouraria. Mesmo espírito de
+// movimentoPorConta() (calculos.js): uma agregação por conta_id, não uma
+// consulta por conta - assim o dashboard não dispara N queries pra N contas.
+export function ultimaMovimentacaoPorConta() {
+  return getDb()
+    .prepare("SELECT conta_id, MAX(paid_at) AS data FROM financeiro_lancamentos WHERE status = 'finalizado' AND conta_id IS NOT NULL GROUP BY conta_id")
+    .all();
 }
 
 // ---------- Centros de custo ----------

@@ -450,7 +450,27 @@
         "apelidoPlaceholder": "Z. B.: Girokonto - Gehaltsabrechnung",
         "digito": "Prüfziffer",
         "dataSaldo": "Datum des Anfangssaldos",
-        "contaPrincipal": "Als Hauptkonto für Zahlungseingänge festlegen"
+        "contaPrincipal": "Als Hauptkonto für Zahlungseingänge festlegen",
+        "chavePix": "Pix-Schlüssel (optional)",
+        "chavePixPlaceholder": "Steuernummer, E-Mail, Telefon oder Zufallsschlüssel"
+      },
+      "dashboard": {
+        "titulo": "Bankkonten & Treasury",
+        "subtitulo": "Verwalten Sie Einlagensalden, Zahlungs-Wallets und die finanzielle Verfügbarkeit des Unternehmens in Echtzeit.",
+        "importarExtrato": "Kontoauszug importieren (OFX/CSV)",
+        "ocultarSaldo": "Saldo ausblenden",
+        "exibirSaldo": "Saldo anzeigen",
+        "atualizadoAgora": "Gerade aktualisiert",
+        "kpiEntradas": "Erwartete Eingänge (Monat)",
+        "kpiSaidas": "Erwartete Ausgänge (Monat)",
+        "kpiDisponibilidade": "Sofortige Verfügbarkeit",
+        "emptyTitulo": "Kein Bankkonto verbunden",
+        "emptyTexto": "Erfassen Sie Ihre Girokonten, physischen Kassen oder digitalen Konten, um Eingänge, Ausgänge und Abrechnungen abzugleichen.",
+        "emptyBotao": "+ Erstes Konto erfassen",
+        "posicaoCaixa": "Liquiditätsposition",
+        "colChavePix": "Pix-Schlüssel",
+        "colUltimaMovimentacao": "Letzte Bewegung",
+        "semMovimentacao": "Keine Bewegung"
       }
     },
     "baixa": { "semConta": "Kein Konto", "confirmar": "Bestätigen" },

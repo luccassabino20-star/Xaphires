@@ -750,7 +750,27 @@
         "apelidoPlaceholder": "Ej.: Cuenta Corriente - Nómina",
         "digito": "Dígito verificador",
         "dataSaldo": "Fecha del saldo inicial",
-        "contaPrincipal": "Definir como Cuenta Principal para Cobros"
+        "contaPrincipal": "Definir como Cuenta Principal para Cobros",
+        "chavePix": "Clave Pix (opcional)",
+        "chavePixPlaceholder": "CPF/CNPJ, correo, teléfono o clave aleatoria"
+      },
+      "dashboard": {
+        "titulo": "Cuentas Bancarias & Tesorería",
+        "subtitulo": "Gestiona los saldos de depósitos, billeteras de pago y la disponibilidad financiera de la empresa en tiempo real.",
+        "importarExtrato": "Importar Extracto (OFX/CSV)",
+        "ocultarSaldo": "Ocultar saldo",
+        "exibirSaldo": "Mostrar saldo",
+        "atualizadoAgora": "Actualizado ahora",
+        "kpiEntradas": "Entradas Previstas (Mes)",
+        "kpiSaidas": "Salidas Previstas (Mes)",
+        "kpiDisponibilidade": "Disponibilidad Inmediata",
+        "emptyTitulo": "Ninguna cuenta bancaria conectada",
+        "emptyTexto": "Registra tus cuentas corrientes, cajas físicas o cuentas digitales para empezar a conciliar entradas, salidas y facturación.",
+        "emptyBotao": "+ Registrar Primera Cuenta",
+        "posicaoCaixa": "Posición de caja",
+        "colChavePix": "Clave Pix",
+        "colUltimaMovimentacao": "Último movimiento",
+        "semMovimentacao": "Sin movimiento"
       }
     },
     "baixa": { "semConta": "Sin cuenta", "confirmar": "Confirmar" },

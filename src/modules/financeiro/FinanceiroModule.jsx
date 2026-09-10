@@ -132,7 +132,14 @@ export default function FinanceiroModule({ onExit }) {
           {aba === "lancamentos" && <LancamentosView />}
           {aba === "titulos" && <TitulosView />}
           {aba === "movimentacao" && <MovimentacaoView />}
-          {aba === "contas" && <ContasView />}
+          {aba === "contas" && (
+            <ContasView
+              onVerExtrato={(contaId) => {
+                setImportarPrefillContaId(contaId);
+                setAba("importar");
+              }}
+            />
+          )}
           {aba === "importar" && (
             <ImportarExtratoView
               contaIdInicial={importarPrefillContaId}

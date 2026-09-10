@@ -211,13 +211,13 @@ router.get("/contas", ah(async (req, res) => res.json(listContas())));
 router.post(
   "/contas",
   ah(async (req, res) => {
-    const { nome, banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData } = req.body || {};
+    const { nome, banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData, chavePix } = req.body || {};
     if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome da conta", code: "FIN_CONTA_NAME_REQUIRED" });
     if (saldoInicialCents !== undefined && !Number.isInteger(saldoInicialCents))
       return res.status(400).json({ error: "Saldo inicial inválido", code: "FIN_VALUE_INVALID" });
     if (tipo !== undefined && !TIPO_CONTA_VALIDOS.includes(tipo))
       return res.status(400).json({ error: "Tipo de conta inválido", code: "FIN_CONTA_TIPO_INVALID" });
-    res.status(201).json(insertConta({ nome: nome.trim(), banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData }));
+    res.status(201).json(insertConta({ nome: nome.trim(), banco, agencia, numero, saldoInicialCents, tipo, principal, saldoInicialData, chavePix }));
   })
 );
 router.patch(
