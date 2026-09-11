@@ -7,6 +7,61 @@ import { normalizeLanguage } from "../../i18n/locale.js";
 import { centsOuZero, formatPercent } from "./dinheiro.js";
 import ContatosView from "./ContatosView.jsx";
 import ContasCorrentesView from "./ContasCorrentesView.jsx";
+import NovaClasseModal from "./NovaClasseModal.jsx";
+
+function IconSearch({ size = 15 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+function IconPlus({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+function IconDownload({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v12m0 0-4-4m4 4 4-4" />
+      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </svg>
+  );
+}
+function IconUpload({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 15V3m0 0-4 4m4-4 4 4" />
+      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </svg>
+  );
+}
+function IconKebab({ size = 16 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+      <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
+    </svg>
+  );
+}
+function IconFolder({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6a1 1 0 0 1 1-1h4.5l2 2H20a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
+    </svg>
+  );
+}
+function IconLeaf({ size = 14 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+      <path d="M9 18V6" />
+      <path d="M9 12h9" />
+    </svg>
+  );
+}
 
 // Cadastros de apoio do Financeiro, organizados em sidebar por categoria (o
 // mesmo agrupamento do menu "Cadastros Básicos" do SIGIM). Só 6 itens são reais
@@ -121,6 +176,18 @@ export default function CadastrosView({ onEmitirCobranca, onVerExtrato }) {
     showToast(t("financeiro.cad.criado"));
     await carregar();
   }
+  // Mesmo desenho de criarContato/editarContato: o modal de classe
+  // (NovaClasseModal) chama direto e mostra o erro inline.
+  async function criarClasse(dados) {
+    await api.finCreateCategoria(dados);
+    showToast(t("financeiro.cad.criado"));
+    await carregar();
+  }
+  async function editarClasse(id, dados) {
+    await api.finUpdateCategoria(id, dados);
+    showToast(t("financeiro.cad.criado"));
+    await carregar();
+  }
   // Mesmo desenho de criarContato/editarContato: o modal de conta bancária
   // (NovaContaBancariaModal) chama direto e mostra o erro inline.
   async function criarConta(dados) {
@@ -168,7 +235,7 @@ export default function CadastrosView({ onEmitirCobranca, onVerExtrato }) {
           />
         )}
         {selecionado === "centros" && <SecaoCentros centros={centros} onCriar={criar} onEditar={editar} onChanged={carregar} />}
-        {selecionado === "classes" && <SecaoClasses classes={classes} onCriar={criar} onEditar={editar} onChanged={carregar} />}
+        {selecionado === "classes" && <SecaoClasses classes={classes} onCriar={criarClasse} onEditar={editarClasse} onChanged={carregar} />}
         {selecionado === "contatos" && (
           <ContatosView
             contatos={contatos}
@@ -429,20 +496,64 @@ function SecaoCentros({ centros, onCriar, onEditar, onChanged }) {
   );
 }
 
+// 'custo' não é um valor de `tipo` no servidor (só receita/despesa existem no
+// schema) - é uma convenção de código só desta tela: despesa cujo código começa
+// com 5 aparece como Custo direto/CPV, o resto como Despesa operacional. Assim
+// o DRE (que soma por `tipo`) e a matriz de fluxo de caixa continuam intocados;
+// só o filtro e o badge desta grade enxergam a terceira categoria.
+function classeGrupo(x) {
+  if (x.tipo === "receita") return "receita";
+  return String(x.codigo || "").trim().startsWith("5") ? "custo" : "despesa";
+}
+
+const FILTROS_CLASSE = ["todas", "receita", "despesa", "custo"];
+
 function SecaoClasses({ classes, onCriar, onEditar, onChanged }) {
   const { t } = useTranslation();
   // O servidor devolve a classe por tipo/nome; para recolher a árvore do plano de
-  // contas (4, 4.08, 4.08.01) reordeno por código aqui, no cliente.
+  // contas (4, 4.08, 4.08.01) reordeno por código aqui, no cliente. Passa a lista
+  // INTEIRA (não a filtrada) pro hook de árvore, senão um pai escondido pelo
+  // filtro quebraria a indentação/recolhimento dos filhos que sobraram.
   const ordenadas = useMemo(() => ordenarPorCodigo(classes), [classes]);
   const arvore = useArvoreColapsavel(ordenadas);
-  const vazio = { nome: "", tipo: "despesa", codigo: "" };
-  const [f, setF] = useState(vazio);
-  const [editandoId, setEditandoId] = useState(null);
+
+  const [busca, setBusca] = useState("");
+  const [filtro, setFiltro] = useState("todas");
+  const [visao, setVisao] = useState("arvore"); // 'arvore' | 'lista' (lista = tudo expandido, sem +/-)
+  const [modalAberto, setModalAberto] = useState(false);
+  const [editando, setEditando] = useState(null); // classe em edição, ou null para "nova"
+  const [paiInicial, setPaiInicial] = useState(null); // pai pré-selecionado via "Adicionar subclasse"
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const menuAnchorRefs = useRef({});
   const [importando, setImportando] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [importErro, setImportErro] = useState("");
-  function editar(x) { setEditandoId(x.id); setF({ nome: x.nome, tipo: x.tipo, codigo: x.codigo || "" }); }
-  function cancelar() { setEditandoId(null); setF(vazio); }
+
+  const resumo = useMemo(() => {
+    const total = classes.length;
+    const ativas = classes.filter((c) => c.ativo !== 0).length;
+    const receitas = classes.filter((c) => classeGrupo(c) === "receita").length;
+    return { total, ativas, receitas, despesasCustos: total - receitas };
+  }, [classes]);
+
+  const visiveis = useMemo(() => {
+    const base = visao === "arvore" ? arvore.visiveis : ordenadas;
+    const termo = busca.trim().toLowerCase();
+    return base.filter((x) => {
+      if (filtro !== "todas" && classeGrupo(x) !== filtro) return false;
+      if (!termo) return true;
+      return x.nome?.toLowerCase().includes(termo) || String(x.codigo || "").toLowerCase().includes(termo);
+    });
+  }, [arvore.visiveis, ordenadas, visao, filtro, busca]);
+
+  function abrirNova() { setEditando(null); setPaiInicial(null); setModalAberto(true); }
+  function abrirEdicao(x) { setOpenMenuId(null); setEditando(x); setPaiInicial(null); setModalAberto(true); }
+  function abrirSubclasse(x) { setOpenMenuId(null); setEditando(null); setPaiInicial(x); setModalAberto(true); }
+  async function alternarAtivo(x) {
+    setOpenMenuId(null);
+    try { await onEditar(x.id, { ativo: x.ativo === 0 ? 1 : 0 }); } catch (e) { alert(translateError(e, t)); }
+  }
+
   async function escolherExcel(e) {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -462,15 +573,30 @@ function SecaoClasses({ classes, onCriar, onEditar, onChanged }) {
     setImportErro("");
     try { await api.finBaixarModeloCategorias(); } catch (err) { setImportErro(translateError(err, t)); }
   }
+
+  const rotuloGrupo = (g) => t(`financeiro.cad.classesBadge${g === "receita" ? "Receita" : g === "custo" ? "Custo" : "Despesa"}`);
+
   return (
-    <div className="fin-cad-secao">
-      <div className="fin-cc-import">
-        <label className={"btn-secondary btn-small fin-importar-file" + (importando ? " is-disabled" : "")}>
-          {importando ? t("financeiro.importar.lendo") : t("financeiro.cad.importarExcel")}
-          <input type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={escolherExcel} disabled={importando} hidden />
-        </label>
-        <button type="button" className="btn-ghost btn-small" onClick={baixarModelo}>{t("financeiro.cad.baixarModelo")}</button>
+    <div className="classes-view">
+      <div className="classes-header">
+        <div>
+          <h2 className="classes-titulo">{t("financeiro.cad.classesTitulo")}</h2>
+          <p className="classes-subtitulo">{t("financeiro.cad.classesSubtitulo")}</p>
+        </div>
+        <div className="classes-header-acoes">
+          <button type="button" className="btn-ghost btn-small" onClick={baixarModelo}>
+            <IconDownload /> {t("financeiro.cad.baixarModelo")}
+          </button>
+          <label className={"btn-secondary btn-small fin-importar-file" + (importando ? " is-disabled" : "")}>
+            <IconUpload /> {importando ? t("financeiro.importar.lendo") : t("financeiro.cad.importarExcel")}
+            <input type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={escolherExcel} disabled={importando} hidden />
+          </label>
+          <button type="button" className="recurrence-btn-primary" onClick={abrirNova}>
+            <IconPlus /> {t("financeiro.cad.classesNovo")}
+          </button>
+        </div>
       </div>
+
       {importErro && <div className="fin-error">{importErro}</div>}
       {resultado && (
         <div className="fin-cc-import-res">
@@ -484,31 +610,176 @@ function SecaoClasses({ classes, onCriar, onEditar, onChanged }) {
           )}
         </div>
       )}
-      <form
-        className="fin-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!f.nome.trim()) return;
-          const dados = { nome: f.nome.trim(), tipo: f.tipo, codigo: f.codigo };
-          if (editandoId) onEditar(api.finUpdateCategoria, editandoId, dados, cancelar);
-          else onCriar(api.finCreateCategoria, dados, () => setF(vazio));
-        }}
-      >
-        <input type="text" placeholder={t("financeiro.cad.codigo")} value={f.codigo} onChange={(e) => setF({ ...f, codigo: e.target.value })} />
-        <input type="text" placeholder={t("financeiro.cad.nome")} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} />
-        <select value={f.tipo} onChange={(e) => setF({ ...f, tipo: e.target.value })}>
-          <option value="receita">{t("financeiro.dre.receitas")}</option>
-          <option value="despesa">{t("financeiro.dre.despesas")}</option>
-        </select>
-        <button type="submit" className="btn-primary btn-small">{editandoId ? t("common.save") : t("financeiro.form.adicionar")}</button>
-        {editandoId && <button type="button" className="btn-ghost btn-small" onClick={cancelar}>{t("common.cancel")}</button>}
-      </form>
-      <Tabela vazio={t("financeiro.vazio")} linhas={arvore.visiveis} colunas={[
-        { h: t("financeiro.cad.codigo"), c: (x) => <CelulaCodigo arvore={arvore} x={x} /> },
-        { h: t("financeiro.cad.nome"), c: (x) => x.nome },
-        { h: t("financeiro.cad.tipo"), c: (x) => (x.tipo === "receita" ? t("financeiro.dre.receitas") : t("financeiro.dre.despesas")) },
-        { h: "", c: (x) => <AcoesCadastro x={x} onEditar={() => editar(x)} onToggle={() => onEditar(api.finUpdateCategoria, x.id, { ativo: !x.ativo }, () => {})} /> },
+
+      <div className="fin-kpis classes-kpis">
+        <div className="fin-kpi">
+          <span className="fin-kpi-label">{t("financeiro.cad.classesTotal")}</span>
+          <span className="fin-kpi-value">{resumo.total}</span>
+          <span className="classes-kpi-sub">{t("financeiro.cad.classesTotalAtivas", { count: resumo.ativas })}</span>
+        </div>
+        <div className="fin-kpi classes-kpi-receita">
+          <span className="fin-kpi-label">{t("financeiro.cad.classesReceitasCard")}</span>
+          <span className="fin-kpi-value">{resumo.receitas}</span>
+        </div>
+        <div className="fin-kpi classes-kpi-despesa">
+          <span className="fin-kpi-label">{t("financeiro.cad.classesDespesasCard")}</span>
+          <span className="fin-kpi-value">{resumo.despesasCustos}</span>
+        </div>
+      </div>
+
+      <div className="classes-toolbar">
+        <label className="contatos-busca classes-busca">
+          <IconSearch />
+          <input type="text" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder={t("financeiro.cad.classesBuscarPlaceholder")} />
+        </label>
+        <div className="timing-toggle classes-chips">
+          {FILTROS_CLASSE.map((f) => (
+            <button key={f} type="button" className={"timing-toggle-btn" + (filtro === f ? " active" : "")} onClick={() => setFiltro(f)}>
+              {t(`financeiro.cad.classesFiltro${f === "todas" ? "Todas" : f === "receita" ? "Receitas" : f === "despesa" ? "Despesas" : "Custos"}`)}
+            </button>
+          ))}
+        </div>
+        <div className="timing-toggle classes-view-toggle">
+          <button type="button" className={"timing-toggle-btn" + (visao === "arvore" ? " active" : "")} onClick={() => setVisao("arvore")}>
+            {t("financeiro.cad.classesVisaoArvore")}
+          </button>
+          <button type="button" className={"timing-toggle-btn" + (visao === "lista" ? " active" : "")} onClick={() => setVisao("lista")}>
+            {t("financeiro.cad.classesVisaoLista")}
+          </button>
+        </div>
+      </div>
+
+      <Tabela vazio={t("financeiro.cad.classesVazio")} linhas={visiveis} colunas={[
+        { h: t("financeiro.cad.codigo"), c: (x) => <ClasseCelulaCodigo arvore={arvore} x={x} expandida={visao === "lista"} /> },
+        { h: t("financeiro.cad.nome"), c: (x) => <ClasseCelulaNome arvore={arvore} x={x} /> },
+        { h: "DRE", c: (x) => <span className={"classes-badge-tipo classes-badge-tipo-" + classeGrupo(x)}>{rotuloGrupo(classeGrupo(x))}</span> },
+        { h: t("financeiro.cad.classesNatureza"), c: (x) => (
+          <span className={"classes-badge-natureza" + (arvore.temFilho(x.codigo) ? " sintetica" : " analitica")}>
+            {t(arvore.temFilho(x.codigo) ? "financeiro.cad.sintetico" : "financeiro.cad.analitico")}
+          </span>
+        ) },
+        { h: t("financeiro.cad.ativo"), c: (x) => (
+          <span className={"classes-status-pill" + (x.ativo === 0 ? " inativa" : " ativa")}>
+            {x.ativo === 0 ? t("financeiro.cad.inativo") : t("financeiro.cad.ativo")}
+          </span>
+        ) },
+        { h: "", c: (x) => (
+          <span className="classes-cell-acoes">
+            <button
+              type="button"
+              ref={(el) => { menuAnchorRefs.current[x.id] = el; }}
+              className="row-menu-btn"
+              onClick={() => setOpenMenuId((cur) => (cur === x.id ? null : x.id))}
+              aria-label={t("financeiro.cad.classesAcoesLinha")}
+            >
+              <IconKebab />
+            </button>
+            {openMenuId === x.id && (
+              <ClasseActionsMenu
+                anchorEl={menuAnchorRefs.current[x.id]}
+                inativa={x.ativo === 0}
+                onClose={() => setOpenMenuId(null)}
+                onEditar={() => abrirEdicao(x)}
+                onAdicionarSub={() => abrirSubclasse(x)}
+                onToggleAtivo={() => alternarAtivo(x)}
+                t={t}
+              />
+            )}
+          </span>
+        ) },
       ]} />
+
+      {modalAberto && (
+        <NovaClasseModal
+          classe={editando}
+          classes={classes}
+          paiInicial={paiInicial}
+          onClose={() => setModalAberto(false)}
+          onCriar={onCriar}
+          onEditar={onEditar}
+        />
+      )}
+    </div>
+  );
+}
+
+// Célula de código: mantém o +/- de recolher (só faz sentido na visão em
+// árvore - na lista expandida está tudo visível, então o botão some).
+function ClasseCelulaCodigo({ arvore, x, expandida }) {
+  const { t } = useTranslation();
+  const cod = String(x.codigo || "");
+  return (
+    <span className="classes-codigo-cell">
+      {!expandida && arvore.temFilho(cod) && (
+        <button
+          type="button" className="fin-tree-toggle" onClick={() => arvore.toggle(cod)}
+          aria-label={arvore.recolhido(cod) ? t("financeiro.cad.expandir") : t("financeiro.cad.recolher")}
+          title={arvore.recolhido(cod) ? t("financeiro.cad.expandir") : t("financeiro.cad.recolher")}
+        >
+          {arvore.recolhido(cod) ? "+" : "−"}
+        </button>
+      )}
+      <span className="classes-codigo-valor">{x.codigo || "-"}</span>
+    </span>
+  );
+}
+
+// Célula de nome: indentada pelo nível real na árvore, com ícone de
+// pasta (sintética/tem filho) ou traço (analítica/folha) e caixa alta em negrito
+// nos nós de topo - é o que dá a leitura de hierarquia contábil pedida.
+function ClasseCelulaNome({ arvore, x }) {
+  const cod = String(x.codigo || "");
+  const nivel = arvore.nivel(cod);
+  const temFilho = arvore.temFilho(cod);
+  return (
+    <span className="classes-nome-cell" style={{ paddingLeft: nivel * 18 }}>
+      {temFilho ? <IconFolder /> : <IconLeaf />}
+      <span className={temFilho ? "classes-nome-pai" : "classes-nome-filho"}>{x.nome}</span>
+    </span>
+  );
+}
+
+// Menu de ações da linha - mesma técnica de ContatoActionsMenu (position:fixed
+// pelo getBoundingClientRect do botão-âncora, sem portal).
+function ClasseActionsMenu({ anchorEl, inativa, onClose, onEditar, onAdicionarSub, onToggleAtivo, t }) {
+  const ref = useRef(null);
+  const [coords, setCoords] = useState(null);
+
+  useEffect(() => {
+    if (!anchorEl) return;
+    const rect = anchorEl.getBoundingClientRect();
+    setCoords({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+  }, [anchorEl]);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target) && !anchorEl?.contains(e.target)) onClose();
+    }
+    // Captura (3º argumento true) em vez de amarrar num ancestral específico:
+    // quem rola aqui é o painel externo .fin-body, não o .fin-table-wrap (que só
+    // tem overflow-x) - um listener preso a um ancestral fixo perdia esse scroll e
+    // deixava o menu grudado na posição antiga da tela. Scroll não borbulha, mas
+    // dispara na fase de captura em qualquer listener acima do alvo, então isto
+    // pega o scroll de QUALQUER ancestral rolável sem precisar adivinhar qual é.
+    function handleKey(e) { if (e.key === "Escape") onClose(); }
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    document.addEventListener("scroll", onClose, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+      document.removeEventListener("scroll", onClose, true);
+    };
+  }, [onClose, anchorEl]);
+
+  if (!coords) return null;
+
+  return (
+    <div className="dropdown" ref={ref} style={{ position: "fixed", top: coords.top, right: coords.right }}>
+      <div className="dropdown-item" onClick={onEditar}>{t("financeiro.cad.editar")}</div>
+      <div className="dropdown-item" onClick={onAdicionarSub}>{t("financeiro.cad.classesAdicionarSub")}</div>
+      <div className="dropdown-divider" />
+      <div className="dropdown-item" onClick={onToggleAtivo}>{inativa ? t("financeiro.cad.ativar") : t("financeiro.cad.desativar")}</div>
     </div>
   );
 }

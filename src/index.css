@@ -10946,7 +10946,57 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
   .fin-cad-nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 8px; }
   .fin-cad-grupo { flex: 1 1 220px; }
 }
-.fin-baixa-inline { display: inline-flex; align-items: center; gap: 6px; }
+/* ---------- Classes (Cadastros → Plano de Contas / Categorias DRE, Ultra-Premium) ----------
+   Mesmo espírito de Contatos: header com contador/ações, toolbar de busca +
+   segmentados, grade com menu "..." por linha. Particular daqui: a árvore do
+   plano de contas (código/nome indentados, +/- de recolher) e os 3 KPIs do
+   topo, que resumem a MESMA lista (não mudam com o filtro da toolbar). */
+.classes-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.classes-titulo { font-size: 19px; font-weight: 700; margin: 0 0 2px; color: var(--text-primary); }
+.classes-subtitulo { font-size: 13px; margin: 0; color: var(--text-muted); max-width: 560px; }
+.classes-header-acoes { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+.classes-kpis { margin-bottom: 16px; }
+.classes-kpi-sub { font-size: 11.5px; color: var(--text-muted); }
+.classes-kpi-receita .fin-kpi-value { color: var(--success); }
+.classes-kpi-despesa .fin-kpi-value { color: var(--danger); }
+
+.classes-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.classes-busca { flex: 1 1 240px; min-width: 200px; margin-bottom: 0; }
+.classes-chips, .classes-view-toggle { margin-bottom: 0; flex-shrink: 0; }
+
+.classes-codigo-cell { display: inline-flex; align-items: center; gap: 6px; }
+.classes-codigo-valor { font-weight: 650; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+
+.classes-nome-cell { display: inline-flex; align-items: center; gap: 8px; }
+.classes-nome-cell svg { color: var(--text-muted); flex-shrink: 0; }
+.classes-nome-pai { font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; font-size: 12.5px; color: var(--text-primary); }
+.classes-nome-filho { font-weight: 500; color: var(--text-primary); }
+
+.classes-badge-tipo { display: inline-block; padding: 3px 10px; font-size: 11.5px; font-weight: 650; border-radius: 999px; white-space: nowrap; }
+.classes-badge-tipo-receita { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+.classes-badge-tipo-despesa { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+.classes-badge-tipo-custo { color: #b45309; background: color-mix(in srgb, #f59e0b 16%, transparent); }
+
+.classes-badge-natureza { display: inline-block; padding: 3px 10px; font-size: 11.5px; font-weight: 600; border-radius: 999px; white-space: nowrap; }
+.classes-badge-natureza.sintetica { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.classes-badge-natureza.analitica { color: var(--text-secondary); background: var(--bg-list); }
+
+.classes-status-pill { display: inline-block; padding: 3px 10px; font-size: 11.5px; font-weight: 650; border-radius: 999px; }
+.classes-status-pill.ativa { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+.classes-status-pill.inativa { color: var(--text-muted); background: var(--bg-list); }
+
+.classes-cell-acoes { position: relative; }
+
+/* Modal (Nova/Editar Classe) - reaproveita o esqueleto de .cobr-form-modal. O
+   segmentado de tipo financeiro tem 3 rótulos mais longos que o de método de
+   pagamento, então precisa poder quebrar linha em telas estreitas. */
+.classes-tipo-toggle { flex-wrap: wrap; }
+.classes-tipo-toggle.is-disabled .timing-toggle-btn { cursor: default; }
+.classes-codigo-hint { font-size: 12px; color: var(--text-muted); margin: -6px 0 0; }
 .fin-baixa-inline select { padding: 5px 8px; font-size: 12.5px; background: var(--bg-list); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 6px; }
 
 /* Toggle de acesso ao Financeiro no painel de usuários */
