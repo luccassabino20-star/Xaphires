@@ -73,7 +73,12 @@ function moldeVazio(listId) {
     monthday: 25,
     monthday2: "",
     hour: 8,
-    dueInDays: "",
+    // "0" por padrão, não vazio: o cartão gerado precisa nascer com vencimento
+    // no dia da própria ocorrência (ver dueDateFor em recurrence.js) - deixar
+    // em branco por padrão é o que fazia o cartão nascer sem due nenhum, e a
+    // prévia da rotina no Calendário nunca reconhecia o cartão de verdade
+    // depois de criado (ela casa pelo `due`), duplicando pra sempre.
+    dueInDays: "0",
     checklistTexto: "",
   };
 }
@@ -91,7 +96,11 @@ function paraForm(r) {
     monthday: r.monthday ?? 25,
     monthday2: r.monthday2 ?? "",
     hour: r.hour,
-    dueInDays: r.dueInDays ?? "",
+    // Mesmo default de moldeVazio: uma regra antiga com dueInDays nulo já
+    // passou a gerar cartão com vencimento no mesmo dia (dueDateFor trata
+    // null como 0) - o formulário mostra "0" para refletir o que realmente
+    // vai acontecer, em vez de um campo vazio que sugeriria "sem vencimento".
+    dueInDays: r.dueInDays ?? "0",
     checklistTexto: r.checklist.map((c) => c.text).join("\n"),
   };
 }
@@ -401,6 +410,7 @@ export default function RecurrencesModal({ board, onClose }) {
                     onChange={(e) => set("dueInDays", e.target.value)}
                     placeholder={t("board.recurrences.noDue")}
                   />
+                  <span className="recurrence-field-hint">{t("board.recurrences.dueInDaysHint")}</span>
                 </label>
               </div>
 

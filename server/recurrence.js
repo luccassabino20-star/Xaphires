@@ -106,15 +106,27 @@ export function shouldGenerate(rule, now = new Date()) {
   return devida > new Date(marco);
 }
 
-// Data de vencimento do cartão gerado, se a regra pedir prazo.
+// Data de vencimento do cartão gerado - SEMPRE volta uma data, nunca null.
+// due_in_days é o prazo além do dia da ocorrência (0 = vence no mesmo dia, o
+// padrão); sem due_in_days válido (regra antiga, de antes deste campo ganhar
+// default, ou gravada direto pela API sem o campo), cai em 0 também, pelo
+// mesmo motivo.
+//
+// Cartão de rotina sem due é o que gerava o bug da prévia duplicada no
+// Calendário: rotinasByDate ali casa a ocorrência-fantasma contra
+// cardsByDate[iso], que é indexado pelo `due` do cartão de verdade - um
+// cartão sem due nunca entra nesse índice, então a prévia continuava
+// aparecendo pra sempre por cima do cartão já criado, todo dia, mesmo depois
+// dele existir. Garantir devido aqui resolve os dois pedidos de uma vez: o
+// cartão nasce com vencimento no dia certo, E some da prévia quando nasce.
 //
 // Devolve YYYY-MM-DD, e não um timestamp: é o formato que o campo `due` usa em
 // todo o resto do app, porque vem de um <input type="date">. Gravar ISO completo
 // aqui fazia o cartão gerado aparecer com "Invalid Date" no crachá, não casar no
 // Calendário e sair com posição NaN na Linha do tempo.
 export function dueDateFor(rule, occurrence) {
-  if (!Number.isInteger(rule.due_in_days) || rule.due_in_days < 0) return null;
+  const diasDePrazo = Number.isInteger(rule.due_in_days) && rule.due_in_days >= 0 ? rule.due_in_days : 0;
   const d = new Date(occurrence);
-  d.setDate(d.getDate() + rule.due_in_days);
+  d.setDate(d.getDate() + diasDePrazo);
   return toLocalISODate(d);
 }
