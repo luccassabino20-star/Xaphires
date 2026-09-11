@@ -40,6 +40,11 @@ export default function FinanceiroModule({ onExit }) {
   // Atalho "Ver Extrato" (Contas correntes → Conciliação & Importar Extrato):
   // mesmo raciocínio do prefill de cobrança acima.
   const [importarPrefillContaId, setImportarPrefillContaId] = useState(null);
+  // Atalho "Ver Título Vinculado" (Cobranças → Títulos, sentido oposto do
+  // "Gerar Cobrança" acima): toda cobrança nova já nasce com um título (ver
+  // cobrancaRepo.insertCobranca), então este atalho só precisa abrir o detalhe
+  // dele na aba certa - mesmo raciocínio dos outros dois prefills.
+  const [tituloDestacadoId, setTituloDestacadoId] = useState(null);
   // Fora do celular a sidebar nasce expandida (o modo ícone-só é escolha do
   // usuário, ver .fin-sidebar-toggle em IresSidebar.jsx); no celular ela
   // nasce fora da tela - mesmo critério de largura do Kanban (AuthenticatedApp.jsx,
@@ -146,6 +151,8 @@ export default function FinanceiroModule({ onExit }) {
                 setCobrancaPrefill(prefill);
                 setAba("cobrancas");
               }}
+              tituloDestacadoId={tituloDestacadoId}
+              onPrefillConsumido={() => setTituloDestacadoId(null)}
             />
           )}
           {aba === "movimentacao" && <MovimentacaoView />}
@@ -184,6 +191,10 @@ export default function FinanceiroModule({ onExit }) {
               descricaoInicial={cobrancaPrefill?.descricao}
               valorInicial={cobrancaPrefill?.valorInicial}
               onPrefillConsumido={() => setCobrancaPrefill(null)}
+              onVerTitulo={(lancamentoId) => {
+                setTituloDestacadoId(lancamentoId);
+                setAba("titulos");
+              }}
             />
           )}
         </div>

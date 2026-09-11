@@ -909,11 +909,19 @@
         "copiarPix": "Copiar Pix", "baixarBoleto": "Baixar boleto", "whatsapp": "Enviar WhatsApp",
         "baixarManual": "Dar baixa manual", "devConfirmar": "Confirmar (simulado)",
         "devConfirmarHint": "Só existe no provedor simulado - marca esta cobrança como paga sem gateway de verdade.",
-        "cancelar": "Cancelar"
+        "cancelar": "Cancelar",
+        "acoesLinha": "Ações da cobrança",
+        "visualizarLink": "Visualizar / Link de pagamento",
+        "verTitulo": "Ver título vinculado",
+        "excluir": "Excluir cobrança"
       },
       "valorOriginalHint": "Valor original antes de multa/juros por atraso",
       "confirmCancelar": "Cancelar esta cobrança?",
       "confirmBaixar": "Dar baixa manual nesta cobrança? Use quando o pagamento chegou fora do gateway (dinheiro, transferência avulsa...).",
+      "confirmExcluirTitulo": "Excluir cobrança?",
+      "confirmExcluirTexto": "Tem certeza que deseja excluir esta cobrança? Se houver um título vinculado, ele também será removido.",
+      "excluidaToast": "Cobrança excluída",
+      "semTituloVinculado": "Esta cobrança não tem título vinculado",
       "canceladaToast": "Cobrança cancelada", "baixadaToast": "Cobrança confirmada", "pixCopiado": "Chave Pix copiada",
       "semTelefone": "Este cliente não tem telefone cadastrado",
       "form": {

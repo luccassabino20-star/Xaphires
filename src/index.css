@@ -10492,6 +10492,7 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-cobr-badge-metodo, .fin-cobr-badge-status {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   font-size: 11px;
   font-weight: 650;
   padding: 3px 9px;
@@ -10502,13 +10503,31 @@ img.landing-nav-icon { background: none; object-fit: contain; flex-shrink: 0; }
 .fin-cobr-metodo-boleto { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
 .fin-cobr-metodo-card { color: var(--text-secondary); background: var(--bg-list); }
 
-.fin-cobr-status-pending { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+/* Pendente em âmbar (pílula pastel, mesmo tom de alerta usado em
+   .mov-status-pill-pendente) - antes usava a cor de destaque (azul), que não
+   lia como "aguardando" à primeira vista. Atrasado continua no vermelho cheio
+   (é o estado que pede mais atenção); cancelado/reembolsado ficam cinza com
+   texto avermelhado - "desativado", não "urgente". */
+.fin-cobr-status-pending { color: #b45309; background: color-mix(in srgb, #f59e0b 16%, transparent); }
 .fin-cobr-status-atrasado { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); }
 .fin-cobr-status-paid { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
-.fin-cobr-status-canceled, .fin-cobr-status-refunded { color: var(--text-muted); background: var(--bg-list); }
+.fin-cobr-status-canceled, .fin-cobr-status-refunded { color: var(--danger); background: var(--bg-list); }
 
 .fin-cobr-valor-original { font-size: 11px; color: var(--text-muted); font-weight: 400; }
 .fin-acao-perigo { color: var(--danger); }
+.fin-cell-acoes { position: relative; text-align: right; }
+
+/* Modal de confirmação de exclusão de cobrança - conteúdo centralizado num
+   .modal-narrow (420px), ícone de perigo em círculo pastel no topo. */
+.cobr-confirm { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-top: 8px; }
+.cobr-confirm-icone {
+  display: flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 999px;
+  color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+.cobr-confirm-titulo { font-size: 16px; font-weight: 700; margin: 0; color: var(--text-primary); }
+.cobr-confirm-texto { font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.cobr-confirm .cobr-form-footer { width: 100%; margin-top: 6px; }
 
 /* Configurações (régua + gateway) */
 .fin-cobr-config { display: flex; flex-direction: column; gap: 20px; max-width: 720px; }

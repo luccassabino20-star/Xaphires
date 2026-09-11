@@ -5,7 +5,7 @@
 import crypto from "node:crypto";
 import { getDb } from "../../db.js";
 import { uid } from "../../repo.js";
-import { hojeCivil, addMesesCivil, insertLancamento, baixarLancamento, getContato } from "./repo.js";
+import { hojeCivil, addMesesCivil, insertLancamento, baixarLancamento, mudarStatusLancamento, deleteLancamento, getContato, getContaPrincipal } from "./repo.js";
 
 // ---------- Config da régua (uma linha por empresa, id fixo) ----------
 const REGUA_ID = "default";
@@ -143,6 +143,12 @@ export function listCobrancas({ contatoId, metodo, status, de, ate } = {}) {
     .all(...args);
 }
 
+// Cria a cobrança e, junto, o Título a Receber correspondente em
+// financeiro_lancamentos - já 'pendente', não só na confirmação do pagamento.
+// Antes o título só nascia em confirmarCobranca(), então uma cobrança recém-
+// emitida (Pix/boleto ainda não pago) não aparecia em Títulos nem no Fluxo de
+// Caixa previsto; agora ela entra na hora, do mesmo jeito que um título criado
+// à mão, e confirmarCobranca (abaixo) só dá baixa nele - não cria um segundo.
 export function insertCobranca({
   contatoId, descricao, valorCents, due, metodo, recorrenciaId,
   provider, providerChargeId, status, pixPayload, pixQrcodeB64, boletoLine, boletoPdfUrl, checkoutUrl,
@@ -150,6 +156,7 @@ export function insertCobranca({
 }) {
   const id = uid();
   const numero = getDb().prepare("SELECT COALESCE(MAX(numero), 0) + 1 AS n FROM financeiro_cobrancas").get().n;
+  const statusInicial = status || "pending";
   getDb()
     .prepare(
       `INSERT INTO financeiro_cobrancas
@@ -159,48 +166,110 @@ export function insertCobranca({
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
-      id, numero, contatoId, descricao || "", valorCents, due, metodo, status || "pending", recorrenciaId || null,
+      id, numero, contatoId, descricao || "", valorCents, due, metodo, statusInicial, recorrenciaId || null,
       provider, providerChargeId || null, pixPayload || null, pixQrcodeB64 || null, boletoLine || null, boletoPdfUrl || null, checkoutUrl || null,
       multaPercent || 0, jurosPercentMes || 0, new Date().toISOString(), createdBy || null
     );
+  const contato = getContato(contatoId);
+  const lancamento = insertLancamento({
+    tipo: "receber",
+    descricao: descricao || `Cobrança #${numero}`,
+    valorCents,
+    due,
+    formaPagto: metodo,
+    contatoId,
+    contraparte: contato?.nome || "",
+    // "Origem: ID da cobrança" pedido no rastreio - o id técnico do provedor
+    // (providerChargeId, tipo "fake_b3dd52b4-...") não diz nada pra quem olha a
+    // grade de Títulos; o número da cobrança sim, e é o mesmo número que
+    // aparece na aba Cobranças.
+    doc: `Cobrança #${numero}`,
+    origem: "cobranca",
+    createdBy,
+  });
+  getDb().prepare("UPDATE financeiro_cobrancas SET lancamento_id = ? WHERE id = ?").run(lancamento.id, id);
+  // Cartão aprova na hora (ver POST /cobrancas em routes.js): a cobrança já
+  // nasce paga, então o título já nasce baixado junto - sem isto o Fluxo de
+  // Caixa/DRE não veriam esse recebimento até alguém chamar confirmarCobranca,
+  // que por sua vez já acharia status='paid' e não faria nada (idempotente).
+  if (statusInicial === "paid") {
+    baixarLancamento(lancamento.id, { paidAt: hojeCivil(), contaId: getContaPrincipal()?.id });
+    getDb().prepare("UPDATE financeiro_cobrancas SET paid_at = ? WHERE id = ?").run(hojeCivil(), id);
+  }
   return getCobranca(id);
 }
 
-// Único caminho que confirma uma cobrança e gera o título correspondente em
-// financeiro_lancamentos (tipo 'receber', já baixado) - mesma regra de ouro do
-// billing de assinatura (confirmarPagamento é o único que libera acesso):
-// nenhuma outra função cria esse lançamento. Idempotente: chamar de novo numa
-// cobrança já paga não duplica o título.
-export function confirmarCobranca(id, { paidAt } = {}) {
+// Único caminho que confirma o PAGAMENTO de uma cobrança - mesma regra de ouro
+// do billing de assinatura (confirmarPagamento é o único que libera acesso):
+// nenhuma outra função baixa esse título. Idempotente: chamar de novo numa
+// cobrança já paga não repete a baixa. Dá baixa no título que já nasceu junto
+// com a cobrança (ver insertCobranca); só cria um agora para cobrança antiga,
+// de antes deste vínculo existir (lancamento_id nulo).
+//
+// contaId: pra onde vai o crédito. Confirmação AUTOMÁTICA (webhook, dev-
+// confirmar, ou o /baixar de hoje, que nenhum ainda deixa escolher) cai na
+// conta marcada como principal - sem isso o título ficava 'finalizado' sem
+// conta_id, e um título sem conta não aparece na Movimentação de conta
+// nenhuma, então nunca dá pra conciliar contra o extrato de verdade depois.
+// Passar contaId explícito (ex.: uma baixa manual que deixe escolher no
+// futuro) sempre tem prioridade sobre esse default.
+export function confirmarCobranca(id, { paidAt, contaId } = {}) {
   const atual = getCobranca(id);
   if (!atual) return null;
   if (atual.status === "paid") return atual;
-  const contato = getContato(atual.contato_id);
   const data = paidAt || hojeCivil();
-  const lancamento = insertLancamento({
-    tipo: "receber",
-    descricao: atual.descricao || `Cobrança #${atual.numero}`,
-    valorCents: atual.valor_cents,
-    due: atual.due,
-    contatoId: atual.contato_id,
-    contraparte: contato?.nome || "",
-    doc: atual.provider_charge_id || "",
-  });
-  baixarLancamento(lancamento.id, { paidAt: data });
+  let lancamentoId = atual.lancamento_id;
+  if (!lancamentoId) {
+    const contato = getContato(atual.contato_id);
+    lancamentoId = insertLancamento({
+      tipo: "receber",
+      descricao: atual.descricao || `Cobrança #${atual.numero}`,
+      valorCents: atual.valor_cents,
+      due: atual.due,
+      formaPagto: atual.metodo,
+      contatoId: atual.contato_id,
+      contraparte: contato?.nome || "",
+      doc: `Cobrança #${atual.numero}`,
+      origem: "cobranca",
+    }).id;
+  }
+  baixarLancamento(lancamentoId, { paidAt: data, contaId: contaId || getContaPrincipal()?.id });
   getDb()
     .prepare("UPDATE financeiro_cobrancas SET status = 'paid', paid_at = ?, lancamento_id = ? WHERE id = ?")
-    .run(data, lancamento.id, id);
+    .run(data, lancamentoId, id);
   return getCobranca(id);
 }
 
+// Cancela a cobrança e anula o título vinculado junto (mesmo espírito de
+// mudarStatusLancamento('anulado') tirar o título de fluxo/DRE) - sem isso um
+// Pix cancelado continuaria contando como "a receber" nos Títulos.
 export function cancelarCobranca(id) {
   const atual = getCobranca(id);
   if (!atual) return null;
   if (atual.status === "paid" || atual.status === "canceled") return atual;
+  if (atual.lancamento_id) mudarStatusLancamento(atual.lancamento_id, "anulado");
   getDb()
     .prepare("UPDATE financeiro_cobrancas SET status = 'canceled', canceled_at = ? WHERE id = ?")
     .run(hojeCivil(), id);
   return getCobranca(id);
+}
+
+// Apaga a cobrança e, junto, o título vinculado - "Excluir" é mais forte que
+// "Cancelar": não deixa rastro nenhum dos dois lados. deleteLancamento já
+// cuida da própria descendência (impostos aplicados, apropriações, anexos); a
+// trava de mês fechado é conferida na rota, do mesmo jeito que a exclusão
+// direta de um título em /lancamentos/:id.
+export function excluirCobranca(id) {
+  const atual = getCobranca(id);
+  if (!atual) return false;
+  // A cobrança primeiro, o título depois - nessa ordem. financeiro_cobrancas.
+  // lancamento_id é FK pra financeiro_lancamentos; com FKs ligadas, apagar o
+  // título enquanto a cobrança ainda aponta pra ele falha com "constraint
+  // failed" (constatado ao testar). Ao contrário: apagar a cobrança primeiro
+  // remove a única referência, e o título fica livre pra sumir em seguida.
+  getDb().prepare("DELETE FROM financeiro_cobrancas WHERE id = ?").run(id);
+  if (atual.lancamento_id) deleteLancamento(atual.lancamento_id);
+  return true;
 }
 
 export function marcarReembolsada(id) {

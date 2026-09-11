@@ -199,7 +199,7 @@ function BaixaPopover({ l, contas, t, lang, onConfirmar }) {
   );
 }
 
-export default function TitulosView({ onGerarCobranca }) {
+export default function TitulosView({ onGerarCobranca, tituloDestacadoId, onPrefillConsumido }) {
   const { t, i18n } = useTranslation();
   const lang = normalizeLanguage(i18n.language);
   const showToast = useToast();
@@ -250,6 +250,16 @@ export default function TitulosView({ onGerarCobranca }) {
   }
   useEffect(() => { carregar(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
   async function recarregarLancamentos() { setLancamentos(await api.finListLancamentos()); }
+
+  // Atalho "Ver Título Vinculado" (Cobranças): abre o detalhe direto, sem
+  // precisar que a pessoa ache a linha na grade - mesmo raciocínio do
+  // "Emitir Cobrança Direta" no sentido oposto (ver FinanceiroModule.jsx).
+  useEffect(() => {
+    if (!tituloDestacadoId) return;
+    setDetalheId(tituloDestacadoId);
+    onPrefillConsumido?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tituloDestacadoId]);
 
   useEffect(() => {
     if (!exportAberto) return;

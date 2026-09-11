@@ -109,6 +109,17 @@ export function updateConta(id, c) {
   if (c.principal) zerarOutrosPrincipais(id);
   return getConta(id);
 }
+// Conta marcada como principal (só uma por vez, ver zerarOutrosPrincipais) -
+// é pra onde a baixa AUTOMÁTICA de uma cobrança credita o título (ver
+// confirmarCobranca em cobrancaRepo.js), pra ele aparecer na Movimentação
+// dessa conta e poder ser conciliado depois contra o extrato de verdade, em
+// vez de ficar 'finalizado' sem conta_id pra sempre (invisível pra qualquer
+// conciliação). null se a empresa ainda não marcou nenhuma conta como
+// principal - a baixa segue funcionando, só sem conta (como já era antes).
+export function getContaPrincipal() {
+  return getDb().prepare("SELECT * FROM financeiro_contas WHERE principal = 1 AND ativo = 1").get() || null;
+}
+
 // Última movimentação FINALIZADA de cada conta - alimenta a coluna "Última
 // movimentação" do dashboard de tesouraria. Mesmo espírito de
 // movimentoPorConta() (calculos.js): uma agregação por conta_id, não uma

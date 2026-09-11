@@ -36,9 +36,12 @@ export function applyCobrancaSchema(companyDb) {
       -- snapshot): mudar a config depois não reescreve cobrança já emitida.
       multa_percent INTEGER NOT NULL DEFAULT 0,
       juros_percent_mes INTEGER NOT NULL DEFAULT 0,
-      -- Título gerado na CONFIRMAÇÃO do pagamento (ver confirmarCobranca em
-      -- cobrancaRepo.js) - é o que entra no Fluxo de Caixa/DRE que já existem.
-      -- Nenhuma outra função grava isto; NULL enquanto pendente.
+      -- Título a Receber gerado JUNTO com a cobrança, já 'pendente' (ver
+      -- insertCobranca em cobrancaRepo.js) - é o que faz a cobrança aparecer em
+      -- Títulos e no Fluxo de Caixa previsto antes mesmo de ser paga.
+      -- confirmarCobranca só dá baixa nele; cancelarCobranca o anula;
+      -- excluirCobranca o apaga junto. NULL só em linha legada, de antes deste
+      -- vínculo existir (nascia NULL e só ganhava valor na confirmação).
       lancamento_id TEXT REFERENCES financeiro_lancamentos(id),
       paid_at TEXT,
       canceled_at TEXT,

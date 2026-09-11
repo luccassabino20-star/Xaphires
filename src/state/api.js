@@ -688,6 +688,7 @@ export const finCreateCobranca = (data) => request("/financeiro/cobrancas", { me
 export const finCancelarCobranca = (id) => request(`/financeiro/cobrancas/${id}/cancelar`, { method: "POST" });
 export const finBaixarCobranca = (id, paidAt) => request(`/financeiro/cobrancas/${id}/baixar`, { method: "POST", body: paidAt ? { paidAt } : {} });
 export const finDevConfirmarCobranca = (id) => request(`/financeiro/cobrancas/${id}/dev-confirmar`, { method: "POST" });
+export const finExcluirCobranca = (id) => request(`/financeiro/cobrancas/${id}`, { method: "DELETE" });
 export const finListRecorrencias = () => request("/financeiro/cobrancas/recorrencias");
 export const finCreateRecorrencia = (data) => request("/financeiro/cobrancas/recorrencias", { method: "POST", body: data });
 export const finDefinirRecorrenciaAtiva = (id, ativa) =>

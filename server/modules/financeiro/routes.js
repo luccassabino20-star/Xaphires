@@ -87,6 +87,7 @@ import {
   insertCobranca,
   confirmarCobranca,
   cancelarCobranca,
+  excluirCobranca,
   kpis as kpisCobrancas,
   listRecorrencias,
   insertRecorrencia,
@@ -1334,9 +1335,23 @@ router.post(
       createdBy: req.user.id,
     });
     // Cartão aprova na hora (o gateway não fica "pendente" como Pix/boleto) -
-    // confirma e já gera o lançamento, mesma regra de ouro de confirmarCobranca.
-    if (resultado.status === "paid") confirmarCobranca(criada.id);
+    // insertCobranca já cuidou de baixar o título junto, nada a fazer aqui.
     res.status(201).json(getCobranca(criada.id));
+  })
+);
+
+router.delete(
+  "/cobrancas/:id",
+  ah(async (req, res) => {
+    const c = getCobranca(req.params.id);
+    if (!c) return res.status(404).json({ error: "Cobrança não encontrada", code: "FIN_COBRANCA_NOT_FOUND" });
+    // Mesma trava de fechamento mensal da exclusão direta de um título
+    // (DELETE /lancamentos/:id) - excluir a cobrança não pode ser um atalho
+    // pra apagar um título de mês fechado sem passar por lá.
+    const lancamento = c.lancamento_id ? getLancamento(c.lancamento_id) : null;
+    if (lancamento && bloqueadoPorFechamento(req, res, lancamento.due)) return;
+    excluirCobranca(req.params.id);
+    res.json({ ok: true });
   })
 );
 
