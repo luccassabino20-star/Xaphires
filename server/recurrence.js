@@ -7,42 +7,75 @@
 
 export const FREQUENCIES = ["daily", "weekly", "monthly"];
 
-// Toda a aritmética abaixo é em horário LOCAL do servidor, não em UTC. A hora que
-// a pessoa escolhe no formulário é a hora do relógio dela: com setUTCHours, "8h"
-// virava 5h da manhã no Brasil, e uma regra mensal do dia 1 à meia-noite disparava
-// às 21h do dia 31 anterior.
-function atHour(base, hour) {
-  const d = new Date(base);
-  d.setHours(hour, 0, 0, 0);
-  return d;
+// Fuso FIXO do produto - não o fuso do sistema operacional do servidor. Brasil
+// aboliu o horário de verão em 2019, então America/Sao_Paulo é UTC-3 o ano
+// inteiro, sem transição para se preocupar (mesma folga que o billing-cron já
+// usa, ver server/jobs/billingCron.js). Antes, a aritmética inteira usava
+// Date/getHours() "local", ou seja, do relógio do SISTEMA ONDE O NODE RODA -
+// em desenvolvimento isso é a máquina do dev, que normalmente já está em
+// horário do Brasil, então o bug nunca apareceu em teste manual. Em produção
+// (VPS na Europa, CEST = UTC+2) o servidor está 5h à frente do Brasil: uma
+// pessoa marcando "17h" pensando no relógio dela via esse instante já ter
+// passado nos relógio DO SERVIDOR (17h Brasil = 22h CEST), e a regra pulava o
+// dia inteiro por causa do "criação não dispara retroativo" logo abaixo.
+const OFFSET_SAO_PAULO_HORAS = 3; // America/Sao_Paulo = UTC menos 3 horas
+
+// Desloca um instante REAL (epoch correto) para um Date cujos getters UTC
+// (getUTCHours, getUTCDate, getUTCDay...) devolvem o relógio de parede de São
+// Paulo naquele instante. Da linha daqui pra baixo em diante só se lê hora/dia
+// por esses getters UTC - os getters locais (getHours, getDate...) continuam
+// refletindo o fuso do SISTEMA operacional, que é exatamente o que se quer
+// evitar.
+function paraRelogioSP(instanteReal) {
+  return new Date(instanteReal.getTime() - OFFSET_SAO_PAULO_HORAS * 60 * 60 * 1000);
+}
+// Inverso: um relógio de parede de São Paulo (ano/mês/dia/hora) de volta para
+// o instante real (epoch correto), para poder comparar contra created_at/
+// last_run_at (que são timestamps de verdade) e gravar como tal.
+function deRelogioSP(ano, mesIndex, dia, hora, minuto = 0, segundo = 0) {
+  return new Date(Date.UTC(ano, mesIndex, dia, hora, minuto, segundo) + OFFSET_SAO_PAULO_HORAS * 60 * 60 * 1000);
 }
 
+// Último dia de um mês (1-31) - cálculo de calendário puro, sem instante real
+// envolvido, então dá para usar UTC direto sem depender de fuso nenhum.
 function lastDayOfMonth(year, monthIndex) {
-  return new Date(year, monthIndex + 1, 0).getDate();
+  return new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
 }
 
-// Data civil local em YYYY-MM-DD. Não dá para usar toISOString().slice(0,10) aqui:
-// ele converte para UTC antes de cortar, e um vencimento às 22h no Brasil viraria
-// o dia seguinte.
-function toLocalISODate(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
+// O dia civil (YYYY-MM-DD) de um instante real, em São Paulo. Não dá para usar
+// toISOString().slice(0,10) aqui: ele reflete UTC, e um vencimento às 22h no
+// Brasil (01h UTC do dia seguinte) viraria o dia seguinte.
+function paraDataCivilSP(instanteReal) {
+  const sp = paraRelogioSP(instanteReal);
+  const y = sp.getUTCFullYear();
+  const m = String(sp.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(sp.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
+// Instante real do dia civil de `base` (em São Paulo) na hora `hour` (também
+// em São Paulo). Equivalente ao antigo atHour(base, hour), só que ancorado no
+// fuso do produto em vez do fuso do servidor.
+function noHorarioSP(baseReal, hour) {
+  const sp = paraRelogioSP(baseReal);
+  return deRelogioSP(sp.getUTCFullYear(), sp.getUTCMonth(), sp.getUTCDate(), hour);
+}
+
+const UM_DIA_MS = 24 * 60 * 60 * 1000;
+
 // Retorna o instante da última ocorrência devida, ou null se a regra ainda não
 // teve nenhuma (por exemplo, mensal no dia 25 e hoje é dia 3 do primeiro mês).
+// `now` é sempre um instante REAL (epoch correto); o resultado também.
 export function lastDueOccurrence(rule, now = new Date()) {
   const hour = Number.isInteger(rule.hour) ? rule.hour : 0;
 
   if (rule.freq === "daily") {
-    const hoje = atHour(now, hour);
+    const hoje = noHorarioSP(now, hour);
     if (hoje <= now) return hoje;
-    // Antes da hora de hoje: a última devida foi ontem.
-    const ontem = new Date(hoje);
-    ontem.setDate(ontem.getDate() - 1);
-    return ontem;
+    // Antes da hora de hoje: a última devida foi ontem. Subtrair 24h em
+    // milissegundos reais é seguro porque São Paulo não tem horário de verão
+    // (nenhum dia tem 23h ou 25h) - sem precisar mexer em ano/mês/dia.
+    return new Date(hoje.getTime() - UM_DIA_MS);
   }
 
   if (rule.freq === "weekly") {
@@ -56,11 +89,12 @@ export function lastDueOccurrence(rule, now = new Date()) {
     const dias = [rule.weekday, rule.weekday2].filter((d) => Number.isInteger(d) && d >= 0 && d <= 6);
     if (dias.length === 0) dias.push(1);
     const candidatos = dias.map((alvo) => {
-      const d = atHour(now, hour);
-      // Recua até cair no dia da semana pedido, sem passar do agora.
-      const diff = (d.getDay() - alvo + 7) % 7;
-      d.setDate(d.getDate() - diff);
-      if (d > now) d.setDate(d.getDate() - 7);
+      let d = noHorarioSP(now, hour);
+      // Recua até cair no dia da semana pedido (em São Paulo), sem passar do agora.
+      const diaSemanaSP = paraRelogioSP(d).getUTCDay();
+      const diff = (diaSemanaSP - alvo + 7) % 7;
+      d = new Date(d.getTime() - diff * UM_DIA_MS);
+      if (d > now) d = new Date(d.getTime() - 7 * UM_DIA_MS);
       return d;
     });
     return candidatos.reduce((a, b) => (a > b ? a : b));
@@ -73,19 +107,20 @@ export function lastDueOccurrence(rule, now = new Date()) {
     // nascer duas vezes no mesmo mês sem precisar de duas regras.
     const dias = [rule.monthday, rule.monthday2].filter((d) => Number.isInteger(d) && d >= 1 && d <= 31);
     if (dias.length === 0) dias.push(1);
+    const spNow = paraRelogioSP(now);
+    const ano = spNow.getUTCFullYear();
+    const mes = spNow.getUTCMonth();
     const candidatos = dias.map((dia) => {
-      // Mês corrente, com o dia limitado ao tamanho do mês: regra do dia 31 cai
-      // no dia 28 em fevereiro em vez de vazar para março.
-      const ano = now.getFullYear();
-      const mes = now.getMonth();
+      // Mês corrente (em São Paulo), com o dia limitado ao tamanho do mês:
+      // regra do dia 31 cai no dia 28 em fevereiro em vez de vazar para março.
       const diaEsteMes = Math.min(dia, lastDayOfMonth(ano, mes));
-      const candidato = atHour(new Date(ano, mes, diaEsteMes), hour);
+      const candidato = deRelogioSP(ano, mes, diaEsteMes, hour);
       if (candidato <= now) return candidato;
       // Ainda não chegou neste mês: a última devida foi no mês anterior.
       const anoAnt = mes === 0 ? ano - 1 : ano;
       const mesAnt = mes === 0 ? 11 : mes - 1;
       const diaAnt = Math.min(dia, lastDayOfMonth(anoAnt, mesAnt));
-      return atHour(new Date(anoAnt, mesAnt, diaAnt), hour);
+      return deRelogioSP(anoAnt, mesAnt, diaAnt, hour);
     });
     return candidatos.reduce((a, b) => (a > b ? a : b));
   }
@@ -126,7 +161,6 @@ export function shouldGenerate(rule, now = new Date()) {
 // Calendário e sair com posição NaN na Linha do tempo.
 export function dueDateFor(rule, occurrence) {
   const diasDePrazo = Number.isInteger(rule.due_in_days) && rule.due_in_days >= 0 ? rule.due_in_days : 0;
-  const d = new Date(occurrence);
-  d.setDate(d.getDate() + diasDePrazo);
-  return toLocalISODate(d);
+  const comPrazo = new Date(occurrence.getTime() + diasDePrazo * UM_DIA_MS);
+  return paraDataCivilSP(comPrazo);
 }
