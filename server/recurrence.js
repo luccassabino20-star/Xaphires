@@ -5,52 +5,23 @@
 // registrado, sabe-se se falta gerar um cartão — e gera-se apenas um, mesmo que
 // várias ocorrências tenham passado sem ninguém abrir o app.
 
+import { paraRelogioSP, deRelogioSP, hojeCivilSP } from "./timezone.js";
+
 export const FREQUENCIES = ["daily", "weekly", "monthly"];
 
-// Fuso FIXO do produto - não o fuso do sistema operacional do servidor. Brasil
-// aboliu o horário de verão em 2019, então America/Sao_Paulo é UTC-3 o ano
-// inteiro, sem transição para se preocupar (mesma folga que o billing-cron já
-// usa, ver server/jobs/billingCron.js). Antes, a aritmética inteira usava
-// Date/getHours() "local", ou seja, do relógio do SISTEMA ONDE O NODE RODA -
-// em desenvolvimento isso é a máquina do dev, que normalmente já está em
-// horário do Brasil, então o bug nunca apareceu em teste manual. Em produção
-// (VPS na Europa, CEST = UTC+2) o servidor está 5h à frente do Brasil: uma
-// pessoa marcando "17h" pensando no relógio dela via esse instante já ter
-// passado nos relógio DO SERVIDOR (17h Brasil = 22h CEST), e a regra pulava o
-// dia inteiro por causa do "criação não dispara retroativo" logo abaixo.
-const OFFSET_SAO_PAULO_HORAS = 3; // America/Sao_Paulo = UTC menos 3 horas
-
-// Desloca um instante REAL (epoch correto) para um Date cujos getters UTC
-// (getUTCHours, getUTCDate, getUTCDay...) devolvem o relógio de parede de São
-// Paulo naquele instante. Da linha daqui pra baixo em diante só se lê hora/dia
-// por esses getters UTC - os getters locais (getHours, getDate...) continuam
-// refletindo o fuso do SISTEMA operacional, que é exatamente o que se quer
-// evitar.
-function paraRelogioSP(instanteReal) {
-  return new Date(instanteReal.getTime() - OFFSET_SAO_PAULO_HORAS * 60 * 60 * 1000);
-}
-// Inverso: um relógio de parede de São Paulo (ano/mês/dia/hora) de volta para
-// o instante real (epoch correto), para poder comparar contra created_at/
-// last_run_at (que são timestamps de verdade) e gravar como tal.
-function deRelogioSP(ano, mesIndex, dia, hora, minuto = 0, segundo = 0) {
-  return new Date(Date.UTC(ano, mesIndex, dia, hora, minuto, segundo) + OFFSET_SAO_PAULO_HORAS * 60 * 60 * 1000);
-}
+// Todo o cálculo abaixo é ancorado em America/Sao_Paulo (ver server/timezone.js
+// para o porquê e a técnica) - não no fuso do sistema operacional do servidor.
+// Em desenvolvimento isso nunca aparecia, porque a máquina do dev já está em
+// horário do Brasil, mas produção roda numa VPS na Europa (CEST, UTC+2), 5h à
+// frente do Brasil: uma pessoa marcando "17h" pensando no relógio dela via
+// esse instante já ter passado no relógio DO SERVIDOR (17h Brasil = 22h
+// CEST), e a regra pulava o dia inteiro por causa do "criação não dispara
+// retroativamente" logo abaixo.
 
 // Último dia de um mês (1-31) - cálculo de calendário puro, sem instante real
 // envolvido, então dá para usar UTC direto sem depender de fuso nenhum.
 function lastDayOfMonth(year, monthIndex) {
   return new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
-}
-
-// O dia civil (YYYY-MM-DD) de um instante real, em São Paulo. Não dá para usar
-// toISOString().slice(0,10) aqui: ele reflete UTC, e um vencimento às 22h no
-// Brasil (01h UTC do dia seguinte) viraria o dia seguinte.
-function paraDataCivilSP(instanteReal) {
-  const sp = paraRelogioSP(instanteReal);
-  const y = sp.getUTCFullYear();
-  const m = String(sp.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(sp.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
 }
 
 // Instante real do dia civil de `base` (em São Paulo) na hora `hour` (também
@@ -162,5 +133,5 @@ export function shouldGenerate(rule, now = new Date()) {
 export function dueDateFor(rule, occurrence) {
   const diasDePrazo = Number.isInteger(rule.due_in_days) && rule.due_in_days >= 0 ? rule.due_in_days : 0;
   const comPrazo = new Date(occurrence.getTime() + diasDePrazo * UM_DIA_MS);
-  return paraDataCivilSP(comPrazo);
+  return hojeCivilSP(comPrazo);
 }

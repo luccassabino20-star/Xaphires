@@ -7,6 +7,7 @@
 
 import crypto from "node:crypto";
 import { getDirectoryDb } from "../directory.js";
+import { hojeCivilSP } from "../timezone.js";
 
 const db = getDirectoryDb();
 
@@ -38,16 +39,10 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-// Data civil de hoje (YYYY-MM-DD) no fuso do servidor, comparada como string - mesmo
-// padrão do `due` dos cartões e do relatório: sem passar por Date, que traria fuso
-// para uma conta que só lida com dia civil.
-function hojeCivil() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dia = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${dia}`;
-}
+// Data civil de hoje (YYYY-MM-DD), ancorada em America/Sao_Paulo (ver
+// server/timezone.js) - comparada como string, mesmo padrão do `due` dos
+// cartões e do relatório.
+const hojeCivil = hojeCivilSP;
 
 function linha(r) {
   if (!r) return null;

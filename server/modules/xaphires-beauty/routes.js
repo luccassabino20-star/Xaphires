@@ -7,6 +7,7 @@ import { getCompany } from "../../directory.js";
 import { runWithCompany } from "../../context.js";
 import { canUseBeautyFinance, canUseBeautyOnlineBooking } from "../../plans.js";
 import { docValido } from "../../doc.js";
+import { anoSP } from "../../timezone.js";
 import {
   getSummary,
   listClients,
@@ -800,7 +801,7 @@ router.get(
   "/monthly-summary",
   exigeBeautyFinance,
   ah(async (req, res) => {
-    const ano = Number(req.query.year) || new Date().getFullYear();
+    const ano = Number(req.query.year) || anoSP();
     res.json(getMonthlyFinanceSummary(ano));
   })
 );

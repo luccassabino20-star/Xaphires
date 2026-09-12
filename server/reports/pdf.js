@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
 import { nomeDoStatus } from "./labels.js";
+import { dataHoraExibicaoSP } from "../timezone.js";
 
 // Documento executivo: paisagem, resumo geral e UMA tabela só com todo mundo junto
 // (pendentes e concluídas), em vez de uma seção nova por responsável. Cabe numa
@@ -57,7 +58,7 @@ function cabecalhoDoDocumento(doc, relatorio) {
   doc.font("Helvetica").fontSize(9);
   const direita = [
     relatorio.empresa,
-    `${t.geradoEm}: ${relatorio.geradoEm.toLocaleString()}`,
+    `${t.geradoEm}: ${dataHoraExibicaoSP(relatorio.geradoEm)}`,
   ].filter(Boolean);
   doc.text(direita.join("   |   "), MARGEM + 16, MARGEM + 36, { width: largura - 32 });
 

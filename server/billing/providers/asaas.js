@@ -57,6 +57,7 @@
 // que o Mercado Pago.
 
 import crypto from "node:crypto";
+import { hojeCivilSP } from "../../timezone.js";
 
 const TIMEOUT_MS = 15000;
 
@@ -124,10 +125,15 @@ function reais(cents) {
   return Number((cents / 100).toFixed(2));
 }
 
+// Vencimento mandado pro Asaas - ancorado em America/Sao_Paulo (ver
+// server/timezone.js), não no fuso do servidor nem em UTC puro: os dois
+// juntos (setDate "local" + toISOString em UTC) já erraram o dia duas vezes -
+// uma cobrança de verdade com vencimento no dia errado é o pior lugar pra
+// esse bug aparecer. Somar dias em milissegundos reais é seguro porque São
+// Paulo não tem horário de verão desde 2019.
 function dataISO(diasAPartirDeHoje = 0) {
-  const d = new Date();
-  d.setDate(d.getDate() + diasAPartirDeHoje);
-  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+  const alvo = new Date(Date.now() + diasAPartirDeHoje * 24 * 60 * 60 * 1000);
+  return hojeCivilSP(alvo);
 }
 
 // Vocabulário deles -> o nosso, no mesmo espírito do traduzirStatus do Mercado

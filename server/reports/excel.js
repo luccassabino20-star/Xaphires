@@ -1,5 +1,6 @@
 import ExcelJS from "exceljs";
 import { nomeDoStatus } from "./labels.js";
+import { dataHoraExibicaoSP } from "../timezone.js";
 
 // Paleta do arquivo. Tons chapados e escuros no cabeçalho porque a planilha é feita
 // para ser impressa e projetada: o cinza-claro do app some no projetor.
@@ -187,7 +188,7 @@ export async function gerarExcel(relatorio) {
   });
   tituloDaAba(resumo, t.relatorio, 7);
   if (relatorio.empresa) linhaDeCampo(resumo, t.empresa, relatorio.empresa, 7);
-  linhaDeCampo(resumo, t.geradoEm, relatorio.geradoEm.toLocaleString(), 7);
+  linhaDeCampo(resumo, t.geradoEm, dataHoraExibicaoSP(relatorio.geradoEm), 7);
   linhaDeCampo(resumo, t.escopo, relatorio.escopo, 7);
   linhaDeCampo(resumo, t.responsavel, relatorio.membroEscolhido || t.todosOsResponsaveis, 7);
   linhaDeCampo(resumo, t.status, nomeDoStatus(t, relatorio.status), 7);

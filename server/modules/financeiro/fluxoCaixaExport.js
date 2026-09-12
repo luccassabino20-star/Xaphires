@@ -5,6 +5,7 @@
 // neutralização de fórmula (descrição de lançamento é texto de usuário).
 import PDFDocument from "pdfkit";
 import ExcelJS from "exceljs";
+import { dataHoraExibicaoSP, dataHoraLocaleSP } from "../../timezone.js";
 
 const BOM = "﻿";
 const SEP = ";";
@@ -68,7 +69,7 @@ export function gerarCsvFluxoCaixa({ matriz, idioma, t, contaNome }) {
   saida.push("");
   saida.push(linha([t.titulo]));
   saida.push(linha([t.conta, contaNome || t.contaTodas]));
-  saida.push(linha([t.geradoEm, new Date().toLocaleString(localeIntl(idioma))]));
+  saida.push(linha([t.geradoEm, dataHoraLocaleSP(new Date(), localeIntl(idioma))]));
   return Buffer.from(BOM + saida.join(EOL) + EOL, "utf8");
 }
 
@@ -110,7 +111,7 @@ export async function gerarPdfFluxoCaixa({ matriz, idioma, t, contaNome, empresa
   function cabecalhoPagina(periodoLabel) {
     doc.rect(MARGEM, MARGEM, larguraUtil, 44).fill(COR.cabecalho);
     doc.fillColor(COR.branco).font("Helvetica-Bold").fontSize(16).text(t.titulo, MARGEM + 14, MARGEM + 10);
-    doc.font("Helvetica").fontSize(9).text([empresa, `${t.geradoEm}: ${new Date().toLocaleString()}`].filter(Boolean).join("   |   "), MARGEM + 14, MARGEM + 29);
+    doc.font("Helvetica").fontSize(9).text([empresa, `${t.geradoEm}: ${dataHoraExibicaoSP()}`].filter(Boolean).join("   |   "), MARGEM + 14, MARGEM + 29);
     doc.fillColor(COR.suave).fontSize(9).text(`${t.conta}: ${contaNome || t.contaTodas}   |   ${periodoLabel}`, MARGEM, MARGEM + 52);
     return MARGEM + 70;
   }

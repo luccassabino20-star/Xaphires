@@ -4,16 +4,16 @@
 // garante nas rotas autenticadas.
 import { getDb } from "../../db.js";
 import { uid } from "../../repo.js";
+import { hojeCivilSP } from "../../timezone.js";
 
 function nowIso() {
   return new Date().toISOString();
 }
-// Dia civil local de quem está apontando - é o que a grade semanal soma, não
-// a data UTC de start_time (podem divergir perto da meia-noite).
-export function hojeCivil() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+// Dia civil de quem está apontando, ancorado em America/Sao_Paulo (ver
+// server/timezone.js) - é o que a grade semanal soma, não a data UTC de
+// start_time (podem divergir perto da meia-noite) nem o fuso do sistema
+// operacional do servidor.
+export const hojeCivil = hojeCivilSP;
 function parseTags(raw) {
   try {
     const arr = JSON.parse(raw || "[]");

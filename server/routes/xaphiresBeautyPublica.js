@@ -11,6 +11,7 @@ import { ah } from "../asyncHandler.js";
 import { getCompany } from "../directory.js";
 import { runWithCompany } from "../context.js";
 import { canUseBeautyOnlineBooking } from "../plans.js";
+import { instanteRealDeCivilSP } from "../timezone.js";
 import {
   listServices,
   listStaff,
@@ -125,7 +126,10 @@ router.post(
       if (staffId && !getStaffMember(staffId)) {
         return res.status(400).json({ error: "Profissional inválido", code: "BEAUTY_STAFF_NOT_FOUND" });
       }
-      if (!startsAt || Number.isNaN(new Date(startsAt).getTime()) || new Date(startsAt) < new Date()) {
+      // startsAt é civil ingênuo (hora do Brasil, sem "Z") - new Date(startsAt)
+      // direto assumiria o fuso do servidor e recusava horário válido perto da
+      // virada do dia (ver server/timezone.js instanteRealDeCivilSP).
+      if (!startsAt || Number.isNaN(instanteRealDeCivilSP(startsAt).getTime()) || instanteRealDeCivilSP(startsAt) < new Date()) {
         return res.status(400).json({ error: "Escolha uma data e hora válidas", code: "BEAUTY_STARTS_AT_REQUIRED" });
       }
       const endsAt = somarMinutosLocal(startsAt, servico.duration_minutes);

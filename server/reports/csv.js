@@ -1,4 +1,5 @@
 import { nomeDoStatus } from "./labels.js";
+import { paraRelogioSP } from "../timezone.js";
 
 // Gerador do CSV. Como o Excel e o PDF, só desenha o que `dados.js` já decidiu -
 // nenhuma regra de negócio mora aqui, nem o que é "concluído".
@@ -50,18 +51,20 @@ function dataCivil(valor, idioma) {
   return idioma === "en" ? `${mes}/${dia}/${ano}` : `${dia}/${mes}/${ano}`;
 }
 
-// Timestamp ISO (criação e conclusão) sai com hora, no fuso local do servidor - o
-// mesmo relógio em que a recorrência e o resto do produto raciocinam.
+// Timestamp ISO (criação e conclusão) sai com hora, ancorado em
+// America/Sao_Paulo (ver server/timezone.js) - não no fuso do sistema
+// operacional do servidor, que em produção fica 5h à frente do Brasil.
 function dataHora(valor, idioma) {
   if (!valor) return "";
-  const d = new Date(valor);
-  if (Number.isNaN(d.getTime())) return "";
+  const real = new Date(valor);
+  if (Number.isNaN(real.getTime())) return "";
+  const d = paraRelogioSP(real);
   const p = (n) => String(n).padStart(2, "0");
   const civil =
     idioma === "en"
-      ? `${p(d.getMonth() + 1)}/${p(d.getDate())}/${d.getFullYear()}`
-      : `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()}`;
-  return `${civil} ${p(d.getHours())}:${p(d.getMinutes())}`;
+      ? `${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())}/${d.getUTCFullYear()}`
+      : `${p(d.getUTCDate())}/${p(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+  return `${civil} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
 }
 
 /**

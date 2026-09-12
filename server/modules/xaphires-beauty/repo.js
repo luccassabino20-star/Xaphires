@@ -8,6 +8,7 @@ import path from "node:path";
 import { getDb, companiesDir } from "../../db.js";
 import { uid } from "../../repo.js";
 import { getCurrentCompanyId } from "../../context.js";
+import { inicioDoDiaSP, hojeCivilSP, deRelogioSP } from "../../timezone.js";
 
 function nowIso() {
   return new Date().toISOString();
@@ -229,13 +230,17 @@ export function getClientRanking(from, to) {
 // isso não pesar.
 export function listUpcomingBirthdays(days) {
   const clientes = getDb().prepare("SELECT id, name, phone, birth_date FROM beauty_clients WHERE active = 1 AND birth_date IS NOT NULL").all();
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
+  // Ancorado em America/Sao_Paulo (ver server/timezone.js), não no fuso do
+  // sistema operacional do servidor - senão "hoje" à noite no Brasil já
+  // contava como amanhã pro servidor, e um aniversário de hoje sumia da lista
+  // 5h antes da meia-noite de verdade.
+  const hoje = inicioDoDiaSP();
+  const anoHoje = Number(hojeCivilSP().slice(0, 4));
   return clientes
     .map((c) => {
       const [, mes, dia] = c.birth_date.split("-").map(Number);
-      let proximo = new Date(hoje.getFullYear(), mes - 1, dia);
-      if (proximo < hoje) proximo = new Date(hoje.getFullYear() + 1, mes - 1, dia);
+      let proximo = deRelogioSP(anoHoje, mes - 1, dia);
+      if (proximo < hoje) proximo = deRelogioSP(anoHoje + 1, mes - 1, dia);
       const diasAte = Math.round((proximo - hoje) / 86400000);
       return { ...c, diasAte };
     })
@@ -780,10 +785,9 @@ export function categoriasDespesaValidas() {
   return CATEGORIAS_DESPESA;
 }
 
-function hojeCivilServidor() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+// Apesar do nome (histórico), já não é o fuso do servidor - ancorado em
+// America/Sao_Paulo (ver server/timezone.js).
+const hojeCivilServidor = hojeCivilSP;
 function ultimoDiaDoMes(ano, mes) {
   return new Date(ano, mes, 0).getDate(); // mes em 1-12, dia 0 do mês seguinte = último dia deste
 }

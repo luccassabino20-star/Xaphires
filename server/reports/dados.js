@@ -1,6 +1,7 @@
 import * as repo from "../repo.js";
 import { getCompany } from "../directory.js";
 import { rotulos } from "./labels.js";
+import { hojeCivilSP } from "../timezone.js";
 
 // Montagem do relatório. Este arquivo é a única fonte dos números: o Excel e o PDF
 // só desenham o que sai daqui, para os dois nunca discordarem entre si.
@@ -50,15 +51,11 @@ export function colunaDeConclusao(titulo) {
   return TITULOS_DE_CONCLUSAO.has(limpo);
 }
 
-// Data civil de hoje no fuso do servidor, no mesmo formato de `due` (YYYY-MM-DD).
-// Comparar string com string é de propósito: `due` é data civil, e converter para
-// Date traria fuso para uma conta que não tem hora nenhuma.
-function hojeCivil(agora = new Date()) {
-  const y = agora.getFullYear();
-  const m = String(agora.getMonth() + 1).padStart(2, "0");
-  const d = String(agora.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
+// Data civil de hoje, ancorada em America/Sao_Paulo (ver server/timezone.js) -
+// não no fuso do sistema operacional do servidor. Comparar string com string é
+// de propósito: `due` é data civil, e converter para Date traria fuso para uma
+// conta que não tem hora nenhuma.
+const hojeCivil = hojeCivilSP;
 
 function estaAtrasado(cartao, hoje) {
   if (!cartao.due || cartao.completed) return false;

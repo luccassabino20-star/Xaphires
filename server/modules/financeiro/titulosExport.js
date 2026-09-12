@@ -6,6 +6,7 @@
 // vencimento no passado), CSV e PDF só desenham a mesma lista.
 import PDFDocument from "pdfkit";
 import { liquidoCents } from "./repo.js";
+import { hojeCivilSP, dataHoraExibicaoSP, dataHoraLocaleSP } from "../../timezone.js";
 
 const BOM = "﻿";
 const SEP = ";";
@@ -28,10 +29,7 @@ function moeda(cents, idioma) {
   const valor = (cents || 0) / 100;
   return new Intl.NumberFormat(idioma, { style: "currency", currency: "BRL" }).format(valor);
 }
-function hojeCivil() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+const hojeCivil = hojeCivilSP;
 
 const ROTULOS = {
   pt: {
@@ -93,7 +91,7 @@ export function gerarTitulosCsv(linhas, idioma) {
     for (const l of linhas) saida.push(linha([l.numero, l.doc, l.contraparte, l.descricao, l.tipo, l.vencimento, l.valor, l.status]));
   }
   saida.push("");
-  saida.push(linha([t.geradoEm, new Date().toLocaleString(idioma === "en" ? "en-US" : idioma === "es" ? "es-ES" : "pt-BR")]));
+  saida.push(linha([t.geradoEm, dataHoraLocaleSP(new Date(), idioma === "en" ? "en-US" : idioma === "es" ? "es-ES" : "pt-BR")]));
   return Buffer.from(BOM + saida.join(EOL) + EOL, "utf8");
 }
 
@@ -137,7 +135,7 @@ export async function gerarTitulosPdf(linhas, idioma) {
   function cabecalhoPagina() {
     doc.rect(MARGEM, MARGEM, larguraUtil, 44).fill(COR.cabecalho);
     doc.fillColor(COR.branco).font("Helvetica-Bold").fontSize(16).text(t.titulo, MARGEM + 14, MARGEM + 10);
-    doc.font("Helvetica").fontSize(9).text(`${t.geradoEm}: ${new Date().toLocaleString()}`, MARGEM + 14, MARGEM + 29);
+    doc.font("Helvetica").fontSize(9).text(`${t.geradoEm}: ${dataHoraExibicaoSP()}`, MARGEM + 14, MARGEM + 29);
     return MARGEM + 58;
   }
   function cabecalhoDaTabela(yy) {

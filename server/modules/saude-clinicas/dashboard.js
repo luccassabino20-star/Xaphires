@@ -3,11 +3,11 @@
 // nenhum dos blocos da tela reimplementa a conta por conta própria, senão os
 // cards do topo e os gráficos do meio poderiam discordar do mesmo período.
 import { getDb } from "../../db.js";
+import { hojeCivilSP } from "../../timezone.js";
 
-function hojeCivil() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+// Ancorado em America/Sao_Paulo (ver server/timezone.js), não no fuso do
+// sistema operacional do servidor.
+const hojeCivil = hojeCivilSP;
 
 function diasNoPeriodo(from, to) {
   const [ya, ma, da] = from.split("-").map(Number);

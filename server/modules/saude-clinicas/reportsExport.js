@@ -5,6 +5,7 @@
 // a mesma neutralização de fórmula - nome de paciente e origem/indicação são
 // texto digitado por usuário, igual título de cartão.
 import PDFDocument from "pdfkit";
+import { dataHoraExibicaoSP, dataHoraLocaleSP } from "../../timezone.js";
 
 const BOM = "﻿";
 const SEP = ";";
@@ -41,7 +42,7 @@ export function gerarCsvRelatorio({ tipo, colunas, linhas, idioma, t, periodoLab
   saida.push("");
   saida.push(linha([t.titulo[tipo] || tipo]));
   saida.push(linha([t.geral.periodo, periodoLabel]));
-  saida.push(linha([t.geral.geradoEm, new Date().toLocaleString(idioma === "en" ? "en-US" : idioma === "es" ? "es-ES" : "pt-BR")]));
+  saida.push(linha([t.geral.geradoEm, dataHoraLocaleSP(new Date(), idioma === "en" ? "en-US" : idioma === "es" ? "es-ES" : "pt-BR")]));
   return Buffer.from(BOM + saida.join(EOL) + EOL, "utf8");
 }
 
@@ -69,7 +70,7 @@ export function gerarPdfRelatorio({ tipo, colunas, linhas, idioma, t, periodoLab
   const larguraUtil = doc.page.width - MARGEM * 2;
   doc.rect(MARGEM, MARGEM, larguraUtil, 44).fill(COR.cabecalho);
   doc.fillColor(COR.branco).font("Helvetica-Bold").fontSize(16).text(t.titulo[tipo] || tipo, MARGEM + 14, MARGEM + 10);
-  doc.font("Helvetica").fontSize(9).text([empresa, `${t.geral.geradoEm}: ${new Date().toLocaleString()}`].filter(Boolean).join("   |   "), MARGEM + 14, MARGEM + 29);
+  doc.font("Helvetica").fontSize(9).text([empresa, `${t.geral.geradoEm}: ${dataHoraExibicaoSP()}`].filter(Boolean).join("   |   "), MARGEM + 14, MARGEM + 29);
   doc.fillColor(COR.suave).fontSize(9).text(`${t.geral.periodo}: ${periodoLabel}`, MARGEM, MARGEM + 52);
   doc.y = MARGEM + 70;
 

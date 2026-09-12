@@ -5,6 +5,7 @@
 // PDF. Fonte única dos números: montarFluxo() em calculos.js decide as
 // linhas, CSV e PDF só desenham.
 import PDFDocument from "pdfkit";
+import { dataHoraExibicaoSP, dataHoraLocaleSP } from "../../timezone.js";
 
 const BOM = "﻿";
 const SEP = ";";
@@ -82,7 +83,7 @@ export function gerarFluxoCsv(linhas, idioma) {
     for (const l of linhas) saida.push(linha([l.mes, l.entradasReal, l.saidasReal, l.saldoReal, l.acumulado, l.entradasPrev, l.saidasPrev, l.saldoPrev]));
   }
   saida.push("");
-  saida.push(linha([t.geradoEm, new Date().toLocaleString(idioma === "en" ? "en-US" : idioma === "es" ? "es-ES" : "pt-BR")]));
+  saida.push(linha([t.geradoEm, dataHoraLocaleSP(new Date(), idioma === "en" ? "en-US" : idioma === "es" ? "es-ES" : "pt-BR")]));
   return Buffer.from(BOM + saida.join(EOL) + EOL, "utf8");
 }
 
@@ -126,7 +127,7 @@ export async function gerarFluxoPdf(linhas, ano, idioma) {
   function cabecalhoPagina() {
     doc.rect(MARGEM, MARGEM, larguraUtil, 44).fill(COR.cabecalho);
     doc.fillColor(COR.branco).font("Helvetica-Bold").fontSize(16).text(`${t.titulo} - ${ano}`, MARGEM + 14, MARGEM + 10);
-    doc.font("Helvetica").fontSize(9).text(`${t.geradoEm}: ${new Date().toLocaleString()}`, MARGEM + 14, MARGEM + 29);
+    doc.font("Helvetica").fontSize(9).text(`${t.geradoEm}: ${dataHoraExibicaoSP()}`, MARGEM + 14, MARGEM + 29);
     return MARGEM + 58;
   }
   function cabecalhoDaTabela(yy) {

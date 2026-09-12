@@ -1,5 +1,6 @@
 import { Router } from "express";
 import fs from "node:fs";
+import { anoSP, hojeCivilSP } from "../../timezone.js";
 import { requireAuth, requireWritablePlan, requireModule, requireMaster } from "../../middleware.js";
 import { ah } from "../../asyncHandler.js";
 import { attachmentLimitFor } from "../../plans.js";
@@ -1088,7 +1089,7 @@ router.post(
 router.get(
   "/fluxo",
   ah(async (req, res) => {
-    const ano = Number(req.query.ano) || new Date().getFullYear();
+    const ano = Number(req.query.ano) || anoSP();
     res.json(montarFluxo(ano));
   })
 );
@@ -1096,7 +1097,7 @@ router.get(
 // Exportação CSV/PDF do Fluxo de Caixa (ano inteiro, mesma fonte da tela -
 // não confundir com /fluxo-caixa/export, que é da Matriz, outra fonte).
 router.get("/fluxo/export", ah(async (req, res) => {
-  const ano = Number(req.query.ano) || new Date().getFullYear();
+  const ano = Number(req.query.ano) || anoSP();
   const formato = req.query.formato === "pdf" ? "pdf" : "csv";
   const lang = LOCALES.includes(req.query.lang) ? req.query.lang : "pt";
   const fluxo = montarFluxo(ano);
@@ -1117,7 +1118,7 @@ router.get(
   "/dre",
   ah(async (req, res) => {
     // Sem período informado, o ano corrente inteiro. Datas civis.
-    const ano = new Date().getFullYear();
+    const ano = anoSP();
     const de = DATA_CIVIL.test(req.query.de || "") ? req.query.de : `${ano}-01-01`;
     const ate = DATA_CIVIL.test(req.query.ate || "") ? req.query.ate : `${ano}-12-31`;
     res.json(montarDRE(de, ate));
@@ -1130,7 +1131,7 @@ router.get(
 router.get(
   "/dre/cascata",
   ah(async (req, res) => {
-    const ano = new Date().getFullYear();
+    const ano = anoSP();
     const de = DATA_CIVIL.test(req.query.de || "") ? req.query.de : `${ano}-01-01`;
     const ate = DATA_CIVIL.test(req.query.ate || "") ? req.query.ate : `${ano}-12-31`;
     const centroCustoId = req.query.centroCustoId || null;
@@ -1142,7 +1143,7 @@ router.get(
 );
 
 router.get("/dre/export", ah(async (req, res) => {
-  const ano = new Date().getFullYear();
+  const ano = anoSP();
   const de = DATA_CIVIL.test(req.query.de || "") ? req.query.de : `${ano}-01-01`;
   const ate = DATA_CIVIL.test(req.query.ate || "") ? req.query.ate : `${ano}-12-31`;
   const centroCustoId = req.query.centroCustoId || null;
@@ -1178,9 +1179,7 @@ const VIEWS_FLUXO_CAIXA = new Set(["mensal", "diario"]);
 
 function paramsFluxoCaixa(req) {
   const view = VIEWS_FLUXO_CAIXA.has(req.query.view) ? req.query.view : "mensal";
-  const hoje = new Date();
-  const hojeCivilLocal = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;
-  const referencia = DATA_CIVIL.test(req.query.referencia || "") ? req.query.referencia : hojeCivilLocal;
+  const referencia = DATA_CIVIL.test(req.query.referencia || "") ? req.query.referencia : hojeCivilSP();
   const contaId = req.query.contaId || null;
   return { view, referencia, contaId };
 }
@@ -1243,7 +1242,7 @@ router.get(
       formato === "csv" ? gerarCsvFluxoCaixa(args) : formato === "xlsx" ? await gerarExcelFluxoCaixa(args) : await gerarPdfFluxoCaixa(args);
     const nomeSemAcento = "fluxo-caixa".normalize("NFD").replace(ACENTOS_RE_FLUXO_CAIXA, "");
     res.setHeader("Content-Type", FORMATOS_FLUXO_CAIXA[formato]);
-    res.setHeader("Content-Disposition", `attachment; filename="${nomeSemAcento}-${new Date().toISOString().slice(0, 10)}.${formato}"`);
+    res.setHeader("Content-Disposition", `attachment; filename="${nomeSemAcento}-${hojeCivilSP()}.${formato}"`);
     res.setHeader("Content-Length", arquivo.length);
     res.send(arquivo);
   })

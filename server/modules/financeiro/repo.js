@@ -9,17 +9,16 @@ import { uid } from "../../repo.js";
 import { getCurrentCompanyId } from "../../context.js";
 import * as centrosGlobais from "../../admin/centrosCustoStore.js";
 import { normalizarTipoCategoria } from "./importCategorias.js";
+import { hojeCivilSP } from "../../timezone.js";
 
-// "Hoje" em data civil YYYY-MM-DD no horário LOCAL do servidor, não UTC - mesma
-// escolha da aritmética de recorrência (a data é a do relógio de quem age).
-// slice do toISOString() daria UTC e poderia adiantar/atrasar um dia perto da
-// virada.
+// "Hoje" em data civil YYYY-MM-DD, ancorado em America/Sao_Paulo (ver
+// server/timezone.js) - não no fuso do sistema operacional do servidor. Usado
+// em "vencido"/"pendente" (título, régua de cobrança), no fallback de data de
+// baixa e nos KPIs do mês corrente: errar isso pelo fuso do servidor (produção
+// roda na Europa, 5h à frente do Brasil) fazia um título vencer 5h antes da
+// meia-noite de verdade, todo entardecer.
 export function hojeCivil() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dia = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${dia}`;
+  return hojeCivilSP();
 }
 
 // ---------- Categorias ----------

@@ -7,6 +7,7 @@
 // nunca podem discordar sobre o resultado final.
 import PDFDocument from "pdfkit";
 import ExcelJS from "exceljs";
+import { dataHoraExibicaoSP, dataHoraLocaleSP } from "../../timezone.js";
 
 const BOM = "﻿";
 const SEP = ";";
@@ -139,7 +140,7 @@ export function gerarDreCsv(linhas, de, ate, idioma) {
   for (const l of linhas) saida.push(linha([l.label, moeda(l.valor, idioma), l.av]));
   saida.push("");
   saida.push(linha([t.periodo, `${de} - ${ate}`]));
-  saida.push(linha([t.geradoEm, new Date().toLocaleString(localeIntl(idioma))]));
+  saida.push(linha([t.geradoEm, dataHoraLocaleSP(new Date(), localeIntl(idioma))]));
   return Buffer.from(BOM + saida.join(EOL) + EOL, "utf8");
 }
 
@@ -172,7 +173,7 @@ export async function gerarDrePdf(linhas, de, ate, idioma) {
   function cabecalhoPagina() {
     doc.rect(MARGEM, MARGEM, larguraUtil, 44).fill(COR.cabecalho);
     doc.fillColor(COR.branco).font("Helvetica-Bold").fontSize(15).text(t.titulo, MARGEM + 14, MARGEM + 10);
-    doc.font("Helvetica").fontSize(9).text(`${t.periodo}: ${de} - ${ate}   |   ${t.geradoEm}: ${new Date().toLocaleString()}`, MARGEM + 14, MARGEM + 29);
+    doc.font("Helvetica").fontSize(9).text(`${t.periodo}: ${de} - ${ate}   |   ${t.geradoEm}: ${dataHoraExibicaoSP()}`, MARGEM + 14, MARGEM + 29);
     return MARGEM + 58;
   }
   function cabecalhoDaTabela(yy) {

@@ -8,6 +8,10 @@ import { getWorkspace } from "../repo.js";
 import * as beauty from "../modules/xaphires-beauty/repo.js";
 import { montarDRE } from "../modules/financeiro/calculos.js";
 import { lancamentosPagosNoPeriodo } from "../modules/financeiro/repo.js";
+import {
+  hojeCivilSP, isoLocalSP, inicioDoDiaSP, fimDoDiaSP,
+  inicioDaSemanaSP, fimDaSemanaSP, inicioDoMesSP, inicioMesAnteriorSP, fimMesAnteriorSP,
+} from "../timezone.js";
 
 const router = Router();
 router.use(requireAuth);
@@ -20,41 +24,15 @@ router.use(requireAuth);
 // o usuário não teria como abrir na tela de origem. Kanban não passa por
 // isModuleEnabled porque "quadro" é core e não tem gate de módulo.
 
-function doisDig(n) {
-  return String(n).padStart(2, "0");
-}
-function dataCivil(d) {
-  return `${d.getFullYear()}-${doisDig(d.getMonth() + 1)}-${doisDig(d.getDate())}`;
-}
-function isoLocal(d) {
-  return `${dataCivil(d)}T${doisDig(d.getHours())}:${doisDig(d.getMinutes())}:${doisDig(d.getSeconds())}`;
-}
-function inicioDoDia(d) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-function fimDoDia(d) {
-  const x = new Date(d);
-  x.setHours(23, 59, 59, 999);
-  return x;
-}
-// Segunda-feira como início de semana (convenção do produto, ver Agenda).
-function inicioDaSemana(d) {
-  const x = inicioDoDia(d);
-  const dia = x.getDay();
-  x.setDate(x.getDate() - (dia === 0 ? 6 : dia - 1));
-  return x;
-}
-function fimDaSemana(d) {
-  const x = inicioDaSemana(d);
-  x.setDate(x.getDate() + 7);
-  x.setMilliseconds(x.getMilliseconds() - 1);
-  return x;
-}
-function inicioDoMes(d) {
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-}
+// dataCivil/isoLocal/inicioDoDia/fimDoDia/inicioDaSemana/fimDaSemana/inicioDoMes
+// viviam aqui como Date "local" - ou seja, do fuso do SISTEMA ONDE O NODE
+// RODA. Em desenvolvimento isso nunca aparecia (a máquina do dev já está no
+// fuso do Brasil), mas produção roda numa VPS na Europa (CEST, UTC+2) - 5h à
+// frente do Brasil: "hoje"/"início da semana" já viravam amanhã pro servidor
+// a partir das 19h no Brasil, e os KPIs deste dashboard (o primeiro número
+// que qualquer pessoa vê ao entrar) saíam de um período errado por até 5h por
+// dia. As versões *SP (server/timezone.js) fazem a mesma coisa ancoradas em
+// America/Sao_Paulo, não no fuso do servidor.
 function crescimentoPct(atual, anterior) {
   if (!anterior) return null; // sem base de comparação - não inventa 0% nem infinito
   return Math.round(((atual - anterior) / anterior) * 1000) / 10;
@@ -101,14 +79,14 @@ router.get(
 
     // ---------- Xaphires Beauty ----------
     if (isModuleEnabled(company, user, "xaphires-beauty")) {
-      const inicioHoje = inicioDoDia(agora);
-      const fimHoje = fimDoDia(agora);
+      const inicioHoje = inicioDoDiaSP(agora);
+      const fimHoje = fimDoDiaSP(agora);
       const agendamentosHoje = beauty
-        .listAppointments(isoLocal(inicioHoje), isoLocal(fimHoje))
+        .listAppointments(isoLocalSP(inicioHoje), isoLocalSP(fimHoje))
         .filter((a) => a.status !== "cancelado");
       resumo.atendimentosHoje = agendamentosHoje.length;
       resumo.proximosAgendamentos = agendamentosHoje
-        .filter((a) => a.ends_at >= isoLocal(agora))
+        .filter((a) => a.ends_at >= isoLocalSP(agora))
         .sort((a, b) => a.starts_at.localeCompare(b.starts_at))
         .slice(0, 5)
         .map((a) => ({
@@ -122,10 +100,10 @@ router.get(
       // Ocupação da semana: minutos ocupados / capacidade cadastrada em
       // beauty_staff_hours. Sem capacidade cadastrada (ninguém preencheu o
       // próprio expediente ainda), fica null - não é 0%, é "sem dado".
-      const inicioSemana = inicioDaSemana(agora);
-      const fimSemana = fimDaSemana(agora);
+      const inicioSemana = inicioDaSemanaSP(agora);
+      const fimSemana = fimDaSemanaSP(agora);
       const agendamentosSemana = beauty
-        .listAppointments(isoLocal(inicioSemana), isoLocal(fimSemana))
+        .listAppointments(isoLocalSP(inicioSemana), isoLocalSP(fimSemana))
         .filter((a) => a.status !== "cancelado");
       const minutosOcupados = agendamentosSemana.reduce((soma, a) => {
         const min = (new Date(a.ends_at) - new Date(a.starts_at)) / 60000;
@@ -136,9 +114,9 @@ router.get(
 
       if (canUseBeautyFinance(company.plan)) {
         temFaturamento = true;
-        const inicioMesAtual = isoLocal(inicioDoMes(agora));
-        const inicioMesAnterior = isoLocal(inicioDoMes(new Date(agora.getFullYear(), agora.getMonth() - 1, 1)));
-        faturamentoBeauty = beauty.somarPagamentosNoPeriodo(inicioMesAtual, isoLocal(agora));
+        const inicioMesAtual = isoLocalSP(inicioDoMesSP(agora));
+        const inicioMesAnterior = isoLocalSP(inicioMesAnteriorSP(agora));
+        faturamentoBeauty = beauty.somarPagamentosNoPeriodo(inicioMesAtual, isoLocalSP(agora));
         faturamentoBeautyAnterior = beauty.somarPagamentosNoPeriodo(inicioMesAnterior, inicioMesAtual);
       }
 
@@ -157,10 +135,10 @@ router.get(
     // ---------- Financeiro (ERP IRES) ----------
     if (isModuleEnabled(company, user, "financeiro")) {
       temFaturamento = true;
-      const de = dataCivil(inicioDoMes(agora));
-      const ate = dataCivil(agora);
-      const mesAnteriorInicio = dataCivil(new Date(agora.getFullYear(), agora.getMonth() - 1, 1));
-      const mesAnteriorFim = dataCivil(new Date(agora.getFullYear(), agora.getMonth(), 0));
+      const de = hojeCivilSP(inicioDoMesSP(agora));
+      const ate = hojeCivilSP(agora);
+      const mesAnteriorInicio = hojeCivilSP(inicioMesAnteriorSP(agora));
+      const mesAnteriorFim = hojeCivilSP(fimMesAnteriorSP(agora));
       const dreAtual = montarDRE(de, ate);
       const dreAnterior = montarDRE(mesAnteriorInicio, mesAnteriorFim);
       faturamentoFinanceiro = dreAtual.totalReceitas;
