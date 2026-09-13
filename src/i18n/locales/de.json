@@ -80,7 +80,7 @@
       "tag": "Vertrieb"
     },
     "financeiro": {
-      "name": "IRES OS",
+      "name": "IRES Core",
       "desc": "Komplette Plattform für mehrere Branchen. Automatisieren Sie Einkauf, Lager, Fuhrpark, Bauprojekte und Finanzen mit operativer Intelligenz.",
       "tag": "ERP-Verwaltung"
     },
@@ -572,7 +572,7 @@
         "reabrir": "Wieder öffnen",
         "mesFechadoToast": "{{mes}} abgeschlossen",
         "mesReabertoToast": "{{mes}} wieder geöffnet",
-        "saldoRegistrado": "Erfasster Saldo (IRES OS)",
+        "saldoRegistrado": "Erfasster Saldo (IRES Core)",
         "saldoConferidoLabel": "Abgeglichener Saldo (Kontoauszug)",
         "divergenciaLabel": "Abzugleichende Differenz",
         "pendentesSecaoTitulo": "Ausstehende Buchungen zum Abgleich",

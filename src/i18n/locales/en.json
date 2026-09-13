@@ -80,7 +80,7 @@
       "tag": "Sales"
     },
     "financeiro": {
-      "name": "IRES OS",
+      "name": "IRES Core",
       "desc": "A complete platform for multiple segments. Automate purchasing, inventory, fleet, projects and finance with operational intelligence.",
       "tag": "ERP Management"
     },
@@ -874,7 +874,7 @@
         "reabrir": "Reopen",
         "mesFechadoToast": "{{mes}} closed",
         "mesReabertoToast": "{{mes}} reopened",
-        "saldoRegistrado": "Recorded Balance (IRES OS)",
+        "saldoRegistrado": "Recorded Balance (IRES Core)",
         "saldoConferidoLabel": "Reconciled Balance (Bank Statement)",
         "divergenciaLabel": "Difference to Reconcile",
         "pendentesSecaoTitulo": "Entries Pending Reconciliation",

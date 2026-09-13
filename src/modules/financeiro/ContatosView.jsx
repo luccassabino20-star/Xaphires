@@ -41,7 +41,7 @@ function IconKebab({ size = 16 }) {
 const FILTROS_TIPO = ["todos", "cliente", "fornecedor", "ambos"];
 const FILTROS_STATUS = ["todos", "ativo", "inativo"];
 
-// Central de Clientes/Fornecedores (IRES OS): o formulário de 12+ campos que
+// Central de Clientes/Fornecedores (IRES Core): o formulário de 12+ campos que
 // vivia sempre exposto na tela virou o modal NovoContatoModal - aqui só ficam o
 // header com contador, a busca/segmentação e a grade. Mesmo espírito das últimas
 // reformas do módulo (Nova Cobrança, Cartões arquivados, Rotinas automáticas).

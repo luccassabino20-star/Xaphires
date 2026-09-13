@@ -25,7 +25,7 @@ function IconInfo({ size = 14 }) {
 
 const VAZIO = { nome: "", tipo: "fornecedor", doc: "", email: "", telefone: "", cep: "", logradouro: "", numero: "", complemento: "", bairro: "", cidade: "", uf: "", pais: "Brasil", pontoReferencia: "" };
 
-// Modal de cadastro/edição de Cliente/Fornecedor (IRES OS): mesmo esqueleto
+// Modal de cadastro/edição de Cliente/Fornecedor (IRES Core): mesmo esqueleto
 // visual de NovaCobrancaModal.jsx (header com ícone + título/subtítulo,
 // premiumModalIn, CTA escuro), com o formulário de 12+ campos que antes ficava
 // sempre exposto na tela agora dividido em duas abas.

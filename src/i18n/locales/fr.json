@@ -80,7 +80,7 @@
       "tag": "Ventes"
     },
     "financeiro": {
-      "name": "IRES OS",
+      "name": "IRES Core",
       "desc": "Plateforme complète pour plusieurs secteurs. Automatisez achats, stocks, flotte, chantiers et finances avec intelligence opérationnelle.",
       "tag": "Gestion ERP"
     },
@@ -572,7 +572,7 @@
         "reabrir": "Rouvrir",
         "mesFechadoToast": "{{mes}} clôturé",
         "mesReabertoToast": "{{mes}} rouvert",
-        "saldoRegistrado": "Solde Enregistré (IRES OS)",
+        "saldoRegistrado": "Solde Enregistré (IRES Core)",
         "saldoConferidoLabel": "Solde Rapproché (Relevé Bancaire)",
         "divergenciaLabel": "Écart à Rapprocher",
         "pendentesSecaoTitulo": "Écritures en Attente de Rapprochement",

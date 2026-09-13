@@ -80,7 +80,7 @@
       "tag": "Vendas"
     },
     "financeiro": {
-      "name": "IRES OS",
+      "name": "IRES Core",
       "desc": "Plataforma completa para múltiplos segmentos. Automatize compras, estoque, frota, obras e financeiro com inteligência operacional.",
       "tag": "Gestão ERP"
     },
@@ -874,7 +874,7 @@
         "reabrir": "Reabrir",
         "mesFechadoToast": "{{mes}} fechado",
         "mesReabertoToast": "{{mes}} reaberto",
-        "saldoRegistrado": "Saldo Registrado (IRES OS)",
+        "saldoRegistrado": "Saldo Registrado (IRES Core)",
         "saldoConferidoLabel": "Saldo Conferido (Extrato Bancário)",
         "divergenciaLabel": "Divergência a Conciliar",
         "pendentesSecaoTitulo": "Lançamentos Pendentes de Conciliação",
