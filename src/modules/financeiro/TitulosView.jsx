@@ -372,17 +372,27 @@ export default function TitulosView({ onGerarCobranca, tituloDestacadoId, onPref
   }
   async function darQuitado() {
     setQuitando(true);
-    try {
-      const ids = selVisiveis.map((l) => l.id);
-      for (const id of ids) await api.finBaixarLancamento(id, { contaId: contaBaixa || undefined, paidAt: dataBaixa });
+    const ids = selVisiveis.map((l) => l.id);
+    // Promise.allSettled em vez de um loop com await sequencial: cada baixa
+    // individual já é idempotente no servidor, então uma falha no meio não pode
+    // deixar a tela sem saber quais títulos já mudaram de estado - sempre
+    // recarrega e sempre limpa a seleção, sucesso total ou parcial.
+    const resultados = await Promise.allSettled(
+      ids.map((id) => api.finBaixarLancamento(id, { contaId: contaBaixa || undefined, paidAt: dataBaixa }))
+    );
+    const falhas = resultados.filter((r) => r.status === "rejected");
+    await recarregarLancamentos();
+    setSelecionados(new Set());
+    if (falhas.length) {
+      setErro(
+        falhas.length === ids.length
+          ? translateError(falhas[0].reason, t)
+          : t("financeiro.tit.quitadosParcial", { ok: ids.length - falhas.length, total: ids.length, falhas: falhas.length })
+      );
+    } else {
       showToast(t("financeiro.tit.quitados", { n: ids.length }));
-      setSelecionados(new Set());
-      await recarregarLancamentos();
-    } catch (err) {
-      setErro(translateError(err, t));
-    } finally {
-      setQuitando(false);
     }
+    setQuitando(false);
   }
 
   async function baixarUm(id, params) {

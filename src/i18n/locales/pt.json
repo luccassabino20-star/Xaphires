@@ -885,7 +885,7 @@
       }
     },
     "baixa": { "semConta": "Sem conta", "confirmar": "Confirmar" },
-    "tit": { "numero": "Nº do título", "identificacao": "Identificação", "docNumero": "Número do documento", "emissao": "Emissão", "formaPagto": "Forma de pagamento", "semForma": "Não informada", "apropriacao": "Apropriação", "valores": "Valores", "valorTitulo": "Valor do título", "impostosRetidos": "Impostos retidos", "impostosAcrescidos": "Impostos acrescidos", "desconto": "Desconto", "retencao": "Retenção", "multa": "Multa", "juros": "Juros", "valorLiquido": "Valor líquido", "emBreveImpostos": "Disponível no bloco de impostos (em breve)", "observacao": "Observação", "detalhesPagto": "Detalhes do pagamento", "dataBaixa": "Data da baixa", "darQuitado": "Dar quitado ({{n}})", "selecionados": "{{n}} selecionado(s)", "quitados": "{{n}} título(s) quitado(s)", "valorPago": "Valor pago", "baixaEmMovimentacao": "A baixa e o estorno ficam na aba Movimentação.",
+    "tit": { "numero": "Nº do título", "identificacao": "Identificação", "docNumero": "Número do documento", "emissao": "Emissão", "formaPagto": "Forma de pagamento", "semForma": "Não informada", "apropriacao": "Apropriação", "valores": "Valores", "valorTitulo": "Valor do título", "impostosRetidos": "Impostos retidos", "impostosAcrescidos": "Impostos acrescidos", "desconto": "Desconto", "retencao": "Retenção", "multa": "Multa", "juros": "Juros", "valorLiquido": "Valor líquido", "emBreveImpostos": "Disponível no bloco de impostos (em breve)", "observacao": "Observação", "detalhesPagto": "Detalhes do pagamento", "dataBaixa": "Data da baixa", "darQuitado": "Dar quitado ({{n}})", "selecionados": "{{n}} selecionado(s)", "quitados": "{{n}} título(s) quitado(s)", "quitadosParcial": "{{ok}} de {{total}} título(s) quitado(s); {{falhas}} falharam", "valorPago": "Valor pago", "baixaEmMovimentacao": "A baixa e o estorno ficam na aba Movimentação.",
     "impostosAplicados": "Impostos aplicados", "semImpostoAplicado": "Nenhum imposto aplicado a este título.", "escolherImposto": "Escolha um imposto do cadastro", "aplicarImposto": "Aplicar", "impostoAplicado": "Imposto aplicado", "recolhimento": "gerou recolhimento", "valorTravadoImposto": "Remova os impostos aplicados para editar o valor do título",
     "geradoDe": "Título de imposto gerado a partir do título {{n}}", "gerou": "Gerou o título de imposto nº {{n}}", "badgeImposto": "imposto", "pesquisePrompt": "Use a busca e os filtros acima e clique em Pesquisar.", "rateadoN": "Rateado ({{n}})" },
     "forma": { "operacao_bancaria": "Operação bancária", "pix": "Pix", "boleto": "Boleto", "transferencia": "Transferência", "dinheiro": "Dinheiro", "cheque": "Cheque", "cartao": "Cartão" },
@@ -3039,6 +3039,8 @@
     "FIN_CONTATO_NAME_REQUIRED": "Informe o nome.",
     "FIN_CONTATO_NOT_FOUND": "Contato não encontrado.",
     "FIN_CONTATO_EM_USO": "Este contato tem lançamentos ou cobranças e não pode ser excluído. Desative-o em vez disso.",
+    "FIN_CONTATO_DOC_DUP": "Já existe um contato ativo com este CPF/CNPJ.",
+    "FIN_CATEGORY_CODIGO_LOCKED": "O código da classe não pode ser alterado depois de criada.",
     "FIN_PARCELA_PAGO": "Só título pendente pode ser desdobrado.",
     "FIN_PARCELA_INVALIDO": "Título gerado não pode ser desdobrado.",
     "FIN_PARCELA_JA": "Título já está parcelado.",

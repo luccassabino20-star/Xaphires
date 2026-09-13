@@ -71,20 +71,6 @@ function IconChevron({ aberto, size = 14 }) {
   );
 }
 
-// Deriva a cascata inteira (subtotais) a partir dos totais brutos por grupo
-// que o servidor devolve (calculos.montarDreCascata) - a montagem (o que
-// soma/subtrai) é apresentação, mesma separação de responsabilidade do
-// resto do módulo financeiro.
-function calcularDerivados(totais) {
-  const receitaBruta = totais.receitaProdutos + totais.receitaServicos + totais.receitaOutras;
-  const receitaLiquida = receitaBruta - totais.impostosSobreVendas;
-  const lucroBruto = receitaLiquida - totais.cpv;
-  const despesasOperacionais = totais.despesaPessoal + totais.despesaAdministrativa + totais.despesaComercial + totais.despesaOutrasOperacionais;
-  const ebitda = lucroBruto - despesasOperacionais;
-  const resultadoFinanceiro = totais.receitaFinanceira - totais.despesaFinanceira;
-  const lucroLiquido = ebitda + resultadoFinanceiro;
-  return { ...totais, receitaBruta, receitaLiquida, lucroBruto, despesasOperacionais, ebitda, resultadoFinanceiro, lucroLiquido };
-}
 function variacaoPct(atual, anterior) {
   if (!anterior) return null;
   return ((atual - anterior) / Math.abs(anterior)) * 100;
@@ -138,8 +124,11 @@ export default function DREView() {
     return () => document.removeEventListener("mousedown", onDoc);
   }, [exportAberto]);
 
-  const derivados = useMemo(() => (dre ? calcularDerivados(dre) : null), [dre]);
-  const derivadosAnterior = useMemo(() => (dreAnterior ? calcularDerivados(dreAnterior) : null), [dreAnterior]);
+  // O servidor já devolve os subtotais derivados prontos (calculos.derivarCascataDre,
+  // dentro de montarDreCascata) - nenhum recálculo aqui, para nunca discordar
+  // da exportação (dreExport.js), que lê os mesmos campos.
+  const derivados = dre;
+  const derivadosAnterior = dreAnterior;
 
   function toggleBloco(chave) {
     setExpandido((e) => ({ ...e, [chave]: !e[chave] }));

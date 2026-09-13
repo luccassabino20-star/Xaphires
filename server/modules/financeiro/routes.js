@@ -180,7 +180,14 @@ router.post(
     if (grupoDre !== undefined && grupoDre !== null && !GRUPOS_DRE_VALIDOS.includes(grupoDre)) {
       return res.status(400).json({ error: "Grupo inválido", code: "FLUXO_CAIXA_GRUPO_INVALID" });
     }
-    res.status(201).json(insertCategoria({ nome: nome.trim(), tipo, codigo: (codigo || "").trim(), grupoDre: grupoDre || null }));
+    try {
+      res.status(201).json(insertCategoria({ nome: nome.trim(), tipo, codigo: (codigo || "").trim(), grupoDre: grupoDre || null }));
+    } catch (err) {
+      if (err.code === "FIN_CAT_DUPLICADO") {
+        return res.status(409).json({ error: err.message, code: err.code });
+      }
+      throw err;
+    }
   })
 );
 
@@ -234,6 +241,12 @@ router.patch(
       return res.status(400).json({ error: "Tipo de classe inválido", code: "FIN_CATEGORY_TIPO_INVALID" });
     if (grupoDre !== undefined && grupoDre !== null && !GRUPOS_DRE_VALIDOS.includes(grupoDre)) {
       return res.status(400).json({ error: "Grupo inválido", code: "FLUXO_CAIXA_GRUPO_INVALID" });
+    }
+    // Código não pode mudar depois de criado: a árvore (pai/filho) é inferida por
+    // prefixo do código em runtime no cliente, então renumerar quebraria a posição
+    // de todas as sub-classes existentes sem nenhum aviso.
+    if (req.body?.codigo !== undefined) {
+      return res.status(400).json({ error: "O código da classe não pode ser alterado depois de criada", code: "FIN_CATEGORY_CODIGO_LOCKED" });
     }
     res.json(updateCategoria(req.params.id, req.body || {}));
   })
@@ -368,7 +381,14 @@ router.post(
     const { nome, tipo, doc, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, pais, pontoReferencia } = req.body || {};
     if (!nome?.trim()) return res.status(400).json({ error: "Informe o nome", code: "FIN_CONTATO_NAME_REQUIRED" });
     const t = ["cliente", "fornecedor", "ambos"].includes(tipo) ? tipo : "fornecedor";
-    res.status(201).json(insertContato({ nome: nome.trim(), tipo: t, doc, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, pais, pontoReferencia }));
+    try {
+      res.status(201).json(insertContato({ nome: nome.trim(), tipo: t, doc, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, pais, pontoReferencia }));
+    } catch (err) {
+      if (err.code === "FIN_CONTATO_DOC_DUP") {
+        return res.status(409).json({ error: err.message, code: err.code });
+      }
+      throw err;
+    }
   })
 );
 router.patch(
@@ -479,6 +499,7 @@ router.post("/movimentacao/manual", ah(async (req, res) => {
   if (!contaId || !getConta(contaId)) return res.status(400).json({ error: "Selecione uma conta", code: "FIN_CONTA_NOT_FOUND" });
   if (!DATA_CIVIL.test(data || "")) return res.status(400).json({ error: "Data inválida", code: "FIN_DATE_INVALID" });
   if (!Number.isInteger(valorCents) || valorCents <= 0) return res.status(400).json({ error: "Valor inválido", code: "FIN_VALUE_INVALID" });
+  if (bloqueadoPorFechamento(req, res, data)) return;
 
   const lista = Array.isArray(rateio) ? rateio : [];
   const classeTitulo = lista.length === 1 ? (lista[0].categoryId || null) : null;
@@ -635,6 +656,7 @@ router.post(
     const erro = validarLancamento(req.body, { parcial: false });
     if (erro) return res.status(400).json(erro);
     const { tipo, descricao, valorCents, due, emissao, formaPagto, observacao, descontoCents, retencaoCents, multaCents, jurosCents, categoryId, centroCustoId, contatoId, contaId, doc, contraparte, status } = req.body;
+    if (bloqueadoPorFechamento(req, res, due, emissao)) return;
     const criado = insertLancamento({
       tipo, descricao, valorCents, due, emissao, formaPagto, observacao,
       descontoCents, retencaoCents, multaCents, jurosCents,
@@ -952,7 +974,11 @@ router.patch(
   ah(async (req, res) => {
     const l = getLancamento(req.params.id);
     if (!l) return res.status(404).json({ error: "Lançamento não encontrado", code: "FIN_LANCAMENTO_NOT_FOUND" });
-    if (bloqueadoPorFechamento(req, res, l.due)) return;
+    // saldoConferido soma por paid_at (data do movimento bancário), não por due
+    // (vencimento original) - a trava tem que olhar a mesma data que o saldo usa,
+    // senão título vencendo num mês aberto mas pago (paid_at) num mês já fechado
+    // furava o fechamento por trás.
+    if (bloqueadoPorFechamento(req, res, l.paid_at)) return;
     if (l.status !== "finalizado")
       return res.status(400).json({ error: "Só título baixado pode ser conferido", code: "FIN_CONFERIR_NAO_FINALIZADO" });
     res.json(definirConferido(req.params.id, !!req.body?.conferido));
@@ -1069,6 +1095,7 @@ router.post(
     if (!contaId || !getConta(contaId)) return res.status(400).json({ error: "Conta não encontrada", code: "FIN_CONTA_NOT_FOUND" });
     const { transacoes, erro } = validarTransacoes(req.body);
     if (erro) return res.status(400).json(erro);
+    if (bloqueadoPorFechamento(req, res, ...transacoes.map((tx) => tx.dataMovimento))) return;
     res.status(201).json(importarExtrato({ contaId, transacoes, createdBy: req.user.id }));
   })
 );
@@ -1125,9 +1152,10 @@ router.get(
   })
 );
 
-// DRE em cascata contábil - totais brutos por grupo (calculos.montarDreCascata);
-// a montagem da cascata em si (o que soma/subtrai, os subtotais) é
-// apresentação e fica no cliente, mesma separação do resto do módulo.
+// DRE em cascata contábil - calculos.montarDreCascata já devolve os grupos
+// brutos MAIS os subtotais derivados (calculos.derivarCascataDre): fonte
+// única da fórmula, para o cliente (tela) e a exportação (dreExport.js) nunca
+// poderem discordar sobre o mesmo período.
 router.get(
   "/dre/cascata",
   ah(async (req, res) => {
@@ -1307,6 +1335,7 @@ router.post(
     if (!valorCentsValido(valorCents)) return res.status(400).json({ error: "Valor inválido", code: "FIN_VALUE_INVALID" });
     if (!DATA_CIVIL.test(due || "")) return res.status(400).json({ error: "Vencimento inválido", code: "FIN_DATE_INVALID" });
     if (!metodoCobrancaValido(metodo)) return res.status(400).json({ error: "Método de cobrança inválido", code: "FIN_METODO_INVALID" });
+    if (bloqueadoPorFechamento(req, res, due)) return;
     const { provider, config } = getGatewayConfigInterno();
     const gateway = resolverGateway(provider);
     if (!gateway.metodosSuportados().includes(metodo)) {

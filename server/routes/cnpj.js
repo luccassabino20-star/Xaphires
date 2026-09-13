@@ -22,8 +22,12 @@ router.get("/:cnpj", cnpjLimit, async (req, res) => {
   const cnpj = String(req.params.cnpj || "").replace(/\D/g, "");
   if (cnpj.length !== 14) return res.status(400).json({ error: "CNPJ inválido", code: "CNPJ_LOOKUP_INVALID" });
   try {
+    // AbortSignal.timeout: sem ele, a BrasilAPI aceitando a conexão e nunca
+    // respondendo prendia o formulário no cliente em "buscando..." pra sempre -
+    // o catch abaixo nunca era alcançado porque o fetch nunca rejeitava.
     const resp = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`, {
       headers: { "User-Agent": "cantiere-app/1.0 (local self-hosted instance)" },
+      signal: AbortSignal.timeout(8000),
     });
     // A BrasilAPI devolve 404 quando o CNPJ não existe na base.
     if (resp.status === 404) return res.status(404).json({ error: "CNPJ não encontrado", code: "CNPJ_NOT_FOUND" });

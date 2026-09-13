@@ -1,11 +1,12 @@
 // Régua de cobrança e recorrência - tudo CALCULADO NA LEITURA, nada por cron
 // (mesmo padrão de runAutoArchive/runRecurrences/varrerCobranca em
-// server/billing/lifecycle.js). O projeto não tem envio automático de e-mail
-// nem WhatsApp (só link wa.me, que abre a conversa com o texto pronto pra
-// pessoa clicar Enviar) - a régua aqui NUNCA dispara mensagem sozinha. O que
-// ela faz é: (1) calcular o estágio de cada cobrança pendente, pra colorir a
-// linha na grade, e (2) montar o texto do lembrete, pra virar o link de
-// WhatsApp quando alguém clica.
+// server/billing/lifecycle.js). Este arquivo em si NUNCA dispara mensagem
+// sozinho: o que ele faz é (1) calcular o estágio de cada cobrança pendente,
+// pra colorir a linha na grade, e (2) montar o texto do lembrete. O disparo
+// automático de verdade mora em server/jobs/billingCron.js (cron real, via
+// node-cron, envia por WhatsApp/Baileys sozinho todo dia) - ele reusa
+// estagio()/montarMensagem() daqui, mas a decisão de mandar sem intervenção
+// humana é de lá, não deste arquivo.
 import { hojeCivil } from "./repo.js";
 import { getReguaConfig, insertCobranca, listRecorrencias, avancarProximaEmissao, getGatewayConfigInterno } from "./cobrancaRepo.js";
 import { resolverGateway } from "./gateway/index.js";

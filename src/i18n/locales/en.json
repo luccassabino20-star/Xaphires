@@ -885,7 +885,7 @@
       }
     },
     "baixa": { "semConta": "No account", "confirmar": "Confirm" },
-    "tit": { "numero": "Title no.", "identificacao": "Identification", "docNumero": "Document number", "emissao": "Issue date", "formaPagto": "Payment method", "semForma": "Not set", "apropriacao": "Allocation", "valores": "Amounts", "valorTitulo": "Title amount", "impostosRetidos": "Withheld taxes", "impostosAcrescidos": "Added taxes", "desconto": "Discount", "retencao": "Retention", "multa": "Penalty", "juros": "Interest", "valorLiquido": "Net amount", "emBreveImpostos": "Available in the taxes block (coming soon)", "observacao": "Notes", "detalhesPagto": "Payment details", "dataBaixa": "Settlement date", "darQuitado": "Settle ({{n}})", "selecionados": "{{n}} selected", "quitados": "{{n}} title(s) settled", "valorPago": "Amount paid", "baixaEmMovimentacao": "Settling and reversing happen in the Movements tab.",
+    "tit": { "numero": "Title no.", "identificacao": "Identification", "docNumero": "Document number", "emissao": "Issue date", "formaPagto": "Payment method", "semForma": "Not set", "apropriacao": "Allocation", "valores": "Amounts", "valorTitulo": "Title amount", "impostosRetidos": "Withheld taxes", "impostosAcrescidos": "Added taxes", "desconto": "Discount", "retencao": "Retention", "multa": "Penalty", "juros": "Interest", "valorLiquido": "Net amount", "emBreveImpostos": "Available in the taxes block (coming soon)", "observacao": "Notes", "detalhesPagto": "Payment details", "dataBaixa": "Settlement date", "darQuitado": "Settle ({{n}})", "selecionados": "{{n}} selected", "quitados": "{{n}} title(s) settled", "quitadosParcial": "{{ok}} of {{total}} title(s) settled; {{falhas}} failed", "valorPago": "Amount paid", "baixaEmMovimentacao": "Settling and reversing happen in the Movements tab.",
     "impostosAplicados": "Applied taxes", "semImpostoAplicado": "No tax applied to this title.", "escolherImposto": "Choose a tax from the register", "aplicarImposto": "Apply", "impostoAplicado": "Tax applied", "recolhimento": "generated remittance", "valorTravadoImposto": "Remove the applied taxes to edit the title amount",
     "geradoDe": "Tax title generated from title {{n}}", "gerou": "Generated tax title no. {{n}}", "badgeImposto": "tax", "pesquisePrompt": "Use the search and filters above, then click Search.", "rateadoN": "Split ({{n}})" },
     "forma": { "operacao_bancaria": "Bank operation", "pix": "Pix", "boleto": "Bank slip", "transferencia": "Transfer", "dinheiro": "Cash", "cheque": "Check", "cartao": "Card" },
@@ -2780,6 +2780,8 @@
     "FIN_CONTATO_NAME_REQUIRED": "Enter the name.",
     "FIN_CONTATO_NOT_FOUND": "Contact not found.",
     "FIN_CONTATO_EM_USO": "This contact has entries or charges and can't be deleted. Deactivate it instead.",
+    "FIN_CONTATO_DOC_DUP": "There's already an active contact with this CPF/CNPJ.",
+    "FIN_CATEGORY_CODIGO_LOCKED": "A class's code can't be changed after it's created.",
     "FIN_PARCELA_PAGO": "Only a pending title can be split.",
     "FIN_PARCELA_INVALIDO": "A generated title cannot be split.",
     "FIN_PARCELA_JA": "Title is already split.",

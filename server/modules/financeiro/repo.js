@@ -10,6 +10,7 @@ import { getCurrentCompanyId } from "../../context.js";
 import * as centrosGlobais from "../../admin/centrosCustoStore.js";
 import { normalizarTipoCategoria } from "./importCategorias.js";
 import { hojeCivilSP } from "../../timezone.js";
+import { normalizarDoc } from "../../doc.js";
 
 // "Hoje" em data civil YYYY-MM-DD, ancorado em America/Sao_Paulo (ver
 // server/timezone.js) - não no fuso do sistema operacional do servidor. Usado
@@ -32,8 +33,16 @@ export function getCategoria(id) {
   return getDb().prepare("SELECT * FROM financeiro_categorias WHERE id = ?").get(id) || null;
 }
 export function insertCategoria({ nome, tipo, codigo, grupoDre }) {
+  const db = getDb();
+  // Código vazio nunca dedupa (classe sem código de plano de contas é válida e
+  // pode repetir) - mesmo critério do import em lote (ver importarCategorias).
+  if (codigo && db.prepare("SELECT 1 FROM financeiro_categorias WHERE codigo = ?").get(codigo)) {
+    const err = new Error("Código já cadastrado.");
+    err.code = "FIN_CAT_DUPLICADO";
+    throw err;
+  }
   const id = uid();
-  getDb()
+  db
     .prepare("INSERT INTO financeiro_categorias (id, nome, tipo, codigo, grupo_dre, created_at) VALUES (?, ?, ?, ?, ?, ?)")
     .run(id, nome, tipo, codigo || "", grupoDre || null, new Date().toISOString());
   return getCategoria(id);
@@ -231,9 +240,11 @@ export function excluirCentroCusto(id) {
     try {
       getDb().prepare(`UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE centro_custo_id IN (${marcas})`).run(...ids);
       limparRateiosComCentros(ids);
-    } catch {
+    } catch (e) {
       // A empresa pode nunca ter aberto o Financeiro (sem tabela de lançamentos):
-      // não há referência a anular, segue.
+      // não há referência a anular, segue. Qualquer outra falha (disco,
+      // corrupção, bug futuro) é logada em vez de desaparecer em silêncio.
+      if (!String(e?.message).includes("no such table")) console.error("[financeiro/centros-custo] falha ao anular referência:", e);
     }
   }
   return { removidos: ids.length };
@@ -253,8 +264,10 @@ export function excluirTodosCentrosCusto() {
     getDb().prepare("UPDATE financeiro_lancamentos SET centro_custo_id = NULL WHERE centro_custo_id IS NOT NULL").run();
     // Sem nenhum centro sobrando, nenhum rateio pode continuar de pé.
     getDb().prepare("DELETE FROM financeiro_apropriacoes").run();
-  } catch {
+  } catch (e) {
     // Empresa sem Financeiro aberto: sem tabela de lançamentos, nada a anular.
+    // Qualquer outra falha é logada em vez de desaparecer em silêncio.
+    if (!String(e?.message).includes("no such table")) console.error("[financeiro/centros-custo] falha ao anular referência:", e);
   }
   return { removidos: ids.length };
 }
@@ -345,8 +358,23 @@ export function getContato(id) {
   return getDb().prepare("SELECT * FROM financeiro_contatos WHERE id = ?").get(id) || null;
 }
 export function insertContato({ nome, tipo, doc, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, pais, pontoReferencia }) {
+  const db = getDb();
+  // CPF/CNPJ vazio nunca dedupa (contato sem documento é válido e pode repetir).
+  // Comparação por dígitos normalizados: "12.345.678/0001-99" e "12345678000199"
+  // são o mesmo documento.
+  const docNorm = normalizarDoc(doc);
+  if (docNorm) {
+    const existente = db
+      .prepare("SELECT 1 FROM financeiro_contatos WHERE ativo = 1 AND REPLACE(REPLACE(REPLACE(doc, '.', ''), '/', ''), '-', '') = ?")
+      .get(docNorm);
+    if (existente) {
+      const err = new Error("Já existe um contato ativo com este CPF/CNPJ");
+      err.code = "FIN_CONTATO_DOC_DUP";
+      throw err;
+    }
+  }
   const id = uid();
-  getDb()
+  db
     .prepare(
       `INSERT INTO financeiro_contatos
          (id, nome, tipo, doc, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, pais, ponto_referencia, ativo, created_at)
@@ -857,13 +885,23 @@ export function deleteLancamento(id) {
       discardFinAttachmentFile(path.join(finAttachmentsUploadsDir(), anexo.id));
     }
   }
-  // ANTES dos títulos: apagar os impostos aplicados que os referenciam. A FK
-  // financeiro_lancamento_impostos.lancamento_id é NOT NULL e as FKs estão ON, então
-  // deletar o título com imposto aplicado sem limpar isto dá "constraint failed".
-  db.prepare(`DELETE FROM financeiro_lancamento_impostos WHERE lancamento_id IN (${marcas})`).run(...ids);
-  // Apropriações também referenciam o título (FK NOT NULL) - somem junto.
-  db.prepare(`DELETE FROM financeiro_apropriacoes WHERE lancamento_id IN (${marcas})`).run(...ids);
-  db.prepare(`DELETE FROM financeiro_lancamentos WHERE id IN (${marcas})`).run(...ids);
+  // As 3 exclusões andam juntas (mesmo padrão de definirApropriacoes): ou saem
+  // todas, ou nenhuma - sem isso, uma falha no meio deixaria o imposto aplicado
+  // apagado mas o título ainda de pé, por exemplo.
+  db.exec("BEGIN");
+  try {
+    // ANTES dos títulos: apagar os impostos aplicados que os referenciam. A FK
+    // financeiro_lancamento_impostos.lancamento_id é NOT NULL e as FKs estão ON, então
+    // deletar o título com imposto aplicado sem limpar isto dá "constraint failed".
+    db.prepare(`DELETE FROM financeiro_lancamento_impostos WHERE lancamento_id IN (${marcas})`).run(...ids);
+    // Apropriações também referenciam o título (FK NOT NULL) - somem junto.
+    db.prepare(`DELETE FROM financeiro_apropriacoes WHERE lancamento_id IN (${marcas})`).run(...ids);
+    db.prepare(`DELETE FROM financeiro_lancamentos WHERE id IN (${marcas})`).run(...ids);
+    db.exec("COMMIT");
+  } catch (e) {
+    db.exec("ROLLBACK");
+    throw e;
+  }
 }
 
 // ---------- Anexos de lançamento ----------

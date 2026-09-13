@@ -583,7 +583,7 @@
       }
     },
     "baixa": { "semConta": "Kein Konto", "confirmar": "Bestätigen" },
-    "tit": { "numero": "Titel-Nr.", "identificacao": "Identifikation", "docNumero": "Belegnummer", "emissao": "Ausstellung", "formaPagto": "Zahlungsart", "semForma": "Nicht angegeben", "apropriacao": "Zuordnung", "valores": "Beträge", "valorTitulo": "Titelbetrag", "impostosRetidos": "Einbehaltene Steuern", "impostosAcrescidos": "Hinzugefügte Steuern", "desconto": "Rabatt", "retencao": "Einbehalt", "multa": "Vertragsstrafe", "juros": "Zinsen", "valorLiquido": "Nettobetrag", "emBreveImpostos": "Im Steuerblock verfügbar (demnächst)", "observacao": "Anmerkung", "detalhesPagto": "Zahlungsdetails", "dataBaixa": "Datum der Begleichung", "darQuitado": "Begleichen ({{n}})", "selecionados": "{{n}} ausgewählt", "quitados": "{{n}} Titel beglichen", "valorPago": "Bezahlter Betrag", "baixaEmMovimentacao": "Begleichung und Stornierung erfolgen im Tab Bewegung.",
+    "tit": { "numero": "Titel-Nr.", "identificacao": "Identifikation", "docNumero": "Belegnummer", "emissao": "Ausstellung", "formaPagto": "Zahlungsart", "semForma": "Nicht angegeben", "apropriacao": "Zuordnung", "valores": "Beträge", "valorTitulo": "Titelbetrag", "impostosRetidos": "Einbehaltene Steuern", "impostosAcrescidos": "Hinzugefügte Steuern", "desconto": "Rabatt", "retencao": "Einbehalt", "multa": "Vertragsstrafe", "juros": "Zinsen", "valorLiquido": "Nettobetrag", "emBreveImpostos": "Im Steuerblock verfügbar (demnächst)", "observacao": "Anmerkung", "detalhesPagto": "Zahlungsdetails", "dataBaixa": "Datum der Begleichung", "darQuitado": "Begleichen ({{n}})", "selecionados": "{{n}} ausgewählt", "quitados": "{{n}} Titel beglichen", "quitadosParcial": "{{ok}} von {{total}} Titel beglichen; {{falhas}} fehlgeschlagen", "valorPago": "Bezahlter Betrag", "baixaEmMovimentacao": "Begleichung und Stornierung erfolgen im Tab Bewegung.",
     "impostosAplicados": "Angewendete Steuern", "semImpostoAplicado": "Keine Steuer auf diesen Titel angewendet.", "escolherImposto": "Wählen Sie eine Steuer aus den Stammdaten", "aplicarImposto": "Anwenden", "impostoAplicado": "Steuer angewendet", "recolhimento": "erzeugte Abführung", "valorTravadoImposto": "Entfernen Sie die angewendeten Steuern, um den Titelbetrag zu bearbeiten",
     "geradoDe": "Steuertitel erstellt aus Titel {{n}}", "gerou": "Steuertitel Nr. {{n}} erstellt", "badgeImposto": "Steuer", "pesquisePrompt": "Nutzen Sie die Suche und Filter oben und klicken Sie auf Suchen.", "rateadoN": "Aufgeteilt ({{n}})" },
     "forma": { "operacao_bancaria": "Bankgeschäft", "pix": "Pix", "boleto": "Zahlschein", "transferencia": "Überweisung", "dinheiro": "Bargeld", "cheque": "Scheck", "cartao": "Karte" },
@@ -2439,6 +2439,8 @@
     "FIN_CONTATO_NAME_REQUIRED": "Geben Sie den Namen an.",
     "FIN_CONTATO_NOT_FOUND": "Kontakt nicht gefunden.",
     "FIN_CONTATO_EM_USO": "Dieser Kontakt hat Buchungen oder Rechnungen und kann nicht gelöscht werden. Deaktivieren Sie ihn stattdessen.",
+    "FIN_CONTATO_DOC_DUP": "Es gibt bereits einen aktiven Kontakt mit dieser CPF/CNPJ.",
+    "FIN_CATEGORY_CODIGO_LOCKED": "Der Code der Klasse kann nach dem Erstellen nicht mehr geändert werden.",
     "FIN_PARCELA_PAGO": "Nur ein ausstehender Titel kann aufgeteilt werden.",
     "FIN_PARCELA_INVALIDO": "Ein erstellter Titel kann nicht aufgeteilt werden.",
     "FIN_PARCELA_JA": "Titel ist bereits in Raten aufgeteilt.",

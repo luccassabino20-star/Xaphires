@@ -45,9 +45,10 @@ export function applyCobrancaSchema(companyDb) {
       lancamento_id TEXT REFERENCES financeiro_lancamentos(id),
       paid_at TEXT,
       canceled_at TEXT,
-      -- Último estágio da régua já mostrado/enviado manualmente (ver
-      -- cobrancaEngine.estagio) - guardado só para o histórico da linha, não
-      -- para decidir envio automático (não existe: ver CLAUDE.md/regua).
+      -- Último estágio da régua já mostrado/enviado (ver cobrancaEngine.estagio)
+      -- - guardado para o histórico da linha e também consultado pelo cron de
+      -- disparo automático (server/jobs/billingCron.js) para não reenviar o
+      -- mesmo estágio duas vezes.
       lembrete_estagio TEXT,
       lembrete_em TEXT,
       created_at TEXT NOT NULL,
@@ -91,9 +92,10 @@ export function applyCobrancaSchema(companyDb) {
     );
 
     -- Uma linha por empresa (id fixo 'default'). As mensagens são templates com
-    -- placeholders {{nome}}/{{valor}}/{{vencimento}}/{{link}}, resolvidos na
-    -- hora de montar o link de WhatsApp (ver cobrancaEngine.montarMensagem) -
-    -- nunca enviados sozinhos, só usados quando alguém clica "Enviar WhatsApp".
+    -- placeholders {{nome}}/{{valor}}/{{vencimento}}/{{link}}, resolvidos tanto
+    -- na hora de montar o link de WhatsApp manual (cobrancaEngine.montarMensagem,
+    -- quando alguém clica "Enviar WhatsApp") quanto pelo disparo automático do
+    -- cron (server/jobs/billingCron.js, que reusa a mesma função).
     CREATE TABLE IF NOT EXISTS financeiro_regua_config (
       id TEXT PRIMARY KEY,
       dias_antes_vencimento INTEGER NOT NULL DEFAULT 3,

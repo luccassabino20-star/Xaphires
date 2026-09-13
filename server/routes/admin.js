@@ -928,9 +928,13 @@ router.patch(
   ah(async (req, res) => {
     const atual = centrosStore.acharCentro(req.params.id);
     if (!atual) return res.status(404).json({ error: "Centro de custo não encontrado", code: "CC_NOT_FOUND" });
+    // Auditoria registrada antes da escrita, não depois: centros_custo é tabela
+    // global (fora de comAcessoAEmpresa/runWithCompany), então essa ordem é o
+    // que impede um crash entre a mutação e o log de deixar a alteração sem
+    // rastro - mesmo espírito do comAcessoAEmpresa, aplicado na mão aqui.
+    auditar(req, "centro_custo_editar", { companyId: atual.company_id, alvo: atual.codigo, detalhe: { nome: req.body?.nome } });
     const r = tratarRegra(res, () => centrosStore.editarCentro(req.params.id, { nome: req.body?.nome }));
     if (!r.ok) return;
-    auditar(req, "centro_custo_editar", { companyId: atual.company_id, alvo: atual.codigo, detalhe: { nome: r.valor.nome } });
     res.json({ centro: r.valor });
   })
 );
@@ -941,9 +945,9 @@ router.post(
     const atual = centrosStore.acharCentro(req.params.id);
     if (!atual) return res.status(404).json({ error: "Centro de custo não encontrado", code: "CC_NOT_FOUND" });
     const ativo = req.body?.ativo === true;
+    auditar(req, ativo ? "centro_custo_reativar" : "centro_custo_desativar", { companyId: atual.company_id, alvo: atual.codigo });
     const r = tratarRegra(res, () => centrosStore.definirAtivo(req.params.id, ativo));
     if (!r.ok) return;
-    auditar(req, ativo ? "centro_custo_reativar" : "centro_custo_desativar", { companyId: atual.company_id, alvo: atual.codigo });
     res.json({ centro: r.valor });
   })
 );

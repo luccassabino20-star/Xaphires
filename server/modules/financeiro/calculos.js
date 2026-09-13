@@ -447,7 +447,7 @@ export function montarDreCascata(de, ate, { centroCustoId, contaId } = {}) {
   }
   const g = (chave) => porGrupo.get(chave) || 0;
 
-  return {
+  const totais = {
     de,
     ate,
     receitaProdutos: g("receita_produtos"),
@@ -462,4 +462,26 @@ export function montarDreCascata(de, ate, { centroCustoId, contaId } = {}) {
     receitaFinanceira: g("receita_financeira"),
     despesaFinanceira: g("despesa_financeira"),
   };
+  return { ...totais, ...derivarCascataDre(totais) };
+}
+
+// Fonte única da fórmula da cascata (Receita Bruta -> ... -> Lucro Líquido).
+// Antes disso, o cliente (DREView.calcularDerivados) e a exportação
+// (dreExport.montarLinhasDreCascata) reimplementavam a mesma conta cada um por
+// conta própria a partir dos totais brutos - os dois sempre bateram até aqui,
+// mas nada impedia uma dessas cópias mudar sozinha no futuro e os dois
+// discordarem pro mesmo período. Calculando aqui uma vez só e devolvendo os
+// subtotais prontos no payload de /dre/cascata, a exportação (que já roda no
+// servidor) para de recalcular, e o cliente (calcularDerivados) fica só como
+// uma cópia de exibição que também deveria ser removida quando o payload
+// novo chegar - ver DREView.jsx.
+export function derivarCascataDre(totais) {
+  const receitaBruta = totais.receitaProdutos + totais.receitaServicos + totais.receitaOutras;
+  const receitaLiquida = receitaBruta - totais.impostosSobreVendas;
+  const lucroBruto = receitaLiquida - totais.cpv;
+  const despesasOperacionais = totais.despesaPessoal + totais.despesaAdministrativa + totais.despesaComercial + totais.despesaOutrasOperacionais;
+  const ebitda = lucroBruto - despesasOperacionais;
+  const resultadoFinanceiro = totais.receitaFinanceira - totais.despesaFinanceira;
+  const lucroLiquido = ebitda + resultadoFinanceiro;
+  return { receitaBruta, receitaLiquida, lucroBruto, despesasOperacionais, ebitda, resultadoFinanceiro, lucroLiquido };
 }

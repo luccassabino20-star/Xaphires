@@ -583,7 +583,7 @@
       }
     },
     "baixa": { "semConta": "Sans compte", "confirmar": "Confirmer" },
-    "tit": { "numero": "N° du titre", "identificacao": "Identification", "docNumero": "Numéro du document", "emissao": "Émission", "formaPagto": "Mode de paiement", "semForma": "Non renseigné", "apropriacao": "Répartition", "valores": "Montants", "valorTitulo": "Montant du titre", "impostosRetidos": "Taxes retenues", "impostosAcrescidos": "Taxes ajoutées", "desconto": "Remise", "retencao": "Retenue", "multa": "Pénalité", "juros": "Intérêts", "valorLiquido": "Montant net", "emBreveImpostos": "Disponible dans le bloc des taxes (bientôt)", "observacao": "Remarque", "detalhesPagto": "Détails du paiement", "dataBaixa": "Date du règlement", "darQuitado": "Régler ({{n}})", "selecionados": "{{n}} sélectionné(s)", "quitados": "{{n}} titre(s) réglé(s)", "valorPago": "Montant payé", "baixaEmMovimentacao": "Le règlement et l'annulation se font dans l'onglet Mouvements.",
+    "tit": { "numero": "N° du titre", "identificacao": "Identification", "docNumero": "Numéro du document", "emissao": "Émission", "formaPagto": "Mode de paiement", "semForma": "Non renseigné", "apropriacao": "Répartition", "valores": "Montants", "valorTitulo": "Montant du titre", "impostosRetidos": "Taxes retenues", "impostosAcrescidos": "Taxes ajoutées", "desconto": "Remise", "retencao": "Retenue", "multa": "Pénalité", "juros": "Intérêts", "valorLiquido": "Montant net", "emBreveImpostos": "Disponible dans le bloc des taxes (bientôt)", "observacao": "Remarque", "detalhesPagto": "Détails du paiement", "dataBaixa": "Date du règlement", "darQuitado": "Régler ({{n}})", "selecionados": "{{n}} sélectionné(s)", "quitados": "{{n}} titre(s) réglé(s)", "quitadosParcial": "{{ok}} sur {{total}} titre(s) réglé(s) ; {{falhas}} échoué(s)", "valorPago": "Montant payé", "baixaEmMovimentacao": "Le règlement et l'annulation se font dans l'onglet Mouvements.",
     "impostosAplicados": "Taxes appliquées", "semImpostoAplicado": "Aucune taxe appliquée à ce titre.", "escolherImposto": "Choisissez une taxe dans le registre", "aplicarImposto": "Appliquer", "impostoAplicado": "Taxe appliquée", "recolhimento": "a généré un versement", "valorTravadoImposto": "Retirez les taxes appliquées pour modifier le montant du titre",
     "geradoDe": "Titre de taxe généré à partir du titre {{n}}", "gerou": "A généré le titre de taxe n° {{n}}", "badgeImposto": "taxe", "pesquisePrompt": "Utilisez la recherche et les filtres ci-dessus, puis cliquez sur Rechercher.", "rateadoN": "Réparti ({{n}})" },
     "forma": { "operacao_bancaria": "Opération bancaire", "pix": "Pix", "boleto": "Bordereau", "transferencia": "Virement", "dinheiro": "Espèces", "cheque": "Chèque", "cartao": "Carte" },
@@ -2613,6 +2613,8 @@
     "FIN_CONTATO_NAME_REQUIRED": "Indiquez le nom.",
     "FIN_CONTATO_NOT_FOUND": "Contact introuvable.",
     "FIN_CONTATO_EM_USO": "Ce contact a des écritures ou des factures et ne peut pas être supprimé. Désactivez-le plutôt.",
+    "FIN_CONTATO_DOC_DUP": "Un contact actif avec ce CPF/CNPJ existe déjà.",
+    "FIN_CATEGORY_CODIGO_LOCKED": "Le code de la classe ne peut pas être modifié après sa création.",
     "FIN_PARCELA_PAGO": "Seul un titre en attente peut être réparti en échéances.",
     "FIN_PARCELA_INVALIDO": "Un titre généré ne peut pas être réparti en échéances.",
     "FIN_PARCELA_JA": "Le titre est déjà réparti en échéances.",

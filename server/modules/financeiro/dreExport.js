@@ -96,16 +96,12 @@ function rotulos(idioma) {
 
 // Monta a lista achatada, na ordem de leitura da cascata - fonte única de
 // "o que soma/subtrai" pros 3 formatos de export. `totais` é o que
-// calculos.montarDreCascata devolve (grupos brutos, sempre positivos).
+// calculos.montarDreCascata devolve: grupos brutos MAIS os subtotais já
+// derivados por calculos.derivarCascataDre - não recalcula a fórmula aqui, só
+// lê o que já veio pronto (evita a mesma conta reimplementada duas vezes).
 export function montarLinhasDreCascata(totais, idioma) {
   const t = rotulos(idioma);
-  const receitaBruta = totais.receitaProdutos + totais.receitaServicos + totais.receitaOutras;
-  const receitaLiquida = receitaBruta - totais.impostosSobreVendas;
-  const lucroBruto = receitaLiquida - totais.cpv;
-  const despesasOperacionais = totais.despesaPessoal + totais.despesaAdministrativa + totais.despesaComercial + totais.despesaOutrasOperacionais;
-  const ebitda = lucroBruto - despesasOperacionais;
-  const resultadoFinanceiro = totais.receitaFinanceira - totais.despesaFinanceira;
-  const lucroLiquido = ebitda + resultadoFinanceiro;
+  const { receitaBruta, receitaLiquida, lucroBruto, despesasOperacionais, ebitda, resultadoFinanceiro, lucroLiquido } = totais;
 
   const av = (v) => pct(v, receitaBruta);
   const L = (chave, valor, nivel, tipo) => ({ label: t[chave], valor, av: av(valor), nivel, tipo });
