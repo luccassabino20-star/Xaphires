@@ -186,9 +186,13 @@ export function getOrCreateTimesheet(userId, startDate, endDate) {
   return getDb().prepare("SELECT * FROM tt_timesheets WHERE id = ?").get(id);
 }
 export function submitTimesheet(id, userId) {
-  getDb()
+  const r = getDb()
     .prepare("UPDATE tt_timesheets SET status = 'submitted', submitted_at = ? WHERE id = ? AND user_id = ? AND status IN ('draft','rejected')")
     .run(nowIso(), id, userId);
+  // changes === 0 cobre tanto "id de outro usuário" quanto "id inexistente" -
+  // sem isso, o SELECT abaixo (sem WHERE user_id) devolvia a timesheet de
+  // outra pessoa mesmo o UPDATE não tendo alterado nada.
+  if (r.changes === 0) return null;
   return getDb().prepare("SELECT * FROM tt_timesheets WHERE id = ?").get(id);
 }
 export function reviewTimesheet(id, decision, reviewerId) {

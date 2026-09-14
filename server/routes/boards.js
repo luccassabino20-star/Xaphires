@@ -33,13 +33,25 @@ router.get(
     // Empresa sem direito à automação não é varrida, mesmo que tenha a regra
     // gravada de quando estava num plano superior.
     const plano = getCompany(req.companyId)?.plan;
+    // Mesmo cuidado de varrerCobranca logo abaixo: uma exceção aqui não pode
+    // derrubar a ÚNICA rota de leitura do workspace inteiro - sem o try/catch,
+    // um dado de regra inesperado tirava a empresa inteira do ar (ninguém
+    // carrega quadro nenhum) até alguém corrigir o dado ou fazer rollback.
     if (canUseAutoArchive(plano)) {
-      await repo.runAutoArchive();
+      try {
+        await repo.runAutoArchive();
+      } catch (err) {
+        console.error("[quadro] arquivamento automático falhou:", err.message);
+      }
     }
     // As rotinas geram antes da leitura pelo mesmo motivo: o quadro que volta já
     // contém os cartões do dia, sem exigir um segundo carregamento.
     if (canUseRecurringCards(plano)) {
-      await repo.runRecurrences();
+      try {
+        await repo.runRecurrences();
+      } catch (err) {
+        console.error("[quadro] rotinas automáticas falharam:", err.message);
+      }
     }
     // Renovação, tentativa de cartão e carência. Aqui pelo mesmo motivo das duas
     // acima: o projeto não tem agendador, e abrir o quadro é o momento em que se

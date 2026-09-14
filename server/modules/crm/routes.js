@@ -72,12 +72,15 @@ router.get(
 router.post(
   "/opportunities",
   ah(async (req, res) => {
-    const { title, contactId, contactName } = req.body || {};
+    const { title, contactId, contactName, valueCents } = req.body || {};
     if (!title || !title.trim()) {
       return res.status(400).json({ error: "Informe o título da oportunidade", code: "CRM_OPPORTUNITY_TITLE_REQUIRED" });
     }
     if (!contactId && (!contactName || !contactName.trim())) {
       return res.status(400).json({ error: "Informe o contato", code: "CRM_CONTACT_REQUIRED" });
+    }
+    if (valueCents !== undefined && (!Number.isInteger(valueCents) || valueCents < 0)) {
+      return res.status(400).json({ error: "Valor inválido", code: "CRM_VALUE_INVALID" });
     }
     seedStagesSeVazio();
     try {
@@ -93,6 +96,10 @@ router.post(
 router.patch(
   "/opportunities/:id",
   ah(async (req, res) => {
+    const { valueCents } = req.body || {};
+    if (valueCents !== undefined && (!Number.isInteger(valueCents) || valueCents < 0)) {
+      return res.status(400).json({ error: "Valor inválido", code: "CRM_VALUE_INVALID" });
+    }
     const atualizada = atualizarOportunidade(req.params.id, req.body || {});
     if (!atualizada) return res.status(404).json({ error: "Oportunidade não encontrada", code: "CRM_OPPORTUNITY_NOT_FOUND" });
     res.json(atualizada);

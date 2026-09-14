@@ -5,6 +5,7 @@
 // (companyId/templateId estão DENTRO do banco da empresa, que só dá pra
 // abrir depois de já saber a empresa - problema de ovo e galinha que só o
 // banco global resolve).
+import crypto from "node:crypto";
 import { getDirectoryDb } from "../../directory.js";
 
 const db = getDirectoryDb();
@@ -24,9 +25,13 @@ db.exec(`
 // alfabeto (54^8, ~7.8×10^13 combinações) torna colisão praticamente
 // impossível mesmo sem checagem além do UNIQUE da própria coluna.
 const ALFABETO = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+// crypto.randomBytes, não Math.random(): mesmo o link sendo público por
+// natureza (pensado pra cartaz/bio), o gerador não deveria ter resistência
+// zero a adivinhação intencional - Math.random() não é CSPRNG.
 function gerarSlug() {
+  const bytes = crypto.randomBytes(8);
   let s = "";
-  for (let i = 0; i < 8; i++) s += ALFABETO[Math.floor(Math.random() * ALFABETO.length)];
+  for (let i = 0; i < 8; i++) s += ALFABETO[bytes[i] % ALFABETO.length];
   return s;
 }
 

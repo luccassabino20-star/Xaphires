@@ -88,6 +88,11 @@ export function criarOportunidade({ contactId, contactName, contactPhone, contac
   if (!idContato) {
     if (!contactName) throw Object.assign(new Error("Informe o contato"), { code: "CRM_CONTACT_REQUIRED" });
     idContato = insertContact({ name: contactName, phone: contactPhone, email: contactEmail }, userId).id;
+  } else if (!getContact(idContato)) {
+    // Sem esta checagem, um contactId inexistente estourava a FK do INSERT
+    // abaixo como exceção crua do SQLite (500 genérico) em vez de um erro
+    // tratável - o catch da rota já sabe traduzir err.code para 400.
+    throw Object.assign(new Error("Contato não encontrado"), { code: "CRM_CONTACT_NOT_FOUND" });
   }
   const estagio = primeiroEstagio();
   if (!estagio) throw Object.assign(new Error("Funil sem estágios"), { code: "CRM_NO_STAGES" });

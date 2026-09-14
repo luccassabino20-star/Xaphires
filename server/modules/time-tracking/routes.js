@@ -117,7 +117,11 @@ router.get(
 
 router.patch(
   "/timesheets/:id/submit",
-  ah(async (req, res) => res.json(repo.submitTimesheet(req.params.id, req.user.id)))
+  ah(async (req, res) => {
+    const ts = repo.submitTimesheet(req.params.id, req.user.id);
+    if (!ts) return res.status(404).json({ error: "Folha não encontrada ou já processada", code: "TT_TIMESHEET_NOT_FOUND" });
+    res.json(ts);
+  })
 );
 
 // Aprovações: decisão é só do master - mesmo padrão de administração
